@@ -17,7 +17,7 @@
 package controllers.businessdetails
 
 import connectors.DataCacheConnector
-import models.aboutthebusiness._
+import models.businessdetails._
 import models.{Country, DateOfChange}
 import org.joda.time.LocalDate
 import org.mockito.ArgumentCaptor

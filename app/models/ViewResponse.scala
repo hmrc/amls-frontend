@@ -16,7 +16,7 @@
 
 package models
 
-import models.aboutthebusiness.AboutTheBusiness
+import models.businessdetails.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities

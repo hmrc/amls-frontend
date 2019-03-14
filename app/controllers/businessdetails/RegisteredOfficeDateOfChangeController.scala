@@ -21,7 +21,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
 import models.DateOfChange
-import models.aboutthebusiness.{AboutTheBusiness, RegisteredOfficeNonUK, RegisteredOfficeUK}
+import models.businessdetails.{AboutTheBusiness, RegisteredOfficeNonUK, RegisteredOfficeUK}
 import org.joda.time.LocalDate
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector

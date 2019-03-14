@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models.aboutthebusiness
+package models.businessdetails
 
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded

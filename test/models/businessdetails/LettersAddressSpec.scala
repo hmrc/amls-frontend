@@ -14,64 +14,67 @@
  * limitations under the License.
  */
 
-package models.aboutthebusiness
+package models.businessdetails
 
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.{Path, ValidationError}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 
-class ContactingYouEmailSpec extends PlaySpec with MockitoSugar {
-  "ContactingYouEmailSpec" must {
+class LettersAddressSpec extends PlaySpec with MockitoSugar {
+  "LettersAddressSpec" must {
 
     "successfully validate" when {
-      "given a 'matchinig emails" in {
+      "given a 'true' value" in {
 
         val data = Map(
-          "email" -> Seq("test@test.com"),
-          "confirmEmail" -> Seq("test@test.com")
-
+          "lettersAddress" -> Seq("true")
         )
 
-        ContactingYouEmail.formRule.validate(data) must
-          be(Valid(ContactingYouEmail("test@test.com","test@test.com")))
+        LettersAddress.formRule.validate(data) must
+          be(Valid(LettersAddress(true)))
       }
 
+      "given a 'false' value" in {
+
+        val data = Map(
+          "lettersAddress" -> Seq("false")
+        )
+
+        LettersAddress.formRule.validate(data) must
+          be(Valid(LettersAddress(false)))
+      }
     }
 
     "fail validation" when {
       "given missing data represented by an empty Map" in {
 
-        ContactingYouEmail.formRule.validate(Map.empty) must
+        LettersAddress.formRule.validate(Map.empty) must
           be(Invalid(Seq(
-            (Path \ "email") -> Seq(ValidationError("error.required")),
-            (Path \ "confirmEmail") -> Seq(ValidationError("error.required"))
+            (Path \ "lettersAddress") -> Seq(ValidationError("error.required.atb.lettersaddress"))
           )))
       }
 
       "given missing data represented by an empty string" in {
 
         val data = Map(
-          "email" -> Seq(""),
-          "confirmEmail" -> Seq("")
+          "lettersAddress" -> Seq("")
         )
 
-        ContactingYouEmail.formRule.validate(data) must
+        LettersAddress.formRule.validate(data) must
           be(Invalid(Seq(
-            (Path \ "email") -> Seq(ValidationError("error.required.rp.email")),
-            (Path \ "confirmEmail") -> Seq(ValidationError("error.invalid.rp.email"))
+            (Path \ "lettersAddress") -> Seq(ValidationError("error.required.atb.lettersaddress"))
           )))
       }
     }
 
     "write correct data" in {
 
-      val model = ContactingYouEmail("test@test.com","test@test.com")
+      val model = LettersAddress(true)
 
-      ContactingYouEmail.formWrites.writes(model) must
+      LettersAddress.formWrites.writes(model) must
         be(Map(
-          "email" -> Seq("test@test.com"),
-          "confirmEmail" -> Seq("test@test.com")
+          "lettersAddress" -> Seq("true")
         ))
     }
   }

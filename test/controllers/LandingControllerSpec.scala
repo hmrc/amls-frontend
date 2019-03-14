@@ -21,7 +21,7 @@ import java.net.URLEncoder
 import config.ApplicationConfig
 import connectors.{DataCacheConnector, KeystoreConnector}
 import generators.StatusGenerator
-import models.aboutthebusiness.AboutTheBusiness
+import models.businessdetails.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities

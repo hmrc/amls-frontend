@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models.aboutthebusiness
+package models.businessdetails
 
 import models.{Country, DateOfChange}
 import models.FormTypes._

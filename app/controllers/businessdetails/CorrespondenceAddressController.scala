@@ -24,7 +24,7 @@ import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
-import models.aboutthebusiness.{AboutTheBusiness, CorrespondenceAddress, UKCorrespondenceAddress}
+import models.businessdetails.{AboutTheBusiness, CorrespondenceAddress, UKCorrespondenceAddress}
 import play.api.mvc.Request
 import services.AutoCompleteService
 import uk.gov.hmrc.http.HeaderCarrier

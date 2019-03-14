@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.aboutthebusiness.AboutTheBusiness
+import models.businessdetails.AboutTheBusiness
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector

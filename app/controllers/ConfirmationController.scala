@@ -23,7 +23,7 @@ import config.AMLSAuthConnector
 import connectors.{AmlsConnector, DataCacheConnector, KeystoreConnector, PayApiConnector, _}
 import javax.inject.{Inject, Singleton}
 import models.ResponseType.AmendOrVariationResponseType
-import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegisteredYes}
+import models.businessdetails.{AboutTheBusiness, PreviouslyRegisteredYes}
 import models.confirmation.{BreakdownRow, Currency}
 import models.payments._
 import models.renewal.Renewal

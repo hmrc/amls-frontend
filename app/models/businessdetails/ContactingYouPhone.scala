@@ -14,28 +14,29 @@
  * limitations under the License.
  */
 
-package models.aboutthebusiness
+package models.businessdetails
 
-import jto.validation.forms._
+import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, Write}
 import play.api.libs.json.Json
 
-case class ConfirmRegisteredOffice(isRegOfficeOrMainPlaceOfBusiness: Boolean)
+case class ContactingYouPhone(phoneNumber: String)
 
-object ConfirmRegisteredOffice {
+object ContactingYouPhone {
 
-  implicit val formats = Json.format[ConfirmRegisteredOffice]
+  implicit val formats = Json.format[ContactingYouPhone]
   import utils.MappingUtils.Implicits._
 
-  implicit val formRule: Rule[UrlFormEncoded, ConfirmRegisteredOffice] =
-    From[UrlFormEncoded] { __ =>
-      import jto.validation.forms.Rules._
-      (__ \ "isRegOfficeOrMainPlaceOfBusiness").read[Boolean].withMessage("error.required.atb.confirm.office") map ConfirmRegisteredOffice.apply
-    }
+  implicit val formRule: Rule[UrlFormEncoded, ContactingYouPhone] =
+  From[UrlFormEncoded] { __ =>
+    import models.FormTypes._
+    import jto.validation.forms.Rules._
+      (__ \ "phoneNumber").read(phoneNumberType) map ContactingYouPhone.apply
+  }
 
-  implicit val formWrites: Write[ConfirmRegisteredOffice, UrlFormEncoded] =
+  implicit val formWrites: Write[ContactingYouPhone, UrlFormEncoded] =
     Write {
-      case ConfirmRegisteredOffice(b) =>
-        Map("isRegOfficeOrMainPlaceOfBusiness" -> Seq(b.toString))
+      case ContactingYouPhone(b) =>
+        Map("phoneNumber" -> Seq(b.toString))
     }
 }

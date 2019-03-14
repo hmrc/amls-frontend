@@ -19,7 +19,7 @@ package controllers.businessdetails
 import java.util.UUID
 
 import connectors.DataCacheConnector
-import models.aboutthebusiness.{AboutTheBusiness, ContactingYou}
+import models.businessdetails.{AboutTheBusiness, ContactingYou}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach

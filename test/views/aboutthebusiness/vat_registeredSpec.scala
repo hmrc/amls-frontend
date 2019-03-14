@@ -17,7 +17,7 @@
 package views.aboutthebusiness
 
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.aboutthebusiness.{VATRegistered, VATRegisteredYes}
+import models.businessdetails.{VATRegistered, VATRegisteredYes}
 import org.scalatest.MustMatchers
 import utils.AmlsSpec
 import jto.validation.Path

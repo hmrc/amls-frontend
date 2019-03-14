@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models.aboutthebusiness
+package models.businessdetails
 
 import org.joda.time.{DateTimeFieldType, LocalDate}
 import jto.validation.{To, Write, From, Rule}

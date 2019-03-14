@@ -18,7 +18,7 @@ package controllers.businessdetails
 
 import connectors.{BusinessMatchingConnector, DataCacheConnector}
 import models.Country
-import models.aboutthebusiness.{AboutTheBusiness, CorporationTaxRegisteredYes}
+import models.businessdetails.{AboutTheBusiness, CorporationTaxRegisteredYes}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.{LimitedCompany, SoleProprietor, UnincorporatedBody}

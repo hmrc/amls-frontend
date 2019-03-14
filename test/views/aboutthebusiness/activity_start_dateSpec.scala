@@ -18,7 +18,7 @@ package views.aboutthebusiness
 
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.aboutthebusiness.ActivityStartDate
+import models.businessdetails.ActivityStartDate
 import org.joda.time.LocalDate
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages

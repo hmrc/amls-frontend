@@ -18,7 +18,7 @@ package controllers.hvd
 
 import connectors.DataCacheConnector
 import models.DateOfChange
-import models.aboutthebusiness.{AboutTheBusiness, ActivityStartDate}
+import models.businessdetails.{AboutTheBusiness, ActivityStartDate}
 import models.hvd.Hvd
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}

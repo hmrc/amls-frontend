@@ -18,7 +18,7 @@ package views.aboutthebusiness
 
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.aboutthebusiness.{PreviouslyRegistered, PreviouslyRegisteredYes}
+import models.businessdetails.{PreviouslyRegistered, PreviouslyRegisteredYes}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec

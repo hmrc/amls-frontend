@@ -19,7 +19,7 @@ package controllers.businessdetails
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.Country
-import models.aboutthebusiness.AboutTheBusiness
+import models.businessdetails.AboutTheBusiness
 import models.businessactivities.BusinessActivities
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}

@@ -19,7 +19,7 @@ package services
 import config.ApplicationConfig
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
-import models.aboutthebusiness.AboutTheBusiness
+import models.businessdetails.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities

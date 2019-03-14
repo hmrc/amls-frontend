@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models.aboutthebusiness
+package models.businessdetails
 
 import cats.data.Validated.{Invalid, Valid}
 import models.Country

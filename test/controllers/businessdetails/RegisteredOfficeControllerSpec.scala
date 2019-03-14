@@ -17,7 +17,7 @@
 package controllers.businessdetails
 
 import connectors.DataCacheConnector
-import models.aboutthebusiness._
+import models.businessdetails._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}

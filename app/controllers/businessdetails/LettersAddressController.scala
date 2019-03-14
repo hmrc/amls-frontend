@@ -18,7 +18,7 @@ package controllers.businessdetails
 
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.aboutthebusiness.{AboutTheBusiness, LettersAddress, RegisteredOffice}
+import models.businessdetails.{AboutTheBusiness, LettersAddress, RegisteredOffice}
 import views.html.aboutthebusiness._
 import play.api.mvc.Result
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}

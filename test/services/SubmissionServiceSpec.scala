@@ -22,7 +22,7 @@ import exceptions.{DuplicateSubscriptionException, NoEnrolmentException}
 import generators.ResponsiblePersonGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models._
-import models.aboutthebusiness.{AboutTheBusiness, RegisteredOfficeUK}
+import models.businessdetails.{AboutTheBusiness, RegisteredOfficeUK}
 import models.bankdetails.BankDetails
 import models.businessactivities.{BusinessActivities => BusActivities}
 import models.businesscustomer.ReviewDetails

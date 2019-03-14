@@ -16,7 +16,7 @@
 
 package controllers.asp
 
-import models.aboutthebusiness.{AboutTheBusiness, ActivityStartDate}
+import models.businessdetails.{AboutTheBusiness, ActivityStartDate}
 import models.asp._
 import org.joda.time.LocalDate
 import org.mockito.Matchers._

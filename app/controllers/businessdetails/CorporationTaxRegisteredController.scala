@@ -22,7 +22,7 @@ import com.google.inject.Inject
 import connectors.{BusinessMatchingConnector, DataCacheConnector}
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.aboutthebusiness.{AboutTheBusiness, CorporationTaxRegistered, CorporationTaxRegisteredYes}
+import models.businessdetails.{AboutTheBusiness, CorporationTaxRegistered, CorporationTaxRegisteredYes}
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany}
 import play.api.mvc.{Request, Result}

@@ -14,67 +14,68 @@
  * limitations under the License.
  */
 
-package models.aboutthebusiness
+package models.businessdetails
 
 import cats.data.Validated.{Invalid, Valid}
-import jto.validation.{Path, ValidationError}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import jto.validation.Path
+import jto.validation.ValidationError
 
-class LettersAddressSpec extends PlaySpec with MockitoSugar {
-  "LettersAddressSpec" must {
+class ConfirmRegisteredOfficeSpec extends PlaySpec with MockitoSugar {
+  "RegOfficeOrMainPlaceOfBusiness" must {
 
     "successfully validate" when {
       "given a 'true' value" in {
 
         val data = Map(
-          "lettersAddress" -> Seq("true")
+          "isRegOfficeOrMainPlaceOfBusiness" -> Seq("true")
         )
 
-        LettersAddress.formRule.validate(data) must
-          be(Valid(LettersAddress(true)))
+        ConfirmRegisteredOffice.formRule.validate(data) must
+          be(Valid(ConfirmRegisteredOffice(true)))
       }
 
       "given a 'false' value" in {
 
         val data = Map(
-          "lettersAddress" -> Seq("false")
+          "isRegOfficeOrMainPlaceOfBusiness" -> Seq("false")
         )
 
-        LettersAddress.formRule.validate(data) must
-          be(Valid(LettersAddress(false)))
+        ConfirmRegisteredOffice.formRule.validate(data) must
+          be(Valid(ConfirmRegisteredOffice(false)))
       }
     }
 
     "fail validation" when {
       "given missing data represented by an empty Map" in {
 
-        LettersAddress.formRule.validate(Map.empty) must
+        ConfirmRegisteredOffice.formRule.validate(Map.empty) must
           be(Invalid(Seq(
-            (Path \ "lettersAddress") -> Seq(ValidationError("error.required.atb.lettersaddress"))
+            (Path \ "isRegOfficeOrMainPlaceOfBusiness") -> Seq(ValidationError("error.required.atb.confirm.office"))
           )))
       }
 
       "given missing data represented by an empty string" in {
 
         val data = Map(
-          "lettersAddress" -> Seq("")
+          "isRegOfficeOrMainPlaceOfBusiness" -> Seq("")
         )
 
-        LettersAddress.formRule.validate(data) must
+        ConfirmRegisteredOffice.formRule.validate(data) must
           be(Invalid(Seq(
-            (Path \ "lettersAddress") -> Seq(ValidationError("error.required.atb.lettersaddress"))
+            (Path \ "isRegOfficeOrMainPlaceOfBusiness") -> Seq(ValidationError("error.required.atb.confirm.office"))
           )))
       }
     }
 
     "write correct data" in {
 
-      val model = LettersAddress(true)
+      val model = ConfirmRegisteredOffice(true)
 
-      LettersAddress.formWrites.writes(model) must
+      ConfirmRegisteredOffice.formWrites.writes(model) must
         be(Map(
-          "lettersAddress" -> Seq("true")
+          "isRegOfficeOrMainPlaceOfBusiness" -> Seq("true")
         ))
     }
   }

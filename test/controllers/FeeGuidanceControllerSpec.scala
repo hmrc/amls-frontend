@@ -20,7 +20,7 @@ import config.ApplicationConfig
 import connectors.DataCacheConnector
 import generators.ResponsiblePersonGenerator
 import generators.tradingpremises.TradingPremisesGenerator
-import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
+import models.businessdetails.{AboutTheBusiness, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
 import models.businessmatching._
 import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}

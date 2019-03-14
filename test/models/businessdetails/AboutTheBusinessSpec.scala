@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models.aboutthebusiness
+package models.businessdetails
 
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import org.joda.time.LocalDate

@@ -17,7 +17,7 @@
 package views.aboutthebusiness
 
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.aboutthebusiness.{CorrespondenceAddress, UKCorrespondenceAddress}
+import models.businessdetails.{CorrespondenceAddress, UKCorrespondenceAddress}
 import org.scalatest.MustMatchers
 import utils.AmlsSpec
 import jto.validation.Path

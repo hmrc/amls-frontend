@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.aboutthebusiness._
+import models.businessdetails._
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.aboutthebusiness._
 

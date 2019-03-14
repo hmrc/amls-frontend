@@ -18,7 +18,7 @@ package controllers.businessdetails
 
 import connectors.DataCacheConnector
 import models.Country
-import models.aboutthebusiness._
+import models.businessdetails._
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
 import org.joda.time.LocalDate

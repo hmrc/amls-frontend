@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models.aboutthebusiness
+package models.businessdetails
 
 import jto.validation.forms._
 import jto.validation.{From, Rule, To, Write}

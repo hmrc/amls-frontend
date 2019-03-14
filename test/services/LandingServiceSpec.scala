@@ -17,7 +17,7 @@
 package services
 
 import connectors._
-import models.aboutthebusiness.{AboutTheBusiness, NonUKCorrespondenceAddress}
+import models.businessdetails.{AboutTheBusiness, NonUKCorrespondenceAddress}
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.{CustomersOutsideUK => BACustomersOutsideUK, InvolvedInOtherYes => BAInvolvedInOtherYes, _}

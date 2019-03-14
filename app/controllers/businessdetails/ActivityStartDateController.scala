@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.aboutthebusiness._
+import models.businessdetails._
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, Partnership, UnincorporatedBody}
 import play.api.mvc.Result

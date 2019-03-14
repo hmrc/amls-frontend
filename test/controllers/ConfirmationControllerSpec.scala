@@ -20,7 +20,7 @@ import connectors._
 import generators.submission.SubscriptionResponseGenerator
 import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
-import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
+import models.businessdetails.{AboutTheBusiness, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
 import models.confirmation.{BreakdownRow, Currency}

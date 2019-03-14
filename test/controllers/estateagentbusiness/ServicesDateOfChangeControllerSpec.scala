@@ -17,7 +17,7 @@
 package controllers.estateagentbusiness
 
 import connectors.DataCacheConnector
-import models.aboutthebusiness.{AboutTheBusiness, ActivityStartDate}
+import models.businessdetails.{AboutTheBusiness, ActivityStartDate}
 import models.estateagentbusiness.EstateAgentBusiness
 import org.joda.time.LocalDate
 import org.mockito.Matchers._

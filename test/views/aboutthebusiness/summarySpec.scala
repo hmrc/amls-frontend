@@ -17,7 +17,7 @@
 package views.aboutthebusiness
 
 import forms.EmptyForm
-import models.aboutthebusiness._
+import models.businessdetails._
 import org.joda.time.LocalDate
 import org.jsoup.nodes.Element
 import org.scalatest.MustMatchers

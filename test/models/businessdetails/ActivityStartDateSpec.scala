@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models.aboutthebusiness
+package models.businessdetails
 
 import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec

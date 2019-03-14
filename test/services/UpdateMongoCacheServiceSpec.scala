@@ -21,7 +21,7 @@ import config.WSHttp
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
-import models.aboutthebusiness._
+import models.businessdetails._
 import models.asp.{Accountancy, Asp, OtherBusinessTaxMattersNo, ServicesOfBusiness}
 import models.bankdetails.{BankDetails, PersonalAccount, UKAccount}
 import models.businessactivities._

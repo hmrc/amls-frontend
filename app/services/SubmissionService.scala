@@ -22,7 +22,7 @@ import connectors.{AmlsConnector, DataCacheConnector}
 import exceptions.{DuplicateSubscriptionException, NoEnrolmentException}
 import javax.inject.Inject
 import models._
-import models.aboutthebusiness.{AboutTheBusiness, RegisteredOfficeUK}
+import models.businessdetails.{AboutTheBusiness, RegisteredOfficeUK}
 import models.asp.Asp
 import models.bankdetails.{BankDetails, NoBankAccountUsed}
 import models.businessactivities.BusinessActivities

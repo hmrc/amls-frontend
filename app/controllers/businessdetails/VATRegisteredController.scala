@@ -20,7 +20,7 @@ import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.aboutthebusiness._
+import models.businessdetails._
 import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany}
 import models.businessmatching.BusinessMatching
 import uk.gov.hmrc.http.cache.client.CacheMap

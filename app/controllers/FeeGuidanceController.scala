@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 
 import config.{AppConfig, ApplicationConfig}
 import connectors.DataCacheConnector
-import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
+import models.businessdetails.{AboutTheBusiness, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
 import models.businessmatching.{BusinessMatching, MoneyServiceBusiness, TrustAndCompanyServices}
 import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.ResponsiblePerson

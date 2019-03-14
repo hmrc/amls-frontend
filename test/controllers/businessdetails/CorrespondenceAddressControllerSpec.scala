@@ -18,7 +18,7 @@ package controllers.businessdetails
 
 import connectors.DataCacheConnector
 import models.Country
-import models.aboutthebusiness.{AboutTheBusiness, NonUKCorrespondenceAddress, UKCorrespondenceAddress}
+import models.businessdetails.{AboutTheBusiness, NonUKCorrespondenceAddress, UKCorrespondenceAddress}
 import models.autocomplete.NameValuePair
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}

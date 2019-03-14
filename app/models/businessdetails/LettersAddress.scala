@@ -14,32 +14,28 @@
  * limitations under the License.
  */
 
-package models.aboutthebusiness
+package models.businessdetails
 
-import jto.validation.forms.UrlFormEncoded
+import jto.validation.forms._
 import jto.validation.{From, Rule, Write}
 import play.api.libs.json.Json
 
-case class ContactingYouEmail(email: String, confirmEmail: String)
+case class LettersAddress(lettersAddress: Boolean)
 
-object ContactingYouEmail {
+object LettersAddress {
 
-  implicit val formats = Json.format[ContactingYouEmail]
+  implicit val formats = Json.format[LettersAddress]
+  import utils.MappingUtils.Implicits._
 
-  implicit val formRule: Rule[UrlFormEncoded, ContactingYouEmail] =
+  implicit val formRule: Rule[UrlFormEncoded, LettersAddress] =
     From[UrlFormEncoded] { __ =>
-      import models.FormTypes._
       import jto.validation.forms.Rules._
-
-      __.read(confirmEmailMatchRule).map (x => ContactingYouEmail(x._1, x._2))
+      (__ \ "lettersAddress").read[Boolean].withMessage("error.required.atb.lettersaddress") map LettersAddress.apply
     }
 
-  implicit val formWrites: Write[ContactingYouEmail, UrlFormEncoded] =
+  implicit val formWrites: Write[LettersAddress, UrlFormEncoded] =
     Write {
-      case ContactingYouEmail(email, confirmEmail) =>
-        Map(
-          "email" -> Seq(email),
-          "confirmEmail" -> Seq(confirmEmail)
-        )
+      case LettersAddress(b) =>
+        Map("lettersAddress" -> Seq(b.toString))
     }
 }

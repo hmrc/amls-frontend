@@ -20,7 +20,7 @@ import cats.data.OptionT
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.aboutthebusiness.{AboutTheBusiness, ConfirmRegisteredOffice, RegisteredOffice, RegisteredOfficeUK}
+import models.businessdetails.{AboutTheBusiness, ConfirmRegisteredOffice, RegisteredOffice, RegisteredOfficeUK}
 import models.businesscustomer.Address
 import models.businessmatching.BusinessMatching
 import views.html.aboutthebusiness._

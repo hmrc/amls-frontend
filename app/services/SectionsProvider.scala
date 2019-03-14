@@ -18,7 +18,7 @@ package services
 
 import connectors.DataCacheConnector
 import javax.inject.Inject
-import models.aboutthebusiness.AboutTheBusiness
+import models.businessdetails.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities

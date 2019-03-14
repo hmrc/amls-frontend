@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models.aboutthebusiness
+package models.businessdetails
 
 import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}

@@ -24,7 +24,7 @@ import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.aboutthebusiness.{AboutTheBusiness, RegisteredOffice, RegisteredOfficeUK}
+import models.businessdetails.{AboutTheBusiness, RegisteredOffice, RegisteredOfficeUK}
 import play.api.mvc.Request
 import services.{AutoCompleteService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
