@@ -22,7 +22,7 @@ import play.api.libs.json.{Json, Reads}
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 
-case class AboutTheBusiness(
+case class BusinessDetails(
                              previouslyRegistered: Option[PreviouslyRegistered] = None,
                              activityStartDate: Option[ActivityStartDate] = None,
                              vatRegistered: Option[VATRegistered] = None,
@@ -35,51 +35,51 @@ case class AboutTheBusiness(
                              hasAccepted: Boolean = false
                            ) {
 
-  def previouslyRegistered(v: PreviouslyRegistered): AboutTheBusiness = {
+  def previouslyRegistered(v: PreviouslyRegistered): BusinessDetails = {
     this.copy(previouslyRegistered = Some(v), hasChanged = hasChanged || !this.previouslyRegistered.contains(v), hasAccepted = hasAccepted && this.previouslyRegistered.contains(v))
   }
 
-  def activityStartDate(v: ActivityStartDate): AboutTheBusiness =
+  def activityStartDate(v: ActivityStartDate): BusinessDetails =
     this.copy(activityStartDate = Some(v), hasChanged = hasChanged || !this.activityStartDate.contains(v), hasAccepted = hasAccepted && this.activityStartDate.contains(v))
 
-  def vatRegistered(v: VATRegistered): AboutTheBusiness =
+  def vatRegistered(v: VATRegistered): BusinessDetails =
     this.copy(vatRegistered = Some(v), hasChanged = hasChanged || !this.vatRegistered.contains(v), hasAccepted = hasAccepted && this.vatRegistered.contains(v))
 
-  def corporationTaxRegistered(c: CorporationTaxRegistered): AboutTheBusiness =
+  def corporationTaxRegistered(c: CorporationTaxRegistered): BusinessDetails =
     this.copy(corporationTaxRegistered = Some(c), hasChanged = hasChanged || !this.corporationTaxRegistered.contains(c), hasAccepted = hasAccepted && this.corporationTaxRegistered.contains(c))
 
-  def registeredOffice(v: RegisteredOffice): AboutTheBusiness =
+  def registeredOffice(v: RegisteredOffice): BusinessDetails =
     this.copy(registeredOffice = Some(v), hasChanged = hasChanged || !this.registeredOffice.contains(v), hasAccepted = hasAccepted && this.registeredOffice.contains(v))
 
-  def contactingYou(v: ContactingYou): AboutTheBusiness =
+  def contactingYou(v: ContactingYou): BusinessDetails =
     this.copy(contactingYou = Some(v), hasChanged = hasChanged || !this.contactingYou.contains(v), hasAccepted = hasAccepted && this.contactingYou.contains(v))
 
-  def altCorrespondenceAddress(v: Boolean): AboutTheBusiness =
+  def altCorrespondenceAddress(v: Boolean): BusinessDetails =
     this.copy(altCorrespondenceAddress = Some(v), hasChanged = hasChanged || !this.altCorrespondenceAddress.contains(v))
 
-  def correspondenceAddress(v: CorrespondenceAddress): AboutTheBusiness =
+  def correspondenceAddress(v: CorrespondenceAddress): BusinessDetails =
     this.copy(correspondenceAddress = Some(v), hasChanged = hasChanged || !this.correspondenceAddress.contains(v), hasAccepted = hasAccepted && this.correspondenceAddress.contains(v))
 
   def isComplete: Boolean =
     this match {
-      case AboutTheBusiness(Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), Some(_), Some(true), None, _, true) =>
+      case BusinessDetails(Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), Some(_), Some(true), None, _, true) =>
         false
-      case AboutTheBusiness(Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), Some(_), Some(_),_, _, true) =>
+      case BusinessDetails(Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), Some(_), Some(_),_, _, true) =>
         true
       case _ =>
         false
     }
 }
 
-object AboutTheBusiness {
+object BusinessDetails {
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "businessdetails"
     val notStarted = Section(messageKey, NotStarted, false, controllers.businessdetails.routes.WhatYouNeedController.get())
-    cache.getEntry[AboutTheBusiness](key).fold(notStarted) {
+    cache.getEntry[BusinessDetails](key).fold(notStarted) {
       case model if model.isComplete =>
         Section(messageKey, Completed, model.hasChanged, controllers.businessdetails.routes.SummaryController.get())
-      case AboutTheBusiness(None, None, None, None, None, _, None, None, _, _) =>
+      case BusinessDetails(None, None, None, None, None, _, None, None, _, _) =>
         notStarted
       case model =>
         Section(messageKey, Started, model.hasChanged, controllers.businessdetails.routes.WhatYouNeedController.get())
@@ -88,9 +88,9 @@ object AboutTheBusiness {
 
   val key = "about-the-business"
 
-  implicit val format = Json.writes[AboutTheBusiness]
+  implicit val format = Json.writes[BusinessDetails]
 
-  implicit val jsonReads: Reads[AboutTheBusiness] = {
+  implicit val jsonReads: Reads[BusinessDetails] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json.Reads._
     import play.api.libs.json._
@@ -110,12 +110,12 @@ object AboutTheBusiness {
         (__ \ "hasAccepted").readNullable[Boolean].map {
           _.getOrElse(false)
         }
-      ).apply(AboutTheBusiness.apply _)
+      ).apply(BusinessDetails.apply _)
 
   }
 
-  implicit def default(aboutTheBusiness: Option[AboutTheBusiness]): AboutTheBusiness =
-    aboutTheBusiness.getOrElse(AboutTheBusiness())
+  implicit def default(aboutTheBusiness: Option[BusinessDetails]): BusinessDetails =
+    aboutTheBusiness.getOrElse(BusinessDetails())
 }
 
 

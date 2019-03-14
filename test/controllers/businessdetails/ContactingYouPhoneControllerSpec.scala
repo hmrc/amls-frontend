@@ -19,7 +19,7 @@ package controllers.businessdetails
 import java.util.UUID
 
 import connectors.DataCacheConnector
-import models.businessdetails.{AboutTheBusiness, ContactingYou}
+import models.businessdetails.{BusinessDetails, ContactingYou}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
@@ -36,7 +36,7 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
 
   val userId = s"user-${UUID.randomUUID}"
   val contactingYou = Some(ContactingYou(Some("+44 (0)123 456-7890"), Some("test@test.com")))
-  val aboutTheBusinessWithData = AboutTheBusiness(contactingYou = contactingYou)
+  val aboutTheBusinessWithData = BusinessDetails(contactingYou = contactingYou)
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
@@ -55,7 +55,7 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
 
       "load the page" in new Fixture {
 
-        when(controller.dataCache.fetch[AboutTheBusiness](any())
+        when(controller.dataCache.fetch[BusinessDetails](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
 
         val result = controller.get()(request)
@@ -65,7 +65,7 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
 
       "load the page with the pre populated data" in new Fixture {
 
-        when(controller.dataCache.fetch[AboutTheBusiness](any())
+        when(controller.dataCache.fetch[BusinessDetails](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
 
         val result = controller.get()(request)
@@ -83,10 +83,10 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
           "phoneNumber" -> "+44 (0)123 456-7890"
         )
 
-        when(controller.dataCache.fetch[AboutTheBusiness](any())
+        when(controller.dataCache.fetch[BusinessDetails](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
 
-        when(controller.dataCache.save[AboutTheBusiness](any(), any())
+        when(controller.dataCache.save[BusinessDetails](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
@@ -101,10 +101,10 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
           "phoneNumber" -> ""
         )
 
-        when(controller.dataCache.fetch[AboutTheBusiness](any())
+        when(controller.dataCache.fetch[BusinessDetails](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
 
-        when(controller.dataCache.save[AboutTheBusiness](any(), any())
+        when(controller.dataCache.save[BusinessDetails](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)

@@ -37,7 +37,7 @@ class PreviouslyRegisteredController @Inject () (
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key) map {
+      dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key) map {
         response =>
           val form: Form2[PreviouslyRegistered] = (for {
             aboutTheBusiness <- response
@@ -59,8 +59,8 @@ class PreviouslyRegisteredController @Inject () (
                 cache <- optionalCache
                 businessType <- ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
               } yield {
-                dataCacheConnector.save[AboutTheBusiness](AboutTheBusiness.key,
-                  getUpdatedModel(businessType,  cache.getEntry[AboutTheBusiness](AboutTheBusiness.key), data))
+                dataCacheConnector.save[BusinessDetails](BusinessDetails.key,
+                  getUpdatedModel(businessType,  cache.getEntry[BusinessDetails](BusinessDetails.key), data))
                 getRouting(businessType, edit, data)
               }).getOrElse(Redirect(routes.ConfirmRegisteredOfficeController.get(edit)))
           }
@@ -68,7 +68,7 @@ class PreviouslyRegisteredController @Inject () (
     }
   }
 
-  private def getUpdatedModel(businessType: BusinessType, aboutTheBusiness: AboutTheBusiness, data: PreviouslyRegistered): AboutTheBusiness = {
+  private def getUpdatedModel(businessType: BusinessType, aboutTheBusiness: BusinessDetails, data: PreviouslyRegistered): BusinessDetails = {
     data match {
       case PreviouslyRegisteredYes(_) => aboutTheBusiness.copy(previouslyRegistered = Some(data), activityStartDate = None,
                                                                 hasChanged = true)

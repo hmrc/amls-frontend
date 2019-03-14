@@ -39,7 +39,7 @@ class VATRegisteredController @Inject () (
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key) map {
+      dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key) map {
         response =>
           val form: Form2[VATRegistered] = (for {
             aboutTheBusiness <- response
@@ -60,9 +60,9 @@ class VATRegisteredController @Inject () (
           val redirect = for {
             cache <- dataCacheConnector.fetchAll
             businessType <- Future.successful(getBusinessType(cache))
-            _ <- dataCacheConnector.update[AboutTheBusiness](AboutTheBusiness.key) {
+            _ <- dataCacheConnector.update[BusinessDetails](BusinessDetails.key) {
               case Some(m) => m.vatRegistered(data)
-              case _ => AboutTheBusiness().vatRegistered(data)
+              case _ => BusinessDetails().vatRegistered(data)
             }
           } yield (businessType, edit) match {
             case (_,true) => Redirect(routes.SummaryController.get())

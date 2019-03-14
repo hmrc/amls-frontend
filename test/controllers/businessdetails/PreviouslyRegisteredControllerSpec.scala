@@ -53,7 +53,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
   "BusinessRegisteredWithHMRCBeforeController" must {
 
     "on get display the previously registered with HMRC page" in new Fixture {
-      when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
+      when(controller.dataCacheConnector.fetch[BusinessDetails](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -62,8 +62,8 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
 
     "on get display the previously registered with HMRC with pre populated data" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(AboutTheBusiness(Some(PreviouslyRegisteredYes("12345678"))))))
+      when(controller.dataCacheConnector.fetch[BusinessDetails](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessDetails(Some(PreviouslyRegisteredYes("12345678"))))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -85,8 +85,8 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
-      when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
-        .thenReturn(Some(AboutTheBusiness(Some(PreviouslyRegisteredNo))))
+      when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
+        .thenReturn(Some(BusinessDetails(Some(PreviouslyRegisteredNo))))
 
       when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -109,8 +109,8 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
-      when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
-        .thenReturn(Some(AboutTheBusiness(Some(PreviouslyRegisteredNo))))
+      when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
+        .thenReturn(Some(BusinessDetails(Some(PreviouslyRegisteredNo))))
 
       when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -133,7 +133,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
-      when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
+      when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
         .thenReturn(None)
 
       when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
@@ -157,8 +157,8 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
-      when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
-        .thenReturn(Some(AboutTheBusiness(Some(PreviouslyRegisteredNo))))
+      when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
+        .thenReturn(Some(BusinessDetails(Some(PreviouslyRegisteredNo))))
 
       when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))

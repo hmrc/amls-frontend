@@ -18,7 +18,7 @@ package controllers.businessdetails
 
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.businessdetails.{AboutTheBusiness, LettersAddress, RegisteredOffice}
+import models.businessdetails.{BusinessDetails, LettersAddress, RegisteredOffice}
 import views.html.businessdetails._
 import play.api.mvc.Result
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -33,7 +33,7 @@ class LettersAddressController @Inject () (
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key) map {
+      dataCache.fetch[BusinessDetails](BusinessDetails.key) map {
         response =>
           (for {
             atb <- response
@@ -52,7 +52,7 @@ class LettersAddressController @Inject () (
     implicit authContext => implicit request =>
       Form2[LettersAddress](request.body) match {
         case f: InvalidForm =>
-          dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key) map {
+          dataCache.fetch[BusinessDetails](BusinessDetails.key) map {
             response =>
               val regOffice: Option[RegisteredOffice] = (for {
                 aboutTheBusiness <- response
@@ -68,9 +68,9 @@ class LettersAddressController @Inject () (
             optionalCache =>
               (for {
                 cache <- optionalCache
-                aboutTheBusiness <- cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)
+                aboutTheBusiness <- cache.getEntry[BusinessDetails](BusinessDetails.key)
               } yield {
-                dataCache.save[AboutTheBusiness](AboutTheBusiness.key, data.lettersAddress match {
+                dataCache.save[BusinessDetails](BusinessDetails.key, data.lettersAddress match {
                   case true =>
                     aboutTheBusiness.altCorrespondenceAddress(false).copy(correspondenceAddress = None)
                   case false =>

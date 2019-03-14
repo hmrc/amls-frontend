@@ -22,7 +22,7 @@ import com.google.inject.Inject
 import connectors.{BusinessMatchingConnector, DataCacheConnector}
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessdetails.{AboutTheBusiness, CorporationTaxRegistered, CorporationTaxRegisteredYes}
+import models.businessdetails.{BusinessDetails, CorporationTaxRegistered, CorporationTaxRegisteredYes}
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany}
 import play.api.mvc.{Request, Result}
@@ -49,7 +49,7 @@ class CorporationTaxRegisteredController @Inject () (
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       filterByBusinessType { cache =>
-        cache.getEntry[AboutTheBusiness](AboutTheBusiness.key) match {
+        cache.getEntry[BusinessDetails](BusinessDetails.key) match {
           case _ =>
             (for {
               bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
@@ -86,8 +86,8 @@ class CorporationTaxRegisteredController @Inject () (
   }
 
   private def updateCache(cache: CacheMap, data: CorporationTaxRegistered)(implicit auth: AuthContext, hc: HeaderCarrier) = for {
-    aboutTheBusiness <- OptionT.fromOption[Future](cache.getEntry[AboutTheBusiness](AboutTheBusiness.key))
-    cacheMap <- OptionT.liftF(dataCacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, aboutTheBusiness.corporationTaxRegistered(data)))
+    aboutTheBusiness <- OptionT.fromOption[Future](cache.getEntry[BusinessDetails](BusinessDetails.key))
+    cacheMap <- OptionT.liftF(dataCacheConnector.save[BusinessDetails](BusinessDetails.key, aboutTheBusiness.corporationTaxRegistered(data)))
   } yield cacheMap
 
   private def getRedirectLocation(edit: Boolean) = if (edit) {

@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 
 import config.{AppConfig, ApplicationConfig}
 import connectors.DataCacheConnector
-import models.businessdetails.{AboutTheBusiness, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
+import models.businessdetails.{BusinessDetails, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
 import models.businessmatching.{BusinessMatching, MoneyServiceBusiness, TrustAndCompanyServices}
 import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.ResponsiblePerson
@@ -62,7 +62,7 @@ class FeeGuidanceController @Inject()(val authConnector: AuthConnector,
         cacheMap <- optCacheMap
         responsiblepeople <- cacheMap.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key).map(_.filterEmpty)
         tradingpremises <- cacheMap.getEntry[Seq[TradingPremises]](TradingPremises.key).map(_.filterEmpty)
-        businessdetails <- cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)
+        businessdetails <- cacheMap.getEntry[BusinessDetails](BusinessDetails.key)
         businessmatching <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
         previouslyRegistered <- businessdetails.previouslyRegistered
         activities <- businessmatching.activities

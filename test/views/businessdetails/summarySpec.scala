@@ -40,20 +40,20 @@ class summarySpec extends AmlsSpec
   "summary view" must {
     "have correct title" in new ViewFixture {
 
-      def view = views.html.businessdetails.summary(EmptyForm, AboutTheBusiness(), true)
+      def view = views.html.businessdetails.summary(EmptyForm, BusinessDetails(), true)
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.businessdetails"))
     }
 
     "have correct headings" in new ViewFixture {
-      def view = views.html.businessdetails.summary(EmptyForm, AboutTheBusiness(), true)
+      def view = views.html.businessdetails.summary(EmptyForm, BusinessDetails(), true)
 
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.businessdetails"))
     }
 
     "does not show registered for mlr question when approved" in new ViewFixture {
-      def view = views.html.businessdetails.summary(EmptyForm, AboutTheBusiness(), false)
+      def view = views.html.businessdetails.summary(EmptyForm, BusinessDetails(), false)
 
       html must not include Messages("businessdetails.registeredformlr.title")
     }
@@ -74,7 +74,7 @@ class summarySpec extends AmlsSpec
 
       def view = views.html.businessdetails.summary(
         EmptyForm,
-        AboutTheBusiness(
+        BusinessDetails(
           Some(PreviouslyRegisteredYes("1234")),
           Some(ActivityStartDate(new LocalDate(2016, 1, 2))),
           Some(VATRegisteredYes("2345")),

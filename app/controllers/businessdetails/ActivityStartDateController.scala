@@ -37,7 +37,7 @@ class ActivityStartDateController @Inject () (
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key) map {
+      dataCache.fetch[BusinessDetails](BusinessDetails.key) map {
         response =>
           val form: Form2[ActivityStartDate] = (for {
             aboutTheBusiness <- response
@@ -65,11 +65,11 @@ class ActivityStartDateController @Inject () (
 
               val aboutTheBusiness = for {
                 cacheMap <- maybeCache
-                atb <- cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)
+                atb <- cacheMap.getEntry[BusinessDetails](BusinessDetails.key)
               } yield atb
 
               for {
-                _ <- dataCache.save[AboutTheBusiness](AboutTheBusiness.key, aboutTheBusiness.activityStartDate(data))
+                _ <- dataCache.save[BusinessDetails](BusinessDetails.key, aboutTheBusiness.activityStartDate(data))
               } yield  getRouting(businessType, edit)
 
             }

@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.businessdetails.AboutTheBusiness
+import models.businessdetails.BusinessDetails
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -36,7 +36,7 @@ class SummaryController @Inject () (
   def get = Authorised.async {
     implicit authContext => implicit request =>
       for {
-        aboutTheBusiness <- dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
+        aboutTheBusiness <- dataCache.fetch[BusinessDetails](BusinessDetails.key)
         status <- statusService.getStatus
       } yield aboutTheBusiness match {
         case Some(data) => {
@@ -53,8 +53,8 @@ class SummaryController @Inject () (
   def post = Authorised.async {
     implicit authContext => implicit request =>
       for {
-        aboutTheBusiness <- dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
-        _ <- dataCache.save[AboutTheBusiness](AboutTheBusiness.key,
+        aboutTheBusiness <- dataCache.fetch[BusinessDetails](BusinessDetails.key)
+        _ <- dataCache.save[BusinessDetails](BusinessDetails.key,
           aboutTheBusiness.copy(hasAccepted = true)
         )
       } yield {

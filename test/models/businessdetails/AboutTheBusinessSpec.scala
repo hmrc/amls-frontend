@@ -51,7 +51,7 @@ class AboutTheBusinessSpec extends AmlsSpec {
     Some("address 4"),
     "AA11 1AA")
 
-  val completeModel = AboutTheBusiness(
+  val completeModel = BusinessDetails(
     previouslyRegistered = Some(previouslyRegistered),
     activityStartDate = Some(activityStartDate),
     vatRegistered = Some(regForVAT),
@@ -96,14 +96,14 @@ class AboutTheBusinessSpec extends AmlsSpec {
     "hasAccepted" -> true
   )
 
-  "AboutTheBusiness Serialisation" must {
+  "BusinessDetails Serialisation" must {
     "Serialise as expected" in {
       Json.toJson(completeModel) must
         be(completeJson)
     }
 
     "Deserialise as expected" in {
-      completeJson.as[AboutTheBusiness] must
+      completeJson.as[BusinessDetails] must
         be(completeModel)
     }
 
@@ -115,13 +115,13 @@ class AboutTheBusinessSpec extends AmlsSpec {
   it when {
     "hasChanged is missing from the Json" must {
       "Deserialise correctly" in {
-        (completeJson - "hasChanged").as[AboutTheBusiness] must
+        (completeJson - "hasChanged").as[BusinessDetails] must
           be (completeModel)
       }
     }
   }
 
-  "Partially complete AboutTheBusiness" must {
+  "Partially complete BusinessDetails" must {
 
     val partialJson = Json.obj(
       "previouslyRegistered" -> Json.obj("previouslyRegistered" -> true,
@@ -131,7 +131,7 @@ class AboutTheBusinessSpec extends AmlsSpec {
       "hasAccepted" -> false
     )
 
-    val partialModel = AboutTheBusiness(Some(previouslyRegistered), None)
+    val partialModel = BusinessDetails(Some(previouslyRegistered), None)
 
     "Serialise as expected" in {
       Json.toJson(partialModel) must
@@ -139,7 +139,7 @@ class AboutTheBusinessSpec extends AmlsSpec {
     }
 
     "Deserialise as expected" in {
-      partialJson.as[AboutTheBusiness] must
+      partialJson.as[BusinessDetails] must
         be(partialModel)
     }
 
@@ -161,45 +161,45 @@ class AboutTheBusinessSpec extends AmlsSpec {
 
   "'None'" when {
 
-    val initial: Option[AboutTheBusiness] = None
+    val initial: Option[BusinessDetails] = None
 
     "Merged with previously registered with MLR" must {
-      "return AboutTheBusiness with correct previously registered for MLR option" in {
+      "return BusinessDetails with correct previously registered for MLR option" in {
         val result = initial.previouslyRegistered(previouslyRegistered)
-        result must be (AboutTheBusiness(Some(previouslyRegistered), None, None, None, None, None, None, None, true))
+        result must be (BusinessDetails(Some(previouslyRegistered), None, None, None, None, None, None, None, true))
       }
     }
 
     "Merged with RegisteredForVAT" must {
-      "return AboutTheBusiness with correct VAT Registered option" in {
+      "return BusinessDetails with correct VAT Registered option" in {
         val result = initial.vatRegistered(regForVAT)
-        result must be (AboutTheBusiness(None, None, Some(regForVAT), None, None, None, None, None, true))
+        result must be (BusinessDetails(None, None, Some(regForVAT), None, None, None, None, None, true))
       }
     }
 
     "Merged with CorporationTaxRegistered" must {
-      "return AboutTheBusiness with correct corporation tax registered option" in {
+      "return BusinessDetails with correct corporation tax registered option" in {
         val result = initial.corporationTaxRegistered(regForCorpTax)
-        result must be (AboutTheBusiness(None, None, None, Some(regForCorpTax), None, None, None, None, true))
+        result must be (BusinessDetails(None, None, None, Some(regForCorpTax), None, None, None, None, true))
       }
     }
 
     "Merged with RegisteredOfficeOrMainPlaceOfBusiness" must {
-      "return AboutTheBusiness with correct registeredOfficeOrMainPlaceOfBusiness" in {
+      "return BusinessDetails with correct registeredOfficeOrMainPlaceOfBusiness" in {
         val result = initial.registeredOffice(regOfficeOrMainPlaceUK)
-        result must be (AboutTheBusiness(None, None, None, None, None, Some(regOfficeOrMainPlaceUK), None, None, true))
+        result must be (BusinessDetails(None, None, None, None, None, Some(regOfficeOrMainPlaceUK), None, None, true))
       }
     }
 
     "Merged with UKCorrespondenceAddress" must {
-      "return AboutTheBusiness with correct UKCorrespondenceAddress" in {
+      "return BusinessDetails with correct UKCorrespondenceAddress" in {
         val result = initial.correspondenceAddress(uKCorrespondenceAddress)
-        result must be (AboutTheBusiness(None, None, None, None, None, None, None, Some(uKCorrespondenceAddress), true))
+        result must be (BusinessDetails(None, None, None, None, None, None, None, Some(uKCorrespondenceAddress), true))
       }
     }
   }
 
-  "AboutTheBusiness class" when {
+  "BusinessDetails class" when {
     "previouslyRegistered value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
@@ -332,27 +332,27 @@ class AboutTheBusinessSpec extends AmlsSpec {
     "return a NotStarted Section when there is no data at all" in {
       val notStartedSection = Section("businessdetails", NotStarted, false, controllers.businessdetails.routes.WhatYouNeedController.get())
 
-      when(cache.getEntry[AboutTheBusiness](meq("about-the-business"))(any())) thenReturn None
+      when(cache.getEntry[BusinessDetails](meq("about-the-business"))(any())) thenReturn None
 
-      AboutTheBusiness.section(cache) must be(notStartedSection)
+      BusinessDetails.section(cache) must be(notStartedSection)
     }
 
     "return a Completed Section when model is complete and has not changed" in {
       val complete = completeModel
       val completedSection = Section("businessdetails", Completed, false, controllers.businessdetails.routes.SummaryController.get())
 
-      when(cache.getEntry[AboutTheBusiness](meq("about-the-business"))(any())) thenReturn Some(complete)
+      when(cache.getEntry[BusinessDetails](meq("about-the-business"))(any())) thenReturn Some(complete)
 
-      AboutTheBusiness.section(cache) must be(completedSection)
+      BusinessDetails.section(cache) must be(completedSection)
     }
 
     "return a Started Section when model is incomplete" in {
-      val incomplete = AboutTheBusiness(Some(previouslyRegistered), None)
+      val incomplete = BusinessDetails(Some(previouslyRegistered), None)
       val startedSection = Section("businessdetails", Started, false, controllers.businessdetails.routes.WhatYouNeedController.get())
 
-      when(cache.getEntry[AboutTheBusiness](meq("about-the-business"))(any())) thenReturn Some(incomplete)
+      when(cache.getEntry[BusinessDetails](meq("about-the-business"))(any())) thenReturn Some(incomplete)
 
-      AboutTheBusiness.section(cache) must be(startedSection)
+      BusinessDetails.section(cache) must be(startedSection)
     }
   }
 }

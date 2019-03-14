@@ -1,6 +1,6 @@
 # microservice specific routes
 
-->          /business-details                                                         aboutTheBusiness.Routes
+->          /business-details                                                         businessDetails.Routes
 ->          /business-activities                                                      businessActivities.Routes
 ->          /bank-details                                                             bankDetails.Routes
 ->          /trading-premises                                                         tradingPremises.Routes

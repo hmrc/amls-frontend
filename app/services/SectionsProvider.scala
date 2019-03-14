@@ -18,7 +18,7 @@ package services
 
 import connectors.DataCacheConnector
 import javax.inject.Inject
-import models.businessdetails.AboutTheBusiness
+import models.businessdetails.BusinessDetails
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
@@ -84,7 +84,7 @@ class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnecto
   private def mandatorySections(implicit cache: CacheMap): Seq[Section] =
     Seq(
       BusinessMatching.section,
-      AboutTheBusiness.section,
+      BusinessDetails.section,
       BusinessActivities.section,
       BankDetails.section,
       TradingPremises.section,

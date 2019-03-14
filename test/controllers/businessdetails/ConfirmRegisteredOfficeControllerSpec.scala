@@ -47,7 +47,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
   }
 
   private val ukAddress = RegisteredOfficeUK("line1", "line2", Some("line3"), Some("line4"), "AA1 1AA")
-  private val aboutTheBusiness = AboutTheBusiness(None, None, None, None, None, Some(ukAddress), None)
+  private val aboutTheBusiness = BusinessDetails(None, None, None, None, None, Some(ukAddress), None)
   val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
     Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "ghghg")
   val bm = BusinessMatching(Some(reviewDtls))
@@ -63,7 +63,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
         when(controller.dataCache.fetch[BusinessMatching](meq(BusinessMatching.key))
           (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
 
-        when(controller.dataCache.fetch[AboutTheBusiness](meq(AboutTheBusiness.key))
+        when(controller.dataCache.fetch[BusinessDetails](meq(BusinessDetails.key))
           (any(), any(), any())).thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -75,7 +75,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
         val registeredAddress = ConfirmRegisteredOffice(isRegOfficeOrMainPlaceOfBusiness = true)
 
-        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
+        when(controller.dataCache.fetch[BusinessDetails](any())(any(),any(),any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -84,12 +84,12 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
       }
 
-      "load Registered office or main place of business when there is already a registered address in AboutTheBusiness" in new Fixture {
+      "load Registered office or main place of business when there is already a registered address in BusinessDetails" in new Fixture {
 
         when(controller.dataCache.fetch[BusinessMatching](meq(BusinessMatching.key))
           (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
 
-        when(controller.dataCache.fetch[AboutTheBusiness](meq(AboutTheBusiness.key))
+        when(controller.dataCache.fetch[BusinessDetails](meq(BusinessDetails.key))
           (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusiness)))
 
         val result = controller.get()(request)
@@ -111,7 +111,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
           .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
         when(controller.dataCache.save[BusinessMatching](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
-        when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
+        when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
           .thenReturn(Some(aboutTheBusiness))
         when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -120,7 +120,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.businessdetails.routes.ContactingYouController.get().url))
         verify(
-          controller.dataCache).save[AboutTheBusiness](any(),
+          controller.dataCache).save[BusinessDetails](any(),
           meq(aboutTheBusiness.copy(registeredOffice = Some(ukAddress))))(any(), any(), any()
         )
       }
@@ -136,7 +136,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
           .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
         when(controller.dataCache.save[BusinessMatching](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
-        when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
+        when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
           .thenReturn(Some(aboutTheBusiness))
         when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -145,7 +145,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.businessdetails.routes.RegisteredOfficeController.get().url))
         verify(
-          controller.dataCache).save[AboutTheBusiness](any(),
+          controller.dataCache).save[BusinessDetails](any(),
           meq(aboutTheBusiness.copy(registeredOffice = None)))(any(), any(), any()
         )
 

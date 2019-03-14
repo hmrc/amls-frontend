@@ -49,7 +49,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
   // scalastyle:off
   private val startDate = ActivityStartDate(new LocalDate(2010, 2, 22))
-  private val aboutTheBusiness = AboutTheBusiness(None, Some(startDate), None, None)
+  private val aboutTheBusiness = BusinessDetails(None, Some(startDate), None, None)
 
   val emptyCache = CacheMap("", Map.empty)
 
@@ -59,7 +59,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
       "load ActivityStartDate page" in new Fixture {
 
-        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(), any(), any()))
+        when(controller.dataCache.fetch[BusinessDetails](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(aboutTheBusiness)))
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -68,7 +68,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
       "load ActivityStartDate with pre-populated data" in new Fixture {
 
-        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(), any(), any()))
+        when(controller.dataCache.fetch[BusinessDetails](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(aboutTheBusiness)))
         val result = controller.get()(request)
         val document = Jsoup.parse(contentAsString(result))
@@ -94,8 +94,8 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
         val mockCacheMap = mock[CacheMap]
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
-        when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
-          .thenReturn(Some(AboutTheBusiness(Some(PreviouslyRegisteredNo))))
+        when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
+          .thenReturn(Some(BusinessDetails(Some(PreviouslyRegisteredNo))))
 
         when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -123,8 +123,8 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
-        when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
-          .thenReturn(Some(AboutTheBusiness(Some(PreviouslyRegisteredNo))))
+        when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
+          .thenReturn(Some(BusinessDetails(Some(PreviouslyRegisteredNo))))
 
         when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -140,7 +140,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
           "startDate.month" -> "",
           "startDate.year" -> ""
         )
-        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(), any(), any()))
+        when(controller.dataCache.fetch[BusinessDetails](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(aboutTheBusiness)))
 
         val result = controller.post()(newRequest)
@@ -155,7 +155,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
           "startDate.month" -> "3",
           "startDate.year" -> "16"
         )
-        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(), any(), any()))
+        when(controller.dataCache.fetch[BusinessDetails](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(aboutTheBusiness)))
 
         val result = controller.post()(newRequest)
@@ -169,7 +169,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
           "startDate.month" -> "3",
           "startDate.year" -> "19782"
         )
-        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(), any(), any()))
+        when(controller.dataCache.fetch[BusinessDetails](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(aboutTheBusiness)))
 
         val result = controller.post()(newRequest)

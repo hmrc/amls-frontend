@@ -39,9 +39,9 @@ class ContactingYouController @Inject () (
     implicit authContext => implicit request =>
       for {
         aboutTheBusiness <-
-        dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
+        dataCache.fetch[BusinessDetails](BusinessDetails.key)
       } yield aboutTheBusiness match {
-        case Some(AboutTheBusiness(_,_, _, _, Some(details), _, _, _, _, _)) if details.email.isDefined =>
+        case Some(BusinessDetails(_,_, _, _, Some(details), _, _, _, _, _)) if details.email.isDefined =>
           Ok(contacting_you(Form2[ContactingYouEmail](ContactingYouEmail(
             Some(details.email.getOrElse("")),
             Some(details.email.getOrElse("")))),
@@ -58,8 +58,8 @@ class ContactingYouController @Inject () (
               Future.successful(BadRequest(contacting_you(f, edit)))
         case ValidForm(_, data) =>
             for {
-              aboutTheBusiness <- dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
-              _ <- dataCache.save[AboutTheBusiness](AboutTheBusiness.key,
+              aboutTheBusiness <- dataCache.fetch[BusinessDetails](BusinessDetails.key)
+              _ <- dataCache.save[BusinessDetails](BusinessDetails.key,
                 aboutTheBusiness.contactingYou(updateData(aboutTheBusiness.contactingYou, data))
               )
             } yield {

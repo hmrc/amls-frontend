@@ -18,7 +18,7 @@ package controllers.businessdetails
 
 import connectors.{BusinessMatchingConnector, DataCacheConnector}
 import models.Country
-import models.businessdetails.{AboutTheBusiness, CorporationTaxRegisteredYes}
+import models.businessdetails.{BusinessDetails, CorporationTaxRegisteredYes}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.{LimitedCompany, SoleProprietor, UnincorporatedBody}
@@ -50,7 +50,7 @@ class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar 
 
     mockCacheFetchAll
     mockCacheGetEntry[BusinessMatching](Some(businessMatching), BusinessMatching.key)
-    mockCacheSave[AboutTheBusiness]
+    mockCacheSave[BusinessDetails]
 
     val controller = new CorporationTaxRegisteredController (
       dataCacheConnector = mockCacheConnector,
@@ -66,9 +66,9 @@ class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar 
       "redirect to SummaryController" when {
         "edit is true" in new Fixture {
 
-          val data = AboutTheBusiness(corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1111111111")))
+          val data = BusinessDetails(corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1111111111")))
 
-          mockCacheGetEntry[AboutTheBusiness](Some(data), AboutTheBusiness.key)
+          mockCacheGetEntry[BusinessDetails](Some(data), BusinessDetails.key)
 
           val result = controller.get(true)(request)
           status(result) must be(SEE_OTHER)
@@ -79,9 +79,9 @@ class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar 
       "redirect to ConfirmRegisteredOfficeController" when {
         "edit is false" in new Fixture {
 
-          val data = AboutTheBusiness(corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1111111111")))
+          val data = BusinessDetails(corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1111111111")))
 
-          mockCacheGetEntry[AboutTheBusiness](Some(data), AboutTheBusiness.key)
+          mockCacheGetEntry[BusinessDetails](Some(data), BusinessDetails.key)
 
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
@@ -92,10 +92,10 @@ class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar 
 
       "display an empty form when no previous entry" in new Fixture {
 
-        val data = AboutTheBusiness(corporationTaxRegistered = None)
+        val data = BusinessDetails(corporationTaxRegistered = None)
 
         mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(Some(reviewDetails.copy(utr = None)))), BusinessMatching.key)
-        mockCacheGetEntry[AboutTheBusiness](Some(data), AboutTheBusiness.key)
+        mockCacheGetEntry[BusinessDetails](Some(data), BusinessDetails.key)
 
         val result = controller.get()(request)
 
@@ -119,9 +119,9 @@ class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar 
              Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
            ))), BusinessMatching.key)
 
-           val data = AboutTheBusiness(corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1111111111")))
+           val data = BusinessDetails(corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1111111111")))
 
-           mockCacheGetEntry[AboutTheBusiness](Some(data), AboutTheBusiness.key)
+           mockCacheGetEntry[BusinessDetails](Some(data), BusinessDetails.key)
 
            val result = controller.get()(request)
            status(result) must be(NOT_FOUND)

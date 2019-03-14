@@ -46,7 +46,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar {
   }
 
   private val ukAddress = RegisteredOfficeUK("line_1", "line_2", Some(""), Some(""), "AA1 1AA")
-  private val aboutTheBusiness = AboutTheBusiness(None, None, None, None, None, Some(ukAddress), None)
+  private val aboutTheBusiness = BusinessDetails(None, None, None, None, None, Some(ukAddress), None)
 
   "ConfirmRegisteredOfficeController" must {
 
@@ -54,7 +54,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
       "load register Office" in new Fixture {
 
-        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
+        when(controller.dataCache.fetch[BusinessDetails](any())(any(),any(),any()))
           .thenReturn(Future.successful(Some(aboutTheBusiness)))
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -62,7 +62,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
       "load Registered office or main place of business when Business Address from mongoCache returns None" in new Fixture {
 
-        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
+        when(controller.dataCache.fetch[BusinessDetails](any())(any(),any(),any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -83,7 +83,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar {
         when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
-        when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
+        when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
           .thenReturn(Some(aboutTheBusiness))
 
         when (controller.dataCache.save(any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -103,7 +103,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar {
         when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
-        when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
+        when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
           .thenReturn(Some(aboutTheBusiness))
 
         when (controller.dataCache.save(any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -117,7 +117,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         val newRequest = request.withFormUrlEncodedBody(
         )
-        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
+        when(controller.dataCache.fetch[BusinessDetails](any())(any(),any(),any()))
           .thenReturn(Future.successful(Some(aboutTheBusiness)))
 
         when (controller.dataCache.save(any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -131,7 +131,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar {
         val newRequest = request.withFormUrlEncodedBody(
           "lettersAddress" -> ""
         )
-        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
+        when(controller.dataCache.fetch[BusinessDetails](any())(any(),any(),any()))
           .thenReturn(Future.successful(Some(aboutTheBusiness)))
 
         when (controller.dataCache.save(any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -146,7 +146,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar {
         val newRequest = request.withFormUrlEncodedBody(
         )
 
-        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
+        when(controller.dataCache.fetch[BusinessDetails](any())(any(),any(),any()))
           .thenReturn(Future.successful(None))
 
         when (controller.dataCache.save(any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))

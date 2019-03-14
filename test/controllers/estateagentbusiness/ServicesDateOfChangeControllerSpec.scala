@@ -17,7 +17,7 @@
 package controllers.estateagentbusiness
 
 import connectors.DataCacheConnector
-import models.businessdetails.{AboutTheBusiness, ActivityStartDate}
+import models.businessdetails.{BusinessDetails, ActivityStartDate}
 import models.estateagentbusiness.EstateAgentBusiness
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
@@ -63,8 +63,8 @@ class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
       )
 
       val mockCacheMap = mock[CacheMap]
-      when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
-        .thenReturn(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
+      when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
+        .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
 
       when(mockCacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key))
         .thenReturn(None)
@@ -89,8 +89,8 @@ class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
       )
 
       val mockCacheMap = mock[CacheMap]
-      when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
-        .thenReturn(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
+      when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
+        .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
 
       when(mockCacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key))
         .thenReturn(None)
@@ -115,8 +115,8 @@ class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
       )
 
       val mockCacheMap = mock[CacheMap]
-      when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
-        .thenReturn(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
+      when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
+        .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
 
       when(mockCacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key))
         .thenReturn(Some(EstateAgentBusiness()))

@@ -19,7 +19,7 @@ package controllers.businessdetails
 import java.util.UUID
 
 import connectors.DataCacheConnector
-import models.businessdetails.{AboutTheBusiness, ContactingYou}
+import models.businessdetails.{BusinessDetails, ContactingYou}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -39,7 +39,7 @@ class ContactingYouControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
   val userId = s"user-${UUID.randomUUID}"
   val contactingYou = Some(ContactingYou(Some("+44 (0)123 456-7890"), Some("test@test.com")))
-  val aboutTheBusinessWithData = AboutTheBusiness(contactingYou = contactingYou)
+  val aboutTheBusinessWithData = BusinessDetails(contactingYou = contactingYou)
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
@@ -58,7 +58,7 @@ class ContactingYouControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
       "load the page" in new Fixture {
 
-        when(controller.dataCache.fetch[AboutTheBusiness](any())
+        when(controller.dataCache.fetch[BusinessDetails](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
 
         val result = controller.get()(request)
@@ -68,7 +68,7 @@ class ContactingYouControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
       "load the page with the pre populated data" in new Fixture {
 
-        when(controller.dataCache.fetch[AboutTheBusiness](any())
+        when(controller.dataCache.fetch[BusinessDetails](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
 
         val result = controller.get()(request)
@@ -77,7 +77,7 @@ class ContactingYouControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
       }
 
       "load the page with no data" in new Fixture {
-        when(controller.dataCache.fetch[AboutTheBusiness](any())
+        when(controller.dataCache.fetch[BusinessDetails](any())
           (any(), any(), any())).thenReturn(Future.successful(None))
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -95,10 +95,10 @@ class ContactingYouControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
           "email" -> "test@test.com"
         )
 
-        when(controller.dataCache.fetch[AboutTheBusiness](any())
+        when(controller.dataCache.fetch[BusinessDetails](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
 
-        when(controller.dataCache.save[AboutTheBusiness](any(), any())
+        when(controller.dataCache.save[BusinessDetails](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
@@ -113,10 +113,10 @@ class ContactingYouControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
           "email" -> "test@test.com"
         )
 
-        when(controller.dataCache.fetch[AboutTheBusiness](any())
+        when(controller.dataCache.fetch[BusinessDetails](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
 
-        when(controller.dataCache.save[AboutTheBusiness](any(), any())
+        when(controller.dataCache.save[BusinessDetails](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
@@ -130,10 +130,10 @@ class ContactingYouControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
           "email" -> "test1@test.com"
         )
 
-        when(controller.dataCache.fetch[AboutTheBusiness](any())
+        when(controller.dataCache.fetch[BusinessDetails](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
 
-        when(controller.dataCache.save[AboutTheBusiness](any(), any())
+        when(controller.dataCache.save[BusinessDetails](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)

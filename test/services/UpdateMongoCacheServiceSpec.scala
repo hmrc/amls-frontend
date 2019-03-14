@@ -86,7 +86,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
 
     val tradingPremises = Seq(tradingPremisesGen.sample.get, tradingPremisesGen.sample.get)
 
-    val aboutTheBusiness = AboutTheBusiness(
+    val aboutTheBusiness = BusinessDetails(
       previouslyRegistered = Some(PreviouslyRegisteredYes("12345678")),
       activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))),
       vatRegistered = Some(VATRegisteredYes("123456789")),
@@ -243,7 +243,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
         mockCacheSave[MoneyServiceBusiness]
         mockCacheSave[Hvd]
         mockCacheSave[Supervision]
-        mockCacheSave[AboutTheBusiness]
+        mockCacheSave[BusinessDetails]
         mockCacheSave[EstateAgentBusiness]
         mockCacheSave[SubscriptionResponse]
         mockCacheSave[AmendVariationRenewalResponse]
@@ -263,7 +263,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
         verify(mockCacheConnector).save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any())
         verify(mockCacheConnector).save[Hvd](eqTo(Hvd.key), any())(any(), any(), any())
         verify(mockCacheConnector).save[Supervision](eqTo(Supervision.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[AboutTheBusiness](eqTo(AboutTheBusiness.key), any())(any(), any(), any())
+        verify(mockCacheConnector).save[BusinessDetails](eqTo(BusinessDetails.key), any())(any(), any(), any())
         verify(mockCacheConnector).save[EstateAgentBusiness](eqTo(EstateAgentBusiness.key), any())(any(), any(), any())
         verify(mockCacheConnector).save[SubscriptionResponse](eqTo(SubscriptionResponse.key), any())(any(), any(), any())
         verify(mockCacheConnector).save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())

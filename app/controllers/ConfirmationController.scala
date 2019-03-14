@@ -23,7 +23,7 @@ import config.AMLSAuthConnector
 import connectors.{AmlsConnector, DataCacheConnector, KeystoreConnector, PayApiConnector, _}
 import javax.inject.{Inject, Singleton}
 import models.ResponseType.AmendOrVariationResponseType
-import models.businessdetails.{AboutTheBusiness, PreviouslyRegisteredYes}
+import models.businessdetails.{BusinessDetails, PreviouslyRegisteredYes}
 import models.confirmation.{BreakdownRow, Currency}
 import models.payments._
 import models.renewal.Renewal
@@ -96,7 +96,7 @@ class ConfirmationController @Inject()(
           renewalData <- OptionT.liftF(dataCacheConnector.fetch[Renewal](Renewal.key))
           paymentStatus <- OptionT.liftF(amlsConnector.refreshPaymentStatus(reference))
           payment <- OptionT(amlsConnector.getPaymentByPaymentReference(reference))
-          aboutTheBusiness <- OptionT(dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key))
+          aboutTheBusiness <- OptionT(dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key))
           _ <- doAudit(paymentStatus.currentStatus)
         } yield (status, paymentStatus.currentStatus, isPaymentSuccessful) match {
           case (_, currentPaymentStatus, false) =>
@@ -132,7 +132,7 @@ class ConfirmationController @Inject()(
           refNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
           status <- OptionT.liftF(statusService.getReadStatus(refNo))
           name <- BusinessName.getName(status.safeId)
-          aboutTheBusiness <- OptionT(dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key))
+          aboutTheBusiness <- OptionT(dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key))
         } yield () match {
           case _ if aboutTheBusiness.previouslyRegistered.fold(false) {
             case PreviouslyRegisteredYes(_) => true

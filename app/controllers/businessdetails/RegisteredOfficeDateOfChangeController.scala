@@ -21,7 +21,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
 import models.DateOfChange
-import models.businessdetails.{AboutTheBusiness, RegisteredOfficeNonUK, RegisteredOfficeUK}
+import models.businessdetails.{BusinessDetails, RegisteredOfficeNonUK, RegisteredOfficeUK}
 import org.joda.time.LocalDate
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -51,7 +51,7 @@ class RegisteredOfficeDateOfChangeController @Inject () (
   def post = Authorised.async {
     implicit authContext =>
       implicit request =>
-        dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key) flatMap { aboutTheBusiness =>
+        dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key) flatMap { aboutTheBusiness =>
           val extraFields: Map[String, Seq[String]] = aboutTheBusiness.get.activityStartDate match {
             case Some(date) => Map("activityStartDate" -> Seq(date.startDate.toString("yyyy-MM-dd")))
             case None => Map()
@@ -64,7 +64,7 @@ class RegisteredOfficeDateOfChangeController @Inject () (
               ))
             case ValidForm(_, dateOfChange) =>
               for {
-                _ <- dataCacheConnector.save[AboutTheBusiness](AboutTheBusiness.key,
+                _ <- dataCacheConnector.save[BusinessDetails](BusinessDetails.key,
                   aboutTheBusiness.registeredOffice(aboutTheBusiness.registeredOffice match {
                     case Some(office: RegisteredOfficeUK) => office.copy(dateOfChange = Some(dateOfChange))
                     case Some(office: RegisteredOfficeNonUK) => office.copy(dateOfChange = Some(dateOfChange))

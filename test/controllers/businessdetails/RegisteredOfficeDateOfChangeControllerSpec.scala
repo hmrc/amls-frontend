@@ -62,12 +62,12 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with  MockitoS
       val office = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "AA1 1AA")
       val updatedOffice = office.copy(dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
 
-      val business = AboutTheBusiness(registeredOffice = Some(office))
+      val business = BusinessDetails(registeredOffice = Some(office))
 
-      when(controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any(), any(), any())).
+      when(controller.dataCacheConnector.fetch[BusinessDetails](eqTo(BusinessDetails.key))(any(), any(), any())).
         thenReturn(Future.successful(Some(business)))
 
-      when(controller.dataCacheConnector.save[AboutTheBusiness](eqTo(AboutTheBusiness.key), any[AboutTheBusiness])(any(), any(), any())).
+      when(controller.dataCacheConnector.save[BusinessDetails](eqTo(BusinessDetails.key), any[BusinessDetails])(any(), any(), any())).
         thenReturn(Future.successful(mock[CacheMap]))
 
       val result = controller.post()(postRequest)
@@ -75,8 +75,8 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with  MockitoS
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.SummaryController.get().url))
 
-      val captor = ArgumentCaptor.forClass(classOf[AboutTheBusiness])
-      verify(controller.dataCacheConnector).save[AboutTheBusiness](eqTo(AboutTheBusiness.key), captor.capture())(any(), any(), any())
+      val captor = ArgumentCaptor.forClass(classOf[BusinessDetails])
+      verify(controller.dataCacheConnector).save[BusinessDetails](eqTo(BusinessDetails.key), captor.capture())(any(), any(), any())
 
       captor.getValue.registeredOffice match {
         case Some(savedOffice: RegisteredOfficeUK) => savedOffice must be(updatedOffice)
@@ -95,12 +95,12 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with  MockitoS
       val office = RegisteredOfficeNonUK("305", "address line", Some("address line2"), Some("address line3"), Country("Finland", "FIN"))
       val updatedOffice = office.copy(dateOfChange = Some(DateOfChange(new LocalDate(2005, 4, 26))))
 
-      val business = AboutTheBusiness(registeredOffice = Some(office))
+      val business = BusinessDetails(registeredOffice = Some(office))
 
-      when(controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any(), any(), any())).
+      when(controller.dataCacheConnector.fetch[BusinessDetails](eqTo(BusinessDetails.key))(any(), any(), any())).
         thenReturn(Future.successful(Some(business)))
 
-      when(controller.dataCacheConnector.save[AboutTheBusiness](eqTo(AboutTheBusiness.key), any[AboutTheBusiness])(any(), any(), any())).
+      when(controller.dataCacheConnector.save[BusinessDetails](eqTo(BusinessDetails.key), any[BusinessDetails])(any(), any(), any())).
         thenReturn(Future.successful(mock[CacheMap]))
 
       val result = controller.post()(postRequest)
@@ -108,8 +108,8 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with  MockitoS
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.SummaryController.get().url))
 
-      val captor = ArgumentCaptor.forClass(classOf[AboutTheBusiness])
-      verify(controller.dataCacheConnector).save[AboutTheBusiness](eqTo(AboutTheBusiness.key), captor.capture())(any(), any(), any())
+      val captor = ArgumentCaptor.forClass(classOf[BusinessDetails])
+      verify(controller.dataCacheConnector).save[BusinessDetails](eqTo(BusinessDetails.key), captor.capture())(any(), any(), any())
 
       captor.getValue.registeredOffice match {
         case Some(savedOffice: RegisteredOfficeNonUK) => savedOffice must be(updatedOffice)
@@ -120,15 +120,15 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with  MockitoS
   "show the data of change form once again" when {
     "posted with invalid data" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any(), any(), any())).
-        thenReturn(Future.successful(Some(AboutTheBusiness())))
+      when(controller.dataCacheConnector.fetch[BusinessDetails](eqTo(BusinessDetails.key))(any(), any(), any())).
+        thenReturn(Future.successful(Some(BusinessDetails())))
 
       val postRequest = request.withFormUrlEncodedBody()
 
       val result = controller.post(postRequest)
 
       status(result) must be(BAD_REQUEST)
-      verify(controller.dataCacheConnector, never()).save[AboutTheBusiness](any(), any())(any(), any(), any())
+      verify(controller.dataCacheConnector, never()).save[BusinessDetails](any(), any())(any(), any(), any())
 
     }
     "dateOfChange is earlier than Business Activities Start Date" in new Fixture {
@@ -141,15 +141,15 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with  MockitoS
       val office = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "AA1 1AA")
       val updatedOffice = office.copy(dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
 
-      val business = AboutTheBusiness(
+      val business = BusinessDetails(
         activityStartDate = Some(ActivityStartDate(new LocalDate(2015, 10, 1))),
         registeredOffice = Some(office)
       )
 
-      when(controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any(), any(), any())).
+      when(controller.dataCacheConnector.fetch[BusinessDetails](eqTo(BusinessDetails.key))(any(), any(), any())).
         thenReturn(Future.successful(Some(business)))
 
-      when(controller.dataCacheConnector.save[AboutTheBusiness](eqTo(AboutTheBusiness.key), any[AboutTheBusiness])(any(), any(), any())).
+      when(controller.dataCacheConnector.save[BusinessDetails](eqTo(BusinessDetails.key), any[BusinessDetails])(any(), any(), any())).
         thenReturn(Future.successful(mock[CacheMap]))
 
       val result = controller.post()(postRequest)

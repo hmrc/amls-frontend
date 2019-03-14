@@ -24,7 +24,7 @@ import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
-import models.businessdetails.{AboutTheBusiness, CorrespondenceAddress, UKCorrespondenceAddress}
+import models.businessdetails.{BusinessDetails, CorrespondenceAddress, UKCorrespondenceAddress}
 import play.api.mvc.Request
 import services.AutoCompleteService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -48,7 +48,7 @@ class CorrespondenceAddressController @Inject () (
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataConnector.fetch[AboutTheBusiness](AboutTheBusiness.key) map {
+      dataConnector.fetch[BusinessDetails](BusinessDetails.key) map {
         response =>
           val form: Form2[CorrespondenceAddress] = (for {
             aboutTheBusiness <- response
@@ -65,8 +65,8 @@ class CorrespondenceAddressController @Inject () (
           Future.successful(BadRequest(correspondence_address(f, edit, autoCompleteService.getCountries)))
         case ValidForm(_, data) =>
           val doUpdate = for {
-            aboutTheBusiness <- OptionT(dataConnector.fetch[AboutTheBusiness](AboutTheBusiness.key))
-            _ <- OptionT.liftF(dataConnector.save[AboutTheBusiness](AboutTheBusiness.key, aboutTheBusiness.correspondenceAddress(data)))
+            aboutTheBusiness <- OptionT(dataConnector.fetch[BusinessDetails](BusinessDetails.key))
+            _ <- OptionT.liftF(dataConnector.save[BusinessDetails](BusinessDetails.key, aboutTheBusiness.correspondenceAddress(data)))
             _ <- OptionT.liftF(auditAddressChange(data, aboutTheBusiness.correspondenceAddress, edit)) orElse OptionT.some(Success)
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())

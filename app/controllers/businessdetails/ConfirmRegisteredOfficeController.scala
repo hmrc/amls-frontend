@@ -20,7 +20,7 @@ import cats.data.OptionT
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessdetails.{AboutTheBusiness, ConfirmRegisteredOffice, RegisteredOffice, RegisteredOfficeUK}
+import models.businessdetails.{BusinessDetails, ConfirmRegisteredOffice, RegisteredOffice, RegisteredOfficeUK}
 import models.businesscustomer.Address
 import models.businessmatching.BusinessMatching
 import views.html.businessdetails._
@@ -53,7 +53,7 @@ class ConfirmRegisteredOfficeController @Inject () (
     }
   }
 
-  def hasRegisteredAddress(aboutTheBusiness: Future[Option[AboutTheBusiness]]) : Future[Option[Boolean]] = {
+  def hasRegisteredAddress(aboutTheBusiness: Future[Option[BusinessDetails]]) : Future[Option[Boolean]] = {
     aboutTheBusiness.map {
       case Some(atb) => Some(atb.registeredOffice.isDefined)
       case _ => Some(false)
@@ -65,7 +65,7 @@ class ConfirmRegisteredOfficeController @Inject () (
     implicit authContext =>
       implicit request =>
         (for {
-          hra <- OptionT.liftF(hasRegisteredAddress(dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)))
+          hra <- OptionT.liftF(hasRegisteredAddress(dataCache.fetch[BusinessDetails](BusinessDetails.key)))
           bma <- OptionT.liftF(getAddress(dataCache.fetch[BusinessMatching](BusinessMatching.key)))
         } yield (hra,bma) match {
           case (Some(false),Some(data)) => Ok(confirm_registered_office_or_main_place(EmptyForm, data))
@@ -86,7 +86,7 @@ class ConfirmRegisteredOfficeController @Inject () (
           case ValidForm(_, data) =>
 
             def updateRegisteredOfficeAndRedirect(bm: BusinessMatching,
-                                                  aboutTheBusiness: AboutTheBusiness) = {
+                                                  aboutTheBusiness: BusinessDetails) = {
 
               val address = if (data.isRegOfficeOrMainPlaceOfBusiness) {
                 updateBMAddress(bm)
@@ -94,7 +94,7 @@ class ConfirmRegisteredOfficeController @Inject () (
                 None
               }
 
-              dataCache.save[AboutTheBusiness](AboutTheBusiness.key, aboutTheBusiness.copy(registeredOffice = address)) map { _ =>
+              dataCache.save[BusinessDetails](BusinessDetails.key, aboutTheBusiness.copy(registeredOffice = address)) map { _ =>
                 if (data.isRegOfficeOrMainPlaceOfBusiness) {
                   Redirect(routes.ContactingYouController.get(edit))
                 } else {
@@ -106,7 +106,7 @@ class ConfirmRegisteredOfficeController @Inject () (
             (for {
               cache <- OptionT(dataCache.fetchAll)
               bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
-              aboutTheBusiness <- OptionT.fromOption[Future](cache.getEntry[AboutTheBusiness](AboutTheBusiness.key))
+              aboutTheBusiness <- OptionT.fromOption[Future](cache.getEntry[BusinessDetails](BusinessDetails.key))
               result <- OptionT.liftF(updateRegisteredOfficeAndRedirect(bm, aboutTheBusiness))
             } yield {
               result

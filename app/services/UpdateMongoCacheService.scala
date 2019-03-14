@@ -19,7 +19,7 @@ package services
 import config.ApplicationConfig
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
-import models.businessdetails.AboutTheBusiness
+import models.businessdetails.BusinessDetails
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
@@ -60,7 +60,7 @@ class UpdateMongoCacheService @Inject()(http: HttpGet, val cacheConnector: DataC
       _ <- fn(MoneyServiceBusiness.key, response.msb)
       _ <- fn(Hvd.key, response.hvd)
       _ <- fn(Supervision.key, response.supervision)
-      _ <- fn(AboutTheBusiness.key, response.aboutTheBusiness)
+      _ <- fn(BusinessDetails.key, response.aboutTheBusiness)
       _ <- fn(EstateAgentBusiness.key, response.estateAgencyBusiness)
       _ <- fn(SubscriptionResponse.key, response.Subscription)
       _ <- fn(AmendVariationRenewalResponse.key, response.amendVariationResponse)

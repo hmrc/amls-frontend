@@ -20,7 +20,7 @@ import config.ApplicationConfig
 import connectors.DataCacheConnector
 import generators.ResponsiblePersonGenerator
 import generators.tradingpremises.TradingPremisesGenerator
-import models.businessdetails.{AboutTheBusiness, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
+import models.businessdetails.{BusinessDetails, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
 import models.businessmatching._
 import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
@@ -115,7 +115,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
 
             override val builder = defaultBuilder.configure("microservice.services.feature-toggle.phase-2-changes" -> false)
 
-            val aboutTheBusiness = AboutTheBusiness(
+            val aboutTheBusiness = BusinessDetails(
               previouslyRegistered = Some(PreviouslyRegisteredNo)
             )
 
@@ -142,7 +142,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
 
             mockCacheGetEntry(Some(tradingPremises), TradingPremises.key)
             mockCacheGetEntry(Some(responsiblePeople), ResponsiblePerson.key)
-            mockCacheGetEntry(Some(aboutTheBusiness), AboutTheBusiness.key)
+            mockCacheGetEntry(Some(aboutTheBusiness), BusinessDetails.key)
             mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
 
             val privateGetBreakdownRows = PrivateMethod[Future[Seq[BreakdownRow]]]('getBreakdownRows)
@@ -160,7 +160,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
 
             override val builder = defaultBuilder.configure("microservice.services.feature-toggle.phase-2-changes" -> false)
 
-            val aboutTheBusiness = AboutTheBusiness(
+            val aboutTheBusiness = BusinessDetails(
               previouslyRegistered = Some(PreviouslyRegisteredNo)
             )
 
@@ -187,7 +187,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
 
             mockCacheGetEntry(Some(tradingPremises), TradingPremises.key)
             mockCacheGetEntry(Some(responsiblePeople), ResponsiblePerson.key)
-            mockCacheGetEntry(Some(aboutTheBusiness), AboutTheBusiness.key)
+            mockCacheGetEntry(Some(aboutTheBusiness), BusinessDetails.key)
             mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
 
             val privateGetBreakdownRows = PrivateMethod[Future[Seq[BreakdownRow]]]('getBreakdownRows)
@@ -203,7 +203,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
 
             override val builder = defaultBuilder.configure("microservice.services.feature-toggle.phase-2-changes" -> false)
 
-            val aboutTheBusiness = AboutTheBusiness(
+            val aboutTheBusiness = BusinessDetails(
               previouslyRegistered = Some(PreviouslyRegisteredNo)
             )
 
@@ -230,7 +230,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
 
             mockCacheGetEntry(Some(tradingPremises), TradingPremises.key)
             mockCacheGetEntry(Some(responsiblePeople), ResponsiblePerson.key)
-            mockCacheGetEntry(Some(aboutTheBusiness), AboutTheBusiness.key)
+            mockCacheGetEntry(Some(aboutTheBusiness), BusinessDetails.key)
             mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
 
             val privateGetBreakdownRows = PrivateMethod[Future[Seq[BreakdownRow]]]('getBreakdownRows)
@@ -253,7 +253,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
 
             override val builder = defaultBuilder.configure("microservice.services.feature-toggle.phase-2-changes" -> true)
 
-            val aboutTheBusiness = AboutTheBusiness(
+            val aboutTheBusiness = BusinessDetails(
               previouslyRegistered = Some(PreviouslyRegisteredNo)
             )
 
@@ -280,7 +280,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
 
             mockCacheGetEntry(Some(tradingPremises), TradingPremises.key)
             mockCacheGetEntry(Some(responsiblePeople), ResponsiblePerson.key)
-            mockCacheGetEntry(Some(aboutTheBusiness), AboutTheBusiness.key)
+            mockCacheGetEntry(Some(aboutTheBusiness), BusinessDetails.key)
             mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
 
             val privateGetBreakdownRows = PrivateMethod[Future[Seq[BreakdownRow]]]('getBreakdownRows)
@@ -301,7 +301,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
           ResponsiblePerson()
         )
 
-        val aboutTheBusiness = AboutTheBusiness(
+        val aboutTheBusiness = BusinessDetails(
           previouslyRegistered = Some(PreviouslyRegisteredYes("regNo"))
         )
 
@@ -314,7 +314,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
         )
 
         mockCacheGetEntry(Some(people), ResponsiblePerson.key)
-        mockCacheGetEntry(Some(aboutTheBusiness), AboutTheBusiness.key)
+        mockCacheGetEntry(Some(aboutTheBusiness), BusinessDetails.key)
         mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
         mockCacheGetEntry(Some(Seq.empty[TradingPremises]), TradingPremises.key)
 
@@ -329,7 +329,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
           responsiblePersonGen.sample.get
         )
 
-        val aboutTheBusiness = AboutTheBusiness(
+        val aboutTheBusiness = BusinessDetails(
           previouslyRegistered = Some(PreviouslyRegisteredYes("regNo"))
         )
 
@@ -348,7 +348,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
         )
 
         mockCacheGetEntry(Some(people), ResponsiblePerson.key)
-        mockCacheGetEntry(Some(aboutTheBusiness), AboutTheBusiness.key)
+        mockCacheGetEntry(Some(aboutTheBusiness), BusinessDetails.key)
         mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
         mockCacheGetEntry(Some(tradingPremises), TradingPremises.key)
 
@@ -371,7 +371,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
 
           val responsiblePeople = responsiblePeopleGen(3).sample.get
 
-          val aboutTheBusiness = AboutTheBusiness(
+          val aboutTheBusiness = BusinessDetails(
             previouslyRegistered = Some(PreviouslyRegisteredYes("regNo"))
           )
 
@@ -381,7 +381,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
 
           mockCacheGetEntry(Some(tradingPremises), TradingPremises.key)
           mockCacheGetEntry(Some(responsiblePeople), ResponsiblePerson.key)
-          mockCacheGetEntry(Some(aboutTheBusiness), AboutTheBusiness.key)
+          mockCacheGetEntry(Some(aboutTheBusiness), BusinessDetails.key)
           mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
 
           val privateGetBreakdownRows = PrivateMethod[Future[Seq[BreakdownRow]]]('getBreakdownRows)
@@ -403,7 +403,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
             BreakdownRow(Messages("summary.tradingpremises"), 2, Currency(premisesFee), Currency(premisesFee * 2))
           )
 
-          val aboutTheBusiness = AboutTheBusiness(
+          val aboutTheBusiness = BusinessDetails(
             previouslyRegistered = Some(PreviouslyRegisteredNo)
           )
 
@@ -430,7 +430,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
 
           mockCacheGetEntry(Some(tradingPremises), TradingPremises.key)
           mockCacheGetEntry(Some(responsiblePeople), ResponsiblePerson.key)
-          mockCacheGetEntry(Some(aboutTheBusiness), AboutTheBusiness.key)
+          mockCacheGetEntry(Some(aboutTheBusiness), BusinessDetails.key)
           mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
 
           val privateGetBreakdownRows = PrivateMethod[Future[Seq[BreakdownRow]]]('getBreakdownRows)
@@ -446,7 +446,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
             BreakdownRow(Messages("summary.tradingpremises"), 2, Currency(premisesFee), Currency(premisesFee * 2))
           )
 
-          val aboutTheBusiness = AboutTheBusiness(
+          val aboutTheBusiness = BusinessDetails(
             previouslyRegistered = Some(PreviouslyRegisteredNo)
           )
 
@@ -473,7 +473,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
 
           mockCacheGetEntry(Some(tradingPremiseses), TradingPremises.key)
           mockCacheGetEntry(Some(responsiblePeople), ResponsiblePerson.key)
-          mockCacheGetEntry(Some(aboutTheBusiness), AboutTheBusiness.key)
+          mockCacheGetEntry(Some(aboutTheBusiness), BusinessDetails.key)
           mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
 
           val privateGetBreakdownRows = PrivateMethod[Future[Seq[BreakdownRow]]]('getBreakdownRows)

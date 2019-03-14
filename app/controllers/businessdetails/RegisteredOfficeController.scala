@@ -24,7 +24,7 @@ import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.businessdetails.{AboutTheBusiness, RegisteredOffice, RegisteredOfficeUK}
+import models.businessdetails.{BusinessDetails, RegisteredOffice, RegisteredOfficeUK}
 import play.api.mvc.Request
 import services.{AutoCompleteService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -49,7 +49,7 @@ class RegisteredOfficeController @Inject () (
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key) map {
+        dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key) map {
           response =>
             val form: Form2[RegisteredOffice] = (for {
               aboutTheBusiness <- response
@@ -68,8 +68,8 @@ class RegisteredOfficeController @Inject () (
           case ValidForm(_, data) =>
 
             val doUpdate = for {
-              aboutTheBusiness <- OptionT(dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key))
-              _ <- OptionT.liftF(dataCacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, aboutTheBusiness.registeredOffice(data)))
+              aboutTheBusiness <- OptionT(dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key))
+              _ <- OptionT.liftF(dataCacheConnector.save[BusinessDetails](BusinessDetails.key, aboutTheBusiness.registeredOffice(data)))
               status <- OptionT.liftF(statusService.getStatus)
               _ <- OptionT.liftF(auditAddressChange(data, aboutTheBusiness.registeredOffice, edit)) orElse OptionT.some(Success)
             } yield {

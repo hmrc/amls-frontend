@@ -20,7 +20,7 @@ import connectors._
 import generators.submission.SubscriptionResponseGenerator
 import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
-import models.businessdetails.{AboutTheBusiness, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
+import models.businessdetails.{BusinessDetails, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
 import models.confirmation.{BreakdownRow, Currency}
@@ -143,9 +143,9 @@ class ConfirmationControllerSpec extends AmlsSpec
       controller.confirmationService.getBreakdownRows(any(), any())(any(), any(), any())
     } thenReturn Future.successful(Some(breakdownRows))
 
-    val aboutTheBusiness = AboutTheBusiness(previouslyRegistered = Some(PreviouslyRegisteredNo))
+    val aboutTheBusiness = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredNo))
     when {
-      controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any(), any(), any())
+      controller.dataCacheConnector.fetch[BusinessDetails](eqTo(BusinessDetails.key))(any(), any(), any())
     } thenReturn Future.successful(Some(aboutTheBusiness))
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(ref))
@@ -460,10 +460,10 @@ class ConfirmationControllerSpec extends AmlsSpec
         } thenReturn Future.successful(None)
 
 
-        val aboutTheBusinessYes = AboutTheBusiness(previouslyRegistered = Some(PreviouslyRegisteredYes("123456")))
+        val aboutTheBusinessYes = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredYes("123456")))
 
         when {
-          controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any(), any(), any())
+          controller.dataCacheConnector.fetch[BusinessDetails](eqTo(BusinessDetails.key))(any(), any(), any())
         } thenReturn Future.successful(Some(aboutTheBusinessYes))
 
         val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
@@ -675,14 +675,14 @@ class ConfirmationControllerSpec extends AmlsSpec
 
       "bacs confirmation is requested and is a transitional renewal" in new Fixture {
 
-        val aboutTheBusinessYes = AboutTheBusiness(previouslyRegistered = Some(PreviouslyRegisteredYes("123456")))
+        val aboutTheBusinessYes = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredYes("123456")))
 
         when {
           controller.statusService.getReadStatus(any())(any(), any(), any())
         } thenReturn Future.successful(ReadStatusResponse(LocalDateTime.now(), "", None, None, None, None, false))
 
         when {
-          controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any(), any(), any())
+          controller.dataCacheConnector.fetch[BusinessDetails](eqTo(BusinessDetails.key))(any(), any(), any())
         } thenReturn Future.successful(Some(aboutTheBusinessYes))
 
         val result = controller.bacsConfirmation()(request)

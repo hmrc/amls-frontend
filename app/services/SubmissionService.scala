@@ -22,7 +22,7 @@ import connectors.{AmlsConnector, DataCacheConnector}
 import exceptions.{DuplicateSubscriptionException, NoEnrolmentException}
 import javax.inject.Inject
 import models._
-import models.businessdetails.{AboutTheBusiness, RegisteredOfficeUK}
+import models.businessdetails.{BusinessDetails, RegisteredOfficeUK}
 import models.asp.Asp
 import models.bankdetails.{BankDetails, NoBankAccountUsed}
 import models.businessactivities.BusinessActivities
@@ -113,7 +113,7 @@ class SubmissionService @Inject()
       businessMatchingSection = cache.getEntry[BusinessMatching](BusinessMatching.key),
       eabSection = cache.getEntry[EstateAgentBusiness](EstateAgentBusiness.key),
       tradingPremisesSection = filteredTradingPremises,
-      aboutTheBusinessSection = cache.getEntry[AboutTheBusiness](AboutTheBusiness.key),
+      aboutTheBusinessSection = cache.getEntry[BusinessDetails](BusinessDetails.key),
       bankDetailsSection = bankDetailsExceptDeleted(cache.getEntry[Seq[BankDetails]](BankDetails.key)),
       aboutYouSection = cache.getEntry[AddPerson](AddPerson.key),
       businessActivitiesSection = cache.getEntry[BusinessActivities](BusinessActivities.key),
