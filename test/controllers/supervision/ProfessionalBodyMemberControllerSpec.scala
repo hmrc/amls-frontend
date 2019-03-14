@@ -113,15 +113,25 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
       "redirect to SummaryController" when {
         "edit is true" when {
           "isMember is true" when {
-            "ProfessionalBodyMemberYes is already defined" in new Fixture {
+            "ProfessionalBodyMemberYes is already defined and professional bodies provided" in new Fixture {
 
               val newRequest = request.withFormUrlEncodedBody(
                 "isAMember" -> "true"
               )
 
-              mockCacheFetch[Supervision](Some(Supervision(
-                professionalBodyMember = Some(ProfessionalBodyMemberYes)
+              val cache = mockCacheFetch[Supervision](Some(Supervision(
+                anotherBody = Some(AnotherBodyNo),
+                professionalBodyMember = Some(ProfessionalBodyMemberYes),
+                professionalBodies = Some(ProfessionalBodies(Set(AccountingTechnicians))),
+                professionalBody = Some(ProfessionalBodyNo),
+                hasChanged = true,
+                hasAccepted = true
               )))
+
+              val complete = mock[Supervision]
+
+              when(complete.isComplete) thenReturn true
+              when(mockCacheMap.getEntry[Supervision]("supervision")) thenReturn Some(complete)
 
               val result = controller.post(true)(newRequest)
               status(result) must be(SEE_OTHER)
