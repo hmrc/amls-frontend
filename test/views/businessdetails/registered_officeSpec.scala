@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.aboutthebusiness
+package views.businessdetails
 
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessdetails.{RegisteredOffice, RegisteredOfficeUK}

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package views.aboutthebusiness
+package views.businessdetails
 
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessdetails.{CorporationTaxRegistered, CorporationTaxRegisteredYes}
+import models.businessdetails.{VATRegistered, VATRegisteredYes}
 import org.scalatest.MustMatchers
 import utils.AmlsSpec
 import jto.validation.Path
@@ -26,29 +26,29 @@ import play.api.i18n.Messages
 import views.Fixture
 
 
-class corporation_tax_registeredSpec extends AmlsSpec with MustMatchers  {
+class vat_registeredSpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
   }
 
-  "corporation_tax_registered view" must {
+  "vat_registered view" must {
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[CorporationTaxRegistered] = Form2(CorporationTaxRegisteredYes("1234567890"))
+      val form2: ValidForm[VATRegistered] = Form2(VATRegisteredYes("1234"))
 
-      def view = views.html.aboutthebusiness.corporation_tax_registered(form2, true)
+      def view = views.html.aboutthebusiness.vat_registered(form2, true)
 
-      doc.title must startWith(Messages("businessdetails.registeredforcorporationtax.title") + " - " + Messages("summary.aboutbusiness"))
+      doc.title must startWith(Messages("businessdetails.registeredforvat.title") + " - " + Messages("summary.aboutbusiness"))
     }
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[CorporationTaxRegistered] = Form2(CorporationTaxRegisteredYes("1234567890"))
+      val form2: ValidForm[VATRegistered] = Form2(VATRegisteredYes("1234"))
 
-      def view = views.html.aboutthebusiness.corporation_tax_registered(form2, true)
+      def view = views.html.aboutthebusiness.vat_registered(form2, true)
 
-      heading.html must be(Messages("businessdetails.registeredforcorporationtax.title"))
+      heading.html must be(Messages("businessdetails.registeredforvat.title"))
       subHeading.html must include(Messages("summary.aboutbusiness"))
 
     }
@@ -57,19 +57,19 @@ class corporation_tax_registeredSpec extends AmlsSpec with MustMatchers  {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "registeredForCorporationTax") -> Seq(ValidationError("not a message Key")),
-          (Path \ "corporationTaxReference-panel") -> Seq(ValidationError("second not a message Key"))
+          (Path \ "registeredForVAT") -> Seq(ValidationError("not a message Key")),
+          (Path \ "vrnNumber-panel") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.aboutthebusiness.corporation_tax_registered(form2, true)
+      def view = views.html.aboutthebusiness.vat_registered(form2, true)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")
 
-      doc.getElementById("registeredForCorporationTax")
+      doc.getElementById("registeredForVAT")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
-      doc.getElementById("corporationTaxReference-panel")
+      doc.getElementById("vrnNumber-panel")
         .getElementsByClass("error-notification").first().html() must include("second not a message Key")
 
     }
@@ -77,7 +77,7 @@ class corporation_tax_registeredSpec extends AmlsSpec with MustMatchers  {
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.aboutthebusiness.corporation_tax_registered(form2, true)
+      def view = views.html.aboutthebusiness.vat_registered(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

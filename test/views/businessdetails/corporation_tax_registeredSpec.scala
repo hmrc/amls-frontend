@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package views.aboutthebusiness
+package views.businessdetails
 
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessdetails.{ConfirmRegisteredOffice, RegisteredOfficeUK}
+import models.businessdetails.{CorporationTaxRegistered, CorporationTaxRegisteredYes}
 import org.scalatest.MustMatchers
 import utils.AmlsSpec
 import jto.validation.Path
@@ -26,34 +26,29 @@ import play.api.i18n.Messages
 import views.Fixture
 
 
-class confirm_registered_office_or_main_placeSpec extends AmlsSpec with MustMatchers {
+class corporation_tax_registeredSpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
   }
 
-  "confirm_registered_office_or_main_place view" must {
+  "corporation_tax_registered view" must {
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[ConfirmRegisteredOffice] = Form2(ConfirmRegisteredOffice(true))
+      val form2: ValidForm[CorporationTaxRegistered] = Form2(CorporationTaxRegisteredYes("1234567890"))
 
-      def view = {
-        val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
-        views.html.aboutthebusiness.confirm_registered_office_or_main_place(form2, address, true)
-      }
+      def view = views.html.aboutthebusiness.corporation_tax_registered(form2, true)
 
-      doc.title must startWith(Messages("businessdetails.confirmingyouraddress.title") + " - " + Messages("summary.aboutbusiness"))
+      doc.title must startWith(Messages("businessdetails.registeredforcorporationtax.title") + " - " + Messages("summary.aboutbusiness"))
     }
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[ConfirmRegisteredOffice] = Form2(ConfirmRegisteredOffice(true))
+      val form2: ValidForm[CorporationTaxRegistered] = Form2(CorporationTaxRegisteredYes("1234567890"))
 
-      def view = {
-        val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
-        views.html.aboutthebusiness.confirm_registered_office_or_main_place(form2, address, true)
-      }
-      heading.html must be(Messages("businessdetails.confirmingyouraddress.title"))
+      def view = views.html.aboutthebusiness.corporation_tax_registered(form2, true)
+
+      heading.html must be(Messages("businessdetails.registeredforcorporationtax.title"))
       subHeading.html must include(Messages("summary.aboutbusiness"))
 
     }
@@ -62,26 +57,27 @@ class confirm_registered_office_or_main_placeSpec extends AmlsSpec with MustMatc
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "isRegOfficeOrMainPlaceOfBusiness") -> Seq(ValidationError("not a message Key"))
+          (Path \ "registeredForCorporationTax") -> Seq(ValidationError("not a message Key")),
+          (Path \ "corporationTaxReference-panel") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = {
-        val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
-        views.html.aboutthebusiness.confirm_registered_office_or_main_place(form2, address, true)
-      }
+      def view = views.html.aboutthebusiness.corporation_tax_registered(form2, true)
 
       errorSummary.html() must include("not a message Key")
+      errorSummary.html() must include("second not a message Key")
 
-      doc.getElementById("isRegOfficeOrMainPlaceOfBusiness")
+      doc.getElementById("registeredForCorporationTax")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
+
+      doc.getElementById("corporationTaxReference-panel")
+        .getElementsByClass("error-notification").first().html() must include("second not a message Key")
 
     }
 
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
 
-      val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
-      def view = views.html.aboutthebusiness.confirm_registered_office_or_main_place(form2, address, true)
+      def view = views.html.aboutthebusiness.corporation_tax_registered(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

@@ -14,67 +14,62 @@
  * limitations under the License.
  */
 
-package views.aboutthebusiness
+package views.businessdetails
 
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.businessdetails.{ConfirmRegisteredOffice, RegisteredOfficeUK}
+import models.businessdetails.ContactingYouEmail
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
 
 
-class letters_addressSpec extends AmlsSpec with MustMatchers {
+class contacting_youSpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
   }
 
-  "letters_address view" must {
+  "contacting_you view" must {
     "have correct title, headings and form fields" in new ViewFixture {
 
-      val form2: ValidForm[ConfirmRegisteredOffice] = Form2(ConfirmRegisteredOffice(true))
+      val form2: ValidForm[ContactingYouEmail] = Form2(ContactingYouEmail("123456789789","test@test.com"))
 
       def view = {
-        val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
-        views.html.aboutthebusiness.letters_address(form2, address, true)
+        views.html.aboutthebusiness.contacting_you(form2, true)
       }
 
-      doc.title must be(Messages("businessdetails.lettersaddress.title") +
+      doc.title must be(Messages("businessdetails.contactingyou.email.title") +
         " - " + Messages("summary.aboutbusiness") +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
-      heading.html must be(Messages("businessdetails.lettersaddress.title"))
+      heading.html must be(Messages("businessdetails.contactingyou.email.title"))
       subHeading.html must include(Messages("summary.aboutbusiness"))
 
-      doc.getElementsMatchingOwnText("line1").text mustBe "line1 line2 AB12CD"
-      doc.select("input[type=radio]").size mustBe 2
+      doc.getElementsByAttributeValue("name", "email") must not be empty
+      doc.getElementsByAttributeValue("name", "confirmEmail") must not be empty
+
     }
 
     "show error summary in correct location" in new ViewFixture {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "lettersAddress") -> Seq(ValidationError("not a message Key"))
+          (Path \ "contactingyou-fieldset") -> Seq(ValidationError("not a message Key"))
         ))
 
       def view = {
-        val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
-        views.html.aboutthebusiness.letters_address(form2, address, true)
+        views.html.aboutthebusiness.contacting_you(form2, true)
       }
 
       errorSummary.html() must include("not a message Key")
-
     }
 
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
 
-      def view = {
-        val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
-        views.html.aboutthebusiness.letters_address(form2, address, true)
-      }
+      def view = views.html.aboutthebusiness.contacting_you(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
