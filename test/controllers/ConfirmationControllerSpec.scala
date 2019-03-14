@@ -460,11 +460,11 @@ class ConfirmationControllerSpec extends AmlsSpec
         } thenReturn Future.successful(None)
 
 
-        val aboutTheBusinessYes = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredYes("123456")))
+        val businessDetailsYes = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredYes("123456")))
 
         when {
           controller.dataCacheConnector.fetch[BusinessDetails](eqTo(BusinessDetails.key))(any(), any(), any())
-        } thenReturn Future.successful(Some(aboutTheBusinessYes))
+        } thenReturn Future.successful(Some(businessDetailsYes))
 
         val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
 
@@ -675,7 +675,7 @@ class ConfirmationControllerSpec extends AmlsSpec
 
       "bacs confirmation is requested and is a transitional renewal" in new Fixture {
 
-        val aboutTheBusinessYes = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredYes("123456")))
+        val businessDetailsYes = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredYes("123456")))
 
         when {
           controller.statusService.getReadStatus(any())(any(), any(), any())
@@ -683,7 +683,7 @@ class ConfirmationControllerSpec extends AmlsSpec
 
         when {
           controller.dataCacheConnector.fetch[BusinessDetails](eqTo(BusinessDetails.key))(any(), any(), any())
-        } thenReturn Future.successful(Some(aboutTheBusinessYes))
+        } thenReturn Future.successful(Some(businessDetailsYes))
 
         val result = controller.bacsConfirmation()(request)
 
