@@ -28,10 +28,10 @@ import utils.MappingUtils.Implicits._
 import utils.{GenericValidators, TraversableValidators}
 
 case class WhichCurrencies(currencies: Seq[String],
-                           usesForeignCurrencies: Option[Boolean],
-                           bankMoneySource: Option[BankMoneySource],
-                           wholesalerMoneySource: Option[WholesalerMoneySource],
-                           customerMoneySource: Option[Boolean])
+                           usesForeignCurrencies: Option[Boolean] = None,
+                           bankMoneySource: Option[BankMoneySource] = None,
+                           wholesalerMoneySource: Option[WholesalerMoneySource] = None,
+                           customerMoneySource: Option[Boolean] = None)
 
 
 object WhichCurrencies {
@@ -56,62 +56,18 @@ object WhichCurrencies {
       basicPunctuationPattern()
   }
 
-  private val currencyListType = TraversableValidators.seqToOptionSeq(emptyToNone) andThen
-    TraversableValidators.flattenR[String] andThen
-    TraversableValidators.minLengthR[Seq[String]](1) andThen
-    GenericRules.traversableR(GenericValidators.inList(currencies))
-
-  private val validateMoneySources: ValidationRule[MoneySourceValidation] = Rule[MoneySourceValidation, MoneySourceValidation] {
-      case x@(Some(_), _, _) => Valid(x)
-      case x@(_, Some(_), _) => Valid(x)
-      case x@(_, _, Some(true)) => Valid(x)
-      case _ => Invalid(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))))
-    }
-
-
-  private val validateWhichCurrencies: ValidationRule[WhichCurrenciesValidation] = Rule[WhichCurrenciesValidation, WhichCurrenciesValidation] {
-    case x@(Some(true), Some(b), _, _) => Valid(x)
-    case x@(Some(true), _, Some(c), _) => Valid(x)
-    case x@(Some(true), _, _, Some(d)) => Valid(x)
-    case x@(Some(false), _, _, _) => Valid((Some(false), None, None, None))
-    case _ => Invalid(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))))
-  }
-
   implicit def formR: Rule[UrlFormEncoded, WhichCurrencies] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
 
-    val currencies = (__ \ "currencies").read(currencyListType).withMessage("error.invalid.msb.wc.currencies")
+    val currencies = (__ \ "currencies").read[Seq[String]].withMessage("error.invalid.msb.wc.currencies")
+    val usesForeignCurrencies = (__ \ "usesForeignCurrencies").read[Option[Boolean]].withMessage("error.required.msb.wc.foreignCurrencies")
+    val bankMoneySource = (__ \ "bankMoneySource").read[Option[BankMoneySource]]
+    val wholesalerMoneySource = (__ \ "wholesalerMoneySource").read[Option[WholesalerMoneySource]]
+    val customerMoneySource = (__ \ "customerMoneySource").read[Option[Boolean]]
 
-    val usesForeignCurrencies =
-        (__ \ "usesForeignCurrencies").read[String] withMessage "error.required.msb.wc.foreignCurrencies" map {
-          case "Yes" => Option(true)
-          case _ => Option(false)
-        }
-
-    val bankMoneySource: Rule[UrlFormEncoded, Option[BankMoneySource]] =
-      (__ \ "bankMoneySource").read[Option[String]] flatMap {
-        case Some("Yes") => (__ \ "bankNames")
-          .read(nameType("bankNames"))
-          .map(names => Some(BankMoneySource(names)))
-        case _ => Rule[UrlFormEncoded, Option[BankMoneySource]](_ => Valid(None))
-      }
-
-    val wholesalerMoneySource: Rule[UrlFormEncoded, Option[WholesalerMoneySource]] =
-      (__ \ "wholesalerMoneySource").read[Option[String]] flatMap {
-        case Some("Yes") => (__ \ "wholesalerNames")
-          .read(nameType("wholesalerNames"))
-          .map(names => Some(WholesalerMoneySource(names)))
-        case _ => Rule[UrlFormEncoded, Option[WholesalerMoneySource]](_ => Valid(None))
-      }
-
-    val customerMoneySource = (__ \ "customerMoneySource").read[Option[String]] map {
-      case Some("Yes") => Some(true)
-      case _ => None
+    (currencies ~ usesForeignCurrencies ~ bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).tupled map {
+      r => WhichCurrencies(r._1, r._2,r._3,r._4,r._5)
     }
-
-    (currencies ~ ((usesForeignCurrencies ~ bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).tupled andThen validateWhichCurrencies)).apply {
-        (a, b) => WhichCurrencies(a.toSeq, b._1, b._2, b._3, b._4)
-      }
   }
 
   implicit val formW: Write[WhichCurrencies, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
@@ -133,15 +89,13 @@ object WhichCurrencies {
         (__ \ "bankNames").write[Option[String]] ~
         (__ \ "wholesalerMoneySource").write[Option[String]] ~
         (__ \ "wholesalerNames").write[Option[String]] ~
-        (__ \ "customerMoneySource").write[Option[String]] ~
-        (__ \ "usesForeignCurrencies").write[Option[String]]
+        (__ \ "customerMoneySource").write[Option[String]]
       ).apply(wc => (wc.currencies,
       wc.bankMoneySource.map(_ => "Yes"),
       wc.bankMoneySource.map(bms => bms.bankNames),
       wc.wholesalerMoneySource.map(_ => "Yes"),
       wc.wholesalerMoneySource.map(bms => bms.wholesalerNames),
-      wc.customerMoneySource.map(_ => "Yes"),
-      wc.usesForeignCurrencies.fold[Option[String]](defaultFlagValue(wc))(bToS)
+      wc.customerMoneySource.map(_ => "Yes")
       ))
   }
 
