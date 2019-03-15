@@ -53,7 +53,6 @@ title = Messages("progress.title") + " - " + Messages("title.yapp")
         @* Main sections *@
         <ul class="grid-layout__column grid-layout__column--2-3 display-block">
             @sections.map { case Section(name, status, _, call) =>
-                @println(s"---- handling section ${name}")
                 @section(name, status, call)
             }
         </ul>

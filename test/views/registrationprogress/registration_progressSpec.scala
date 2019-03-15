@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package views
+package views.registrationprogress
 
 import forms.EmptyForm
+import generators.businesscustomer.AddressGenerator
 import models.registrationprogress.{Completed, Section, Started}
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.mvc.Call
 import utils.AmlsSpec
-import generators.businesscustomer.AddressGenerator
+import views.Fixture
 
 class registration_progressSpec extends AmlsSpec with MockitoSugar with AddressGenerator {
 
