@@ -95,11 +95,13 @@ class SupplyForeignCurrenciesControllerSpec extends AmlsSpec
       "show a pre-populated form when model contains data" in new Fixture {
 
         val currentModel = WhichCurrencies(
-          Seq("USD"),
-          usesForeignCurrencies = Some(true),
-          None,
-          None,
-          Some(true))
+          Seq("USD")
+//          ,
+//          usesForeignCurrencies = Some(true),
+//          None,
+//          None,
+//          Some(true)
+        )
 
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(NotCompleted))

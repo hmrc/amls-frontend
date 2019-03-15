@@ -49,11 +49,12 @@ class CETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
   val emptyCache = CacheMap("", Map.empty)
 
   val fullModel = WhichCurrencies(
-    Seq("USD", "CHF", "EUR"),
-    Some(false),
-    Some(BankMoneySource("Bank names")),
-    Some(WholesalerMoneySource("wholesaler names")),
-    Some(true)
+    Seq("USD", "CHF", "EUR")
+//    ,
+//    Some(false),
+//    Some(BankMoneySource("Bank names")),
+//    Some(WholesalerMoneySource("wholesaler names")),
+//    Some(true)
   )
 
   "CETransactionsInNext12MonthsController" must {

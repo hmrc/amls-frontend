@@ -19,10 +19,8 @@ package views.msb
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessMatchingMsbServices, CurrencyExchange}
 import models.moneyservicebusiness.{MoneyServiceBusiness, WhichCurrencies}
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import play.api.test.FakeApplication
 import utils.AmlsSpec
 import views.Fixture
 
@@ -37,7 +35,9 @@ class summaryPreRelease7Spec extends  AmlsSpec with MustMatchers {
 
     "indicate whether foreign currencies are used" in new ViewFixture {
 
-      val model = MoneyServiceBusiness(whichCurrencies = Some(WhichCurrencies(Seq("GBP"), None, None, None, None)))
+      val model = MoneyServiceBusiness(whichCurrencies = Some(WhichCurrencies(Seq("GBP")
+//        , None, None, None, None
+      )))
 
       def view = views.html.msb.summary(model, Some(BusinessMatchingMsbServices(Set(CurrencyExchange))), false, ServiceChangeRegister())
 

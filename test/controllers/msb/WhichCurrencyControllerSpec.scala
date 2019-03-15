@@ -17,17 +17,15 @@
 package controllers.msb
 
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices, CurrencyExchange, ForeignExchange, MoneyServiceBusiness => MoneyServiceBusinessActivity}
+import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices, MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import models.moneyservicebusiness._
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
-import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
-import play.api.http.Status.{BAD_REQUEST, SEE_OTHER}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
@@ -97,11 +95,13 @@ class WhichCurrencyControllerSpec extends AmlsSpec
       "show a pre-populated form when model contains data" in new Fixture {
 
         val currentModel = WhichCurrencies(
-          Seq("USD"),
-          usesForeignCurrencies = Some(true),
-          None,
-          None,
-          Some(true))
+          Seq("USD")
+//          ,
+//          usesForeignCurrencies = Some(true),
+//          None,
+//          None,
+//          Some(true)
+        )
 
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(NotCompleted))

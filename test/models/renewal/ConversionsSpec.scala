@@ -120,7 +120,10 @@ class ConversionsSpec extends WordSpec with MustMatchers {
 
       converted.msbSection.get.whichCurrencies mustBe Some(
         models.moneyservicebusiness.WhichCurrencies(
-          Seq("USD", "CHF", "EUR"), None, Some(BankMoneySource("Bank names")), None, None))
+          Seq("USD", "CHF", "EUR")
+//          ,
+//          None, Some(BankMoneySource("Bank names")), None, None
+        ))
 
     }
 

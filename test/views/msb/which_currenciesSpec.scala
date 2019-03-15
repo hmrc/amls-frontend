@@ -34,15 +34,18 @@ class which_currenciesSpec extends AmlsSpec with MustMatchers {
   "which_currencies view" must {
 
     "have the back link button" in new ViewFixture {
-      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP"), None, None, None, None))
+      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP")
+        //        , None, None, None, None
+      ))
       def view = views.html.msb.which_currencies(formData, true)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "have correct title" in new ViewFixture {
 
-      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP"), None, None, None, None))
-
+      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP")
+        //        , None, None, None, None
+      ))
       def view = views.html.msb.which_currencies(formData, true)
 
       doc.title must startWith(Messages("msb.which_currencies.title") + " - " + Messages("summary.msb"))
@@ -50,7 +53,9 @@ class which_currenciesSpec extends AmlsSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP"), None, None, None, None))
+      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP")
+        //        , None, None, None, None
+      ))
 
       def view = views.html.msb.which_currencies(formData, true)
 

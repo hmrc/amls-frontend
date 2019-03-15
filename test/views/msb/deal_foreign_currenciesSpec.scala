@@ -34,15 +34,18 @@ class deal_foreign_currenciesSpec extends AmlsSpec with MustMatchers {
   "which_currencies view" must {
 
     "have the back link button" in new ViewFixture {
-      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP"), None, None, None, None))
+      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP")
+//        , None, None, None, None
+      ))
       def view = views.html.msb.deal_foreign_currencies(formData, true)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "have correct title" in new ViewFixture {
 
-      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP"), None, None, None, None))
-
+      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP")
+        //        , None, None, None, None
+      ))
       def view = views.html.msb.deal_foreign_currencies(formData, true)
 
       doc.title must startWith(Messages("msb.deal_foreign_currencies.title") + " - " + Messages("summary.msb"))
@@ -50,8 +53,9 @@ class deal_foreign_currenciesSpec extends AmlsSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP"), None, None, None, None))
-
+      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP")
+        //        , None, None, None, None
+      ))
       def view = views.html.msb.deal_foreign_currencies(formData, true)
 
       heading.html must be(Messages("msb.deal_foreign_currencies.title"))
@@ -61,8 +65,9 @@ class deal_foreign_currenciesSpec extends AmlsSpec with MustMatchers {
 
     "ask the user whether they deal in foreign currencies" in new ViewFixture {
 
-      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP"), None, None, None, None))
-
+      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP")
+        //        , None, None, None, None
+      ))
       def view = views.html.msb.deal_foreign_currencies(formData, true)
 
       Option(doc.getElementById("usesForeignCurrencies-Yes")).isDefined must be(true)

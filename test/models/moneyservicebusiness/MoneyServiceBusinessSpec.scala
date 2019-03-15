@@ -122,11 +122,13 @@ trait MoneyServiceBusinessTestData {
     businessUseAnIPSP = Some(businessUseAnIPSP),
     identifyLinkedTransactions = Some(IdentifyLinkedTransactions(true)),
     Some(WhichCurrencies(
-      Seq("USD", "GBP", "EUR"),
-      usesForeignCurrencies = Some(true),
-      Some(BankMoneySource("bank names")),
-      Some(WholesalerMoneySource("Wholesaler Names")),
-      Some(true))),
+      Seq("USD", "GBP", "EUR")
+//      ,
+//      usesForeignCurrencies = Some(true),
+//      Some(BankMoneySource("bank names")),
+//      Some(WholesalerMoneySource("Wholesaler Names")),
+//      Some(true)
+    )),
     sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
     fundsTransfer = Some(FundsTransfer(true)),
     branchesOrAgents = Some(BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))),

@@ -77,11 +77,13 @@ class summarySpec extends AmlsSpec
       Some(ExpectedThroughput.First),
       Some(BusinessUseAnIPSPNo),
       Some(IdentifyLinkedTransactions(false)),
-      Some(WhichCurrencies(Seq("USD", "GBP", "EUR"),
-        usesForeignCurrencies = Some(true),
-        Some(BankMoneySource("bank names")),
-        Some(WholesalerMoneySource("Wholesaler Names")),
-        Some(true))),
+      Some(WhichCurrencies(Seq("USD", "GBP", "EUR")
+//        ,
+//        usesForeignCurrencies = Some(true),
+//        Some(BankMoneySource("bank names")),
+//        Some(WholesalerMoneySource("Wholesaler Names")),
+//        Some(true)
+      )),
       Some(SendMoneyToOtherCountry(true)),
       Some(FundsTransfer(false)),
       Some(BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))),
