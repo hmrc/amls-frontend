@@ -98,8 +98,9 @@
         </div>
     </div>
 
-    @printLink(linkId="bank-details-print",
-    gaTag=Some("bank-details:click:print")
+    @printLink(
+        linkId="bank-details-print",
+        gaTag=Some("bank-details:click:print")
     )
 
     <p><a class="button" id="banks-details-submit" href="@controllers.routes.ConfirmationController.bacsConfirmation()">@Messages("button.continue")</a></p>

@@ -30,15 +30,10 @@
     heading = header
 ) {
 
-    @panel(
-        wide = true,
-        jsHidden = false,
-        gutter = true
-    ){
-        <p>@Messages("payments.waystopay.info")</p>
-        <p>@Messages("payments.waystopay.info2")</p>
-        <p>@Messages("payments.waystopay.lead.time")</p>
-    }
+
+    <p>@Messages("payments.waystopay.info")</p>
+    <p>@Messages("payments.waystopay.info2")</p>
+    <p>@Messages("payments.waystopay.lead.time")</p>
 
     @form(f, controllers.payments.routes.WaysToPayController.post()) {
 
@@ -53,13 +48,13 @@
             ) {
                 @radio(
                     f = f("waysToPay"),
-                    labelText = "payments.waystopay.card",
-                    value = "Card"
+                    labelText = "payments.waystopay.bacs",
+                    value = "Bacs"
                 )
                 @radio(
                     f = f("waysToPay"),
-                    labelText = "payments.waystopay.bacs",
-                    value = "Bacs"
+                    labelText = "payments.waystopay.card",
+                    value = "Card"
                 )
             }
         }
