@@ -24,29 +24,21 @@
     @status match {
 
         case NotStarted => {
-        <a id = @getStatusId(name) href="@call.url">
-            Add @Messages(s"progress.${name}.name")
-        </a>
-        <div class="task-status task-status--not-started">
-            <span class="visuallyhidden">This section is </span>Not started
-        </div>
+            <a id = @getStatusId(name) href="@call.url">
+                Add @Messages(s"progress.${name}.name")
+            </a>
+            <div class="task-status task-status--not-started">
+                <span class="visuallyhidden">This section is </span>Not started
+            </div>
         }
 
         case Started => {
-        <a class="progress-step progress-step__started" href="@call.url" aria-label="@Messages(s"progress.${name}.name"). @Messages(s"progress.$name.description") @Messages("progress.visuallyhidden.continue")">
-            <div class="grid-layout__column grid-layout__column--2-3 progress-step--details">
-                <h2 class="heading-small">@Messages(s"progress.${name}.name")</h2>
-                <p>@Messages(s"progress.$name.description")</p>
+            <a id = @getStatusId(name) href="@call.url">
+                Add @Messages(s"progress.${name}.name")
+            </a>
+            <div class="task-status taks-status--not-started">
+                <span class="visuallyhidden">This section is</span>Incomplete
             </div>
-            <div class="grid-layout__column grid-layout__column--1-3 progress-step--status">
-                <div class="grid-layout__column--2-3 progress-step--status-time">
-                    <p id="@getStatusId(name)" class="font-xsmall">@Messages("progress.continue")</p>
-                </div>
-                <div class="grid-layout__column grid-layout__column--1-3">
-                  &nbsp;
-                </div>
-            </div>
-        </a>
         }
 
         case Completed => {

@@ -16,8 +16,7 @@
 
 package views
 
-import forms.EmptyForm
-import models.registrationprogress.NotStarted
+import models.registrationprogress.{NotStarted, Started}
 import org.scalatest.mock.MockitoSugar
 import play.api.mvc.Call
 import utils.AmlsSpec
@@ -35,6 +34,15 @@ class SectionSpec extends AmlsSpec with MockitoSugar {
       def view = views.html.registrationprogress.section("hvd", NotStarted, mock[Call])
 
       doc.select("#hvd-status").first().ownText() must be ("Add High Value Dealer")
+      doc.select( "div").first().ownText() must be ("Not started")
+    }
+
+    "have correct text displayd for Started status" in new ViewFixture {
+
+      def view = views.html.registrationprogress.section("hvd", Started, mock[Call])
+
+      doc.select("#hvd-status").first().ownText() must be ("Add High Value Dealer")
+      doc.select("div").first().ownText() must be ("Incomplete")
     }
   }
 }
