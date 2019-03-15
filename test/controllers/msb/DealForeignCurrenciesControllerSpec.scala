@@ -17,15 +17,17 @@
 package controllers.msb
 
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices, MoneyServiceBusiness => MoneyServiceBusinessActivity}
+import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices, CurrencyExchange, ForeignExchange, MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import models.moneyservicebusiness._
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
+import play.api.http.Status.{BAD_REQUEST, SEE_OTHER}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
@@ -33,24 +35,23 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import scala.concurrent.Future
 
 class DealForeignCurrenciesControllerSpec extends AmlsSpec
-                                    with MockitoSugar
-                                    with MustMatchers
-                                    with PatienceConfiguration
-                                    with IntegrationPatience
-                                    with ScalaFutures {
+  with MockitoSugar
+  with MustMatchers
+  with PatienceConfiguration
+  with IntegrationPatience
+  with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
-    self => val request = addToken(authRequest)
-
-    //val cache: DataCacheConnector = mock[DataCacheConnector]
+    self =>
+    val request = addToken(authRequest)
 
     when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
       .thenReturn(Future.successful(None))
 
-    when(mockCacheConnector.save[MoneyServiceBusiness](any(), any())(any(),any(),any()))
+    when(mockCacheConnector.save[MoneyServiceBusiness](any(), any())(any(), any(), any()))
       .thenReturn(Future.successful(CacheMap("TESTID", Map())))
 
-    val controller = new DealForeignCurrenciesController ( dataCacheConnector = mockCacheConnector,
+    val controller = new DealForeignCurrenciesController(dataCacheConnector = mockCacheConnector,
       authConnector = self.authConnector,
       statusService = mockStatusService,
       serviceFlow = mockServiceFlow)
@@ -61,16 +62,22 @@ class DealForeignCurrenciesControllerSpec extends AmlsSpec
     val cacheMap = mock[CacheMap]
 
     when(controller.dataCacheConnector.fetchAll(any(), any()))
-            .thenReturn(Future.successful(Some(cacheMap)))
+      .thenReturn(Future.successful(Some(cacheMap)))
     val msbServices = Some(BusinessMatchingMsbServices(Set()))
     when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key))
-            .thenReturn(Some(MoneyServiceBusiness()))
+      .thenReturn(Some(MoneyServiceBusiness()))
     when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-            .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+      .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+  }
+
+  trait DealsInForeignCurrencyFixture extends Fixture {
+    val newRequest = request.withFormUrlEncodedBody(
+      "usesForeignCurrencies" -> "Yes"
+    )
   }
 
 
-  "WhichCurrencyController" when {
+  "DealForeignCurrencyController" when {
     "get is called" should {
       "succeed" when {
         "status is pre-submission" in new Fixture {
@@ -92,31 +99,52 @@ class DealForeignCurrenciesControllerSpec extends AmlsSpec
         }
       }
 
-      "show a pre-populated form when model contains data" in new Fixture {
+//            "show a pre-populated form when model contains data" in new Fixture {
+//              val currentModel = DealForeignCurrencies(
+//                usesForeignCurrencies = Some(true))
+//
+//              when(controller.statusService.getStatus(any(), any(), any()))
+//                .thenReturn(Future.successful(NotCompleted))
+//
+//              when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+//                .thenReturn(Future.successful(Some(MoneyServiceBusiness(DealForeignCurrencies = Some(currentModel)))))
+//
+//              val result = controller.get()(request)
+//              val document = Jsoup.parse(contentAsString(result))
+//
+//              status(result) mustEqual OK
+//
+//              document.select("select[name=currencies[0]] > option[value=USD]").hasAttr("selected") must be(true)
+//              document.select("input[name=bankMoneySource][checked]").`val` mustEqual ""
+//              document.select("input[name=wholesalerMoneySource][checked]").`val` mustEqual ""
+//            }
+          }
 
-        val currentModel = WhichCurrencies(
-          Seq("USD"),
-          usesForeignCurrencies = Some(true),
-          None,
-          None,
-          Some(true))
+      "post is called " when {
+        "data is valid and edit is false" should {
+          "redirect to Deal Foreign Currency Controller" in new DealsInForeignCurrencyFixture {
+            val result = controller.post().apply(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) mustBe Some(controllers.msb.routes.SupplyForeignCurrenciesController.get().url)
+          }
+        }
+        "data is valid and edit is true" should {
+          "redirect to Summary Controller" in new DealsInForeignCurrencyFixture {
+            val result = controller.post(edit = true).apply(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) mustBe Some(controllers.msb.routes.SummaryController.get().url)
+          }
+        }
+        "data is invalid" should {
+          "return bad request" in new Fixture {
+            val newRequest = request.withFormUrlEncodedBody(
+              ("IncorrectData1", "IncorrectData2")
+            )
 
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(NotCompleted))
-
-        when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
-          .thenReturn(Future.successful(Some(MoneyServiceBusiness(whichCurrencies = Some(currentModel)))))
-
-        val result = controller.get()(request)
-        val document = Jsoup.parse(contentAsString(result))
-
-        status(result) mustEqual OK
-
-//        document.select("select[name=currencies[0]] > option[value=USD]").hasAttr("selected") must be(true)
-//        document.select("input[name=usesForeignCurrencies][checked]").`val` mustEqual "Yes"
-        document.select("input[name=bankMoneySource][checked]").`val` mustEqual ""
-        document.select("input[name=wholesalerMoneySource][checked]").`val` mustEqual ""
-//        document.select("input[name=customerMoneySource][checked]").`val` mustEqual "Yes"
+            val result = controller.post().apply(newRequest)
+            status(result) must be(BAD_REQUEST)
+          }
+        }
       }
     }
 
@@ -130,170 +158,4 @@ class DealForeignCurrenciesControllerSpec extends AmlsSpec
         status(result) must be(NOT_FOUND)
       }
     }
-
-    "post is called " when {
-      "data is valid" should {
-        trait DealsInForeignCurrencyFixture extends Fixture {
-          val newRequest = request.withFormUrlEncodedBody (
-            "currencies[0]" -> "USD",
-            "currencies[1]" -> "GBP",
-            "currencies[2]" -> "BOB",
-            "bankMoneySource" ->"Yes",
-            "bankNames" ->"Bank names",
-            "wholesalerMoneySource" -> "Yes",
-            "wholesalerNames" -> "wholesaler names",
-            "customerMoneySource" -> "Yes",
-            "usesForeignCurrencies" -> "Yes"
-          )
-        }
-
-        trait NoDealsInForeignCurrencyFixture extends Fixture {
-          val newRequest = request.withFormUrlEncodedBody (
-            "currencies[0]" -> "USD",
-            "currencies[1]" -> "GBP",
-            "currencies[2]" -> "BOB",
-            "usesForeignCurrencies" -> "No"
-          )
-        }
-
-//        "user deals in foreign currency, redirect to check your answers when FX not an msb subservice" in new DealsInForeignCurrencyFixture {
-//          val result = controller.post().apply(newRequest)
-//          status(result) must be (SEE_OTHER)
-//          redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
-//        }
-//
-//        "user does not in foreign currency, redirect to check your answers when FX not an msb subservice" in new NoDealsInForeignCurrencyFixture {
-//          val result = controller.post().apply(newRequest)
-//          status(result) must be (SEE_OTHER)
-//          redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
-//        }
-//
-//        "user deals in foreign currency, go to FX transactions when FX an msb subservice" in new DealsInForeignCurrencyFixture {
-//          override val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
-//          when(controller.dataCacheConnector.fetchAll(any(), any()))
-//                  .thenReturn(Future.successful(Some(cacheMap)))
-//          when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-//                  .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
-//          val result = controller.post().apply(newRequest)
-//          status(result) must be (SEE_OTHER)
-//          redirectLocation(result) mustEqual Some(routes.FXTransactionsInNext12MonthsController.get().url)
-//        }
-//
-//        "user does not in foreign currency, go to FX transactions when FX an msb subservice" in new NoDealsInForeignCurrencyFixture {
-//          override val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
-//          when(controller.dataCacheConnector.fetchAll(any(), any()))
-//                  .thenReturn(Future.successful(Some(cacheMap)))
-//          when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-//                  .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
-//          val result = controller.post(true).apply(newRequest)
-//          status(result) must be (SEE_OTHER)
-//          redirectLocation(result) mustEqual Some(routes.FXTransactionsInNext12MonthsController.get(true).url)
-//        }
-//
-//        "user deals in foreign currency, redirect to FX transactions when FX transaction question unanswered and in edit mode" in new DealsInForeignCurrencyFixture {
-//          override val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
-//          when(controller.dataCacheConnector.fetchAll(any(), any()))
-//                  .thenReturn(Future.successful(Some(cacheMap)))
-//          when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-//                  .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
-//          val result = controller.post(true).apply(newRequest)
-//          status(result) must be (SEE_OTHER)
-//          redirectLocation(result) mustEqual Some(routes.FXTransactionsInNext12MonthsController.get(true).url)
-//        }
-//
-//        "user does not in foreign currency, redirect to FX transactions when FX transaction question unanswered and in edit mode" in new NoDealsInForeignCurrencyFixture {
-//          override val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
-//          when(controller.dataCacheConnector.fetchAll(any(), any()))
-//                  .thenReturn(Future.successful(Some(cacheMap)))
-//          when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-//                  .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
-//          val result = controller.post(true).apply(newRequest)
-//          status(result) must be (SEE_OTHER)
-//          redirectLocation(result) mustEqual Some(routes.FXTransactionsInNext12MonthsController.get(true).url)
-//        }
-//
-//        "user deals in foreign currency, redirect to check your answers when FX transaction question answered and in edit mode" in new DealsInForeignCurrencyFixture {
-//          override val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
-//          when(controller.dataCacheConnector.fetchAll(any(), any()))
-//                  .thenReturn(Future.successful(Some(cacheMap)))
-//          when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-//                  .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
-//          val currentModel = FXTransactionsInNext12Months("1")
-//          when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key))
-//                  .thenReturn(Some(MoneyServiceBusiness(fxTransactionsInNext12Months = Some(currentModel))))
-//          val result = controller.post(true).apply(newRequest)
-//          status(result) must be (SEE_OTHER)
-//          redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
-//        }
-//
-//        "user does not deal in foreign currency, redirect to check your answers when FX transaction question answered and in edit mode" in new NoDealsInForeignCurrencyFixture {
-//          override val msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
-//          when(controller.dataCacheConnector.fetchAll(any(), any()))
-//                  .thenReturn(Future.successful(Some(cacheMap)))
-//          when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-//                  .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
-//          val currentModel = FXTransactionsInNext12Months("1")
-//          when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key))
-//                  .thenReturn(Some(MoneyServiceBusiness(fxTransactionsInNext12Months = Some(currentModel))))
-//          val result = controller.post(true).apply(newRequest)
-//          status(result) must be (SEE_OTHER)
-//          redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
-//        }
-//      }
-
-
-//      "data is valid, but not using foreign currencies" should {
-//        "clear the foreign currency data" in new Fixture {
-//
-//          val newRequest = request.withFormUrlEncodedBody (
-//            "currencies[0]" -> "USD",
-//            "currencies[1]" -> "GBP",
-//            "currencies[2]" -> "BOB",
-//            "bankMoneySource" ->"Yes",
-//            "bankNames" ->"Bank names",
-//            "wholesalerMoneySource" -> "Yes",
-//            "wholesalerNames" -> "wholesaler names",
-//            "customerMoneySource" -> "Yes",
-//            "usesForeignCurrencies" -> "No"
-//          )
-//
-//          val currentModel = WhichCurrencies(Seq("USD"), usesForeignCurrencies = Some(true), Some(mock[BankMoneySource]), Some(mock[WholesalerMoneySource]), Some(true))
-//
-//          when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any())).
-//            thenReturn(Future.successful(Some(MoneyServiceBusiness(whichCurrencies = Some(currentModel)))))
-//
-//          val expectedModel = WhichCurrencies(Seq("USD", "GBP", "BOB"), usesForeignCurrencies = Some(false), None, None, None)
-//          val result = controller.post(false).apply(newRequest)
-//
-//          status(result) must be(SEE_OTHER)
-//
-//          val captor = ArgumentCaptor.forClass(classOf[MoneyServiceBusiness])
-//
-//          verify(controller.dataCacheConnector).save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), captor.capture())(any(), any(), any())
-//
-//          captor.getValue match {
-//            case result: MoneyServiceBusiness => result.whichCurrencies must be(Some(expectedModel))
-//          }
-//        }
-//      }
-//
-//      "data is invalid" should {
-//        "return invalid form" in new Fixture {
-//
-//          val newRequest = request.withFormUrlEncodedBody(
-//            "bankMoneySource" ->"Yes",
-//            "bankNames" ->"Bank names",
-//            "wholesalerMoneySource" -> "Yes",
-//            "wholesalerNames" -> "wholesaler names",
-//            "customerMoneySource" -> "Yes"
-//          )
-//
-//          whenReady(controller.post(false).apply(newRequest)) {
-//            resp =>
-//              resp.header.status must be(BAD_REQUEST)
-//          }
-//        }
-      }
-    }
-  }
 }

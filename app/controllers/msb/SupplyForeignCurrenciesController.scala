@@ -36,30 +36,52 @@ class SupplyForeignCurrenciesController @Inject()(val authConnector: AuthConnect
                                           ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
-      ControllerHelper.allowedToEdit(MsbActivity, Some(CurrencyExchange)) flatMap {
-        case true => dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
-        response =>
-          val form = (for {
-            msb <- response
-            currencies <- msb.whichCurrencies
-          } yield Form2[WhichCurrencies](currencies)).getOrElse(EmptyForm)
+    implicit authContext =>
+      implicit request => {
+        ControllerHelper.allowedToEdit(MsbActivity, Some(CurrencyExchange)) flatMap {
+          case true => dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+            response =>
+              val form = (for {
+                msb <- response
+                currencies <- msb.whichCurrencies
+              } yield Form2[WhichCurrencies](currencies)).getOrElse(EmptyForm)
 
-          Ok(views.html.msb.supply_foreign_currencies(form, edit))
+              Ok(views.html.msb.supply_foreign_currencies(form, edit))
+          }
+          case false => Future.successful(NotFound(notFoundView))
+        }
       }
-        case false => Future.successful(NotFound(notFoundView))
-      }
-    }
   }
+
   def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
-      val foo = Form2[WhichCurrencies](request.body)
-      foo match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.msb.supply_foreign_currencies(f, edit)))
-        case ValidForm(_, data) =>
-          Future.successful(Redirect(routes.FXTransactionsInNext12MonthsController.get()))
+    implicit authContext =>
+      implicit request => {
+        val foo = Form2[WhichCurrencies](request.body)
+        foo match {
+          case f: InvalidForm =>
+            Future.successful(BadRequest(views.html.msb.supply_foreign_currencies(f, edit)))
+          case ValidForm(_, data) =>
+            dataCacheConnector.fetchAll flatMap {
+              optMap =>
+                val result = for {
+                  cache <- optMap
+                  msb <- cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
+                  bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+                  services <- bm.msbServices
+                } yield {
+                  dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
+                    msb.whichCurrencies(data)
+                  ) map { _ =>
+                    services.msbServices.contains(ForeignExchange) match {
+                      case true if msb.fxTransactionsInNext12Months.isEmpty || !edit =>
+                        Redirect(routes.FXTransactionsInNext12MonthsController.get(edit))
+                      case _ => Redirect(routes.SummaryController.get())
+                    }
+                  }
+                }
+                result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
+            }
+        }
       }
-    }
   }
 }
