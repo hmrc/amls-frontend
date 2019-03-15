@@ -24,7 +24,7 @@
     @status match {
 
         case NotStarted => {
-        <a href="@call.url">
+        <a id = @getStatusId(name) href="@call.url">
             Add @Messages(s"progress.${name}.name")
         </a>
         <div class="task-status task-status--not-started">
