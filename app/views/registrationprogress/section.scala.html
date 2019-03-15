@@ -17,7 +17,6 @@
 @import models.registrationprogress._
 
 @(name: String, status: Status, call: Call)(implicit request: Request[_],m:Messages, lang: Lang)
-
 @getStatusId(name:String) = {@name.concat("-status")}
 
 <li class = "task-list-item">
@@ -42,16 +41,12 @@
         }
 
         case Completed => {
-        <a class="progress-step progress-step__complete" href="@call.url" aria-label="@Messages(s"progress.${name}.name"). @Messages("progress.visuallyhidden.completed") @Messages("progress.visuallyhidden.edit")">
-            <div class="grid-layout__column grid-layout__column--2-3 progress-step--details">
-                <h2 class="heading-small">@Messages(s"progress.${name}.name")</h2>
-                <p class="visuallyhidden">@Messages("progress.visuallyhidden.completed")</p>
-                <p id="@getStatusId(name)" class="progress-step__edit">@Messages("progress.link.edit")</p>
+            <a id = @getStatusId(name) href= "@call.url">
+                Edit @Messages(s"progress.${name}.name")
+            </a>
+            <div class = "task-status task-status--not-started">
+                <span class="visuallyhidden">This section is</span>Completed
             </div>
-            <div class="grid-layout__column grid-layout__column--1-3 progress-step--status">
-              &nbsp;
-            </div>
-        </a>
         }
     }
 </li>

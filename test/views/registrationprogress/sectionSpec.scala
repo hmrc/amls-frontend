@@ -16,7 +16,7 @@
 
 package views
 
-import models.registrationprogress.{NotStarted, Started}
+import models.registrationprogress.{Completed, NotStarted, Started}
 import org.scalatest.mock.MockitoSugar
 import play.api.mvc.Call
 import play.twirl.api.HtmlFormat
@@ -56,6 +56,20 @@ class SectionSpec extends AmlsSpec with MockitoSugar {
         override def view: HtmlFormat.Appendable = views.html.registrationprogress.section("hvd", Started, mock[Call])
 
         doc.select("div").first().ownText() must be ("Incomplete")
+      }
+    }
+
+    "status is Complete" must {
+      "show Edit [SectionName] link text" in new ViewFixture {
+        override def view: HtmlFormat.Appendable = views.html.registrationprogress.section("hvd", Completed, mock[Call])
+
+        doc.select("#hvd-status").first().ownText() must be("Edit High Value Dealer")
+      }
+
+      "show Complete info text" in new ViewFixture {
+        override def view: HtmlFormat.Appendable = views.html.registrationprogress.section("hvd", Completed, mock[Call])
+
+        doc.select("div").first().ownText() must be ("Completed")
       }
     }
   }
