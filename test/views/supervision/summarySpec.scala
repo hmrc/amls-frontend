@@ -32,6 +32,10 @@ class summarySpec extends AmlsSpec with MustMatchers with TableDrivenPropertyChe
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
+
+    val start = Some(SupervisionStart(new LocalDate(1990, 2, 24)))  //scalastyle:off magic.number
+    val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24)))//scalastyle:off magic.number
+    val reason = Some(SupervisionEndReasons("Ending reason"))
   }
 
   "summary view" must {
@@ -48,11 +52,11 @@ class summarySpec extends AmlsSpec with MustMatchers with TableDrivenPropertyChe
       subHeading.html must include(Messages("summary.supervision"))
     }
 
-    "include the provided data" in new ViewFixture {
+    "include the provided data if there is another body provided" in new ViewFixture {
 
       def view = {
         val testdata = Supervision(
-          Some(AnotherBodyYes("Company A", new LocalDate(1993, 8, 25), new LocalDate(1999, 8, 25), "Ending reason")),
+          Some(AnotherBodyYes("Company A", start, end, reason)),
           Some(ProfessionalBodyMemberYes),
           Some(ProfessionalBodies(Set(AccountingTechnicians, CharteredCertifiedAccountants, Other("anotherProfessionalBody")))),
           Some(ProfessionalBodyYes("details")),
@@ -64,7 +68,47 @@ class summarySpec extends AmlsSpec with MustMatchers with TableDrivenPropertyChe
 
       val sectionChecks = Table[String, Element => Boolean](
         ("title key", "check"),
-        ("supervision.another_body.title",checkElementTextIncludes(_, "lbl.yes", "Company A", "25 August 1993", "25 August 1999", "Ending reason")),
+        ("supervision.another_body.title",checkElementTextIncludes(_, "Company A")),
+        ("supervision.supervision_start.title",checkElementTextIncludes(_, "24 February 1990")),
+        ("supervision.supervision_end.title",checkElementTextIncludes(_, "24 February 1998")),
+        ("supervision.supervision_end_reasons.title",checkElementTextIncludes(_, "Ending reason")),
+        ("supervision.memberofprofessionalbody.title",checkElementTextIncludes(_, "lbl.yes")),
+        ("supervision.whichprofessionalbody.title",checkElementTextIncludes(_,
+          "supervision.memberofprofessionalbody.lbl.01",
+          "supervision.memberofprofessionalbody.lbl.02",
+          "supervision.memberofprofessionalbody.lbl.14",
+          "anotherProfessionalBody"
+        )),
+        ("supervision.penalisedbyprofessional.title",checkElementTextIncludes(_, "details"))
+      )
+
+      forAll(sectionChecks) { (key, check) => {
+        val hTwos = doc.select("section.check-your-answers h2")
+        val hTwo = hTwos.toList.find(e => e.text() == Messages(key))
+
+        hTwo must not be None
+        val section = hTwo.get.parents().select("section").first()
+        check(section) must be(true)
+      }}
+    }
+
+    "include the provided data if there is no another body provided" in new ViewFixture {
+
+      def view = {
+        val testdata = Supervision(
+          Some(AnotherBodyNo),
+          Some(ProfessionalBodyMemberYes),
+          Some(ProfessionalBodies(Set(AccountingTechnicians, CharteredCertifiedAccountants, Other("anotherProfessionalBody")))),
+          Some(ProfessionalBodyYes("details")),
+          hasAccepted = true
+        )
+
+        views.html.supervision.summary(EmptyForm, testdata)
+      }
+
+      val sectionChecks = Table[String, Element => Boolean](
+        ("title key", "check"),
+        ("supervision.another_body.title",checkElementTextIncludes(_, "lbl.no")),
         ("supervision.memberofprofessionalbody.title",checkElementTextIncludes(_, "lbl.yes")),
         ("supervision.whichprofessionalbody.title",checkElementTextIncludes(_,
           "supervision.memberofprofessionalbody.lbl.01",

@@ -16,14 +16,20 @@
 
 package models.supervision
 
+import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Path, Invalid, Valid}
-import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class AnotherBodySpec extends PlaySpec with MockitoSugar {
+
+  trait Fixture {
+
+    val start = Some(SupervisionStart(new LocalDate(1990, 2, 24)))  //scalastyle:off magic.number
+    val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24)))//scalastyle:off magic.number
+    val reason = Some(SupervisionEndReasons("Reason"))
+  }
 
   "Form Rules and Writes" must {
 
@@ -34,113 +40,51 @@ class AnotherBodySpec extends PlaySpec with MockitoSugar {
         AnotherBody.formRule.validate(urlFormEncoded) must be(expected)
       }
 
-      "given 'yes' selected with valid data" in {
+      "given 'yes' selected with valid Name" in new Fixture {
 
         val urlFormEncoded = Map(
           "anotherBody" -> Seq("true"),
           "supervisorName" -> Seq("Name"),
-          "startDate.day" -> Seq("24"),
-          "startDate.month" -> Seq("2"),
-          "startDate.year" -> Seq("1990"),
-          "endDate.day" -> Seq("24"),
-          "endDate.month" -> Seq("2"),
-          "endDate.year" -> Seq("1998"),
-          "endingReason" -> Seq("Reason")
+          "startDate" -> Seq(""),
+          "endDate" -> Seq(""),
+          "endingReason" -> Seq("")
         )
 
-        val start = new LocalDate(1990, 2, 24) //scalastyle:off magic.number
-        val end = new LocalDate(1998, 2, 24) //scalastyle:off magic.number
-        val expected = Valid(AnotherBodyYes("Name", start, end, "Reason"))
+        val expected = Valid(AnotherBodyYes("Name", None, None, None))
 
         AnotherBody.formRule.validate(urlFormEncoded) must be(expected)
       }
     }
 
-    "fail validation" when {
-      "given a future date" in {
 
-        val data = AnotherBody.formWrites.writes(AnotherBodyYes("Name", LocalDate.now().plusDays(1), LocalDate.now().plusMonths(1), "Reason"))
-        AnotherBody.formRule.validate(data) must be(Invalid(Seq(Path \ "startDate" -> Seq(
-          ValidationError("error.future.date")),Path \ "endDate" -> Seq(
-          ValidationError("error.future.date")))))
-      }
-    }
 
     "fail validation" when {
       "missing values when Yes selected" in {
         val urlFormEncoded = Map("anotherBody" -> Seq("true"))
         val expected = Invalid(
-          Seq((Path \ "supervisorName") -> Seq(ValidationError("error.required")),
-            (Path \ "startDate") -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")),
-            (Path \ "endDate") -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")),
-            (Path \ "endingReason") -> Seq(ValidationError("error.required")))
+          Seq((Path \ "supervisorName") -> Seq(ValidationError("error.required")))
         )
-        AnotherBody.formRule.validate(urlFormEncoded) must be(expected)
-      }
-
-      "supervision enddate is before supervision startdate" in {
-        val urlFormEncoded = Map(
-          "anotherBody" -> Seq("true"),
-          "supervisorName" -> Seq("Name"),
-          "startDate.day" -> Seq("25"),
-          "startDate.month" -> Seq("2"),
-          "startDate.year" -> Seq("1998"),
-          "endDate.day" -> Seq("24"),
-          "endDate.month" -> Seq("2"),
-          "endDate.year" -> Seq("1998"),
-          "endingReason" -> Seq("reason")
-        )
-
-        val expected = Invalid(
-          Seq((Path \ "startDate") -> Seq(ValidationError("error.expected.supervision.startdate.before.enddate")),
-          (Path \ "endDate") -> Seq(ValidationError("error.expected.supervision.enddate.after.startdate")))
-        )
-
         AnotherBody.formRule.validate(urlFormEncoded) must be(expected)
       }
 
       "given invalid characters in endingReason and supervisorName" in {
         val urlFormEncoded = Map(
           "anotherBody" -> Seq("true"),
-          "supervisorName" -> Seq("invalid {} <>"),
-          "startDate.day" -> Seq("24"),
-          "startDate.month" -> Seq("2"),
-          "startDate.year" -> Seq("1990"),
-          "endDate.day" -> Seq("24"),
-          "endDate.month" -> Seq("2"),
-          "endDate.year" -> Seq("1998"),
-          "endingReason" -> Seq("invalid {} <>")
-        )
+          "supervisorName" -> Seq("invalid {} <>"))
 
-        val expected = Invalid(
-              Seq((Path \ "supervisorName") -> Seq(ValidationError("err.text.validation")),
-                (Path \ "endingReason") -> Seq(ValidationError("err.text.validation")))
-          )
+        val expected = Invalid(Seq((Path \ "supervisorName") -> Seq(ValidationError("err.text.validation"))))
 
         AnotherBody.formRule.validate(urlFormEncoded) must be(expected)
-
       }
 
       "given only spaces in endingReason and supervisorName" in {
         val urlFormEncoded = Map(
           "anotherBody" -> Seq("true"),
-          "supervisorName" -> Seq("  "),
-          "startDate.day" -> Seq("24"),
-          "startDate.month" -> Seq("2"),
-          "startDate.year" -> Seq("1990"),
-          "endDate.day" -> Seq("24"),
-          "endDate.month" -> Seq("2"),
-          "endDate.year" -> Seq("1998"),
-          "endingReason" -> Seq("  ")
-        )
+          "supervisorName" -> Seq("  "))
 
-        val expected = Invalid(
-          Seq((Path \ "supervisorName") -> Seq(ValidationError("error.required.supervision.supervisor")),
-            (Path \ "endingReason") -> Seq(ValidationError("error.required.supervision.reason")))
-        )
+        val expected = Invalid(Seq((Path \ "supervisorName") -> Seq(ValidationError("error.required.supervision.supervisor"))))
 
         AnotherBody.formRule.validate(urlFormEncoded) must be(expected)
-
       }
     }
   }
@@ -152,23 +96,14 @@ class AnotherBodySpec extends PlaySpec with MockitoSugar {
       AnotherBody.formWrites.writes(AnotherBodyNo) must be(expected)
     }
 
-    "successfully write Yes" in {
+    "successfully write Yes" in  new Fixture {
 
       val expected = Map(
         "anotherBody" -> Seq("true"),
-        "supervisorName" -> Seq("Name"),
-        "startDate.day" -> Seq("24"),
-        "startDate.month" -> Seq("2"),
-        "startDate.year" -> Seq("1990"),
-        "endDate.day" -> Seq("24"),
-        "endDate.month" -> Seq("2"),
-        "endDate.year" -> Seq("1998"),
-        "endingReason" -> Seq("Reason")
+        "supervisorName" -> Seq("Name")
       )
 
-      val start = new LocalDate(1990, 2, 24) //scalastyle:off magic.number
-      val end = new LocalDate(1998, 2, 24) //scalastyle:off magic.number
-      val input = AnotherBodyYes("Name", start, end, "Reason")
+      val input = AnotherBodyYes("Name", None, None, None)
 
       AnotherBody.formWrites.writes(input) must be(expected)
     }
@@ -176,18 +111,16 @@ class AnotherBodySpec extends PlaySpec with MockitoSugar {
       Json.toJson(AnotherBodyNo) must be(Json.obj("anotherBody" -> false))
     }
 
-    "Serialise AnotherBodyYes service as expected" in {
+    "Serialise AnotherBodyYes service as expected" in new Fixture {
 
-      val start = new LocalDate(1990, 2, 24) //scalastyle:off magic.number
-      val end = new LocalDate(1998, 2, 24)   //scalastyle:off magic.number
-      val input = AnotherBodyYes("Name", start, end, "Reason")
+      val input = AnotherBodyYes("Name", start, end, reason)
 
       val expectedJson = Json.obj(
         "anotherBody" -> true,
         "supervisorName" -> "Name",
-        "startDate" -> "1990-02-24",
-        "endDate" -> "1998-02-24",
-        "endingReason" -> "Reason"
+        "startDate" -> Json.obj("supervisionStartDate" -> "1990-02-24"),
+        "endDate" -> Json.obj("supervisionEndDate" -> "1998-02-24"),
+        "endingReason" -> Json.obj("supervisionEndingReason" -> "Reason")
       )
 
       Json.toJson(input) must be(expectedJson)
@@ -199,19 +132,17 @@ class AnotherBodySpec extends PlaySpec with MockitoSugar {
       Json.fromJson[AnotherBody](json) must be (expected)
     }
 
-    "Deserialise AnotherBodyYes as expected" in {
+    "Deserialise AnotherBodyYes as expected" in new Fixture {
 
       val input = Json.obj(
         "anotherBody" -> true,
         "supervisorName" -> "Name",
-        "startDate" -> "1990-02-24",
-        "endDate" -> "1998-02-24",
-        "endingReason" -> "Reason"
+        "startDate" -> Json.obj("supervisionStartDate" -> "1990-02-24"),
+        "endDate" -> Json.obj("supervisionEndDate" -> "1998-02-24"),
+        "endingReason" -> Json.obj("supervisionEndingReason" -> "Reason")
       )
 
-      val start = new LocalDate(1990, 2, 24) //scalastyle:off magic.number
-      val end = new LocalDate(1998, 2, 24)   //scalastyle:off magic.number
-      val expected = AnotherBodyYes("Name", start, end, "Reason")
+      val expected = AnotherBodyYes("Name", start, end, reason)
 
       Json.fromJson[AnotherBody](input) must be (JsSuccess(expected, JsPath))
     }
@@ -219,6 +150,18 @@ class AnotherBodySpec extends PlaySpec with MockitoSugar {
     "fail when missing all data" in {
       Json.fromJson[AnotherBody](Json.obj()) must
         be(JsError((JsPath \ "anotherBody") -> play.api.data.validation.ValidationError("error.path.missing")))
+    }
+  }
+
+  "isComplete" must {
+    "return true for complete AnotherBodyYes" in new Fixture {
+      val completeAnotherBodyYes = AnotherBodyYes("Name", start, end, reason)
+      completeAnotherBodyYes.isComplete() mustBe true
+    }
+
+    "return false for incomplete AnotherBodyYes" in new Fixture {
+      val completeAnotherBodyYes = AnotherBodyYes("Name", start, end, reason)
+      completeAnotherBodyYes.copy(startDate = None).isComplete() mustBe false
     }
   }
 }

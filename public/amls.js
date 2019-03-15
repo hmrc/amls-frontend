@@ -334,16 +334,20 @@ $(function () {
       url: '/anti-money-laundering/assets/countries'
     })
 
-    var selectFieldName = $(this).attr('id');
+    var selectFieldName = $(this).attr('id').replace('[', '\\[').replace(']', '\\]');
     var nonSelectFieldName = selectFieldName.replace('-select','');
-    $('#' + nonSelectFieldName).keydown(function(e) {
+
+    var selectField = $('#' + selectFieldName)
+    var nonSelectField = $('#' + nonSelectFieldName)
+
+    nonSelectField.keydown(function(e) {
       if (e.keyCode === 13 && $(this).val() === '') {
-          $('#' + selectFieldName).val('')
+          selectField.val('')
       }
     }).keyup(function() {
         var menu = $('.autocomplete__menu')
         if (menu.text() === 'No results found') {
-          $('#' + selectFieldName).val('')
+          selectField.val('')
         }
     }).attr('name', nonSelectFieldName + '-autocomp');
 
@@ -359,10 +363,22 @@ $(function () {
       })
 
     $("button[name='submit']").click(function(){
-      if($('#' + nonSelectFieldName).val() === '')
-        $('#' + selectFieldName).val('');
+
+        var selectedOption = $('#' + selectFieldName + ' option:selected')
+
+        if(nonSelectField.val() === '')
+            selectField.val('');
+
+        if (selectField.val() === "" && nonSelectField.val() !== "" || selectedOption.text() !== nonSelectField.val())
+            addOption(nonSelectField.val())
+
+        function addOption(value) {
+            $("<option data-added='true'>")
+                .attr("value", value)
+                .text(value)
+                .prop("selected", true)
+                .appendTo($('#' + selectFieldName))
+        }
     })
-
   })
-
 });
