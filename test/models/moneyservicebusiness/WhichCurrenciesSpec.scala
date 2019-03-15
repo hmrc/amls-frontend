@@ -47,11 +47,11 @@ class WhichCurrenciesSpec extends AmlsSpec with CharacterSets {
       )
 
       "Write correctly to a form" in {
-        WhichCurrencies.formW.writes(fullModel) must be(fullFormData)
+        WhichCurrencies.formWrite.writes(fullModel) must be(fullFormData)
       }
 
       "Read correctly from a form" in {
-        WhichCurrencies.formR.validate(fullFormData) must be(Valid(fullModel))
+        WhichCurrencies.formRule.validate(fullFormData) must be(Valid(fullModel))
       }
 
 

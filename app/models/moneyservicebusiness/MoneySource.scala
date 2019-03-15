@@ -17,36 +17,73 @@
 package models.moneyservicebusiness
 
 import cats.data.Validated.Valid
-import jto.validation.GenericRules.{maxLength, minLength}
+import jto.validation._
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, Write}
-import models.FormTypes.{basicPunctuationPattern, notEmptyStrip}
+import models.FormTypes._
 import play.api.libs.json._
-import utils.MappingUtils.Implicits._
 
-trait MoneySource {
+case class BankMoneySource(bankNames : String)
 
-  def nameType(fieldName: String) = {
+case class WholesalerMoneySource(wholesalerNames : String)
+
+case object CustomerMoneySource
+
+case class MoneySources(bankMoneySource: Option[BankMoneySource],
+                         wholesalerMoneySource: Option[WholesalerMoneySource],
+                         customerMoneySource: Option[Boolean])
+
+
+object MoneySource {
+  import jto.validation.forms.Rules._
+  import utils.MappingUtils.Implicits._
+
+  private def nameType(fieldName: String) = {
     notEmptyStrip andThen
       minLength(1).withMessage(s"error.invalid.msb.wc.$fieldName") andThen
       maxLength(140).withMessage("error.invalid.maxlength.140") andThen
       basicPunctuationPattern()
   }
-}
 
-case class BankMoneySource(bankNames : String)
+  implicit def formRule: Rule[UrlFormEncoded, MoneySources] = From[UrlFormEncoded] { __ =>
+    import jto.validation.forms._
 
-object BankMoneySource extends MoneySource {
+    val bankMoneySource: Rule[UrlFormEncoded, Option[BankMoneySource]] =
+      (__ \ "bankMoneySource").read[Option[String]] flatMap {
+        case Some("Yes") => (__ \ "bankNames")
+          .read(nameType("bankNames"))
+          .map(names => Some(BankMoneySource(names)))
+        case _ => Rule[UrlFormEncoded, Option[BankMoneySource]](_ => Valid(None))
+      }
 
-  implicit def formRule: Rule[UrlFormEncoded, Option[BankMoneySource]] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
+    val wholesalerMoneySource: Rule[UrlFormEncoded, Option[WholesalerMoneySource]] =
+      (__ \ "wholesalerMoneySource").read[Option[String]] flatMap {
+        case Some("Yes") => (__ \ "wholesalerNames")
+          .read(nameType("wholesalerNames"))
+          .map(names => Some(WholesalerMoneySource(names)))
+        case _ => Rule[UrlFormEncoded, Option[WholesalerMoneySource]](_ => Valid(None))
+      }
 
-    (__ \ "bankMoneySource").read[Option[String]] flatMap {
-      case Some("Yes") => (__ \ "bankNames")
-        .read(nameType("bankNames"))
-        .map(names => Some(BankMoneySource(names)))
-      case _ => Rule[UrlFormEncoded, Option[BankMoneySource]](_ => Valid(None))
+    val customerMoneySource = (__ \ "customerMoneySource").read[Option[String]] map {
+      case Some("Yes") => Some(true)
+      case _ => None
     }
+
+    (bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).apply(MoneySources.apply _)
+  }
+
+  implicit val formWrite: Write[MoneySources, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
+    import jto.validation.forms.Writes._
+
+    ((__ \ "bankMoneySource").write[Option[String]] ~
+      (__ \ "bankNames").write[Option[String]] ~
+      (__ \ "wholesalerMoneySource").write[Option[String]] ~
+      (__ \ "wholesalerNames").write[Option[String]] ~
+      (__ \ "customerMoneySource").write[Option[String]]).apply(ms =>
+      (ms.bankMoneySource.map(_ => "Yes"),
+        ms.bankMoneySource.map(bms => bms.bankNames),
+        ms.wholesalerMoneySource.map(_ => "Yes"),
+        ms.wholesalerMoneySource.map(bms => bms.wholesalerNames),
+        ms.customerMoneySource.map(_ => "Yes")))
   }
 
   implicit val bmsReader: Reads[Option[BankMoneySource]] = {
@@ -69,22 +106,6 @@ object BankMoneySource extends MoneySource {
       case _ => Json.obj()
     }
   }
-}
-
-case class WholesalerMoneySource(wholesalerNames : String)
-
-object WholesalerMoneySource extends MoneySource {
-
-  implicit def formRule: Rule[UrlFormEncoded, Option[WholesalerMoneySource]] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-
-    (__ \ "wholesalerMoneySource").read[Option[String]] flatMap {
-      case Some("Yes") => (__ \ "wholesalerNames")
-        .read(nameType("wholesalerNames"))
-        .map(names => Some(WholesalerMoneySource(names)))
-      case _ => Rule[UrlFormEncoded, Option[WholesalerMoneySource]](_ => Valid(None))
-    }
-  }
 
   implicit val wsReader: Reads[Option[WholesalerMoneySource]] = {
     import play.api.libs.functional.syntax._
@@ -104,54 +125,44 @@ object WholesalerMoneySource extends MoneySource {
       case _ => Json.obj()
     }
   }
-}
 
-sealed trait CustomerMoneySource
-
-object CustomerMoneySource {
-
-  import utils.MappingUtils.Implicits._
-  import play.api.libs.json._
-
-  implicit val formRule: Rule[UrlFormEncoded, CustomerMoneySource] =
-    From[UrlFormEncoded] { __ =>
-      (__ \ "customerMoneySource").readNullable[Boolean].withMessage("error.required.msb.wc.foreignCurrencies")
-    }
-
-//  implicit def formWrites = Write[CustomerMoneySource, UrlFormEncoded] {
-//    case UsesForeignCurrenciesYes => Map("customerMoneySource" -> "true")
-//    case CustomerMoneySourceNo => Map("customerMoneySource" -> "false")
-//  }
-
-//  implicit val jsonReads: Reads[CustomerMoneySource] = {
-//
-//    (__ \ "customerMoneySource").read[Boolean] flatMap {
-//      case true => Reads(_ => JsSuccess(CustomerMoneySourceYes))
-//      case false => Reads(_ => JsSuccess(CustomerMoneySourceNo))
-//    }
-//  }
-//
-//
-//
-//  implicit val jsonWrites = Writes[CustomerMoneySource] {
-//    case CustomerMoneySourceYes => Json.obj("customerMoneySource" -> true)
-//    case CustomerMoneySourceNo => Json.obj("customerMoneySource" -> false)
-//
-//  }
-
-  implicit val cmsReader: Reads[Boolean] = {
+  val cmsReader: Reads[Boolean] = {
     __.read[String] map {
       case "Yes" => true
       case _ => false
     }
   }
 
-  implicit val cmsWriter = new Writes[Boolean] {
+  val cmsWriter = new Writes[Boolean] {
     override def writes(o: Boolean): JsValue = o match {
       case true => JsString("Yes")
       case _ => JsNull
     }
   }
+
+  implicit val jsonR: Reads[MoneySources] = {
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json._
+    (
+      __.read[Option[BankMoneySource]] and
+        __.read[Option[WholesalerMoneySource]] and
+        (__ \ "customerMoneySource").readNullable(cmsReader))((bms, wms, cms) => MoneySources(bms, wms, cms))
+  }
+
+  implicit val jsonW: Writes[MoneySources] = {
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json._
+
+    (
+      __.write[Option[BankMoneySource]] and
+        __.write[Option[WholesalerMoneySource]] and
+        (__ \ "customerMoneySource").writeNullable(cmsWriter))(x => (x.bankMoneySource, x.wholesalerMoneySource, x.customerMoneySource))
+  }
 }
+
+
+
+
+
 
 

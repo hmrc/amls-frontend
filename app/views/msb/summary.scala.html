@@ -198,20 +198,7 @@
                         }
                     </ul>
 
-                    @wc.usesForeignCurrencies.map { usesForeignCurrencies =>
-                        @checkYourAnswersExtra(
-                            question = Messages("msb.which_currencies.foreign_currencies_question")
-                        ) {
-                            <p>@usesForeignCurrencies match {
-                                case true => {@Messages("lbl.yes")}
-                                case _ => {@Messages("lbl.no")}
-                            }</p>
-                        }
 
-                        @if(usesForeignCurrencies) {
-                            @whoUsesCurrencies(wc)
-                        }
-                    }
                 }
             }
         }
@@ -233,22 +220,4 @@
         @form(EmptyForm, controllers.msb.routes.SummaryController.post()) {
             @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), false)
         }
-}
-
-@whoUsesCurrencies(wc: WhichCurrencies) = {
-    @checkYourAnswersExtra(
-        question = Messages("msb.which_currencies.who.will")
-    ) {
-        <ul class="list">
-            @wc.bankMoneySource.map { bms =>
-            <li>@Messages("msb.which_currencies.source.banks"): @bms.bankNames</li>
-            }
-            @wc.wholesalerMoneySource.map { wms =>
-            <li>@Messages("msb.which_currencies.source.wholesalers"): @wms.wholesalerNames</li>
-            }
-            @if(wc.customerMoneySource.isDefined) {
-            <li>@Messages("msb.which_currencies.source.customers")</li>
-            }
-        </ul>
-    }
 }
