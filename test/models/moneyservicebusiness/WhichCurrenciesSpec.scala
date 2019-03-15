@@ -16,7 +16,7 @@
 
 package models.moneyservicebusiness
 
-import jto.validation.{Invalid, Path, Valid, ValidationError}
+import jto.validation.Valid
 import models.CharacterSets
 import play.api.libs.json.Json
 import utils.AmlsSpec
