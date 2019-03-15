@@ -70,7 +70,7 @@ object UpdateMongoCacheResponse {
         readLegacyField[BusinessMatching](BusinessMatching.key, "businessMatching") ~
         readLegacyField[EstateAgentBusiness](EstateAgentBusiness.key, "estateAgencyBusiness") ~
         readLegacyField[Seq[TradingPremises]](TradingPremises.key, "tradingPremises") ~
-        readLegacyField[BusinessDetails](BusinessDetails.key, "businessDetails") ~
+        readLegacyField[BusinessDetails](BusinessDetails.key, "aboutTheBusiness") ~
         readLegacyField[Seq[BankDetails]](BankDetails.key, "bankDetails") ~
         readLegacyField[AddPerson](AddPerson.key, "addPerson") ~
         readLegacyField[BusinessActivities](BusinessActivities.key, "businessActivities") ~
