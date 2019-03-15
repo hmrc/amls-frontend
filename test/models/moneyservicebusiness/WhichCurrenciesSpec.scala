@@ -53,13 +53,13 @@ class WhichCurrenciesSpec extends AmlsSpec with CharacterSets {
       "Read correctly from a form" in {
         WhichCurrencies.formR.validate(fullFormData) must be(Valid(fullModel))
       }
-    }
 
-//      "Round trip through Json correctly" in {
-//        val js = Json.toJson(fullModel)
-//        js.as[WhichCurrencies] must be(fullModel)
-//      }
-//    }
+
+      "Round trip through Json correctly" in {
+        val js = Json.toJson(fullModel)
+        js.as[WhichCurrencies] must be(fullModel)
+      }
+    }
 //
 //    "there is no foreignCurrency flag present" should {
 //

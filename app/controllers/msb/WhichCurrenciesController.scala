@@ -54,10 +54,12 @@ class WhichCurrenciesController @Inject() (val authConnector: AuthConnector,
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
       val foo = Form2[WhichCurrencies](request.body)
+      println("======================================================================================" + foo)
       foo match {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.msb.which_currencies(f, edit)))
         case ValidForm(_, data) =>
+          println(data)
           Future.successful(Redirect(routes.DealForeignCurrenciesController.get()))
       }
     }

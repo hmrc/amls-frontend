@@ -20,8 +20,11 @@ import jto.validation.GenericRules._
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import models.FormTypes._
+import models.currencies
+import models.moneyservicebusiness.WhichCurrencies.emptyToNone
 import models.renewal.{WhichCurrencies => RWhichCurrencies}
 import play.api.libs.json._
+import utils.{GenericValidators, TraversableValidators}
 import utils.MappingUtils.Implicits._
 
 case class WhichCurrencies(currencies: Seq[String],
@@ -36,26 +39,28 @@ object WhichCurrencies {
     RWhichCurrencies(wc.currencies,  wc.usesForeignCurrencies, wc.bankMoneySource, wc.wholesalerMoneySource, wc.customerMoneySource)
   }
 
-  type MoneySourceValidation = (Option[BankMoneySource], Option[WholesalerMoneySource], Option[Boolean])
-  type WhichCurrenciesValidation = (Option[Boolean], Option[BankMoneySource], Option[WholesalerMoneySource], Option[Boolean])
-
-
-  private def nameType(fieldName: String) = {
-    notEmptyStrip andThen
-      minLength(1).withMessage(s"error.invalid.msb.wc.$fieldName") andThen
-      maxLength(140).withMessage("error.invalid.maxlength.140") andThen
-      basicPunctuationPattern()
+  val emptyToNone: String => Option[String] = { x =>
+    x.trim() match {
+      case "" => None
+      case s => Some(s)
+    }
   }
+
+  private val currencyListType = TraversableValidators.seqToOptionSeq(emptyToNone) andThen
+    TraversableValidators.flattenR[String] andThen
+    TraversableValidators.minLengthR[Seq[String]](1) andThen
+    GenericRules.traversableR(GenericValidators.inList(currencies))
+
 
   implicit def formR: Rule[UrlFormEncoded, WhichCurrencies] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
 
-    ((__ \ "currencies").read[Seq[String]].withMessage("error.invalid.msb.wc.currencies") ~
+    ((__ \ "currencies").read(currencyListType).withMessage("error.invalid.msb.wc.currencies") ~
     (__ \ "usesForeignCurrencies").read[Option[Boolean]].withMessage("error.required.msb.wc.foreignCurrencies") ~
     (__ \ "bankMoneySource").read[Option[BankMoneySource]] ~
     (__ \ "wholesalerMoneySource").read[Option[WholesalerMoneySource]] ~
     (__ \ "customerMoneySource").read[Option[Boolean]]).tupled map {
-      r => WhichCurrencies(r._1, r._2,r._3,r._4,r._5)
+      r => WhichCurrencies(r._1.toSeq, r._2,r._3,r._4,r._5)
     }
   }
 
@@ -154,7 +159,7 @@ object WhichCurrencies {
       )((currencies, usesForeignCurrencies, bms, wms, cms) => {
 
       val flag = usesForeignCurrencies match {
-        case None => Some(bms.isDefined || wms.isDefined || cms.contains(true))
+        case None => None//Some(bms.isDefined || wms.isDefined || cms.contains(true))
         case x => x
       }
 
