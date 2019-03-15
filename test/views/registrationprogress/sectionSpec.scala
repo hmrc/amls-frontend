@@ -19,6 +19,7 @@ package views
 import models.registrationprogress.{NotStarted, Started}
 import org.scalatest.mock.MockitoSugar
 import play.api.mvc.Call
+import play.twirl.api.HtmlFormat
 import utils.AmlsSpec
 
 class SectionSpec extends AmlsSpec with MockitoSugar {
@@ -28,21 +29,34 @@ class SectionSpec extends AmlsSpec with MockitoSugar {
 
   }
 
-  "The section view" must {
-    "have correct text displayed for NotStarted status" in new ViewFixture {
+  "The section view" when {
 
-      def view = views.html.registrationprogress.section("hvd", NotStarted, mock[Call])
+    "status is NotStarted" must {
+      "show Add [SectionName] link text" in new ViewFixture {
+        override def view: HtmlFormat.Appendable = views.html.registrationprogress.section("hvd", NotStarted, mock[Call])
 
-      doc.select("#hvd-status").first().ownText() must be ("Add High Value Dealer")
-      doc.select( "div").first().ownText() must be ("Not started")
+        doc.select("#hvd-status").first().ownText() must be("Add High Value Dealer")
+      }
+
+      "show Not started info text" in new ViewFixture {
+        override def view: HtmlFormat.Appendable = views.html.registrationprogress.section("hvd", NotStarted, mock[Call])
+
+        doc.select("div").first().ownText() must be("Not started")
+      }
     }
 
-    "have correct text displayd for Started status" in new ViewFixture {
+    "status is Started" must {
+      "show Add [SectionName] link text" in new ViewFixture {
+        override def view: HtmlFormat.Appendable = views.html.registrationprogress.section("hvd", Started, mock[Call])
 
-      def view = views.html.registrationprogress.section("hvd", Started, mock[Call])
+        doc.select("#hvd-status").first().ownText() must be("Add High Value Dealer")
+      }
 
-      doc.select("#hvd-status").first().ownText() must be ("Add High Value Dealer")
-      doc.select("div").first().ownText() must be ("Incomplete")
+      "show Incomplete info text" in new ViewFixture {
+        override def view: HtmlFormat.Appendable = views.html.registrationprogress.section("hvd", Started, mock[Call])
+
+        doc.select("div").first().ownText() must be ("Incomplete")
+      }
     }
   }
 }
