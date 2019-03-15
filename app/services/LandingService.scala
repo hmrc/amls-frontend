@@ -141,10 +141,10 @@ class LandingService @Inject() (
     val cachedTradingPremises = cacheConnector.upsert[Option[Seq[TradingPremises]]](cachedEstateAgentBusiness, TradingPremises.key,
       tradingPremisesSection(viewResponse.tradingPremisesSection))
 
-    val cachedAboutTheBusiness = cacheConnector.upsert[BusinessDetails](cachedTradingPremises, BusinessDetails.key, aboutSection(viewResponse))
+    val cachedBusinessDetails = cacheConnector.upsert[BusinessDetails](cachedTradingPremises, BusinessDetails.key, aboutSection(viewResponse))
 
     val cachedBankDetails = cacheConnector.upsert[Seq[BankDetails]](
-      cachedAboutTheBusiness, BankDetails.key, writeEmptyBankDetails(viewResponse.bankDetailsSection)
+      cachedBusinessDetails, BankDetails.key, writeEmptyBankDetails(viewResponse.bankDetailsSection)
     )
     val cachedAddPerson = cacheConnector.upsert[AddPerson](cachedBankDetails, AddPerson.key, viewResponse.aboutYouSection)
 

@@ -412,7 +412,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                           cacheMap: CacheMap = mock[CacheMap]): CacheMap = {
 
       val testASP = Asp(hasChanged = hasChanged)
-      val testAboutTheBusiness = BusinessDetails(hasChanged = hasChanged)
+      val testBusinessDetails = BusinessDetails(hasChanged = hasChanged)
       val testBankDetails = Seq(BankDetails(hasChanged = hasChanged))
       val testBusinessActivities = BusinessActivities(hasChanged = hasChanged)
       val testBusinessMatching = BusinessMatching(hasChanged = hasChanged)
@@ -426,7 +426,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       val testRenewal = Renewal(hasChanged = hasChanged)
 
       when(cacheMap.getEntry[Asp](Asp.key)).thenReturn(Some(testASP))
-      when(cacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(testAboutTheBusiness))
+      when(cacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(testBusinessDetails))
       when(cacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any())).thenReturn(Some(testBankDetails))
       when(cacheMap.getEntry[BusinessActivities](BusinessActivities.key)).thenReturn(Some(testBusinessActivities))
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(testBusinessMatching))
