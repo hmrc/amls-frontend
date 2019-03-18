@@ -58,7 +58,10 @@ class DealForeignCurrenciesController @Inject()(val authConnector: AuthConnector
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.msb.deal_foreign_currencies(f, edit)))
         case ValidForm(_, data) =>
-          Future.successful(Redirect(routes.SupplyForeignCurrenciesController.get()))
+          edit match {
+            case true => Future.successful(Redirect(routes.SummaryController.get()))
+            case _ => Future.successful(Redirect(routes.SupplyForeignCurrenciesController.get()))
+          }
       }
     }
   }
