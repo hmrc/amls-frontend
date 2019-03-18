@@ -685,15 +685,15 @@ progress.visuallyhidden.completed = This section has been completed.
 progress.visuallyhidden.start.approx = This section needs starting and will take
 progress.visuallyhidden.edit = You can edit this section.
 progress.visuallyhidden.continue = You can continue this section.
-progress.visuallyhidden.view.amend = View and amend your information
-progress.visuallyhidden.view.started = Section incomplete
+progress.visuallyhidden.view.amend = Completed
+progress.visuallyhidden.view.started = Incomplete
 progress.preapplication.canedit = Add or remove services
 progress.preapplication.readonly = view details
 
 progress.submit.updates = Submit Updates
 progress.updates.made = Updates made: you can continue making updates, or submit your changes
-progress.updates.not.made = You haven’t made any updates
-progress.view.status = View Your Status
+progress.updates.not.made = You haven not made any updates
+progress.view.status = Submit updates
 
 progress.update.registration = Update registration
 

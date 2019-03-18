@@ -255,11 +255,11 @@ class RegistrationProgressControllerSpec extends AmlsSpec
               status(responseF) must be(OK)
 
               val submitDiv = Jsoup.parse(contentAsString(responseF)).select(".submit-application")
-              val submitAnchor = submitDiv.select("a")
+              val submitAnchor = submitDiv.select("#progress-continue")
 
               submitDiv.text() must include(Messages("progress.view.status"))
               submitAnchor.attr("href") must be(controllers.routes.StatusController.get().url)
-              submitAnchor.text() must include(Messages("button.continue"))
+              submitAnchor.text() must include("Check your status and messages")
             }
           }
 
@@ -286,7 +286,6 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
               val submitButtons = Jsoup.parse(contentAsString(responseF)).select("button[type=\"submit\"]")
               submitButtons.size() must be(0)
-//              submitButtons.first().hasAttr("disabled") must be(true)
             }
           }
 
@@ -308,11 +307,11 @@ class RegistrationProgressControllerSpec extends AmlsSpec
               status(responseF) must be(OK)
 
               val submitDiv = Jsoup.parse(contentAsString(responseF)).select(".submit-application")
-              val submitAnchor = submitDiv.select("a")
+              val submitAnchor = submitDiv.select("#progress-continue")
 
               submitDiv.text() must include(Messages("progress.view.status"))
               submitAnchor.attr("href") must be(controllers.routes.StatusController.get().url)
-              submitAnchor.text() must include(Messages("button.continue"))
+              submitAnchor.text() must include("Check your status and messages")
             }
           }
 
@@ -489,8 +488,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
           val html = Jsoup.parse(contentAsString(result))
 
-          html.select(".progress-new-sections").text() must include(Messages("progress.hvd.name"))
-          html.select(".progress-existing-sections").text() must not include Messages("progress.hvd.name")
+          html.select("#new-sections-list").text() must include(Messages("progress.hvd.name"))
+          html.select("#existing-sections-list").text() must not include Messages("progress.hvd.name")
         }
       }
     }

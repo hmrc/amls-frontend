@@ -23,13 +23,6 @@
     call: Call
 )(implicit request: Request[_],m:Messages, lang: Lang)
 
-@progressClass = {
-    @status match {
-        case Completed => {progress-step}
-        case _ => {progress-step progress-step__started}
-    }
-}
-
 @progressText = {
    @status match {
        case Started => {@Messages("progress.visuallyhidden.view.started")}
@@ -38,22 +31,12 @@
 }
 
 @getStatusId(name:String) = {@name.concat("-status")}
-
-<li>
-    <a href="@call.url" class="@{progressClass}" aria-label="@Messages(s"progress.$name.name"). @Messages(s"progress.$name.description"). @progressText">
-        <div class="grid-layout__column grid-layout__column--2-3 progress-step--details">
-            <h2 class="heading-small">@Messages(s"progress.$name.name")</h2>
-            <p>@Messages(s"progress.$name.description")</p>
+    <li id=@getStatusId(s"${name}") class="task-list-item">
+        <a href="@call.url">
+            Manage @Messages(s"progress.${name}.name")
+        </a>
+        <div class="task-status taks-status--not-started">
+            <span class="visuallyhidden">This section is</span>@progressText
         </div>
-        <div class="grid-layout__column grid-layout__column--1-3 progress-step--status @if(hasChanged && status == Completed){progress-step_changed}else{@progressClass}">
 
-            <div class="grid-layout__column grid-layout__column--2-3 progress-step--status-time">
-                <p id="@getStatusId(name)" class="font-xsmall">@progressText</p>
-            </div>
-            <div class="grid-layout__column grid-layout__column--1-3">
-                &nbsp;
-            </div>
-
-        </div>
-    </a>
-</li>
+    </li>
