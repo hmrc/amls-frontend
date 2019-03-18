@@ -44,12 +44,13 @@
         </div>
     </div>
 
+    @* Sidebar *@
+    @registration_progress_sidebar(canEditPreApplication, address, serviceNames)
+
     <div class="grid-layout grid-layout--stacked">
         @section_list(sections, newSections)
 
-        @* Sidebar *@
-        @registration_progress_sidebar(canEditPreApplication, address, serviceNames)
-         
+
     </div>
     @submit_application(declarationAvailable)
 }
