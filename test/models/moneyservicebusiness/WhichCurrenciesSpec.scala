@@ -27,23 +27,13 @@ class WhichCurrenciesSpec extends AmlsSpec with CharacterSets {
     "data is complete" should {
 
       val fullModel = WhichCurrencies(
-        Seq("USD", "CHF", "EUR") //,
-        //        usesForeignCurrencies = Some(true),
-        //        Some(BankMoneySource("Bank names")),
-        //        Some(WholesalerMoneySource("wholesaler names")),
-        //        customerMoneySource = Some(true)
+        Seq("USD", "CHF", "EUR")
       )
 
       val fullFormData = Map(
         "currencies[0]" -> Seq("USD"),
         "currencies[1]" -> Seq("CHF"),
-        "currencies[2]" -> Seq("EUR") //,
-        //        "bankMoneySource" -> Seq("Yes"),
-        //        "bankNames" -> Seq("Bank names"),
-        //        "wholesalerMoneySource" -> Seq("Yes"),
-        //        "wholesalerNames" -> Seq("wholesaler names"),
-        //        "customerMoneySource" -> Seq("Yes"),
-        //        "usesForeignCurrencies" -> Seq("Yes")
+        "currencies[2]" -> Seq("EUR")
       )
 
       "Write correctly to a form" in {

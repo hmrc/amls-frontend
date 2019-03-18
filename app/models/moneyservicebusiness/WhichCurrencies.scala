@@ -55,13 +55,12 @@ object WhichCurrencies {
   implicit def formRule: Rule[UrlFormEncoded, WhichCurrencies] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
 
-    (__ \ "currencies").read(currencyListType).withMessage("error.invalid.msb.wc.currencies").map(r => WhichCurrencies(r.toSeq))
+    (__ \ "currencies").read(currencyListType).withMessage("error.invalid.msb.wc.currencies").flatMap(r => WhichCurrencies(r.toSeq))
   }
 
-  implicit val formWrite: Write[WhichCurrencies, UrlFormEncoded] = Write {
-    case w:WhichCurrencies => Map(
-      "currencies" -> w.currencies
-    )
+  implicit val formWrite: Write[WhichCurrencies, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
+    import jto.validation.forms.Writes._
+    (__ \ "currencies").write[Seq[String]] contramap {x =>x.currencies}
   }
 
   implicit val bmsReader: Reads[Option[BankMoneySource]] = {
