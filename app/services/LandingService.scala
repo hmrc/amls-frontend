@@ -63,7 +63,7 @@ class LandingService @Inject() (
       entry <- OptionT.fromOption[Future](cache.getEntry[BusinessDetails](BusinessDetails.key))
     } yield entry
 
-    lazy val etmpModel = OptionT.liftF(desConnector.view(amlsRefNumber) map { v => v.aboutTheBusinessSection })
+    lazy val etmpModel = OptionT.liftF(desConnector.view(amlsRefNumber) map { v => v.businessDetailsSection })
 
     (for {
       businessDetails <- cachedModel orElse etmpModel
@@ -183,7 +183,7 @@ class LandingService @Inject() (
   }
 
   private def aboutSection(viewResponse: ViewResponse) = {
-    viewResponse.aboutTheBusinessSection.copy(hasAccepted = true)
+    viewResponse.businessDetailsSection.copy(hasAccepted = true)
   }
 
   private def activitySection(viewResponse: ViewResponse) = {

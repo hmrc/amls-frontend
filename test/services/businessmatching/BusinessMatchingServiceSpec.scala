@@ -97,7 +97,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
       val viewResponse = ViewResponse(
         "",
         businessMatchingSection = api5BusinessMatching,
-        aboutTheBusinessSection = BusinessDetails(),
+        businessDetailsSection = BusinessDetails(),
         bankDetailsSection = Seq.empty,
         businessActivitiesSection = BusinessActivities(),
         eabSection = None,
@@ -133,7 +133,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
             Set(BillPaymentServices)
           ))
         ),
-        aboutTheBusinessSection = BusinessDetails(),
+        businessDetailsSection = BusinessDetails(),
         bankDetailsSection = Seq.empty,
         businessActivitiesSection = BusinessActivities(),
         eabSection = None,
@@ -228,7 +228,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
             Set(BillPaymentServices)
           ))
         ),
-        aboutTheBusinessSection = BusinessDetails(),
+        businessDetailsSection = BusinessDetails(),
         bankDetailsSection = Seq.empty,
         businessActivitiesSection = BusinessActivities(),
         eabSection = None,
@@ -291,7 +291,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
         val viewResponse = ViewResponse(
           "",
           businessMatchingSection = existing,
-          aboutTheBusinessSection = BusinessDetails(),
+          businessDetailsSection = BusinessDetails(),
           bankDetailsSection = Seq.empty,
           businessActivitiesSection = BusinessActivities(),
           eabSection = None,
@@ -330,7 +330,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
           val viewResponse = ViewResponse(
             "",
             businessMatchingSection = existing,
-            aboutTheBusinessSection = BusinessDetails(),
+            businessDetailsSection = BusinessDetails(),
             bankDetailsSection = Seq.empty,
             businessActivitiesSection = BusinessActivities(),
             eabSection = None,
@@ -367,7 +367,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
           val viewResponse = ViewResponse(
             "",
             businessMatchingSection = existing,
-            aboutTheBusinessSection = BusinessDetails(),
+            businessDetailsSection = BusinessDetails(),
             bankDetailsSection = Seq.empty,
             businessActivitiesSection = BusinessActivities(),
             eabSection = None,
@@ -408,7 +408,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
         val viewResponse = ViewResponse(
           "",
           businessMatchingSection = existing,
-          aboutTheBusinessSection = BusinessDetails(),
+          businessDetailsSection = BusinessDetails(),
           bankDetailsSection = Seq.empty,
           businessActivitiesSection = BusinessActivities(),
           eabSection = None,
@@ -445,7 +445,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
         val viewResponse = ViewResponse(
           "",
           businessMatchingSection = existing,
-          aboutTheBusinessSection = BusinessDetails(),
+          businessDetailsSection = BusinessDetails(),
           bankDetailsSection = Seq.empty,
           businessActivitiesSection = BusinessActivities(),
           eabSection = None,
