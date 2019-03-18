@@ -26,6 +26,7 @@
 @progressText = {
    @status match {
        case Started => {@Messages("progress.visuallyhidden.view.started")}
+       case Completed if(hasChanged) => {@Messages("progress.visuallyhidden.view.updated")}
        case _ => {@Messages("progress.visuallyhidden.view.amend")}
    }
 }

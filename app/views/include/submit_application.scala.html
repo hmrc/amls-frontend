@@ -27,11 +27,7 @@
         <form method="POST" action="@controllers.routes.RegistrationProgressController.post.url">
             @CSRF.formField
             <fieldset>
-                @legend(
-                    legend = "progress.submit.updates",
-                    jsHidden = false,
-                    bold = true
-                )
+                <h2 class="heading-medium">@Messages("progress.submit.updates")</h2>
                 <p>@Messages("progress.updates.made")</p>
                 <button id="progress-continue" type="submit" name="submit" class="button">@Messages("button.continue")</button>
             </fieldset>
