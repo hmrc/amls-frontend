@@ -21,12 +21,14 @@
 @import views.html.helper.CSRF
 @import models.businesscustomer.Address
 
-@(sections: Seq[Section],
-        declarationAvailable: Boolean,
-        address: Address,
-        serviceNames: Seq[String],
-        canEditPreApplication: Boolean,
-        newSections: Option[Seq[Section]] = None)(implicit request: Request[_],m:Messages)
+@(
+    sections: Seq[Section],
+    declarationAvailable: Boolean,
+    businessName: String,
+    serviceNames: Seq[String],
+    canEditPreApplication: Boolean,
+    newSections: Option[Seq[Section]] = None
+)(implicit request: Request[_],m:Messages)
 
 @main2(
     title = Messages("amendment.title") + " - " + Messages("title.yapp"),
@@ -45,7 +47,7 @@
     </div>
 
     @* Sidebar *@
-    @registration_progress_sidebar(canEditPreApplication, address, serviceNames)
+    @registration_progress_sidebar(canEditPreApplication, businessName, serviceNames)
 
     <div class="grid-layout grid-layout--stacked">
         @section_list(sections, newSections)

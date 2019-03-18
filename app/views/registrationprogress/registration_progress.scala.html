@@ -21,7 +21,13 @@
 @import models.registrationprogress.Section
 @import models.businesscustomer.Address
 
-@(sections: Seq[Section], declarationAvailable: Boolean, address: Address, serviceNames: Seq[String], canEditPreApplication: Boolean)(implicit request: Request[_],m:Messages)
+@(
+    sections: Seq[Section],
+    declarationAvailable: Boolean,
+    businessName: String,
+    serviceNames: Seq[String],
+    canEditPreApplication: Boolean
+)(implicit request: Request[_],m:Messages)
 
 @main2(
 title = Messages("progress.title") + " - " + Messages("title.yapp")
@@ -40,7 +46,7 @@ title = Messages("progress.title") + " - " + Messages("title.yapp")
     </div>
 
     @* registration progress *@
-    @registration_progress_sidebar(canEditPreApplication, address, serviceNames)
+    @registration_progress_sidebar(canEditPreApplication, businessName, serviceNames)
 
     @if(!declarationAvailable) {
         <div class="grid-layout grid-layout--stacked">

@@ -16,7 +16,6 @@
 
 package views.registrationprogress
 
-import forms.EmptyForm
 import generators.businesscustomer.AddressGenerator
 import models.registrationprogress.{Completed, Section, Started}
 import org.scalatest.mock.MockitoSugar
@@ -43,7 +42,7 @@ class registration_amendmentSpec extends AmlsSpec with MockitoSugar with Address
             Seq(Section("section1", Completed, true, mock[Call]),
               Section("section2", Started, true, mock[Call])),
             true,
-            addressGen.sample.get,
+            "businessName",
             Seq.empty,
             true
           )

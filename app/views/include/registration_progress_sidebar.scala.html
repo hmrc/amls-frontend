@@ -16,13 +16,17 @@
 
 @import models.businesscustomer.Address
 
-@(canEditPreApplication: Boolean, address: Address, serviceNames: Seq[String])(implicit request: Request[_], messages: Messages)
+@(
+    canEditPreApplication: Boolean,
+    businessName: String,
+    serviceNames: Seq[String]
+)(implicit request: Request[_], messages: Messages)
 
     <div class="business-info">
         <div class="business-info__item">
             <h2 class="heading-small">Your business</h2>
             <p>
-                @Html(address.toLines.mkString("<br/>"))
+                @Html(businessName)
             </p>
         </div>
 

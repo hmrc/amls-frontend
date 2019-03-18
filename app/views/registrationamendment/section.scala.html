@@ -16,7 +16,12 @@
 
 @import models.registrationprogress.{Status, Completed, Started}
 
-@(name: String, status: Status, hasChanged: Boolean, call: Call)(implicit request: Request[_],m:Messages, lang: Lang)
+@(
+    name: String,
+    status: Status,
+    hasChanged: Boolean,
+    call: Call
+)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @progressClass = {
     @status match {

@@ -74,7 +74,7 @@ class RegistrationProgressController @Inject()(
                   case true => Ok(registration_amendment(
                     sectionsToDisplay,
                     amendmentDeclarationAvailable(sections),
-                    reviewDetails.businessAddress,
+                    reviewDetails.businessName,
                     activities,
                     canEditPreapplication,
                     Some(newSections)
@@ -82,7 +82,7 @@ class RegistrationProgressController @Inject()(
                   case _ => Ok(registration_progress(
                     sectionsToDisplay,
                     declarationAvailable(sections),
-                    reviewDetails.businessAddress,
+                    reviewDetails.businessName,
                     activities,
                     canEditPreapplication
                   ))

@@ -39,7 +39,7 @@ class registration_progressSpec extends AmlsSpec with MockitoSugar with AddressG
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.registrationprogress.registration_progress(sections, true, addressGen.sample.get, Seq.empty[String], true)
+      def view = views.html.registrationprogress.registration_progress(sections, true, "biz name", Seq.empty[String], true)
 
       doc.title must be(Messages("progress.title") + " - " +
         Messages("title.yapp") + " - " +
