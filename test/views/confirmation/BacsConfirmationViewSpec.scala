@@ -56,7 +56,7 @@ class BacsConfirmationViewSpec extends AmlsSpec with MustMatchers {
       doc.html() must include(Messages("confirmation.payment.info.keep_up_to_date.item1"))
       doc.html() must include(Messages("confirmation.payment.info.keep_up_to_date.item2"))
       doc.html() must include(Messages("confirmation.payment.info.keep_up_to_date.item3"))
-      doc.getElementsByClass("print-link").first().text() mustBe "Print"
+      doc.getElementsByClass("print-link").first().text() mustBe Messages("link.print")
       doc.getElementsByClass("button").first().text() mustBe Messages("confirmation.payment.continue_button.text")
     }
 
