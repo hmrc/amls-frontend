@@ -48,7 +48,7 @@ class registration_amendmentSpec extends AmlsSpec with MockitoSugar with Address
           )
 
 
-        val expectedFullCompletedString = s"This section is ${Messages("progress.visuallyhidden.view.amend")}"
+        val expectedFullCompletedString = s"This section is ${Messages("progress.visuallyhidden.view.updated")}"
         doc.select("#section1-status .task-status").text mustBe expectedFullCompletedString
 
         val expectedFullIncompleteString = s"This section is ${Messages("progress.visuallyhidden.view.started")}"

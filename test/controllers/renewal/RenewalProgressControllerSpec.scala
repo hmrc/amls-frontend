@@ -186,7 +186,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
 //      html.select(".progress-step_changed").size() must be(1)
       html.select("button[name=submit]").hasAttr("disabled") must be(false)
 
-      val elements = html.getElementsMatchingOwnText(Messages("progress.visuallyhidden.view.amend"))
+      val elements = html.getElementsMatchingOwnText(Messages("progress.visuallyhidden.view.updated"))
       elements.size() must be(1)
 
     }
