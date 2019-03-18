@@ -16,10 +16,11 @@
 
 package models.moneyservicebusiness
 
-import cats.data.Validated.Valid
+import cats.data.Validated.{Invalid, Valid}
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import models.FormTypes._
+import models.ValidationRule
 import play.api.libs.json._
 
 case class BankMoneySource(bankNames : String)
@@ -32,8 +33,7 @@ case class MoneySources(bankMoneySource: Option[BankMoneySource],
                          wholesalerMoneySource: Option[WholesalerMoneySource],
                          customerMoneySource: Option[Boolean])
 
-
-object MoneySource {
+object MoneySources {
   import jto.validation.forms.Rules._
   import utils.MappingUtils.Implicits._
 
@@ -42,6 +42,15 @@ object MoneySource {
       minLength(1).withMessage(s"error.invalid.msb.wc.$fieldName") andThen
       maxLength(140).withMessage("error.invalid.maxlength.140") andThen
       basicPunctuationPattern()
+  }
+
+  type MoneySourceValidation = (Option[BankMoneySource], Option[WholesalerMoneySource], Option[Boolean])
+
+  private val validateMoneySources: ValidationRule[MoneySourceValidation] = Rule[MoneySourceValidation, MoneySourceValidation] {
+    case x@(Some(_), _, _) => Valid(x)
+    case x@(_, Some(_), _) => Valid(x)
+    case x@(_, _, Some(true)) => Valid(x)
+    case _ => Invalid(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))))
   }
 
   implicit def formRule: Rule[UrlFormEncoded, MoneySources] = From[UrlFormEncoded] { __ =>
@@ -63,12 +72,19 @@ object MoneySource {
         case _ => Rule[UrlFormEncoded, Option[WholesalerMoneySource]](_ => Valid(None))
       }
 
-    val customerMoneySource = (__ \ "customerMoneySource").read[Option[String]] map {
+    val customerMoneySource: Rule[UrlFormEncoded, Option[Boolean]] =
+      (__ \ "customerMoneySource").read[Option[String]] map {
       case Some("Yes") => Some(true)
       case _ => None
     }
 
-    (bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).apply(MoneySources.apply _)
+    val validatedMs = (bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).tupled andThen validateMoneySources
+
+    validatedMs map { msv: MoneySourceValidation =>
+      (msv._1, msv._2, msv._3) match{
+        case (b, w, c) => MoneySources(b,w,c)
+      }
+    }
   }
 
   implicit val formWrite: Write[MoneySources, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
@@ -140,7 +156,7 @@ object MoneySource {
     }
   }
 
-  implicit val jsonR: Reads[MoneySources] = {
+  implicit val jsonReads: Reads[MoneySources] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
     (
@@ -149,7 +165,7 @@ object MoneySource {
         (__ \ "customerMoneySource").readNullable(cmsReader))((bms, wms, cms) => MoneySources(bms, wms, cms))
   }
 
-  implicit val jsonW: Writes[MoneySources] = {
+  implicit val jsonWrites: Writes[MoneySources] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
 

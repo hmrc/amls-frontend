@@ -63,64 +63,14 @@ object WhichCurrencies {
     (__ \ "currencies").write[Seq[String]] contramap {x =>x.currencies}
   }
 
-  implicit val bmsReader: Reads[Option[BankMoneySource]] = {
-
-    import play.api.libs.functional.syntax._
+  implicit val jsonReads: Reads[WhichCurrencies] = {
     import play.api.libs.json._
-
-    ((__ \ "bankMoneySource").readNullable[String] and
-      (__ \ "bankNames").readNullable[String])((a, b) => (a, b) match {
-      case (Some("Yes"), Some(names)) => Some(BankMoneySource(names))
-      case _ => None
-    })
-
+    (__ \ "currencies").read[Seq[String]].flatMap(WhichCurrencies.apply)
   }
 
-  implicit val bmsWriter = new Writes[Option[BankMoneySource]] {
-    override def writes(o: Option[BankMoneySource]): JsValue = o match {
-      case Some(x) => Json.obj("bankMoneySource" -> "Yes",
-        "bankNames" -> x.bankNames)
-      case _ => Json.obj()
-    }
+  implicit val jsonWrites = Writes[WhichCurrencies] { wc =>
+    Json.obj(
+      "currencies" -> wc.currencies
+    )
   }
-
-  implicit val wsReader: Reads[Option[WholesalerMoneySource]] = {
-    import play.api.libs.functional.syntax._
-    import play.api.libs.json._
-
-    ((__ \ "wholesalerMoneySource").readNullable[String] and
-      (__ \ "wholesalerNames").readNullable[String])((a, b) => (a, b) match {
-      case (Some("Yes"), Some(names)) => Some(WholesalerMoneySource(names))
-      case _ => None
-    })
-  }
-
-  implicit val wsWriter = new Writes[Option[WholesalerMoneySource]] {
-    override def writes(o: Option[WholesalerMoneySource]): JsValue = o match {
-      case Some(x) => Json.obj("wholesalerMoneySource" -> "Yes",
-        "wholesalerNames" -> x.wholesalerNames)
-      case _ => Json.obj()
-    }
-  }
-
-  val cmsReader: Reads[Boolean] = {
-    __.read[String] map {
-      case "Yes" => true
-      case _ => false
-    }
-  }
-
-  val cmsWriter = new Writes[Boolean] {
-    override def writes(o: Boolean): JsValue = o match {
-      case true => JsString("Yes")
-      case _ => JsNull
-    }
-  }
-
-  implicit val jsonR: Reads[WhichCurrencies] = {
-    import play.api.libs.json._
-    (__ \ "currencies").read[Seq[String]].map(WhichCurrencies.apply)
-  }
-
-  implicit val jsonWrites: Writes[WhichCurrencies] = Json.writes[WhichCurrencies]
 }
