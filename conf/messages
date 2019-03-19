@@ -124,7 +124,7 @@ error.required.atb.corporation.tax = Select yes if your business is registered f
 error.required.atb.corporation.tax.number = Enter a valid Corporation Tax reference number
 error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax reference number
 error.required.atb.lettersaddress = Select yes if this is the right address to send you letters
-error.mismatch.atb.email = The email addresses you’ve entered don’t match
+error.mismatch.atb.email = The email addresses you’ve entered do not match
 
 error.businessmatching.updateservice.responsiblepeople = Select at least one option to show which responsible people have passed the HMRC Money Laundering Regulations fit and proper test
 error.businessmatching.updateservice.addmoreactivities = Select yes if you want to add another type of business
@@ -227,7 +227,7 @@ error.required.rp.nationality = Enter a nationality
 error.required.rp.passport.option = Select one or more options to show what kind of passport this person has
 error.required.rp.register.another.person = Select yes if you want to register another responsible person
 error.required.rp.email = Enter an email address in the correct format, like name@example.com
-error.invalid.rp.email = Re-enter an email address in the correct format, like name@example.com
+error.invalid.rp.email = Re-enter the email address in the correct format, like name@example.com
 error.max.length.rp.email = You can’t enter more than 100 characters
 error.required.rp.experiencetraining = Select yes if this person has experience in these activities
 error.required.rp.experiencetraining.information = Enter a brief description of this person’s experience
