@@ -400,7 +400,9 @@ button.continuetopayment = Continue to payment
 button.returntosummary = Return to Summary
 button.confirmandsubmit = Confirm and submit
 button.confirmandcontinue = Confirm and continue
-button.returntoapplicationprogress = Return to application progress
+
+button.returntoapplicationprogress = Return to about your business
+
 button.payfee = Pay registration fee
 button.amendment.payfee = Pay amendment fee
 button.logout = Log out
@@ -496,8 +498,8 @@ lbl.hint.crn = It’s 8 characters and can be just numbers, or a mix of numbers 
 
 lbl.hint.vat = It's 9 numbers with no letters, punctuation or other characters.
 
-link.return.registration.progress = Return to application progress
-link.return.renewal.progress = Return to renewal progress
+link.return.registration.progress = Return to about your business
+link.return.renewal.progress = Return to about your business
 link.renewal.progress.change.answers = Change your answers
 link.print = Print this page
 
