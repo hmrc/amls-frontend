@@ -49,10 +49,9 @@ class FitAndProperController @Inject()(
         case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,alreadyPassed,_,_,_,_,_,_))
           if alreadyPassed.hasAlreadyPassedFitAndProper.isDefined =>
           Ok(views.html.responsiblepeople.fit_and_proper(Form2[Boolean](alreadyPassed.hasAlreadyPassedFitAndProper.get),
-            edit, index, flow, personName.titleName, appConfig.showFeesToggle, appConfig.phase2ChangesToggle))
+            edit, index, flow, personName.titleName))
         case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) => {
-          Ok(views.html.responsiblepeople.fit_and_proper(EmptyForm, edit, index, flow, personName.titleName,
-            appConfig.showFeesToggle, appConfig.phase2ChangesToggle))
+          Ok(views.html.responsiblepeople.fit_and_proper(EmptyForm, edit, index, flow, personName.titleName))
         }
         case _ => NotFound(notFoundView)
       }
@@ -66,7 +65,7 @@ class FitAndProperController @Inject()(
             case f: InvalidForm =>
               getData[ResponsiblePerson](index) map { rp =>
                 BadRequest(views.html.responsiblepeople.fit_and_proper(f, edit, index, flow,
-                  ControllerHelper.rpTitleName(rp), appConfig.showFeesToggle, appConfig.phase2ChangesToggle))
+                  ControllerHelper.rpTitleName(rp)))
               }
             case ValidForm(_, data) => {
               dataCacheConnector.fetchAll flatMap { maybeCache =>
