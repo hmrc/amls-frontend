@@ -1,4 +1,0 @@
- + [AMLS-4272](https://jira.tools.tax.service.gov.uk/browse/AMLS-4272) - 'Supervision section page split'
- + [AMLS-4603](https://jira.tools.tax.service.gov.uk/browse/AMLS-4603) - 'Bug fix: Flow does not break on Which professional body are you member of? anymore'
- + [AMLS-4754](https://jira.tools.tax.service.gov.uk/browse/AMLS-4754) - 'Fixed removal of countries and validation of multiple countries. Removed "Add another country", instead, pages display all country fields by default.'
- + [AMLS-4759](https://jira.tools.tax.service.gov.uk/browse/AMLS-4759) - 'Fixed legend on "Where did you send the most transactions in the last 12 months?"'
