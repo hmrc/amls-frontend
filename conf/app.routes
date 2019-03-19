@@ -66,8 +66,6 @@ GET         /submit-application/nominated-officer                               
 GET         /update-information/nominated-officer                                     @controllers.declaration.WhoIsTheBusinessNominatedOfficerController.getWithAmendment()
 POST        /submit-application/nominated-officer                                     @controllers.declaration.WhoIsTheBusinessNominatedOfficerController.post()
 
-GET         /submit-application/fee-guidance                                          @controllers.FeeGuidanceController.get()
-
 GET         /submit-application/ways-to-pay                                           @controllers.payments.WaysToPayController.get()
 POST        /submit-application/ways-to-pay                                           @controllers.payments.WaysToPayController.post()
 
