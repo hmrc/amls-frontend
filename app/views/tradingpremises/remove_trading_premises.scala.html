@@ -41,13 +41,22 @@
         </div>
 
         @if(showDateField) {
+          @fieldset(
+            f = f("endDate-fieldset"),
+            legend = "tradingpremises.remove.trading.premises.enddate.lbl",
+            legendHidden = true,
+            panel = false,
+            classes = Seq("inline")
+          ) {
+
             @date(
-                f = f,
-                p = "endDate",
-                labelText = "",
-                hintText = "",
-                true
+              f = f,
+              p = "endDate",
+              labelText = "",
+              hintText = "",
+              true
             )
+          }
         }
 
         @submit(false, Some(Messages("tradingpremises.remove.trading.premises.btn")))

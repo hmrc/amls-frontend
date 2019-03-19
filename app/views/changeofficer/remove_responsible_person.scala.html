@@ -33,12 +33,21 @@
 
     @form(f, controllers.changeofficer.routes.RemoveResponsiblePersonController.post()) {
 
-        @date(
-            f = f,
-            p = "date",
-            labelText = "",
-            example = true
-        )
+
+        @fieldset(
+          f = f("date-fieldset"),
+          legend = Messages("changeofficer.removeresponsibleperson.lbl", personName),
+          legendHidden = true,
+          panel = false,
+          classes = Seq("inline")
+        ) {
+            @date(
+              f = f,
+              p = "date",
+              labelText = "",
+              example = true
+            )
+        }
 
         @submit(false, Some(Messages("changeofficer.remove.responsibleperson.btn")))
 
