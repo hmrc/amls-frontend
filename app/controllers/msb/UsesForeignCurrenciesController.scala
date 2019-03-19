@@ -17,6 +17,7 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
@@ -24,12 +25,11 @@ import models.businessmatching.{CurrencyExchange, MoneyServiceBusiness => MsbAct
 import models.moneyservicebusiness._
 import services.StatusService
 import services.businessmatching.ServiceFlow
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
 
 import scala.concurrent.Future
 
-class DealForeignCurrenciesController @Inject()(val authConnector: AuthConnector,
+class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector,
                                                 implicit val dataCacheConnector: DataCacheConnector,
                                                 implicit val statusService: StatusService,
                                                 implicit val serviceFlow: ServiceFlow
@@ -40,12 +40,13 @@ class DealForeignCurrenciesController @Inject()(val authConnector: AuthConnector
       ControllerHelper.allowedToEdit(MsbActivity, Some(CurrencyExchange)) flatMap {
         case true => dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
           response =>
-            val form = (for {
+            val form: Form2[UsesForeignCurrencies] = (for {
               msb <- response
               currencies <- msb.whichCurrencies
-            } yield Form2[WhichCurrencies](currencies)).getOrElse(EmptyForm)
+              whichCurrencies <- currencies.usesForeignCurrencies
+            } yield Form2[UsesForeignCurrencies](whichCurrencies)).getOrElse(EmptyForm)
 
-            Ok(views.html.msb.deal_foreign_currencies(form, edit))
+            Ok(views.html.msb.uses_foreign_currencies(form, edit))
         }
         case false => Future.successful(NotFound(notFoundView))
       }
@@ -53,14 +54,14 @@ class DealForeignCurrenciesController @Inject()(val authConnector: AuthConnector
   }
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-      val foo = Form2[WhichCurrencies](request.body)
+      val foo = Form2[UsesForeignCurrencies](request.body)
       foo match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.msb.deal_foreign_currencies(f, edit)))
+          Future.successful(BadRequest(views.html.msb.uses_foreign_currencies(f, edit)))
         case ValidForm(_, data) =>
           edit match {
             case true => Future.successful(Redirect(routes.SummaryController.get()))
-            case _ => Future.successful(Redirect(routes.SupplyForeignCurrenciesController.get()))
+            case _ => Future.successful(Redirect(routes.MoneySourcesController.get()))
           }
       }
     }

@@ -29,10 +29,10 @@ import utils.ControllerHelper
 
 import scala.concurrent.Future
 
-class SupplyForeignCurrenciesController @Inject()(val authConnector: AuthConnector,
-                                                  implicit val dataCacheConnector: DataCacheConnector,
-                                                  implicit val statusService: StatusService,
-                                                  implicit val serviceFlow: ServiceFlow
+class MoneySourcesController @Inject()(val authConnector: AuthConnector,
+                                       implicit val dataCacheConnector: DataCacheConnector,
+                                       implicit val statusService: StatusService,
+                                       implicit val serviceFlow: ServiceFlow
                                           ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
@@ -41,12 +41,13 @@ class SupplyForeignCurrenciesController @Inject()(val authConnector: AuthConnect
         ControllerHelper.allowedToEdit(MsbActivity, Some(CurrencyExchange)) flatMap {
           case true => dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
             response =>
-              val form = (for {
+              val form: Form2[MoneySources] = (for {
                 msb <- response
                 currencies <- msb.whichCurrencies
-              } yield Form2[WhichCurrencies](currencies)).getOrElse(EmptyForm)
+                moneySources <- currencies.moneySources
+              } yield Form2[MoneySources](moneySources)).getOrElse(EmptyForm)
 
-              Ok(views.html.msb.supply_foreign_currencies(form, edit))
+              Ok(views.html.msb.money_sources(form, edit))
           }
           case false => Future.successful(NotFound(notFoundView))
         }
@@ -56,21 +57,22 @@ class SupplyForeignCurrenciesController @Inject()(val authConnector: AuthConnect
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request => {
-        val foo = Form2[WhichCurrencies](request.body)
+        val foo = Form2[MoneySources](request.body)
         foo match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.msb.supply_foreign_currencies(f, edit)))
+            Future.successful(BadRequest(views.html.msb.money_sources(f, edit)))
           case ValidForm(_, data) =>
             dataCacheConnector.fetchAll flatMap {
               optMap =>
                 val result = for {
                   cache <- optMap
                   msb <- cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
+                  whichCurrencies <- msb.whichCurrencies
                   bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
                   services <- bm.msbServices
                 } yield {
                   dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
-                    msb.whichCurrencies(data)
+                    msb.copy(whichCurrencies = Some(whichCurrencies.copy(moneySources = Some(data))))
                   ) map { _ =>
                     services.msbServices.contains(ForeignExchange) match {
                       case true if msb.fxTransactionsInNext12Months.isEmpty || !edit =>

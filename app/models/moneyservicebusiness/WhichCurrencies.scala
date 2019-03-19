@@ -24,7 +24,9 @@ import utils.MappingUtils.Implicits._
 import utils.{GenericValidators, TraversableValidators}
 import models.renewal.{WhichCurrencies => RWhichCurrencies}
 
-case class WhichCurrencies(currencies: Seq[String])
+case class WhichCurrencies(currencies: Seq[String],
+                           usesForeignCurrencies: Option[UsesForeignCurrencies] = None,
+                           moneySources: Option[MoneySources] = None)
 
 
 object WhichCurrencies {
@@ -64,13 +66,20 @@ object WhichCurrencies {
   }
 
   implicit val jsonReads: Reads[WhichCurrencies] = {
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json.Reads._
     import play.api.libs.json._
-    (__ \ "currencies").read[Seq[String]].flatMap(WhichCurrencies.apply)
+
+    ((__ \ "currencies").read[Seq[String]] and
+      (__ \ "usesForeignCurrencies").read(Reads.optionNoError[UsesForeignCurrencies]) and
+      (__ \ "moneySources").read(Reads.optionNoError[MoneySources])) (WhichCurrencies.apply _)
   }
 
-  implicit val jsonWrites = Writes[WhichCurrencies] { wc =>
-    Json.obj(
-      "currencies" -> wc.currencies
+  implicit val jsonWrites = Writes[WhichCurrencies] {
+    case wc: WhichCurrencies => Json.obj(
+      "currencies" -> wc.currencies,
+      "usesForeignCurrencies" -> wc.usesForeignCurrencies,
+      "moneySources" -> wc.moneySources
     )
   }
 }

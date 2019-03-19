@@ -29,7 +29,7 @@ class WhichCurrenciesSpec extends AmlsSpec with CharacterSets {
     "data is complete" should {
 
       val fullModel = WhichCurrencies(
-        Seq("USD", "CHF", "EUR")
+        Seq("USD", "CHF", "EUR"), None, Some(MoneySources(None, None, None))
       )
 
       val fullFormData = Map(
@@ -43,7 +43,7 @@ class WhichCurrenciesSpec extends AmlsSpec with CharacterSets {
       }
 
       "Read correctly from a form" in {
-        WhichCurrencies.formRule.validate(fullFormData) must be(Valid(fullModel))
+        WhichCurrencies.formRule.validate(fullFormData) must be(Valid(fullModel.copy(moneySources = None)))
       }
 
 
@@ -90,7 +90,9 @@ class WhichCurrenciesSpec extends AmlsSpec with CharacterSets {
         val input = WhichCurrencies(Seq("USD", "CHF", "EUR"))
 
         val expectedJson = Json.obj(
-          "currencies" -> Seq("USD", "CHF", "EUR"))
+          "currencies" -> Seq("USD", "CHF", "EUR"),
+          "usesForeignCurrencies" -> Json.obj(),
+          "moneySources" -> Json.obj())
 
         Json.toJson(input) must be(expectedJson)
       }
@@ -100,7 +102,7 @@ class WhichCurrenciesSpec extends AmlsSpec with CharacterSets {
 
         val inputJson = Json.obj("currencies" -> Seq("USD", "CHF", "EUR"))
 
-        val expected = WhichCurrencies(Seq("USD", "CHF", "EUR"))
+        val expected = WhichCurrencies(Seq("USD", "CHF", "EUR"), None, None)
 
         Json.fromJson[WhichCurrencies](inputJson) must be (JsSuccess(expected, JsPath))
       }

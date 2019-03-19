@@ -34,12 +34,12 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
-class SupplyForeignCurrenciesControllerSpec extends AmlsSpec
-  with MockitoSugar
-  with MustMatchers
-  with PatienceConfiguration
-  with IntegrationPatience
-  with ScalaFutures {
+class WhichCurrenciesControllerSpec extends AmlsSpec
+                                    with MockitoSugar
+                                    with MustMatchers
+                                    with PatienceConfiguration
+                                    with IntegrationPatience
+                                    with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
@@ -51,7 +51,7 @@ class SupplyForeignCurrenciesControllerSpec extends AmlsSpec
     when(mockCacheConnector.save[MoneyServiceBusiness](any(), any())(any(), any(), any()))
       .thenReturn(Future.successful(CacheMap("TESTID", Map())))
 
-    val controller = new SupplyForeignCurrenciesController(dataCacheConnector = mockCacheConnector,
+    val controller = new WhichCurrenciesController(dataCacheConnector = mockCacheConnector,
       authConnector = self.authConnector,
       statusService = mockStatusService,
       serviceFlow = mockServiceFlow)
@@ -72,11 +72,9 @@ class SupplyForeignCurrenciesControllerSpec extends AmlsSpec
 
   trait DealsInForeignCurrencyFixture extends Fixture {
     val newRequest = request.withFormUrlEncodedBody(
-      "bankMoneySource" ->"Yes",
-      "bankNames" ->"Bank names",
-      "wholesalerMoneySource" -> "Yes",
-      "wholesalerNames" -> "wholesaler names",
-      "customerMoneySource" -> "Yes"
+      "currencies[0]" -> "USD",
+      "currencies[1]" -> "GBP",
+      "currencies[2]" -> "BOB"
     )
   }
 
@@ -103,35 +101,33 @@ class SupplyForeignCurrenciesControllerSpec extends AmlsSpec
         }
       }
 
-//      "show a pre-populated form when model contains data" in new Fixture {
-//        val currentModel = SupplyForeignCurrencies(
-//          None,
-//          None,
-//          Some(true))
-//
-//        when(controller.statusService.getStatus(any(), any(), any()))
-//          .thenReturn(Future.successful(NotCompleted))
-//
-//        when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
-//          .thenReturn(Future.successful(Some(MoneyServiceBusiness(SupplyForeignCurrencies = Some(currentModel)))))
-//
-//        val result = controller.get()(request)
-//        val document = Jsoup.parse(contentAsString(result))
-//
-//        status(result) mustEqual OK
-//
-//        document.select("select[name=currencies[0]] > option[value=USD]").hasAttr("selected") must be(true)
-//        document.select("input[name=bankMoneySource][checked]").`val` mustEqual ""
-//        document.select("input[name=wholesalerMoneySource][checked]").`val` mustEqual ""
-//      }
+      "show a pre-populated form when model contains data" in new Fixture {
+        val currentModel = WhichCurrencies(
+          Seq("USD"))
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(NotCompleted))
+
+        when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+          .thenReturn(Future.successful(Some(MoneyServiceBusiness(whichCurrencies = Some(currentModel)))))
+
+        val result = controller.get()(request)
+        val document = Jsoup.parse(contentAsString(result))
+
+        status(result) mustEqual OK
+
+        document.select("select[name=currencies[0]] > option[value=USD]").hasAttr("selected") must be(true)
+        document.select("input[name=bankMoneySource][checked]").`val` mustEqual ""
+        document.select("input[name=wholesalerMoneySource][checked]").`val` mustEqual ""
+      }
     }
 
     "post is called " when {
       "data is valid and edit is false" should {
-        "redirect to FXTransactions in the next 12 months controller" in new DealsInForeignCurrencyFixture {
+        "redirect to Uses Foreign Currency Controller" in new DealsInForeignCurrencyFixture {
           val result = controller.post().apply(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(controllers.msb.routes.FXTransactionsInNext12MonthsController.get().url)
+          redirectLocation(result) mustBe Some(controllers.msb.routes.UsesForeignCurrenciesController.get().url)
         }
       }
       "data is valid and edit is true" should {

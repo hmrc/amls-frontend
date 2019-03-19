@@ -60,7 +60,7 @@ class WhichCurrenciesController @Inject() (val authConnector: AuthConnector,
         case ValidForm(_, data) =>
           edit match {
             case true => Future.successful(Redirect(routes.SummaryController.get()))
-            case _ => Future.successful(Redirect(routes.DealForeignCurrenciesController.get()))
+            case _ => Future.successful(Redirect(routes.UsesForeignCurrenciesController.get()))
           }
       }
     }

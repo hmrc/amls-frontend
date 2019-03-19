@@ -40,6 +40,8 @@ POST        /transfers-b                                       @controllers.msb.
 GET         /transfers-c                                       @controllers.msb.FXTransactionsInNext12MonthsController.get(edit: Boolean ?= false)
 POST        /transfers-c                                       @controllers.msb.FXTransactionsInNext12MonthsController.post(edit: Boolean ?= false)
 
-GET         /deal-foreign-currencies                           @controllers.msb.DealForeignCurrenciesController.get(edit: Boolean ?= false)
+GET         /uses-foreign-currencies                           @controllers.msb.UsesForeignCurrenciesController.get(edit: Boolean ?= false)
+POST        /uses-foreign-currencies                           @controllers.msb.UsesForeignCurrenciesController.post(edit: Boolean ?= false)
 
-GET         /supply-foreign-currencies                         @controllers.msb.SupplyForeignCurrenciesController.get(edit: Boolean ?= false)
+GET         /money-sources                                     @controllers.msb.MoneySourcesController.get(edit: Boolean ?= false)
+POST        /money-sources                                     @controllers.msb.MoneySourcesController.post(edit: Boolean ?= false)

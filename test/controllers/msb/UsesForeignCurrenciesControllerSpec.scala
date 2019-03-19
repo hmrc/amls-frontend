@@ -66,7 +66,7 @@
 //    when(mockCacheConnector.save[MoneyServiceBusiness](any(), any())(any(),any(),any()))
 //      .thenReturn(Future.successful(CacheMap("TESTID", Map())))
 //
-//    val controller = new DealForeignCurrenciesController ( dataCacheConnector = mockCacheConnector,
+//    val controller = new UsesForeignCurrenciesController ( dataCacheConnector = mockCacheConnector,
 //      authConnector = self.authConnector,
 //      statusService = mockStatusService,
 //      serviceFlow = mockServiceFlow)
