@@ -47,6 +47,8 @@ class remove_responsible_personSpec extends AmlsSpec with MustMatchers  {
       heading.html must be(Messages("changeofficer.removeresponsibleperson.lbl", "testName"))
       subHeading.html must include(Messages("summary.updateinformation"))
 
+      doc.getElementsByAttributeValue("id", "date-fieldset") must not be empty
+
     }
 
     "show errors in the correct locations" in new ViewFixture {

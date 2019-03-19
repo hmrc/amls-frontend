@@ -34,8 +34,6 @@
     heading = header
 )  {
 
-    <p>@Messages("supervision.another_body.description")</p>
-
     @form(f, controllers.supervision.routes.AnotherBodyController.post(edit)) {
 
         @fieldset(
@@ -75,31 +73,6 @@
                     panel = false
                 )
             }
-
-            @date(
-                f = f,
-                p = "startDate",
-                labelText = "supervision.another_body.startDate.lbl",
-                hintText = "supervision.another_body.startDate.hint",
-                example = false
-            )
-
-            @date(
-                f = f,
-                p = "endDate",
-                labelText = "supervision.another_body.endDate.lbl",
-                hintText = "supervision.another_body.endDate.hint",
-                example = false
-            )
-
-            @textarea(
-                field = f("endingReason"),
-                labelText = "supervision.another_body.endingReason.lbl",
-                bold = false,
-                largeWidth = true,
-                cols = "30",
-                rows = "8"
-            )
         }
 
         @submit(edit)

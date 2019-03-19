@@ -72,18 +72,17 @@
                 hint = "businessactivities.hight.value.customer.lbl.hint",
                 panel = false
             ) {
-                @addRemove("lbl.add.another.country") {
-                    @for(i <- 0 until 10) {
-                        @country_autocomplete(
-                            field = f(s"countries[$i]"),
-                            data = countryData.getOrElse(Seq.empty))
-}
+                @for(i <- 0 until 10) {
+                    @defining(
+                        f(s"countries[$i]")
+                    ) { field => @country_autocomplete(
+                        field = field,
+                        labelText = s"lbl.country.line${i+1}",
+                        data = countryData.getOrElse(Seq.empty)
+                    ) }
                 }
             }
-
         }
-
         @submit(edit, returnLocation = Some("renewal"))
     }
-
 }
