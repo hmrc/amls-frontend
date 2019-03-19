@@ -52,10 +52,13 @@ title = Messages("progress.title") + " - " + Messages("title.yapp")
         <div class="grid-layout grid-layout--stacked">
             <h2 class = "heading-medium">Sections to complete</h2>
         </div>
+    } else {
+        <div class="grid-layout grid-layout--stacked">
+            <h2 class="heading-medium">Sections</h2>
+        </div>
     }
 
     <div class="grid-layout">
-
         @* Main sections *@
         <ul class="grid-layout__column grid-layout__column--2-3 display-block">
             @sections.map { case Section(name, status, _, call) =>
