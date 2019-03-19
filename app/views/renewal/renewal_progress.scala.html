@@ -41,14 +41,14 @@
 
     @* Heading *@
     <div class="grid-layout">
-        <div class="grid-layout__column grid-layout__column--1-3">
+        <div class="grid-layout__column grid-layout__column--2-3">
             @header
         </div>
     </div>
 
-    <div class="grid-layout grid-layout--stacked">
 
-        <div class="grid-layout__column grid-layout__column--2-3">
+    <div class="grid-layout">
+        <div class="grid-layout__column--2-3">
             @renewal.renewalDate.map {date =>
 
                 @if(renewalSectionCompleted) {
@@ -63,19 +63,22 @@
                         </a>
                     </p>
                 }
+
                 <p>@messages("renewal.progress.intro").convertLineBreaksH</p>
+
+                <div class="grid-layout__column grid-layout__column--1-3">
+                        &nbsp;
+                </div>
             }
-            <div class="grid-layout grid-layout--stacked">
-                @section_list(sections)
-            </div>
-
         </div>
+    </div>
 
-        <div class="grid-layout__column grid-layout__column--1-3">
-            @* Sidebar *@
-            <div class="grid-layout__column grid-layout__column--1-3 progress-step--submit">
-                @application_submit(canSubmit, renewal, renewalSectionCompleted)
-            </div>
-        </div>
+    <div class="grid-layout">
+        @section_list(sections)
+    </div>
+
+    @* Sidebar *@
+    <div>
+        @application_submit(canSubmit, renewal, renewalSectionCompleted)
     </div>
 }

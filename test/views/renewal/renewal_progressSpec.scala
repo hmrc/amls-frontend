@@ -55,13 +55,15 @@ class renewal_progressSpec extends AmlsSpec with MustMatchers{
 
       doc.select("form button[name=submit]").hasAttr("disabled") mustBe false
 
-      doc.select(".application-submit").get(0).text() must include(Messages("renewal.progress.submit.intro"))
+      html must include (Messages("renewal.progress.ready.to.submit.intro"))
 
       doc.getElementsMatchingOwnText(Messages("renewal.progress.edit")).attr("href") must be(controllers.renewal.routes.SummaryController.get().url)
     }
 
     "not have the submit registration button when cannot submit because renewal section not complete" in new ViewFixture {
       override def view = views.html.renewal.renewal_progress(Seq.empty, canSubmit = false, msbOrTcspExists = true, readyForRenewal, renewalSectionCompleted = false)
+
+      html must include (Messages("renewal.progress.submit.intro"))
 
       doc.select(".application-submit form button[name=submit]").isEmpty mustBe true
 
@@ -72,8 +74,6 @@ class renewal_progressSpec extends AmlsSpec with MustMatchers{
       override def view = views.html.renewal.renewal_progress(Seq.empty, canSubmit = false, msbOrTcspExists = true, readyForRenewal, renewalSectionCompleted = true)
 
       doc.select("form button[name=submit]").hasAttr("disabled") mustBe true
-
-      doc.select(".application-submit").get(0).text() must include(Messages("renewal.progress.submit.intro"))
 
       doc.getElementsMatchingOwnText(Messages("renewal.progress.edit")).attr("href") must be(controllers.renewal.routes.SummaryController.get().url)
     }
@@ -90,6 +90,7 @@ class renewal_progressSpec extends AmlsSpec with MustMatchers{
       override def view = views.html.renewal.renewal_progress(Seq.empty, false, true, readyForRenewal, true)
 
       doc.select("#renewal-information-completed").get(0).text() must be(Messages("renewal.progress.information.completed.info"))
+//      html must include (Messages("renewal.progress.ready.to.submit.intro"))
     }
 
     "show submit renewal link and text when information are not completed yet" in new ViewFixture {
@@ -103,6 +104,7 @@ class renewal_progressSpec extends AmlsSpec with MustMatchers{
 
       doc.select("#renewal-information-not-completed").get(0).text() must be(expectedText)
       doc.select("#renewal-information-not-completed a").attr("href") must be(controllers.renewal.routes.WhatYouNeedController.get().url)
+//      html must include (Messages("renewal.progress.submit.intro"))
     }
 
 
