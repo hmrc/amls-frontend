@@ -18,7 +18,6 @@ package views.confirmation
 
 import generators.PaymentGenerator
 import models.confirmation.Currency
-import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
@@ -50,7 +49,7 @@ class SubmitRegistrationConfirmationViewSpec extends AmlsSpec with PaymentGenera
     }
 
     "show the correct informational paragraph" in new ViewFixture {
-      doc.select(".panel-border-wide").text mustBe Messages("confirmation.submission.info")
+      doc.select(".info").text mustBe Messages("confirmation.submission.info")
     }
 
     "show the correct fee" in new ViewFixture {
