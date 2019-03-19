@@ -50,7 +50,20 @@
 
         <div class="grid-layout__column grid-layout__column--2-3">
             @renewal.renewalDate.map {date =>
-                    <p>@messages("renewal.progress.intro").convertLineBreaksH</p>
+
+                @if(renewalSectionCompleted) {
+                    <p id="renewal-information-completed">
+                        @Messages("renewal.progress.information.completed.info")
+                    </p>
+                } else {
+                    <p id="renewal-information-not-completed">
+                        @Messages("renewal.progress.information.not.completed.info.part1")
+                        <a href="@controllers.renewal.routes.WhatYouNeedController.get().url">
+                            @Messages("renewal.progress.information.not.completed.info.part2")
+                        </a>
+                    </p>
+                }
+                <p>@messages("renewal.progress.intro").convertLineBreaksH</p>
             }
             <div class="grid-layout grid-layout--stacked">
                 @section_list(sections)
