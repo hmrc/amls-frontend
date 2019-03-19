@@ -48,7 +48,6 @@ class renewal_progressSpec extends AmlsSpec with MustMatchers{
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
       heading.html must be(Messages("renewal.progress.title"))
-      subHeading.html must include(Messages("summary.status"))
     }
 
     "enable the submit registration button when can submit and renewal section complete" in new ViewFixture {
