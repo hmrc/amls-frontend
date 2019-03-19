@@ -82,14 +82,14 @@ class renewal_progressSpec extends AmlsSpec with MustMatchers{
 
       override def view = views.html.renewal.renewal_progress(Seq.empty, false, true, readyForRenewal)
 
-      html must include (Messages("renewal.progress.tpandrp.intro", DateHelper.formatDate(renewalDate)).convertLineBreaks)
+      html must include (Messages("renewal.progress.intro", DateHelper.formatDate(renewalDate)).convertLineBreaks)
     }
 
     "show intro for non MSB and TCSP businesses" in new ViewFixture {
 
       override def view = views.html.renewal.renewal_progress(Seq.empty, false, false, readyForRenewal)
 
-      html must include (Messages("renewal.progress.tponly.intro", DateHelper.formatDate(renewalDate)).convertLineBreaks)
+      html must include (Messages("renewal.progress.intro", DateHelper.formatDate(renewalDate)).convertLineBreaks)
     }
 
   }
