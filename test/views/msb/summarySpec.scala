@@ -62,7 +62,7 @@ class summarySpec extends AmlsSpec
       ("msb.throughput.title",checkElementTextIncludes(_, "msb.throughput.lbl.01")),
       ("msb.ipsp.title",checkElementTextIncludes(_, "lbl.no")),
       ("msb.linked.txn.title",checkElementTextIncludes(_, "lbl.no")),
-      ("msb.which_currencies.title",checkElementTextIncludes(_, "USD","GBP","EUR","bank names","Wholesaler Names")),
+      ("msb.which_currencies.title",checkElementTextIncludes(_, "USD","GBP","EUR")),
       ("msb.send.money.title",checkElementTextIncludes(_, "lbl.yes")),
       ("msb.fundstransfer.title",checkElementTextIncludes(_, "lbl.no")),
       ("msb.branchesoragents.title",checkElementTextIncludes(_, "United Kingdom")),

@@ -89,10 +89,7 @@ class WhichCurrenciesSpec extends AmlsSpec with CharacterSets {
 
         val input = WhichCurrencies(Seq("USD", "CHF", "EUR"))
 
-        val expectedJson = Json.obj(
-          "currencies" -> Seq("USD", "CHF", "EUR"),
-          "usesForeignCurrencies" -> Json.obj(),
-          "moneySources" -> Json.obj())
+        val expectedJson = Json.obj("currencies" -> Seq("USD", "CHF", "EUR"))
 
         Json.toJson(input) must be(expectedJson)
       }
@@ -102,7 +99,7 @@ class WhichCurrenciesSpec extends AmlsSpec with CharacterSets {
 
         val inputJson = Json.obj("currencies" -> Seq("USD", "CHF", "EUR"))
 
-        val expected = WhichCurrencies(Seq("USD", "CHF", "EUR"), None, None)
+        val expected = WhichCurrencies(Seq("USD", "CHF", "EUR"))
 
         Json.fromJson[WhichCurrencies](inputJson) must be (JsSuccess(expected, JsPath))
       }

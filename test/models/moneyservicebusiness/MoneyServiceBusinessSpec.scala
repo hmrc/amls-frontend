@@ -152,13 +152,13 @@ trait MoneyServiceBusinessTestData {
     ),
     "identifyLinkedTransactions" -> Json.obj("linkedTxn" -> true),
     "whichCurrencies" -> Json.obj(
-      "currencies" -> Json.arr("USD", "GBP", "EUR"),
-      "bankMoneySource" -> "Yes",
-      "bankNames" -> "bank names",
-      "wholesalerMoneySource" -> "Yes",
-      "wholesalerNames" -> "Wholesaler Names",
-      "customerMoneySource" -> "Yes",
-      "usesForeignCurrencies" -> true
+      "currencies" -> Json.arr("USD", "GBP", "EUR")
+//      "bankMoneySource" -> "Yes",
+//      "bankNames" -> "bank names",
+//      "wholesalerMoneySource" -> "Yes",
+//      "wholesalerNames" -> "Wholesaler Names",
+//      "customerMoneySource" -> "Yes",
+//      "usesForeignCurrencies" -> true
     ),
     "sendMoneyToOtherCountry" -> Json.obj("money" -> true),
     "fundsTransfer" -> Json.obj("transferWithoutFormalSystems" -> true),

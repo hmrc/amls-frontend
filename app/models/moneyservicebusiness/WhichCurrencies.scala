@@ -71,15 +71,10 @@ object WhichCurrencies {
     import play.api.libs.json._
 
     ((__ \ "currencies").read[Seq[String]] and
-      (__ \ "usesForeignCurrencies").read(Reads.optionNoError[UsesForeignCurrencies]) and
-      (__ \ "moneySources").read(Reads.optionNoError[MoneySources])) (WhichCurrencies.apply _)
+      (__ \ "usesForeignCurrencies").readNullable[UsesForeignCurrencies] and
+      (__ \ "moneySources").readNullable[MoneySources]) (WhichCurrencies.apply _)
   }
 
-  implicit val jsonWrites = Writes[WhichCurrencies] {
-    case wc: WhichCurrencies => Json.obj(
-      "currencies" -> wc.currencies,
-      "usesForeignCurrencies" -> wc.usesForeignCurrencies,
-      "moneySources" -> wc.moneySources
-    )
-  }
+  implicit val jsonWrites = Json.writes[WhichCurrencies]
+
 }
