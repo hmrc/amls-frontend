@@ -62,26 +62,33 @@ class MoneySourcesController @Inject()(val authConnector: AuthConnector,
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.msb.money_sources(f, edit)))
           case ValidForm(_, data) =>
+            println(data)
             dataCacheConnector.fetchAll flatMap {
               optMap =>
-                val result = for {
+                println(optMap.get.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key))
+                for {
                   cache <- optMap
                   msb <- cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
                   whichCurrencies <- msb.whichCurrencies
                   bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
                   services <- bm.msbServices
                 } yield {
-                  dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
-                    msb.copy(whichCurrencies = Some(whichCurrencies.copy(moneySources = Some(data))))
-                  ) map { _ =>
+                  println(msb)
+                  println(whichCurrencies)
+                  println(services)
+//                  dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
+//                    msb.copy(whichCurrencies = Some(whichCurrencies.copy(moneySources = Some(data))))
+//                  ) map { _ =>
                     services.msbServices.contains(ForeignExchange) match {
                       case true if msb.fxTransactionsInNext12Months.isEmpty || !edit =>
                         Redirect(routes.FXTransactionsInNext12MonthsController.get(edit))
                       case _ => Redirect(routes.SummaryController.get())
                     }
-                  }
+                 // }
                 }
-                result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
+//                println(result)
+//                result getOrElse
+                  Future.failed(new Exception("Unable to retrieve sufficient data"))
             }
         }
       }
