@@ -31,7 +31,7 @@
     heading = header
 ) {
 
-    @form(f, controllers.msb.routes.UsesForeignCurrenciesController.post()) {
+    @form(f, controllers.msb.routes.UsesForeignCurrenciesController.post(edit)) {
 
         @fieldset(
             f = f("usesForeignCurrencies-fieldset"),
@@ -45,14 +45,14 @@
                 @radio(
                     f = f("usesForeignCurrencies"),
                     labelText = "lbl.yes",
-                    value = "Yes",
+                    value = "true",
                     inline = true
                 )
 
                 @radio(
                     f = f("usesForeignCurrencies"),
                     labelText = "lbl.no",
-                    value = "No",
+                    value = "false",
                     inline = true
                 )
             }
