@@ -26,7 +26,7 @@
             <a id = @getStatusId(name) href="@call.url">
                 Add @Messages(s"progress.${name}.name")
             </a>
-            <div class="task-status task-status--not-started">
+            <div class="task-status">
                 <span class="visuallyhidden">This section is </span>Not started
             </div>
         }
@@ -35,7 +35,7 @@
             <a id = @getStatusId(name) href="@call.url">
                 Add @Messages(s"progress.${name}.name")
             </a>
-            <div class="task-status taks-status--not-started">
+            <div class="task-status">
                 <span class="visuallyhidden">This section is</span>Incomplete
             </div>
         }
@@ -44,7 +44,7 @@
             <a id = @getStatusId(name) href= "@call.url">
                 Edit @Messages(s"progress.${name}.name")
             </a>
-            <div class = "task-status task-status--not-started">
+            <div class = "task-status">
                 <span class="visuallyhidden">This section is</span>Completed
             </div>
         }

@@ -21,6 +21,7 @@
 @import views.html.helper.CSRF
 @import models.businesscustomer.Address
 
+@import models.registrationprogress._
 @(
     sections: Seq[Section],
     declarationAvailable: Boolean,
@@ -57,5 +58,5 @@
         @section_list(sections, newSections)
     </div>
 
-    @submit_application(declarationAvailable)
+    @submit_application(declarationAvailable, sections.exists(_.status != Completed) || sections.exists(_.hasChanged))
 }

@@ -20,7 +20,7 @@
 @import views.html.helper.CSRF
 @import utils.Strings._
 
-@(declarationAvailable: Boolean)(implicit messages: Messages, request: Request[_])
+@(declarationAvailable: Boolean, hasChanged: Boolean)(implicit messages: Messages, request: Request[_])
 
 <div class="grid-layout grid-layout--stacked submit-application">
     @if(declarationAvailable){
@@ -34,7 +34,11 @@
         </form>
     } else {
         <h2 class="heading-medium">@Messages("progress.view.status")</h2>
-        <p>@Messages("progress.updates.not.made")</p>
+        <p>@if(hasChanged) {
+            @Messages("progress.updates.made")
+        } else {
+            @Messages("progress.updates.not.made")
+        }</p>
         <a id="progress-continue" href="@controllers.routes.StatusController.get().url">
             <span class="visuallyhidden">Check your status and messages</span>Check your status and messages
         </a>
