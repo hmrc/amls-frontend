@@ -69,7 +69,7 @@ object WhichCurrencies {
     (__ \ "currencies").write[Seq[String]] contramap {x =>x.currencies}
   }
 
-  def oldUsesForeignCurrencies: Reads[Option[UsesForeignCurrencies]] =
+  def oldUsesForeignCurrenciesReader: Reads[Option[UsesForeignCurrencies]] =
     (__ \ "usesForeignCurrencies").readNullable[Boolean] map { ed =>
       ed.fold[Option[UsesForeignCurrencies]](None) { e => e match {
         case true => Some(UsesForeignCurrenciesYes)
@@ -77,7 +77,7 @@ object WhichCurrencies {
       }}
     }
 
-  def oldMoneySources: Reads[Option[MoneySources]] = {
+  def oldMoneySourcesReader: Reads[Option[MoneySources]] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
 
@@ -109,13 +109,13 @@ object WhichCurrencies {
 
     ((__ \ "currencies").read[Seq[String]] and
       ((__ \ "usesForeignCurrencies").read(Reads.optionNoError[UsesForeignCurrencies]) flatMap {
-        case None => oldUsesForeignCurrencies
+        case None => oldUsesForeignCurrenciesReader
         case x => constant(x)
     }) and
-      ((__ \ "moneySources").read(Reads.optionNoError[MoneySources]) flatMap {
-      case None => oldMoneySources
+      ((__ \ "moneySources").readNullable[MoneySources] flatMap {
+      case None => oldMoneySourcesReader
       case x => constant(x)
-    }) (WhichCurrencies.apply _)
+    })) (WhichCurrencies.apply _)
   }
 
   implicit val jsonWrites = Json.writes[WhichCurrencies]

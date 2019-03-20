@@ -160,8 +160,8 @@ object MoneySources {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
     (
-      __.read[Option[BankMoneySource]] and
-        __.read[Option[WholesalerMoneySource]] and
+      (__ \ "bankMoneySource").read(bmsReader) and
+        (__ \ "wholesalerMoneySource").read(wsReader) and
         (__ \ "customerMoneySource").readNullable(cmsReader))((bms, wms, cms) => MoneySources(bms, wms, cms))
   }
 
