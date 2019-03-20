@@ -77,6 +77,31 @@ object WhichCurrencies {
       }}
     }
 
+  def oldMoneySources: Reads[Option[MoneySources]] = {
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json._
+
+    val bankMoney = ((__ \ "bankMoneySource").readNullable[String] and
+      (__ \ "bankNames").readNullable[String])((a, b) => (a, b) match {
+      case (Some("Yes"), Some(names)) => Some(BankMoneySource(names))
+      case _ => None
+    })
+
+    val wholeSalerMoney = ((__ \ "wholesalerMoneySource").readNullable[String] and
+      (__ \ "wholesalerNames").readNullable[String])((a, b) => (a, b) match {
+      case (Some("Yes"), Some(names)) => Some(WholesalerMoneySource(names))
+      case _ => None
+    })
+
+    val customerMoney = (__ \ "customerMoneySource").read[String] map {
+      case "Yes" => true
+      case _ => false
+    }
+
+    (bankMoney and wholeSalerMoney and customerMoney) ((a, b, c) => Some(MoneySources(a, b, Some(c))))
+
+  }
+
   implicit val jsonReads: Reads[WhichCurrencies] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json.Reads._
@@ -87,7 +112,10 @@ object WhichCurrencies {
         case None => oldUsesForeignCurrencies
         case x => constant(x)
     }) and
-      (__ \ "moneySources").readNullable[MoneySources]) (WhichCurrencies.apply _)
+      ((__ \ "moneySources").read(Reads.optionNoError[MoneySources]) flatMap {
+      case None => oldMoneySources
+      case x => constant(x)
+    }) (WhichCurrencies.apply _)
   }
 
   implicit val jsonWrites = Json.writes[WhichCurrencies]
