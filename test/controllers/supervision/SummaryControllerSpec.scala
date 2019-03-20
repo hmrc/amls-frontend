@@ -17,7 +17,7 @@
 package controllers.supervision
 
 import models.asp.Asp
-import models.supervision.Supervision
+import models.supervision.{Supervision, SupervisionValues}
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -30,7 +30,7 @@ import scala.concurrent.Future
 
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture  with DependencyMocks{
+  trait Fixture extends AuthorisedFixture  with DependencyMocks with SupervisionValues {
     self => val request = addToken(authRequest)
 
     val controller = new SummaryController(mockCacheConnector, authConnector = self.authConnector)
@@ -39,20 +39,24 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
   }
 
   "Get" must {
-
-    "load the summary page when section data is available" in new Fixture {
-
-
+    "load the summary page when section data is available and section is complete" in new Fixture {
 
       when(controller.dataCacheConnector.fetch[Supervision](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(model)))
+        (any(), any(), any())).thenReturn(Future.successful(Some(completeModel)))
 
       val result = controller.get()(request)
       status(result) must be(OK)
     }
 
-    "redirect to the main summary page when section data is unavailable" in new Fixture {
+    "redirect to the main summary page when section data is available but incomplete" in new Fixture {
+      when(controller.dataCacheConnector.fetch[Supervision](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(model)))
 
+      val result = controller.get()(request)
+      status(result) must be(SEE_OTHER)
+    }
+
+    "redirect to the main summary page when section data is unavailable" in new Fixture {
       when(controller.dataCacheConnector.fetch[Asp](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
