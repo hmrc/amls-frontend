@@ -83,7 +83,7 @@ object WhichCurrencies {
     import play.api.libs.json._
 
     ((__ \ "currencies").read[Seq[String]] and
-      ((__ \ "usesForeignCurrencies").readNullable[UsesForeignCurrencies] flatMap {
+      ((__ \ "usesForeignCurrencies").read(Reads.optionNoError[UsesForeignCurrencies]) flatMap {
         case None => oldUsesForeignCurrencies
         case x => constant(x)
     }) and
