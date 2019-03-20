@@ -19,11 +19,11 @@
 @(name: String, status: Status, call: Call)(implicit request: Request[_],m:Messages, lang: Lang)
 @getStatusId(name:String) = {@name.concat("-status")}
 
-<li class = "task-list-item">
+<li id = @getStatusId(name) class = "task-list-item">
     @status match {
 
         case NotStarted => {
-            <a id = @getStatusId(name) href="@call.url">
+            <a href="@call.url">
                 Add @Messages(s"progress.${name}.name")
             </a>
             <div class="task-status">
@@ -32,7 +32,7 @@
         }
 
         case Started => {
-            <a id = @getStatusId(name) href="@call.url">
+            <a href="@call.url">
                 Add @Messages(s"progress.${name}.name")
             </a>
             <div class="task-status">
@@ -41,7 +41,7 @@
         }
 
         case Completed => {
-            <a id = @getStatusId(name) href= "@call.url">
+            <a href= "@call.url">
                 Edit @Messages(s"progress.${name}.name")
             </a>
             <div class = "task-status">
