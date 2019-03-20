@@ -25,7 +25,7 @@ import models.renewal.CustomersOutsideUK
 import models.responsiblepeople.ResponsiblePerson.filter
 import models.responsiblepeople.{NonUKResidence, ResponsiblePerson}
 import models.status._
-import models.supervision.{AnotherBodyNo, AnotherBodyYes, Supervision}
+import models.supervision.{AnotherBody, AnotherBodyNo, AnotherBodyYes, Supervision}
 import play.api.Play.current
 import play.api.i18n.Messages
 import play.api.i18n.Messages.Implicits._
@@ -192,6 +192,12 @@ object ControllerHelper {
 
   def supervisionComplete(cache: CacheMap) = cache.getEntry[Supervision](Supervision.key) match {
     case Some(supervision) => supervision.isComplete
+    case _ => false
+  }
+
+  def isAbComplete(anotherBody: AnotherBody): Boolean = anotherBody match {
+    case AnotherBodyYes(_, Some(_), Some(_), Some(_)) => true
+    case AnotherBodyNo => true
     case _ => false
   }
 }
