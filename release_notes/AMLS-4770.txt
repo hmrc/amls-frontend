@@ -1,1 +1,0 @@
- + [AMLS-4770](https://jira.tools.tax.service.gov.uk/browse/AMLS-4770) - 'Fix Voice Over - VO not working as it should on Remove pages'

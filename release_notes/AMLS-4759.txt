@@ -1,1 +1,0 @@
- + [AMLS-4759](https://jira.tools.tax.service.gov.uk/browse/AMLS-4759) - 'Fixed legend on "Where did you send the most transactions in the last 12 months?"'
