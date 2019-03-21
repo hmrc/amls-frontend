@@ -21,7 +21,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.DateOfChange
-import models.aboutthebusiness.AboutTheBusiness
+import models.businessdetails.BusinessDetails
 import models.asp.Asp
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -72,9 +72,9 @@ class ServicesOfBusinessDateOfChangeController @Inject()(val dataCacheConnector:
       optionalCache =>
         (for {
           cache <- optionalCache
-          aboutTheBusiness <- cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)
+          businessDetails <- cache.getEntry[BusinessDetails](BusinessDetails.key)
           asp <- cache.getEntry[Asp](Asp.key)
-        } yield (asp, aboutTheBusiness.activityStartDate)) match {
+        } yield (asp, businessDetails.activityStartDate)) match {
           case Some((asp, Some(activityStartDate))) => (asp, Map("activityStartDate" -> Seq(activityStartDate.startDate.toString("yyyy-MM-dd"))))
           case Some((asp, _)) => (asp, Map())
           case _ => (Asp(), Map())

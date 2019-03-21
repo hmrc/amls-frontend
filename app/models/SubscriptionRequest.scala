@@ -16,7 +16,7 @@
 
 package models
 
-import models.aboutthebusiness.AboutTheBusiness
+import models.businessdetails.BusinessDetails
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businessmatching.BusinessMatching
@@ -37,7 +37,7 @@ case class SubscriptionRequest(
                                 businessMatchingSection: Option[BusinessMatching],
                                 eabSection: Option[EstateAgentBusiness],
                                 tradingPremisesSection: Option[Seq[TradingPremises]],
-                                aboutTheBusinessSection: Option[AboutTheBusiness],
+                                businessDetailsSection: Option[BusinessDetails],
                                 bankDetailsSection: Option[Seq[BankDetails]],
                                 aboutYouSection: Option[AddPerson],
                                 businessActivitiesSection: Option[BusinessActivities],
