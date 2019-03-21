@@ -24,6 +24,7 @@ import models.businessmatching.{BusinessMatching, CurrencyExchange, ForeignExcha
 import models.moneyservicebusiness._
 import services.StatusService
 import services.businessmatching.ServiceFlow
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
 
@@ -61,36 +62,41 @@ class MoneySourcesController @Inject()(val authConnector: AuthConnector,
         foo match {
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.msb.money_sources(f, edit)))
-          case ValidForm(_, data) =>
-            println(data)
-            dataCacheConnector.fetchAll flatMap {
-              optMap =>
-                println(optMap.get.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key))
-                for {
-                  cache <- optMap
-                  msb <- cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
-                  whichCurrencies <- msb.whichCurrencies
-                  bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-                  services <- bm.msbServices
-                } yield {
-                  println(msb)
-                  println(whichCurrencies)
-                  println(services)
-//                  dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
-//                    msb.copy(whichCurrencies = Some(whichCurrencies.copy(moneySources = Some(data))))
-//                  ) map { _ =>
-                    services.msbServices.contains(ForeignExchange) match {
-                      case true if msb.fxTransactionsInNext12Months.isEmpty || !edit =>
-                        Redirect(routes.FXTransactionsInNext12MonthsController.get(edit))
-                      case _ => Redirect(routes.SummaryController.get())
-                    }
-                 // }
-                }
-//                println(result)
-//                result getOrElse
-                  Future.failed(new Exception("Unable to retrieve sufficient data"))
-            }
+          case ValidForm(_, data: MoneySources) =>
+            for {
+              msb <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
+              cache <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
+                updateMoneySources(msb, data))
+            } yield redirectToNextPage(cache, edit).getOrElse(NotFound(notFoundView))
+
+
         }
       }
+  }
+
+  def redirectToNextPage(map: CacheMap, edit: Boolean) = {
+    for {
+      msb <- map.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
+      bm <- map.getEntry[BusinessMatching](BusinessMatching.key)
+      services <- bm.msbServices
+    } yield {
+      services.msbServices.contains(ForeignExchange) match {
+        case true if msb.fxTransactionsInNext12Months.isEmpty || !edit =>
+          Redirect(routes.FXTransactionsInNext12MonthsController.get(edit))
+        case _ => Redirect(routes.SummaryController.get())
+      }
+    }
+  }
+
+  def updateMoneySources(oldMsb: Option[MoneyServiceBusiness], moneySources: MoneySources): Option[MoneyServiceBusiness] = {
+    oldMsb match {
+      case Some(msb) => {
+        msb.whichCurrencies match {
+          case Some(w) => Some(msb.whichCurrencies(w.moneySources(moneySources)))
+          case _ => None
+        }
+      }
+      case _ => None
+    }
   }
 }

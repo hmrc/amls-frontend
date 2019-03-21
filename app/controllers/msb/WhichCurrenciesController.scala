@@ -61,12 +61,11 @@ class WhichCurrenciesController @Inject() (val authConnector: AuthConnector,
                 msb <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
                 _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
                   updateCurrencies(msb, data))
-              } yield Redirect(routes.UsesForeignCurrenciesController.get())
-//                  edit match {
-//                    case true => Redirect(routes.SummaryController.get())
-//                    case _ => Redirect(routes.UsesForeignCurrenciesController.get())
-//                  }
-
+              } yield
+                  edit match {
+                    case true => Redirect(routes.SummaryController.get())
+                    case _ => Redirect(routes.UsesForeignCurrenciesController.get())
+                  }
       }
     }
   }
@@ -81,6 +80,5 @@ class WhichCurrenciesController @Inject() (val authConnector: AuthConnector,
       }
       case _ => None
     }
-
   }
 }

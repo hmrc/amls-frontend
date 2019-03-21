@@ -58,15 +58,30 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
       val foo = Form2[UsesForeignCurrencies](request.body)
       foo match {
         case f: InvalidForm =>
-          println(f)
           Future.successful(BadRequest(views.html.msb.uses_foreign_currencies(f, edit)))
-        case ValidForm(_, data) =>
-          println(data)
+        case ValidForm(_, data: UsesForeignCurrencies) =>
+          for {
+            msb <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
+            _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
+              updateCurrencies(msb, data))
+          } yield
           edit match {
-            case true => Future.successful(Redirect(routes.SummaryController.get()))
-            case _ => Future.successful(Redirect(routes.MoneySourcesController.get()))
+            case true => Redirect(routes.SummaryController.get())
+            case _ => Redirect(routes.MoneySourcesController.get())
           }
       }
+    }
+  }
+
+  def updateCurrencies(oldMsb: Option[MoneyServiceBusiness], usesForeignCurrencies: UsesForeignCurrencies): Option[MoneyServiceBusiness] = {
+    oldMsb match {
+      case Some(msb) => {
+        msb.whichCurrencies match {
+          case Some(w) => Some(msb.whichCurrencies(w.usesForeignCurrencies(usesForeignCurrencies)))
+          case _ => None
+        }
+      }
+      case _ => None
     }
   }
 }
