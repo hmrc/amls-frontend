@@ -145,7 +145,7 @@ object MoneySources {
   implicit val customerMoneySourceReader: Reads[Option[Boolean]] = {
     __.read(Reads.optionNoError[String]) map {
       case Some("Yes") => Some(true)
-      case _ => Some(false)
+      case _ => None
     }
   }
 
