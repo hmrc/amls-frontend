@@ -56,11 +56,27 @@ class WhichCurrenciesController @Inject() (val authConnector: AuthConnector,
       val foo = Form2[WhichCurrencies](request.body)
       foo match {
         case f: InvalidForm =>
+          println(f)
           Future.successful(BadRequest(views.html.msb.which_currencies(f, edit)))
         case ValidForm(_, data) =>
-          edit match {
-            case true => Future.successful(Redirect(routes.SummaryController.get()))
-            case _ => Future.successful(Redirect(routes.UsesForeignCurrenciesController.get()))
+          println(data)
+          dataCacheConnector.fetchAll flatMap {
+            optMap =>
+              val result = for {
+                cache <- optMap
+                msb <- cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
+                currencies <- msb.whichCurrencies
+              } yield {
+                dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
+                  msb.copy(whichCurrencies = Some(currencies.copy(currencies = data.currencies)))
+                ) map { _ =>
+                  edit match {
+                    case true => Redirect(routes.SummaryController.get())
+                    case _ => Redirect(routes.SummaryController.get())
+                  }
+                }
+              }
+              result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
           }
       }
     }

@@ -43,8 +43,8 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
             val form: Form2[UsesForeignCurrencies] = (for {
               msb <- response
               currencies <- msb.whichCurrencies
-              whichCurrencies <- currencies.usesForeignCurrencies
-            } yield Form2[UsesForeignCurrencies](whichCurrencies)).getOrElse(EmptyForm)
+              usesForeign <- currencies.usesForeignCurrencies
+            } yield Form2[UsesForeignCurrencies](usesForeign)).getOrElse(EmptyForm)
 
             Ok(views.html.msb.uses_foreign_currencies(form, edit))
         }
@@ -52,13 +52,16 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
       }
     }
   }
+
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
       val foo = Form2[UsesForeignCurrencies](request.body)
       foo match {
         case f: InvalidForm =>
+          println(f)
           Future.successful(BadRequest(views.html.msb.uses_foreign_currencies(f, edit)))
         case ValidForm(_, data) =>
+          println(data)
           edit match {
             case true => Future.successful(Redirect(routes.SummaryController.get()))
             case _ => Future.successful(Redirect(routes.MoneySourcesController.get()))
