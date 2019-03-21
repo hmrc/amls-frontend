@@ -37,7 +37,7 @@ class SectionSpec extends AmlsSpec with MockitoSugar {
     "status is NotStarted" must {
       "show Add [SectionName] link text" in new ViewFixture {
         override def view: HtmlFormat.Appendable = views.html.registrationprogress.section("hvd", NotStarted, mock[Call])
-        doc.select(s"#hvd${sectionPath}").text() must be("Add High Value Dealer")
+        doc.select(s"#high-value-dealer${sectionPath}").text() must be("Add High Value Dealer")
       }
 
       "show Not started info text" in new ViewFixture {
@@ -51,7 +51,7 @@ class SectionSpec extends AmlsSpec with MockitoSugar {
       "show Add [SectionName] link text" in new ViewFixture {
         override def view: HtmlFormat.Appendable = views.html.registrationprogress.section("hvd", Started, mock[Call])
 
-        doc.select(s"#hvd${sectionPath}").text() must be("Add High Value Dealer")
+        doc.select(s"#high-value-dealer${sectionPath}").text() must be("Add High Value Dealer")
       }
 
       "show Incomplete info text" in new ViewFixture {
@@ -65,7 +65,7 @@ class SectionSpec extends AmlsSpec with MockitoSugar {
       "show Edit [SectionName] link text" in new ViewFixture {
         override def view: HtmlFormat.Appendable = views.html.registrationprogress.section("hvd", Completed, mock[Call])
 
-        doc.select(s"#hvd${sectionPath}").first().ownText() must be("Edit High Value Dealer")
+        doc.select(s"#high-value-dealer${sectionPath}").first().ownText() must be("Edit High Value Dealer")
       }
 
       "show Complete info text" in new ViewFixture {

@@ -17,7 +17,7 @@
 @import models.registrationprogress._
 
 @(name: String, status: Status, call: Call)(implicit request: Request[_],m:Messages, lang: Lang)
-@getStatusId(name:String) = {@name.concat("-status")}
+@getStatusId(name:String) = {@Messages(s"progress.${name}.name").replaceAll(" ", "-").concat("-status").toLowerCase}
 
 <li id = @getStatusId(name) class = "task-list-item">
     @status match {
