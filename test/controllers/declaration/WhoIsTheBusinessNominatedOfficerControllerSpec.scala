@@ -16,7 +16,7 @@
 
 package controllers.declaration
 
-import connectors.{AmlsConnector, DataCacheConnector, KeystoreConnector}
+import connectors.{AmlsConnector, DataCacheConnector}
 import models.declaration.BusinessNominatedOfficer
 import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import models.responsiblepeople._
@@ -38,7 +38,6 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
     val request = addToken(authRequest)
 
     lazy val defaultBuilder = new GuiceApplicationBuilder()
-      .configure("microservice.services.feature-toggle.show-fees" -> true)
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[AmlsConnector].to(mock[AmlsConnector]))
@@ -124,27 +123,6 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
         }
     }
 
-    "redirect to Fee Guidance" when {
-
-      "selected option is a valid responsible person" in new Fixture {
-
-        val newRequest = request.withFormUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
-
-        val updatedList = Seq(rp.copy(
-          positions = Some(positions.copy(positions = Set(BeneficialOwner, InternalAccountant, NominatedOfficer)))
-        ), rp2)
-
-        mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeoples), Some(ResponsiblePerson.key))
-        mockApplicationStatus(SubmissionReady)
-        mockCacheSave[Option[Seq[ResponsiblePerson]]](Some(updatedList))
-
-        val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.routes.FeeGuidanceController.get().url))
-      }
-
-    }
-
     "redirect to 'Who is registering this business?' page" when {
 
       "post submission" when {
@@ -184,31 +162,6 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
         }
 
       }
-
-      "pre-submission" when {
-
-        "show-fees is toggled off" in new Fixture {
-
-          override val builder = defaultBuilder.configure("microservice.services.feature-toggle.show-fees" -> false)
-
-          val newRequest = request.withFormUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
-
-          val updatedList = Seq(rp.copy(
-            positions = Some(positions.copy(positions = Set(BeneficialOwner, InternalAccountant, NominatedOfficer)))
-          ), rp2)
-
-          mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeoples), Some(ResponsiblePerson.key))
-          mockApplicationStatus(SubmissionReady)
-          mockCacheSave[Option[Seq[ResponsiblePerson]]](Some(updatedList))
-
-          val result = controller.post()(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.declaration.routes.WhoIsRegisteringController.get().url))
-
-        }
-
-      }
-
     }
 
     "successfully redirect to adding new responsible people .i.e what you need page of RP" when {

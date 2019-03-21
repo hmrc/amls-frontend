@@ -149,7 +149,9 @@ object FormTypes {
   private val emailRequired = required("error.required.rp.email")
   private val confirmEmailRequired = required("error.invalid.rp.email")
   private val emailLength = maxWithMsg(maxEmailLength, "error.max.length.rp.email")
-  private val emailPattern = regexWithMsg(emailRegex, "error.invalid.rp.email")
+
+  private val confirmEmailPattern = regexWithMsg(emailRegex, "error.invalid.rp.email")
+  private val emailPattern = regexWithMsg(emailRegex, "error.required.rp.email")
 
   private val dayRequired = required("error.required.tp.date")
   private val dayPattern = regexWithMsg(dayRegex, "error.invalid.tp.date")
@@ -163,7 +165,7 @@ object FormTypes {
 
   val phoneNumberType = notEmptyStrip andThen phoneNumberRequired andThen phoneNumberLength andThen phoneNumberPattern
   val emailType = emailRequired andThen emailLength andThen emailPattern
-  val confirmEmailType = confirmEmailRequired andThen emailLength andThen emailPattern
+  val confirmEmailType = confirmEmailRequired andThen emailLength andThen confirmEmailPattern
   val dayType = dayRequired andThen dayPattern
   val monthType = monthRequired andThen monthPattern
   private val yearTypePost1900: Rule[String, String] = yearRequired andThen yearPatternPost1900

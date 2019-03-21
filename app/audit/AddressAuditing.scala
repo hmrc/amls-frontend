@@ -19,7 +19,7 @@ package audit
 import audit.Utils._
 import cats.Functor
 import cats.implicits._
-import models.aboutthebusiness._
+import models.businessdetails._
 import models.responsiblepeople.{PersonAddress, PersonAddressNonUK, PersonAddressUK}
 import models.tradingpremises.{Address => TradingPremisesAddress}
 import play.api.libs.json._

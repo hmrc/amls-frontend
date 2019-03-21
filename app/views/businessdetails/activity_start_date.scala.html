@@ -1,0 +1,46 @@
+@*
+ * Copyright 2019 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages)
+
+@header = {
+    @components.back_link()
+    @errorSummary(f)
+    @heading("businessdetails.activity.start.date.title", "summary.businessdetails")
+}
+
+@main(
+    title = Messages("businessdetails.activity.start.date.title") + " - " + Messages("summary.businessdetails"),
+    heading = header
+) {
+
+
+
+    @form(f, controllers.businessdetails.routes.ActivityStartDateController.post(edit)) {
+
+        @date(
+            f = f,
+            p = "startDate",
+            example = true,
+            legendHidden = false
+        )
+
+        @submit(false)
+    }
+}
