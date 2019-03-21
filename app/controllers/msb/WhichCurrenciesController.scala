@@ -75,7 +75,7 @@ class WhichCurrenciesController @Inject() (val authConnector: AuthConnector,
       case Some(msb) => {
        msb.whichCurrencies match {
           case Some(w) => Some(msb.whichCurrencies(w.currencies(newWhichCurrencies.currencies)))
-          case _ => Some(msb.whichCurrencies(WhichCurrencies(newWhichCurrencies.currencies, None, Some(MoneySources(None, None, None)))))
+          case _ => Some(msb.whichCurrencies(WhichCurrencies(newWhichCurrencies.currencies)))
         }
       }
       case _ => None

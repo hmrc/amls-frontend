@@ -119,10 +119,13 @@ object WhichCurrencies {
         case None => oldUsesForeignCurrenciesReader
         case x => constant(x)
     }) and
-      ((__ \ "moneySources").readNullable[MoneySources] flatMap {
-      case None => oldMoneySourcesReader
-      case x => constant(x)
-    })) (WhichCurrencies.apply _)
+      ((__ \ "moneySources").readNullable[MoneySources]
+
+//        flatMap {
+//      case None => oldMoneySourcesReader
+//      case x => constant(x)
+//    }
+        )) (WhichCurrencies.apply _)
   }
 
   implicit val jsonWrites = Json.writes[WhichCurrencies]
