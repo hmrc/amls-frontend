@@ -124,7 +124,7 @@ error.required.atb.corporation.tax = Select yes if your business is registered f
 error.required.atb.corporation.tax.number = Enter a valid Corporation Tax reference number
 error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax reference number
 error.required.atb.lettersaddress = Select yes if this is the right address to send you letters
-error.mismatch.atb.email = The email addresses you’ve entered don’t match
+error.mismatch.atb.email = The email addresses you’ve entered do not match
 
 error.businessmatching.updateservice.responsiblepeople = Select at least one option to show which responsible people have passed the HMRC Money Laundering Regulations fit and proper test
 error.businessmatching.updateservice.addmoreactivities = Select yes if you want to add another type of business
@@ -223,11 +223,11 @@ error.required.eab.penalised.by.professional.body = Select yes if the business, 
 ############################### Responsible People ###############################
 error.required.rp.is.uk.resident = Select yes if {0} is a UK resident
 error.required.rp.birth.country = Enter an official country name: for example, Holland is Netherlands
-error.required.rp.nationality = Enter a nationality.
+error.required.rp.nationality = Enter a nationality
 error.required.rp.passport.option = Select one or more options to show what kind of passport this person has
 error.required.rp.register.another.person = Select yes if you want to register another responsible person
-error.required.rp.email = Enter an email address in the correct format, like name@example.com.
-error.invalid.rp.email = Re-enter an email address in the correct format, like name@example.com.
+error.required.rp.email = Enter an email address in the correct format, like name@example.com
+error.invalid.rp.email = Re-enter the email address in the correct format, like name@example.com
 error.max.length.rp.email = You can’t enter more than 100 characters
 error.required.rp.experiencetraining = Select yes if this person has experience in these activities
 error.required.rp.experiencetraining.information = Enter a brief description of this person’s experience
@@ -237,8 +237,8 @@ error.required.rp.fit_and_proper = Select yes if this person has already passed 
 error.required.rp.approval_check = Select yes if this person has already been charged for the approval check
 error.invalid.length.rp.training.information = You can’t enter more than 255 characters
 error.required.rp.isknownbyothernames = Select yes if this person is known by another name
-error.required.rp.otherfirstnames = Enter all other first names.
-error.required.rp.otherlastnames = Enter all other last names.
+error.required.rp.otherfirstnames = Enter all other first names
+error.required.rp.otherlastnames = Enter all other last names
 error.required.rp.hasPreviousName = Select yes if this person has ever changed their name
 error.required.rp.hasOtherNames = Select yes if this person is known by another name
 error.required.rp.first_name = Enter the responsible person’s first name
@@ -400,7 +400,9 @@ button.continuetopayment = Continue to payment
 button.returntosummary = Return to Summary
 button.confirmandsubmit = Confirm and submit
 button.confirmandcontinue = Confirm and continue
-button.returntoapplicationprogress = Return to application progress
+
+button.returntoapplicationprogress = Return to about your business
+
 button.payfee = Pay registration fee
 button.amendment.payfee = Pay amendment fee
 button.logout = Log out
@@ -496,10 +498,10 @@ lbl.hint.crn = It’s 8 characters and can be just numbers, or a mix of numbers 
 
 lbl.hint.vat = It's 9 numbers with no letters, punctuation or other characters.
 
-link.return.registration.progress = Return to application progress
-link.return.renewal.progress = Return to renewal progress
+link.return.registration.progress = Return to about your business
+link.return.renewal.progress = Return to about your business
 link.renewal.progress.change.answers = Change your answers
-link.print = Print
+link.print = Print this page
 
 ############################### Login Page ###############################
 amls.Login.title = AMLS
@@ -724,7 +726,7 @@ confirmation.header.secondary = Update information
 confirmation.lede = You’ve submitted your application.
 confirmation.thankyou = Thank you for registering online.
 confirmation.thankyou.p = You now need to pay the registration fee. Your application won’t be reviewed by HM Revenue and Customs until the fee is paid.
-confirmation.submission.info = Your application won’t be reviewed by HM Revenue and Customs until the fee is paid.
+confirmation.submission.info = Your application will not be reviewed by HMRC until you pay the fee.
 confirmation.notice = You must make a note of this reference number and registration fee. You’ll need them to make the payment.
 confirmation.reference.notice = You must make a note of this reference number.
 confirmation.fee = Your fee
@@ -784,8 +786,8 @@ confirmation.renewal.summary = This shows your total renewal fees for each item.
 confirmation.payment.title = You’ve submitted
 confirmation.payment.lede = You’ve submitted
 confirmation.payment.reference_header = Payment reference: {0}
-confirmation.payment.info.hmrc_review = HM Revenue and Customs (HMRC) will review your application when we receive your payment. It can take up to 45 days to review your application or request further information.
-confirmation.payment.info.hmrc_review2 = You can sign into this service at any time to see the status of your application. We’ll send you an email when the decision has been made. You’ll need to sign in to see the decision.
+confirmation.payment.info.hmrc_review = HMRC will review your application when we receive your payment. It can take up to 45 days to review your application, or request further information.
+confirmation.payment.info.hmrc_review2 = You can sign into this service at any time to see the status of your application. We’ll email you when we’ve made a decision. You’ll need to sign in to see the decision.
 confirmation.payment.info.heading.keep_up_to_date = Keep your information up to date
 confirmation.payment.info.keep_up_to_date = If any of your information changes you’ll need to sign in to update your details within 30 days of the change. For example, you’ll need to update if:
 confirmation.payment.info.keep_up_to_date.item1 = a responsible person leaves your business
@@ -817,9 +819,9 @@ confirmation.payment.button.retry = Try to pay again
 payments.waystopay.title = How do you want to pay your fee?
 payments.waystopay.header = How do you want to pay your fee?
 
-payments.waystopay.info = If paying by Bacs (Bankers Automated Clearing System), check your bank’s transaction limits and processing times.
-payments.waystopay.info2 = You can’t pay by personal credit card. There’s a fee if you pay by corporate credit card.
-payments.waystopay.lead.time = Payments usually take 3 working days.
+payments.waystopay.info = If paying by Bacs Payment Schemes Limited (Bacs), check transaction limits and processing times for your bank.
+payments.waystopay.info2 = There is a fee if you pay by corporate credit card. You cannot pay by personal credit card.
+payments.waystopay.lead.time = Payments normally take 3 working days.
 
 payments.waystopay.card = Debit or credit card
 payments.waystopay.bacs = Bacs
@@ -1465,7 +1467,7 @@ businessactivities.summary.directly.involved.text = directly involved in MLR act
 businessactivities.involved.hint = Do not include personal or financial information, like your National Insurance number or credit card details.\n\
   Enter 255 characters or less.
 
-submit.registration = Submit registration
+submit.registration = Submit application
 submit.amendment.application = Update information
 submit.renewal.application = Submit renewal
 
@@ -1476,12 +1478,12 @@ updateanyinformation.example.item1 = a responsible person leaves your business
 updateanyinformation.example.item2 = you start trading from a new premises
 updateanyinformation.example.item3 = your main contact number changes
 
-declaration.addperson.title = What’s your name?
+declaration.addperson.title = What is your name?
 declaration.addperson.firstname = First name
 declaration.addperson.middlename = Middle name (optional)
 declaration.addperson.lastname = Last name
 declaration.addperson.whatsyourrole = What’s your role in the business?
-declaration.addperson.amendment.title = What’s your name?
+declaration.addperson.amendment.title = What is your name?
 declaration.declaration.header = Declaration
 declaration.addperson.lbl.01 = Beneficial shareholder
 declaration.addperson.lbl.02 = Director
@@ -1498,10 +1500,10 @@ declaration.declaration.fullname = You’ve told us you’re {0}
 declaration.declaration.declare = I declare that:
 declaration.declaration.correctinformation = all the information in this application is correct
 declaration.declaration.amendment.correctinformation = all the information in this submission is correct
-declaration.declaration.tellhmrc = I understand that the business must tell HM Revenue and Customs about any change to any of the information provided
+declaration.declaration.tellhmrc = I understand that the business must tell HMRC about any changes to the information provided
 declaration.declaration.noncompliance = I understand that non-compliance with the Money Laundering Regulations may result in a civil penalty or criminal prosecution
 declaration.declaration.confirm = I confirm that I have read and understood the
-declaration.declaration.guidance = guidance
+declaration.declaration.guidance = Money Laundering Regulations guidance
 declaration.who.is.registering.amendment.title = Who is declaring this update?
 declaration.who.is.registering.title = Who is registering this business?
 declaration.who.is.registering.text = One person must take responsibility for the accuracy of this anti-money laundering supervision registration.
@@ -1519,7 +1521,7 @@ declaration.register.partners.desc = You need to register all the partners in yo
 declaration.register.partners.title = Who are the business’s partners?
 
 
-declaration.who.is.business.nominated.officer = Who is the business’s nominated officer?
+declaration.who.is.business.nominated.officer = Who is the nominated officer for your business?
 declaration.who.is.business.nominated.officer.text = You need to appoint a nominated officer before you can submit your application. The nominated officer must be one of the responsible people you’ve registered.
 
 fee.guidance = Fee guidance
@@ -1626,7 +1628,7 @@ responsiblepeople.position_within_business.lbl.06 = Sole proprietor
 responsiblepeople.position_within_business.lbl.07 = Designated member (Partner)
 responsiblepeople.position_within_business.lbl.08 = External accountant
 responsiblepeople.position_within_business.lbl.09 = Other
-responsiblepeople.position_within_business.other_position.lbl = Please specify
+responsiblepeople.position_within_business.other_position.lbl = Add your role in the business
 responsiblepeople.position_within_business.other_position.othermissing = You haven’t specified their role in the business. Enter their role in the business
 responsiblepeople.aretheynominatedofficer.heading = Is {0} the nominated officer for the business?
 responsiblepeople.aretheynominatedofficer.title = Is this person the nominated officer for the business?

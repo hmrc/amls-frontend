@@ -54,7 +54,7 @@ class ProgressService @Inject()(
     } yield businessType match {
       case Partnership if DeclarationHelper.numberOfPartners(responsiblePeople) < 2 =>
         Some(controllers.declaration.routes.RegisterPartnersController.get())
-      case _ => Some(DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status, config.showFeesToggle))
+      case _ => Some(DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status))
     }
     result getOrElse none[Call]
   }

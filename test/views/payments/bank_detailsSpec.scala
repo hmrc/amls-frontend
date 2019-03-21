@@ -56,7 +56,7 @@ class bank_detailsSpec extends AmlsSpec with PaymentGenerator{
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.bics.value")) must not be empty
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.iban.name")) must not be empty
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.iban.value")) must not be empty
-        doc.getElementById("bank-details-print").html() mustBe "Print"
+        doc.getElementById("bank-details-print").html() mustBe Messages("link.print")
         doc.getElementById("fee-to-pay").html() mustBe "£100.00"
 
       }
@@ -72,7 +72,7 @@ class bank_detailsSpec extends AmlsSpec with PaymentGenerator{
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.sortcode.value")) must not be empty
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.accountnumber.name")) must not be empty
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.accountnumber.value")) must not be empty
-        doc.getElementById("bank-details-print").html() mustBe "Print"
+        doc.getElementById("bank-details-print").html() mustBe Messages("link.print")
         doc.getElementById("fee-to-pay").html() mustBe "£100.00"
       }
     }

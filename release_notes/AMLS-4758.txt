@@ -1,0 +1,1 @@
+ + [AMLS-4758](https://jira.tools.tax.service.gov.uk/browse/AMLS-4758) - 'Correct error messages for confirm email and remove full stop'

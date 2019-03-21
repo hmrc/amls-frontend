@@ -66,8 +66,7 @@ class ProfessionalBodyMemberController @Inject()(
 
   def redirectTo(data: ProfessionalBodyMember, supervision: Supervision, edit: Boolean) =
     (data, edit) match {
-      case (ProfessionalBodyMemberYes, _) if !supervision.professionalBodyMember.contains(ProfessionalBodyMemberYes) =>
-        Redirect(routes.WhichProfessionalBodyController.get(edit))
+      case (ProfessionalBodyMemberYes, _) if !supervision.isComplete => Redirect(routes.WhichProfessionalBodyController.get(edit))
       case (ProfessionalBodyMemberNo, false) => Redirect(routes.PenalisedByProfessionalController.get())
       case _ => Redirect(routes.SummaryController.get())
     }

@@ -16,7 +16,7 @@
 
 package utils
 
-import controllers.{declaration, routes}
+import controllers.declaration
 import models.responsiblepeople.{Partner, ResponsiblePerson}
 import models.status._
 import services.StatusService
@@ -54,17 +54,10 @@ object DeclarationHelper {
     }
   }
 
-  def routeDependingOnNominatedOfficer(hasNominatedOfficer: Boolean, status: SubmissionStatus, showFees: Boolean) = {
+  def routeDependingOnNominatedOfficer(hasNominatedOfficer: Boolean, status: SubmissionStatus) = {
     hasNominatedOfficer match {
-      case true => routeWithNominatedOfficer(status, showFees)
+      case true => declaration.routes.WhoIsRegisteringController.get()
       case false => routeWithoutNominatedOfficer(status)
-    }
-  }
-
-  private def routeWithNominatedOfficer(status: SubmissionStatus, showFees: Boolean) = {
-    status match {
-      case SubmissionReady | NotCompleted if showFees => routes.FeeGuidanceController.get()
-      case _ => declaration.routes.WhoIsRegisteringController.get()
     }
   }
 

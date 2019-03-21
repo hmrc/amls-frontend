@@ -1,1 +1,1 @@
- + [AMLS-4754](https://jira.tools.tax.service.gov.uk/browse/AMLS-4754) - 'Fixed removal of countries and validation of multiple countries. Removed "Add another country", instead, pages display all country fields by default.'
++ [AMLS-4754](https://jira.tools.tax.service.gov.uk/browse/AMLS-4754) - 'Fixed removal of countries and validation of multiple countries. Removed "Add another country", instead, pages display all country fields by default.'

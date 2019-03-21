@@ -1,7 +1,10 @@
 #!/bin/bash
 
-mkdir -p "release_notes/releases/$1"
-echo "Generating release notes for $1"
+echo "Please enter the tag. I.e. v0.0.1:"
+read tag
 
-cat release_notes/*.txt > release_notes/releases/$1/"$1-$(date +'%d-%m-%Y')".txt
+mkdir -p "release_notes/releases/$tag"
+echo "Generating release notes for $tag"
+
+cat release_notes/*.txt > release_notes/releases/$tag/"$tag-$(date +'%d-%m-%Y')".txt
 rm -rf release_notes/*.txt

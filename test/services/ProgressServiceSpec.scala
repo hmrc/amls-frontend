@@ -35,7 +35,6 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
   trait Fixture extends AuthorisedFixture with DependencyMocks with AutoCompleteServiceMocks { self =>
 
     lazy val defaultBuilder = new GuiceApplicationBuilder()
-      .configure("microservice.services.feature-toggle.show-fees" -> true)
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
@@ -72,12 +71,12 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
         whenReady(service.getSubmitRedirect) {
-          _ mustEqual Some(controllers.routes.FeeGuidanceController.get())
+          _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get())
         }
 
       }
 
-      "business is not a prtnership and at least one of the person in responsible people is the nominated officer" in new Fixture {
+      "business is not a partnership and at least one of the person in responsible people is the nominated officer" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
         val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
         val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
@@ -98,7 +97,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
         whenReady(service.getSubmitRedirect) {
-          _ mustEqual Some(controllers.routes.FeeGuidanceController.get())
+          _ mustEqual Some( controllers.declaration.routes.WhoIsRegisteringController.get())
         }
       }
     }

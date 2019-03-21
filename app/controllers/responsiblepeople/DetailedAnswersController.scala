@@ -113,7 +113,7 @@ class DetailedAnswersController @Inject () (
       case Partnership if DeclarationHelper.numberOfPartners(model) < 2 =>
         Redirect(controllers.declaration.routes.RegisterPartnersController.get())
       case _ =>
-        Redirect(DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status, config.showFeesToggle))
+        Redirect(DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status))
     }) getOrElse InternalServerError("Cannot determine redirect")
 
   private def fetchModel(implicit authContext: AuthContext, hc: HeaderCarrier) =
