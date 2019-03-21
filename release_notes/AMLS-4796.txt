@@ -1,0 +1,1 @@
+ + [AMLS-4796](https://jira.tools.tax.service.gov.uk/browse/AMLS-4796) - 'Bug fix: supervision section summary page breaks when user is navigating back through the section'

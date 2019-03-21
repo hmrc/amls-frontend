@@ -16,7 +16,7 @@
 
 package controllers.asp
 
-import models.aboutthebusiness.{AboutTheBusiness, ActivityStartDate}
+import models.businessdetails.{BusinessDetails, ActivityStartDate}
 import models.asp._
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
@@ -58,8 +58,8 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
         "dateOfChange.year" -> "1990"
       )
 
-      when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
-        .thenReturn(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
+      when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
+        .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
 
       when(mockCacheMap.getEntry[Asp](Asp.key))
         .thenReturn(None)
@@ -83,8 +83,8 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
         "dateOfChange.year" -> "199000"
       )
 
-      when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
-        .thenReturn(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
+      when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
+        .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
 
       when(mockCacheMap.getEntry[Asp](Asp.key))
         .thenReturn(None)
@@ -108,8 +108,8 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
         "dateOfChange.year" -> "1980"
       )
 
-      when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
-        .thenReturn(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
+      when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
+        .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
 
       when(mockCacheMap.getEntry[Asp](Asp.key))
         .thenReturn(Some(Asp()))

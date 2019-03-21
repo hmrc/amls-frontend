@@ -169,5 +169,24 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
         ControllerHelper.supervisionComplete(mockCacheMap) mustBe false
       }
     }
+
+    "isAbComplete" must {
+
+      val start = Some(SupervisionStart(new LocalDate(1990, 2, 24)))  //scalastyle:off magic.number
+      val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24)))//scalastyle:off magic.number
+      val reason = Some(SupervisionEndReasons("Reason"))
+
+      "return true if another body is AnotherBodyNo" in {
+        ControllerHelper.isAbComplete(AnotherBodyNo) mustBe true
+      }
+
+      "return true if another body is complete AnotherBodyYes" in {
+        ControllerHelper.isAbComplete(AnotherBodyYes("Supervisor", start, end, reason)) mustBe true
+      }
+
+      "return false if another body is incomplete AnotherBodyYes" in {
+        ControllerHelper.isAbComplete(AnotherBodyYes("Supervisor", None, end, reason)) mustBe false
+      }
+    }
   }
 }

@@ -22,7 +22,7 @@ import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models._
-import models.aboutthebusiness.AboutTheBusiness
+import models.businessdetails.BusinessDetails
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
@@ -150,7 +150,7 @@ class LandingController @Inject()(val landingService: LandingService,
 
     cache.getEntry[BusinessMatching](BusinessMatching.key) map { bm =>
       Logger.debug(s"[AMLSLandingController][preApplicationComplete]: found BusinessMatching key")
-      (bm.isComplete, cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)) match {
+      (bm.isComplete, cache.getEntry[BusinessDetails](BusinessDetails.key)) match {
         case (true, Some(abt)) =>
           landingService.setAltCorrespondenceAddress(abt) flatMap { _ =>
             Logger.debug(s"[AMLSLandingController][preApplicationComplete]: landingService.setAltCorrespondenceAddress returned")
@@ -166,7 +166,7 @@ class LandingController @Inject()(val landingService: LandingService,
           }
 
         case (true, _) =>
-          Logger.debug(s"[AMLSLandingController][preApplicationComplete]: bm.isComplete is true but no cache Entry for AboutTheBusiness - redirecting to status")
+          Logger.debug(s"[AMLSLandingController][preApplicationComplete]: bm.isComplete is true but no cache Entry for BusinessDetails - redirecting to status")
           Future.successful(Redirect(controllers.routes.StatusController.get()))
 
         case (false, _) =>
@@ -214,7 +214,7 @@ class LandingController @Inject()(val landingService: LandingService,
       cacheMap.getEntry[Asp](Asp.key).fold(false) {
         _.hasChanged
       },
-      cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key).fold(false) {
+      cacheMap.getEntry[BusinessDetails](BusinessDetails.key).fold(false) {
         _.hasChanged
       },
       cacheMap.getEntry[Seq[BankDetails]](BankDetails.key).fold(false) {

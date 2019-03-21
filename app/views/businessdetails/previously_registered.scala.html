@@ -1,0 +1,84 @@
+@*
+ * Copyright 2019 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages)
+
+@target = @{
+    s"""${f("prevMLRRegNo").id}-panel"""
+}
+
+@header = {
+    @components.back_link()
+    @errorSummary(f)
+    @heading("businessdetails.registeredformlr.title", "summary.businessdetails")
+}
+
+@main(
+    title = Messages("businessdetails.registeredformlr.title") + " - " + Messages("summary.businessdetails"),
+    heading = header
+) {
+
+    @form(f, controllers.businessdetails.routes.PreviouslyRegisteredController.post(edit)) {
+
+        @fieldset(
+            legend = "businessdetails.registeredformlr.title",
+            legendHidden = true,
+            panel = false,
+            f = f("previouslyRegistered-fieldset"),
+            classes = Seq("inline")
+        ) {
+
+            @errorGroup(
+                field = f("previouslyRegistered")
+            ) {
+
+                @radio(
+                    f = f("previouslyRegistered"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    target = s"#$target",
+                    inline = true)
+                @radio(
+                    f = f("previouslyRegistered"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
+        }
+
+        @panel(
+            field = Some(f(s"$target")),
+            jsHidden = false,
+            id = target
+        ) {
+            @input(
+                field = f("prevMLRRegNo"),
+                labelText = "businessdetails.registeredformlr.mlrregno.lbl",
+                hintText = "businessdetails.registeredformlr.taxReferenceHint",
+                bold = false,
+                attrType = "number",
+                attrMaxlength = "8",
+                attrPattern = "[0-9]{1,8}"
+            )
+        }
+
+        @submit(false)
+    }
+}

@@ -22,7 +22,7 @@ import exceptions.{DuplicateSubscriptionException, NoEnrolmentException}
 import generators.ResponsiblePersonGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models._
-import models.aboutthebusiness.{AboutTheBusiness, RegisteredOfficeUK}
+import models.businessdetails.{BusinessDetails, RegisteredOfficeUK}
 import models.bankdetails.BankDetails
 import models.businessactivities.{BusinessActivities => BusActivities}
 import models.businesscustomer.ReviewDetails
@@ -117,7 +117,7 @@ class SubmissionServiceSpec extends AmlsSpec
     val reviewDetails = mock[ReviewDetails]
     val activities = mock[BusinessActivities]
     val businessMatching = mock[BusinessMatching]
-    val aboutTheBusiness = mock[AboutTheBusiness]
+    val businessDetails = mock[BusinessDetails]
 
     mockCacheFetchAll
     mockCacheSave[SubscriptionResponse]
@@ -134,7 +134,7 @@ class SubmissionServiceSpec extends AmlsSpec
       businessMatching.reviewDetails
     } thenReturn Some(reviewDetails)
     when {
-      aboutTheBusiness.registeredOffice
+      businessDetails.registeredOffice
     } thenReturn Some(RegisteredOfficeUK("Line 1", "Line 2", None, None, "postcode", None))
     when {
       businessMatching.activities
@@ -148,7 +148,7 @@ class SubmissionServiceSpec extends AmlsSpec
     mockCacheGetEntry[Hvd](Some(Hvd()), Hvd.key)
     mockCacheGetEntry[BusinessMatching](Some(businessMatching), BusinessMatching.key)
     mockCacheGetEntry[EstateAgentBusiness](Some(mock[EstateAgentBusiness]), EstateAgentBusiness.key)
-    mockCacheGetEntry[AboutTheBusiness](Some(aboutTheBusiness), AboutTheBusiness.key)
+    mockCacheGetEntry[BusinessDetails](Some(businessDetails), BusinessDetails.key)
     mockCacheGetEntry[Seq[BankDetails]](Some(Seq(BankDetails())), BankDetails.key)
     mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(responsiblePersonGen.sample.get)), ResponsiblePerson.key)
     mockCacheGetEntry[AmendVariationRenewalResponse](Some(amendmentResponse), AmendVariationRenewalResponse.key)

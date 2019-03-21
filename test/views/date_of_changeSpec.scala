@@ -38,7 +38,7 @@ class date_of_changeSpec extends AmlsSpec with MustMatchers {
       def view = views.html.date_of_change(
         form2,
         "testSubheadingMessage",
-        controllers.aboutthebusiness.routes.RegisteredOfficeDateOfChangeController.post()
+        controllers.businessdetails.routes.RegisteredOfficeDateOfChangeController.post()
       )
 
       doc.title must startWith(Messages("dateofchange.title"))
@@ -48,7 +48,7 @@ class date_of_changeSpec extends AmlsSpec with MustMatchers {
       def view = views.html.date_of_change(
         form2,
         "testSubheadingMessage",
-        controllers.aboutthebusiness.routes.RegisteredOfficeDateOfChangeController.post()
+        controllers.businessdetails.routes.RegisteredOfficeDateOfChangeController.post()
       )
 
       heading.html must be (Messages("dateofchange.title"))
@@ -59,7 +59,7 @@ class date_of_changeSpec extends AmlsSpec with MustMatchers {
       def view = views.html.date_of_change(
         form2,
         "testSubheadingMessage",
-        controllers.aboutthebusiness.routes.RegisteredOfficeDateOfChangeController.post()
+        controllers.businessdetails.routes.RegisteredOfficeDateOfChangeController.post()
       )
 
       html must include(Messages("lbl.date.example"))
@@ -75,7 +75,7 @@ class date_of_changeSpec extends AmlsSpec with MustMatchers {
       def view = views.html.date_of_change(
         form2,
         "testSubheadingMessage",
-        controllers.aboutthebusiness.routes.RegisteredOfficeDateOfChangeController.post()
+        controllers.businessdetails.routes.RegisteredOfficeDateOfChangeController.post()
       )
 
       errorSummary.html() must include("not a message Key")
@@ -89,7 +89,7 @@ class date_of_changeSpec extends AmlsSpec with MustMatchers {
       def view = views.html.date_of_change(
         EmptyForm,
         "testSubheadingMessage",
-        controllers.aboutthebusiness.routes.RegisteredOfficeDateOfChangeController.post()
+        controllers.businessdetails.routes.RegisteredOfficeDateOfChangeController.post()
       )
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty

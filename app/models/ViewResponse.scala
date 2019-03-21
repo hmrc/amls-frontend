@@ -16,7 +16,7 @@
 
 package models
 
-import models.aboutthebusiness.AboutTheBusiness
+import models.businessdetails.BusinessDetails
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
@@ -37,7 +37,7 @@ case class ViewResponse(
                          businessMatchingSection: BusinessMatching,
                          eabSection: Option[EstateAgentBusiness],
                          tradingPremisesSection: Option[Seq[TradingPremises]],
-                         aboutTheBusinessSection: AboutTheBusiness,
+                         businessDetailsSection: BusinessDetails,
                          bankDetailsSection: Seq[BankDetails],
                          aboutYouSection: AddPerson,
                          businessActivitiesSection: BusinessActivities,
@@ -62,7 +62,7 @@ object ViewResponse {
       (__ \ "businessMatchingSection").read[BusinessMatching] and
       (__ \ "eabSection").readNullable[EstateAgentBusiness] and
       (__ \ "tradingPremisesSection").readNullable[Seq[TradingPremises]] and
-      (__ \ "aboutTheBusinessSection").read[AboutTheBusiness] and
+      (__ \ "businessDetailsSection").read[BusinessDetails] and
       (__ \ "bankDetailsSection").read[Seq[BankDetails]] and
       (__ \ "aboutYouSection").read[AddPerson] and
       (__ \ "businessActivitiesSection").read[BusinessActivities] and

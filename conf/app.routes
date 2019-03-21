@@ -1,6 +1,6 @@
 # microservice specific routes
 
-->          /about-the-business                                                       aboutTheBusiness.Routes
+->          /business-details                                                         businessDetails.Routes
 ->          /business-activities                                                      businessActivities.Routes
 ->          /bank-details                                                             bankDetails.Routes
 ->          /trading-premises                                                         tradingPremises.Routes
@@ -65,8 +65,6 @@ POST        /declaration/partner                                                
 GET         /submit-application/nominated-officer                                     @controllers.declaration.WhoIsTheBusinessNominatedOfficerController.get()
 GET         /update-information/nominated-officer                                     @controllers.declaration.WhoIsTheBusinessNominatedOfficerController.getWithAmendment()
 POST        /submit-application/nominated-officer                                     @controllers.declaration.WhoIsTheBusinessNominatedOfficerController.post()
-
-GET         /submit-application/fee-guidance                                          @controllers.FeeGuidanceController.get()
 
 GET         /submit-application/ways-to-pay                                           @controllers.payments.WaysToPayController.get()
 POST        /submit-application/ways-to-pay                                           @controllers.payments.WaysToPayController.post()

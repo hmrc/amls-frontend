@@ -16,12 +16,11 @@
 
 package controllers.declaration
 
-import javax.inject.Inject
-
 import config.AppConfig
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.declaration.BusinessNominatedOfficer
 import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import models.responsiblepeople.{NominatedOfficer, Positions, ResponsiblePerson}
@@ -31,7 +30,6 @@ import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.StatusConstants
 import views.html.declaration.select_business_nominated_officer
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -95,9 +93,8 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
               responsiblePeople <- dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key)
               rp <- updateNominatedOfficer(responsiblePeople, data)
               _ <- dataCacheConnector.save(ResponsiblePerson.key, rp)
-            } yield serviceStatus match {
-              case SubmissionReady | NotCompleted if config.showFeesToggle => Redirect(controllers.routes.FeeGuidanceController.get())
-              case _ => Redirect(routes.WhoIsRegisteringController.get())
+            } yield {
+              Redirect(routes.WhoIsRegisteringController.get())
             }
           }
       }
