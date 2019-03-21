@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
-import models.businessmatching.{CurrencyExchange, ForeignExchange, MoneyServiceBusiness => MsbActivity}
+import models.businessmatching.{ForeignExchange, MoneyServiceBusiness => MsbActivity}
 import models.moneyservicebusiness.{FXTransactionsInNext12Months, MoneyServiceBusiness}
 import services.StatusService
 import services.businessmatching.ServiceFlow
@@ -59,10 +59,14 @@ class FXTransactionsInNext12MonthsController @Inject()(val authConnector: AuthCo
                 case ValidForm(_, data) =>
                     for {
                         msb <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
-                        _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
+                        cache <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
                             msb.fxTransactionsInNext12Months(data)
                         )
-                    } yield Redirect(routes.SummaryController.get())
+                    } yield {
+                        println("XXXXXXXXXXXX" + cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key))
+
+                        Redirect(routes.SummaryController.get())
+                    }
             }
         }
     }

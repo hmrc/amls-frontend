@@ -260,15 +260,18 @@
                             controllers.msb.routes.MoneySourcesController.get(true).toString
                         } else ""
                     ) {
-                        @if(ms.bankMoneySource.isDefined) {
-                            <p>@ms.bankMoneySource.get.bankNames</p>
+                        @ms.bankMoneySource.map { bms =>
+                        <p>@Messages("msb.bank.names"): @bms.bankNames</p>
                         }
-                        @if(ms.wholesalerMoneySource.isDefined) {
-                            <p>@ms.wholesalerMoneySource.get.wholesalerNames</p>
+                        @ms.wholesalerMoneySource.map { wms =>
+                        <p>@Messages("msb.wholesaler.names"): @wms.wholesalerNames</p>
                         }
                         @ms.customerMoneySource match {
                             case Some(true) => {
                                 <p>@Messages("msb.which_currencies.source.customers")</p>
+                            }
+                            case _ => {
+                                <p></p>
                             }
                         }
                     }

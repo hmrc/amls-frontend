@@ -106,7 +106,6 @@ object WhichCurrencies {
     }
 
     (bankMoney and wholeSalerMoney and customerMoney) ((a, b, c) => Some(MoneySources(a, b, Some(c))))
-
   }
 
   implicit val jsonReads: Reads[WhichCurrencies] = {
@@ -115,19 +114,25 @@ object WhichCurrencies {
     import play.api.libs.json._
 
     ((__ \ "currencies").read[Seq[String]] and
-      ((__ \ "usesForeignCurrencies").readNullable[UsesForeignCurrencies] flatMap {
+      ((__ \ "usesForeignCurrencies").read(Reads.optionNoError[UsesForeignCurrencies]) flatMap {
         case None => oldUsesForeignCurrenciesReader
         case x => constant(x)
     }) and
       ((__ \ "moneySources").readNullable[MoneySources]
 
-//        flatMap {
-//      case None => oldMoneySourcesReader
-//      case x => constant(x)
-//    }
+        flatMap {
+      case None => oldMoneySourcesReader
+      case x => constant(x)
+    }
         )) (WhichCurrencies.apply _)
   }
 
-  implicit val jsonWrites = Json.writes[WhichCurrencies]
+  implicit val jsonWrites: Writes[WhichCurrencies] = Writes {
+    case wc: WhichCurrencies => {
+      Json.obj("currencies" -> wc.currencies,
+      "usesForeignCurrencies" -> wc.usesForeignCurrencies,
+      "moneySources" -> wc.moneySources)
+    }
+  }
 
 }
