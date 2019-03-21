@@ -49,10 +49,10 @@ class registration_amendmentSpec extends AmlsSpec with MockitoSugar with Address
 
 
         val expectedFullCompletedString = s"This section is ${Messages("progress.visuallyhidden.view.updated")}"
-        doc.select("#section1-status .task-status").text mustBe expectedFullCompletedString
+        doc.getElementById("progress.section1.name-status").select(".task-status").text mustBe expectedFullCompletedString
 
         val expectedFullIncompleteString = s"This section is ${Messages("progress.visuallyhidden.view.started")}"
-        doc.select("#section2-status .task-status").text mustBe expectedFullIncompleteString
+        doc.getElementById("progress.section2.name-status").select(".task-status").text mustBe expectedFullIncompleteString
 
       }
     }
