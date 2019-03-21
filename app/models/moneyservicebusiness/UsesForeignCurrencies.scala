@@ -45,15 +45,15 @@ object UsesForeignCurrencies {
   }
 
   implicit val jsonReads: Reads[UsesForeignCurrencies] = {
-    (__ \ "usesForeignCurrencies").read[Boolean] flatMap {
+    (__ \ "foreignCurrencies").read[Boolean] flatMap {
       case true => Reads(_ => JsSuccess(UsesForeignCurrenciesYes))
       case false => Reads(_ => JsSuccess(UsesForeignCurrenciesNo))
     }
   }
 
   implicit val jsonWrites = Writes[UsesForeignCurrencies] {
-    case UsesForeignCurrenciesYes => Json.obj("usesForeignCurrencies" -> true)
-    case UsesForeignCurrenciesNo => Json.obj("usesForeignCurrencies" -> false)
+    case UsesForeignCurrenciesYes => Json.obj("foreignCurrencies" -> true)
+    case UsesForeignCurrenciesNo => Json.obj("foreignCurrencies" -> false)
 
   }
 }

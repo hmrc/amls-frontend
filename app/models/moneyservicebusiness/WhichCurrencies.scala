@@ -100,13 +100,12 @@ object WhichCurrencies {
       case _ => None
     })
 
-    val customerMoney = (__ \ "customerMoneySource").read[String] map {
-      case "Yes" => true
+    val customerMoney = (__ \ "customerMoneySource").readNullable[String] map {
+      case Some("Yes") => true
       case _ => false
     }
 
     (bankMoney and wholeSalerMoney and customerMoney) ((a, b, c) => Some(MoneySources(a, b, Some(c))))
-
   }
 
   implicit val jsonReads: Reads[WhichCurrencies] = {
@@ -115,19 +114,38 @@ object WhichCurrencies {
     import play.api.libs.json._
 
     ((__ \ "currencies").read[Seq[String]] and
-      ((__ \ "usesForeignCurrencies").readNullable[UsesForeignCurrencies] flatMap {
+      ((__ \ "usesForeignCurrencies").read(Reads.optionNoError[UsesForeignCurrencies]) flatMap {
         case None => oldUsesForeignCurrenciesReader
         case x => constant(x)
     }) and
       ((__ \ "moneySources").readNullable[MoneySources]
-
-//        flatMap {
-//      case None => oldMoneySourcesReader
-//      case x => constant(x)
-//    }
+        flatMap {
+      case None => oldMoneySourcesReader
+      case x => constant(x)
+    }
         )) (WhichCurrencies.apply _)
   }
 
-  implicit val jsonWrites = Json.writes[WhichCurrencies]
+  implicit val jsonWrites: Writes[WhichCurrencies] = Writes {
+    case wc: WhichCurrencies => {
+      Json.obj("currencies" -> wc.currencies,
+      "usesForeignCurrencies" -> wc.usesForeignCurrencies) ++ Json.obj("moneySources" -> wc.moneySources)
+//        (wc.moneySources match {
+//        case Some(MoneySources(_, _, Some(false))) => {
+//          println("wcccccccccc" + wc.moneySources)
+//          Json.obj()
+//        }
+//        case Some(MoneySources(_, _, Some(true))) => {
+//          println("wcccccccccc" + wc.moneySources)
+//          Json.obj("moneySources" -> wc.moneySources)
+//        }
+//        case Some(MoneySources(None, None, None)) => {
+//          println("wcccccccccc" + wc.moneySources)
+//          Json.obj()
+//        }
+//        case None => Json.obj()
+//      })
+    }
+  }
 
 }
