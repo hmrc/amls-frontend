@@ -43,12 +43,14 @@
 
 
     @if(renewalSectionCompleted){
-        <form method="post" action="@controllers.renewal.routes.RenewalProgressController.post().url" class="panel-indent--gutter">
-            @CSRF.formField
-            <button id="renewal-progress-submit" type="submit" name="submit" class="button" @if(!canSubmit) {disabled} >
-                @messages("renewal.progress.submit")
-            </button>
-        </form>
+        @if(canSubmit) {
+            <form method="post" action="@controllers.renewal.routes.RenewalProgressController.post().url" class="panel-indent--gutter">
+                @CSRF.formField
+                    <button id="renewal-progress-submit" type="submit" name="submit" class="button" >
+                        @messages("renewal.progress.submit")
+                    </button>
+            </form>
+        }
         <p>
             @anchor(
                 attrHref = controllers.renewal.routes.SummaryController.get().url,

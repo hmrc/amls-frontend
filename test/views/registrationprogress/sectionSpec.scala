@@ -24,6 +24,9 @@ import utils.AmlsSpec
 
 class SectionSpec extends AmlsSpec with MockitoSugar {
 
+  val sectionPath = "-status a"
+  val statusPath = "div span.section-status"
+
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
@@ -34,14 +37,13 @@ class SectionSpec extends AmlsSpec with MockitoSugar {
     "status is NotStarted" must {
       "show Add [SectionName] link text" in new ViewFixture {
         override def view: HtmlFormat.Appendable = views.html.registrationprogress.section("hvd", NotStarted, mock[Call])
-
-        doc.select("#hvd-status").first().ownText() must be("Add High Value Dealer")
+        doc.select(s"#hvd${sectionPath}").text() must be("Add High Value Dealer")
       }
 
       "show Not started info text" in new ViewFixture {
         override def view: HtmlFormat.Appendable = views.html.registrationprogress.section("hvd", NotStarted, mock[Call])
 
-        doc.select("div").first().ownText() must be("Not started")
+        doc.select(statusPath).text() must be("Not started")
       }
     }
 
@@ -49,13 +51,13 @@ class SectionSpec extends AmlsSpec with MockitoSugar {
       "show Add [SectionName] link text" in new ViewFixture {
         override def view: HtmlFormat.Appendable = views.html.registrationprogress.section("hvd", Started, mock[Call])
 
-        doc.select("#hvd-status").first().ownText() must be("Add High Value Dealer")
+        doc.select(s"#hvd${sectionPath}").text() must be("Add High Value Dealer")
       }
 
       "show Incomplete info text" in new ViewFixture {
         override def view: HtmlFormat.Appendable = views.html.registrationprogress.section("hvd", Started, mock[Call])
 
-        doc.select("div").first().ownText() must be ("Incomplete")
+        doc.select(statusPath).text() must be ("Incomplete")
       }
     }
 
@@ -63,13 +65,13 @@ class SectionSpec extends AmlsSpec with MockitoSugar {
       "show Edit [SectionName] link text" in new ViewFixture {
         override def view: HtmlFormat.Appendable = views.html.registrationprogress.section("hvd", Completed, mock[Call])
 
-        doc.select("#hvd-status").first().ownText() must be("Edit High Value Dealer")
+        doc.select(s"#hvd${sectionPath}").first().ownText() must be("Edit High Value Dealer")
       }
 
       "show Complete info text" in new ViewFixture {
         override def view: HtmlFormat.Appendable = views.html.registrationprogress.section("hvd", Completed, mock[Call])
 
-        doc.select("div").first().ownText() must be ("Completed")
+        doc.select(statusPath).first().ownText() must be ("Completed")
       }
     }
   }

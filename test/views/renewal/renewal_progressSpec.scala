@@ -70,10 +70,10 @@ class renewal_progressSpec extends AmlsSpec with MustMatchers{
       doc.getElementsMatchingOwnText(Messages("renewal.progress.continue")).attr("href") must be(controllers.renewal.routes.WhatYouNeedController.get().url)
     }
 
-    "disable the submit registration button when cannot submit and renewal section complete" in new ViewFixture {
+    "not show the submit registration button when cannot submit and renewal section complete" in new ViewFixture {
       override def view = views.html.renewal.renewal_progress(Seq.empty, canSubmit = false, msbOrTcspExists = true, readyForRenewal, renewalSectionCompleted = true)
 
-      doc.select("form button[name=submit]").hasAttr("disabled") mustBe true
+      doc.select("form button[name=submit]").isEmpty mustBe true
 
       doc.getElementsMatchingOwnText(Messages("renewal.progress.edit")).attr("href") must be(controllers.renewal.routes.SummaryController.get().url)
     }
