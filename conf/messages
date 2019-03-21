@@ -1919,6 +1919,9 @@ msb.summary.ipsp-name = IPSP’s name
 msb.summary.ipsp-registration-number = IPSP’s HM Revenue and Customs registration number
 msb.ce.transactions.expected.in.12.months.title = How many currency exchange transactions do you expect in the next 12 months?
 msb.fx.transactions.expected.in.12.months.title = How many foreign exchange transactions do you expect in the next 12 months?
+msb.bank.names = Bank names
+msb.wholesaler.names = Wholesaler names
+msb.bank.names.hint = asd
 
 msb.services.title = Which services does your business provide?
 msb.services.heading = Which services does your business provide?
