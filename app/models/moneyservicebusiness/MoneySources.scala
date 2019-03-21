@@ -29,9 +29,9 @@ case class WholesalerMoneySource(wholesalerNames : String)
 
 case object CustomerMoneySource
 
-case class MoneySources(bankMoneySource: Option[BankMoneySource],
-                         wholesalerMoneySource: Option[WholesalerMoneySource],
-                         customerMoneySource: Option[Boolean])
+case class MoneySources(bankMoneySource: Option[BankMoneySource] = None,
+                         wholesalerMoneySource: Option[WholesalerMoneySource] = None,
+                         customerMoneySource: Option[Boolean] = None)
 
 object MoneySources {
   import jto.validation.forms.Rules._
@@ -102,7 +102,7 @@ object MoneySources {
         ms.customerMoneySource.map(_ => "Yes")))
   }
 
-  implicit val bmsReader: Reads[Option[BankMoneySource]] = {
+  implicit val bankMoneySourceReader: Reads[Option[BankMoneySource]] = {
 
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
@@ -115,7 +115,7 @@ object MoneySources {
 
   }
 
-  implicit val bmsWriter = new Writes[Option[BankMoneySource]] {
+  implicit val bankMoneySourceWriter = new Writes[Option[BankMoneySource]] {
     override def writes(o: Option[BankMoneySource]): JsValue = o match {
       case Some(x) => Json.obj("bankMoneySource" -> "Yes",
         "bankNames" -> x.bankNames)
@@ -123,7 +123,7 @@ object MoneySources {
     }
   }
 
-  implicit val wsReader: Reads[Option[WholesalerMoneySource]] = {
+  implicit val wholesalerMoneySourceReader: Reads[Option[WholesalerMoneySource]] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
 
@@ -134,7 +134,7 @@ object MoneySources {
     })
   }
 
-  implicit val wsWriter = new Writes[Option[WholesalerMoneySource]] {
+  implicit val wholesalerMoneySourceWriter = new Writes[Option[WholesalerMoneySource]] {
     override def writes(o: Option[WholesalerMoneySource]): JsValue = o match {
       case Some(x) => Json.obj("wholesalerMoneySource" -> "Yes",
         "wholesalerNames" -> x.wholesalerNames)
@@ -142,17 +142,17 @@ object MoneySources {
     }
   }
 
-  val cmsReader: Reads[Boolean] = {
-    __.read[String] map {
-      case "Yes" => true
-      case _ => false
+  implicit val customerMoneySourceReader: Reads[Option[Boolean]] = {
+    __.read(Reads.optionNoError[String]) map {
+      case Some("Yes") => Some(true)
+      case _ => Some(false)
     }
   }
 
-  val cmsWriter = new Writes[Boolean] {
-    override def writes(o: Boolean): JsValue = o match {
-      case true => JsString("Yes")
-      case _ => JsNull
+  implicit val customerMoneySourceWriter = new Writes[Option[Boolean]] {
+    override def writes(o: Option[Boolean]): JsValue = o match {
+      case Some(true) => JsString("Yes")
+      case _ => Json.obj()
     }
   }
 
@@ -160,20 +160,27 @@ object MoneySources {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
     (
-      (__ \ "bankMoneySource").read(bmsReader) and
-        (__ \ "wholesalerMoneySource").read(wsReader) and
-        (__ \ "customerMoneySource").readNullable(cmsReader))((bms, wms, cms) => MoneySources(bms, wms, cms))
+      (__ \ "bankMoneySource").read(bankMoneySourceReader) and
+        (__ \ "wholesalerMoneySource").read(wholesalerMoneySourceReader) and
+        (__ \ "customerMoneySource").read(customerMoneySourceReader))((bms, wms, cms) => MoneySources(bms, wms, cms))
   }
 
-  implicit val jsonWrites: Writes[MoneySources] = {
-    import play.api.libs.functional.syntax._
-    import play.api.libs.json._
-
-    (
-      __.write[Option[BankMoneySource]] and
-        __.write[Option[WholesalerMoneySource]] and
-        (__ \ "customerMoneySource").writeNullable(cmsWriter))(x => (x.bankMoneySource, x.wholesalerMoneySource, x.customerMoneySource))
+  implicit val jsonWrites = Writes[MoneySources] {
+    case m: MoneySources =>
+      Json.obj(
+        "bankMoneySource" -> m.bankMoneySource,
+        "wholesalerMoneySource" -> m.wholesalerMoneySource,
+        "customerMoneySource" -> m.customerMoneySource
+      )
   }
+//    import play.api.libs.functional.syntax._
+//    import play.api.libs.json._
+//
+//    (
+//      __.write[Option[BankMoneySource]] and
+//        __.write[Option[WholesalerMoneySource]] and
+//        (__ \ "customerMoneySource").writeNullable(cmsWriter))(x => (x.bankMoneySource, x.wholesalerMoneySource, x.customerMoneySource))
+
 }
 
 

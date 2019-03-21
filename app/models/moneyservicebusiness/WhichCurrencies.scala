@@ -19,18 +19,19 @@ package models.moneyservicebusiness
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import models.currencies
+import models.renewal.{WhichCurrencies => RWhichCurrencies}
 import play.api.libs.json._
 import utils.MappingUtils.Implicits._
-import utils.{GenericValidators, TraversableValidators}
-import models.renewal.{WhichCurrencies => RWhichCurrencies}
-import models.supervision.AnotherBody.oldEndDateReader
-import models.supervision.SupervisionEnd
-import org.joda.time.LocalDate
 import utils.MappingUtils.constant
+import utils.{GenericValidators, TraversableValidators}
 
 case class WhichCurrencies(currencies: Seq[String],
                            usesForeignCurrencies: Option[UsesForeignCurrencies] = None,
-                           moneySources: Option[MoneySources] = None)
+                           moneySources: Option[MoneySources] = None) {
+
+  def currencies(p: Seq[String]): WhichCurrencies =
+    this.copy(currencies = p)
+}
 
 
 object WhichCurrencies {
@@ -108,7 +109,7 @@ object WhichCurrencies {
     import play.api.libs.json._
 
     ((__ \ "currencies").read[Seq[String]] and
-      ((__ \ "usesForeignCurrencies").read(Reads.optionNoError[UsesForeignCurrencies]) flatMap {
+      ((__ \ "usesForeignCurrencies").readNullable[UsesForeignCurrencies] flatMap {
         case None => oldUsesForeignCurrenciesReader
         case x => constant(x)
     }) and
