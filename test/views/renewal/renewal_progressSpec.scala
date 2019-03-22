@@ -98,9 +98,12 @@ class renewal_progressSpec extends AmlsSpec with MustMatchers{
       override def view = views.html.renewal.renewal_progress(Seq.empty, false, true, readyForRenewal, false)
 
       val space = " "
+      val fullStop = "."
+
       val expectedText = s"${Messages("renewal.progress.information.not.completed.info.part1")}" +
                          s"$space" +
-                         s"${Messages("renewal.progress.information.not.completed.info.part2")}"
+                         s"${Messages("renewal.progress.information.not.completed.info.part2")}" +
+                         s"$fullStop"
 
       doc.select("#renewal-information-not-completed").get(0).text() must be(expectedText)
       doc.select("#renewal-information-not-completed a").attr("href") must be(controllers.renewal.routes.WhatYouNeedController.get().url)
