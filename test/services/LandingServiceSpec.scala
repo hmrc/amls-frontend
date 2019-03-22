@@ -287,9 +287,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       sendTheLargestAmountsOfMoney = Some(MsbSendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
       mostTransactions = Some(MsbMostTransactions(Seq(Country("United Kingdom", "GB")))),
       ceTransactionsInNext12Months = Some(CETransactionsInNext12Months("12345678963")),
-      whichCurrencies = Some(MsbWhichCurrencies(Seq("USD", "GBP", "EUR")
-        //,None, None, None, None
-      )),
+      whichCurrencies = Some(MsbWhichCurrencies(Seq("USD", "GBP", "EUR"), None, None)),
       hasAccepted = true
     )
 
