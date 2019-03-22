@@ -32,11 +32,6 @@
 
     @if(renewalSectionCompleted) {
         <p>@messages("renewal.progress.ready.to.submit.intro")</p>
-        @* <p>@if(canSubmit) {
-            @messages("renewal.progress.ready.to.submit.intro")
-        } else {
-            "a big blahblah is needed"
-        }</p> *@
     } else {
         <p>@messages("renewal.progress.submit.intro")</p>
     }
