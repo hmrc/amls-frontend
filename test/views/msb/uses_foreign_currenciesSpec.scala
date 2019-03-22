@@ -18,7 +18,7 @@ package views.msb
 
 import forms.{Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.moneyservicebusiness.WhichCurrencies
+import models.moneyservicebusiness.{MoneySources, UsesForeignCurrenciesYes, WhichCurrencies}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -65,13 +65,11 @@ class uses_foreign_currenciesSpec extends AmlsSpec with MustMatchers {
 
     "ask the user whether they deal in foreign currencies" in new ViewFixture {
 
-      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP")
-        //        , None, None, None, None
-      ))
+      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP"), Some(UsesForeignCurrenciesYes), Some(MoneySources(None, None, None))))
       def view = views.html.msb.uses_foreign_currencies(formData, true)
 
-      Option(doc.getElementById("usesForeignCurrencies-Yes")).isDefined must be(true)
-      Option(doc.getElementById("usesForeignCurrencies-No")).isDefined must be(true)
+      Option(doc.getElementsContainingText("yes")).isDefined must be(true)
+      Option(doc.getElementsContainingText("no")).isDefined must be(true)
     }
     "show errors in the correct locations" in new ViewFixture {
 
