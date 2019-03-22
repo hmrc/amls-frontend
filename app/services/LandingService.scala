@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import com.google.inject.Inject
 import connectors.{AmlsConnector, BusinessMatchingConnector, DataCacheConnector, KeystoreConnector}
-import models.aboutthebusiness.AboutTheBusiness
+import models.businessdetails.BusinessDetails
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.{BusinessActivities, ExpectedAMLSTurnover, ExpectedBusinessTurnover}
@@ -60,23 +60,23 @@ class LandingService @Inject() (
                                  (implicit authContext: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
     val cachedModel = for {
       cache <- OptionT.fromOption[Future](maybeCacheMap)
-      entry <- OptionT.fromOption[Future](cache.getEntry[AboutTheBusiness](AboutTheBusiness.key))
+      entry <- OptionT.fromOption[Future](cache.getEntry[BusinessDetails](BusinessDetails.key))
     } yield entry
 
-    lazy val etmpModel = OptionT.liftF(desConnector.view(amlsRefNumber) map { v => v.aboutTheBusinessSection })
+    lazy val etmpModel = OptionT.liftF(desConnector.view(amlsRefNumber) map { v => v.businessDetailsSection })
 
     (for {
-      aboutTheBusiness <- cachedModel orElse etmpModel
-      cacheMap <- OptionT.liftF(cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, fixAddress(aboutTheBusiness)))
+      businessDetails <- cachedModel orElse etmpModel
+      cacheMap <- OptionT.liftF(cacheConnector.save[BusinessDetails](BusinessDetails.key, fixAddress(businessDetails)))
     } yield cacheMap) getOrElse (throw new Exception("Unable to update alt correspondence address"))
   }
 
-  def setAltCorrespondenceAddress(aboutTheBusiness: AboutTheBusiness)(implicit
-                                                                      authContext: AuthContext,
-                                                                      hc: HeaderCarrier,
-                                                                      ec: ExecutionContext
+  def setAltCorrespondenceAddress(businessDetails: BusinessDetails)(implicit
+                                                                     authContext: AuthContext,
+                                                                     hc: HeaderCarrier,
+                                                                     ec: ExecutionContext
   ): Future[CacheMap] = {
-    cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, fixAddress(aboutTheBusiness))
+    cacheConnector.save[BusinessDetails](BusinessDetails.key, fixAddress(businessDetails))
   }
 
   def refreshCache(amlsRefNumber: String)
@@ -141,10 +141,10 @@ class LandingService @Inject() (
     val cachedTradingPremises = cacheConnector.upsert[Option[Seq[TradingPremises]]](cachedEstateAgentBusiness, TradingPremises.key,
       tradingPremisesSection(viewResponse.tradingPremisesSection))
 
-    val cachedAboutTheBusiness = cacheConnector.upsert[AboutTheBusiness](cachedTradingPremises, AboutTheBusiness.key, aboutSection(viewResponse))
+    val cachedBusinessDetails = cacheConnector.upsert[BusinessDetails](cachedTradingPremises, BusinessDetails.key, aboutSection(viewResponse))
 
     val cachedBankDetails = cacheConnector.upsert[Seq[BankDetails]](
-      cachedAboutTheBusiness, BankDetails.key, writeEmptyBankDetails(viewResponse.bankDetailsSection)
+      cachedBusinessDetails, BankDetails.key, writeEmptyBankDetails(viewResponse.bankDetailsSection)
     )
     val cachedAddPerson = cacheConnector.upsert[AddPerson](cachedBankDetails, AddPerson.key, viewResponse.aboutYouSection)
 
@@ -187,7 +187,7 @@ class LandingService @Inject() (
   }
 
   private def aboutSection(viewResponse: ViewResponse) = {
-    viewResponse.aboutTheBusinessSection.copy(hasAccepted = true)
+    viewResponse.businessDetailsSection.copy(hasAccepted = true)
   }
 
   private def activitySection(viewResponse: ViewResponse) = {
@@ -297,7 +297,7 @@ class LandingService @Inject() (
     }
   }
 
-  private def fixAddress(model: AboutTheBusiness) = (model.correspondenceAddress, model.altCorrespondenceAddress) match {
+  private def fixAddress(model: BusinessDetails) = (model.correspondenceAddress, model.altCorrespondenceAddress) match {
     case (Some(_), None) => model.copy(altCorrespondenceAddress = Some(true), hasAccepted = true)
     case (None, None) => model.copy(altCorrespondenceAddress = Some(false), hasAccepted = true)
     case _ => model

@@ -1,0 +1,91 @@
+/*
+ * Copyright 2019 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package controllers.businessdetails
+
+import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import com.google.inject.Inject
+import connectors.DataCacheConnector
+import controllers.BaseController
+import models.businessdetails._
+import models.businessmatching.{BusinessMatching, BusinessType}
+import models.businessmatching.BusinessType._
+import play.api.mvc.Result
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.ControllerHelper
+import views.html.businessdetails._
+
+import scala.concurrent.Future
+
+class PreviouslyRegisteredController @Inject () (
+                                                  val dataCacheConnector: DataCacheConnector,
+                                                  val authConnector: AuthConnector
+                                                ) extends BaseController {
+
+  def get(edit: Boolean = false) = Authorised.async {
+    implicit authContext => implicit request =>
+      dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key) map {
+        response =>
+          val form: Form2[PreviouslyRegistered] = (for {
+            businessDetails <- response
+            prevRegistered <- businessDetails.previouslyRegistered
+          } yield Form2[PreviouslyRegistered](prevRegistered)).getOrElse(EmptyForm)
+          Ok(previously_registered(form, edit))
+      }
+  }
+
+  def post(edit: Boolean = false) = Authorised.async {
+    implicit authContext => implicit request => {
+      Form2[PreviouslyRegistered](request.body) match {
+        case f: InvalidForm =>
+          Future.successful(BadRequest(previously_registered(f, edit)))
+        case ValidForm(_, data) =>
+          dataCacheConnector.fetchAll map {
+            optionalCache =>
+              (for {
+                cache <- optionalCache
+                businessType <- ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
+              } yield {
+                dataCacheConnector.save[BusinessDetails](BusinessDetails.key,
+                  getUpdatedModel(businessType,  cache.getEntry[BusinessDetails](BusinessDetails.key), data))
+                getRouting(businessType, edit, data)
+              }).getOrElse(Redirect(routes.ConfirmRegisteredOfficeController.get(edit)))
+          }
+      }
+    }
+  }
+
+  private def getUpdatedModel(businessType: BusinessType, businessDetails: BusinessDetails, data: PreviouslyRegistered): BusinessDetails = {
+    data match {
+      case PreviouslyRegisteredYes(_) => businessDetails.copy(previouslyRegistered = Some(data), activityStartDate = None,
+                                                                hasChanged = true)
+      case PreviouslyRegisteredNo => businessDetails.copy(previouslyRegistered = Some(data),
+                                                                hasChanged = true)
+    }
+  }
+
+  private def getRouting(businessType: BusinessType, edit: Boolean, data: PreviouslyRegistered): Result = {
+    (businessType, edit, data) match {
+      case (UnincorporatedBody | LPrLLP | LimitedCompany | Partnership, _, PreviouslyRegisteredYes(_)) =>
+          Redirect (routes.VATRegisteredController.get (edit))
+      case (_, _, PreviouslyRegisteredNo) =>
+        Redirect (routes.ActivityStartDateController.get (edit))
+      case (_, true, PreviouslyRegisteredYes(_)) => Redirect(routes.SummaryController.get())
+      case (_, false, PreviouslyRegisteredYes(_)) =>
+        Redirect(routes.ConfirmRegisteredOfficeController.get(edit))
+    }
+  }
+}

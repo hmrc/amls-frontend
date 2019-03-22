@@ -1,0 +1,121 @@
+/*
+ * Copyright 2019 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package models.businessdetails
+
+import config.ApplicationConfig
+import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import play.api.libs.json.{Json, Reads}
+import uk.gov.hmrc.http.cache.client.CacheMap
+
+
+case class BusinessDetails(
+                             previouslyRegistered: Option[PreviouslyRegistered] = None,
+                             activityStartDate: Option[ActivityStartDate] = None,
+                             vatRegistered: Option[VATRegistered] = None,
+                             corporationTaxRegistered: Option[CorporationTaxRegistered] = None,
+                             contactingYou: Option[ContactingYou] = None,
+                             registeredOffice: Option[RegisteredOffice] = None,
+                             altCorrespondenceAddress: Option[Boolean] = None,
+                             correspondenceAddress: Option[CorrespondenceAddress] = None,
+                             hasChanged: Boolean = false,
+                             hasAccepted: Boolean = false
+                           ) {
+
+  def previouslyRegistered(v: PreviouslyRegistered): BusinessDetails = {
+    this.copy(previouslyRegistered = Some(v), hasChanged = hasChanged || !this.previouslyRegistered.contains(v), hasAccepted = hasAccepted && this.previouslyRegistered.contains(v))
+  }
+
+  def activityStartDate(v: ActivityStartDate): BusinessDetails =
+    this.copy(activityStartDate = Some(v), hasChanged = hasChanged || !this.activityStartDate.contains(v), hasAccepted = hasAccepted && this.activityStartDate.contains(v))
+
+  def vatRegistered(v: VATRegistered): BusinessDetails =
+    this.copy(vatRegistered = Some(v), hasChanged = hasChanged || !this.vatRegistered.contains(v), hasAccepted = hasAccepted && this.vatRegistered.contains(v))
+
+  def corporationTaxRegistered(c: CorporationTaxRegistered): BusinessDetails =
+    this.copy(corporationTaxRegistered = Some(c), hasChanged = hasChanged || !this.corporationTaxRegistered.contains(c), hasAccepted = hasAccepted && this.corporationTaxRegistered.contains(c))
+
+  def registeredOffice(v: RegisteredOffice): BusinessDetails =
+    this.copy(registeredOffice = Some(v), hasChanged = hasChanged || !this.registeredOffice.contains(v), hasAccepted = hasAccepted && this.registeredOffice.contains(v))
+
+  def contactingYou(v: ContactingYou): BusinessDetails =
+    this.copy(contactingYou = Some(v), hasChanged = hasChanged || !this.contactingYou.contains(v), hasAccepted = hasAccepted && this.contactingYou.contains(v))
+
+  def altCorrespondenceAddress(v: Boolean): BusinessDetails =
+    this.copy(altCorrespondenceAddress = Some(v), hasChanged = hasChanged || !this.altCorrespondenceAddress.contains(v))
+
+  def correspondenceAddress(v: CorrespondenceAddress): BusinessDetails =
+    this.copy(correspondenceAddress = Some(v), hasChanged = hasChanged || !this.correspondenceAddress.contains(v), hasAccepted = hasAccepted && this.correspondenceAddress.contains(v))
+
+  def isComplete: Boolean =
+    this match {
+      case BusinessDetails(Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), Some(_), Some(true), None, _, true) =>
+        false
+      case BusinessDetails(Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), Some(_), Some(_),_, _, true) =>
+        true
+      case _ =>
+        false
+    }
+}
+
+object BusinessDetails {
+
+  def section(implicit cache: CacheMap): Section = {
+    val messageKey = "businessdetails"
+    val notStarted = Section(messageKey, NotStarted, false, controllers.businessdetails.routes.WhatYouNeedController.get())
+    cache.getEntry[BusinessDetails](key).fold(notStarted) {
+      case model if model.isComplete =>
+        Section(messageKey, Completed, model.hasChanged, controllers.businessdetails.routes.SummaryController.get())
+      case BusinessDetails(None, None, None, None, None, _, None, None, _, _) =>
+        notStarted
+      case model =>
+        Section(messageKey, Started, model.hasChanged, controllers.businessdetails.routes.WhatYouNeedController.get())
+    }
+  }
+
+  val key = "about-the-business"
+
+  implicit val format = Json.writes[BusinessDetails]
+
+  implicit val jsonReads: Reads[BusinessDetails] = {
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json.Reads._
+    import play.api.libs.json._
+
+    (
+      (__ \ "previouslyRegistered").readNullable[PreviouslyRegistered] and
+        (__ \ "activityStartDate").readNullable[ActivityStartDate] and
+        (__ \ "vatRegistered").readNullable[VATRegistered] and
+        (__ \ "corporationTaxRegistered").readNullable[CorporationTaxRegistered] and
+        (__ \ "contactingYou").readNullable[ContactingYou] and
+        (__ \ "registeredOffice").readNullable[RegisteredOffice] and
+        (__ \ "altCorrespondenceAddress").readNullable[Boolean] and
+        (__ \ "correspondenceAddress").readNullable[CorrespondenceAddress] and
+        (__ \ "hasChanged").readNullable[Boolean].map {
+          _.getOrElse(false)
+        } and
+        (__ \ "hasAccepted").readNullable[Boolean].map {
+          _.getOrElse(false)
+        }
+      ).apply(BusinessDetails.apply _)
+
+  }
+
+  implicit def default(businessDetails: Option[BusinessDetails]): BusinessDetails =
+    businessDetails.getOrElse(BusinessDetails())
+}
+
+

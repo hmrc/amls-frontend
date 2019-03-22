@@ -168,7 +168,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
     invalidEmailAddresses.foreach { testData =>
       s"fail to validate $testData" in {
         emailType.validate(testData) must be(Invalid(Seq(
-          Path -> Seq(ValidationError("error.invalid.rp.email"))
+          Path -> Seq(ValidationError("error.required.rp.email"))
         )))
       }
     }

@@ -67,7 +67,7 @@ class RemoveTradingPremisesController @Inject () (
       }
   }
 
-  def remove(index: Int, complete: Boolean = false, tradingAddress: String) = Authorised.async {
+  def remove(index: Int, complete: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
 
       def removeWithoutDate = removeDataStrict[TradingPremises](index) map { _ =>
@@ -91,20 +91,23 @@ class RemoveTradingPremisesController @Inject () (
                 val extraFields = Map(
                   "premisesStartDate" -> Seq(premises.get.yourTradingPremises.get.startDate.get.toString("yyyy-MM-dd"))
                 )
-
                 Form2[ActivityEndDate](request.body.asFormUrlEncoded.get ++ extraFields) match {
                   case f: InvalidForm =>
-                    Future.successful(
-                      BadRequest(
-                        remove_trading_premises(
-                          f = f,
-                          index = index,
-                          complete = complete,
-                          tradingAddress = tradingAddress,
-                          showDateField = true
+                    for {
+                      tp <- getData[TradingPremises](index)
+                    } yield (tp) match {
+                      case (Some(_)) =>
+                        BadRequest(
+                          remove_trading_premises(
+                            f = f,
+                            index = index,
+                            complete = complete,
+                            tradingAddress = tp.yourTradingPremises.fold("")(_.tradingPremisesAddress.toLines.mkString(", ")),
+                            showDateField = true
+                          )
                         )
-                      )
-                    )
+                      case _ => NotFound(notFoundView)
+                    }
                   case ValidForm(_, data) => {
                     for {
                       _ <- updateDataStrict[TradingPremises](index) { tp =>

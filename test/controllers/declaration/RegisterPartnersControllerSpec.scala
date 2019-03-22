@@ -16,7 +16,7 @@
 
 package controllers.declaration
 
-import connectors.{DataCacheConnector, KeystoreConnector}
+import connectors.DataCacheConnector
 import models.responsiblepeople._
 import models.status._
 import org.joda.time.LocalDate
@@ -116,12 +116,10 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
             .thenReturn(Future.successful(emptyCache))
 
           when(controller.progressService.getSubmitRedirect(any(), any(), any()))
-            .thenReturn(Future.successful(Some(controllers.routes.FeeGuidanceController.get())))
+            .thenReturn(Future.successful(Some(controllers.declaration.routes.WhoIsRegisteringController.get())))
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.routes.FeeGuidanceController.get().url))
-
 
         }
       }

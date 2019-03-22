@@ -18,7 +18,7 @@ package controllers.hvd
 
 import connectors.DataCacheConnector
 import models.DateOfChange
-import models.aboutthebusiness.{AboutTheBusiness, ActivityStartDate}
+import models.businessdetails.{BusinessDetails, ActivityStartDate}
 import models.hvd.Hvd
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
@@ -62,8 +62,8 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
       )
       val hvd = Hvd(dateOfChange = Some(DateOfChange(new LocalDate(1990,2,24))))
       val mockCacheMap = mock[CacheMap]
-      when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
-        .thenReturn(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
+      when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
+        .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
 
       when(mockCacheMap.getEntry[Hvd](Hvd.key))
         .thenReturn(None)
@@ -95,8 +95,8 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
         val mockCacheMap = mock[CacheMap]
         val hvd = Hvd(dateOfChange = Some(DateOfChange(new LocalDate(1999,1,28))))
 
-        when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
-          .thenReturn(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(1988, 2, 24))))))
+        when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
+          .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1988, 2, 24))))))
 
         when(mockCacheMap.getEntry[Hvd](Hvd.key))
           .thenReturn(Some(hvd))
@@ -126,8 +126,8 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
         val mockCacheMap = mock[CacheMap]
         val hvd = Hvd(dateOfChange = Some(DateOfChange(new LocalDate(1990,1,20))))
 
-        when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
-          .thenReturn(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(1988, 2, 24))))))
+        when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
+          .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1988, 2, 24))))))
 
         when(mockCacheMap.getEntry[Hvd](Hvd.key))
           .thenReturn(Some(hvd))
@@ -158,8 +158,8 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
       )
 
       val mockCacheMap = mock[CacheMap]
-      when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
-        .thenReturn(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
+      when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
+        .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
 
       when(mockCacheMap.getEntry[Hvd](Hvd.key))
         .thenReturn(None)
@@ -184,8 +184,8 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
       )
 
       val mockCacheMap = mock[CacheMap]
-      when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
-        .thenReturn(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
+      when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
+        .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
 
       when(mockCacheMap.getEntry[Hvd](Hvd.key))
         .thenReturn(Some(Hvd()))

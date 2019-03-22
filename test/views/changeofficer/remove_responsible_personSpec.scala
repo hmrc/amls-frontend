@@ -18,7 +18,7 @@ package views.changeofficer
 
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.aboutthebusiness.{VATRegistered, VATRegisteredYes}
+import models.businessdetails.{VATRegistered, VATRegisteredYes}
 import models.changeofficer.StillEmployed
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
@@ -46,6 +46,8 @@ class remove_responsible_personSpec extends AmlsSpec with MustMatchers  {
 
       heading.html must be(Messages("changeofficer.removeresponsibleperson.lbl", "testName"))
       subHeading.html must include(Messages("summary.updateinformation"))
+
+      doc.getElementsByAttributeValue("id", "date-fieldset") must not be empty
 
     }
 

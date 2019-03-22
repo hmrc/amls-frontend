@@ -24,6 +24,7 @@ import forms.EmptyForm
 import javax.inject.Inject
 import models.supervision.Supervision
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.ControllerHelper
 import views.html.supervision.summary
 
 class SummaryController  @Inject() (val dataCacheConnector: DataCacheConnector,
@@ -33,7 +34,8 @@ class SummaryController  @Inject() (val dataCacheConnector: DataCacheConnector,
   def get() = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[Supervision](Supervision.key) map {
-        case Some(data) => Ok(summary(EmptyForm, data))
+        case Some(data@Supervision(Some(anotherBody), Some(_), _, Some(_), _, _)) if ControllerHelper.isAbComplete(anotherBody) =>
+          Ok(summary(EmptyForm, data))
         case _ =>
           Redirect(controllers.routes.RegistrationProgressController.get())
       }

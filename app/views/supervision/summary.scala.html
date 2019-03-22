@@ -43,10 +43,10 @@
             }
         }
 
-        case AnotherBodyYes(supervisorName, startDate, endDate, endingReasons) => {
+        case AnotherBodyYes(supervisorName, Some(sDate), Some(eDate), Some(reasons)) => {
             @checkYourAnswers(
                 question = Messages("supervision.another_body.title"),
-                editLinkTag = "supervisionanotherbody-edit",
+                editLinkTag = "supervisionanotherbody-edit-name",
                 editUrl = controllers.supervision.routes.AnotherBodyController.get(true).toString
             ) {
                 <p>@supervisorName</p>
@@ -54,29 +54,28 @@
 
             @checkYourAnswers(
                 question = Messages("supervision.supervision_start.title"),
-                editLinkTag = "supervisionanotherbody-edit",
+                editLinkTag = "supervisionanotherbody-edit-start-date",
                 editUrl = controllers.supervision.routes.SupervisionStartController.get(true).toString
             ) {
-                    <p>@DateHelper.formatDate(startDate.get.startDate)</p>
+                <p>@DateHelper.formatDate(sDate.startDate)</p>
             }
 
             @checkYourAnswers(
                 question = Messages("supervision.supervision_end.title"),
-                editLinkTag = "supervisionanotherbody-edit",
+                editLinkTag = "supervisionanotherbody-edit-end-date",
                 editUrl = controllers.supervision.routes.SupervisionEndController.get(true).toString
             ) {
-                <p>@DateHelper.formatDate(endDate.get.endDate)</p>
+                <p>@DateHelper.formatDate(eDate.endDate)</p>
             }
 
             @checkYourAnswers(
                 question = Messages("supervision.supervision_end_reasons.title"),
-                editLinkTag = "supervisionanotherbody-edit",
+                editLinkTag = "supervisionanotherbody-edit-ending-reason",
                 editUrl = controllers.supervision.routes.SupervisionEndReasonsController.get(true).toString
             ) {
-                <p>@endingReasons.get.endingReason</p>
+                <p>@reasons.endingReason</p>
             }
         }
-
     }
 
     @checkYourAnswers(

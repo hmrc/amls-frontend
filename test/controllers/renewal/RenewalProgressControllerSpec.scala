@@ -17,7 +17,8 @@
 package controllers.renewal
 
 import cats.data.OptionT
-import connectors.{DataCacheConnector, KeystoreConnector}
+import cats.implicits._
+import connectors.DataCacheConnector
 import generators.businessmatching.BusinessMatchingGenerator
 import models.ReadStatusResponse
 import models.businessmatching._
@@ -32,17 +33,16 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Call
 import play.api.test.Helpers._
+import services.businessmatching.BusinessMatchingService
 import services.{ProgressService, RenewalService, SectionsProvider, StatusService}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AmlsSpec, AuthorisedFixture}
-import cats.implicits._
-import services.businessmatching.BusinessMatchingService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
 
@@ -223,12 +223,10 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
       val newRequest = request.withFormUrlEncodedBody()
 
       when(controller.progressService.getSubmitRedirect(any(), any(), any()))
-        .thenReturn(Future.successful(Some(controllers.routes.FeeGuidanceController.get())))
+        .thenReturn(Future.successful(Some(controllers.declaration.routes.WhoIsRegisteringController.get())))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.routes.FeeGuidanceController.get().url))
     }
   }
-
 }

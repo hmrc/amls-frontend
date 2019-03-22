@@ -16,7 +16,7 @@
 
 package utils
 
-import models.aboutthebusiness.{RegisteredOffice, RegisteredOfficeUK}
+import models.businessdetails.{RegisteredOffice, RegisteredOfficeUK}
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved, SubmissionReadyForReview}
 
 class DateOfChangeHelperSpec extends AmlsSpec {
