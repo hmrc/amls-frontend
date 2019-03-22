@@ -656,7 +656,7 @@ progress.businessmatching.name = Pre-application
 progress.businessmatching.description = Administrative information about your business.
 progress.businessmatching.time = 5
 
-progress.businessdetails.name = Business Details
+progress.businessdetails.name = Business details
 progress.businessdetails.description = Administrative information about your business and your current registration status.
 progress.businessdetails.time = 3 and 10
 
@@ -1177,7 +1177,7 @@ businessmatching.button.confirm.start = Confirm and start application
 businessmatching.confirm.postcode.title = Confirm the postcode for your business
 
 
-businessmatching.summary.noedit.anchortext = Return to update or view your information
+businessmatching.summary.noedit.anchortext = Return to about your business
 businessmatching.services.title = Which services does your business provide?
 businessmatching.services.list.heading = Select all that apply
 businessmatching.services.list.lbl.01 = Transmitting money
@@ -1195,7 +1195,7 @@ businessmatching.cannotchangeservices.requiredinfo = Your business must have a P
   to register for Money Service Business as part of your anti-money laundering supervision from HM Revenue and Customs.\n\
   You can apply for a PSR reference number from the Financial Conduct Authority (FCA).
 
-businessmatching.cannotchangeservices.button.text = Return to update information
+businessmatching.cannotchangeservices.button.text = Return to about your business
 
 ########################################################################################################################
 ########################################################################################################################
@@ -1250,7 +1250,7 @@ businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.heading = 
 businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title = You can’t continue with your change
 businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.1 = Your business must have a PSR reference number to include a money service business as part of your anti-money laundering supervision.
 businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.2 = You can apply for a PSR reference number from the Financial Conduct Authority (FCA).
-businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.button.text = Return to update information
+businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.button.text = Return to about your business
 
 businessmatching.updateservice.selectactivities.title = What type of business do you need to register?
 businessmatching.updateservice.selectactivities.heading = What type of business do you need to register?
