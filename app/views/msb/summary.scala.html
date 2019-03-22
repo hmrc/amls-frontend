@@ -253,28 +253,27 @@
 
             @model.whichCurrencies.map { wc =>
                 @wc.moneySources.map { ms =>
-                    @checkYourAnswers(
-                        question = Messages("msb.supply_foreign_currencies.title"),
-                        editLinkTag = "msbwhichcurrencies-edit",
-                        editUrl = if(isEditable || register.addedSubSectors.fold(false)(_.contains(CurrencyExchange))) {
-                            controllers.msb.routes.MoneySourcesController.get(true).toString
-                        } else ""
-                    ) {
-                        @ms.bankMoneySource.map { bms =>
-                        <p>@Messages("msb.bank.names"): @bms.bankNames</p>
-                        }
-                        @ms.wholesalerMoneySource.map { wms =>
-                        <p>@Messages("msb.wholesaler.names"): @wms.wholesalerNames</p>
-                        }
-                        @ms.customerMoneySource match {
-                            case Some(true) => {
-                                <p>@Messages("msb.which_currencies.source.customers")</p>
+                    @if(ms.bankMoneySource.isDefined | ms.wholesalerMoneySource.isDefined | ms.customerMoneySource.isDefined){
+                        @checkYourAnswers(
+                            question = Messages("msb.supply_foreign_currencies.title"),
+                            editLinkTag = "msbwhichcurrencies-edit",
+                            editUrl = if(isEditable || register.addedSubSectors.fold(false)(_.contains(CurrencyExchange))) {
+                                controllers.msb.routes.MoneySourcesController.get(true).toString
+                            } else ""
+                        ) {
+                            @ms.bankMoneySource.map { bms =>
+                                <p>@Messages("msb.bank.names"): @bms.bankNames</p>
                             }
-                            case _ => {
-                                <p></p>
+                            @ms.wholesalerMoneySource.map { wms =>
+                                <p>@Messages("msb.wholesaler.names"): @wms.wholesalerNames</p>
+                            }
+                            @ms.customerMoneySource.map { cms =>
+                                @if(cms) {
+                                    <p>@Messages("msb.which_currencies.source.customers")</p>
+                                }
                             }
                         }
-                    }
+                }
                 }
             }
         }
