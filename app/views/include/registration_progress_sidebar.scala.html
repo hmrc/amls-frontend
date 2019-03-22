@@ -32,8 +32,14 @@
 
         <div class="business-info__item">
             <h2 class="heading-small">Your services</h2>
-            <p>@serviceNames.map(name => Html(name + "<br/>"))</p>
-            <p>
+            @if(serviceNames.length == 1) {
+                <p>@Html(serviceNames(0))</p>
+            } else {
+                <ul class="list list-bullet">
+                    @serviceNames.map(name => Html("<li>" + name + "</li>"))
+                </ul>
+            }
+            <p style="margin-top: -0.75em;">
                 <a id="view-details" href="@controllers.businessmatching.routes.SummaryController.get.url" class="edit-preapp">
                     @(if(canEditPreApplication) Messages("progress.preapplication.canedit") else Messages("progress.preapplication.readonly"))
                 </a>

@@ -641,7 +641,7 @@ fee.details.note = You must keep a record of the fee amount and reference number
 ############################### Progress page ###############################
 progress.title = About your business
 progress.lede = You need to add information about your business to apply for supervision. 
-progress.saved.automatically = Your information is saved automatically. If you sign out, you’ll have 28 days to return and complete your application. 
+progress.saved.automatically = Information is saved automatically. If you sign out, you’ll have 28 days to return and complete your application. 
 progress.link.edit = Edit
 progress.link.continue = Continue
 progress.continue = Section incomplete
@@ -696,7 +696,7 @@ progress.visuallyhidden.view.amend = Completed
 progress.visuallyhidden.view.started = Incomplete
 progress.visuallyhidden.view.updated = Updated
 progress.preapplication.canedit = Add or remove services
-progress.preapplication.readonly = check details
+progress.preapplication.readonly = Check details
 
 progress.submit.updates = Submit Updates
 progress.updates.made = To submit your updates you need to complete a declaration, and pay the fees.
@@ -709,7 +709,7 @@ progress.update.registration = Update registration
 amendment.title = About your business
 amendment.section-heading = Your registration
 amendment.text.1 = If something has changed in your business that is relevant to Money Laundering Regulations you must update and resubmit your information.
-amendment.text.2 = There will be an additional fee to pay if you increase the number of responsible people or trading premises.
+amendment.text.2 = There may be an additional fee to pay if you increase the number of responsible people or trading premises.
 amendment.sidebar.heading = Submit amended application
 amendment.sidebar.text = You don’t need to re-submit your application until you’ve made changes to it.
 amendment.sidebar.button.text = Submit amendment
@@ -918,7 +918,7 @@ withdrawal.reason.lbl.04 = Other
 withdrawal.reason.lbl.specify.other.reason = Please specify
 
 main.sidebar.title = Automatic saving
-main.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
+main.sidebar.information = Information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
 
 aboutyou.yourdetails.title = What’s your name?
 aboutyou.rolewithinbusiness.title = What’s your role in the business?
