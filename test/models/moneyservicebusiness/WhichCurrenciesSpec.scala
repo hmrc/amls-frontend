@@ -18,7 +18,7 @@ package models.moneyservicebusiness
 
 import jto.validation._
 import models.CharacterSets
-import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
+import play.api.libs.json._
 import utils.AmlsSpec
 
 import scala.collection.mutable.ArrayBuffer
@@ -87,9 +87,9 @@ class WhichCurrenciesSpec extends AmlsSpec with CharacterSets {
     "Json read and writes" must {
       "Serialise WhichCurrencies as expected" in {
 
-        val input = WhichCurrencies(Seq("USD", "CHF", "EUR"))
+        val input = WhichCurrencies(Seq("USD", "CHF", "EUR"), Some(UsesForeignCurrenciesYes), Some(MoneySources(None, None, None)))
 
-        val expectedJson = Json.obj("currencies" -> Seq("USD", "CHF", "EUR"))
+        val expectedJson = Json.obj("currencies" -> Seq("USD", "CHF", "EUR"), "usesForeignCurrencies" -> UsesForeignCurrenciesYes, "moneySources" -> Json.obj())
 
         Json.toJson(input) must be(expectedJson)
       }
@@ -97,16 +97,18 @@ class WhichCurrenciesSpec extends AmlsSpec with CharacterSets {
 
       "Deserialise WhichCurrencies as expected" in {
 
-        val inputJson = Json.obj("currencies" -> Seq("USD", "CHF", "EUR"))
+        val inputJson = Json.obj("currencies" -> Seq("USD", "CHF", "EUR"), "usesForeignCurrencies" -> UsesForeignCurrenciesYes, "moneySources" -> Json.obj())
 
-        val expected = WhichCurrencies(Seq("USD", "CHF", "EUR"))
+        val expected = WhichCurrencies(Seq("USD", "CHF", "EUR"), Some(UsesForeignCurrenciesYes), Some(MoneySources(None, None, None)))
 
         Json.fromJson[WhichCurrencies](inputJson) must be (JsSuccess(expected, JsPath))
       }
 
       "fail when missing all data" in {
-        Json.fromJson[WhichCurrencies](Json.obj()) must
-          be(JsError((JsPath \ "currencies") -> play.api.data.validation.ValidationError("error.path.missing")))
+        Json.fromJson[WhichCurrencies](Json.obj()) must be
+        JsError((JsPath \ "currencies") -> play.api.data.validation.ValidationError("error.path.missing"))
+        JsError((JsPath \ "customerMoneySource") -> play.api.data.validation.ValidationError("error.path.missing"))
+        JsError((JsPath \ "currencies") -> play.api.data.validation.ValidationError("error.path.missing"))
       }
     }
   }

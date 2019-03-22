@@ -49,12 +49,11 @@ class FXTransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
     val emptyCache = CacheMap("", Map.empty)
 
     val fullModel = WhichCurrencies(
-        Seq("USD", "CHF", "EUR")
-//        ,
-//        Some(false),
-//        Some(BankMoneySource("Bank names")),
-//        Some(WholesalerMoneySource("wholesaler names")),
-//        Some(true)
+        Seq("USD", "CHF", "EUR"),
+        Some(UsesForeignCurrenciesNo),
+        Some(MoneySources(Some(BankMoneySource("Bank names")),
+        Some(WholesalerMoneySource("wholesaler names")),
+        Some(true)))
     )
 
     "FETransactionsInNext12MonthsController" must {
@@ -83,7 +82,6 @@ class FXTransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
             val result = controller.get()(request)
             status(result) must be(OK)
-            print(contentAsString(result))
             contentAsString(result) must include("12345678963")
         }
 
