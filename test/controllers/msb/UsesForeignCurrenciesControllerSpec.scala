@@ -201,24 +201,6 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
             }
           }
         }
-
-        "data is invalid" should {
-          "return invalid form" in new Fixture {
-
-            val newRequest = request.withFormUrlEncodedBody(
-              "bankMoneySource" -> "Yes",
-              "bankNames" -> "Bank names",
-              "wholesalerMoneySource" -> "Yes",
-              "wholesalerNames" -> "wholesaler names",
-              "customerMoneySource" -> "Yes"
-            )
-
-            whenReady(controller.post(false).apply(newRequest)) {
-              resp =>
-                resp.header.status must be(BAD_REQUEST)
-            }
-          }
-        }
       }
     }
   }

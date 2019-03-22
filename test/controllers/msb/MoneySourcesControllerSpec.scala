@@ -71,8 +71,12 @@ class MoneySourcesControllerSpec extends AmlsSpec
 
   trait DealsInForeignCurrencyFixture extends Fixture {
     val newRequest = request.withFormUrlEncodedBody(
-      "bankMoneySource" ->"Yes",
-      "bankNames" ->"Bank names",
+      "currencies[0]" -> "USD",
+      "currencies[1]" -> "GBP",
+      "currencies[2]" -> "BOB",
+      "usesForeignCurrencies" -> "false",
+      "bankMoneySource" -> "Yes",
+      "bankNames" -> "Bank names",
       "wholesalerMoneySource" -> "Yes",
       "wholesalerNames" -> "wholesaler names",
       "customerMoneySource" -> "Yes"
@@ -138,7 +142,7 @@ class MoneySourcesControllerSpec extends AmlsSpec
         }
       }
       "data is valid and edit is true" should {
-        "redirect to Summary Controller" in new DealsInForeignCurrencyFixture {
+        "redirect to Summary Controller" in new DealsInForeignCurrencyFixture with MoneyServiceBusinessTestData {
           val result = controller.post(edit = true).apply(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(controllers.msb.routes.SummaryController.get().url)
