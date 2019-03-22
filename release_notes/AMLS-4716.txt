@@ -1,1 +1,0 @@
- + [AMLS-4716](https://jira.tools.tax.service.gov.uk/browse/AMLS-4716) - 'Content updates on Declaration and Submission pages'
