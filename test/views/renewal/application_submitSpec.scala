@@ -36,6 +36,7 @@ class application_submitSpec extends AmlsSpec with MustMatchers{
   }
 
   "The renewal progress view" must {
+
     "show ready to submit message" when {
       "renewal is complete and can submit" in new ViewFixture {
 
@@ -45,10 +46,18 @@ class application_submitSpec extends AmlsSpec with MustMatchers{
       }
     }
 
+    "show section must be completed message" when {
+      "renewal is complete and sections are incomplete" in new ViewFixture {
+        override def view = views.html.renewal.application_submit(false, readyForRenewal, true)
+
+        doc.html must include(Messages("renewal.progress.complete.sections.incomplete"))
+      }
+    }
+
     "show have not completed your renewal message" when {
       "renewal section is not complete" in new ViewFixture {
 
-        override def view = views.html.renewal.application_submit(true, readyForRenewal, false)
+        override def view = views.html.renewal.application_submit(false, readyForRenewal, false)
 
         doc.html must include(Messages("renewal.progress.submit.intro"))
       }

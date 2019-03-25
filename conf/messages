@@ -2083,6 +2083,7 @@ renewal.progress.edit = Edit your renewal
 renewal.progress.continue = Continue renewal
 renewal.progress.submit.intro = You have not completed your renewal.
 renewal.progress.ready.to.submit.intro = To submit your renewal you need to complete a declaration, and pay the fees.
+renewal.progress.complete.sections.incomplete = You can submit your renewal when you have completed all the sections.
 renewal.progress.information.completed.info = You’ve added information to renew your supervision, but have not submitted your renewal.
 renewal.progress.information.not.completed.info.part1 = You need to add information about your business to
 renewal.progress.information.not.completed.info.part2 = renew your supervision
