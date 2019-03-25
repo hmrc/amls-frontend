@@ -1,0 +1,1 @@
+ + [AMLS-4515](https://jira.tools.tax.service.gov.uk/browse/AMLS-4515) - 'porting the frontend to latest protoype version - where the user status is set in text rather relying on colors and image'
