@@ -129,22 +129,8 @@ object WhichCurrencies {
   implicit val jsonWrites: Writes[WhichCurrencies] = Writes {
     case wc: WhichCurrencies => {
       Json.obj("currencies" -> wc.currencies,
-      "usesForeignCurrencies" -> wc.usesForeignCurrencies) ++ Json.obj("moneySources" -> wc.moneySources)
-//        (wc.moneySources match {
-//        case Some(MoneySources(_, _, Some(false))) => {
-//          println("wcccccccccc" + wc.moneySources)
-//          Json.obj()
-//        }
-//        case Some(MoneySources(_, _, Some(true))) => {
-//          println("wcccccccccc" + wc.moneySources)
-//          Json.obj("moneySources" -> wc.moneySources)
-//        }
-//        case Some(MoneySources(None, None, None)) => {
-//          println("wcccccccccc" + wc.moneySources)
-//          Json.obj()
-//        }
-//        case None => Json.obj()
-//      })
+      "usesForeignCurrencies" -> wc.usesForeignCurrencies) ++
+        Json.obj("moneySources" -> wc.moneySources)
     }
   }
 
