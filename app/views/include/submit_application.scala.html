@@ -27,15 +27,15 @@
         <form method="POST" action="@controllers.routes.RegistrationProgressController.post.url">
             @CSRF.formField
             <fieldset>
-                <h2 class="heading-medium">@Messages("progress.submit.updates")</h2>
+                <h2 class="heading-medium override-heading-medium">@Messages("progress.submit.updates")</h2>
                 <p>@Messages("progress.updates.made")</p>
                 <button id="progress-continue" type="submit" name="submit" class="button">@Messages("button.continue")</button>
             </fieldset>
         </form>
     } else {
-        <h2 class="heading-medium">@Messages("progress.view.status")</h2>
+        <h2 class="heading-medium override-heading-medium">@Messages("progress.view.status")</h2>
         <p>@if(hasChanged) {
-            @Messages("progress.updates.made")
+            @Messages("progress.updates.incomplete")
         } else {
             @Messages("progress.updates.not.made")
         }</p>

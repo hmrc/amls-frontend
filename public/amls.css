@@ -1591,3 +1591,7 @@ li.autocomplete__option {
 .task-status {
   float: right;
 }
+
+h2.override-heading-medium {
+  margin-top: 1.875em !important;
+}

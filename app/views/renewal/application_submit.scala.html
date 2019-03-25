@@ -28,7 +28,7 @@
 
 <div class="grid-layout grid-layout--stacked submit-application">
 
-    <h2 class="heading-medium">@messages("renewal.progress.submit.header")</h2>
+    <h2 class="heading-medium override-heading-medium">@messages("renewal.progress.submit.header")</h2>
     <p>
         @{(renewalSectionCompleted, canSubmit) match {
             case(true, false) => Messages("renewal.progress.complete.sections.incomplete")

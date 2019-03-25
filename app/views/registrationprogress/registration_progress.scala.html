@@ -50,11 +50,11 @@ title = Messages("progress.title") + " - " + Messages("title.yapp")
 
     @if(!declarationAvailable) {
         <div class="grid-layout grid-layout--stacked">
-            <h2 class = "heading-medium">Sections to complete</h2>
+            <h2 class = "heading-medium override-heading-medium">Sections to complete</h2>
         </div>
     } else {
         <div class="grid-layout grid-layout--stacked">
-            <h2 class="heading-medium">Sections</h2>
+            <h2 class="heading-medium override-heading-medium">Sections</h2>
         </div>
     }
 
@@ -71,7 +71,7 @@ title = Messages("progress.title") + " - " + Messages("title.yapp")
     @* the page bottom section *@
     <div class="grid-layout display-block">
         <div class="grid-layout__column grid-layout__column--2-3 display-block">
-            <h2 class = "heading-medium" style="margin-top: 1.25em !important;">@Messages("progress.submit.title")</h2>
+            <h2 class = "heading-medium override-heading-medium">@Messages("progress.submit.title")</h2>
             <p>@if(declarationAvailable) {
                 @Messages("progress.declarationavailable")
             } else {
