@@ -166,19 +166,10 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
           )
         }
 
-
-        "data is valid, but not using foreign currencies" should {
-          "clear the foreign currency data" in new Fixture {
+          "clear the foreign currency data when not using foreign currencies" in new Fixture {
 
             val newRequest = request.withFormUrlEncodedBody(
               "currencies[0]" -> "USD",
-              "currencies[1]" -> "GBP",
-              "currencies[2]" -> "BOB",
-              "bankMoneySource" -> "Yes",
-              "bankNames" -> "Bank names",
-              "wholesalerMoneySource" -> "Yes",
-              "wholesalerNames" -> "wholesaler names",
-              "customerMoneySource" -> "Yes",
               "usesForeignCurrencies" -> "No"
             )
 
@@ -187,7 +178,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
             when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any())).
               thenReturn(Future.successful(Some(MoneyServiceBusiness(whichCurrencies = Some(currentModel)))))
 
-            val expectedModel = WhichCurrencies(Seq("USD", "GBP", "BOB"), Some(UsesForeignCurrenciesYes), None)
+            val expectedModel = WhichCurrencies(Seq("USD", "GBP", "BOB"), Some(UsesForeignCurrenciesNo), Some(MoneySources()))
             val result = controller.post(false).apply(newRequest)
 
             status(result) must be(SEE_OTHER)
@@ -203,5 +194,4 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
         }
       }
     }
-  }
 }
