@@ -333,7 +333,6 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
             val submitButtons = Jsoup.parse(contentAsString(responseF)).select("button[type=\"submit\"]")
             submitButtons.size() must be(0)
-//            submitButtons.first().hasAttr("disabled") must be(true)
           }
         }
       }
