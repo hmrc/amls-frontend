@@ -90,7 +90,6 @@ class renewal_progressSpec extends AmlsSpec with MustMatchers{
       override def view = views.html.renewal.renewal_progress(Seq.empty, false, true, readyForRenewal, true)
 
       doc.select("#renewal-information-completed").get(0).text() must be(Messages("renewal.progress.information.completed.info"))
-//      html must include (Messages("renewal.progress.ready.to.submit.intro"))
     }
 
     "show submit renewal link and text when information are not completed yet" in new ViewFixture {
