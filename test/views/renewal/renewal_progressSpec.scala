@@ -107,7 +107,7 @@ class renewal_progressSpec extends AmlsSpec with MustMatchers{
 
       doc.select("#renewal-information-not-completed").get(0).text() must be(expectedText)
       doc.select("#renewal-information-not-completed a").attr("href") must be(controllers.renewal.routes.WhatYouNeedController.get().url)
-//      html must include (Messages("renewal.progress.submit.intro"))
+      html must include (Messages("renewal.progress.submit.intro"))
     }
 
 
