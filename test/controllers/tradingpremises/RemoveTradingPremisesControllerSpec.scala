@@ -235,7 +235,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(NotCompleted))
 
-          val result = controller.remove(1, false, "addressLine1, addressLine2")(request)
+          val result = controller.remove(1, false)(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.tradingpremises.routes.YourTradingPremisesController.get().url))
 
@@ -255,7 +255,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
 
-          val result = controller.remove(1, false, "addressLine1, addressLine2")(request)
+          val result = controller.remove(1, false)(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.tradingpremises.routes.YourTradingPremisesController.get().url))
 
@@ -277,7 +277,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
 
-          val result = controller.remove(1, false, "addressLine1,addressLine2")(request)
+          val result = controller.remove(1, false)(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.tradingpremises.routes.YourTradingPremisesController.get().url))
 
@@ -305,7 +305,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
 
-          val result = controller.remove(1, false, "addressLine1,addressLine2")(newRequest)
+          val result = controller.remove(1, false)(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.tradingpremises.routes.YourTradingPremisesController.get().url))
 
@@ -331,7 +331,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
           when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          val result = controller.remove(1, false, "addressLine1, addressLine2")(request)
+          val result = controller.remove(1, false)(request)
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.tradingpremises.routes.YourTradingPremisesController.get().url))
@@ -358,7 +358,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-          val result = controller.remove(1, true, "addressLine1, addressLine2")(newRequest)
+          val result = controller.remove(1, true)(newRequest)
           status(result) must be(BAD_REQUEST)
 
         }
@@ -378,7 +378,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-          val result = controller.remove(1, true, "addressLine1, addressLine2")(newRequest)
+          val result = controller.remove(1, true)(newRequest)
           status(result) must be(BAD_REQUEST)
 
         }
@@ -399,7 +399,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-          val result = controller.remove(1, true, "addressLine1, addressLine2")(newRequest)
+          val result = controller.remove(1, true)(newRequest)
           status(result) must be(BAD_REQUEST)
 
         }
@@ -423,7 +423,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-          val result = controller.remove(1, true, "addressLine1, addressLine2")(newRequest)
+          val result = controller.remove(1, true)(newRequest)
           status(result) must be(BAD_REQUEST)
 
         }
