@@ -16,9 +16,10 @@
 
 package controllers.msb
 
+import connectors.DataCacheConnector
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices, MoneyServiceBusiness => MoneyServiceBusinessActivity}
-import models.moneyservicebusiness._
+import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity, _}
+import models.moneyservicebusiness.{MoneyServiceBusiness, _}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -26,10 +27,12 @@ import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
-import play.api.http.Status.{BAD_REQUEST, SEE_OTHER}
+import play.api.http.Status.SEE_OTHER
 import play.api.test.Helpers._
+import services.StatusService
+import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, ServiceFlowMocks}
 
 import scala.concurrent.Future
 
@@ -69,18 +72,41 @@ class MoneySourcesControllerSpec extends AmlsSpec
       .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
   }
 
-  trait DealsInForeignCurrencyFixture extends Fixture {
+  trait DealsInForeignCurrencyFixture extends AuthorisedFixture with MoneyServiceBusinessTestData {
+    self =>
+
+    val request = addToken(authRequest)
+
     val newRequest = request.withFormUrlEncodedBody(
-      "currencies[0]" -> "USD",
-      "currencies[1]" -> "GBP",
-      "currencies[2]" -> "BOB",
-      "usesForeignCurrencies" -> "false",
       "bankMoneySource" -> "Yes",
       "bankNames" -> "Bank names",
       "wholesalerMoneySource" -> "Yes",
       "wholesalerNames" -> "wholesaler names",
-      "customerMoneySource" -> "Yes"
-    )
+      "customerMoneySource" -> "Yes")
+
+    val cacheMap = mock[CacheMap]
+
+    val mockCacheConnector = mock[DataCacheConnector]
+
+    when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+      .thenReturn(Future.successful(Some(completeMsb.copy(whichCurrencies = Some(WhichCurrencies(Seq("USD"), Some(UsesForeignCurrenciesYes)))))))
+
+    when(mockCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
+      .thenReturn(Future.successful(cacheMap))
+
+    val controller = new MoneySourcesController(dataCacheConnector = mockCacheConnector,
+      authConnector = self.authConnector,
+      statusService = mock[StatusService],
+      serviceFlow = mock[ServiceFlow])
+
+    val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
+    when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key))
+      .thenReturn(Some(completeMsb))
+
+    when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+      .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+    when(cacheMap.getEntry[BusinessMatchingMsbServices](BusinessMatching.key))
+      .thenReturn(Some(BusinessMatchingMsbServices(Set(ForeignExchange))))
   }
 
 
@@ -95,7 +121,7 @@ class MoneySourcesControllerSpec extends AmlsSpec
           status(resp) must be(200)
         }
 
-        "status is approved but the service has just been added" in new Fixture {
+        "status is approved but the service has just been added" in new Fixture with ServiceFlowMocks {
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
@@ -131,23 +157,22 @@ class MoneySourcesControllerSpec extends AmlsSpec
 
     "post is called " when {
       "data is valid and edit is false" should {
-        "redirect to FXTransactions in the next 12 months controller" in new DealsInForeignCurrencyFixture with MoneyServiceBusinessTestData {
+        "redirect to FXTransactions in the next 12 months controller" in new DealsInForeignCurrencyFixture {
+          val result = controller.post()(newRequest)
 
-          mockCacheGetEntry[MoneyServiceBusiness](Some(completeMsb), MoneyServiceBusiness.key)
-
-
-          val result = controller.post().apply(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(controllers.msb.routes.FXTransactionsInNext12MonthsController.get().url)
         }
       }
+
       "data is valid and edit is true" should {
         "redirect to Summary Controller" in new DealsInForeignCurrencyFixture with MoneyServiceBusinessTestData {
-          val result = controller.post(edit = true).apply(newRequest)
+          val result = controller.post(edit = true)(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(controllers.msb.routes.SummaryController.get().url)
         }
       }
+
       "data is invalid" should {
         "return bad request" in new Fixture {
           val newRequest = request.withFormUrlEncodedBody(
