@@ -79,7 +79,6 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
                   _ => routing(services.msbServices, register, msb, edit, data)
                 }
               }
-
               result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
             }
         }
@@ -88,7 +87,7 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
 
   def updateCurrencies(oldMsb: MoneyServiceBusiness, usesForeignCurrencies: UsesForeignCurrencies): Option[MoneyServiceBusiness] = {
     oldMsb match {
-      case msb => {
+      case msb: MoneyServiceBusiness => {
         msb.whichCurrencies match {
           case Some(w) => {
             Some(msb.whichCurrencies(w.usesForeignCurrencies(usesForeignCurrencies).moneySources(MoneySources())))
