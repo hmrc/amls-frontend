@@ -44,7 +44,6 @@ class renewal_progressSpec extends AmlsSpec with MustMatchers{
       doc.title must startWith(Messages("renewal.progress.title"))
 
       doc.title must be(Messages("renewal.progress.title") +
-        " - " + Messages("summary.status") +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
       heading.html must be(Messages("renewal.progress.title"))

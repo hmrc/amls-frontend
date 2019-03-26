@@ -95,7 +95,6 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           status(responseF) must be(OK)
 
           val pageTitle = Messages("amendment.title") + " - " +
-            Messages("title.yapp") + " - " +
             Messages("title.amls") + " - " + Messages("title.gov")
 
           Jsoup.parse(contentAsString(responseF)).title mustBe pageTitle
@@ -132,7 +131,6 @@ class RegistrationProgressControllerSpec extends AmlsSpec
             val responseF = controller.get()(request)
             status(responseF) must be(OK)
             val pageTitle = Messages("amendment.title") + " - " +
-              Messages("title.yapp") + " - " +
               Messages("title.amls") + " - " + Messages("title.gov")
 
             Jsoup.parse(contentAsString(responseF)).title mustBe pageTitle
@@ -156,7 +154,6 @@ class RegistrationProgressControllerSpec extends AmlsSpec
             status(responseF) must be(OK)
 
             val pageTitle = Messages("progress.title") + " - " +
-              Messages("title.yapp") + " - " +
               Messages("title.amls") + " - " + Messages("title.gov")
             Jsoup.parse(contentAsString(responseF)).title mustBe pageTitle
 
@@ -409,7 +406,6 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           status(responseF) must be(OK)
 
           val pageTitle = Messages("progress.title") + " - " +
-            Messages("title.yapp") + " - " +
             Messages("title.amls") + " - " + Messages("title.gov")
           Jsoup.parse(contentAsString(responseF)).title mustBe pageTitle
         }
