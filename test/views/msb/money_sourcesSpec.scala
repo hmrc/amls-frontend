@@ -18,7 +18,7 @@ package views.msb
 
 import forms.{Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.moneyservicebusiness.WhichCurrencies
+import models.moneyservicebusiness.MoneySources
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -34,28 +34,21 @@ class money_sourcesSpec extends AmlsSpec with MustMatchers {
   "money_sources view" must {
 
     "have the back link button" in new ViewFixture {
-      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP")
-//        , None, None, None, None
-      ))
+      val formData: ValidForm[MoneySources] = Form2(MoneySources())
       def view = views.html.msb.money_sources(formData, true)
+
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "have correct title" in new ViewFixture {
-
-      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP")
-        //        , None, None, None, None
-      ))
+      val formData: ValidForm[MoneySources] = Form2(MoneySources())
       def view = views.html.msb.money_sources(formData, true)
 
       doc.title must startWith(Messages("msb.supply_foreign_currencies.title") + " - " + Messages("summary.msb"))
     }
 
     "have correct headings" in new ViewFixture {
-
-      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP")
-        //        , None, None, None, None
-      ))
+      val formData: ValidForm[MoneySources] = Form2(MoneySources())
       def view = views.html.msb.money_sources(formData, true)
 
       heading.html must be(Messages("msb.supply_foreign_currencies.title"))
@@ -64,10 +57,7 @@ class money_sourcesSpec extends AmlsSpec with MustMatchers {
     }
 
     "ask the user who will supply the foreign currency" in new ViewFixture {
-
-      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP")
-        //        , None, None, None, None
-      ))
+      val formData: ValidForm[MoneySources] = Form2(MoneySources())
       def view = views.html.msb.money_sources(formData, true)
 
       Option(doc.getElementById("bankMoneySource-Yes")).isDefined must be(true)

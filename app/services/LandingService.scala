@@ -29,7 +29,7 @@ import models.businessmatching.{BusinessMatching, BusinessActivities => BMActivi
 import models.declaration.AddPerson
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
-import models.moneyservicebusiness.{ExpectedThroughput, MoneyServiceBusiness}
+import models.moneyservicebusiness.{MostTransactions => _, SendTheLargestAmountsOfMoney => _, WhichCurrencies => _, _}
 import models.renewal.{ReceiveCashPayments, _}
 import models.responsiblepeople.ResponsiblePerson
 import models.status.RenewalSubmitted

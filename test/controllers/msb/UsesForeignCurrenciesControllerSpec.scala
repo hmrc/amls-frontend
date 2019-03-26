@@ -128,7 +128,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
 
   }
 
-  "WhichCurrencyController" when {
+  "UsesForeignCurrenciesController" when {
     "get is called" should {
       "succeed" when {
         "status is pre-submission" in new Fixture {

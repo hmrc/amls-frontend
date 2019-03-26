@@ -110,7 +110,7 @@ class MoneySourcesControllerSpec extends AmlsSpec
   }
 
 
-  "WhichCurrencyController" when {
+  "MoneySourcesController" when {
     "get is called" should {
       "succeed" when {
         "status is pre-submission" in new Fixture {

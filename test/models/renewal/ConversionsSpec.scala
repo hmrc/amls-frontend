@@ -19,7 +19,7 @@ package models.renewal
 import models.{Country, SubscriptionRequest}
 import models.businessactivities.BusinessActivities
 import models.hvd.Hvd
-import models.moneyservicebusiness.{BankMoneySource, MoneyServiceBusiness}
+import models.moneyservicebusiness.{BankMoneySource, MoneyServiceBusiness, MoneySources, UsesForeignCurrenciesNo}
 import models.renewal.Conversions._
 import org.scalatest.{MustMatchers, WordSpec}
 
@@ -120,9 +120,9 @@ class ConversionsSpec extends WordSpec with MustMatchers {
 
       converted.msbSection.get.whichCurrencies mustBe Some(
         models.moneyservicebusiness.WhichCurrencies(
-          Seq("USD", "CHF", "EUR")
-//          ,
-//          None, Some(BankMoneySource("Bank names")), None, None
+          currencies = Seq("USD", "CHF", "EUR"),
+          usesForeignCurrencies = Some(UsesForeignCurrenciesNo),
+          moneySources = Some(MoneySources(Some(BankMoneySource("Bank names"))))
         ))
 
     }
