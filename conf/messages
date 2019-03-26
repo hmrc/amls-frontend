@@ -654,7 +654,7 @@ progress.businessmatching.name = Pre-application
 progress.businessmatching.description = Administrative information about your business.
 progress.businessmatching.time = 5
 
-progress.businessdetails.name = Business details
+progress.businessdetails.name = business details
 progress.businessdetails.description = Administrative information about your business and your current registration status.
 progress.businessdetails.time = 3 and 10
 progress.businessactivities.name = business activities
