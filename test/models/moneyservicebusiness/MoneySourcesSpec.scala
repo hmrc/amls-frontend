@@ -269,11 +269,5 @@ class MoneySourcesSpec extends AmlsSpec {
       val expected = JsSuccess(completeModel, JsPath)
       Json.fromJson[MoneySources](json) must be(expected)
     }
-
-    //todo
-//    "Fail when invalid data given" in {
-//      Json.fromJson[MoneySources](Json.obj("wholesalerMoneySource" -> "Yes")) must
-//        be(JsError((JsPath \ "wholesalerNames") -> validation.ValidationError("error.path.missing")))
-//    }
   }
 }
