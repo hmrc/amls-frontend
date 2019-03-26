@@ -47,15 +47,14 @@ class RemoveResponsiblePersonController @Inject () (
     implicit authContext => implicit request =>
 
       def redirectToEdit = {
-        Redirect(routes.PositionWithinBusinessController.get(index, true, flow))
+        Redirect(routes.WhatYouNeedController.get(index, flow))
       }
 
       for {
         rp <- getData[ResponsiblePerson](index)
         status <- statusService.getStatus
       } yield rp match {
-        case Some(person) if ((person.lineId.isDefined) &&
-          (person.positions.isEmpty || person.positions.get.startDate.isEmpty)) =>
+        case Some(person) if (person.lineId.isDefined && !person.isComplete) =>
           redirectToEdit
         case (Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))) =>
           Ok(views.html.responsiblepeople.remove_responsible_person(
