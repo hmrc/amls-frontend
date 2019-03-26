@@ -111,5 +111,42 @@ class WhichCurrenciesSpec extends AmlsSpec with CharacterSets {
         JsError((JsPath \ "currencies") -> play.api.data.validation.ValidationError("error.path.missing"))
       }
     }
+
+    "convert function" should {
+      "convert msb which currencies to renewal which currencies for UsesForeignCurrenciesNo" in {
+        val msbWc = WhichCurrencies(Seq("USD"), Some(UsesForeignCurrenciesNo))
+        val renewalWc = models.renewal.WhichCurrencies(Seq("USD"), Some(false), None, None, None)
+
+        WhichCurrencies.convert(msbWc) mustBe renewalWc
+      }
+
+      "convert msb which currencies to renewal which currencies for UsesForeignCurrenciesYes and BankMoneySources" in {
+        val msbWc = WhichCurrencies(Seq("USD"), Some(UsesForeignCurrenciesYes), Some(MoneySources(Some(BankMoneySource("Bank names")))))
+        val renewalWc = models.renewal.WhichCurrencies(Seq("USD"), Some(true), Some(BankMoneySource("Bank names")), None, None)
+
+        WhichCurrencies.convert(msbWc) mustBe renewalWc
+      }
+
+      "convert msb which currencies to renewal which currencies for UsesForeignCurrenciesYes and WholesalerMoneySources" in {
+        val msbWc = WhichCurrencies(Seq("USD"), Some(UsesForeignCurrenciesYes), Some(MoneySources(wholesalerMoneySource = Some(WholesalerMoneySource("Wholesaler names")))))
+        val renewalWc = models.renewal.WhichCurrencies(Seq("USD"), Some(true), None, Some(WholesalerMoneySource("Wholesaler names")), None)
+
+        WhichCurrencies.convert(msbWc) mustBe renewalWc
+      }
+
+      "convert msb which currencies to renewal which currencies for UsesForeignCurrenciesYes and CustomerMoneySources" in {
+        val msbWc = WhichCurrencies(Seq("USD"), Some(UsesForeignCurrenciesYes), Some(MoneySources(customerMoneySource = Some(true))))
+        val renewalWc = models.renewal.WhichCurrencies(Seq("USD"), Some(true), None, None, Some(true))
+
+        WhichCurrencies.convert(msbWc) mustBe renewalWc
+      }
+
+      "convert msb which currencies to renewal which currencies for UsesForeignCurrenciesYes and all money sources" in {
+        val msbWc = WhichCurrencies(Seq("USD"), Some(UsesForeignCurrenciesYes), Some(MoneySources(Some(BankMoneySource("Bank names")), Some(WholesalerMoneySource("Wholesaler names")),Some(true))))
+        val renewalWc = models.renewal.WhichCurrencies(Seq("USD"), Some(true), Some(BankMoneySource("Bank names")), Some(WholesalerMoneySource("Wholesaler names")), Some(true))
+
+        WhichCurrencies.convert(msbWc) mustBe renewalWc
+      }
+    }
   }
 }

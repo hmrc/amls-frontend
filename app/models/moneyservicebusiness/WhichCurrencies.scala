@@ -39,17 +39,24 @@ case class WhichCurrencies(currencies: Seq[String],
     this.copy(moneySources = Some(p))
 }
 
-
 object WhichCurrencies {
-  def convert(wc: WhichCurrencies, uf: UsesForeignCurrencies, ms: MoneySources): RWhichCurrencies = {
-    RWhichCurrencies(wc.currencies,  uf match {
-      case UsesForeignCurrenciesYes => Some(true)
-      case UsesForeignCurrenciesNo => Some(false)
-    }, ms.bankMoneySource, ms.wholesalerMoneySource, ms.customerMoneySource)
-  }
-
   def convert(wc: WhichCurrencies): RWhichCurrencies = {
-    RWhichCurrencies(wc.currencies, None, None, None, None)
+    RWhichCurrencies(wc.currencies,  wc.usesForeignCurrencies match {
+      case Some(UsesForeignCurrenciesYes) => Some(true)
+      case _ => Some(false)
+    },
+      wc.moneySources match {
+      case Some(ms) => ms.bankMoneySource.fold[Option[BankMoneySource]](None)(b => Some(b))
+      case _ => None
+    },
+    wc.moneySources match {
+      case Some(ms) => ms.wholesalerMoneySource.fold[Option[WholesalerMoneySource]](None)(w => Some(w))
+      case _ => None
+    },
+    wc.moneySources match {
+      case Some(ms) => ms.customerMoneySource.fold[Option[Boolean]](None)(c => Some(c))
+      case _ => None
+    })
   }
 
   val emptyToNone: String => Option[String] = { x =>
