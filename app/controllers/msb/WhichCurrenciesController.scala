@@ -73,7 +73,6 @@ class WhichCurrenciesController @Inject() (val authConnector: AuthConnector,
   def updateCurrencies(oldMsb: Option[MoneyServiceBusiness], newWhichCurrencies: WhichCurrencies): Option[MoneyServiceBusiness] = {
     oldMsb match {
       case Some(msb) => {
-        println("msbbbbbbbbbb" + msb)
        msb.whichCurrencies match {
           case Some(w) => Some(msb.whichCurrencies(w.currencies(newWhichCurrencies.currencies)))
           case _ => Some(msb.whichCurrencies(WhichCurrencies(newWhichCurrencies.currencies)))
