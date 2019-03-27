@@ -60,7 +60,7 @@ class summarySpec extends AmlsSpec with MustMatchers with HtmlAssertions with Ta
                                                                      "tcsp.provided_services.service.lbl.05",
                                                                      "tcsp.provided_services.service.lbl.06",
                                                                      "tcsp.provided_services.service.lbl.07",
-                                                                     "Other:sfasfasef"))),
+                                                                     "Other: sfasfasef"))),
       ("tcsp.servicesOfAnotherTcsp.title", checkElementTextIncludes(_, "lbl.yes")),
       ("tcsp.anothertcspsupervision.title", checkElementTextIncludes(_, s"Money Laundering Regulation reference number: $amlsRegistrationNumber"))
     )
@@ -70,7 +70,7 @@ class summarySpec extends AmlsSpec with MustMatchers with HtmlAssertions with Ta
         val testdata = Tcsp(
           Some(TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, RegisteredOfficeEtc, CompanyDirectorEtc, CompanyFormationAgent(true,false)))),
           Some(ProvidedServices(Set(
-            PhonecallHandling,EmailHandling,EmailServer,SelfCollectMailboxes,MailForwarding,Receptionist,ConferenceRooms, Other("sfasfasef")
+            PhonecallHandling,EmailHandling,EmailServer,SelfCollectMailboxes,MailForwarding,Receptionist,ConferenceRooms, Other(" sfasfasef")
           ))),
           Some(true),
           Some(ServicesOfAnotherTCSPYes(amlsRegistrationNumber))
