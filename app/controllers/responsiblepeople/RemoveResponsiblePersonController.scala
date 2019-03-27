@@ -50,7 +50,6 @@ class RemoveResponsiblePersonController @Inject () (
         status <- statusService.getStatus
       } yield rp match {
         case Some(person) if (person.lineId.isDefined && !person.isComplete) =>
-          println("ACHI: redirect")
           Redirect(routes.WhatYouNeedController.get(index, flow))
         case (Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))) =>
           Ok(views.html.responsiblepeople.remove_responsible_person(
