@@ -61,8 +61,7 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request => {
-        val foo = Form2[UsesForeignCurrencies](request.body)
-        foo match {
+        Form2[UsesForeignCurrencies](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.msb.uses_foreign_currencies(f, edit)))
           case ValidForm(_, data: UsesForeignCurrencies) =>

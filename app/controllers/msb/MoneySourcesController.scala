@@ -58,8 +58,7 @@ class MoneySourcesController @Inject()(val authConnector: AuthConnector,
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request => {
-        val foo = Form2[MoneySources](request.body)
-        foo match {
+        Form2[MoneySources](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.msb.money_sources(f, edit)))
           case ValidForm(_, data: MoneySources) =>
@@ -68,8 +67,6 @@ class MoneySourcesController @Inject()(val authConnector: AuthConnector,
               cache <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
                 updateMoneySources(msb, data))
             } yield redirectToNextPage(cache, edit).getOrElse(NotFound(notFoundView))
-
-
         }
       }
   }
