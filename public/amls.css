@@ -1595,3 +1595,7 @@ li.autocomplete__option {
 h2.override-heading-medium {
   margin-top: 1.875em !important;
 }
+
+.sidebar-top-spacing {
+  margin-top: -0.75em;
+}
