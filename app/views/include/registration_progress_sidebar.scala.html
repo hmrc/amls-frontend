@@ -16,21 +16,33 @@
 
 @import models.businesscustomer.Address
 
-@(canEditPreApplication: Boolean, address: Address, serviceNames: Seq[String])(implicit request: Request[_], messages: Messages)
+@(
+    canEditPreApplication: Boolean,
+    businessName: String,
+    serviceNames: Seq[String]
+)(implicit request: Request[_], messages: Messages)
 
-<div class="grid-layout__column grid-layout__column--1-3 progress-step--submit">
-    <div class="application-submit">
-        <h3 class="heading-small">Your business</h3>
-        <p>
-            @Html(address.toLines.mkString("<br/>"))
-        </p>
+    <div class="business-info">
+        <div class="business-info__item">
+            <h2 class="heading-small">Your business</h2>
+            <p>
+                @Html(businessName)
+            </p>
+        </div>
 
-        <h3 class="heading-small">Services registering</h3>
-        <p>@serviceNames.map(name => Html(name + "<br/>"))</p>
-
-        <p><a id="view-details" href="@controllers.businessmatching.routes.SummaryController.get.url" class="edit-preapp">
-            @(if(canEditPreApplication) Messages("progress.preapplication.canedit") else Messages("progress.preapplication.readonly"))
-            </a>
-        </p>
+        <div class="business-info__item">
+            <h2 class="heading-small">Your services</h2>
+            @if(serviceNames.length == 1) {
+                <p>@Html(serviceNames(0))</p>
+            } else {
+                <ul class="list list-bullet">
+                    @serviceNames.map(name => Html("<li>" + name + "</li>"))
+                </ul>
+            }
+            <p class="sidebar-top-spacing">
+                <a id="view-details" href="@controllers.businessmatching.routes.SummaryController.get.url" class="edit-preapp">
+                    @(if(canEditPreApplication) Messages("progress.preapplication.canedit") else Messages("progress.preapplication.readonly"))
+                </a>
+            </p>
+        </div>
     </div>
-</div>
