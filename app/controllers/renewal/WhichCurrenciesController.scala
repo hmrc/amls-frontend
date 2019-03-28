@@ -62,7 +62,10 @@ class WhichCurrenciesController @Inject()(val authConnector: AuthConnector,
                   bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
                 } yield {
                   renewalService.updateRenewal(renewal.whichCurrencies(model)) map { _ =>
-                    Redirect(routes.UsesForeignCurrenciesController.get())
+                    edit match {
+                      case true => Redirect(routes.SummaryController.get())
+                      case _ => Redirect(routes.UsesForeignCurrenciesController.get())
+                    }
                   }
 
                 }
