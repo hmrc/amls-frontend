@@ -1546,3 +1546,56 @@ li.autocomplete__option {
   top: 50%;
   margin-top: -6px;
 }
+
+.business-info:after,
+.business-info:before {
+  content: '';
+  display: table;
+}
+
+.business-info:after {
+  clear: both;
+}
+
+@media (min-width: 481px) {
+  .business-info .business-info__item {
+    display: block;
+    float: left;
+    width: 50%;
+  }
+}
+
+@media (min-width: 641px) {
+  .business-info .business-info__item {
+    width: 33.3333333%;
+  }
+}
+/*  new progress page css */
+.task-list-item {
+  border-bottom: 1px solid #bfc1c3;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.task-list-item a {
+  margin-right: .5em;
+}
+
+.task-list-item:first-child {
+  border-top: 1px solid #bfc1c3;
+}
+
+.task-status {
+  float: right;
+}
+
+h2.override-heading-medium {
+  margin-top: 1.875em !important;
+}
+
+.sidebar-top-spacing {
+  margin-top: -0.75em;
+}
