@@ -1815,7 +1815,7 @@ supervision.whatyouneed.requiredinfo.text.1 = details of any previous supervisor
 supervision.whatyouneed.requiredinfo.text.2 = if your business is a member of any professional bodies
 supervision.whatyouneed.requiredinfo.text.3 = if your business has been penalised in the past
 
-supervision.another_body.title = Has your business ever been registered for anti-money laundering supervision with another supervising body?
+supervision.another_body.title = Has your business ever been registered with another supervising body for anti-money laundering supervision? 
 supervision.another_body.description = This only refers to registration for anti-money laundering supervision.
 supervision.another_body.lbl.supervisor = Name of your last supervisor
 supervision.another_body.startDate.lbl = Start date of supervision

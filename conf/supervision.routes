@@ -1,7 +1,7 @@
 GET         /what-you-need                                                @controllers.supervision.WhatYouNeedController.get()
 
-GET         /supervised                                                   @controllers.supervision.AnotherBodyController.get(edit: Boolean ?= false)
-POST        /supervised                                                   @controllers.supervision.AnotherBodyController.post(edit: Boolean ?= false)
+GET         /another-supervising-body                                                   @controllers.supervision.AnotherBodyController.get(edit: Boolean ?= false)
+POST        /another-supervising-body                                                   @controllers.supervision.AnotherBodyController.post(edit: Boolean ?= false)
 
 GET         /supervised-start-date                                        @controllers.supervision.SupervisionStartController.get(edit: Boolean ?= false)
 POST        /supervised-start-date                                        @controllers.supervision.SupervisionStartController.post(edit: Boolean ?= false)
