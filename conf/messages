@@ -1806,7 +1806,7 @@ asp.service.lbl.01 = Accountancy
 asp.service.lbl.02 = Payroll services
 asp.service.lbl.03 = Bookkeeping
 asp.service.lbl.04 = Auditing
-asp.service.lbl.05 = Financial advice and/or tax advice
+asp.service.lbl.05 = Financial or tax advice 
 asp.summary.registration.number = HMRC Registration number:
 
 #Supervision
