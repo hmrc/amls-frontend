@@ -1811,7 +1811,7 @@ asp.summary.registration.number = HMRC Registration number:
 
 #Supervision
 supervision.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:
-supervision.whatyouneed.requiredinfo.text.1 = details of any previous supervision by another body
+supervision.whatyouneed.requiredinfo.text.1 = details of any previous supervisors 
 supervision.whatyouneed.requiredinfo.text.2 = if your business is a member of any professional bodies
 supervision.whatyouneed.requiredinfo.text.3 = if your business has been penalised in the past
 
