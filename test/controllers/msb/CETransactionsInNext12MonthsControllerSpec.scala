@@ -50,10 +50,10 @@ class CETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
   val fullModel = WhichCurrencies(
     Seq("USD", "CHF", "EUR"),
-    Some(false),
-    Some(BankMoneySource("Bank names")),
+    Some(UsesForeignCurrenciesYes),
+    Some(MoneySources(Some(BankMoneySource("Bank names")),
     Some(WholesalerMoneySource("wholesaler names")),
-    Some(true)
+    Some(true)))
   )
 
   "CETransactionsInNext12MonthsController" must {

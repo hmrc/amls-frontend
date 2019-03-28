@@ -22,10 +22,10 @@
 @import forms.EmptyForm
 @import models.businessmatching.updateservice.ServiceChangeRegister
 
-@(model: MoneyServiceBusiness, bmMsbServices: Option[BusinessMatchingMsbServices], isEditable:Boolean, register: ServiceChangeRegister)(implicit request: Request[_],m:Messages, lang: Lang)
+@(model: MoneyServiceBusiness, bmMsbServices: Option[BusinessMatchingMsbServices], isEditable: Boolean, register: ServiceChangeRegister)(implicit request: Request[_], m: Messages, lang: Lang)
 
 @header = {
-    @heading("title.cya", "summary.msb")
+@heading("title.cya", "summary.msb")
 }
 
 @main(
@@ -33,21 +33,37 @@
     heading = header
 ) {
 
-    @bmMsbServices.map{ services =>
-        @model.throughput.map{ throughput =>
+    @bmMsbServices.map { services =>
+        @model.throughput.map { throughput =>
             @checkYourAnswers(
                 question = Messages("msb.throughput.title"),
                 editLinkTag = "msbthroughput-edit",
-                editUrl = if(isEditable){controllers.msb.routes.ExpectedThroughputController.get(true).toString} else ""
+                editUrl = if(isEditable) {
+                    controllers.msb.routes.ExpectedThroughputController.get(true).toString
+                } else ""
             ) {
                 <p>@throughput match {
-                    case ExpectedThroughput.First => {@Messages("msb.throughput.lbl.01")}
-                    case ExpectedThroughput.Second => {@Messages("msb.throughput.lbl.02")}
-                    case ExpectedThroughput.Third => {@Messages("msb.throughput.lbl.03")}
-                    case ExpectedThroughput.Fourth => {@Messages("msb.throughput.lbl.04")}
-                    case ExpectedThroughput.Fifth => {@Messages("msb.throughput.lbl.05")}
-                    case ExpectedThroughput.Sixth => {@Messages("msb.throughput.lbl.06")}
-                    case ExpectedThroughput.Seventh => {@Messages("msb.throughput.lbl.07")}
+                    case ExpectedThroughput.First => {
+                        @Messages("msb.throughput.lbl.01")
+                    }
+                    case ExpectedThroughput.Second => {
+                        @Messages("msb.throughput.lbl.02")
+                    }
+                    case ExpectedThroughput.Third => {
+                        @Messages("msb.throughput.lbl.03")
+                    }
+                    case ExpectedThroughput.Fourth => {
+                        @Messages("msb.throughput.lbl.04")
+                    }
+                    case ExpectedThroughput.Fifth => {
+                        @Messages("msb.throughput.lbl.05")
+                    }
+                    case ExpectedThroughput.Sixth => {
+                        @Messages("msb.throughput.lbl.06")
+                    }
+                    case ExpectedThroughput.Seventh => {
+                        @Messages("msb.throughput.lbl.07")
+                    }
                 }</p>
             }
         }
@@ -60,10 +76,10 @@
             ) {
                 @boa.branches.fold {
                     <p>@Messages("lbl.no")</p>
-                    } { branches =>
+                } { branches =>
                     <ul class="list list--comma">
                         @branches.map { country =>
-                        <li>@country</li>
+                            <li>@country</li>
                         }
                     </ul>
                 }
@@ -77,8 +93,12 @@
                 editUrl = controllers.msb.routes.IdentifyLinkedTransactionsController.get(true).toString
             ) {
                 <p>@ilt.linkedTxn match {
-                    case true => {@Messages("lbl.yes")}
-                    case _ => {@Messages("lbl.no")}
+                    case true => {
+                        @Messages("lbl.yes")
+                    }
+                    case _ => {
+                        @Messages("lbl.no")
+                    }
                 }</p>
             }
         }
@@ -91,12 +111,14 @@
                     editUrl = controllers.msb.routes.BusinessUseAnIPSPController.get(true).toString
                 ) {
                     @ipsp match {
-                        case BusinessUseAnIPSPNo => {<p>@Messages("lbl.no")</p>}
-                        case BusinessUseAnIPSPYes(name , reference) => {
-                        <ul class="list">
-                            <li>@Messages("msb.summary.ipsp-name"): @name</li>
-                            <li>@Messages("msb.summary.ipsp-registration-number"): @reference</li>
-                        </ul>
+                        case BusinessUseAnIPSPNo => {
+                            <p>@Messages("lbl.no")</p>
+                        }
+                        case BusinessUseAnIPSPYes(name, reference) => {
+                            <ul class="list">
+                                <li>@Messages("msb.summary.ipsp-name"): @name</li>
+                                <li>@Messages("msb.summary.ipsp-registration-number"): @reference</li>
+                            </ul>
                         }
                     }
                 }
@@ -109,13 +131,17 @@
                     editUrl = controllers.msb.routes.FundsTransferController.get(true).toString
                 ) {
                     <p>@ft.transferWithoutFormalSystems match {
-                        case true => {@Messages("lbl.yes")}
-                        case _ => {@Messages("lbl.no")}
+                        case true => {
+                            @Messages("lbl.yes")
+                        }
+                        case _ => {
+                            @Messages("lbl.no")
+                        }
                     }</p>
                 }
             }
 
-            @model.transactionsInNext12Months.map{ trans =>
+            @model.transactionsInNext12Months.map { trans =>
                 @checkYourAnswers(
                     question = Messages("msb.transactions.expected.title"),
                     editLinkTag = "msbtransactionsexpected-edit",
@@ -127,15 +153,19 @@
                 }
             }
 
-            @model.sendMoneyToOtherCountry.map{ otherCountries =>
+            @model.sendMoneyToOtherCountry.map { otherCountries =>
                 @checkYourAnswers(
                     question = Messages("msb.send.money.title"),
                     editLinkTag = "msbsendmoneytoothercountries-edit",
                     editUrl = controllers.msb.routes.SendMoneyToOtherCountryController.get(true).toString
                 ) {
                     <p>@otherCountries.money match {
-                        case true => {@Messages("lbl.yes")}
-                        case _ => {@Messages("lbl.no")}
+                        case true => {
+                            @Messages("lbl.yes")
+                        }
+                        case _ => {
+                            @Messages("lbl.no")
+                        }
                     }</p>
                 }
 
@@ -147,9 +177,9 @@
                             editUrl = controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true).toString
                         ) {
                             <ul class="list list--comma">
-                                @lom.countryList.map { country =>
+                            @lom.countryList.map { country =>
                                 <li>@country.name</li>
-                                }
+                            }
                             </ul>
                         }
                     }
@@ -161,9 +191,9 @@
                             editUrl = controllers.msb.routes.MostTransactionsController.get(true).toString
                         ) {
                             <ul class="list list--comma">
-                                @mt.countries.map { country =>
+                            @mt.countries.map { country =>
                                 <li>@country.name</li>
-                                }
+                            }
                             </ul>
                         }
                     }
@@ -172,7 +202,7 @@
         }
 
         @if(services.msbServices.contains(CurrencyExchange)) {
-            @model.ceTransactionsInNext12Months.map{ trans =>
+            @model.ceTransactionsInNext12Months.map { trans =>
                 @checkYourAnswers(
                     question = Messages("msb.ce.transactions.expected.in.12.months.title"),
                     editLinkTag = "msbcetransactionsexpected-edit",
@@ -193,31 +223,63 @@
                     } else ""
                 ) {
                     <ul class="list list--comma">
-                        @wc.currencies.map { cur =>
+                    @wc.currencies.map { cur =>
                         <li>@cur</li>
-                        }
+                    }
                     </ul>
+                }
+            }
 
-                    @wc.usesForeignCurrencies.map { usesForeignCurrencies =>
-                        @checkYourAnswersExtra(
-                            question = Messages("msb.which_currencies.foreign_currencies_question")
-                        ) {
-                            <p>@usesForeignCurrencies match {
-                                case true => {@Messages("lbl.yes")}
-                                case _ => {@Messages("lbl.no")}
-                            }</p>
-                        }
-
-                        @if(usesForeignCurrencies) {
-                            @whoUsesCurrencies(wc)
+            @model.whichCurrencies.map { wc =>
+                @wc.usesForeignCurrencies.map { ufc =>
+                    @checkYourAnswers(
+                        question = Messages("msb.deal_foreign_currencies.title"),
+                        editLinkTag = "msbwhichcurrencies-edit",
+                        editUrl = if(isEditable || register.addedSubSectors.fold(false)(_.contains(CurrencyExchange))) {
+                            controllers.msb.routes.UsesForeignCurrenciesController.get(true).toString
+                        } else ""
+                    ) {
+                        @ufc match {
+                            case UsesForeignCurrenciesYes => {
+                                <p>@Messages("lbl.yes")</p>
+                            }
+                            case UsesForeignCurrenciesNo => {
+                                <p>@Messages("lbl.no")</p>
+                            }
                         }
                     }
+                }
+            }
+
+            @model.whichCurrencies.map { wc =>
+                @wc.moneySources.map { ms =>
+                    @if(ms.bankMoneySource.isDefined | ms.wholesalerMoneySource.isDefined | ms.customerMoneySource.isDefined){
+                        @checkYourAnswers(
+                            question = Messages("msb.supply_foreign_currencies.title"),
+                            editLinkTag = "msbwhichcurrencies-edit",
+                            editUrl = if(isEditable || register.addedSubSectors.fold(false)(_.contains(CurrencyExchange))) {
+                                controllers.msb.routes.MoneySourcesController.get(true).toString
+                            } else ""
+                        ) {
+                            @ms.bankMoneySource.map { bms =>
+                                <p>@Messages("msb.bank.names"): @bms.bankNames</p>
+                            }
+                            @ms.wholesalerMoneySource.map { wms =>
+                                <p>@Messages("msb.wholesaler.names"): @wms.wholesalerNames</p>
+                            }
+                            @ms.customerMoneySource.map { cms =>
+                                @if(cms) {
+                                    <p>@Messages("msb.which_currencies.source.customers")</p>
+                                }
+                            }
+                        }
+                }
                 }
             }
         }
 
         @if(services.msbServices.contains(ForeignExchange)) {
-            @model.fxTransactionsInNext12Months.map{ trans =>
+            @model.fxTransactionsInNext12Months.map { trans =>
                 @checkYourAnswers(
                     question = Messages("msb.fx.transactions.expected.in.12.months.title"),
                     editLinkTag = "msbfxtransactionsexpected-edit",
@@ -230,25 +292,8 @@
             }
         }
     }
-        @form(EmptyForm, controllers.msb.routes.SummaryController.post()) {
-            @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), false)
-        }
-}
-
-@whoUsesCurrencies(wc: WhichCurrencies) = {
-    @checkYourAnswersExtra(
-        question = Messages("msb.which_currencies.who.will")
-    ) {
-        <ul class="list">
-            @wc.bankMoneySource.map { bms =>
-            <li>@Messages("msb.which_currencies.source.banks"): @bms.bankNames</li>
-            }
-            @wc.wholesalerMoneySource.map { wms =>
-            <li>@Messages("msb.which_currencies.source.wholesalers"): @wms.wholesalerNames</li>
-            }
-            @if(wc.customerMoneySource.isDefined) {
-            <li>@Messages("msb.which_currencies.source.customers")</li>
-            }
-        </ul>
+    @form(EmptyForm, controllers.msb.routes.SummaryController.post()) {
+        @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), false)
     }
 }
+

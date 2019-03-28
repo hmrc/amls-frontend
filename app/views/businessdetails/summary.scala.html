@@ -124,7 +124,7 @@
 
     @model.correspondenceAddress.map { ca =>
         @checkYourAnswers(
-            question = Messages("businessdetails.correspondenceaddress.postal.address"),
+            question = Messages("businessdetails.correspondenceaddress.title"),
             editLinkTag = "businessdetailscorraddress-edit",
             classes = Seq("check-your-answers__last"),
             editUrl = controllers.businessdetails.routes.CorrespondenceAddressController.get(true).toString
