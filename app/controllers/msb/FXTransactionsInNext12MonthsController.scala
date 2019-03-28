@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
-import models.businessmatching.{CurrencyExchange, ForeignExchange, MoneyServiceBusiness => MsbActivity}
+import models.businessmatching.{ForeignExchange, MoneyServiceBusiness => MsbActivity}
 import models.moneyservicebusiness.{FXTransactionsInNext12Months, MoneyServiceBusiness}
 import services.StatusService
 import services.businessmatching.ServiceFlow
@@ -34,36 +34,38 @@ class FXTransactionsInNext12MonthsController @Inject()(val authConnector: AuthCo
                                                        implicit val dataCacheConnector: DataCacheConnector,
                                                        implicit val statusService: StatusService,
                                                        implicit val serviceFlow: ServiceFlow
-                                                       ) extends BaseController {
+                                                      ) extends BaseController {
 
-    def get(edit:Boolean = false) = Authorised.async {
-        implicit authContext => implicit request =>
-            ControllerHelper.allowedToEdit(MsbActivity, Some(ForeignExchange)) flatMap {
-                case true => dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
-                    response =>
-                        val form: Form2[FXTransactionsInNext12Months] = (for {
-                            msb <- response
-                            transactions <- msb.fxTransactionsInNext12Months
-                        } yield Form2[FXTransactionsInNext12Months](transactions)).getOrElse(EmptyForm)
-                        Ok(fx_transaction_in_next_12_months(form, edit))
-                }
-                case false => Future.successful(NotFound(notFoundView))
-            }
-    }
-
-    def post(edit: Boolean = false) = Authorised.async {
-        implicit authContext => implicit request => {
-            Form2[FXTransactionsInNext12Months](request.body) match {
-                case f: InvalidForm =>
-                    Future.successful(BadRequest(fx_transaction_in_next_12_months(f, edit)))
-                case ValidForm(_, data) =>
-                    for {
-                        msb <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
-                        _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
-                            msb.fxTransactionsInNext12Months(data)
-                        )
-                    } yield Redirect(routes.SummaryController.get())
-            }
+  def get(edit: Boolean = false) = Authorised.async {
+    implicit authContext =>
+      implicit request =>
+        ControllerHelper.allowedToEdit(MsbActivity, Some(ForeignExchange)) flatMap {
+          case true => dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+            response =>
+              val form: Form2[FXTransactionsInNext12Months] = (for {
+                msb <- response
+                transactions <- msb.fxTransactionsInNext12Months
+              } yield Form2[FXTransactionsInNext12Months](transactions)).getOrElse(EmptyForm)
+              Ok(fx_transaction_in_next_12_months(form, edit))
+          }
+          case false => Future.successful(NotFound(notFoundView))
         }
-    }
+  }
+
+  def post(edit: Boolean = false) = Authorised.async {
+    implicit authContext =>
+      implicit request => {
+        Form2[FXTransactionsInNext12Months](request.body) match {
+          case f: InvalidForm =>
+            Future.successful(BadRequest(fx_transaction_in_next_12_months(f, edit)))
+          case ValidForm(_, data) =>
+            for {
+              msb <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
+              _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
+                msb.fxTransactionsInNext12Months(data)
+              )
+            } yield Redirect(routes.SummaryController.get())
+        }
+      }
+  }
 }
