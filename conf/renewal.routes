@@ -47,3 +47,9 @@ POST        /receiving                                                        @c
 
 GET         /check-your-answers                                               @controllers.renewal.SummaryController.get()
 POST        /check-your-answers                                               @controllers.renewal.SummaryController.post()
+
+GET         /uses-foreign-currencies                                          @controllers.renewal.UsesForeignCurrenciesController.get()
+POST        /uses-foreign-currencies                                          @controllers.renewal.UsesForeignCurrenciesController.post()
+
+GET         /money-sources                                                    @controllers.renewal.MoneySourcesController.get()
+POST        /money-sources                                                    @controllers.renewal.MoneySourcesController.post()

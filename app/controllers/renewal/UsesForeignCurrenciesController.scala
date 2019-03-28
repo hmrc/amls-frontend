@@ -26,11 +26,11 @@ import models.businessmatching._
 import models.renewal.{Renewal, WhichCurrencies}
 import services.RenewalService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import views.html.renewal.which_currencies
+import views.html.renewal.uses_foreign_currencies
 
 import scala.concurrent.Future
 
-class WhichCurrenciesController @Inject()(val authConnector: AuthConnector,
+class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector,
                                           renewalService: RenewalService,
                                           dataCacheConnector: DataCacheConnector) extends BaseController {
 
@@ -41,10 +41,10 @@ class WhichCurrenciesController @Inject()(val authConnector: AuthConnector,
           renewal <- OptionT(renewalService.getRenewal)
           whichCurrencies <- OptionT.fromOption[Future](renewal.whichCurrencies)
         } yield {
-          Ok(which_currencies(Form2[WhichCurrencies](whichCurrencies), edit))
+          Ok(uses_foreign_currencies(Form2[WhichCurrencies](whichCurrencies), edit))
         }
 
-        block getOrElse Ok(which_currencies(EmptyForm, edit))
+        block getOrElse Ok(uses_foreign_currencies(EmptyForm, edit))
 
   }
 
@@ -52,7 +52,7 @@ class WhichCurrenciesController @Inject()(val authConnector: AuthConnector,
     implicit authContext =>
       implicit request =>
         Form2[WhichCurrencies](request.body) match {
-          case f: InvalidForm => Future.successful(BadRequest(which_currencies(f, edit)))
+          case f: InvalidForm => Future.successful(BadRequest(uses_foreign_currencies(f, edit)))
           case ValidForm(_, model) =>
             dataCacheConnector.fetchAll flatMap {
               optMap =>
@@ -62,7 +62,7 @@ class WhichCurrenciesController @Inject()(val authConnector: AuthConnector,
                   bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
                 } yield {
                   renewalService.updateRenewal(renewal.whichCurrencies(model)) map { _ =>
-                    Redirect(routes.UsesForeignCurrenciesController.get())
+                    Redirect(routes.MoneySourcesController.get())
                   }
 
                 }
