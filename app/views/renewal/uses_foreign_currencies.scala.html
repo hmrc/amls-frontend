@@ -30,7 +30,7 @@
 title = Messages("renewal.msb.foreign_currencies.header") + " - " + Messages("summary.renewal"),
 heading = header
 ) {
-    @form(f, controllers.renewal.routes.WhichCurrenciesController.post(edit)) {
+    @form(f, controllers.renewal.routes.UsesForeignCurrenciesController.post(edit)) {
 
     @fieldset(
         f = f("usesForeignCurrencies-fieldset"),

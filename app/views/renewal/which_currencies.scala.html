@@ -30,22 +30,37 @@
     title = Messages("renewal.msb.whichcurrencies.header") + " - " + Messages("summary.renewal"),
     heading = header
 ) {
-
     @form(f, controllers.renewal.routes.WhichCurrenciesController.post(edit)) {
+
+        @hint(
+            hint = "msb.which_currencies.uptoThree.hint",
+            hint2 = "msb.which_currencies.uptoThree.hint2"
+        )
 
         @fieldset(
             f = f("currencies-fieldset"),
-            legend = "msb.which_currencies.title",
+            legend = "renewal.msb.whichcurrencies.header",
             legendHidden = true,
             panel = false,
-            classes = Seq("form-group"),
-            hint = "msb.which_currencies.uptoThree.hint"
+            classes = Seq("form-group")
         ) {
             @errorGroup(f("currencies")) {
-                @currency(field = f("currencies[0]"))
-                @currency(field = f("currencies[1]"))
-                @currency(field = f("currencies[2]"))
+                @currency(
+                    field = f("currencies[0]"),
+                    labelText = "lbl.currency.line1"
+                )
+                @currency(
+                    field = f("currencies[1]"),
+                    labelText = "lbl.currency.line2"
+                )
+                @currency(
+                    field = f("currencies[2]"),
+                    labelText = "lbl.currency.line3"
+                )
             }
         }
+        <div class="clear">
+        @submit(returnLocation = Some("renewal"))
+        </div>
     }
 }

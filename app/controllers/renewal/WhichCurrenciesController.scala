@@ -59,7 +59,6 @@ class WhichCurrenciesController @Inject()(val authConnector: AuthConnector,
                 val result = for {
                   cacheMap <- optMap
                   renewal <- cacheMap.getEntry[Renewal](Renewal.key)
-                  bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
                 } yield {
                   renewalService.updateRenewal(renewal.whichCurrencies(model)) map { _ =>
                     edit match {
