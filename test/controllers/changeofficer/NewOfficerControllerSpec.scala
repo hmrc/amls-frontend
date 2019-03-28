@@ -348,7 +348,7 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
 
         val updateNominatedOfficers = PrivateMethod[Seq[ResponsiblePerson]]('updateNominatedOfficers)
 
-        val result = controller invokePrivate updateNominatedOfficers((oldOfficer, 1), RoleInBusiness(Set()), responsiblePeople, 0)
+        val result = controller invokePrivate updateNominatedOfficers((oldOfficer, 1), RoleInBusiness(Set()), responsiblePeople :+ emptyPerson, 0)
 
         result must equal(Seq(
           newOfficer.copy(
@@ -362,6 +362,8 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
             hasAccepted = true
           )
         ))
+
+        result.seq.length must equal(2)
       }
     }
 
