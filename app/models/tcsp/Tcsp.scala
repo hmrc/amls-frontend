@@ -21,6 +21,8 @@ import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class Tcsp (tcspTypes: Option[TcspTypes] = None,
+                 onlyOffTheShelfCompsSold: Option[OnlyOffTheShelfCompsSold] = None,
+                 complexCorpStructureCreation: Option[ComplexCorpStructureCreation] = None,
                  providedServices: Option[ProvidedServices] = None,
                  doesServicesOfAnotherTCSP: Option[Boolean] = None,
                  servicesOfAnotherTCSP: Option[ServicesOfAnotherTCSP] = None,
@@ -29,6 +31,12 @@ case class Tcsp (tcspTypes: Option[TcspTypes] = None,
 
   def tcspTypes(trust: TcspTypes): Tcsp =
     this.copy(tcspTypes = Some(trust), hasChanged = hasChanged || !this.tcspTypes.contains(trust), hasAccepted = hasAccepted && this.tcspTypes.contains(trust))
+
+  def onlyOffTheShelfCompsSold(x: OnlyOffTheShelfCompsSold): Tcsp =
+    this.copy(onlyOffTheShelfCompsSold = Some(x), hasChanged = hasChanged || !this.onlyOffTheShelfCompsSold.contains(x), hasAccepted = hasAccepted && this.onlyOffTheShelfCompsSold.contains(x))
+
+  def complexCorpStructureCreation(x: ComplexCorpStructureCreation): Tcsp =
+    this.copy(complexCorpStructureCreation = Some(x), hasChanged = hasChanged || !this.complexCorpStructureCreation.contains(x), hasAccepted = hasAccepted && this.complexCorpStructureCreation.contains(x))
 
   def providedServices(ps: ProvidedServices): Tcsp =
     this.copy(providedServices = Some(ps), hasChanged = hasChanged || !this.providedServices.contains(ps), hasAccepted = hasAccepted && this.providedServices.contains(ps))
@@ -40,9 +48,10 @@ case class Tcsp (tcspTypes: Option[TcspTypes] = None,
     this.copy(servicesOfAnotherTCSP = Some(p), hasChanged = hasChanged || !this.servicesOfAnotherTCSP.contains(p), hasAccepted = hasAccepted && this.servicesOfAnotherTCSP.contains(p))
 
   def isComplete: Boolean = this match {
-    case Tcsp(Some(s), t, Some(true), Some(_), _, accepted) => if(s.serviceProviders contains RegisteredOfficeEtc) { t.isDefined & accepted } else accepted
-    case Tcsp(Some(s), t, Some(false), _, _, accepted) =>  if(s.serviceProviders contains RegisteredOfficeEtc) { t.isDefined & accepted } else accepted
-    case Tcsp(Some(TcspTypes(serviceProviders)), _, Some(_), Some(_), _, accepted) if !serviceProviders.contains(RegisteredOfficeEtc) => accepted
+    //case Tcsp(Some(s), t, Some(true), Some(_), _, accepted) => if(s.serviceProviders contains RegisteredOfficeEtc) { t.isDefined & accepted } else accepted
+    //case Tcsp(Some(s), t, Some(false), _, _, accepted) =>  if(s.serviceProviders contains RegisteredOfficeEtc) { t.isDefined & accepted } else accepted
+    //case Tcsp(Some(TcspTypes(serviceProviders)), _, Some(_), Some(_), _, accepted) if !serviceProviders.contains(RegisteredOfficeEtc) => accepted
+    //case _ => false
     case _ => false
   }
 }
@@ -96,6 +105,8 @@ object Tcsp {
     import play.api.libs.json._
 
     (__ \ "tcspTypes").readNullable[TcspTypes] and
+      (__ \ "onlyOffTheShelfCompsSold").readNullable[OnlyOffTheShelfCompsSold] and
+      (__ \ "complexCorpStructureCreation").readNullable[ComplexCorpStructureCreation] and
       (__ \ "providedServices").readNullable[ProvidedServices] and
       doesServicesOfAnotherTCSPReader and
       (__ \ "servicesOfAnotherTCSP").readNullable[ServicesOfAnotherTCSP] and
