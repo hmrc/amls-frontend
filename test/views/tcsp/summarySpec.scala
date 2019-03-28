@@ -70,7 +70,7 @@ class summarySpec extends AmlsSpec with MustMatchers with HtmlAssertions with Ta
         val testdata = Tcsp(
           Some(TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, RegisteredOfficeEtc, CompanyDirectorEtc, CompanyFormationAgent(true,false)))),
           Some(ProvidedServices(Set(
-            PhonecallHandling,EmailHandling,EmailServer,SelfCollectMailboxes,MailForwarding,Receptionist,ConferenceRooms, Other(" sfasfasef")
+            PhonecallHandling,EmailHandling,EmailServer,SelfCollectMailboxes,MailForwarding,Receptionist,ConferenceRooms, Other("sfasfasef")
           ))),
           Some(true),
           Some(ServicesOfAnotherTCSPYes(amlsRegistrationNumber))
