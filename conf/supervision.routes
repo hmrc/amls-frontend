@@ -12,8 +12,8 @@ POST        /supervised-end-date                                          @contr
 GET         /supervised-end-reasons                                       @controllers.supervision.SupervisionEndReasonsController.get(edit: Boolean ?= false)
 POST        /supervised-end-reasons                                       @controllers.supervision.SupervisionEndReasonsController.post(edit: Boolean ?= false)
 
-GET         /professional-body                                            @controllers.supervision.ProfessionalBodyMemberController.get(edit: Boolean ?= false)
-POST        /professional-body                                            @controllers.supervision.ProfessionalBodyMemberController.post(edit: Boolean ?= false)
+GET         /member-professional-body                                            @controllers.supervision.ProfessionalBodyMemberController.get(edit: Boolean ?= false)
+POST        /member-professional-body                                            @controllers.supervision.ProfessionalBodyMemberController.post(edit: Boolean ?= false)
 
 GET         /which-professional-body                                      @controllers.supervision.WhichProfessionalBodyController.get(edit: Boolean ?= false)
 POST        /which-professional-body                                      @controllers.supervision.WhichProfessionalBodyController.post(edit: Boolean ?= false)
