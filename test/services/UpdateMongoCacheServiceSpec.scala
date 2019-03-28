@@ -146,10 +146,11 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
       identifyLinkedTransactions = Some(IdentifyLinkedTransactions(true)),
       Some(WhichCurrencies(
         Seq("USD", "GBP", "EUR"),
-        usesForeignCurrencies = Some(true),
-        Some(BankMoneySource("bank names")),
+        Some(UsesForeignCurrenciesYes),
+        Some(MoneySources(Some(BankMoneySource("bank names")),
         Some(WholesalerMoneySource("Wholesaler Names")),
-        Some(true))),
+        Some(true)))
+      )),
       sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
       fundsTransfer = Some(FundsTransfer(true)),
       branchesOrAgents = Some(BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))),

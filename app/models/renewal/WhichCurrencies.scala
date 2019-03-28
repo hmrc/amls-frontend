@@ -22,7 +22,7 @@ import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import models.FormTypes._
 import models._
-import models.moneyservicebusiness.{BankMoneySource, WholesalerMoneySource}
+import models.moneyservicebusiness._
 import play.api.libs.json._
 import utils.MappingUtils.Implicits._
 import utils.{GenericValidators, TraversableValidators}
@@ -233,10 +233,14 @@ object WhichCurrencies {
 
   implicit def convert(model: WhichCurrencies): models.moneyservicebusiness.WhichCurrencies = {
     models.moneyservicebusiness.WhichCurrencies(
-      model.currencies,
-      model.usesForeignCurrencies,
-      model.bankMoneySource,
-      model.wholesalerMoneySource,
-      model.customerMoneySource)
+     currencies = model.currencies,
+      usesForeignCurrencies = model.usesForeignCurrencies match {
+        case Some(true) => Some(UsesForeignCurrenciesYes)
+        case _ => Some(UsesForeignCurrenciesNo)
+      },
+      moneySources = (model.bankMoneySource, model.wholesalerMoneySource, model.customerMoneySource) match {
+        case (bms, wms, cms) => Some(MoneySources(bms, wms, cms))
+      }
+    )
   }
 }
