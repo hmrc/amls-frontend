@@ -1796,8 +1796,8 @@ tcsp.anothertcspsupervision.header = Is that Trust or Company Service Provider r
 
 #ASP
 asp.whatyouneed.subheading = In this section, you’ll be asked for things like:
-asp.whatyouneed.line_1 = what services you provide
-asp.whatyouneed.line_2 = if you’re registered with HMRC to handle other businesses’ tax matters
+asp.whatyouneed.line_1 = which services you provide 
+asp.whatyouneed.line_2 = if you’re registered with HMRC to handle other businesses’ tax matters 
 asp.other.business.tax.matters.title = Are you registered with HMRC to handle other businesses’ tax matters?
 asp.other.business.tax.matters.agentrefno.lbl = HMRC Agent Registration Number
 asp.other.business.tax.matters.lbl = This refers to the HMRC Agent Registration Scheme.
