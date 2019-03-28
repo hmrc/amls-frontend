@@ -1782,13 +1782,13 @@ tcsp.servicesOfAnotherTcsp.mlrregno.lbl = Money Laundering Regulations number.
 tcsp.cya.mlrregno = Money Laundering Regulation reference number
 
 tcsp.provided_services.title = Which services does your business provide?
-tcsp.provided_services.service.lbl.01 = Conference room
+tcsp.provided_services.service.lbl.01 = Telephone call handling
 tcsp.provided_services.service.lbl.02 = Email handling
 tcsp.provided_services.service.lbl.03 = Email server
-tcsp.provided_services.service.lbl.04 = Mail forwarding
-tcsp.provided_services.service.lbl.05 = Self-collect mailboxes
-tcsp.provided_services.service.lbl.06 = Telephone call handling
-tcsp.provided_services.service.lbl.07 = Receptionist
+tcsp.provided_services.service.lbl.04 = Self-collect mailboxes
+tcsp.provided_services.service.lbl.05 = Mail forwarding
+tcsp.provided_services.service.lbl.06 = Receptionist
+tcsp.provided_services.service.lbl.07 = Conference room
 tcsp.provided_services.service.lbl.08 = Other
 tcsp.provided_services.service.lbl.details = Service type
 
