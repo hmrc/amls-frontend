@@ -1831,7 +1831,7 @@ supervision.supervision_end_reasons.lbl = Why did your previous supervision end?
 supervision.supervision_end_reasons.description = Give details of why your previous registration ended
 
 
-supervision.penalisedbyprofessional.title = Has the business, or anyone in the business, ever been penalised by a professional body?
+supervision.penalisedbyprofessional.title = Has your business, or anyone in your business, ever been penalised for business activities covered by Money Laundering Regulations?
 supervision.penalisedbyprofessional.subtitle = Examples of a penalty include:
 supervision.penalisedbyprofessional.line_1 = a fine
 supervision.penalisedbyprofessional.line_2 = a warning
@@ -1839,7 +1839,7 @@ supervision.penalisedbyprofessional.line_3 = suspension
 supervision.penalisedbyprofessional.line_4 = expulsion
 supervision.penalisedbyprofessional.line_5 = special terms or conditions imposed on your business
 supervision.penalisedbyprofessional.details = Only include penalties for business activities covered by Money Laundering Regulations.
-supervision.penalisedbyprofessional.details.lbl = Please provide details
+supervision.penalisedbyprofessional.details.lbl = Describe the penalty, when it occurred, and who was involved.
 
 supervision.memberofprofessionalbody.title = Is your business a member of a professional body?
 supervision.memberofprofessionalbody.lbl.01 = Association of Accounting Technicians
