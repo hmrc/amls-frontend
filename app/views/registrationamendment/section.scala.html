@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import models.registrationprogress.{Status, Completed, Started}
+@import models.registrationprogress.{Status, Completed, Started, NotStarted}
 
 @(
     name: String,
@@ -27,6 +27,7 @@
 @progressText = {
    @status match {
        case Started => {@Messages("progress.visuallyhidden.view.started")}
+       case NotStarted => {@Messages("progress.visuallyhidden.view.started")}
        case Completed if(hasChanged) => {@Messages("progress.visuallyhidden.view.updated")}
        case _ => {@Messages("progress.visuallyhidden.view.amend")}
    }
