@@ -18,29 +18,29 @@ package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
 import models.businessactivities.{BusinessActivities, InvolvedInOtherYes}
-import models.responsiblepeople.{ExperienceTrainingNo, ExperienceTrainingYes, PersonName, ResponsiblePerson}
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
 import models.responsiblepeople.ResponsiblePerson._
+import models.responsiblepeople.{ExperienceTrainingNo, ExperienceTrainingYes, PersonName, ResponsiblePerson}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.AmlsSpec
 import play.api.i18n.Messages
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   val RecordId = 1
+
+  def getMessage(service: BusinessActivity): String = Messages("businessactivities.registerservices.servicename.lbl." + BusinessMatchingActivities.getValue(service))
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
@@ -88,9 +88,11 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
         val RecordId = 1
         val result = controller.get(RecordId)(request)
         status(result) must be(OK)
-        contentAsString(result) must include(AccountancyServices.getMessage())
-        contentAsString(result) must include(BillPaymentServices.getMessage())
-        contentAsString(result) must include(EstateAgentBusinessService.getMessage())
+
+        contentAsString(result) must include(getMessage(AccountancyServices))
+        contentAsString(result) must include(getMessage(BillPaymentServices))
+        contentAsString(result) must include(getMessage(EstateAgentBusinessService))
+
         contentAsString(result) must include(Messages("responsiblepeople.experiencetraining.title"))
       }
     }
