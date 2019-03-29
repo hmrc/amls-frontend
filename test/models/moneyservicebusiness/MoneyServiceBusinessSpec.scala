@@ -123,10 +123,9 @@ trait MoneyServiceBusinessTestData {
     identifyLinkedTransactions = Some(IdentifyLinkedTransactions(true)),
     Some(WhichCurrencies(
       Seq("USD", "GBP", "EUR"),
-      usesForeignCurrencies = Some(true),
-      Some(BankMoneySource("bank names")),
-      Some(WholesalerMoneySource("Wholesaler Names")),
-      Some(true))),
+      Some(UsesForeignCurrenciesYes),
+      Some(MoneySources(Some(BankMoneySource("Bank Name")), Some(WholesalerMoneySource("Wholesaler Name")), Some(true)))
+    )),
     sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
     fundsTransfer = Some(FundsTransfer(true)),
     branchesOrAgents = Some(BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))),
@@ -150,14 +149,13 @@ trait MoneyServiceBusinessTestData {
     ),
     "identifyLinkedTransactions" -> Json.obj("linkedTxn" -> true),
     "whichCurrencies" -> Json.obj(
-      "currencies" -> Json.arr("USD", "GBP", "EUR"),
+      "currencies" -> Json.arr("USD", "GBP", "EUR"), "usesForeignCurrencies" -> UsesForeignCurrenciesYes, "moneySources" -> Json.obj(
       "bankMoneySource" -> "Yes",
-      "bankNames" -> "bank names",
+      "bankNames" -> "Bank Name",
       "wholesalerMoneySource" -> "Yes",
-      "wholesalerNames" -> "Wholesaler Names",
-      "customerMoneySource" -> "Yes",
-      "usesForeignCurrencies" -> true
-    ),
+      "wholesalerNames" -> "Wholesaler Name",
+      "customerMoneySource" -> "Yes"
+    )),
     "sendMoneyToOtherCountry" -> Json.obj("money" -> true),
     "fundsTransfer" -> Json.obj("transferWithoutFormalSystems" -> true),
     "branchesOrAgents" -> Json.obj("hasCountries" -> true,"countries" ->Json.arr("GB")),

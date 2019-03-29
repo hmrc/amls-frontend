@@ -98,7 +98,7 @@ class NewOfficerController @Inject()(val authConnector: AuthConnector,
   }
 
   private def updateNominatedOfficers(oldOfficer: (ResponsiblePerson, Int), roles: RoleInBusiness, responsiblePeople: Seq[ResponsiblePerson], index: Int) = {
-    removeNominatedOfficers(responsiblePeople)
+    removeNominatedOfficers(ResponsiblePerson.filter(responsiblePeople))
       .patch(oldOfficer._2 - 1, Seq(updateRoles(oldOfficer._1, roles)), 1)
       .patch(index, Seq(addNominatedOfficer(responsiblePeople(index))), 1)
       .map(_.copy(hasAccepted = true))
