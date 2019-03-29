@@ -119,10 +119,16 @@ object Tcsp {
   }
 
   def oldOnlyOffTheShelfCompsSoldReader: Reads[Option[OnlyOffTheShelfCompsSold]] =
-    (__ \ "tcspTypes" \ "onlyOffTheShelfCompsSold").readNullable[OnlyOffTheShelfCompsSold] orElse constant(None)
+    (__ \ "tcspTypes" \ "onlyOffTheShelfCompsSold").readNullable[Boolean] map {
+      case Some(true) => Some(OnlyOffTheShelfCompsSoldYes)
+      case _ => Some(OnlyOffTheShelfCompsSoldNo)
+    }
 
   def oldComplexCorpStructureCreationReader: Reads[Option[ComplexCorpStructureCreation]] =
-    (__ \ "tcspTypes" \ "complexCorpStructureCreation").readNullable[ComplexCorpStructureCreation] orElse constant(None)
+    (__ \ "tcspTypes" \ "complexCorpStructureCreation").readNullable[Boolean] map {
+      case Some(true) => Some(ComplexCorpStructureCreationYes)
+      case _ => Some(ComplexCorpStructureCreationNo)
+    }
 
   implicit val jsonReads : Reads[Tcsp] = {
     import play.api.libs.functional.syntax._
