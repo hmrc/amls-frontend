@@ -6,6 +6,12 @@ POST        /services                                  @controllers.tcsp.Provide
 GET         /service-type                              @controllers.tcsp.TcspTypesController.get(edit: Boolean ?= false)
 POST        /service-type                              @controllers.tcsp.TcspTypesController.post(edit: Boolean ?= false)
 
+GET         /only-off-the-shelf-comps-sold             @controllers.tcsp.OnlyOffTheShelfCompsSoldController.get(edit: Boolean ?= false)
+POST        /only-off-the-shelf-comps-sold             @controllers.tcsp.OnlyOffTheShelfCompsSoldController.post(edit: Boolean ?= false)
+
+GET         /complex-corp-structure-creation           @controllers.tcsp.ComplexCorpStructureCreationController.get(edit: Boolean ?= false)
+POST        /complex-corp-structure-creation           @controllers.tcsp.ComplexCorpStructureCreationController.post(edit: Boolean ?= false)
+
 GET         /other-trust-provider                      @controllers.tcsp.ServicesOfAnotherTCSPController.get(edit: Boolean ?= false)
 POST        /other-trust-provider                      @controllers.tcsp.ServicesOfAnotherTCSPController.post(edit: Boolean ?= false)
 

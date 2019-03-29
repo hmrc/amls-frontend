@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
-import models.tcsp.{RegisteredOfficeEtc, Tcsp, TcspTypes}
+import models.tcsp.{CompanyFormationAgent, RegisteredOfficeEtc, Tcsp, TcspTypes}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.tcsp.service_provider_types
 
@@ -52,11 +52,19 @@ class TcspTypesController @Inject() (val dataCacheConnector: DataCacheConnector,
             tcsp <-
             dataCacheConnector.fetch[Tcsp](Tcsp.key)
             _ <- dataCacheConnector.save[Tcsp](Tcsp.key,
-              tcsp.tcspTypes(data)
+              {
+                (data.serviceProviders.contains(CompanyFormationAgent)) match {
+                  case (false) => tcsp.tcspTypes(data).copy(onlyOffTheShelfCompsSold = None, complexCorpStructureCreation = None)
+                  case _ => tcsp.tcspTypes(data)
+                }
+              }
+
             )
-          } yield data.serviceProviders.contains(RegisteredOfficeEtc) match {
-            case true => Redirect(routes.ProvidedServicesController.get(edit))
-            case false => edit match {
+          } yield (data.serviceProviders.contains(CompanyFormationAgent),
+            data.serviceProviders.contains(RegisteredOfficeEtc)) match {
+            case (true, _) => Redirect(routes.OnlyOffTheShelfCompsSoldController.get())
+            case (false, true) => Redirect(routes.ProvidedServicesController.get())
+            case (_) => edit match {
                 case true => Redirect(routes.SummaryController.get())
                 case false => Redirect(routes.ServicesOfAnotherTCSPController.get())
             }

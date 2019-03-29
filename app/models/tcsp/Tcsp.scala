@@ -14,6 +14,22 @@
  * limitations under the License.
  */
 
+/*
+ * Copyright 2019 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package models.tcsp
 
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
@@ -48,10 +64,12 @@ case class Tcsp (tcspTypes: Option[TcspTypes] = None,
     this.copy(servicesOfAnotherTCSP = Some(p), hasChanged = hasChanged || !this.servicesOfAnotherTCSP.contains(p), hasAccepted = hasAccepted && this.servicesOfAnotherTCSP.contains(p))
 
   def isComplete: Boolean = this match {
-    //case Tcsp(Some(s), t, Some(true), Some(_), _, accepted) => if(s.serviceProviders contains RegisteredOfficeEtc) { t.isDefined & accepted } else accepted
-    //case Tcsp(Some(s), t, Some(false), _, _, accepted) =>  if(s.serviceProviders contains RegisteredOfficeEtc) { t.isDefined & accepted } else accepted
-    //case Tcsp(Some(TcspTypes(serviceProviders)), _, Some(_), Some(_), _, accepted) if !serviceProviders.contains(RegisteredOfficeEtc) => accepted
-    //case _ => false
+    case Tcsp(Some(s),_,_, t, Some(true), Some(_), _, accepted) => if(s.serviceProviders contains RegisteredOfficeEtc) { t.isDefined & accepted } else accepted
+    case Tcsp(Some(s), _, _, t, Some(false), _, _, accepted) =>  if(s.serviceProviders contains RegisteredOfficeEtc) { t.isDefined & accepted } else accepted
+    case Tcsp(Some(TcspTypes(serviceProviders)), _, _, _, Some(_), Some(_), _, accepted) if !serviceProviders.contains(RegisteredOfficeEtc) => accepted
+    case Tcsp(Some(s), Some(_), Some(_), t, _, _, _, accepted) => if(s.serviceProviders contains CompanyFormationAgent) { t.isDefined & accepted } else accepted
+    case Tcsp(Some(s), Some(_), Some(_), t, _, _, _, accepted) =>  if(s.serviceProviders contains CompanyFormationAgent) { t.isDefined & accepted } else accepted
+    case Tcsp(Some(TcspTypes(serviceProviders)), _, _, _, _, _, _, accepted) if !serviceProviders.contains(CompanyFormationAgent) => accepted
     case _ => false
   }
 }
@@ -100,13 +118,25 @@ object Tcsp {
     }
   }
 
+  def oldOnlyOffTheShelfCompsSoldReader: Reads[Option[OnlyOffTheShelfCompsSold]] =
+    (__ \ "foo" \ "onlyOffTheShelfCompsSold").readNullable[OnlyOffTheShelfCompsSold] orElse constant(None)
+
+  def oldComplexCorpStructureCreationReader: Reads[Option[ComplexCorpStructureCreation]] =
+    (__ \ "foo" \ "complexCorpStructureCreation").readNullable[ComplexCorpStructureCreation] orElse constant(None)
+
   implicit val jsonReads : Reads[Tcsp] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
 
     (__ \ "tcspTypes").readNullable[TcspTypes] and
-      (__ \ "onlyOffTheShelfCompsSold").readNullable[OnlyOffTheShelfCompsSold] and
-      (__ \ "complexCorpStructureCreation").readNullable[ComplexCorpStructureCreation] and
+      ((__ \ "onlyOffTheShelfCompsSold").readNullable[OnlyOffTheShelfCompsSold] flatMap {
+        case None => oldOnlyOffTheShelfCompsSoldReader
+        case x => constant(x)
+      }) and
+      ((__ \ "complexCorpStructureCreation").readNullable[ComplexCorpStructureCreation] flatMap {
+        case None => oldComplexCorpStructureCreationReader
+        case x => constant(x)
+      }) and
       (__ \ "providedServices").readNullable[ProvidedServices] and
       doesServicesOfAnotherTCSPReader and
       (__ \ "servicesOfAnotherTCSP").readNullable[ServicesOfAnotherTCSP] and

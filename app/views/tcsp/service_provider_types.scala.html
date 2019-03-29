@@ -51,60 +51,7 @@
                 @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.02", "02")
                 @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.03", "03")
                 @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.04", "04")
-                @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.05", "05", target = s"#$target")
-            }
-        }
-
-        @panel(
-            field = Some(f(s"$target")),
-            jsHidden = true
-        ) {
-            @fieldset(
-                legend = "tcsp.off-the-shelf.companies.lbl",
-                f = f("onlyOffTheShelfCompsSold-fieldset"),
-                classes = Seq("inline form-group"),
-                panel = false
-            ) {
-                @errorGroup(
-                    field = f("onlyOffTheShelfCompsSold")
-                ) {
-                    @radio(
-                        f = f("onlyOffTheShelfCompsSold"),
-                        labelText = "lbl.yes",
-                        value = "true",
-                        inline = true
-                    )
-                    @radio(
-                        f = f("onlyOffTheShelfCompsSold"),
-                        labelText = "lbl.no",
-                        value = "false",
-                        inline = true
-                    )
-                }
-            }
-
-            @fieldset(
-                legend = "tcsp.create.complex.corporate.structures.lbl",
-                f = f("complexCorpStructureCreation-fieldset"),
-                classes = Seq("inline form-group"),
-                panel = false
-            ) {
-                @errorGroup(
-                    field = f("complexCorpStructureCreation")
-                ) {
-                    @radio(
-                        f = f("complexCorpStructureCreation"),
-                        labelText = "lbl.yes",
-                        value = "true",
-                        inline = true
-                    )
-                    @radio(
-                        f = f("complexCorpStructureCreation"),
-                        labelText = "lbl.no",
-                        value = "false",
-                        inline = true
-                    )
-                }
+                @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.05", "05")
             }
         }
 

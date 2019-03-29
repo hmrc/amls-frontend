@@ -44,39 +44,45 @@
                     case TrusteeProvider => {@Messages("tcsp.service.provider.lbl.02")}
                     case RegisteredOfficeEtc => {@Messages("tcsp.service.provider.lbl.03")}
                     case CompanyDirectorEtc => {@Messages("tcsp.service.provider.lbl.04")}
-                    case CompanyFormationAgent(_, _) => {@Messages("tcsp.service.provider.lbl.05")}
+                    case CompanyFormationAgent => {@Messages("tcsp.service.provider.lbl.05")}
                 }</li>
             }
         </ul>
         }
-        @model.tcspTypes.map { v =>
-            @v.serviceProviders.map { x =>
-                @x match {
-                    case CompanyFormationAgent(shelf, corp) => {
-                        @checkYourAnswersExtra(
-                            question = Messages("tcsp.off-the-shelf.companies.lbl")
-                        ) {
-                            @shelf match {
-                                case true => {<p>@Messages("lbl.yes")</p>}
-                                case false => {<p>@Messages("lbl.no")</p>}
-                            }
-                        }
-                        @checkYourAnswersExtra(
-                            question = Messages("tcsp.create.complex.corporate.structures.lbl")
-                        ) {
-                            @corp match {
-                                case true => {<p>@Messages("lbl.yes")</p>}
-                                case false => {<p>@Messages("lbl.no")</p>}
-                            }
-                        }
-                    }
-                    case _ => {
-
-                    }
-                }
-            }
-        }
     }
+
+
+@model.onlyOffTheShelfCompsSold.map { s =>
+
+@checkYourAnswers(
+question = Messages("tcsp.onlyOffTheShelfCompsSold.title"),
+editLinkTag = "onlyOffTheShelfCompsSold-edit",
+editUrl = controllers.tcsp.routes.OnlyOffTheShelfCompsSoldController.get(true).toString
+) {
+<p>
+    @s match {
+    case OnlyOffTheShelfCompsSoldNo => { @Messages("lbl.no") }
+    case OnlyOffTheShelfCompsSoldYes => { @Messages("lbl.yes") }
+    }
+</p>
+}
+}
+
+@model.complexCorpStructureCreation.map { s =>
+
+@checkYourAnswers(
+question = Messages("tcsp.complexCorpStructureCreation.title"),
+editLinkTag = "complexCorpStructureCreation-edit",
+editUrl = controllers.tcsp.routes.ComplexCorpStructureCreationController.get(true).toString
+) {
+<p>
+    @s match {
+    case ComplexCorpStructureCreationNo => { @Messages("lbl.no") }
+    case ComplexCorpStructureCreationYes => { @Messages("lbl.yes") }
+    }
+</p>
+}
+}
 
     @model.tcspTypes.map { v =>
         @if(v.serviceProviders.contains(RegisteredOfficeEtc)) {
