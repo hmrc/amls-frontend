@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package models.moneyservicebusiness
+package models.renewal
 
 import cats.data.Validated.{Invalid, Valid}
-import jto.validation._
+import jto.validation.{From, Path, Rule, To, ValidationError, Write}
 import jto.validation.forms.UrlFormEncoded
-import models.FormTypes._
+import models.FormTypes.{basicPunctuationPattern, notEmptyStrip}
 import models.ValidationRule
 import play.api.libs.json._
 
@@ -30,8 +30,8 @@ case class WholesalerMoneySource(wholesalerNames : String)
 case object CustomerMoneySource
 
 case class MoneySources(bankMoneySource: Option[BankMoneySource] = None,
-                         wholesalerMoneySource: Option[WholesalerMoneySource] = None,
-                         customerMoneySource: Option[Boolean] = None)
+                        wholesalerMoneySource: Option[WholesalerMoneySource] = None,
+                        customerMoneySource: Option[Boolean] = None)
 
 object MoneySources {
   import jto.validation.forms.Rules._
@@ -74,9 +74,9 @@ object MoneySources {
 
     val customerMoneySource: Rule[UrlFormEncoded, Option[Boolean]] =
       (__ \ "customerMoneySource").read[Option[String]] map {
-      case Some("Yes") => Some(true)
-      case _ => None
-    }
+        case Some("Yes") => Some(true)
+        case _ => None
+      }
 
     val validatedMs = (bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).tupled andThen validateMoneySources
 
@@ -168,7 +168,7 @@ object MoneySources {
     import play.api.libs.json._
 
     (__.write(bankMoneySourceWriter) and
-        __.write(wholesalerMoneySourceWriter) and
-        __.write(customerMoneySourceWriter))(x => (x.bankMoneySource, x.wholesalerMoneySource, x.customerMoneySource))
+      __.write(wholesalerMoneySourceWriter) and
+      __.write(customerMoneySourceWriter))(x => (x.bankMoneySource, x.wholesalerMoneySource, x.customerMoneySource))
   }
 }

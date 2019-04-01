@@ -40,21 +40,29 @@ case class WhichCurrencies(currencies: Seq[String],
 }
 
 object WhichCurrencies {
+
+  import models.renewal.{BankMoneySource => RBankMoneySource, WholesalerMoneySource => RWholesalerMoneySource, MoneySources => RMoneySources}
+
   def convert(wc: WhichCurrencies): RWhichCurrencies = {
-    RWhichCurrencies(wc.currencies,  wc.usesForeignCurrencies match {
-      case Some(UsesForeignCurrenciesYes) => Some(true)
-      case _ => Some(false)
-    },
-      wc.moneySources match {
-      case Some(ms) => ms.bankMoneySource.fold[Option[BankMoneySource]](None)(b => Some(b))
-      case _ => None
-    },
-    wc.moneySources match {
-      case Some(ms) => ms.wholesalerMoneySource.fold[Option[WholesalerMoneySource]](None)(w => Some(w))
-      case _ => None
-    },
-    wc.moneySources match {
-      case Some(ms) => ms.customerMoneySource.fold[Option[Boolean]](None)(c => Some(c))
+    RWhichCurrencies(wc.currencies, wc.usesForeignCurrencies match {
+      case Some(UsesForeignCurrenciesYes) => Some(models.renewal.UsesForeignCurrenciesYes)
+      case Some(UsesForeignCurrenciesNo) => Some(models.renewal.UsesForeignCurrenciesNo)
+    }, wc.moneySources match {
+      case Some(ms) => {
+        val bms = ms.bankMoneySource.fold[Option[RBankMoneySource]](None) {
+          b => Some(RBankMoneySource(b.bankNames))
+        }
+
+        val wms = ms.wholesalerMoneySource.fold[Option[RWholesalerMoneySource]](None) {
+          b => Some(RWholesalerMoneySource(b.wholesalerNames))
+        }
+
+        val cms = ms.customerMoneySource.fold[Option[Boolean]](None) {
+          b => Some(b)
+        }
+
+        Some(RMoneySources(bms, wms, cms))
+      }
       case _ => None
     })
   }

@@ -23,7 +23,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching._
-import models.renewal.{Renewal, WhichCurrencies}
+import models.renewal.{MoneySources, Renewal, UsesForeignCurrencies, WhichCurrencies}
 import services.RenewalService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.renewal.uses_foreign_currencies
@@ -40,8 +40,9 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
         val block = for {
           renewal <- OptionT(renewalService.getRenewal)
           whichCurrencies <- OptionT.fromOption[Future](renewal.whichCurrencies)
+          ufc <- OptionT.fromOption[Future](whichCurrencies.usesForeignCurrencies)
         } yield {
-          Ok(uses_foreign_currencies(Form2[WhichCurrencies](whichCurrencies), edit))
+          Ok(uses_foreign_currencies(Form2[UsesForeignCurrencies](ufc), edit))
         }
 
         block getOrElse Ok(uses_foreign_currencies(EmptyForm, edit))
@@ -51,7 +52,7 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        Form2[WhichCurrencies](request.body) match {
+        Form2[UsesForeignCurrencies](request.body) match {
           case f: InvalidForm => Future.successful(BadRequest(uses_foreign_currencies(f, edit)))
           case ValidForm(_, model) =>
             dataCacheConnector.fetchAll flatMap {
@@ -59,9 +60,8 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
                 val result = for {
                   cacheMap <- optMap
                   renewal <- cacheMap.getEntry[Renewal](Renewal.key)
-                  bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
                 } yield {
-                  renewalService.updateRenewal(renewal.whichCurrencies(model)) map { _ =>
+                  renewalService.updateRenewal(updateCurrencies(renewal, model)) map { _ =>
                     edit match {
                       case true => Redirect(routes.SummaryController.get())
                       case _ => Redirect(routes.MoneySourcesController.get())
@@ -73,5 +73,18 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
                 result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
             }
         }
+  }
+  def updateCurrencies(oldRenewal: Renewal, usesForeignCurrencies: UsesForeignCurrencies): Option[Renewal] = {
+    oldRenewal match {
+      case renewal: Renewal => {
+        renewal.whichCurrencies match {
+          case Some(w) => {
+            Some(renewal.whichCurrencies(w.usesForeignCurrencies(usesForeignCurrencies).moneySources(MoneySources())))
+          }
+          case _ => None
+        }
+      }
+      case _ => None
+    }
   }
 }

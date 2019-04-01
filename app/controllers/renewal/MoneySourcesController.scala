@@ -23,11 +23,11 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching._
-import models.renewal.{Renewal, WhichCurrencies}
+import models.renewal.{MoneySources, Renewal, WhichCurrencies}
 import play.api.mvc.Result
 import services.RenewalService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import views.html.renewal.{money_sources, uses_foreign_currencies}
+import views.html.renewal.money_sources
 
 import scala.concurrent.Future
 
@@ -52,7 +52,7 @@ class MoneySourcesController @Inject()(val authConnector: AuthConnector,
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        Form2[WhichCurrencies](request.body) match {
+        Form2[MoneySources](request.body) match {
           case f: InvalidForm => Future.successful(BadRequest(money_sources(f, edit)))
           case ValidForm(_, model) =>
             dataCacheConnector.fetchAll flatMap {
@@ -64,7 +64,7 @@ class MoneySourcesController @Inject()(val authConnector: AuthConnector,
                   services <- bm.msbServices
                   activities <- bm.activities
                 } yield {
-                  renewalService.updateRenewal(renewal.whichCurrencies(model)) map { _ =>
+                  renewalService.updateRenewal(updateMoneySources(renewal, model)) map { _ =>
                     standardRouting(services.msbServices, activities.businessActivities, edit)
                   }
 
@@ -72,6 +72,18 @@ class MoneySourcesController @Inject()(val authConnector: AuthConnector,
                 result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
             }
         }
+  }
+
+  def updateMoneySources(oldRenewal: Renewal, moneySources: MoneySources): Renewal = {
+    oldRenewal match {
+      case renewal: Renewal => {
+        renewal.whichCurrencies match {
+          case Some(w) => Some(renewal.whichCurrencies(w.moneySources(moneySources)))
+          case _ => None
+        }
+      }
+      case _ => None
+    }
   }
 
   private def standardRouting(services: Set[BusinessMatchingMsbService], businessActivities: Set[BusinessActivity], edit: Boolean): Result =
