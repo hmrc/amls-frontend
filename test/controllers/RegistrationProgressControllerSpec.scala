@@ -390,7 +390,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           val elements = doc.getElementsMatchingOwnText(Messages("progress.visuallyhidden.view.amend"))
           elements.size() must be(sections.size - 1)
 
-          doc.select("a.edit-preapp").text must include(Messages("progress.preapplication.readonly"))
+          doc.select("a.edit-preapp").text must include(Messages("progress.preapplication.canedit"))
         }
       }
 
