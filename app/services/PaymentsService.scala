@@ -92,9 +92,9 @@ class PaymentsService @Inject()(
   private def savePaymentBeforeResponse(response: CreatePaymentResponse, amlsRefNo: String, safeId: String)
                                        (implicit hc: HeaderCarrier, authContext: AuthContext): Future[Unit] = {
       amlsConnector
-        .savePayment(response.paymentId, amlsRefNo, safeId)
+        .savePayment(response.journeyId, amlsRefNo, safeId)
         .recover {
-          case e => throw new Exception(s"Payment details failed to save. [paymentId:${response.paymentId}]", e)
+          case e => throw new Exception(s"Payment details failed to save. [paymentId:${response.journeyId}]", e)
         }.map(_ =>())
   }
 }

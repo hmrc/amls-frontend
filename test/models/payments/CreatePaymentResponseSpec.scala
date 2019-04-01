@@ -29,12 +29,12 @@ class CreatePaymentResponseSpec extends PlaySpec with MustMatchers {
         """
           | {
           |   "nextUrl":"https://tax.service.gov.uk/pay/1234567890",
-          |   "paymentId":"1234567890"
+          |   "journeyId":"1234567890"
           | }
         """.stripMargin
 
       //noinspection ScalaStyle
-      val model = CreatePaymentResponse(nextUrl = NextUrl("https://tax.service.gov.uk/pay/1234567890"), paymentId = "1234567890")
+      val model = CreatePaymentResponse(nextUrl = NextUrl("https://tax.service.gov.uk/pay/1234567890"), journeyId = "1234567890")
 
       Json.toJson(model) mustBe Json.parse(expectedJson)
     }

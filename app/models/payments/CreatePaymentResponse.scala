@@ -25,7 +25,7 @@ object NextUrl {
   implicit val format: Format[NextUrl] = implicitly[Format[String]].inmap(NextUrl(_), _.value)
 }
 
-case class CreatePaymentResponse(nextUrl: NextUrl, paymentId: String)
+case class CreatePaymentResponse(nextUrl: NextUrl, journeyId: String)
 
 object CreatePaymentResponse {
   implicit val format = Json.format[CreatePaymentResponse]
