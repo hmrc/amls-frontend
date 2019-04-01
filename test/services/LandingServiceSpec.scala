@@ -65,7 +65,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
     sendTheLargestAmountsOfMoney = Some(MsbSendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
     mostTransactions = Some(MsbMostTransactions(Seq(Country("United Kingdom", "GB")))),
     ceTransactionsInNext12Months = Some(CETransactionsInNext12Months("12345678963")),
-    whichCurrencies = Some(MsbWhichCurrencies(Seq("USD", "GBP", "EUR"),None, None, None, None)),
+    whichCurrencies = Some(MsbWhichCurrencies(Seq("USD", "GBP", "EUR"),None, None)),
     hasAccepted = true
   )
 
@@ -400,6 +400,27 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       hasAccepted = true
     )
 
+    val msbSection = MoneyServiceBusiness(
+      throughput = Some(ExpectedThroughput.Second),
+      transactionsInNext12Months = Some(TransactionsInNext12Months("12345678963")),
+      sendTheLargestAmountsOfMoney = Some(MsbSendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
+      mostTransactions = Some(MsbMostTransactions(Seq(Country("United Kingdom", "GB")))),
+      ceTransactionsInNext12Months = Some(CETransactionsInNext12Months("12345678963")),
+      whichCurrencies = Some(MsbWhichCurrencies(Seq("USD", "GBP", "EUR"), None, None)),
+      hasAccepted = true
+    )
+
+    val paymentMethods = PaymentMethods(courier = true, direct = true, other = Some("foo"))
+    val renewalPaymentMethods = RPaymentMethods(courier = true, direct = true, other = Some("foo"))
+
+    val hvdSection  = Hvd(
+      products = Some(Products(Set(Alcohol, Tobacco))),
+      percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
+      receiveCashPayments = Some(true),
+      cashPaymentMethods = Some(paymentMethods),
+      hasAccepted = true
+    )
+
     val renewalModel = Renewal(Some(InvolvedInOtherYes("test")),Some(BusinessTurnover.First),
       Some(AMLSTurnover.First),Some(CustomersOutsideUK(Some(List(Country("United Kingdom","GB"))))),
       Some(RPercentageOfCashPaymentOver15000.First),Some(RReceiveCashPayments(Some(renewalPaymentMethods))),
@@ -485,8 +506,10 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         eqTo(Some(viewResponse.aspSection.copy(hasAccepted = true))))(any(), any(), any())
       verify(service.cacheConnector).upsert(any(), eqTo(MoneyServiceBusiness.key),
         eqTo(Some(viewResponse.msbSection.copy(hasAccepted = true))))(any(), any(), any())
+
       verify(service.cacheConnector).upsert(any(), eqTo(Hvd.key),
         eqTo(Some(viewResponse.hvdSection.copy(hasAccepted = true))))(any(), any(), any())
+
       verify(service.cacheConnector).upsert(any(), eqTo(Supervision.key),
         eqTo(Some(viewResponse.supervisionSection.copy(hasAccepted = true))))(any(), any(), any())
       verify(service.cacheConnector).upsert(any(), eqTo(SubscriptionResponse.key),

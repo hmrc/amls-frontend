@@ -44,11 +44,9 @@ class renewal_progressSpec extends AmlsSpec with MustMatchers{
       doc.title must startWith(Messages("renewal.progress.title"))
 
       doc.title must be(Messages("renewal.progress.title") +
-        " - " + Messages("summary.status") +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
       heading.html must be(Messages("renewal.progress.title"))
-      subHeading.html must include(Messages("summary.status"))
     }
 
     "enable the submit registration button when can submit and renewal section complete" in new ViewFixture {
@@ -56,7 +54,7 @@ class renewal_progressSpec extends AmlsSpec with MustMatchers{
 
       doc.select("form button[name=submit]").hasAttr("disabled") mustBe false
 
-      doc.select(".application-submit").get(0).text() must include(Messages("renewal.progress.submit.intro"))
+      html must include (Messages("renewal.progress.ready.to.submit.intro"))
 
       doc.getElementsMatchingOwnText(Messages("renewal.progress.edit")).attr("href") must be(controllers.renewal.routes.SummaryController.get().url)
     }
@@ -64,34 +62,52 @@ class renewal_progressSpec extends AmlsSpec with MustMatchers{
     "not have the submit registration button when cannot submit because renewal section not complete" in new ViewFixture {
       override def view = views.html.renewal.renewal_progress(Seq.empty, canSubmit = false, msbOrTcspExists = true, readyForRenewal, renewalSectionCompleted = false)
 
+      html must include (Messages("renewal.progress.submit.intro"))
+
       doc.select(".application-submit form button[name=submit]").isEmpty mustBe true
 
       doc.getElementsMatchingOwnText(Messages("renewal.progress.continue")).attr("href") must be(controllers.renewal.routes.WhatYouNeedController.get().url)
     }
 
-    "disable the submit registration button when cannot submit and renewal section complete" in new ViewFixture {
+    "not show the submit registration button when cannot submit and renewal section complete" in new ViewFixture {
       override def view = views.html.renewal.renewal_progress(Seq.empty, canSubmit = false, msbOrTcspExists = true, readyForRenewal, renewalSectionCompleted = true)
 
-      doc.select("form button[name=submit]").hasAttr("disabled") mustBe true
-
-      doc.select(".application-submit").get(0).text() must include(Messages("renewal.progress.submit.intro"))
+      doc.select("form button[name=submit]").isEmpty mustBe true
 
       doc.getElementsMatchingOwnText(Messages("renewal.progress.edit")).attr("href") must be(controllers.renewal.routes.SummaryController.get().url)
     }
 
-    "show intro for MSB and TCSP businesses" in new ViewFixture {
+    "show intro text" in new ViewFixture {
 
       override def view = views.html.renewal.renewal_progress(Seq.empty, false, true, readyForRenewal)
 
-      html must include (Messages("renewal.progress.tpandrp.intro", DateHelper.formatDate(renewalDate)).convertLineBreaks)
+      html must include (Messages("renewal.progress.intro", DateHelper.formatDate(renewalDate)).convertLineBreaks)
     }
 
-    "show intro for non MSB and TCSP businesses" in new ViewFixture {
+    "show ready to submit renewal when information are completed" in new ViewFixture {
 
-      override def view = views.html.renewal.renewal_progress(Seq.empty, false, false, readyForRenewal)
+      override def view = views.html.renewal.renewal_progress(Seq.empty, false, true, readyForRenewal, true)
 
-      html must include (Messages("renewal.progress.tponly.intro", DateHelper.formatDate(renewalDate)).convertLineBreaks)
+      doc.select("#renewal-information-completed").get(0).text() must be(Messages("renewal.progress.information.completed.info"))
     }
+
+    "show submit renewal link and text when information are not completed yet" in new ViewFixture {
+
+      override def view = views.html.renewal.renewal_progress(Seq.empty, false, true, readyForRenewal, false)
+
+      val space = " "
+      val fullStop = "."
+
+      val expectedText = s"${Messages("renewal.progress.information.not.completed.info.part1")}" +
+                         s"$space" +
+                         s"${Messages("renewal.progress.information.not.completed.info.part2")}" +
+                         s"$fullStop"
+
+      doc.select("#renewal-information-not-completed").get(0).text() must be(expectedText)
+      doc.select("#renewal-information-not-completed a").attr("href") must be(controllers.renewal.routes.WhatYouNeedController.get().url)
+      html must include (Messages("renewal.progress.submit.intro"))
+    }
+
 
   }
 
