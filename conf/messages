@@ -1769,11 +1769,12 @@ tcsp.whatyouneed.requiredinfo.text.3 = if you use the services of another trust 
 tcsp.whatyouneed.requiredinfo.text.4 = your trust or company service provider’s Money Laundering Regulations number
 
 tcsp.kind.of.service.provider.title = What type of trust or company service provider are you?
-tcsp.service.provider.lbl.01 = Company director, secretary, or partner provider
-tcsp.service.provider.lbl.02 = Nominee shareholders provider
+tcsp.service.provider.lbl.01 = Nominee shareholders provider
+tcsp.service.provider.lbl.02 = Trustee provider
 tcsp.service.provider.lbl.03 = Registered office, business address, or virtual office services provider
-tcsp.service.provider.lbl.04 = Trustee provider
+tcsp.service.provider.lbl.04 = Company director, secretary, or partner provider
 tcsp.service.provider.lbl.05 = Trust or company formation agent
+
 tcsp.off-the-shelf.companies.lbl = Do you sell only off-the-shelf companies?
 tcsp.create.complex.corporate.structures.lbl = Do you create complex corporate structures for clients, or are you planning to do so in the future?
 tcsp.servicesOfAnotherTcsp.title = Does your business use the services of another trust or company service provider?
