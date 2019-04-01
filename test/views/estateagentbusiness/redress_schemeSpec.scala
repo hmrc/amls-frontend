@@ -67,19 +67,14 @@ class redress_schemeSpec extends AmlsSpec with MustMatchers  {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "isRedress") -> Seq(ValidationError("not a message key")),
           (Path \ "propertyRedressScheme") -> Seq(ValidationError("not another message key")),
           (Path \ "other") -> Seq(ValidationError("not yet another message key"))
         ))
 
       def view = views.html.estateagentbusiness.redress_scheme(form2, edit = true)
 
-      errorSummary.html() must include("not a message key")
       errorSummary.html() must include("not another message key")
       errorSummary.html() must include("not yet another message key")
-
-      doc.getElementById("isRedress")
-        .getElementsByClass("error-notification").first().html() must include("not a message key")
 
       doc.getElementById("propertyRedressScheme")
         .getElementsByClass("error-notification").first().html() must include("not another message key")
