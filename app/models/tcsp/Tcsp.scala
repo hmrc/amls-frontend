@@ -66,10 +66,9 @@ case class Tcsp (tcspTypes: Option[TcspTypes] = None,
   def isComplete: Boolean = this match {
     case Tcsp(Some(s),_,_, t, Some(true), Some(_), _, accepted) => if(s.serviceProviders contains RegisteredOfficeEtc) { t.isDefined & accepted } else accepted
     case Tcsp(Some(s), _, _, t, Some(false), _, _, accepted) =>  if(s.serviceProviders contains RegisteredOfficeEtc) { t.isDefined & accepted } else accepted
-    case Tcsp(Some(TcspTypes(serviceProviders)), _, _, _, Some(_), Some(_), _, accepted) if !serviceProviders.contains(RegisteredOfficeEtc) => accepted
     case Tcsp(Some(s), Some(_), Some(_), t, _, _, _, accepted) => if(s.serviceProviders contains CompanyFormationAgent) { t.isDefined & accepted } else accepted
     case Tcsp(Some(s), Some(_), Some(_), t, _, _, _, accepted) =>  if(s.serviceProviders contains CompanyFormationAgent) { t.isDefined & accepted } else accepted
-    case Tcsp(Some(TcspTypes(serviceProviders)), _, _, _, _, _, _, accepted) if !serviceProviders.contains(CompanyFormationAgent) => accepted
+    case Tcsp(Some(TcspTypes(serviceProviders)), _, _, _, Some(_), Some(_), _, accepted) if !serviceProviders.contains(RegisteredOfficeEtc) => accepted
     case _ => false
   }
 }
