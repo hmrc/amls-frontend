@@ -38,14 +38,24 @@
     ) {
         @model.tcspTypes.map { v =>
         <ul class="list list--semicolon">
-            @v.serviceProviders.map { x =>
-                <li>@x match {
-                    case NomineeShareholdersProvider => {@Messages("tcsp.service.provider.lbl.01")}
-                    case TrusteeProvider => {@Messages("tcsp.service.provider.lbl.02")}
-                    case RegisteredOfficeEtc => {@Messages("tcsp.service.provider.lbl.03")}
-                    case CompanyDirectorEtc => {@Messages("tcsp.service.provider.lbl.04")}
-                    case CompanyFormationAgent(_, _) => {@Messages("tcsp.service.provider.lbl.05")}
-                }</li>
+            @if(v.serviceProviders.contains(CompanyDirectorEtc)) {
+                <li>@Messages("tcsp.service.provider.lbl.04")</li>
+            }
+
+            @if(v.serviceProviders.contains(NomineeShareholdersProvider)) {
+                <li>@Messages("tcsp.service.provider.lbl.01")</li>
+            }
+
+            @if(v.serviceProviders.contains(RegisteredOfficeEtc)) {
+                <li>@Messages("tcsp.service.provider.lbl.03")</li>
+            }
+
+            @if(v.serviceProviders.contains(TrusteeProvider)) {
+                <li>@Messages("tcsp.service.provider.lbl.02")</li>
+            }
+
+            @if(v.serviceProviders.collectFirst {case CompanyFormationAgent(_, _) => true}) {
+                <li>@Messages("tcsp.service.provider.lbl.05")</li>
             }
         </ul>
         }
