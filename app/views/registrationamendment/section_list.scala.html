@@ -19,19 +19,13 @@
 @import views.html.registrationamendment.section
 
 @(sections: Seq[Section], newSections: Option[Seq[Section]] = None)(implicit request: Request[_], m: Messages)
-
     @* new sections *@
-    @newSections.collect { case seq if seq.nonEmpty =>
-        <ul id="new-sections-list" class="grid-layout__column grid-layout__column--2-3 display-block">
-            @seq.map { s =>
-                @submissionSection(s.name, s.status, s.call)
-            }
-        </ul>
-    }
+
+    @allSections = @{sections union newSections.getOrElse(Seq())}
 
     @* existing *@
     <ul id="existing-sections-list" class="grid-layout__column grid-layout__column--2-3 display-block">
-        @sections.map { case Section(name, status, hasChanged, call) =>
-            @section(name, status, hasChanged, call)
+        @allSections.sortBy(section => Messages(s"progress.${section.name}.name")).map { s =>
+            @{ if(sections.contains(s)) section(s.name, s.status, s.hasChanged, s.call) else submissionSection(s.name, s.status, s.call)}
         }
     </ul>

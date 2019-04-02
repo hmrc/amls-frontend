@@ -61,7 +61,7 @@ title = Messages("progress.title")
     <div class="grid-layout">
         @* Main sections *@
         <ul class="grid-layout__column grid-layout__column--2-3 display-block">
-            @sections.map { case Section(name, status, _, call) =>
+            @sections.sortBy(section => Messages(s"progress.${section.name}.name")).map { case Section(name, status, _, call) =>
                 @section(name, status, call)
             }
         </ul>
