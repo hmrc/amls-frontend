@@ -55,7 +55,6 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        println("dfgdfgd")
         Form2[UsesForeignCurrencies](request.body) match {
           case f: InvalidForm => Future.successful(BadRequest(uses_foreign_currencies(f, edit)))
           case ValidForm(_, model) =>
@@ -67,10 +66,7 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
                   bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
                   services <- bm.msbServices
                 } yield {
-                  println(renewal)
-                  println(model)
                   val ren = updateCurrencies(renewal, model)
-                  println(ren)
                   renewalService.updateRenewal(updateCurrencies(renewal, model).getOrElse(Renewal())) map { _ =>
                     routing(services.msbServices, edit, model)
                   }
