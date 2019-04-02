@@ -57,7 +57,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
       "currencies[0]" -> "USD",
       "currencies[1]" -> "GBP",
       "currencies[2]" -> "BOB",
-      "usesForeignCurrencies" -> "Yes",
+      "usesForeignCurrencies" -> "true",
       "bankMoneySource" -> "Yes",
       "bankNames" -> "Bank names",
       "wholesalerMoneySource" -> "Yes",
@@ -127,13 +127,35 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
   "Calling the POST action" when {
     "posting valid data" must {
       "redirect to the summary page" when {
-        "editing" in new RoutingFixture {
+        "editing and answer is no" in new RoutingFixture {
+          setupBusinessMatching(Set(HighValueDealing), Set(TransmittingMoney))
+
+          val validFormRequest2 = request.withFormUrlEncodedBody(
+            "currencies[0]" -> "USD",
+            "currencies[1]" -> "GBP",
+            "currencies[2]" -> "BOB",
+            "usesForeignCurrencies" -> "false",
+            "bankMoneySource" -> "Yes",
+            "bankNames" -> "Bank names",
+            "wholesalerMoneySource" -> "Yes",
+            "wholesalerNames" -> "wholesaler names",
+            "customerMoneySource" -> "Yes"
+          )
+
+          val result = controller.post(edit = true)(validFormRequest2)
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe controllers.renewal.routes.SummaryController.get().url.some
+        }
+      }
+      "Redirect to the MoneySources page" when {
+        "editing and answer is yes" in new RoutingFixture {
           setupBusinessMatching(Set(HighValueDealing), Set(TransmittingMoney))
 
           val result = controller.post(edit = true)(validFormRequest)
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe controllers.renewal.routes.SummaryController.get().url.some
+          redirectLocation(result) mustBe controllers.renewal.routes.MoneySourcesController.get(true).url.some
         }
       }
 

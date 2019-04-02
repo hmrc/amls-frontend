@@ -59,8 +59,8 @@ class uses_foreign_currenciesSpec extends AmlsSpec with MustMatchers {
 
       def view = uses_foreign_currencies(formData, true)
 
-      Option(doc.getElementById("usesForeignCurrencies-Yes")).isDefined must be(true)
-      Option(doc.getElementById("usesForeignCurrencies-No")).isDefined must be(true)
+      Option(doc.getElementById("usesForeignCurrencies-true")).isDefined must be(true)
+      Option(doc.getElementById("usesForeignCurrencies-false")).isDefined must be(true)
     }
 
     "show errors in the correct locations" in new ViewFixture {
