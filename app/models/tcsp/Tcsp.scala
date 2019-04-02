@@ -63,13 +63,43 @@ case class Tcsp (tcspTypes: Option[TcspTypes] = None,
   def servicesOfAnotherTCSP(p: ServicesOfAnotherTCSP): Tcsp =
     this.copy(servicesOfAnotherTCSP = Some(p), hasChanged = hasChanged || !this.servicesOfAnotherTCSP.contains(p), hasAccepted = hasAccepted && this.servicesOfAnotherTCSP.contains(p))
 
-  def isComplete: Boolean = this match {
-    case Tcsp(Some(s),_,_, t, Some(true), Some(_), _, accepted) => if(s.serviceProviders contains RegisteredOfficeEtc) { t.isDefined & accepted } else accepted
-    case Tcsp(Some(s), _, _, t, Some(false), _, _, accepted) =>  if(s.serviceProviders contains RegisteredOfficeEtc) { t.isDefined & accepted } else accepted
-    case Tcsp(Some(s), Some(_), Some(_), t, _, _, _, accepted) => if(s.serviceProviders contains CompanyFormationAgent) { t.isDefined & accepted } else accepted
-    case Tcsp(Some(s), Some(_), Some(_), t, _, _, _, accepted) =>  if(s.serviceProviders contains CompanyFormationAgent) { t.isDefined & accepted } else accepted
-    case Tcsp(Some(TcspTypes(serviceProviders)), _, _, _, Some(_), Some(_), _, accepted) if !serviceProviders.contains(RegisteredOfficeEtc) => accepted
+  def hasRegisteredOfficeEtc(s: TcspTypes) = {
+    s.serviceProviders.contains(RegisteredOfficeEtc)
+  }
+
+  def hasCompanyFormationAgent(s: TcspTypes) = {
+    s.serviceProviders.contains(CompanyFormationAgent)
+  }
+
+  def completeWithCompanyFormationAgent: Boolean = this match {
+    case Tcsp(Some(s),Some(_),Some(_), t, Some(true), Some(_), _, accepted) =>
+      if(hasRegisteredOfficeEtc(s)) { t.isDefined & accepted } else accepted
+    case Tcsp(Some(s), Some(_), Some(_), t, Some(false), _, _, accepted) =>
+      if(hasRegisteredOfficeEtc(s)) { t.isDefined & accepted } else accepted
+    case Tcsp(Some(TcspTypes(serviceProviders)), Some(_), Some(_), _, Some(_), Some(_), _, accepted)
+      if !serviceProviders.contains(RegisteredOfficeEtc) => accepted
     case _ => false
+  }
+
+  def completeWithoutCompanyFormationAgent: Boolean = this match {
+    case Tcsp(Some(s),_,_, t, Some(true), Some(_), _, accepted) =>
+      if(hasRegisteredOfficeEtc(s)) { t.isDefined & accepted } else accepted
+    case Tcsp(Some(s), _, _, t, Some(false), _, _, accepted) =>
+      if(hasRegisteredOfficeEtc(s)) { t.isDefined & accepted } else accepted
+    case Tcsp(Some(TcspTypes(serviceProviders)),_, _, _, Some(_), Some(_), _, accepted)
+      if !serviceProviders.contains(RegisteredOfficeEtc) => accepted
+    case _ => false
+  }
+
+  def isComplete: Boolean =  {
+    this.tcspTypes match {
+      case Some(s) => if(hasCompanyFormationAgent(s)) {
+        completeWithCompanyFormationAgent
+      } else {
+        completeWithoutCompanyFormationAgent
+      }
+      case _ => false
+    }
   }
 }
 

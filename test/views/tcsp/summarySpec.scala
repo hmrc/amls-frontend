@@ -68,13 +68,15 @@ class summarySpec extends AmlsSpec with MustMatchers with HtmlAssertions with Ta
     "include the provided data" in new ViewFixture {
       def view = {
         val testdata = Tcsp(
-          Some(TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, RegisteredOfficeEtc, CompanyDirectorEtc, CompanyFormationAgent(true,false)))),
-          Some(ProvidedServices(Set(
-            PhonecallHandling,EmailHandling,EmailServer,SelfCollectMailboxes,MailForwarding,Receptionist,ConferenceRooms, Other("sfasfasef")
-          ))),
-          Some(true),
-          Some(ServicesOfAnotherTCSPYes(amlsRegistrationNumber))
-        )
+          Some(TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, RegisteredOfficeEtc, CompanyDirectorEtc, CompanyFormationAgent))),
+            Some(OnlyOffTheShelfCompsSoldYes),
+            Some(ComplexCorpStructureCreationNo),
+            Some(ProvidedServices(Set(
+              PhonecallHandling,EmailHandling,EmailServer,SelfCollectMailboxes,MailForwarding,Receptionist,ConferenceRooms, Other("sfasfasef")
+            ))),
+            Some(true),
+            Some(ServicesOfAnotherTCSPYes(amlsRegistrationNumber))
+          )
 
         views.html.tcsp.summary(testdata)
       }

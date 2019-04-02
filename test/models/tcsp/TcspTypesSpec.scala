@@ -25,15 +25,13 @@ class TcspTypesSpec extends PlaySpec {
 
   "TrustOrCompanyServiceProviders" must {
 
-    val Services = TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, RegisteredOfficeEtc, CompanyDirectorEtc, CompanyFormationAgent(true, false)))
+    val Services = TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, RegisteredOfficeEtc, CompanyDirectorEtc, CompanyFormationAgent))
 
     "pass validation" when {
 
       "few checkboxes selected and radio buttons selected for the last checkbox option" in {
         val model = Map(
-          "serviceProviders[]" -> Seq("01", "02", "03", "04", "05"),
-          "onlyOffTheShelfCompsSold" -> Seq("true"),
-          "complexCorpStructureCreation" -> Seq("false")
+          "serviceProviders[]" -> Seq("01", "02", "03", "04", "05")
         )
 
         TcspTypes.formReads.validate(model) mustBe
@@ -49,18 +47,6 @@ class TcspTypesSpec extends PlaySpec {
           Invalid(Seq((Path \ "serviceProviders") -> Seq(ValidationError("error.required.tcsp.service.providers"))))
       }
 
-      "return error messages when user hasn't selected the radio buttons for the Trust or company formation agent option" in {
-        val model = Map(
-          "serviceProviders[]" -> Seq("05"),
-          "onlyOffTheShelfCompsSold" -> Seq(""),
-          "complexCorpStructureCreation" -> Seq("")
-        )
-
-        TcspTypes.formReads.validate(model) mustBe
-          Invalid(Seq((Path \ "onlyOffTheShelfCompsSold") -> Seq(ValidationError("error.required.tcsp.off.the.shelf.companies")),
-            (Path \ "complexCorpStructureCreation") -> Seq(ValidationError("error.required.tcsp.complex.corporate.structures"))))
-      }
-
       "return failure message when user has filled invalid data" in {
 
         val model = Map(
@@ -70,17 +56,14 @@ class TcspTypesSpec extends PlaySpec {
         TcspTypes.formReads.validate(model) mustBe
           Invalid(Seq((Path \ "serviceProviders") -> Seq(ValidationError("error.invalid"))))
       }
-
     }
 
     "form validation" must {
 
       "write correct data with Trust or company formation agent option selected and associated radio buttons selected" in {
-        val model = TcspTypes(Set(RegisteredOfficeEtc, CompanyDirectorEtc, CompanyFormationAgent(true, false)))
+        val model = TcspTypes(Set(RegisteredOfficeEtc, CompanyDirectorEtc, CompanyFormationAgent))
 
-        TcspTypes.formWrites.writes(model) mustBe Map("serviceProviders[]" -> Seq("03", "04", "05"),
-          "onlyOffTheShelfCompsSold" -> Seq("true"),
-          "complexCorpStructureCreation" -> Seq("false"))
+        TcspTypes.formWrites.writes(model) mustBe Map("serviceProviders[]" -> Seq("03", "04", "05"))
       }
 
       "write correct data with few check boxes selected other than Trust or company formation agent" in {
@@ -94,9 +77,7 @@ class TcspTypesSpec extends PlaySpec {
 
       "successfully validate given values with option Trust or company formation agent etc" in {
         val json = Json.obj(
-          "serviceProviders" -> Seq("01", "02", "03", "04", "05"),
-          "onlyOffTheShelfCompsSold" -> true,
-          "complexCorpStructureCreation" -> false
+          "serviceProviders" -> Seq("01", "02", "03", "04", "05")
         )
 
         Json.fromJson[TcspTypes](json) must

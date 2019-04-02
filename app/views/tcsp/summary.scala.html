@@ -55,7 +55,7 @@
 @model.onlyOffTheShelfCompsSold.map { s =>
 
 @checkYourAnswers(
-question = Messages("tcsp.onlyOffTheShelfCompsSold.title"),
+question = Messages("tcsp.off-the-shelf.companies.lbl"),
 editLinkTag = "onlyOffTheShelfCompsSold-edit",
 editUrl = controllers.tcsp.routes.OnlyOffTheShelfCompsSoldController.get(true).toString
 ) {
@@ -71,7 +71,7 @@ editUrl = controllers.tcsp.routes.OnlyOffTheShelfCompsSoldController.get(true).t
 @model.complexCorpStructureCreation.map { s =>
 
 @checkYourAnswers(
-question = Messages("tcsp.complexCorpStructureCreation.title"),
+question = Messages("tcsp.create.complex.corporate.structures.lbl"),
 editLinkTag = "complexCorpStructureCreation-edit",
 editUrl = controllers.tcsp.routes.ComplexCorpStructureCreationController.get(true).toString
 ) {
