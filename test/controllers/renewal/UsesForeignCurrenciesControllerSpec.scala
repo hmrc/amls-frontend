@@ -71,7 +71,14 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
   }
 
   trait RoutingFixture extends FormSubmissionFixture {
-    val renewal = Renewal()
+    val whichCurrencies = WhichCurrencies(
+      Seq("USD"),
+      Some(UsesForeignCurrenciesYes),
+      Some(MoneySources(None,
+        None,
+        None)))
+
+    val renewal = Renewal(whichCurrencies = Some(whichCurrencies))
 
     val msbServices = Some(
       BusinessMatchingMsbServices(
@@ -84,13 +91,6 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
     val businessActivities = Some(
       BusinessActivities(Set(HighValueDealing,  AccountancyServices))
     )
-
-    val whichCurrencies = WhichCurrencies(
-      Seq("USD"),
-      Some(UsesForeignCurrenciesYes),
-      Some(MoneySources(None,
-      None,
-      Some(true))))
 
 
     val expectedRenewal = renewal.copy(
@@ -160,12 +160,6 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
       }
 
       "save the model data into the renewal object" in new RoutingFixture {
-        val currentModel = WhichCurrencies(
-          Seq("USD", "GBP", "BOB"),
-          Some(UsesForeignCurrenciesYes),
-          Some(MoneySources(Some(BankMoneySource("Bank names")),
-          Some(WholesalerMoneySource("wholesaler names")),
-          Some(true))))
 
         val result = await(controller.post()(validFormRequest))
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
@@ -173,11 +167,11 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
         verify(renewalService).updateRenewal(captor.capture())(any(), any(), any())
 
         captor.getValue.whichCurrencies mustBe Some(WhichCurrencies(
-          Seq("USD", "GBP", "BOB"),
+          Seq("USD"),
           Some(UsesForeignCurrenciesYes),
-          Some(MoneySources(Some(BankMoneySource("Bank names")),
-          Some(WholesalerMoneySource("wholesaler names")),
-          Some(true)))
+          Some(MoneySources(None,
+            None,
+            None))
         ))
       }
     }
