@@ -38,10 +38,10 @@ class SummaryControllerSpec extends AmlsSpec {
       CompanyFormationAgent(true, false)))
 
     val model = Tcsp(
-      Some(defaultCompanyServiceProviders),
-      Some(defaultProvidedServices),
-      Some(true),
-      Some(defaultServicesOfAnotherTCSP)
+      tcspTypes = Some(defaultCompanyServiceProviders),
+      providedServices = Some(defaultProvidedServices),
+      doesServicesOfAnotherTCSP = Some(true),
+      servicesOfAnotherTCSP = Some(defaultServicesOfAnotherTCSP)
     )
 
     val controller = new SummaryController(
@@ -57,6 +57,55 @@ class SummaryControllerSpec extends AmlsSpec {
   }
 
   "Get" must {
+
+    "show alphabetically sorted service provider names" in new Fixture {
+      val modelCopy: Tcsp = model.copy(
+        tcspTypes=Some(
+          TcspTypes(
+            Set(TrusteeProvider,
+              RegisteredOfficeEtc,
+              NomineeShareholdersProvider,
+              CompanyDirectorEtc
+            )
+          )
+        )
+      )
+
+      val res = controller.sortProviders(modelCopy)
+
+      res mustEqual List(
+        "Company director, secretary, or partner provider",
+        "Nominee shareholders provider",
+        "Registered office, business address, or virtual office services provider",
+        "Trustee provider"
+      )
+    }
+
+    "sorting does not apply to the Trust or company formation agent" in new Fixture {
+      val modelCopy: Tcsp = model.copy(
+        tcspTypes=Some(
+          TcspTypes(
+            Set(
+              CompanyFormationAgent(false,false),
+              TrusteeProvider,
+              RegisteredOfficeEtc,
+              NomineeShareholdersProvider,
+              CompanyDirectorEtc
+            )
+          )
+        )
+      )
+
+      val res = controller.sortProviders(modelCopy)
+
+      res mustEqual List(
+        "Company director, secretary, or partner provider",
+        "Nominee shareholders provider",
+        "Registered office, business address, or virtual office services provider",
+        "Trustee provider",
+        "Trust or company formation agent"
+      )
+    }
 
     "load the summary page when section data is available" in new Fixture {
 

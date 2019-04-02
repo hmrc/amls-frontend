@@ -36,7 +36,7 @@ class summarySpec extends AmlsSpec with MustMatchers with HtmlAssertions with Ta
   "summary view" must {
     "have correct title, heading and subheading" in new ViewFixture {
 
-      def view = views.html.tcsp.summary(Tcsp())
+      def view = views.html.tcsp.summary(Tcsp(), List())
 
       val title = Messages("title.cya") + " - " + Messages("summary.tcsp") + " - " +
                   Messages("title.amls") + " - " + Messages("title.gov")
@@ -76,7 +76,7 @@ class summarySpec extends AmlsSpec with MustMatchers with HtmlAssertions with Ta
           Some(ServicesOfAnotherTCSPYes(amlsRegistrationNumber))
         )
 
-        views.html.tcsp.summary(testdata)
+        views.html.tcsp.summary(testdata, List())
       }
 
       forAll(sectionChecks) { (key, check) => {

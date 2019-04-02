@@ -21,7 +21,7 @@
 @import config.ApplicationConfig
 @import scala.math.Ordering
 
-@(model: Tcsp)(implicit request: Request[_],m:Messages, lang: Lang)
+@(model: Tcsp, sortedProviders: List[String])(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.tcsp")
@@ -37,29 +37,13 @@
         editLinkTag = "tcspkindserviceprovider-edit",
         editUrl = controllers.tcsp.routes.TcspTypesController.get(true).toString
     ) {
-        @model.tcspTypes.map { v =>
-        <ul class="list list--semicolon">
-            @if(v.serviceProviders.contains(CompanyDirectorEtc)) {
-                <li>@Messages("tcsp.service.provider.lbl.04")</li>
-            }
 
-            @if(v.serviceProviders.contains(NomineeShareholdersProvider)) {
-                <li>@Messages("tcsp.service.provider.lbl.01")</li>
-            }
-
-            @if(v.serviceProviders.contains(RegisteredOfficeEtc)) {
-                <li>@Messages("tcsp.service.provider.lbl.03")</li>
-            }
-
-            @if(v.serviceProviders.contains(TrusteeProvider)) {
-                <li>@Messages("tcsp.service.provider.lbl.02")</li>
-            }
-
-            @if(v.serviceProviders.collectFirst {case CompanyFormationAgent(_, _) => true}) {
-                <li>@Messages("tcsp.service.provider.lbl.05")</li>
-            }
-        </ul>
+        <ul class="list">
+        @sortedProviders.map{line =>
+            <li>@line</li>
         }
+        </ul>
+
         @model.tcspTypes.map { v =>
             @v.serviceProviders.map { x =>
                 @x match {
