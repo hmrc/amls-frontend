@@ -120,13 +120,15 @@ object Tcsp {
   def oldOnlyOffTheShelfCompsSoldReader: Reads[Option[OnlyOffTheShelfCompsSold]] =
     (__ \ "tcspTypes" \ "onlyOffTheShelfCompsSold").readNullable[Boolean] map {
       case Some(true) => Some(OnlyOffTheShelfCompsSoldYes)
-      case _ => Some(OnlyOffTheShelfCompsSoldNo)
+      case Some(false) => Some(OnlyOffTheShelfCompsSoldNo)
+      case _ => None
     }
 
   def oldComplexCorpStructureCreationReader: Reads[Option[ComplexCorpStructureCreation]] =
     (__ \ "tcspTypes" \ "complexCorpStructureCreation").readNullable[Boolean] map {
       case Some(true) => Some(ComplexCorpStructureCreationYes)
-      case _ => Some(ComplexCorpStructureCreationNo)
+      case Some(false) => Some(ComplexCorpStructureCreationNo)
+      case _ => None
     }
 
   implicit val jsonReads : Reads[Tcsp] = {
