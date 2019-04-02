@@ -86,10 +86,16 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
       "the submission status is Renewal amendment" must {
         "respond with OK when the index is valid" in new Fixture {
 
+          val p = mock[ResponsiblePerson]
+          when(p.isComplete).thenReturn(true)
+          when(p.personName).thenReturn(Some(PersonName("firstName", None, "lastName")))
+          when(p.lineId).thenReturn(Some(4444))
+
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(RenewalSubmitted(None)))
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(Some(PersonName("firstName", None, "lastName")), lineId = Some(4444))))))
+            .thenReturn(Future.successful(Some(Seq(p))))
+
 
           val result = controller.get(1)(request)
 
@@ -104,10 +110,15 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
       "the submission status is Renewal" must {
         "respond with OK when the index is valid" in new Fixture {
 
+          val p = mock[ResponsiblePerson]
+          when(p.isComplete).thenReturn(true)
+          when(p.personName).thenReturn(Some(PersonName("firstName", None, "lastName")))
+          when(p.lineId).thenReturn(Some(4444))
+
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(ReadyForRenewal(None)))
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(Some(PersonName("firstName", None, "lastName")), lineId = Some(4444))))))
+            .thenReturn(Future.successful(Some(Seq(p))))
 
           val result = controller.get(1)(request)
 
@@ -121,10 +132,15 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
       "the submission status is SubmissionDecisionApproved" must {
         "respond with OK when the index is valid" in new Fixture {
 
+          val p = mock[ResponsiblePerson]
+          when(p.isComplete).thenReturn(true)
+          when(p.personName).thenReturn(Some(PersonName("firstName", None, "lastName")))
+          when(p.lineId).thenReturn(Some(4444))
+
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(Some(PersonName("firstName", None, "lastName")), lineId = Some(4444))))))
+            .thenReturn(Future.successful(Some(Seq(p))))
 
           val result = controller.get(1)(request)
 
@@ -185,18 +201,19 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           contentAsString(result) must not include Messages("responsiblepeople.remove.responsible.person.enddate.lbl")
 
         }
+
         "respond with OK without showing endDate form when RP does have lineId" in new Fixture{
 
-          val rp = ResponsiblePerson(
-            personName = Some(PersonName("firstName", None, "lastName")),
-            lineId = Some(4444)
-          )
+          val p = mock[ResponsiblePerson]
+          when(p.isComplete).thenReturn(true)
+          when(p.personName).thenReturn(Some(PersonName("firstName", None, "lastName")))
+          when(p.lineId).thenReturn(Some(4444))
 
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(rp))))
+            .thenReturn(Future.successful(Some(Seq(p))))
 
           val result = controller.get(1)(request)
 
@@ -204,6 +221,26 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           contentAsString(result) must not include Messages("responsiblepeople.remove.responsible.person.enddate.lbl")
 
+        }
+
+        "redirect to start of RP flow where RP is not completed and has a lineId" in new Fixture {
+
+          val emptyCache = CacheMap("", Map.empty)
+
+          val p = mock[ResponsiblePerson]
+          when(p.isComplete).thenReturn(false)
+          when(p.personName).thenReturn(Some(PersonName("firstName", None, "lastName")))
+          when(p.lineId).thenReturn(Some(4444))
+
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionReadyForReview))
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(p))))
+
+          val result = controller.get(1)(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.WhatYouNeedController.get(1).url))
         }
       }
     }

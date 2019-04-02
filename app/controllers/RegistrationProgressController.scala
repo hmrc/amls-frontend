@@ -16,11 +16,10 @@
 
 package controllers
 
-import javax.inject.{Inject, Singleton}
 import cats.data.OptionT
 import cats.implicits._
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
+import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessActivity, BusinessMatching}
 import models.registrationprogress.{Completed, Section}
 import models.renewal.Renewal
@@ -67,7 +66,7 @@ class RegistrationProgressController @Inject()(
                 val newSections = sectionsProvider.sectionsFromBusinessActivities(newActivities, businessMatching.msbServices)(cacheMap).toSeq
                 val sections = sectionsProvider.sections(cacheMap)
                 val sectionsToDisplay = sections.filter(s => s.name != BusinessMatching.messageKey) diff newSections
-                val canEditPreapplication = Set(NotCompleted, SubmissionReady).contains(status)
+                val canEditPreapplication = Set(NotCompleted, SubmissionReady, SubmissionDecisionApproved).contains(status)
                 val activities = businessMatching.activities.fold(Seq.empty[String])(_.businessActivities.map(_.getMessage()).toSeq)
 
                 completePreApp match {
