@@ -16,13 +16,9 @@
 
 package models.renewal
 
-import cats.data.Validated.{Invalid, Valid}
-import jto.validation.GenericRules._
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
-import models.FormTypes._
-import models._
-import models.moneyservicebusiness._
+import models.{currencies => currenciesSeq, _}
 import play.api.libs.json._
 import utils.MappingUtils.Implicits._
 import utils.MappingUtils.constant
@@ -54,7 +50,7 @@ object WhichCurrencies {
   private val currencyListType = TraversableValidators.seqToOptionSeq(emptyToNone) andThen
     TraversableValidators.flattenR[String] andThen
     TraversableValidators.minLengthR[Seq[String]](1) andThen
-    GenericRules.traversableR(GenericValidators.inList(currencies))
+    GenericRules.traversableR(GenericValidators.inList(currenciesSeq))
 
 
   implicit def formRule: Rule[UrlFormEncoded, WhichCurrencies] = From[UrlFormEncoded] { __ =>
@@ -125,19 +121,33 @@ object WhichCurrencies {
         Json.obj("moneySources" -> wc.moneySources)
     }
   }
-//
-//  implicit def convert(model: WhichCurrencies): models.moneyservicebusiness.WhichCurrencies = {
-//    models.moneyservicebusiness.WhichCurrencies(
-//      currencies = model.currencies,
-//      usesForeignCurrencies = model.usesForeignCurrencies match {
-//        case Some(true) => Some(UsesForeignCurrenciesYes)
-//        case _ => Some(UsesForeignCurrenciesNo)
-//      },
-//      moneySources = (model.bankMoneySource, model.wholesalerMoneySource, model.customerMoneySource) match {
-//        case (bms, wms, cms) => Some(MoneySources(bms, wms, cms))
-//      }
-//    )
-//  }
+
+  implicit def convert(model: WhichCurrencies): models.moneyservicebusiness.WhichCurrencies = {
+    models.moneyservicebusiness.WhichCurrencies(currencies = model.currencies,
+      usesForeignCurrencies = model.usesForeignCurrencies match {
+      case Some(UsesForeignCurrenciesYes) => Some(models.moneyservicebusiness.UsesForeignCurrenciesYes)
+      case Some(UsesForeignCurrenciesNo) => Some(models.moneyservicebusiness.UsesForeignCurrenciesNo)
+    }, model.moneySources match {
+      case Some(ms) => {
+        val bms = ms.bankMoneySource.fold[Option[models.moneyservicebusiness.BankMoneySource]](None) {
+          b => Some(models.moneyservicebusiness.BankMoneySource(b.bankNames))
+        }
+
+        val wms = ms.wholesalerMoneySource.fold[Option[models.moneyservicebusiness.WholesalerMoneySource]](None) {
+          b => Some(models.moneyservicebusiness.WholesalerMoneySource(b.wholesalerNames))
+        }
+
+        val cms = ms.customerMoneySource.fold[Option[Boolean]](None) {
+          b => Some(b)
+        }
+
+        Some(models.moneyservicebusiness.MoneySources(bms, wms, cms))
+      }
+      case _ => None
+    }
+
+    )
+  }
 }
 
 

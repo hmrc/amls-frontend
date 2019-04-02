@@ -19,7 +19,7 @@ package models.renewal
 import models.{Country, SubscriptionRequest}
 import models.businessactivities.BusinessActivities
 import models.hvd.Hvd
-import models.moneyservicebusiness.{BankMoneySource, MoneyServiceBusiness, MoneySources, UsesForeignCurrenciesNo}
+import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal.Conversions._
 import org.scalatest.{MustMatchers, WordSpec}
 
@@ -114,16 +114,11 @@ class ConversionsSpec extends WordSpec with MustMatchers {
     }
 
     "convert the 'MSB which currencies' model" in new Fixture {
-      val model = WhichCurrencies(Seq("USD", "CHF", "EUR"), None, Some(BankMoneySource("Bank names")), None, None)
+      val model = WhichCurrencies(Seq("USD", "CHF", "EUR"), None, Some(MoneySources(Some(BankMoneySource("Bank names")))))
       val renewal = Renewal(whichCurrencies = Some(model))
       val converted = subscriptionRequest.withRenewalData(renewal)
 
-      converted.msbSection.get.whichCurrencies mustBe Some(
-        models.moneyservicebusiness.WhichCurrencies(
-          currencies = Seq("USD", "CHF", "EUR"),
-          usesForeignCurrencies = Some(UsesForeignCurrenciesNo),
-          moneySources = Some(MoneySources(Some(BankMoneySource("Bank names"))))
-        ))
+      converted.msbSection.get.whichCurrencies mustBe Some(models.renewal.WhichCurrencies(Seq("USD", "CHF", "EUR"), None, Some(MoneySources(Some(BankMoneySource("Bank names"))))))
 
     }
 

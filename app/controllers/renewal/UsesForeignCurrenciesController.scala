@@ -23,8 +23,11 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching._
-import models.renewal.{MoneySources, Renewal, UsesForeignCurrencies, WhichCurrencies}
+import models.renewal._
+import play.api.mvc.Result
 import services.RenewalService
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.renewal.uses_foreign_currencies
 
@@ -60,13 +63,11 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
                 val result = for {
                   cacheMap <- optMap
                   renewal <- cacheMap.getEntry[Renewal](Renewal.key)
+                  bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+                  services <- bm.msbServices
                 } yield {
                   renewalService.updateRenewal(updateCurrencies(renewal, model)) map { _ =>
-                    edit match {
-                      case true => Redirect(routes.SummaryController.get())
-                      case _ => Redirect(routes.MoneySourcesController.get())
-
-                    }
+                    routing(services.msbServices, edit, model)
                   }
 
                 }
@@ -85,6 +86,18 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
         }
       }
       case _ => None
+    }
+  }
+
+  def routing(msbServices: Set[BusinessMatchingMsbService],
+              edit: Boolean,
+              data: UsesForeignCurrencies)(implicit hc: HeaderCarrier, auth: AuthContext) = {
+      if (data == UsesForeignCurrenciesYes) {
+      Redirect(routes.MoneySourcesController.get(edit))
+    } else if (msbServices.contains(ForeignExchange) && !edit) {
+      Redirect(routes.FXTransactionsInLast12MonthsController.get(edit))
+    } else {
+      Redirect(routes.SummaryController.get())
     }
   }
 }

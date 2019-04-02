@@ -28,7 +28,7 @@ import models.declaration.release7.RoleWithinBusinessRelease7
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.{Hvd, PaymentMethods, PercentageOfCashPaymentOver15000}
 import models.moneyservicebusiness.{MostTransactions => MsbMostTransactions, SendTheLargestAmountsOfMoney => MsbSendTheLargestAmountsOfMoney, WhichCurrencies => MsbWhichCurrencies, _}
-import models.renewal.{PaymentMethods => RPaymentMethods, PercentageOfCashPaymentOver15000 => RPercentageOfCashPaymentOver15000, ReceiveCashPayments => RReceiveCashPayments, _}
+import models.renewal.{PaymentMethods => RPaymentMethods, PercentageOfCashPaymentOver15000 => RPercentageOfCashPaymentOver15000, ReceiveCashPayments => RReceiveCashPayments, WhichCurrencies => RenWhichCurrencies, MoneySources => RMoneySources, _}
 import models.responsiblepeople.ResponsiblePerson
 import models.status.{RenewalSubmitted, SubmissionReadyForReview}
 import models.supervision.Supervision
@@ -304,7 +304,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
     val renewalModel = Renewal(Some(InvolvedInOtherYes("test")),Some(BusinessTurnover.First),
       Some(AMLSTurnover.First),Some(CustomersOutsideUK(Some(List(Country("United Kingdom","GB"))))),
       Some(RPercentageOfCashPaymentOver15000.First),Some(RReceiveCashPayments(Some(renewalPaymentMethods))),
-      Some(TotalThroughput("02")),Some(WhichCurrencies(List("USD", "GBP", "EUR"),None,None,None,None)),
+      Some(TotalThroughput("02")),Some(RenWhichCurrencies(Seq("USD"), None, Some(RMoneySources(None, None, None)))),
       Some(TransactionsInLast12Months("12345678963")),
       Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"),None,None)),
       Some(MostTransactions(List(Country("United Kingdom", "GB")))),

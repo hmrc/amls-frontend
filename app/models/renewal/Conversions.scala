@@ -38,17 +38,17 @@ object Conversions {
 
       val msbSection: Option[MoneyServiceBusiness] = None
 
-//        request.msbSection flatMap { msb =>
-//        Some(msb.copy(
-//          throughput = renewal.totalThroughput contramap TotalThroughput.convert,
-//          transactionsInNext12Months = renewal.transactionsInLast12Months contramap TransactionsInLast12Months.convert,
-//          sendTheLargestAmountsOfMoney = renewal.sendTheLargestAmountsOfMoney contramap SendTheLargestAmountsOfMoney.convert,
-//          mostTransactions = renewal.mostTransactions contramap MostTransactions.convert,
-//          ceTransactionsInNext12Months = renewal.ceTransactionsInLast12Months contramap CETransactionsInLast12Months.convert,
-//          whichCurrencies = renewal.whichCurrencies contramap WhichCurrencies.convert,
-//          fxTransactionsInNext12Months = renewal.fxTransactionsInLast12Months contramap FXTransactionsInLast12Months.convert
-//        ))
-//      }
+        request.msbSection flatMap { msb =>
+        Some(msb.copy(
+          throughput = renewal.totalThroughput contramap TotalThroughput.convert,
+          transactionsInNext12Months = renewal.transactionsInLast12Months contramap TransactionsInLast12Months.convert,
+          sendTheLargestAmountsOfMoney = renewal.sendTheLargestAmountsOfMoney contramap SendTheLargestAmountsOfMoney.convert,
+          mostTransactions = renewal.mostTransactions contramap MostTransactions.convert,
+          ceTransactionsInNext12Months = renewal.ceTransactionsInLast12Months contramap CETransactionsInLast12Months.convert,
+          whichCurrencies = renewal.whichCurrencies contramap WhichCurrencies.convert,
+          fxTransactionsInNext12Months = renewal.fxTransactionsInLast12Months contramap FXTransactionsInLast12Months.convert
+        ))
+      }
 
       val hvdSection = request.hvdSection flatMap { hvd =>
         Some(hvd.copy(

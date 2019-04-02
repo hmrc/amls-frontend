@@ -312,7 +312,7 @@ class SubmissionServiceSpec extends AmlsSpec
         sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(
           Country("United Kingdom", "GB"), Some(Country("France", "FR")), Some(Country("us", "US")))),
         whichCurrencies = Some(WhichCurrencies(
-          Seq("USD", "CHF", "EUR"), None, Some(BankMoneySource("Bank names")), None, None)),
+          Seq("USD", "CHF", "EUR"), None, Some(MoneySources(None, None, None)))),
         ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("12345678963")),
         transactionsInLast12Months = Some(TransactionsInLast12Months("2500")),
         percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
@@ -365,7 +365,7 @@ class SubmissionServiceSpec extends AmlsSpec
         sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(
           Country("United Kingdom", "GB"), Some(Country("France", "FR")), Some(Country("us", "US")))),
         whichCurrencies = Some(WhichCurrencies(
-          Seq("USD", "CHF", "EUR"), None, Some(BankMoneySource("Bank names")), None, None)),
+          Seq("USD", "CHF", "EUR"), None, Some(MoneySources(None, None, None)))),
         ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("12345678963")),
         transactionsInLast12Months = Some(TransactionsInLast12Months("2500")),
         percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),

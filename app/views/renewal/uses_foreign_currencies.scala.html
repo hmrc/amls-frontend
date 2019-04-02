@@ -34,9 +34,10 @@ heading = header
 
     @fieldset(
         f = f("usesForeignCurrencies-fieldset"),
-        legend = Messages("renewal.msb.which_currencies.foreign_currencies_question"),
+        legend = Messages("renewal.msb.foreign_currencies.header"),
         panel = false,
-        classes = Seq("inline")
+        classes = Seq("inline"),
+        legendHidden = true
     ) {
 
         @errorGroup(f("usesForeignCurrencies")) {

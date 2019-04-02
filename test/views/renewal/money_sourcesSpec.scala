@@ -18,12 +18,12 @@ package views.renewal
 
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.renewal.WhichCurrencies
+import models.renewal.MoneySources
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
-import views.html.renewal.{money_sources, which_currencies}
+import views.html.renewal.money_sources
 
 
 class money_sourcesSpec extends AmlsSpec with MustMatchers {
@@ -35,7 +35,7 @@ class money_sourcesSpec extends AmlsSpec with MustMatchers {
   "money sources view" must {
     "have correct title" in new ViewFixture {
 
-      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP"), None, None, None, None))
+      val formData: ValidForm[MoneySources] = Form2(MoneySources(None, None, None))
 
       def view = money_sources(formData, true)
 
@@ -44,7 +44,7 @@ class money_sourcesSpec extends AmlsSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP"), None, None, None, None))
+      val formData: ValidForm[MoneySources] = Form2(MoneySources(None, None, None))
 
       def view = money_sources(formData, true)
 
@@ -55,7 +55,7 @@ class money_sourcesSpec extends AmlsSpec with MustMatchers {
 
     "include the necessary checkboxes" in new ViewFixture {
 
-      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP"), None, None, None, None))
+      val formData: ValidForm[MoneySources] = Form2(MoneySources(None, None, None))
 
       def view = money_sources(formData, true)
 

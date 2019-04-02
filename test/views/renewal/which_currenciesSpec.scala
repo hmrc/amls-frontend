@@ -35,7 +35,7 @@ class which_currenciesSpec extends AmlsSpec with MustMatchers {
   "which_currencies view" must {
     "have correct title" in new ViewFixture {
 
-      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP"), None, None, None, None))
+      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP")))
 
       def view = which_currencies(formData, true)
 
@@ -44,7 +44,7 @@ class which_currenciesSpec extends AmlsSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP"), None, None, None, None))
+      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP")))
 
       def view = which_currencies(formData, true)
 

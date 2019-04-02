@@ -18,7 +18,7 @@ package views.renewal
 
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.renewal.WhichCurrencies
+import models.renewal.{UsesForeignCurrencies, UsesForeignCurrenciesYes, WhichCurrencies}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -35,7 +35,7 @@ class uses_foreign_currenciesSpec extends AmlsSpec with MustMatchers {
   "uses foreign currencies view" must {
     "have correct title" in new ViewFixture {
 
-      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP"), None, None, None, None))
+      val formData: ValidForm[UsesForeignCurrencies] = Form2(UsesForeignCurrenciesYes)
 
       def view = uses_foreign_currencies(formData, true)
 
@@ -44,7 +44,7 @@ class uses_foreign_currenciesSpec extends AmlsSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP"), None, None, None, None))
+      val formData: ValidForm[UsesForeignCurrencies] = Form2(UsesForeignCurrenciesYes)
 
       def view = uses_foreign_currencies(formData, true)
 
@@ -55,7 +55,7 @@ class uses_foreign_currenciesSpec extends AmlsSpec with MustMatchers {
 
     "ask the user whether they deal in foreign currencies" in new ViewFixture {
 
-      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP"), None, None, None, None))
+      val formData: ValidForm[UsesForeignCurrencies] = Form2(UsesForeignCurrenciesYes)
 
       def view = uses_foreign_currencies(formData, true)
 

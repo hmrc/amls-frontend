@@ -178,7 +178,7 @@
         }
 
         @if(services.msbServices.contains(CurrencyExchange)) {
-            @model.ceTransactionsInLast12Months.map{ trans =>
+            @model.ceTransactionsInLast12Months.map { trans =>
                 @checkYourAnswers(
                     question = Messages("renewal.msb.ce.transactions.expected.title"),
                     editLinkTag = "msbcetransactionsexpected-edit",
@@ -195,14 +195,57 @@
                     editUrl = controllers.renewal.routes.WhichCurrenciesController.get(edit = true).toString
                 ) {
                     <ul class="list list--comma">
-                        @wc.currencies.map { cur =>
-                            <li>@cur</li>
-                        }
+                    @wc.currencies.map { cur =>
+                        <li>@cur</li>
+                    }
                     </ul>
+                }
+            }
 
+            @model.whichCurrencies.map { wc =>
+                @wc.usesForeignCurrencies.map { ufc =>
+                    @checkYourAnswers(
+                        question = Messages("msb.deal_foreign_currencies.title"),
+                        editLinkTag = "msbwhichcurrencies-edit",
+                        editUrl = controllers.renewal.routes.UsesForeignCurrenciesController.get(true).toString
+                    ) {
+                        @ufc match {
+                            case UsesForeignCurrenciesYes => {
+                                <p>@Messages("lbl.yes")</p>
+                            }
+                            case UsesForeignCurrenciesNo => {
+                                <p>@Messages("lbl.no")</p>
+                            }
+                        }
+                    }
+                }
+            }
+
+            @model.whichCurrencies.map { wc =>
+                @wc.moneySources.map { ms =>
+                    @if(ms.bankMoneySource.isDefined | ms.wholesalerMoneySource.isDefined | ms.customerMoneySource.isDefined) {
+                        @checkYourAnswers(
+                            question = Messages("msb.supply_foreign_currencies.title"),
+                            editLinkTag = "msbwhichcurrencies-edit",
+                            editUrl = controllers.renewal.routes.MoneySourcesController.get(true).toString
+                        ) {
+                            @ms.bankMoneySource.map { bms =>
+                                <p>@Messages("msb.bank.names"): @bms.bankNames</p>
+                            }
+                            @ms.wholesalerMoneySource.map { wms =>
+                                <p>@Messages("msb.wholesaler.names"): @wms.wholesalerNames</p>
+                            }
+                            @ms.customerMoneySource.map { cms =>
+                                @if(cms) {
+                                    <p>@Messages("msb.which_currencies.source.customers")</p>
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
+
         @if(services.msbServices.contains(ForeignExchange)) {
             @model.fxTransactionsInLast12Months.map{ trans =>
                 @checkYourAnswers(

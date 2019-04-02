@@ -19,8 +19,7 @@ package controllers.renewal
 import cats.implicits._
 import connectors.DataCacheConnector
 import models.businessmatching._
-import models.moneyservicebusiness.{BankMoneySource, WholesalerMoneySource}
-import models.renewal.{Renewal, WhichCurrencies}
+import models.renewal.{MoneySources, Renewal, UsesForeignCurrenciesYes, WhichCurrencies, BankMoneySource, WholesalerMoneySource}
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -88,10 +87,10 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
 
     val whichCurrencies = WhichCurrencies(
       Seq("USD"),
-      usesForeignCurrencies = Some(true),
+      Some(UsesForeignCurrenciesYes),
+      Some(MoneySources(None,
       None,
-      None,
-      Some(true))
+      Some(true))))
 
 
     val expectedRenewal = renewal.copy(
@@ -135,7 +134,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
       "reads the current value from the renewals model" in new Fixture {
         when {
           renewalService.getRenewal(any(), any(), any())
-        } thenReturn Future.successful(Renewal(whichCurrencies = WhichCurrencies(Seq("EUR"), None, None, None, None).some).some)
+        } thenReturn Future.successful(Renewal(whichCurrencies = WhichCurrencies(Seq("EUR"), None, MoneySources(None, None, None).some).some).some)
 
         val result = controller.get(true)(request)
         val doc = Jsoup.parse(contentAsString(result))
@@ -196,10 +195,11 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
       "save the model data into the renewal object" in new RoutingFixture {
         val currentModel = WhichCurrencies(
           Seq("USD", "GBP", "BOB"),
-          Some(true),
+          Some(UsesForeignCurrenciesYes),
+          Some(MoneySources(
           Some(BankMoneySource("Bank names")),
           Some(WholesalerMoneySource("wholesaler names")),
-          Some(true))
+          Some(true))))
 
         val result = await(controller.post()(validFormRequest))
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
@@ -208,10 +208,11 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
 
         captor.getValue.whichCurrencies mustBe Some(WhichCurrencies(
           Seq("USD", "GBP", "BOB"),
-          Some(true),
+          Some(UsesForeignCurrenciesYes),
+          Some(MoneySources(
           Some(BankMoneySource("Bank names")),
           Some(WholesalerMoneySource("wholesaler names")),
-          Some(true)
+          Some(true)))
         ))
       }
     }

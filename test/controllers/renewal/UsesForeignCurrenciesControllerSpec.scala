@@ -19,8 +19,7 @@ package controllers.renewal
 import cats.implicits._
 import connectors.DataCacheConnector
 import models.businessmatching._
-import models.moneyservicebusiness.{BankMoneySource, WholesalerMoneySource}
-import models.renewal.{Renewal, WhichCurrencies}
+import models.renewal._
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -58,12 +57,12 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
       "currencies[0]" -> "USD",
       "currencies[1]" -> "GBP",
       "currencies[2]" -> "BOB",
+      "usesForeignCurrencies" -> "Yes",
       "bankMoneySource" -> "Yes",
       "bankNames" -> "Bank names",
       "wholesalerMoneySource" -> "Yes",
       "wholesalerNames" -> "wholesaler names",
-      "customerMoneySource" -> "Yes",
-      "usesForeignCurrencies" -> "Yes"
+      "customerMoneySource" -> "Yes"
     )
 
     when {
@@ -88,10 +87,10 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
 
     val whichCurrencies = WhichCurrencies(
       Seq("USD"),
-      usesForeignCurrencies = Some(true),
+      Some(UsesForeignCurrenciesYes),
+      Some(MoneySources(None,
       None,
-      None,
-      Some(true))
+      Some(true))))
 
 
     val expectedRenewal = renewal.copy(
@@ -122,28 +121,6 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
         val doc = Jsoup.parse(contentAsString(result))
         doc.select(".heading-xlarge").text mustBe Messages("renewal.msb.foreign_currencies.header")
       }
-
-//      "edit is true" in new Fixture {
-//        val result = controller.get(true)(request)
-//
-//        status(result) mustBe OK
-//
-//        val doc = Jsoup.parse(contentAsString(result))
-//        doc.select("form").first.attr("action") mustBe routes.UsesForeignCurrenciesController.post(true).url
-//      }
-
-//      "reads the current value from the renewals model" in new Fixture {
-//        when {
-//          renewalService.getRenewal(any(), any(), any())
-//        } thenReturn Future.successful(Renewal(whichCurrencies = WhichCurrencies(Seq("EUR"), None, None, None, None).some).some)
-//
-//        val result = controller.get(true)(request)
-//        val doc = Jsoup.parse(contentAsString(result))
-//
-//        doc.select("select[name=currencies[0]] option[selected]").attr("value") mustBe "EUR"
-//
-//        verify(renewalService).getRenewal(any(), any(), any())
-//      }
     }
   }
 
@@ -163,10 +140,10 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
       "save the model data into the renewal object" in new RoutingFixture {
         val currentModel = WhichCurrencies(
           Seq("USD", "GBP", "BOB"),
-          Some(true),
-          Some(BankMoneySource("Bank names")),
+          Some(UsesForeignCurrenciesYes),
+          Some(MoneySources(Some(BankMoneySource("Bank names")),
           Some(WholesalerMoneySource("wholesaler names")),
-          Some(true))
+          Some(true))))
 
         val result = await(controller.post()(validFormRequest))
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
@@ -175,10 +152,10 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
 
         captor.getValue.whichCurrencies mustBe Some(WhichCurrencies(
           Seq("USD", "GBP", "BOB"),
-          Some(true),
-          Some(BankMoneySource("Bank names")),
+          Some(UsesForeignCurrenciesYes),
+          Some(MoneySources(Some(BankMoneySource("Bank names")),
           Some(WholesalerMoneySource("wholesaler names")),
-          Some(true)
+          Some(true)))
         ))
       }
     }

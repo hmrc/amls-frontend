@@ -41,8 +41,9 @@ class MoneySourcesController @Inject()(val authConnector: AuthConnector,
         val block = for {
           renewal <- OptionT(renewalService.getRenewal)
           whichCurrencies <- OptionT.fromOption[Future](renewal.whichCurrencies)
+          ms <- OptionT.fromOption[Future](whichCurrencies.moneySources)
         } yield {
-          Ok(money_sources(Form2[WhichCurrencies](whichCurrencies), edit))
+          Ok(money_sources(Form2[MoneySources](ms), edit))
         }
 
         block getOrElse Ok(money_sources(EmptyForm, edit))
