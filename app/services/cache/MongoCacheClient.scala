@@ -44,11 +44,19 @@ import scala.util.{Failure, Success, Try}
 case class Cache(id: String, data: Map[String, JsValue], lastUpdated: DateTime = DateTime.now(DateTimeZone.UTC)) {
 
   /**
-    * Upsert a value into the cache given its key
+    * Upsert a value into the cache given its key.
+    * If the data to be inserted is null then remove the entry by key
     */
-  def upsert[T](key: String, data: JsValue)(implicit ev: Writes[T]) = {
+  def upsert[T](key: String, data: JsValue, hasValue: Boolean)(implicit ev: Writes[T]) = {
+    val updated = if(hasValue) {
+      this.data + (key -> data)
+    }
+    else {
+      this.data - (key)
+    }
+
     this.copy(
-      data = this.data + (key -> data),
+      data = updated,
       lastUpdated = DateTime.now(DateTimeZone.UTC)
     )
   }
@@ -130,6 +138,26 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
   }
 
   /**
+    * Removes the item with the specified key from the cache
+    */
+  def removeByKey[T](id: String, key: String)(implicit writes: Writes[T]): Future[Cache] = {
+
+    fetchAll(id) flatMap { maybeCache =>
+      val cache = maybeCache.getOrElse(Cache(id, Map.empty))
+
+      val updatedCache = cache.copy(
+        data = cache.data - (key),
+        lastUpdated = DateTime.now(DateTimeZone.UTC)
+      )
+
+      val document = Json.toJson(updatedCache)
+      val modifier = BSONDocument("$set" -> document)
+
+      collection.update(bsonIdQuery(id), modifier, upsert = true) map { _ => updatedCache }
+    }
+  }
+
+  /**
     * Inserts data into the existing cache object in memory given the specified key. If the data does not exist, it will be created.
     */
   def upsert[T](targetCache: CacheMap, id: String, data: T, key: String)(implicit writes: Writes[T]) : CacheMap = {
@@ -139,7 +167,8 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
     } else {
       Json.toJson(data)
     }
-    toCacheMap(Cache(targetCache).upsert[T](key, jsonData))
+
+    toCacheMap(Cache(targetCache).upsert[T](key, jsonData, data != None))
   }
 
   /**

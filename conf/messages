@@ -1112,9 +1112,11 @@ estateagentbusiness.redress.lbl.01 = The Property Ombudsman Limited
 estateagentbusiness.redress.lbl.02 = Ombudsman Services
 estateagentbusiness.redress.lbl.03 = Property Redress Scheme
 estateagentbusiness.redress.lbl.04 = Other
-estateagentbusiness.registered.redress.title = Is your business registered with a redress scheme?
-estateagentbusiness.registered.redress.heading = Is this business registered with a redress scheme?
-estateagentbusiness.registered.redress.text = A redress scheme is an independent service that resolves disputes between an estate agency business and its customers.
+estateagentbusiness.redress.lbl.05 = The business is not registered with a redress scheme
+estateagentbusiness.redress.lbl.other = Redress scheme name
+estateagentbusiness.registered.redress.title = Which redress scheme is your business registered with?
+estateagentbusiness.registered.redress.heading = Which redress scheme is your business registered with?
+estateagentbusiness.registered.redress.text = A redress scheme is an independent service which resolves disputes between an estate agency business and its customers.
 estateagentbusiness.which.redress.scheme.lbl = Which redress scheme?
 
 businessmatching.businessType.title = What’s your business structure?

@@ -117,8 +117,13 @@ class ChangeSubSectorHelper @Inject()(val authConnector: AuthConnector,
       if (sectorDiff.isEmpty) {
         Future.successful(msb)
       } else {
-        dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key, updatedMsb) map { _ =>
-          updatedMsb.copy(hasAccepted = hasAccepted)
+        // If the msb section is an empty section return none to avoid empty cache entry for MSB
+        if (msb == MoneyServiceBusiness()) {
+          Future.successful(None)
+        } else {
+          dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key, updatedMsb) map { _ =>
+            updatedMsb.copy(hasAccepted = hasAccepted)
+          }
         }
       }
     }

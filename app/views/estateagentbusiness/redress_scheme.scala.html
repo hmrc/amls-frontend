@@ -35,39 +35,20 @@
         <p>@Messages("estateagentbusiness.registered.redress.text")</p>
 
         @fieldset(
-            f = f("isRedress-fieldset"),
-            legend = "estateagentbusiness.registered.redress.title",
-            panel = false,
-            legendHidden = true,
-            classes = Seq("inline")
-        ) {
-            @errorGroup(
-                field = f("isRedress")
-            ) {
-                @radio(
-                    f = f("isRedress"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true,
-                    target = s".propertyRedress-fieldset"
-                )
-                @radio(
-                    f = f("isRedress"),
-                    labelText = "lbl.no",
-                    inline = true,
-                    value = "false"
-                )
-            }
-        }
-
-        @fieldset(
             f = f("propertyRedressScheme-fieldset"),
             legend = "estateagentbusiness.which.redress.scheme.lbl",
-            classes = Seq("propertyRedress-fieldset")
+            legendHidden = true,
+            classes = Seq("propertyRedress-fieldset"),
+            panel = false
         ) {
             @errorGroup(
                 field = f("propertyRedressScheme")
             ) {
+                @radio(
+                    f = f("propertyRedressScheme"),
+                    labelText = "estateagentbusiness.redress.lbl.05",
+                    value = "05"
+                )
                 @radio(
                     f = f("propertyRedressScheme"),
                     labelText = "estateagentbusiness.redress.lbl.01",
@@ -93,14 +74,14 @@
         }
 
         @fieldset(
-            legend = "estateagentbusiness.redress.lbl.04",
+            legend = "estateagentbusiness.redress.lbl.other",
             legendHidden = true,
             classes = Seq("other-fieldset"),
             f = f("other-fieldset")
         ) {
             @input(
                 field = f("other"),
-                labelText = "lbl.pleasespecify"
+                labelText = "estateagentbusiness.redress.lbl.other"
             )
         }
 
