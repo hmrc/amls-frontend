@@ -53,6 +53,10 @@ class summarySpec extends AmlsSpec with MustMatchers with HtmlAssertions with Ta
                                                                             "tcsp.service.provider.lbl.03",
                                                                             "tcsp.service.provider.lbl.04",
                                                                             "tcsp.service.provider.lbl.05"))),
+
+      ("tcsp.off-the-shelf.companies.lbl", checkElementTextIncludes(_, "lbl.yes")),
+      ("tcsp.create.complex.corporate.structures.lbl", checkElementTextIncludes(_, "lbl.no")),
+
       ("tcsp.provided_services.title", checkListContainsItems(_, Set("tcsp.provided_services.service.lbl.01",
                                                                      "tcsp.provided_services.service.lbl.02",
                                                                      "tcsp.provided_services.service.lbl.03",

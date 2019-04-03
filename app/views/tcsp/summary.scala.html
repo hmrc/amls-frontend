@@ -51,38 +51,35 @@
         }
     }
 
-
-@model.onlyOffTheShelfCompsSold.map { s =>
-
-@checkYourAnswers(
-question = Messages("tcsp.off-the-shelf.companies.lbl"),
-editLinkTag = "onlyOffTheShelfCompsSold-edit",
-editUrl = controllers.tcsp.routes.OnlyOffTheShelfCompsSoldController.get(true).toString
-) {
-<p>
-    @s match {
-    case OnlyOffTheShelfCompsSoldNo => { @Messages("lbl.no") }
-    case OnlyOffTheShelfCompsSoldYes => { @Messages("lbl.yes") }
+    @model.onlyOffTheShelfCompsSold.map { s =>
+        @checkYourAnswers(
+            question = Messages("tcsp.off-the-shelf.companies.lbl"),
+            editLinkTag = "onlyOffTheShelfCompsSold-edit",
+            editUrl = controllers.tcsp.routes.OnlyOffTheShelfCompsSoldController.get(true).toString
+        ) {
+            <p>
+            @s match {
+                case OnlyOffTheShelfCompsSoldNo => { @Messages("lbl.no") }
+                case OnlyOffTheShelfCompsSoldYes => { @Messages("lbl.yes") }
+            }
+            </p>
+        }
     }
-</p>
-}
-}
 
-@model.complexCorpStructureCreation.map { s =>
-
-@checkYourAnswers(
-question = Messages("tcsp.create.complex.corporate.structures.lbl"),
-editLinkTag = "complexCorpStructureCreation-edit",
-editUrl = controllers.tcsp.routes.ComplexCorpStructureCreationController.get(true).toString
-) {
-<p>
-    @s match {
-    case ComplexCorpStructureCreationNo => { @Messages("lbl.no") }
-    case ComplexCorpStructureCreationYes => { @Messages("lbl.yes") }
+    @model.complexCorpStructureCreation.map { s =>
+        @checkYourAnswers(
+            question = Messages("tcsp.create.complex.corporate.structures.lbl"),
+            editLinkTag = "complexCorpStructureCreation-edit",
+            editUrl = controllers.tcsp.routes.ComplexCorpStructureCreationController.get(true).toString
+        ) {
+            <p>
+            @s match {
+                case ComplexCorpStructureCreationNo => { @Messages("lbl.no") }
+                case ComplexCorpStructureCreationYes => { @Messages("lbl.yes") }
+            }
+            </p>
+        }
     }
-</p>
-}
-}
 
     @model.tcspTypes.map { v =>
         @if(v.serviceProviders.contains(RegisteredOfficeEtc)) {
