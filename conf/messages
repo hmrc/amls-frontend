@@ -496,7 +496,7 @@ hint.255.chars = Enter 255 characters or less.
 
 lbl.hint.crn = It’s 8 characters and can be just numbers, or a mix of numbers and capital letters. If yours is 7 characters, enter a 0 (zero) at the beginning.
 
-lbl.hint.vat = It’s 9 numbers with no letters, punctuation or other characters.
+lbl.hint.vat = This is 9 numbers, sometimes with ‘GB’ at the start, for example 123456789 or GB123456789. You can find it on your VAT registration certificate.
 
 link.return.registration.progress = Return to about your business
 link.return.renewal.progress = Return to about your business
