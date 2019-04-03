@@ -26,29 +26,21 @@ class RedressSchemeSpec extends PlaySpec with MockitoSugar {
 
   "RedressScheemsSpec" must {
 
-    "validate model with redress option selected as yes" in {
+    "successfully validate model" in {
 
-      RedressScheme.formRedressRule.validate(Map("isRedress" -> Seq("true"), "propertyRedressScheme" -> Seq("01"))) must
+      RedressScheme.formRedressRule.validate(Map("propertyRedressScheme" -> Seq("01"))) must
         be(Valid(ThePropertyOmbudsman))
 
-      RedressScheme.formRedressRule.validate(Map("isRedress" -> Seq("true"), "propertyRedressScheme" -> Seq("02"))) must
+      RedressScheme.formRedressRule.validate(Map("propertyRedressScheme" -> Seq("02"))) must
         be(Valid(OmbudsmanServices))
 
-      RedressScheme.formRedressRule.validate(Map("isRedress" -> Seq("true"), "propertyRedressScheme" -> Seq("03"))) must
+      RedressScheme.formRedressRule.validate(Map("propertyRedressScheme" -> Seq("03"))) must
         be(Valid(PropertyRedressScheme))
 
-      RedressScheme.formRedressRule.validate(Map("isRedress" -> Seq("true"), "propertyRedressScheme" -> Seq("04"), "other" -> Seq("test"))) must
+      RedressScheme.formRedressRule.validate(Map("propertyRedressScheme" -> Seq("04"), "other" -> Seq("test"))) must
         be(Valid(Other("test")))
 
-    }
-
-    "validate model redress option selected as No" in {
-      val model = Map(
-        "isRedress" -> Seq("false"),
-        "propertyRedressScheme" -> Seq("02")
-      )
-
-      RedressScheme.formRedressRule.validate(model) must
+      RedressScheme.formRedressRule.validate(Map("propertyRedressScheme" -> Seq("05"))) must
         be(Valid(RedressSchemedNo))
     }
 
@@ -98,7 +90,7 @@ class RedressSchemeSpec extends PlaySpec with MockitoSugar {
       val data = Map[String, Seq[String]]()
 
       RedressScheme.formRedressRule.validate(data) must be(Invalid(Seq(
-        (Path \ "isRedress") -> Seq(ValidationError("error.required.eab.redress.scheme"))
+        (Path \ "propertyRedressScheme") -> Seq(ValidationError("error.required.eab.which.redress.scheme"))
       )))
     }
 
@@ -115,19 +107,19 @@ class RedressSchemeSpec extends PlaySpec with MockitoSugar {
     "write correct data from enum value" in {
 
       RedressScheme.formRedressWrites.writes(ThePropertyOmbudsman) must
-        be(Map("isRedress" -> Seq("true"),"propertyRedressScheme" -> Seq("01")))
+        be(Map("propertyRedressScheme" -> Seq("01")))
 
       RedressScheme.formRedressWrites.writes(OmbudsmanServices) must
-        be(Map("isRedress" -> Seq("true"),"propertyRedressScheme" -> Seq("02")))
+        be(Map("propertyRedressScheme" -> Seq("02")))
 
       RedressScheme.formRedressWrites.writes(PropertyRedressScheme) must
-        be(Map("isRedress" -> Seq("true"),"propertyRedressScheme" -> Seq("03")))
+        be(Map("propertyRedressScheme" -> Seq("03")))
 
       RedressScheme.formRedressWrites.writes(Other("foobar")) must
-        be(Map("isRedress" -> Seq("true"),"propertyRedressScheme" -> Seq("04"), "other" -> Seq("foobar")))
+        be(Map("propertyRedressScheme" -> Seq("04"), "other" -> Seq("foobar")))
 
       RedressScheme.formRedressWrites.writes(RedressSchemedNo) must
-        be(Map("isRedress" -> Seq("false")))
+        be(Map("propertyRedressScheme" -> Seq("05")))
     }
 
     "JSON validation" must {

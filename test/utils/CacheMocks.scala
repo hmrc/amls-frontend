@@ -57,12 +57,25 @@ trait CacheMocks extends MockitoSugar {
     cache.save[T](any(), any())(any(), any(), any())
   } thenReturn Future.successful(mockCacheMap)
 
+  def mockCacheRemoveByKey[T](implicit cache: DataCacheConnector) = when {
+    cache.removeByKey[T](any())(any(), any(), any())
+  } thenReturn Future.successful(mockCacheMap)
+
   def mockCacheSave[T](item: T, key: Option[String] = None)(implicit cache: DataCacheConnector) = key match {
     case Some(k) => when {
       cache.save[T](eqTo(k), eqTo(item))(any(), any(), any())
     } thenReturn Future.successful(mockCacheMap)
     case _ => when {
       cache.save[T](any(), eqTo(item))(any(), any(), any())
+    } thenReturn Future.successful(mockCacheMap)
+  }
+
+  def mockCacheRemoveByKey[T](item: T, key: Option[String] = None)(implicit cache: DataCacheConnector) = key match {
+    case Some(k) => when {
+      cache.removeByKey[T](eqTo(k))(any(), any(), any())
+    } thenReturn Future.successful(mockCacheMap)
+    case _ => when {
+      cache.removeByKey[T](any())(any(), any(), any())
     } thenReturn Future.successful(mockCacheMap)
   }
 

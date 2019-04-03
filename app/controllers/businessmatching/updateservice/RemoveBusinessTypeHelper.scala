@@ -44,15 +44,41 @@ import scala.concurrent.{ExecutionContext, Future}
 class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
                                          implicit val dataCacheConnector: DataCacheConnector
                                    ) {
+
   def removeSectionData(model: RemoveBusinessTypeFlowModel)
                        (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Seq[CacheMap]] = {
-    OptionT.liftF(Future.sequence((model.activitiesToRemove.getOrElse(Seq.empty) collect {
-      case MoneyServiceBusiness => dataCacheConnector.save(MSBSection.key, MSBSection())
-      case HighValueDealing => dataCacheConnector.save(Hvd.key, Hvd())
-      case TrustAndCompanyServices => dataCacheConnector.save(Tcsp.key, Tcsp())
-      case AccountancyServices => dataCacheConnector.save(Asp.key, Asp())
-      case EstateAgentBusinessService => dataCacheConnector.save(EstateAgentBusiness.key, EstateAgentBusiness())
-    }).toSeq))
+
+    def removeActivities(activities: List[BMBusinessActivity]): Future[Seq[CacheMap]] = {
+      activities match {
+        case Nil =>
+          Future.successful(Seq.empty)
+        case first :: rest =>
+          for {
+            f <- removeActivity(first).map(Seq(_))
+            r <- removeActivities(rest)
+          } yield f ++ r
+      }
+    }
+
+    def removeActivity(activity: BMBusinessActivity): Future[CacheMap] = {
+      activity match {
+        case MoneyServiceBusiness =>
+          dataCacheConnector.removeByKey[MSBSection](MSBSection.key)
+        case HighValueDealing =>
+          dataCacheConnector.removeByKey[Hvd](Hvd.key)
+        case TrustAndCompanyServices =>
+          dataCacheConnector.removeByKey[Tcsp](Tcsp.key)
+        case AccountancyServices =>
+          dataCacheConnector.removeByKey[Asp](Asp.key)
+        case EstateAgentBusinessService =>
+          dataCacheConnector.removeByKey[EstateAgentBusiness](EstateAgentBusiness.key)
+      }
+    }
+
+    OptionT.liftF(model.activitiesToRemove.fold(Future.successful(Seq.empty[CacheMap])) {
+      activities =>
+        removeActivities(activities.toList)
+    })
   }
 
   def removeBusinessMatchingBusinessTypes(model: RemoveBusinessTypeFlowModel)

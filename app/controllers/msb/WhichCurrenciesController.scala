@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
-import models.businessmatching.{BusinessMatching, CurrencyExchange, ForeignExchange, MoneyServiceBusiness => MsbActivity}
+import models.businessmatching.{CurrencyExchange, MoneyServiceBusiness => MsbActivity}
 import models.moneyservicebusiness._
 import services.StatusService
 import services.businessmatching.ServiceFlow
@@ -51,35 +51,34 @@ class WhichCurrenciesController @Inject() (val authConnector: AuthConnector,
       }
     }
   }
-
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-      val foo = Form2[WhichCurrencies](request.body)
-      foo match {
+      Form2[WhichCurrencies](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.msb.which_currencies(f, edit)))
-        case ValidForm(_, data) =>
-          dataCacheConnector.fetchAll flatMap {
-            optMap =>
-              val result = for {
-                cache <- optMap
-                msb <- cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
-                bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-                services <- bm.msbServices
-              } yield {
-                dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
-                  msb.whichCurrencies(data)
-                ) map { _ =>
-                  services.msbServices.contains(ForeignExchange) match {
-                    case true if msb.fxTransactionsInNext12Months.isEmpty || !edit =>
-                      Redirect(routes.FXTransactionsInNext12MonthsController.get(edit))
-                    case _ => Redirect(routes.SummaryController.get())
+        case ValidForm(_, data: WhichCurrencies) =>
+              for {
+                msb <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
+                _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
+                  updateCurrencies(msb, data))
+              } yield
+                  edit match {
+                    case true => Redirect(routes.SummaryController.get())
+                    case _ => Redirect(routes.UsesForeignCurrenciesController.get())
                   }
-                }
-              }
-              result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
-          }
       }
+    }
+  }
+
+  def updateCurrencies(oldMsb: Option[MoneyServiceBusiness], newWhichCurrencies: WhichCurrencies): Option[MoneyServiceBusiness] = {
+    oldMsb match {
+      case Some(msb) => {
+       msb.whichCurrencies match {
+          case Some(w) => Some(msb.whichCurrencies(w.currencies(newWhichCurrencies.currencies)))
+          case _ => Some(msb.whichCurrencies(WhichCurrencies(newWhichCurrencies.currencies)))
+        }
+      }
+      case _ => None
     }
   }
 }
