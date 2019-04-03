@@ -33,7 +33,7 @@ class ComplexCorpStructureCreationController @Inject()(
 
   val NAME = "complexCorpStructureCreation"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(NAME)
-  implicit val boolRead = utils.BooleanFormReadWrite.formRule(NAME, "error.required.tcsp.complexCorpStructureCreation")
+  implicit val boolRead = utils.BooleanFormReadWrite.formRule(NAME, "error.required.tcsp.complex.corporate.structures")
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -51,7 +51,7 @@ class ComplexCorpStructureCreationController @Inject()(
     implicit authContext => implicit request =>
       Form2[Boolean](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(services_of_another_tcsp(f, edit)))
+          Future.successful(BadRequest(complex_corp_structure_creation(f, edit)))
         case ValidForm(_, data) =>
           val res = data match {
             case true => ComplexCorpStructureCreationYes

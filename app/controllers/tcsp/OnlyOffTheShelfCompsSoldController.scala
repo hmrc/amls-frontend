@@ -33,7 +33,7 @@ class OnlyOffTheShelfCompsSoldController @Inject()(
 
   val NAME = "onlyOffTheShelfCompsSold"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(NAME)
-  implicit val boolRead = utils.BooleanFormReadWrite.formRule(NAME, "error.required.tcsp.onlyOffTheShelfCompsSold")
+  implicit val boolRead = utils.BooleanFormReadWrite.formRule(NAME, "error.required.tcsp.off.the.shelf.companies")
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -51,7 +51,7 @@ class OnlyOffTheShelfCompsSoldController @Inject()(
     implicit authContext => implicit request =>
       Form2[Boolean](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(services_of_another_tcsp(f, edit)))
+          Future.successful(BadRequest(only_off_the_shelf_comps_sold(f, edit)))
         case ValidForm(_, data) =>
           val res = data match {
             case true => OnlyOffTheShelfCompsSoldYes
