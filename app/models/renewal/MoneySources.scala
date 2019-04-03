@@ -39,7 +39,7 @@ object MoneySources {
 
   private def nameType(fieldName: String) = {
     notEmptyStrip andThen
-      minLength(1).withMessage(s"error.invalid.msb.wc.$fieldName") andThen
+      minLength(1).withMessage(s"error.invalid.renewal.msb.wc.$fieldName") andThen
       maxLength(140).withMessage("error.invalid.maxlength.140") andThen
       basicPunctuationPattern()
   }
@@ -50,7 +50,7 @@ object MoneySources {
     case x@(Some(_), _, _) => Valid(x)
     case x@(_, Some(_), _) => Valid(x)
     case x@(_, _, Some(true)) => Valid(x)
-    case _ => Invalid(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))))
+    case _ => Invalid(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.renewal.msb.wc.moneySources"))))
   }
 
   implicit def formRule: Rule[UrlFormEncoded, MoneySources] = From[UrlFormEncoded] { __ =>

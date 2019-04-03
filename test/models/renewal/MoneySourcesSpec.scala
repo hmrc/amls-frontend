@@ -156,14 +156,14 @@ class MoneySourcesSpec extends AmlsSpec {
           "wholesalerMoneySource" -> Seq("Yes"),
           "wholesalerNames" -> Seq("")
         )
-        val expected = Invalid(Seq((Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.msb.wc.wholesalerNames"))))
+        val expected = Invalid(Seq((Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.renewal.msb.wc.wholesalerNames"))))
         MoneySources.formRule.validate(form) must be(expected)
       }
 
       "submitting empty form" in new Fixture {
         val form: Map[String, Seq[String]] = Map.empty
 
-        val expected = Invalid(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))))
+        val expected = Invalid(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.renewal.msb.wc.moneySources"))))
         MoneySources.formRule.validate(form) must be(expected)
       }
 
@@ -172,7 +172,7 @@ class MoneySourcesSpec extends AmlsSpec {
           "bankMoneySource" -> Seq("Yes"),
           "bankNames" -> Seq("")
         )
-        val expected = Invalid(Seq((Path \ "bankNames") -> Seq(ValidationError("error.invalid.msb.wc.bankNames"))))
+        val expected = Invalid(Seq((Path \ "bankNames") -> Seq(ValidationError("error.invalid.renewal.msb.wc.bankNames"))))
         MoneySources.formRule.validate(form) must be(expected)
       }
 
@@ -212,8 +212,8 @@ class MoneySourcesSpec extends AmlsSpec {
           "bankNames" -> Seq("    ")
         )
         val expected = Invalid(Seq(
-          (Path \ "bankNames") -> Seq(ValidationError("error.invalid.msb.wc.bankNames")),
-          (Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.msb.wc.wholesalerNames"))))
+          (Path \ "bankNames") -> Seq(ValidationError("error.invalid.renewal.msb.wc.bankNames")),
+          (Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.renewal.msb.wc.wholesalerNames"))))
 
         MoneySources.formRule.validate(form) must be(expected)
       }

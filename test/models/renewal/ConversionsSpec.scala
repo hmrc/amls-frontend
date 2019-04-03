@@ -75,7 +75,6 @@ class ConversionsSpec extends WordSpec with MustMatchers {
       val model = TotalThroughput("03")
       val renewal = Renewal(totalThroughput = Some(model))
       val converted = subscriptionRequest.withRenewalData(renewal)
-      println(converted)
 
       converted.msbSection.get.throughput mustBe Some(models.moneyservicebusiness.ExpectedThroughput.Third)
     }

@@ -68,7 +68,6 @@ class MoneySourcesController @Inject()(val authConnector: AuthConnector,
                   renewalService.updateRenewal(updateMoneySources(renewal, model)) map { _ =>
                     standardRouting(services.msbServices, activities.businessActivities, edit)
                   }
-
                 }
                 result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
             }

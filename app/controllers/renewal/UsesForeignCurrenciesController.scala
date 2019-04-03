@@ -69,7 +69,6 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
                   renewalService.updateRenewal(updateCurrencies(renewal, model)) map { _ =>
                     routing(services.msbServices, edit, model)
                   }
-
                 }
                 result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
             }

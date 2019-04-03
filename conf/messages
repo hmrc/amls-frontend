@@ -2131,8 +2131,6 @@ renewal.msb.money_sources.header =  Who supplied your physical foreign currency 
 renewal.msb.ce.transactions.expected.title = How many currency exchange transactions did you make in the last 12 months?
 renewal.msb.fx.transactions.expected.title = How many foreign exchange transactions did you make in the last 12 months?
 
-renewal.msb.uses_foreign_currencies.question =
-
 renewal.msb.send.money.title = Did you send money to other countries in the last 12 months?
 
 renewal.msb.most.transactions.title = Where did you send the most transactions in the last 12 months?
@@ -2148,7 +2146,6 @@ renewal.hvd.percentage.title = What proportion of your turnover in the last 12 m
 renewal.msb.largest.amounts.title = Where did you send the largest amounts of money in the last 12 months?
 
 renewal.customers.outside.uk.hint.lbl = Where did these customers live or work?
-
 ############################### Survey ###############################
 
 survey.satisfaction.heading = Give feedback
