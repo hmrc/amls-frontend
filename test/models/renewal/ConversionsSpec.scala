@@ -75,6 +75,7 @@ class ConversionsSpec extends WordSpec with MustMatchers {
       val model = TotalThroughput("03")
       val renewal = Renewal(totalThroughput = Some(model))
       val converted = subscriptionRequest.withRenewalData(renewal)
+      println(converted)
 
       converted.msbSection.get.throughput mustBe Some(models.moneyservicebusiness.ExpectedThroughput.Third)
     }
@@ -114,11 +115,11 @@ class ConversionsSpec extends WordSpec with MustMatchers {
     }
 
     "convert the 'MSB which currencies' model" in new Fixture {
-      val model = WhichCurrencies(Seq("USD", "CHF", "EUR"), None, Some(MoneySources(Some(BankMoneySource("Bank names")))))
+      val model = WhichCurrencies(Seq("USD", "CHF", "EUR"), Some(UsesForeignCurrenciesYes), Some(MoneySources(Some(BankMoneySource("Bank names")))))
       val renewal = Renewal(whichCurrencies = Some(model))
       val converted = subscriptionRequest.withRenewalData(renewal)
 
-      converted.msbSection.get.whichCurrencies mustBe Some(models.renewal.WhichCurrencies(Seq("USD", "CHF", "EUR"), None, Some(MoneySources(Some(BankMoneySource("Bank names"))))))
+      converted.msbSection.get.whichCurrencies mustBe Some(models.moneyservicebusiness.WhichCurrencies(Seq("USD", "CHF", "EUR"), Some(models.moneyservicebusiness.UsesForeignCurrenciesYes), Some(models.moneyservicebusiness.MoneySources(Some(models.moneyservicebusiness.BankMoneySource("Bank names"))))))
 
     }
 

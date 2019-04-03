@@ -36,9 +36,7 @@ object Conversions {
         case _ => throw new Exception("[Conversions] Trying to process data for renewal, but no business activities data was found")
       }
 
-      val msbSection: Option[MoneyServiceBusiness] = None
-
-        request.msbSection flatMap { msb =>
+      val msbSection: Option[MoneyServiceBusiness] = request.msbSection flatMap { msb =>
         Some(msb.copy(
           throughput = renewal.totalThroughput contramap TotalThroughput.convert,
           transactionsInNext12Months = renewal.transactionsInLast12Months contramap TransactionsInLast12Months.convert,
