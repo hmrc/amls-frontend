@@ -80,7 +80,7 @@
                 editLinkTag = "tcsptypes-edit",
                 editUrl = controllers.tcsp.routes.ProvidedServicesController.get(true).toString
             ) {
-                <ul class="list list--comma">
+                <ul class="list">
                     @model.providedServices.map { a =>
                         @if(a.services.collectFirst {case Other(_) => true}){
                             @a.services.toSeq.filterNot(_.isInstanceOf[Other]).sortBy(_.getMessage).map { x =>
