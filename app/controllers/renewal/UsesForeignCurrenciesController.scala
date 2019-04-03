@@ -66,8 +66,7 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
                   bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
                   services <- bm.msbServices
                 } yield {
-                  val ren = updateCurrencies(renewal, model)
-                  renewalService.updateRenewal(updateCurrencies(renewal, model).getOrElse(Renewal())) map { _ =>
+                  renewalService.updateRenewal(updateCurrencies(renewal, model)) map { _ =>
                     routing(services.msbServices, edit, model)
                   }
 
@@ -76,17 +75,17 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
             }
         }
   }
-  def updateCurrencies(oldRenewal: Renewal, usesForeignCurrencies: UsesForeignCurrencies): Option[Renewal] = {
-    oldRenewal match {
-      case renewal: Renewal => {
-        renewal.whichCurrencies match {
-          case Some(w) => {
-            Some(renewal.whichCurrencies(w.usesForeignCurrencies(usesForeignCurrencies).moneySources(MoneySources())))
-          }
-          case _ => None
-        }
+  def updateCurrencies(oldRenewal: Renewal, usesForeignCurrencies: UsesForeignCurrencies) = {
+    oldRenewal.whichCurrencies match {
+      case Some(wc) if usesForeignCurrencies.equals(UsesForeignCurrenciesYes) => {
+        val newWc = wc.usesForeignCurrencies(usesForeignCurrencies)
+        oldRenewal.whichCurrencies(newWc)
       }
-      case _ => None
+      case Some(wc) if usesForeignCurrencies.equals(UsesForeignCurrenciesNo) => {
+        val newWc = wc.usesForeignCurrencies(usesForeignCurrencies).moneySources(MoneySources())
+        oldRenewal.whichCurrencies(newWc)
+      }
+      case _ => oldRenewal
     }
   }
 

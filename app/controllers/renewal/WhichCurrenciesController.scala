@@ -60,7 +60,7 @@ class WhichCurrenciesController @Inject()(val authConnector: AuthConnector,
                   cacheMap <- optMap
                   renewal <- cacheMap.getEntry[Renewal](Renewal.key)
                 } yield {
-                  renewalService.updateRenewal(renewal.whichCurrencies(model)) map { _ =>
+                  renewalService.updateRenewal(updateWhichCurrencies(renewal, model)) map { _ =>
                     edit match {
                       case true => Redirect(routes.SummaryController.get())
                       case _ => Redirect(routes.UsesForeignCurrenciesController.get())
@@ -71,5 +71,18 @@ class WhichCurrenciesController @Inject()(val authConnector: AuthConnector,
                 result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
             }
         }
+  }
+
+  def updateWhichCurrencies(oldRenewal: Renewal, whichCurrencies: WhichCurrencies) = {
+    oldRenewal.whichCurrencies match {
+      case Some(wc) => {
+        val newWc = wc.currencies(whichCurrencies.currencies)
+        oldRenewal.whichCurrencies(newWc)
+      }
+      case None => {
+        val newWc = WhichCurrencies(whichCurrencies.currencies)
+        oldRenewal.whichCurrencies(newWc)
+      }
+    }
   }
 }
