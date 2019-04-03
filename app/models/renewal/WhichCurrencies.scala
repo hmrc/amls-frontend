@@ -18,7 +18,7 @@ package models.renewal
 
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
-import models.{currencies => currenciesSeq, _}
+import models.{currencies => currenciesSeq, moneyservicebusiness => msb}
 import play.api.libs.json._
 import utils.MappingUtils.Implicits._
 import utils.MappingUtils.constant
@@ -122,26 +122,26 @@ object WhichCurrencies {
     }
   }
 
-  implicit def convert(model: WhichCurrencies): models.moneyservicebusiness.WhichCurrencies = {
-    models.moneyservicebusiness.WhichCurrencies(currencies = model.currencies,
+  implicit def convert(model: WhichCurrencies): msb.WhichCurrencies = {
+    msb.WhichCurrencies(currencies = model.currencies,
       usesForeignCurrencies = model.usesForeignCurrencies match {
-      case Some(UsesForeignCurrenciesYes) => Some(models.moneyservicebusiness.UsesForeignCurrenciesYes)
-      case Some(UsesForeignCurrenciesNo) => Some(models.moneyservicebusiness.UsesForeignCurrenciesNo)
+      case Some(UsesForeignCurrenciesYes) => Some(msb.UsesForeignCurrenciesYes)
+      case Some(UsesForeignCurrenciesNo) => Some(msb.UsesForeignCurrenciesNo)
     }, model.moneySources match {
       case Some(ms) => {
-        val bms = ms.bankMoneySource.fold[Option[models.moneyservicebusiness.BankMoneySource]](None) {
-          b => Some(models.moneyservicebusiness.BankMoneySource(b.bankNames))
+        val bms = ms.bankMoneySource.fold[Option[msb.BankMoneySource]](None) {
+          b => Some(msb.BankMoneySource(b.bankNames))
         }
 
-        val wms = ms.wholesalerMoneySource.fold[Option[models.moneyservicebusiness.WholesalerMoneySource]](None) {
-          b => Some(models.moneyservicebusiness.WholesalerMoneySource(b.wholesalerNames))
+        val wms = ms.wholesalerMoneySource.fold[Option[msb.WholesalerMoneySource]](None) {
+          b => Some(msb.WholesalerMoneySource(b.wholesalerNames))
         }
 
         val cms = ms.customerMoneySource.fold[Option[Boolean]](None) {
           b => Some(b)
         }
 
-        Some(models.moneyservicebusiness.MoneySources(bms, wms, cms))
+        Some(msb.MoneySources(bms, wms, cms))
       }
       case _ => None
     }

@@ -18,8 +18,7 @@ package models.moneyservicebusiness
 
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
-import models.currencies
-import models.renewal.{WhichCurrencies => RWhichCurrencies}
+import models.{currencies => currenciesSeq, renewal => r}
 import play.api.libs.json._
 import utils.MappingUtils.Implicits._
 import utils.MappingUtils.constant
@@ -41,27 +40,25 @@ case class WhichCurrencies(currencies: Seq[String],
 
 object WhichCurrencies {
 
-  import models.renewal.{BankMoneySource => RBankMoneySource, WholesalerMoneySource => RWholesalerMoneySource, MoneySources => RMoneySources}
-
-  def convert(wc: WhichCurrencies): RWhichCurrencies = {
-    RWhichCurrencies(wc.currencies, wc.usesForeignCurrencies match {
-      case Some(UsesForeignCurrenciesYes) => Some(models.renewal.UsesForeignCurrenciesYes)
-      case Some(UsesForeignCurrenciesNo) => Some(models.renewal.UsesForeignCurrenciesNo)
+  def convert(wc: WhichCurrencies): r.WhichCurrencies = {
+    r.WhichCurrencies(wc.currencies, wc.usesForeignCurrencies match {
+      case Some(UsesForeignCurrenciesYes) => Some(r.UsesForeignCurrenciesYes)
+      case Some(UsesForeignCurrenciesNo) => Some(r.UsesForeignCurrenciesNo)
     }, wc.moneySources match {
       case Some(ms) => {
-        val bms = ms.bankMoneySource.fold[Option[RBankMoneySource]](None) {
-          b => Some(RBankMoneySource(b.bankNames))
+        val bms = ms.bankMoneySource.fold[Option[r.BankMoneySource]](None) {
+          b => Some(r.BankMoneySource(b.bankNames))
         }
 
-        val wms = ms.wholesalerMoneySource.fold[Option[RWholesalerMoneySource]](None) {
-          b => Some(RWholesalerMoneySource(b.wholesalerNames))
+        val wms = ms.wholesalerMoneySource.fold[Option[r.WholesalerMoneySource]](None) {
+          b => Some(r.WholesalerMoneySource(b.wholesalerNames))
         }
 
         val cms = ms.customerMoneySource.fold[Option[Boolean]](None) {
           b => Some(b)
         }
 
-        Some(RMoneySources(bms, wms, cms))
+        Some(r.MoneySources(bms, wms, cms))
       }
       case _ => None
     })
@@ -77,7 +74,7 @@ object WhichCurrencies {
   private val currencyListType = TraversableValidators.seqToOptionSeq(emptyToNone) andThen
     TraversableValidators.flattenR[String] andThen
     TraversableValidators.minLengthR[Seq[String]](1) andThen
-    GenericRules.traversableR(GenericValidators.inList(currencies))
+    GenericRules.traversableR(GenericValidators.inList(currenciesSeq))
 
 
   implicit def formRule: Rule[UrlFormEncoded, WhichCurrencies] = From[UrlFormEncoded] { __ =>
