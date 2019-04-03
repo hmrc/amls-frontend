@@ -97,13 +97,26 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
       }
 
       "respond with SUCCESS" when {
-        "edit is 'true'" which {
-          "redirects to SummaryController" in new TestFixture {
+
+        "where CompanyFormationAgent" which {
+          "redirects to ComplexCorpStructureCreationController" in new TestFixture {
+
+            val companyFormationAgentTcsp = Tcsp(
+              Some(TcspTypes(Set(
+                NomineeShareholdersProvider,
+                CompanyFormationAgent))),
+              None,
+              None,
+              Some(ProvidedServices(Set(PhonecallHandling, Other("other service")))),
+              Some(true),
+              None,
+              hasAccepted = true
+            )
 
             val expected = Tcsp(
               tcspTypes = Some(TcspTypes(Set(
                 NomineeShareholdersProvider,
-                TrusteeProvider))),
+                CompanyFormationAgent))),
               onlyOffTheShelfCompsSold = Some(OnlyOffTheShelfCompsSoldYes),
               complexCorpStructureCreation = None,
               providedServices = Some(ProvidedServices(Set(PhonecallHandling, Other("other service")))),
@@ -113,34 +126,63 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
               hasChanged = true
             )
 
-            val result = controller.post(true)(request.withFormUrlEncodedBody("onlyOffTheShelfCompsSold" -> "true"))
+            when(cache.fetch[Tcsp](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(companyFormationAgentTcsp)))
 
-            status(result) mustBe SEE_OTHER
-            verify(controller.dataCacheConnector).save[Tcsp](any(), eqTo(expected))(any(), any(), any())
-            redirectLocation(result) mustBe Some(controllers.tcsp.routes.SummaryController.get().url)
-          }
-        }
+            val result = controller.post()(request.withFormUrlEncodedBody("onlyOffTheShelfCompsSold" -> "true"))
 
-        "edit is 'false'" which {
-          "redirects to ComplexCorpStructureCreationController" in new TestFixture {
-
-            val expected = Tcsp(
-              tcspTypes = Some(TcspTypes(Set(
-                NomineeShareholdersProvider,
-                TrusteeProvider))),
-              onlyOffTheShelfCompsSold = Some(OnlyOffTheShelfCompsSoldNo),
-              complexCorpStructureCreation = None,
-              providedServices = Some(ProvidedServices(Set(PhonecallHandling, Other("other service")))),
-              doesServicesOfAnotherTCSP = Some(true),
-              servicesOfAnotherTCSP = None,
-              hasAccepted = false,
-              hasChanged = true
-            )
-
-            val result = controller.post(false)(request.withFormUrlEncodedBody("onlyOffTheShelfCompsSold" -> "false"))
             status(result) mustBe SEE_OTHER
             verify(controller.dataCacheConnector).save[Tcsp](any(), eqTo(expected))(any(), any(), any())
             redirectLocation(result) mustBe Some(controllers.tcsp.routes.ComplexCorpStructureCreationController.get().url)
+          }
+        }
+
+        "where not CompanyFormationAgent" which {
+          "edit is 'true'" which {
+            "redirects to SummaryController" in new TestFixture {
+
+              val expected = Tcsp(
+                tcspTypes = Some(TcspTypes(Set(
+                  NomineeShareholdersProvider,
+                  TrusteeProvider))),
+                onlyOffTheShelfCompsSold = Some(OnlyOffTheShelfCompsSoldYes),
+                complexCorpStructureCreation = None,
+                providedServices = Some(ProvidedServices(Set(PhonecallHandling, Other("other service")))),
+                doesServicesOfAnotherTCSP = Some(true),
+                servicesOfAnotherTCSP = None,
+                hasAccepted = false,
+                hasChanged = true
+              )
+
+              val result = controller.post(true)(request.withFormUrlEncodedBody("onlyOffTheShelfCompsSold" -> "true"))
+
+              status(result) mustBe SEE_OTHER
+              verify(controller.dataCacheConnector).save[Tcsp](any(), eqTo(expected))(any(), any(), any())
+              redirectLocation(result) mustBe Some(controllers.tcsp.routes.SummaryController.get().url)
+            }
+          }
+
+          "edit is 'false'" which {
+            "redirects to SummaryController" in new TestFixture {
+
+              val expected = Tcsp(
+                tcspTypes = Some(TcspTypes(Set(
+                  NomineeShareholdersProvider,
+                  TrusteeProvider))),
+                onlyOffTheShelfCompsSold = Some(OnlyOffTheShelfCompsSoldNo),
+                complexCorpStructureCreation = None,
+                providedServices = Some(ProvidedServices(Set(PhonecallHandling, Other("other service")))),
+                doesServicesOfAnotherTCSP = Some(true),
+                servicesOfAnotherTCSP = None,
+                hasAccepted = false,
+                hasChanged = true
+              )
+
+              val result = controller.post(false)(request.withFormUrlEncodedBody("onlyOffTheShelfCompsSold" -> "false"))
+              status(result) mustBe SEE_OTHER
+              verify(controller.dataCacheConnector).save[Tcsp](any(), eqTo(expected))(any(), any(), any())
+              redirectLocation(result) mustBe Some(controllers.tcsp.routes.SummaryController.get().url)
+            }
           }
         }
       }

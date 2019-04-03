@@ -32,11 +32,11 @@ case class Tcsp (tcspTypes: Option[TcspTypes] = None,
   def tcspTypes(trust: TcspTypes): Tcsp =
     this.copy(tcspTypes = Some(trust), hasChanged = hasChanged || !this.tcspTypes.contains(trust), hasAccepted = hasAccepted && this.tcspTypes.contains(trust))
 
-  def onlyOffTheShelfCompsSold(x: OnlyOffTheShelfCompsSold): Tcsp =
-    this.copy(onlyOffTheShelfCompsSold = Some(x), hasChanged = hasChanged || !this.onlyOffTheShelfCompsSold.contains(x), hasAccepted = hasAccepted && this.onlyOffTheShelfCompsSold.contains(x))
+  def onlyOffTheShelfCompsSold(onlyOffTheShelf: OnlyOffTheShelfCompsSold): Tcsp =
+    this.copy(onlyOffTheShelfCompsSold = Some(onlyOffTheShelf), hasChanged = hasChanged || !this.onlyOffTheShelfCompsSold.contains(onlyOffTheShelf), hasAccepted = hasAccepted && this.onlyOffTheShelfCompsSold.contains(onlyOffTheShelf))
 
-  def complexCorpStructureCreation(x: ComplexCorpStructureCreation): Tcsp =
-    this.copy(complexCorpStructureCreation = Some(x), hasChanged = hasChanged || !this.complexCorpStructureCreation.contains(x), hasAccepted = hasAccepted && this.complexCorpStructureCreation.contains(x))
+  def complexCorpStructureCreation(complexCorp: ComplexCorpStructureCreation): Tcsp =
+    this.copy(complexCorpStructureCreation = Some(complexCorp), hasChanged = hasChanged || !this.complexCorpStructureCreation.contains(complexCorp), hasAccepted = hasAccepted && this.complexCorpStructureCreation.contains(complexCorp))
 
   def providedServices(ps: ProvidedServices): Tcsp =
     this.copy(providedServices = Some(ps), hasChanged = hasChanged || !this.providedServices.contains(ps), hasAccepted = hasAccepted && this.providedServices.contains(ps))

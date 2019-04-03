@@ -62,8 +62,8 @@ class TcspTypesController @Inject() (val dataCacheConnector: DataCacheConnector,
             )
           } yield (data.serviceProviders.contains(CompanyFormationAgent),
             data.serviceProviders.contains(RegisteredOfficeEtc)) match {
-            case (true, _) => Redirect(routes.OnlyOffTheShelfCompsSoldController.get())
-            case (false, true) => Redirect(routes.ProvidedServicesController.get())
+            case (true, _) => Redirect(routes.OnlyOffTheShelfCompsSoldController.get(edit))
+            case (false, true) => Redirect(routes.ProvidedServicesController.get(edit))
             case (_) => edit match {
                 case true => Redirect(routes.SummaryController.get())
                 case false => Redirect(routes.ServicesOfAnotherTCSPController.get())

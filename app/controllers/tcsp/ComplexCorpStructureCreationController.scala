@@ -66,8 +66,8 @@ class ComplexCorpStructureCreationController @Inject()(
 
   def redirectTo(edit: Boolean, tcsp: Tcsp) = {
     (edit, tcsp.tcspTypes.map(t => t.serviceProviders.contains(RegisteredOfficeEtc))) match {
-      case (false, Some(true)) => Redirect(routes.ProvidedServicesController.get())
-      case (false, Some(false)) => Redirect(routes.ServicesOfAnotherTCSPController.get())
+      case (_, Some(true)) => Redirect(routes.ProvidedServicesController.get(edit))
+      case (false, Some(false)) => Redirect(routes.ServicesOfAnotherTCSPController.get(edit))
       case _ => Redirect(routes.SummaryController.get())
     }
   }
