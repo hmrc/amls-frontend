@@ -82,17 +82,11 @@
             ) {
                 <ul class="list">
                     @model.providedServices.map { a =>
-                        @if(a.services.collectFirst {case Other(_) => true}){
-                            @a.services.toSeq.filterNot(_.isInstanceOf[Other]).sortBy(_.getMessage).map { x =>
-                                <li>@x.getMessage</li>
-                            }
-                            @a.services.toSeq.filter(_.isInstanceOf[Other]).sortBy(_.getMessage).map { x =>
-                                <li>@x.getMessage</li>
-                            }
-                        } else{
-                            @a.services.toSeq.sortBy(_.getMessage).map { x =>
-                                <li>@x.getMessage</li>
-                            }
+                        @a.services.toSeq.filterNot(_.isInstanceOf[Other]).sortBy(_.getMessage).map { x =>
+                            <li>@x.getMessage</li>
+                        }
+                        @a.services.toSeq.filter(_.isInstanceOf[Other]).sortBy(_.getMessage).map { x =>
+                            <li>@x.getMessage</li>
                         }
                     }
                 </ul>
