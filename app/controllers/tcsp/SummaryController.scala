@@ -40,19 +40,20 @@ class SummaryController @Inject()
 
   def sortProviders(data: Tcsp): List[String] = {
 
-    val res = data.tcspTypes match {
-      case Some(types) => types.serviceProviders.collect{
-        case provider if provider.value != "05" => Messages(s"tcsp.service.provider.lbl.${provider.value}")
-      }
-    }
+    val sortedList = for {
+      types <- data.tcspTypes
+      providers <- Some(types.serviceProviders)
+      labels <- Some(providers.collect {
+          case provider if provider.value != "05" => Messages(s"tcsp.service.provider.lbl.${provider.value}")
+        }
+      )
+      specialCase <- Some(providers.collect {
+          case provider if provider.value == "05" => Messages(s"tcsp.service.provider.lbl.05")
+        }
+      )
+    } yield labels.toList.sorted ++ specialCase.toList
 
-    val special = (data.tcspTypes match {
-      case Some(types) => types.serviceProviders.filter { case provider => provider.value == "05" }
-    }) map {
-      case _ => Messages("tcsp.service.provider.lbl.05")
-    }
-
-    res.toList.sorted ++ special.toList
+    sortedList.getOrElse(List())
   }
 
   def get = Authorised.async {

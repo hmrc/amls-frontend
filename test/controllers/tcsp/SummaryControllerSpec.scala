@@ -56,56 +56,89 @@ class SummaryControllerSpec extends AmlsSpec {
     } thenReturn Future.successful(false)
   }
 
+  "sortProviders" must {
+
+    "return Trust or company formation agent as the last item in the sorted list" when {
+
+      "CompanyFormationAgent service provider is included" in new Fixture {
+
+        val modelCopy: Tcsp = model.copy(
+          tcspTypes=Some(
+            TcspTypes(
+              Set(
+                CompanyFormationAgent(false,false),
+                TrusteeProvider,
+                RegisteredOfficeEtc,
+                NomineeShareholdersProvider,
+                CompanyDirectorEtc
+              )
+            )
+          )
+        )
+
+        val res = controller.sortProviders(modelCopy)
+
+        res mustEqual List(
+          "Company director, secretary, or partner provider",
+          "Nominee shareholders provider",
+          "Registered office, business address, or virtual office services provider",
+          "Trustee provider",
+          "Trust or company formation agent"
+        )
+      }
+
+    }
+
+    "return empty list" when {
+
+      "no service providers list is given" in new Fixture {
+        val modelCopy: Tcsp = model.copy(
+          tcspTypes=Some(
+            TcspTypes(
+              Set()
+            )
+          )
+        )
+
+        val res = controller.sortProviders(modelCopy)
+
+        res mustEqual List()
+      }
+    }
+
+    "return sorted list" when {
+
+      "normal service provider list is provided" in new Fixture {
+        val modelCopy: Tcsp = model.copy(
+          tcspTypes=Some(
+            TcspTypes(
+              Set(TrusteeProvider,
+                RegisteredOfficeEtc,
+                NomineeShareholdersProvider,
+                CompanyDirectorEtc
+              )
+            )
+          )
+        )
+
+        val res = controller.sortProviders(modelCopy)
+
+        res mustEqual List(
+          "Company director, secretary, or partner provider",
+          "Nominee shareholders provider",
+          "Registered office, business address, or virtual office services provider",
+          "Trustee provider"
+        )
+      }
+
+    }
+
+  }
+
   "Get" must {
 
-    "show alphabetically sorted service provider names" in new Fixture {
-      val modelCopy: Tcsp = model.copy(
-        tcspTypes=Some(
-          TcspTypes(
-            Set(TrusteeProvider,
-              RegisteredOfficeEtc,
-              NomineeShareholdersProvider,
-              CompanyDirectorEtc
-            )
-          )
-        )
-      )
 
-      val res = controller.sortProviders(modelCopy)
 
-      res mustEqual List(
-        "Company director, secretary, or partner provider",
-        "Nominee shareholders provider",
-        "Registered office, business address, or virtual office services provider",
-        "Trustee provider"
-      )
-    }
-
-    "sorting does not apply to the Trust or company formation agent" in new Fixture {
-      val modelCopy: Tcsp = model.copy(
-        tcspTypes=Some(
-          TcspTypes(
-            Set(
-              CompanyFormationAgent(false,false),
-              TrusteeProvider,
-              RegisteredOfficeEtc,
-              NomineeShareholdersProvider,
-              CompanyDirectorEtc
-            )
-          )
-        )
-      )
-
-      val res = controller.sortProviders(modelCopy)
-
-      res mustEqual List(
-        "Company director, secretary, or partner provider",
-        "Nominee shareholders provider",
-        "Registered office, business address, or virtual office services provider",
-        "Trustee provider",
-        "Trust or company formation agent"
-      )
-    }
 
     "load the summary page when section data is available" in new Fixture {
 
