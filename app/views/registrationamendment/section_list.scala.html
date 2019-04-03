@@ -25,7 +25,7 @@
 
     @* existing *@
     <ul id="existing-sections-list" class="grid-layout__column grid-layout__column--2-3 display-block">
-        @allSections.sortBy(section => Messages(s"progress.${section.name}.name")).map { s =>
+        @allSections.map { s =>
             @{ if(sections.contains(s)) section(s.name, s.status, s.hasChanged, s.call) else submissionSection(s.name, s.status, s.call)}
         }
     </ul>
