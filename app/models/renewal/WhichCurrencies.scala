@@ -40,7 +40,7 @@ case class WhichCurrencies(currencies: Seq[String],
 
 object WhichCurrencies {
 
-  val emptyToNone: String => Option[String] = { x =>
+  private val emptyToNone: String => Option[String] = { x =>
     x.trim() match {
       case "" => None
       case s => Some(s)
