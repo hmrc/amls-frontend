@@ -29,6 +29,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.tcsp.summary
+import play.api.Logger
 
 class SummaryController @Inject()
 (
@@ -51,9 +52,14 @@ class SummaryController @Inject()
           case _: CompanyFormationAgent => Messages(s"tcsp.service.provider.lbl.05")
         }
       )
-    } yield labels.toList.sorted ++ specialCase.toList
+    } yield (labels.toList.sorted ++ specialCase.toList).getOrElse(List())
 
-    sortedList.getOrElse(List())
+
+    if (sortedList.isEmpty) {
+      Logger.warn(s"[tcsp][SummaryController][sortProviders] - tcsp provider list is empty")
+    }
+
+    sortedList
   }
 
   def get = Authorised.async {
