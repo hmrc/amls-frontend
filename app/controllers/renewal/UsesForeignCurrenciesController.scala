@@ -16,15 +16,14 @@
 
 package controllers.renewal
 
-import javax.inject.Inject
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.businessmatching._
 import models.renewal._
-import play.api.mvc.Result
 import services.RenewalService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -34,8 +33,8 @@ import views.html.renewal.uses_foreign_currencies
 import scala.concurrent.Future
 
 class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector,
-                                          renewalService: RenewalService,
-                                          dataCacheConnector: DataCacheConnector) extends BaseController {
+                                                renewalService: RenewalService,
+                                                dataCacheConnector: DataCacheConnector) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -74,6 +73,7 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
             }
         }
   }
+
   def updateCurrencies(oldRenewal: Renewal, usesForeignCurrencies: UsesForeignCurrencies) = {
     oldRenewal.whichCurrencies match {
       case Some(wc) if usesForeignCurrencies.equals(UsesForeignCurrenciesYes) => {
@@ -91,7 +91,7 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
   def routing(msbServices: Set[BusinessMatchingMsbService],
               edit: Boolean,
               data: UsesForeignCurrencies)(implicit hc: HeaderCarrier, auth: AuthContext) = {
-      if (data == UsesForeignCurrenciesYes) {
+    if (data == UsesForeignCurrenciesYes) {
       Redirect(routes.MoneySourcesController.get(edit))
     } else if (msbServices.contains(ForeignExchange) && !edit) {
       Redirect(routes.FXTransactionsInLast12MonthsController.get(edit))
