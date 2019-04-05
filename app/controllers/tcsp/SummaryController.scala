@@ -41,7 +41,7 @@ class SummaryController @Inject()
 
   def sortProviders(data: Tcsp): List[String] = {
 
-    val sortedList = for {
+    val sortedList = (for {
       types <- data.tcspTypes
       providers <- Some(types.serviceProviders)
       labels <- Some(providers.collect {
@@ -52,7 +52,7 @@ class SummaryController @Inject()
           case _: CompanyFormationAgent => Messages(s"tcsp.service.provider.lbl.05")
         }
       )
-    } yield (labels.toList.sorted ++ specialCase.toList).getOrElse(List())
+    } yield labels.toList.sorted ++ specialCase.toList).getOrElse(List())
 
 
     if (sortedList.isEmpty) {
