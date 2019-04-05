@@ -1,1 +1,0 @@
- + [AMLS-4835](https://jira.tools.tax.service.gov.uk/browse/AMLS-4835) - 'fix to bug found when any supervised section is cleared it shows completed in the about your business page'
