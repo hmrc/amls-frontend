@@ -20,14 +20,14 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
-import models.hvd.{CashPayment, CashPaymentNo, CashPaymentYes, Hvd}
+import models.hvd.{CashPayment, Hvd}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import views.html.hvd.cash_payment
+import views.html.hvd.cash_payment_first_date
 
 import scala.concurrent.Future
 
-class CashPaymentController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                       val authConnector: AuthConnector
+class CashPaymentFirstDateController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                               val authConnector: AuthConnector
                                         ) extends BaseController {
 
   def get(edit: Boolean = false) =
@@ -39,7 +39,7 @@ class CashPaymentController @Inject() (val dataCacheConnector: DataCacheConnecto
               hvd <- response
               cashPayment <- hvd.cashPayment
             } yield Form2[CashPayment](cashPayment)).getOrElse(EmptyForm)
-            Ok(cash_payment(form, edit))
+            Ok(cash_payment_first_date(form, edit))
         }
     }
 
@@ -49,21 +49,17 @@ class CashPaymentController @Inject() (val dataCacheConnector: DataCacheConnecto
       implicit authContext => implicit request => {
         Form2[CashPayment](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(cash_payment(f, edit)))
+            Future.successful(BadRequest(cash_payment_first_date(f, edit)))
           case ValidForm(_, data) =>
             for {
               hvd <- dataCacheConnector.fetch[Hvd](Hvd.key)
               _ <- dataCacheConnector.save[Hvd](Hvd.key,
                 hvd.cashPayment(data)
               )
-            } yield data match {
-              case CashPaymentYes(_) => Redirect(routes.CashPaymentFirstDateController.get())
-              case CashPaymentNo => if (edit) {
-                Redirect(routes.SummaryController.get())
-              } else {
-                Redirect(routes.LinkedCashPaymentsController.get())
-              }
-          }
+            } yield edit match {
+              case true => Redirect(routes.SummaryController.get())
+              case false => Redirect(routes.LinkedCashPaymentsController.get())
+            }
         }
       }
     }

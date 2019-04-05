@@ -16,16 +16,16 @@
 
 package models.hvd
 
+import cats.data.Validated.Valid
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
 import models.FormTypes._
 import org.joda.time.{DateTimeFieldType, LocalDate}
-import jto.validation.forms.UrlFormEncoded
-import jto.validation._
-import play.api.libs.json.{Reads}
-import cats.data.Validated.{Invalid, Valid}
+import play.api.libs.json.Reads
 
 sealed trait CashPayment
 
-case class CashPaymentYes(paymentDate: LocalDate) extends CashPayment
+case class CashPaymentYes(paymentDate: Option[LocalDate]) extends CashPayment
 
 case object CashPaymentNo extends CashPayment
 
@@ -34,16 +34,23 @@ object CashPayment {
   import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, CashPayment] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "acceptedAnyPayment").read[Boolean].withMessage("error.required.hvd.accepted.cash.payment") flatMap {
-      case true =>
-        (__ \ "paymentDate").read(localDateFutureRule) map CashPaymentYes.apply
-      case false => Rule.fromMapping { _ => Valid(CashPaymentNo) }
+    import jto.validation
+
+    // TODO: Need to separate out model objects as can't use same rule for both forms
+
+    if ((__ \ "acceptedAnyPayment").nonEmpty) {
+      (__ \ "acceptedAnyPayment").read[Boolean].withMessage("error.required.hvd.accepted.cash.payment") flatMap {
+        case true => Rule.fromMapping { _ => Valid(CashPaymentYes(None)) }
+        case false => Rule.fromMapping { _ => Valid(CashPaymentNo) }
+      }
+    } else {
+      (__ \ "paymentDate").read(localDateFutureRule) map Option.apply map CashPaymentYes.apply
     }
   }
 
   implicit def formWrites: Write[CashPayment, UrlFormEncoded] = Write {
-    case CashPaymentYes(date) =>
+    case CashPaymentYes(None) =>  Map("acceptedAnyPayment" -> Seq("true"))
+    case CashPaymentYes(Some(date)) =>
       Map("acceptedAnyPayment" -> Seq("true"),
         "paymentDate.day" -> Seq(date.get(DateTimeFieldType.dayOfMonth()).toString),
         "paymentDate.month" -> Seq(date.get(DateTimeFieldType.monthOfYear()).toString),
@@ -54,11 +61,11 @@ object CashPayment {
 
 
   implicit val jsonReads: Reads[CashPayment] = {
-    import play.api.libs.json._
     import play.api.libs.json.Reads._
+    import play.api.libs.json._
 
     (__ \ "acceptedAnyPayment").read[Boolean] flatMap {
-      case true => (__ \ "paymentDate").read[LocalDate] map CashPaymentYes.apply
+      case true => (__ \ "paymentDate").read[LocalDate] map Option.apply map CashPaymentYes.apply
       case false => Reads(_ => JsSuccess(CashPaymentNo))
     }
   }
@@ -68,7 +75,10 @@ object CashPayment {
     import play.api.libs.json._
 
     Writes[CashPayment] {
-      case CashPaymentYes(b) => Json.obj(
+      case CashPaymentYes(None) => Json.obj(
+        "acceptedAnyPayment" -> true
+      )
+      case CashPaymentYes(Some(b)) => Json.obj(
         "acceptedAnyPayment" -> true,
         "paymentDate" -> b.toString
       )

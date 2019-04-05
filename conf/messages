@@ -1945,7 +1945,8 @@ hvd.how-will-you-sell-goods.channels.wholesale = Wholesale
 
 hvd.cash.payment.title = Has your business made or accepted any cash payments of €10,000 or more?
 hvd.cash.payment.convert.currency.text = If you don’t use euros, please convert to the currency you use.
-hvd.cash.payment.data.text = What was the date of the first payment?
+
+hvd.cash.payment.date.title = What was the date of the first payment?
 hvd.cash.payment.date.example = For example, 31 03 2015
 hvd.cash.payment.data.details.summary = What a cash payment is
 hvd.cash.payment.data.details.summary.details = A cash payment is physical money, notes and coins, either paid to you in person or paid directly into a bank account.

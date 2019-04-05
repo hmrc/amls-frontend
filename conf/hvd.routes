@@ -3,6 +3,9 @@ GET         /what-you-need                                          @controllers
 GET         /cash-payments                                          @controllers.hvd.CashPaymentController.get(edit: Boolean ?= false)
 POST        /cash-payments                                          @controllers.hvd.CashPaymentController.post(edit: Boolean ?= false)
 
+GET         /cash-payments-first-date                               @controllers.hvd.CashPaymentFirstDateController.get(edit: Boolean ?= false)
+POST        /cash-payments-first-date                               @controllers.hvd.CashPaymentFirstDateController.post(edit: Boolean ?= false)
+
 GET         /check-your-answers                                     @controllers.hvd.SummaryController.get()
 POST        /check-your-answers                                     @controllers.hvd.SummaryController.post()
 
