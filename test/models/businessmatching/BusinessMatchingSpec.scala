@@ -72,39 +72,6 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
       "preAppComplete" -> true
     )
 
-    val completeJson = Json.obj(
-      "previouslyRegistered" -> Json.obj("previouslyRegistered" -> true,
-        "prevMLRRegNo" -> "12345678"),
-      "activityStartDate" -> Json.obj(
-        "startDate" -> "1990-02-24"),
-      "vatRegistered" -> Json.obj("registeredForVAT" -> true,
-        "vrnNumber" -> "123456789"),
-      "corporationTaxRegistered" -> Json.obj("registeredForCorporationTax" -> true,
-        "corporationTaxReference" -> "1234567890"),
-      "contactingYou" -> Json.obj(
-        "phoneNumber" -> "1234567890",
-        "email" -> "test@test.com"),
-      "registeredOffice" -> Json.obj(
-        "addressLine1" -> "38B",
-        "addressLine2" -> "line2",
-        "addressLine3" -> JsNull,
-        "addressLine4" -> JsNull,
-        "postCode" -> "AA1 1AA",
-        "dateOfChange" -> JsNull),
-      "altCorrespondenceAddress" -> true,
-      "correspondenceAddress" -> Json.obj(
-        "yourName" -> "Name",
-        "businessName" -> "Business Name",
-        "correspondenceAddressLine1" -> "address 1",
-        "correspondenceAddressLine2" -> "address 2",
-        "correspondenceAddressLine3" -> "address 3",
-        "correspondenceAddressLine4" -> "address 4",
-        "correspondencePostCode" -> "AA11 1AA"
-      ),
-      "hasChanged" -> false,
-      "hasAccepted" -> true
-    )
-
     val businessMatching = BusinessMatching(
       Some(reviewDetailsModel),
       Some(businessActivitiesModel),
