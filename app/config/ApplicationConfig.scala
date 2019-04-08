@@ -57,7 +57,7 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 
   lazy val notificationsUrl = baseUrl("amls-notification")
   lazy val allNotificationsUrl = s"$notificationsUrl/amls-notification"
-  lazy val paymentsUrl = getConfigString("paymentsUrl")
+  lazy val paymentsUrl:String = getConfigString("paymentsUrl")
 
   lazy val timeout = getInt("timeout.seconds")
   lazy val timeoutCountdown = getInt("timeout.countdown")

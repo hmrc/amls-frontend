@@ -45,14 +45,10 @@ class PayApiConnector @Inject()(
     val bodyParser = JsonParsed[CreatePaymentResponse]
 
     logDebug(s"Creating payment: ${Json.toJson(request)}")
-    http.POST[CreatePaymentRequest, HttpResponse](s"$payBaseUrl/payment", request) map {
+    http.POST[CreatePaymentRequest, HttpResponse](s"$payBaseUrl/amls/journey/start", request) map {
       case response & bodyParser(JsSuccess(body: CreatePaymentResponse, _)) =>
-        val responseModel = body.copy(
-          paymentId = response.header("Location").map(_.split("/").last)
-        )
-
-        auditConnector.sendExtendedEvent(CreatePaymentEvent(request, responseModel))
-        responseModel.some
+        auditConnector.sendExtendedEvent(CreatePaymentEvent(request, body))
+        body.some
 
       case response: HttpResponse =>
         auditConnector.sendExtendedEvent(CreatePaymentFailureEvent(request.reference, response.status, response.body, request))
