@@ -31,10 +31,6 @@ class OnlyOffTheShelfCompsSoldController @Inject()(
                                                  val dataCacheConnector: DataCacheConnector
                                                ) extends BaseController {
 
-  val NAME = "onlyOffTheShelfCompsSold"
-  implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(NAME)
-  implicit val boolRead = utils.BooleanFormReadWrite.formRule(NAME, "error.required.tcsp.off.the.shelf.companies")
-
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[Tcsp](Tcsp.key) map {
@@ -49,17 +45,13 @@ class OnlyOffTheShelfCompsSoldController @Inject()(
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      Form2[Boolean](request.body) match {
+      Form2[OnlyOffTheShelfCompsSold](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(only_off_the_shelf_comps_sold(f, edit)))
         case ValidForm(_, data) =>
-          val res = data match {
-            case true => OnlyOffTheShelfCompsSoldYes
-            case false => OnlyOffTheShelfCompsSoldNo
-          }
           for {
             tcsp <- dataCacheConnector.fetch[Tcsp](Tcsp.key)
-            _ <- dataCacheConnector.save[Tcsp](Tcsp.key, tcsp.onlyOffTheShelfCompsSold(res))
+            _ <- dataCacheConnector.save[Tcsp](Tcsp.key, tcsp.onlyOffTheShelfCompsSold(data))
 
           } yield redirectTo(edit, tcsp)
       }
