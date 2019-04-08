@@ -31,6 +31,10 @@ class ComplexCorpStructureCreationController @Inject()(
                                                  val dataCacheConnector: DataCacheConnector
                                                ) extends BaseController {
 
+  val NAME = "complexCorpStructureCreation"
+  implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(NAME)
+  implicit val boolRead = utils.BooleanFormReadWrite.formRule(NAME, "error.required.tcsp.complex.corporate.structures")
+
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[Tcsp](Tcsp.key) map {
@@ -45,13 +49,17 @@ class ComplexCorpStructureCreationController @Inject()(
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      Form2[ComplexCorpStructureCreation](request.body) match {
+      Form2[Boolean](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(complex_corp_structure_creation(f, edit)))
         case ValidForm(_, data) =>
+          val res = data match {
+            case true => ComplexCorpStructureCreationYes
+            case false => ComplexCorpStructureCreationNo
+          }
           for {
             tcsp <- dataCacheConnector.fetch[Tcsp](Tcsp.key)
-            _ <- dataCacheConnector.save[Tcsp](Tcsp.key, tcsp.complexCorpStructureCreation(data))
+            _ <- dataCacheConnector.save[Tcsp](Tcsp.key, tcsp.complexCorpStructureCreation(res))
           } yield redirectTo(edit, tcsp)
       }
   }
