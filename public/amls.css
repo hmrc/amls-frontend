@@ -1588,6 +1588,12 @@ li.autocomplete__option {
   border-top: 1px solid #bfc1c3;
 }
 
+#new-sections-list .task-list-item:last-child {
+  border-bottom: 0;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
 .task-status {
   float: right;
 }
