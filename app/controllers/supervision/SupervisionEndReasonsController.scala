@@ -62,8 +62,10 @@ class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCach
           case ValidForm(_, data) =>
             for {
               supervision: Option[Supervision] <- dataCacheConnector.fetch[Supervision](Supervision.key)
-              cache <- dataCacheConnector.save[Supervision](Supervision.key,
+              _ <- dataCacheConnector.save[Supervision](Supervision.key,
                 updateData(supervision, data))
+              maybeCache <- dataCacheConnector.fetchAll
+              cache <- Future.successful(maybeCache)
             } yield redirectTo(edit, cache)
         }
   }
@@ -76,12 +78,17 @@ class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCach
     supervision.anotherBody(updatedAnotherBody).copy(hasAccepted = true)
   }
 
-  private def redirectTo(edit: Boolean, cache: CacheMap)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
+  private def redirectTo(edit: Boolean, maybeCache: Option[CacheMap])(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
       import utils.ControllerHelper.supervisionComplete
 
-      supervisionComplete(cache) match {
-        case false => Redirect(routes.ProfessionalBodyMemberController.get())
-        case true => Redirect(routes.SummaryController.get())
+    maybeCache match {
+      case Some(cache) => {
+        supervisionComplete(cache) match {
+          case false => Redirect(routes.ProfessionalBodyMemberController.get())
+          case true => Redirect(routes.SummaryController.get())
+        }
       }
+      case _ => InternalServerError("Could not fetch the data")
+    }
   }
 }

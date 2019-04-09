@@ -64,17 +64,19 @@ class MoneySourcesController @Inject()(val authConnector: AuthConnector,
           case ValidForm(_, data: MoneySources) =>
             for {
               msb <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
-              cache <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
-                updateMoneySources(msb, data))
+              _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key, updateMoneySources(msb, data))
+              maybeCache <- dataCacheConnector.fetchAll
+              cache <- Future.successful(maybeCache)
             } yield redirectToNextPage(cache, edit).getOrElse(NotFound(notFoundView))
         }
       }
   }
 
-  def redirectToNextPage(map: CacheMap, edit: Boolean) = {
+  def redirectToNextPage(maybeCache: Option[CacheMap], edit: Boolean) = {
     for {
-      msb <- map.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
-      bm <- map.getEntry[BusinessMatching](BusinessMatching.key)
+      cache <- maybeCache
+      msb <- cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
+      bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
       services <- bm.msbServices
     } yield {
       services.msbServices.contains(ForeignExchange) match {
