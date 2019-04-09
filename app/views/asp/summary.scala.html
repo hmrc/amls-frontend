@@ -37,7 +37,7 @@
             editLinkTag = "aspservices-edit"
         ) {
             <ul class="list list--comma">
-            @a.services.map { line =>
+            @a.services.toList.sortBy(_.toString).map { line =>
                 <li>@line match {
                     case Accountancy => {@Messages("asp.service.lbl.01")}
                     case PayrollServices => {@Messages("asp.service.lbl.02")}

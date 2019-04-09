@@ -90,10 +90,10 @@ class detailed_answersSpec extends AmlsSpec
         element.hasAttr("href") must be(true)
         element.attr("href") must be("/anti-money-laundering/responsible-people/date-change-moved/1/")
 
+
         forAll(sectionChecks) { (key, check) => {
           val headers = doc.select("section.check-your-answers h2")
           val header = headers.toList.find(e => e.text() == key)
-
           header must not be None
           val section = header.get.parents().select("section").first()
           check(section) must be(true)
@@ -173,7 +173,6 @@ class detailed_answersSpec extends AmlsSpec
         forAll(sectionChecks) { (key, check) => {
           val headers = doc.select("section.check-your-answers h2")
           val header = headers.toList.find(e => e.text() == key)
-
           header must not be None
           val section = header.get.parents().select("section").first()
           check(section) must be(true)
@@ -201,7 +200,6 @@ class detailed_answersSpec extends AmlsSpec
         forAll(sectionChecks) { (key, check) => {
           val headers = doc.select("section.check-your-answers h2")
           val header = headers.toList.find(e => e.text() == key)
-
           header must not be None
           val section = header.get.parents().select("section").first()
           check(section) must be(true)
