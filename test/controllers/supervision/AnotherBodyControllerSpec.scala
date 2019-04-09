@@ -86,11 +86,11 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       val newRequest = request.withFormUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
 
-      mockCacheFetch[Supervision](None)
+
 
       mockCacheSave[Supervision]
 
-      mockCacheGetEntry[Supervision](Some(Supervision(anotherBody = Some(AnotherBodyYes(supervisorName = "Name")))), Supervision.key)
+      mockCacheFetch[Supervision](Some(Supervision(anotherBody = Some(AnotherBodyYes(supervisorName = "Name")))))
 
       val result = controller.post()(newRequest)
 
@@ -106,7 +106,7 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       mockCacheSave[Supervision]
 
-      mockCacheGetEntry[Supervision](Some(Supervision(anotherBody = Some(AnotherBodyYes(supervisorName = "Name")))), Supervision.key)
+      mockCacheFetch[Supervision](Some(Supervision(anotherBody = Some(AnotherBodyYes(supervisorName = "Name")))))
 
       val result = controller.post(true)(newRequest)
 
@@ -125,7 +125,7 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
         mockCacheSave[Supervision]
 
-        mockCacheGetEntry[Supervision](Some(Supervision(anotherBody = Some(AnotherBodyYes("Name", start, end, Some(SupervisionEndReasons("Reason")))))), Supervision.key)
+        mockCacheFetch[Supervision](Some(Supervision(anotherBody = Some(AnotherBodyYes("Name", start, end, Some(SupervisionEndReasons("Reason")))))))
 
         val result = controller.post(true)(newRequest)
 
@@ -143,7 +143,7 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
         mockCacheSave[Supervision]
 
-        mockCacheGetEntry[Supervision](Some(completeModel), Supervision.key)
+        mockCacheFetch[Supervision](Some(completeModel))
 
         val result = controller.post(true)(newRequest)
 
@@ -171,9 +171,9 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       mockCacheFetch[Supervision](None)
 
-      mockCacheGetEntry[Supervision](Some(completeModel.copy(anotherBody = Some(AnotherBodyNo))), Supervision.key)
-
       mockCacheSave[Supervision]
+
+      mockCacheFetch[Supervision](Some(completeModel.copy(anotherBody = Some(AnotherBodyNo))))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -188,9 +188,9 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       mockCacheFetch[Supervision](None)
 
-      mockCacheGetEntry[Supervision](Some(Supervision(anotherBody = Some(AnotherBodyNo))), Supervision.key)
-
       mockCacheSave[Supervision]
+
+      mockCacheFetch[Supervision](Some(Supervision(anotherBody = Some(AnotherBodyNo))))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)

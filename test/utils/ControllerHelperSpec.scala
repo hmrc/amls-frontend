@@ -74,63 +74,63 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
 
     "anotherBodyComplete" must {
       "return tuple of (is anotherBodyComplete, is anotherBodyYes) for AnotherBodyNo " in {
-        mockCacheGetEntry[Supervision](Some(Supervision(Some(AnotherBodyNo))), Supervision.key)
+        val supervision = Supervision(Some(AnotherBodyNo))
 
-        ControllerHelper.anotherBodyComplete(mockCacheMap) mustBe Some(true, false)
+        ControllerHelper.anotherBodyComplete(supervision) mustBe Some(true, false)
       }
 
       "return tuple of (is anotherBodyComplete, is anotherBodyYes) for AnotherBodyYes " in {
-        mockCacheGetEntry[Supervision](Some(Supervision(Some(AnotherBodyYes(supervisorName = "Name")))), Supervision.key)
+        val supervision = Supervision(Some(AnotherBodyYes(supervisorName = "Name")))
 
-        ControllerHelper.anotherBodyComplete(mockCacheMap) mustBe Some(false, true)
+        ControllerHelper.anotherBodyComplete(supervision) mustBe Some(false, true)
       }
 
       "return tuple of (is anotherBodyComplete, is anotherBodyYes) for complete AnotherBodyYes " in {
-        mockCacheGetEntry[Supervision](Some(Supervision(Some(AnotherBodyYes("Name",
+        val supervision = Supervision(Some(AnotherBodyYes("Name",
           Some(SupervisionStart(new LocalDate(1990, 2, 24))),
           Some(SupervisionEnd(new LocalDate(1998, 2, 24))),
-          Some(SupervisionEndReasons("Reason")))))), Supervision.key)
+          Some(SupervisionEndReasons("Reason")))))
 
-        ControllerHelper.anotherBodyComplete(mockCacheMap) mustBe Some(true, true)
+        ControllerHelper.anotherBodyComplete(supervision) mustBe Some(true, true)
       }
     }
 
     "isAnotherBodyYes" must {
       "return true if AnotherBody is instance of AnotherBodyYes" in {
-        mockCacheGetEntry[Supervision](Some(Supervision(Some(AnotherBodyYes(supervisorName = "Name")))), Supervision.key)
+        val supervision = Supervision(Some(AnotherBodyYes(supervisorName = "Name")))
 
-        ControllerHelper.isAnotherBodyYes(ControllerHelper.anotherBodyComplete(mockCacheMap)) mustBe true
+        ControllerHelper.isAnotherBodyYes(ControllerHelper.anotherBodyComplete(supervision)) mustBe true
       }
 
       "return false if AnotherBody is AnotherBodyNo" in {
-        mockCacheGetEntry[Supervision](Some(Supervision(Some(AnotherBodyNo))), Supervision.key)
+        val supervision = Supervision(Some(AnotherBodyNo))
 
-        ControllerHelper.isAnotherBodyYes(ControllerHelper.anotherBodyComplete(mockCacheMap)) mustBe false
+        ControllerHelper.isAnotherBodyYes(ControllerHelper.anotherBodyComplete(supervision)) mustBe false
       }
     }
 
     "isAnotherBodyComplete" must {
       "return true if AnotherBodyYes is complete" in {
-        mockCacheGetEntry[Supervision](Some(Supervision(Some(AnotherBodyYes("Name",
+        val supervision = Supervision(Some(AnotherBodyYes("Name",
           Some(SupervisionStart(new LocalDate(1990, 2, 24))),
           Some(SupervisionEnd(new LocalDate(1998, 2, 24))),
-          Some(SupervisionEndReasons("Reason")))))), Supervision.key)
+          Some(SupervisionEndReasons("Reason")))))
 
-        ControllerHelper.isAnotherBodyComplete(ControllerHelper.anotherBodyComplete(mockCacheMap)) mustBe true
+        ControllerHelper.isAnotherBodyComplete(ControllerHelper.anotherBodyComplete(supervision)) mustBe true
       }
 
       "return false if AnotherBodyYes is incomplete" in {
-        mockCacheGetEntry[Supervision](Some(Supervision(Some(AnotherBodyYes("Name",
+        val supervision = Supervision(Some(AnotherBodyYes("Name",
           Some(SupervisionStart(new LocalDate(1990, 2, 24))),
-          Some(SupervisionEnd(new LocalDate(1998, 2, 24))))))), Supervision.key)
+          Some(SupervisionEnd(new LocalDate(1998, 2, 24))))))
 
-        ControllerHelper.isAnotherBodyComplete(ControllerHelper.anotherBodyComplete(mockCacheMap)) mustBe false
+        ControllerHelper.isAnotherBodyComplete(ControllerHelper.anotherBodyComplete(supervision)) mustBe false
       }
 
       "return true if AnotherBody is AnotherBodyNo" in {
-        mockCacheGetEntry[Supervision](Some(Supervision(Some(AnotherBodyNo))), Supervision.key)
+        val supervision = Supervision(Some(AnotherBodyNo))
 
-        ControllerHelper.isAnotherBodyComplete(ControllerHelper.anotherBodyComplete(mockCacheMap)) mustBe true
+        ControllerHelper.isAnotherBodyComplete(ControllerHelper.anotherBodyComplete(supervision)) mustBe true
       }
     }
 

@@ -22,7 +22,6 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.supervision.{AnotherBody, AnotherBodyNo, AnotherBodyYes, Supervision}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.supervision.another_body
@@ -56,9 +55,8 @@ class AnotherBodyController @Inject()(val dataCacheConnector: DataCacheConnector
             for {
               supervision <- dataCacheConnector.fetch[Supervision](Supervision.key)
               _ <- dataCacheConnector.save[Supervision](Supervision.key, updateData(supervision, data))
-              maybeCache <- dataCacheConnector.fetchAll
-              cache <- Future.successful(maybeCache)
-            } yield redirectTo(edit, cache)
+              updatedSupervision <- dataCacheConnector.fetch[Supervision](Supervision.key)
+            } yield redirectTo(edit, updatedSupervision)
         }
   }
 
@@ -74,15 +72,15 @@ class AnotherBodyController @Inject()(val dataCacheConnector: DataCacheConnector
     supervision.anotherBody(updatedAnotherBody).copy(hasAccepted = true)
   }
 
-  private def redirectTo(edit: Boolean, maybeCache: Option[CacheMap])(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
+  private def redirectTo(edit: Boolean, maybeSupervision: Option[Supervision])(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
 
-    import utils.ControllerHelper.{anotherBodyComplete, isAnotherBodyYes, supervisionComplete}
+    import utils.ControllerHelper.{anotherBodyComplete, isAnotherBodyYes}
 
-    maybeCache match {
-      case Some(cache) => {
-        val anotherBody = anotherBodyComplete(cache)
+    maybeSupervision match {
+      case Some(supervision) => {
+        val anotherBody = anotherBodyComplete(supervision)
 
-        supervisionComplete(cache) match {
+        supervision.isComplete match {
           case false if isAnotherBodyYes(anotherBody) => Redirect(routes.SupervisionStartController.get())
           case false => Redirect(routes.ProfessionalBodyMemberController.get())
           case true => Redirect(routes.SummaryController.get())
