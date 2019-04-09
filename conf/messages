@@ -864,7 +864,7 @@ summary.declarationlocked.title = You can’t complete this section yet
 summary.businessmatching = Pre-application
 summary.start = Pre-application
 summary.tcsp = Trust or Company Service Provider
-summary.asp = Accountancy Service Provider
+summary.asp = Accountancy service provider
 summary.supervision = Supervision
 summary.msb = Money Service Business
 summary.hvd = High Value Dealer
@@ -1798,26 +1798,26 @@ tcsp.anothertcspsupervision.header = Is that Trust or Company Service Provider r
 
 #ASP
 asp.whatyouneed.subheading = In this section, you’ll be asked for things like:
-asp.whatyouneed.line_1 = what services you provide
-asp.whatyouneed.line_2 = if you’re registered with HMRC to handle other businesses’ tax matters
+asp.whatyouneed.line_1 = which services you provide 
+asp.whatyouneed.line_2 = if you’re registered with HMRC to handle other businesses’ tax matters 
 asp.other.business.tax.matters.title = Are you registered with HMRC to handle other businesses’ tax matters?
 asp.other.business.tax.matters.agentrefno.lbl = HMRC Agent Registration Number
-asp.other.business.tax.matters.lbl = This refers to the HMRC Agent Registration Scheme.
+asp.other.business.tax.matters.lbl = If you act as a tax agent or adviser, you must have formal authorisation to deal with HMRC on your client’s behalf.
 asp.services.title = Which services does your business provide?
 asp.service.lbl.01 = Accountancy
 asp.service.lbl.02 = Payroll services
 asp.service.lbl.03 = Bookkeeping
 asp.service.lbl.04 = Auditing
-asp.service.lbl.05 = Financial advice and/or tax advice
+asp.service.lbl.05 = Financial or tax advice 
 asp.summary.registration.number = HMRC Registration number:
 
 #Supervision
 supervision.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:
-supervision.whatyouneed.requiredinfo.text.1 = details of any previous supervision by another body
+supervision.whatyouneed.requiredinfo.text.1 = details of any previous supervisors 
 supervision.whatyouneed.requiredinfo.text.2 = if your business is a member of any professional bodies
 supervision.whatyouneed.requiredinfo.text.3 = if your business has been penalised in the past
 
-supervision.another_body.title = Has your business ever been registered for anti-money laundering supervision with another supervising body?
+supervision.another_body.title = Has your business ever been registered with another supervising body for anti-money laundering supervision? 
 supervision.another_body.description = This only refers to registration for anti-money laundering supervision.
 supervision.another_body.lbl.supervisor = Name of your last supervisor
 supervision.another_body.startDate.lbl = Start date of supervision
@@ -1833,7 +1833,7 @@ supervision.supervision_end_reasons.lbl = Why did your previous supervision end?
 supervision.supervision_end_reasons.description = Give details of why your previous registration ended
 
 
-supervision.penalisedbyprofessional.title = Has the business, or anyone in the business, ever been penalised by a professional body?
+supervision.penalisedbyprofessional.title = Has your business, or anyone in your business, ever been penalised for business activities covered by Money Laundering Regulations?
 supervision.penalisedbyprofessional.subtitle = Examples of a penalty include:
 supervision.penalisedbyprofessional.line_1 = a fine
 supervision.penalisedbyprofessional.line_2 = a warning
@@ -1841,7 +1841,7 @@ supervision.penalisedbyprofessional.line_3 = suspension
 supervision.penalisedbyprofessional.line_4 = expulsion
 supervision.penalisedbyprofessional.line_5 = special terms or conditions imposed on your business
 supervision.penalisedbyprofessional.details = Only include penalties for business activities covered by Money Laundering Regulations.
-supervision.penalisedbyprofessional.details.lbl = Please provide details
+supervision.penalisedbyprofessional.details.lbl = Describe the penalty, when it occurred, and who was involved.
 
 supervision.memberofprofessionalbody.title = Is your business a member of a professional body?
 supervision.memberofprofessionalbody.lbl.01 = Association of Accounting Technicians
@@ -1851,9 +1851,9 @@ supervision.memberofprofessionalbody.lbl.04 = Association of Taxation Technician
 supervision.memberofprofessionalbody.lbl.05 = Chartered Institute of Management Accountants
 supervision.memberofprofessionalbody.lbl.06 = Chartered Institute of Taxation
 supervision.memberofprofessionalbody.lbl.07 = Institute of Certified Bookkeepers
-supervision.memberofprofessionalbody.lbl.08 = Institute of Chartered Accountants in Ireland
-supervision.memberofprofessionalbody.lbl.09 = Institute of Chartered Accountants in Scotland
-supervision.memberofprofessionalbody.lbl.10 = Institute of Chartered Accountants of England and Wales
+supervision.memberofprofessionalbody.lbl.08 = Institute of Chartered Accountants of England and Wales
+supervision.memberofprofessionalbody.lbl.09 = Institute of Chartered Accountants in Ireland
+supervision.memberofprofessionalbody.lbl.10 = Institute of Chartered Accountants in Scotland
 supervision.memberofprofessionalbody.lbl.11 = Institute of Financial Accountants
 supervision.memberofprofessionalbody.lbl.12 = International Association of Bookkeepers
 supervision.memberofprofessionalbody.lbl.13 = Law Society
