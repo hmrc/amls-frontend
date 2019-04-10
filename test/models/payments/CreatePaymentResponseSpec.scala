@@ -24,9 +24,19 @@ class CreatePaymentResponseSpec extends PlaySpec with MustMatchers {
 
   "The CreatePaymentResponse model" must {
     "round-trip through JSON serialization correctly" in {
-      val model = CreatePaymentResponse(PayApiLinks("http://next.url"))
 
-      Json.toJson(model).as[CreatePaymentResponse] mustBe model
+      val expectedJson =
+        """
+          | {
+          |   "nextUrl":"https://tax.service.gov.uk/pay/1234567890",
+          |   "journeyId":"1234567890"
+          | }
+        """.stripMargin
+
+      //noinspection ScalaStyle
+      val model = CreatePaymentResponse(nextUrl = NextUrl("https://tax.service.gov.uk/pay/1234567890"), journeyId = "1234567890")
+
+      Json.toJson(model) mustBe Json.parse(expectedJson)
     }
   }
 

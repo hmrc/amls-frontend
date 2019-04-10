@@ -56,7 +56,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
     val businessMatchingModel = businessMatchingGen.sample.get
 
     mockCacheFetch(Some(businessMatchingModel), Some(BusinessMatching.key))
-    mockCacheSave[BusinessMatching]
+    mockCacheRemoveByKey[BusinessMatching]
   }
 
   "getModel" when {
@@ -477,9 +477,8 @@ class BusinessMatchingServiceSpec extends PlaySpec
 
       await(result)
 
-      verify(mockCacheConnector).save[Asp](
-        eqTo(Asp.key),
-        eqTo(None)
+      verify(mockCacheConnector).removeByKey[Asp](
+        eqTo(Asp.key)
       )(any(), any(), any())
 
     }
@@ -489,9 +488,8 @@ class BusinessMatchingServiceSpec extends PlaySpec
 
       await(result)
 
-      verify(mockCacheConnector).save[Hvd](
-        eqTo(Hvd.key),
-        eqTo(None)
+      verify(mockCacheConnector).removeByKey[Hvd](
+        eqTo(Hvd.key)
       )(any(), any(), any())
 
     }
@@ -501,9 +499,8 @@ class BusinessMatchingServiceSpec extends PlaySpec
 
       await(result)
 
-      verify(mockCacheConnector).save[Msb](
-        eqTo(Msb.key),
-        eqTo(None)
+      verify(mockCacheConnector).removeByKey[Msb](
+        eqTo(Msb.key)
       )(any(), any(), any())
 
     }
@@ -513,9 +510,8 @@ class BusinessMatchingServiceSpec extends PlaySpec
 
       await(result)
 
-      verify(mockCacheConnector).save[Tcsp](
-        eqTo(Tcsp.key),
-        eqTo(None)
+      verify(mockCacheConnector).removeByKey[Tcsp](
+        eqTo(Tcsp.key)
       )(any(), any(), any())
 
     }
@@ -525,9 +521,8 @@ class BusinessMatchingServiceSpec extends PlaySpec
 
       await(result)
 
-      verify(mockCacheConnector).save[Eab](
-        eqTo(Eab.key),
-        eqTo(None)
+      verify(mockCacheConnector).removeByKey[Eab](
+        eqTo(Eab.key)
       )(any(), any(), any())
 
     }

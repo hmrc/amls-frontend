@@ -66,7 +66,7 @@ class summarySpec extends AmlsSpec
       ("businessdetails.registeredoffice.title",checkElementTextIncludes(_, "line1","line2","line3","line4","AB12CD")),
       ("businessdetails.contactingyou.email.title",checkElementTextIncludes(_, "businessdetails.contactingyou.email.lbl", "test@test.com")),
       ("businessdetails.contactingyou.phone.title",checkElementTextIncludes(_, "businessdetails.contactingyou.phone.lbl", "01234567890")),
-      ("businessdetails.correspondenceaddress.postal.address",
+      ("businessdetails.correspondenceaddress.title",
         checkElementTextIncludes(_, "your name", "business name","line1","line2","line3","line4","AB12CD"))
     )
 

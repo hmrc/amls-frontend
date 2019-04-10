@@ -57,12 +57,57 @@ object ViewResponse {
 
   implicit val formatOption = Reads.optionWithNull[ViewResponse]
 
+  def constructReads(
+                 etmpFormBundleNumber:String,
+                 businessMatchingSection: BusinessMatching,
+                 eabSection: Option[EstateAgentBusiness],
+                 tradingPremisesSection: Option[Seq[TradingPremises]],
+                 businessDetailsSection: Option[BusinessDetails],
+                 oldBusinessDetailsSection: Option[BusinessDetails],
+                 bankDetailsSection: Seq[BankDetails],
+                 aboutYouSection: AddPerson,
+                 businessActivitiesSection: BusinessActivities,
+                 responsiblePeopleSection: Option[Seq[ResponsiblePerson]],
+                 tcspSection: Option[Tcsp],
+                 aspSection: Option[Asp],
+                 msbSection: Option[MoneyServiceBusiness],
+                 hvdSection: Option[Hvd],
+                 supervisionSection: Option[Supervision]
+               ) =  {
+
+    def readBusinessDetails = {
+      businessDetailsSection.getOrElse(
+        oldBusinessDetailsSection.getOrElse(
+          throw new Exception("[ViewResponse][constructReads] - Invalid Index (businessDetailsSection)")
+        )
+      )
+    }
+
+    apply(
+      etmpFormBundleNumber,
+      businessMatchingSection,
+      eabSection,
+      tradingPremisesSection,
+      readBusinessDetails,
+      bankDetailsSection,
+      aboutYouSection,
+      businessActivitiesSection,
+      responsiblePeopleSection,
+      tcspSection,
+      aspSection,
+      msbSection,
+      hvdSection,
+      supervisionSection
+    )
+  }
+
   implicit val jsonReads: Reads[ViewResponse] = {
     (__ \ "etmpFormBundleNumber").read[String] and
       (__ \ "businessMatchingSection").read[BusinessMatching] and
       (__ \ "eabSection").readNullable[EstateAgentBusiness] and
       (__ \ "tradingPremisesSection").readNullable[Seq[TradingPremises]] and
-      (__ \ "businessDetailsSection").read[BusinessDetails] and
+      (__ \ "businessDetailsSection").readNullable[BusinessDetails] and
+      (__ \ "aboutTheBusinessSection").readNullable[BusinessDetails] and
       (__ \ "bankDetailsSection").read[Seq[BankDetails]] and
       (__ \ "aboutYouSection").read[AddPerson] and
       (__ \ "businessActivitiesSection").read[BusinessActivities] and
@@ -72,7 +117,6 @@ object ViewResponse {
       (__ \ "msbSection").readNullable[MoneyServiceBusiness] and
       (__ \ "hvdSection").readNullable[Hvd] and
       (__ \ "supervisionSection").readNullable[Supervision]
-  }.apply(ViewResponse.apply _)
-
+  }.apply(ViewResponse.constructReads _)
 
 }

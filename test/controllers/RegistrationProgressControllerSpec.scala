@@ -390,7 +390,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           val elements = doc.getElementsMatchingOwnText(Messages("progress.visuallyhidden.view.amend"))
           elements.size() must be(sections.size - 1)
 
-          doc.select("a.edit-preapp").text must include(Messages("progress.preapplication.readonly"))
+          doc.select("a.edit-preapp").text must include(Messages("progress.preapplication.canedit"))
         }
       }
 
@@ -483,8 +483,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
           val html = Jsoup.parse(contentAsString(result))
 
-          html.select("#new-sections-list").text() must include(Messages("progress.hvd.name"))
-          html.select("#existing-sections-list").text() must not include Messages("progress.hvd.name")
+          html.select("#existing-sections-list").text() must include(Messages("progress.hvd.name"))
         }
       }
     }

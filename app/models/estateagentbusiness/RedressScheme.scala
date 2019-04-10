@@ -16,12 +16,11 @@
 
 package models.estateagentbusiness
 
+import cats.data.Validated.Valid
+import jto.validation.{ValidationError, _}
 import jto.validation.forms.Rules._
-import jto.validation.ValidationError
-import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
-import cats.data.Validated.{Invalid, Valid}
 
 sealed trait RedressScheme
 
@@ -41,10 +40,8 @@ object RedressScheme {
 
   implicit val formRedressRule: Rule[UrlFormEncoded, RedressScheme] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    import models.FormTypes._
-    (__ \ "isRedress").read[Boolean].withMessage("error.required.eab.redress.scheme") flatMap {
-      case true => {
         ( __ \ "propertyRedressScheme").read[String].withMessage("error.required.eab.which.redress.scheme") flatMap {
+          case "05" => Rule.fromMapping { _ => Valid(RedressSchemedNo) }
           case "01" => ThePropertyOmbudsman
           case "02" => OmbudsmanServices
           case "03" => PropertyRedressScheme
@@ -54,22 +51,18 @@ object RedressScheme {
             (Path \ "propertyRedressScheme") -> Seq(ValidationError("error.invalid"))
         }
       }
-      case false => Rule.fromMapping { _ => Valid(RedressSchemedNo) }
-    }
-  }
 
 
   implicit val formRedressWrites: Write[RedressScheme, UrlFormEncoded] = Write {
-    case ThePropertyOmbudsman => Map("isRedress" -> "true","propertyRedressScheme" -> "01")
-    case OmbudsmanServices => Map("isRedress" -> "true","propertyRedressScheme" -> "02")
-    case PropertyRedressScheme => Map("isRedress" -> "true","propertyRedressScheme" -> "03")
+    case ThePropertyOmbudsman => Map("propertyRedressScheme" -> "01")
+    case OmbudsmanServices => Map("propertyRedressScheme" -> "02")
+    case PropertyRedressScheme => Map("propertyRedressScheme" -> "03")
     case Other(value) =>
       Map(
-        "isRedress" -> "true",
         "propertyRedressScheme" -> "04",
         "other" -> value
       )
-    case RedressSchemedNo => Map("isRedress" -> "false")
+    case RedressSchemedNo => Map("propertyRedressScheme" -> "05")
   }
 
   implicit val jsonRedressReads : Reads[RedressScheme] = {
