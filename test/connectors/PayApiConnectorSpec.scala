@@ -18,7 +18,7 @@ package connectors
 
 import config.WSHttp
 import models.ReturnLocation
-import models.payments.{CreatePaymentRequest, CreatePaymentResponse, PayApiLinks}
+import models.payments.{CreatePaymentRequest, CreatePaymentResponse, NextUrl}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent._
@@ -41,7 +41,8 @@ class PayApiConnectorSpec extends AmlsSpec with ScalaFutures with IntegrationPat
   trait TestFixture {
     val paymentAmount = 100
 
-    val paymentUrl = "http://pay-api/payment"
+    val paymentId = "1234567890"
+    val paymentUrl = "http://tax.service.gov.uk/pay/1234567890"
 
     val validRequest = CreatePaymentRequest(
       "other",
@@ -50,7 +51,7 @@ class PayApiConnectorSpec extends AmlsSpec with ScalaFutures with IntegrationPat
       paymentAmount,
       ReturnLocation("/confirmation", "http://localhost:9222"))
 
-    val validResponse = CreatePaymentResponse(PayApiLinks(paymentUrl))
+    val validResponse = CreatePaymentResponse(NextUrl(paymentUrl), paymentId)
     val http = mock[WSHttp]
     val payApiUrl = "http://localhost:9057"
 
@@ -69,7 +70,7 @@ class PayApiConnectorSpec extends AmlsSpec with ScalaFutures with IntegrationPat
       "the payments feature is toggled on" must {
         "make a request to the payments API" in new TestFixture {
           when {
-            http.POST[CreatePaymentRequest, HttpResponse](eqTo(s"$payApiUrl/pay-api/payment"), any(), any())(any(), any(), any(), any())
+            http.POST[CreatePaymentRequest, HttpResponse](eqTo(s"$payApiUrl/pay-api/amls/journey/start"), any(), any())(any(), any(), any(), any())
           } thenReturn Future.successful(
             HttpResponse(OK, Some(Json.toJson(validResponse)))
           )
