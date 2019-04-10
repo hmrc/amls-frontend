@@ -20,8 +20,8 @@ import connectors._
 import generators.submission.SubscriptionResponseGenerator
 import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
-import models.businessdetails.{BusinessDetails, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
 import models.businesscustomer.{Address, ReviewDetails}
+import models.businessdetails.{BusinessDetails, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
 import models.businessmatching.BusinessMatching
 import models.confirmation.{BreakdownRow, Currency}
 import models.payments.PaymentStatuses.{Cancelled, Created, Failed}
@@ -36,7 +36,6 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalacheck.Gen
 import play.api.i18n.Messages
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.HttpResponse
@@ -98,7 +97,7 @@ class ConfirmationControllerSpec extends AmlsSpec
 
     when {
       controller.paymentsConnector.createPayment(any())(any(), any())
-    } thenReturn Future.successful(Some(CreatePaymentResponse(PayApiLinks("/payments"), Some(amlsRegistrationNumber))))
+    } thenReturn Future.successful(Some(CreatePaymentResponse(NextUrl("/payments"), amlsRegistrationNumber)))
 
     when {
       controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
@@ -409,12 +408,12 @@ class ConfirmationControllerSpec extends AmlsSpec
 
       when {
         controller.paymentsService.paymentsUrlOrDefault(any(), any(), any(), any(), any())(any(), any(), any(), any())
-      } thenReturn Future.successful(paymentResponse)
+      } thenReturn Future.successful(paymentResponse.nextUrl)
 
       val result = controller.retryPayment()(request.withFormUrlEncodedBody(postData))
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(paymentResponse.links.nextUrl)
+      redirectLocation(result) mustBe Some(paymentResponse.nextUrl.value)
     }
 
     "fail if a payment cannot be retried" in new Fixture {

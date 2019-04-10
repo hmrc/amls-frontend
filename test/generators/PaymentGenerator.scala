@@ -76,7 +76,7 @@ trait PaymentGenerator extends BaseGenerator with AmlsReferenceNumberGenerator {
   val paymentResponseGen: Gen[CreatePaymentResponse] = for {
     id <- Gen.listOfN(15, Gen.alphaNumChar)
     url <- stringOfLengthGen(10)
-  } yield CreatePaymentResponse(PayApiLinks(s"/$url"), Some(id.mkString))
+  } yield CreatePaymentResponse(NextUrl(s"/$url/${id.mkString}"), id.mkString)
 
   lazy val paymentReferenceNumber: String = paymentRefGen.sample.get
 }

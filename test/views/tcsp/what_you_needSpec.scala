@@ -57,6 +57,7 @@ class what_you_needSpec extends AmlsSpec with MustMatchers {
       html must include(Messages("tcsp.whatyouneed.requiredinfo.text.1"))
       html must include(Messages("tcsp.whatyouneed.requiredinfo.text.2"))
       html must include(Messages("tcsp.whatyouneed.requiredinfo.text.3"))
+      html must include(Messages("tcsp.whatyouneed.requiredinfo.text.4"))
     }
   }
 }

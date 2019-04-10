@@ -19,8 +19,9 @@
 @import models.tcsp._
 @import forms.EmptyForm
 @import config.ApplicationConfig
+@import scala.math.Ordering
 
-@(model: Tcsp)(implicit request: Request[_],m:Messages, lang: Lang)
+@(model: Tcsp, sortedProviders: List[String])(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.tcsp")
@@ -36,19 +37,12 @@
         editLinkTag = "tcspkindserviceprovider-edit",
         editUrl = controllers.tcsp.routes.TcspTypesController.get(true).toString
     ) {
-        @model.tcspTypes.map { v =>
-        <ul class="list list--semicolon">
-            @v.serviceProviders.map { x =>
-                <li>@x match {
-                    case NomineeShareholdersProvider => {@Messages("tcsp.service.provider.lbl.01")}
-                    case TrusteeProvider => {@Messages("tcsp.service.provider.lbl.02")}
-                    case RegisteredOfficeEtc => {@Messages("tcsp.service.provider.lbl.03")}
-                    case CompanyDirectorEtc => {@Messages("tcsp.service.provider.lbl.04")}
-                    case CompanyFormationAgent => {@Messages("tcsp.service.provider.lbl.05")}
-                }</li>
-            }
-        </ul>
+
+        <ul class="list">
+        @sortedProviders.map{line =>
+            <li>@line</li>
         }
+        </ul>
     }
 
     @model.onlyOffTheShelfCompsSold.map { s =>
@@ -88,9 +82,12 @@
                 editLinkTag = "tcsptypes-edit",
                 editUrl = controllers.tcsp.routes.ProvidedServicesController.get(true).toString
             ) {
-                <ul class="list list--comma">
+                <ul class="list">
                     @model.providedServices.map { a =>
-                        @a.services.map { x =>
+                        @a.services.toSeq.filterNot(_.isInstanceOf[Other]).sortBy(_.getMessage).map { x =>
+                            <li>@x.getMessage</li>
+                        }
+                        @a.services.toSeq.filter(_.isInstanceOf[Other]).sortBy(_.getMessage).map { x =>
                             <li>@x.getMessage</li>
                         }
                     }

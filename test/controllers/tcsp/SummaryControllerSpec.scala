@@ -58,7 +58,89 @@ class SummaryControllerSpec extends AmlsSpec {
     } thenReturn Future.successful(false)
   }
 
+  "sortProviders" must {
+
+    "return Trust or company formation agent as the last item in the sorted list" when {
+
+      "CompanyFormationAgent service provider is included" in new Fixture {
+
+        val modelCopy: Tcsp = model.copy(
+          tcspTypes=Some(
+            TcspTypes(
+              Set(
+                CompanyFormationAgent,
+                TrusteeProvider,
+                RegisteredOfficeEtc,
+                NomineeShareholdersProvider,
+                CompanyDirectorEtc
+              )
+            )
+          )
+        )
+
+        val res = controller.sortProviders(modelCopy)
+
+        res mustEqual List(
+          "Company director, secretary, or partner provider",
+          "Nominee shareholders provider",
+          "Registered office, business address, or virtual office services provider",
+          "Trustee provider",
+          "Trust or company formation agent"
+        )
+      }
+
+    }
+
+    "return empty list" when {
+
+      "no service providers list is given" in new Fixture {
+        val modelCopy: Tcsp = model.copy(
+          tcspTypes=Some(
+            TcspTypes(
+              Set()
+            )
+          )
+        )
+
+        val res = controller.sortProviders(modelCopy)
+
+        res mustEqual List()
+      }
+    }
+
+    "return sorted list" when {
+
+      "normal service provider list is provided" in new Fixture {
+        val modelCopy: Tcsp = model.copy(
+          tcspTypes=Some(
+            TcspTypes(
+              Set(TrusteeProvider,
+                RegisteredOfficeEtc,
+                NomineeShareholdersProvider,
+                CompanyDirectorEtc
+              )
+            )
+          )
+        )
+
+        val res = controller.sortProviders(modelCopy)
+
+        res mustEqual List(
+          "Company director, secretary, or partner provider",
+          "Nominee shareholders provider",
+          "Registered office, business address, or virtual office services provider",
+          "Trustee provider"
+        )
+      }
+
+    }
+
+  }
+
   "Get" must {
+
+
+
 
     "load the summary page when section data is available" in new Fixture {
 
