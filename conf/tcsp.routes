@@ -3,14 +3,14 @@ GET         /what-you-need                             @controllers.tcsp.WhatYou
 GET         /services                                  @controllers.tcsp.ProvidedServicesController.get(edit: Boolean ?= false)
 POST        /services                                  @controllers.tcsp.ProvidedServicesController.post(edit: Boolean ?= false)
 
-GET         /service-type                              @controllers.tcsp.TcspTypesController.get(edit: Boolean ?= false)
-POST        /service-type                              @controllers.tcsp.TcspTypesController.post(edit: Boolean ?= false)
+GET         /type-of-trust-company-service-provider    @controllers.tcsp.TcspTypesController.get(edit: Boolean ?= false)
+POST        /type-of-trust-company-service-provider    @controllers.tcsp.TcspTypesController.post(edit: Boolean ?= false)
 
-GET         /other-trust-provider                      @controllers.tcsp.ServicesOfAnotherTCSPController.get(edit: Boolean ?= false)
-POST        /other-trust-provider                      @controllers.tcsp.ServicesOfAnotherTCSPController.post(edit: Boolean ?= false)
+GET         /another-trust-company-service-provider    @controllers.tcsp.ServicesOfAnotherTCSPController.get(edit: Boolean ?= false)
+POST        /another-trust-company-service-provider    @controllers.tcsp.ServicesOfAnotherTCSPController.post(edit: Boolean ?= false)
 
-GET         /other-trust-provider-supervision          @controllers.tcsp.AnotherTCSPSupervisionController.get(edit: Boolean ?= false)
-POST        /other-trust-provider-supervision          @controllers.tcsp.AnotherTCSPSupervisionController.post(edit: Boolean ?= false)
+GET         /provider-hmrc-supervision                 @controllers.tcsp.AnotherTCSPSupervisionController.get(edit: Boolean ?= false)
+POST        /provider-hmrc-supervision                 @controllers.tcsp.AnotherTCSPSupervisionController.post(edit: Boolean ?= false)
 
 GET         /check-your-answers                        @controllers.tcsp.SummaryController.get()
 POST        /check-your-answers                        @controllers.tcsp.SummaryController.post()
