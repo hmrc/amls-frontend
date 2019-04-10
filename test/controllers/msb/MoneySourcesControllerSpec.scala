@@ -153,11 +153,6 @@ class MoneySourcesControllerSpec extends AmlsSpec
         "redirect to FXTransactions in the next 12 months controller" in new DealsInForeignCurrencyFixture {
           val result = controller.post()(newRequest)
 
-          //mockCacheFetchAll
-
-          //mockCacheGetEntry[MoneyServiceBusiness](Some(MoneyServiceBusiness()), MoneyServiceBusiness.key)
-          //mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
-
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(controllers.msb.routes.FXTransactionsInNext12MonthsController.get().url)
         }
