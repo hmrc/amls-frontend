@@ -16,7 +16,6 @@
 
 package controllers.msb
 
-import connectors.DataCacheConnector
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity, _}
 import models.moneyservicebusiness.{MoneyServiceBusiness, _}
@@ -72,7 +71,7 @@ class MoneySourcesControllerSpec extends AmlsSpec
       .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
   }
 
-  trait DealsInForeignCurrencyFixture extends AuthorisedFixture with MoneyServiceBusinessTestData {
+  trait DealsInForeignCurrencyFixture extends AuthorisedFixture with MoneyServiceBusinessTestData with DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
@@ -86,8 +85,6 @@ class MoneySourcesControllerSpec extends AmlsSpec
 
     val cacheMap = mock[CacheMap]
 
-    val mockCacheConnector = mock[DataCacheConnector]
-
     when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
       .thenReturn(Future.successful(Some(completeMsb.copy(whichCurrencies = Some(WhichCurrencies(Seq("USD"), Some(UsesForeignCurrenciesYes)))))))
 
@@ -100,13 +97,9 @@ class MoneySourcesControllerSpec extends AmlsSpec
       serviceFlow = mock[ServiceFlow])
 
     val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
-    when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key))
-      .thenReturn(Some(completeMsb))
 
-    when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-      .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
-    when(cacheMap.getEntry[BusinessMatchingMsbServices](BusinessMatching.key))
-      .thenReturn(Some(BusinessMatchingMsbServices(Set(ForeignExchange))))
+    when(mockCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
+      .thenReturn(Future.successful(Some(BusinessMatching(msbServices = msbServices))))
   }
 
 
@@ -168,6 +161,12 @@ class MoneySourcesControllerSpec extends AmlsSpec
       "data is valid and edit is true" should {
         "redirect to Summary Controller" in new DealsInForeignCurrencyFixture with MoneyServiceBusinessTestData {
           val result = controller.post(edit = true)(newRequest)
+
+          mockCacheFetchAll
+
+          mockCacheGetEntry[MoneyServiceBusiness](Some(MoneyServiceBusiness()), MoneyServiceBusiness.key)
+          mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))))), BusinessMatching.key)
+
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(controllers.msb.routes.SummaryController.get().url)
         }

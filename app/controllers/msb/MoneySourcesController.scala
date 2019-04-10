@@ -24,7 +24,6 @@ import models.businessmatching.{BusinessMatching, CurrencyExchange, ForeignExcha
 import models.moneyservicebusiness._
 import services.StatusService
 import services.businessmatching.ServiceFlow
-import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
 
@@ -64,17 +63,18 @@ class MoneySourcesController @Inject()(val authConnector: AuthConnector,
           case ValidForm(_, data: MoneySources) =>
             for {
               msb <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
-              cache <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
-                updateMoneySources(msb, data))
-            } yield redirectToNextPage(cache, edit).getOrElse(NotFound(notFoundView))
+              _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key, updateMoneySources(msb, data))
+              updatedMsb <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
+              bm <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
+            } yield redirectToNextPage(updatedMsb, bm, edit).getOrElse(NotFound(notFoundView))
         }
       }
   }
 
-  def redirectToNextPage(map: CacheMap, edit: Boolean) = {
+  def redirectToNextPage(maybeMsb: Option[MoneyServiceBusiness], maybeBm: Option[BusinessMatching], edit: Boolean) = {
     for {
-      msb <- map.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
-      bm <- map.getEntry[BusinessMatching](BusinessMatching.key)
+      msb <- maybeMsb
+      bm <- maybeBm
       services <- bm.msbServices
     } yield {
       services.msbServices.contains(ForeignExchange) match {
