@@ -2081,9 +2081,10 @@ notifications.nmrj.title = No longer considering refusal
 notifications.nmrv.title = No longer considering revocation
 
 ############################### Renewal ###############################
-renewal.whatyouneed.requiredinfo.heading = For this section you’ll need to show your business activities for the last 12 months. You’ll be asked for:
-renewal.whatyouneed.line_1 = your net profit
-renewal.whatyouneed.line_2 = your net profit on activities covered by Money Laundering Regulations
+renewal.whatyouneed.requiredinfo.heading = In this section you’ll be asked for things like: 
+renewal.whatyouneed.line_1 = your business activities over the last 12 months
+renewal.whatyouneed.line_2 = your net profit
+renewal.whatyouneed.line_3 = your net profit on activities covered by Money Laundering Regulations
 renewal.progress.title = About your business
 renewal.progress.intro = If something has changed in your business that is relevant to Money Laundering Regulations you must update your information.\nYou’ll need to pay a fee for each of your trading premises. You may also need to pay a fee for any additional responsible people.
 renewal.progress.submit.header = Submit renewal
