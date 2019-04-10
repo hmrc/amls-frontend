@@ -69,7 +69,7 @@ class InvolvedInOtherController @Inject()(
     }
 
     typesString match {
-      case Some(_) => Some(typesString.getOrElse(Set()).mkString(", ") + ".")
+      case Some(x) => Some(s"${x.toList.sorted.mkString(", ")}.")
       case None => None
     }
 

@@ -3,8 +3,8 @@ POST        /progress                                                         @c
 
 GET         /what-you-need                                                    @controllers.renewal.WhatYouNeedController.get()
 
-GET         /confirm-activities                                               @controllers.renewal.InvolvedInOtherController.get(edit: Boolean ?= false)
-POST        /confirm-activities                                               @controllers.renewal.InvolvedInOtherController.post(edit: Boolean ?= false)
+GET         /other-activities                                               @controllers.renewal.InvolvedInOtherController.get(edit: Boolean ?= false)
+POST        /other-activities                                               @controllers.renewal.InvolvedInOtherController.post(edit: Boolean ?= false)
 
 GET         /business-turnover                                                @controllers.renewal.BusinessTurnoverController.get(edit: Boolean ?= false)
 POST        /business-turnover                                                @controllers.renewal.BusinessTurnoverController.post(edit: Boolean ?= false)
