@@ -3,8 +3,8 @@ GET         /what-you-need                               @controllers.asp.WhatYo
 GET         /services                                    @controllers.asp.ServicesOfBusinessController.get(edit: Boolean ?= false)
 POST        /services                                    @controllers.asp.ServicesOfBusinessController.post(edit: Boolean ?= false)
 
-GET         /agent-authorisation                                @controllers.asp.OtherBusinessTaxMattersController.get(edit: Boolean ?= false)
-POST        /agent-authorisation                                @controllers.asp.OtherBusinessTaxMattersController.post(edit: Boolean ?= false)
+GET         /agent-authorisation                         @controllers.asp.OtherBusinessTaxMattersController.get(edit: Boolean ?= false)
+POST        /agent-authorisation                         @controllers.asp.OtherBusinessTaxMattersController.post(edit: Boolean ?= false)
 
 GET         /date-change                                 @controllers.asp.ServicesOfBusinessDateOfChangeController.get
 POST        /date-change                                 @controllers.asp.ServicesOfBusinessDateOfChangeController.post
