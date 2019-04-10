@@ -16,23 +16,20 @@
 
 package services
 
+import config.ApplicationConfig
 import connectors.{AmlsConnector, PayApiConnector}
 import generators.PaymentGenerator
 import models.confirmation.Currency
-import models.payments.{CreateBacsPaymentRequest, CreatePaymentResponse, Payment, UpdateBacsRequest}
+import models.payments._
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AuthorisedFixture, AmlsSpec}
+import uk.gov.hmrc.http.HttpResponse
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
 
 class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerator {
 
@@ -99,7 +96,7 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
 
           //noinspection ScalaStyle
           whenReady(testPaymentService.paymentsUrlOrDefault("ref", 100, "http://return.com", "ref-no", "safeid")) { result =>
-            result mustBe CreatePaymentResponse.default
+            result mustBe NextUrl(ApplicationConfig.paymentsUrl)
           }
 
         }
