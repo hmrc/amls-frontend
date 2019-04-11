@@ -24,26 +24,26 @@ import utils.AmlsSpec
 import views.Fixture
 
 
-class service_provider_typesSpec extends AmlsSpec with MustMatchers {
+class complex_corp_structure_creationSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
   }
 
-  "provided_services view" must {
+  "complex_corp_structure_creation view" must {
+    "have correct title, heading amd subheading" in new ViewFixture {
 
-    "have correct title, heading and subheading" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.tcsp.service_provider_types(form2, true)
+      def view = views.html.tcsp.complex_corp_structure_creation(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
-      val title = Messages("tcsp.kind.of.service.provider.title") + " - " + Messages("summary.tcsp") + " - " +
-                  Messages("title.amls") + " - " + Messages("title.gov")
-      doc.title must be(title)
+      val title = Messages("tcsp.create.complex.corporate.structures.lbl") + " - " + Messages("summary.tcsp") + " - " +
+        Messages("title.amls") + " - " + Messages("title.gov")
 
-      heading.html must be(Messages("tcsp.kind.of.service.provider.title"))
+      doc.title must be(title)
+      heading.html must be(Messages("tcsp.create.complex.corporate.structures.lbl"))
       subHeading.html must include(Messages("summary.tcsp"))
     }
 
@@ -51,16 +51,15 @@ class service_provider_typesSpec extends AmlsSpec with MustMatchers {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "serviceProviders") -> Seq(ValidationError("not a message Key"))
+          (Path \ "complexCorpStructureCreation") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.tcsp.service_provider_types(form2, true)
+      def view = views.html.tcsp.complex_corp_structure_creation(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
-      doc.getElementById("serviceProviders")
+      doc.getElementById("complexCorpStructureCreation")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
-
     }
   }
 }

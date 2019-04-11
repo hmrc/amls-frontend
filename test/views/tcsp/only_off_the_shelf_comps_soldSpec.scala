@@ -24,26 +24,26 @@ import utils.AmlsSpec
 import views.Fixture
 
 
-class service_provider_typesSpec extends AmlsSpec with MustMatchers {
+class only_off_the_shelf_comps_soldSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
   }
 
-  "provided_services view" must {
+  "only_off_the_shelf_comps_sold view" must {
+    "have correct title, heading amd subheading" in new ViewFixture {
 
-    "have correct title, heading and subheading" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.tcsp.service_provider_types(form2, true)
+      def view = views.html.tcsp.only_off_the_shelf_comps_sold(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
-      val title = Messages("tcsp.kind.of.service.provider.title") + " - " + Messages("summary.tcsp") + " - " +
-                  Messages("title.amls") + " - " + Messages("title.gov")
-      doc.title must be(title)
+      val title = Messages("tcsp.off-the-shelf.companies.lbl") + " - " + Messages("summary.tcsp") + " - " +
+        Messages("title.amls") + " - " + Messages("title.gov")
 
-      heading.html must be(Messages("tcsp.kind.of.service.provider.title"))
+      doc.title must be(title)
+      heading.html must be(Messages("tcsp.off-the-shelf.companies.lbl"))
       subHeading.html must include(Messages("summary.tcsp"))
     }
 
@@ -51,16 +51,15 @@ class service_provider_typesSpec extends AmlsSpec with MustMatchers {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "serviceProviders") -> Seq(ValidationError("not a message Key"))
+          (Path \ "onlyOffTheShelfCompsSold") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.tcsp.service_provider_types(form2, true)
+      def view = views.html.tcsp.only_off_the_shelf_comps_sold(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
-      doc.getElementById("serviceProviders")
+      doc.getElementById("onlyOffTheShelfCompsSold")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
-
     }
   }
 }
