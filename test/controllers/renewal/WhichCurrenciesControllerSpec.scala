@@ -160,20 +160,17 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
         }
       }
 
-      "redirect to PercentageOfCashPaymentOver15000Controller" when {
-        "the business is HVD and ASP" in new RoutingFixture {
-          setupBusinessMatching(Set(HighValueDealing, AccountancyServices), Set(TransmittingMoney))
+      "redirect to CustomersOutsideTheUKController" when {
+        "the business is HVD and not an ASP" in new RoutingFixture {
+          setupBusinessMatching(Set(HighValueDealing), Set(TransmittingMoney))
 
           val result = controller.post()(validFormRequest)
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.get().url.some
+          redirectLocation(result) mustBe controllers.renewal.routes.CustomersOutsideUKController.get().url.some
         }
-      }
-
-      "redirect to CustomersOutsideTheUKController" when {
-        "the business is HVD and not an ASP" in new RoutingFixture {
-          setupBusinessMatching(Set(HighValueDealing), Set(TransmittingMoney))
+        "the business is HVD and ASP" in new RoutingFixture {
+          setupBusinessMatching(Set(HighValueDealing, AccountancyServices), Set(TransmittingMoney))
 
           val result = controller.post()(validFormRequest)
 

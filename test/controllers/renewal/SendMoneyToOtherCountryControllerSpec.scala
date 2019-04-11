@@ -191,17 +191,28 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.get().url))
+        redirectLocation(result) must be(Some(controllers.renewal.routes.CustomersOutsideUKController.get().url))
       }
     }
 
     "redirect to the CustomersOutsideTheUKController" when {
-      "post no and has HVD and NOT ASP or CE" in new Fixture {
+      "post no and has HVD" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody(
           "money" -> "false"
         )
 
         setupBusinessMatching(Set(HighValueDealing), Set(TransmittingMoney))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.renewal.routes.CustomersOutsideUKController.get().url))
+      }
+      "not CE, not FX, and not HVD" in new Fixture {
+        val newRequest = request.withFormUrlEncodedBody(
+          "money" -> "false"
+        )
+
+        setupBusinessMatching(Set(AccountancyServices), Set(TransmittingMoney))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -221,18 +232,6 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
 
-      }
-
-      "not CE, not FX, and not HVD" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
-          "money" -> "false"
-        )
-
-        setupBusinessMatching(Set(AccountancyServices), Set(TransmittingMoney))
-
-        val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
       }
     }
   }
