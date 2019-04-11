@@ -55,5 +55,5 @@ object CashPayment {
   }
 
   def update(cashPayment: CashPayment, firstDate: CashPaymentFirstDate): CashPayment =
-    CashPayment(cashPayment.acceptedPayment, Some(firstDate))
+    CashPayment(CashPaymentOverTenThousandEuros(true), Some(firstDate))
 }

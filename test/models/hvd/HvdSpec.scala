@@ -19,20 +19,17 @@ package models.hvd
 import models.DateOfChange
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import org.joda.time.LocalDate
-import org.scalatest.mock.MockitoSugar
 import org.mockito.Mockito._
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.Application
-import play.api.inject.guice.GuiceApplicationBuilder
+import org.scalatest.mock.MockitoSugar
+import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsUndefined, Json}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import org.scalatest.MustMatchers
 
 sealed trait HvdTestFixture {
-  val DefaultCashPayment = CashPaymentYes(new LocalDate(1956, 2, 15))
+  val DefaultCashPayment = CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(new LocalDate(1956, 2, 15))))
   private val paymentMethods = PaymentMethods(courier = true, direct = true, other = Some("foo"))
 
-  val NewCashPayment = CashPaymentNo
+  val NewCashPayment = CashPayment(CashPaymentOverTenThousandEuros(false), None)
 
   val completeModel = Hvd(
     cashPayment = Some(DefaultCashPayment),

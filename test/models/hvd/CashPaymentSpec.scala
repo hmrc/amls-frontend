@@ -19,172 +19,77 @@ package models.hvd
 import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
-import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
+import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 class CashPaymentSpec extends PlaySpec with MockitoSugar {
 
-  "CashPaymentSpec" should {
-    val DefaultCashPaymentYes = CashPaymentYes(new LocalDate(1990, 2, 24))
+  "CashPayment" should {
 
-    "Form Validation" must {
+    val cashPaymentYes = CashPayment(
+      CashPaymentOverTenThousandEuros(true),
+      Some(CashPaymentFirstDate(new LocalDate(1990, 2, 24))))
+    val cashPaymentYesJson = Json.obj("acceptedAnyPayment" -> true, "paymentDate" ->"1990-02-24")
 
-      "successfully validate given an enum value" in {
+    val cashPaymentNo = CashPayment(
+      CashPaymentOverTenThousandEuros(false),
+      None)
+    val cashPaymentNoJson = Json.obj("acceptedAnyPayment" -> false)
 
-        CashPayment.formRule.validate(Map("acceptedAnyPayment" -> Seq("false"))) must
-          be(Valid(CashPaymentNo))
+    "on calling Update" must {
+
+      "return CashPayment with acceptedPayment:false and paymentDate:None when passed acceptedPayment:false" in {
+
+        CashPayment.update(cashPaymentYes, CashPaymentOverTenThousandEuros(false))
+          .mustBe(CashPayment(CashPaymentOverTenThousandEuros(false), None))
+
+        CashPayment.update(cashPaymentNo, CashPaymentOverTenThousandEuros(false))
+          .mustBe(CashPayment(CashPaymentOverTenThousandEuros(false), None))
       }
 
-      "successfully validate given an `Yes` value" in {
-
-        val data = Map(
-          "acceptedAnyPayment" -> Seq("true"),
-          "paymentDate.day" -> Seq("15"),
-          "paymentDate.month" -> Seq("2"),
-          "paymentDate.year" -> Seq("1956")
-        )
-
-        CashPayment.formRule.validate(data) must
-          be(Valid(CashPaymentYes(new LocalDate(1956, 2, 15))))
+      "return CashPayment with acceptedPayment:true and paymentDate:None when passed acceptedPayment:true" in {
+        CashPayment.update(cashPaymentNo, CashPaymentOverTenThousandEuros(true))
+          .mustBe(CashPayment(CashPaymentOverTenThousandEuros(true), None))
       }
 
-      "fail to validate when neither 'Yes' nor 'No' is selected" in {
-        CashPayment.formRule.validate(Map.empty) must
-          be(Invalid(Seq(
-            (Path \ "acceptedAnyPayment") -> Seq(ValidationError("error.required.hvd.accepted.cash.payment"))
-          )))
+      "return unchanged CashPayment when acceptedPayment:true and passed acceptedPayment:true" in {
+        CashPayment.update(cashPaymentYes, CashPaymentOverTenThousandEuros(true))
+          .mustBe(cashPaymentYes)
       }
 
-      "fail validation" when {
-        "given a day in future beyond end of 2099" in {
-          val model = CashPayment.formWrites.writes(CashPaymentYes(new LocalDate(2100, 1, 1)))
+      "return CashPayment with acceptedPayment:true and paymentDate:Some when passed paymentDate" in {
+        CashPayment.update(cashPaymentYes, CashPaymentFirstDate(new LocalDate(1980, 2, 24)))
+          .mustBe(CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(new LocalDate(1980, 2, 24)))))
 
-          CashPayment.formRule.validate(model) must be(Invalid(Seq(
-            Path \ "paymentDate" -> Seq(ValidationError("error.future.date"))
-          )))
-        }
-      }
-
-      "fail validation" when {
-        "given a day in the past before start of 1900" in {
-          val model = CashPayment.formWrites.writes(CashPaymentYes(new LocalDate(1089, 12, 31)))
-
-          CashPayment.formRule.validate(model) must
-            be(Invalid(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.allowed.start.date")))))
-        }
-      }
-
-      "fail to validate given an invalid date" in {
-
-        val data = Map(
-          "acceptedAnyPayment" -> Seq("true"),
-          "paymentDate.day" -> Seq("30"),
-          "paymentDate.month" -> Seq("2"),
-          "paymentDate.year" -> Seq("1956")
-        )
-
-        CashPayment.formRule.validate(data) must
-          be(Invalid(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
-      }
-
-      "fail to validate given an future date" in {
-        val model = CashPayment.formWrites.writes(CashPaymentYes(LocalDate.now.plusMonths(1)))
-
-        CashPayment.formRule.validate(model) must
-          be(Invalid(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.future.date")))))
-      }
-
-      "fail to validate given missing day" in {
-
-        val data = Map(
-          "acceptedAnyPayment" -> Seq("true"),
-          "paymentDate.day" -> Seq(""),
-          "paymentDate.month" -> Seq("2"),
-          "paymentDate.year" -> Seq("1956")
-        )
-
-        CashPayment.formRule.validate(data) must
-          be(Invalid(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
-      }
-
-      "fail to validate given missing month" in {
-
-        val data = Map(
-          "acceptedAnyPayment" -> Seq("true"),
-          "paymentDate.day" -> Seq("2"),
-          "paymentDate.month" -> Seq(""),
-          "paymentDate.year" -> Seq("1956")
-        )
-
-        CashPayment.formRule.validate(data) must
-          be(Invalid(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
-      }
-
-      "fail to validate given missing year" in {
-
-        val data = Map(
-          "acceptedAnyPayment" -> Seq("true"),
-          "paymentDate.day" -> Seq("1"),
-          "paymentDate.month" -> Seq("2"),
-          "paymentDate.year" -> Seq("")
-        )
-
-        CashPayment.formRule.validate(data) must
-          be(Invalid(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
-      }
-
-      "write correct data from enum value" in {
-
-        CashPayment.formWrites.writes(CashPaymentNo) must
-          be(Map("acceptedAnyPayment" -> Seq("false")))
-
-      }
-
-      "write correct data from `Yes` value" in {
-
-        CashPayment.formWrites.writes(DefaultCashPaymentYes) must
-          be(Map("acceptedAnyPayment" -> Seq("true"),
-            "paymentDate.day" -> List("24"), "paymentDate.month" -> List("2"), "paymentDate.year" -> List("1990")))
+        CashPayment.update(cashPaymentNo, CashPaymentFirstDate(new LocalDate(1980, 2, 24)))
+          .mustBe(CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(new LocalDate(1980, 2, 24)))))
       }
     }
 
     "JSON validation" must {
 
-      "successfully validate given an enum value" in {
+      "successfully validate given a `Yes` value" in {
 
-        Json.fromJson[CashPayment](Json.obj("acceptedAnyPayment" -> false)) must
-          be(JsSuccess(CashPaymentNo, JsPath))
+        Json.fromJson[CashPayment](cashPaymentYesJson) must
+          be(JsSuccess(cashPaymentYes, JsPath))
       }
 
-      "successfully validate given an `Yes` value" in {
+      "successfully validate given a `No` value" in {
 
-        val json = Json.obj("acceptedAnyPayment" -> true, "paymentDate" ->"1990-02-24")
-
-        Json.fromJson[CashPayment](json) must
-          be(JsSuccess(CashPaymentYes(new LocalDate(1990, 2, 24)), JsPath \"paymentDate"))
-      }
-
-      "fail to validate when given an empty `Yes` value" in {
-
-        val json = Json.obj("acceptedAnyPayment" -> true)
-
-        Json.fromJson[CashPayment](json) must
-          be(JsError((JsPath \ "paymentDate") -> play.api.data.validation.ValidationError("error.path.missing")))
+        Json.fromJson[CashPayment](cashPaymentNoJson) must
+          be(JsSuccess(cashPaymentNo, JsPath))
       }
 
       "Successfully read and write Json data" in {
-
-        CashPayment.jsonReads.reads(CashPayment.jsonWrites.writes(DefaultCashPaymentYes)) must be(
-          JsSuccess(CashPaymentYes(new LocalDate(1990, 2, 24)), JsPath \ "paymentDate"))
+        CashPayment.jsonReads.reads(CashPayment.jsonWrites.writes(cashPaymentYes)) must be(
+          JsSuccess(cashPaymentYes))
       }
 
       "write the correct value" in {
 
-        Json.toJson(CashPaymentNo) must
+        Json.toJson(cashPaymentNo) must
           be(Json.obj("acceptedAnyPayment" -> false))
 
-        Json.toJson(DefaultCashPaymentYes) must
+        Json.toJson(cashPaymentYes) must
           be(Json.obj(
             "acceptedAnyPayment" -> true,
             "paymentDate" -> new LocalDate(1990, 2, 24)
@@ -192,5 +97,4 @@ class CashPaymentSpec extends PlaySpec with MockitoSugar {
       }
     }
   }
-
 }

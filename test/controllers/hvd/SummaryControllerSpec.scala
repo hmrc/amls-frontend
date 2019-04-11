@@ -55,7 +55,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
     val month = 2
     val year = 1956
 
-    val completeModel = Hvd(Some(CashPaymentYes(new LocalDate(year, month, day))),
+    val completeModel = Hvd(Some(CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(new LocalDate(year, month, day))))),
       Some(Products(Set(Alcohol, Tobacco, Other("test")))),
       Some(ExciseGoods(true)),
       Some(HowWillYouSellGoods(Seq(Wholesale, Retail, Auction))),
@@ -119,8 +119,9 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
         document.getElementsByTag("section").get(2).getElementsByTag("a").hasClass("change-answer") must be(true)
         document.getElementsByTag("section").get(3).getElementsByTag("a").hasClass("change-answer") must be(true)
         document.getElementsByTag("section").get(4).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByTag("section").get(5).getElementsByTag("a").hasClass("change-answer") must be(false)
+        document.getElementsByTag("section").get(5).getElementsByTag("a").hasClass("change-answer") must be(true)
         document.getElementsByTag("section").get(6).getElementsByTag("a").hasClass("change-answer") must be(false)
+        document.getElementsByTag("section").get(7).getElementsByTag("a").hasClass("change-answer") must be(false)
       }
     }
 

@@ -1956,8 +1956,6 @@ hvd.cash.payment.data.details.summary.details.01 = any single cash payment of �
 hvd.cash.payment.data.details.summary.details.02 = several related cash payments totalling €10,000 or more including things like payment plans, payments on account and deposits
 hvd.cash.payment.data.details.summary.details.03 = cash paid by a customer totalling €10,000 or more in any 90 day period
 
-hvd.summary.payment.date.label = Date of first payment
-
 hvd.products.title = What will your business buy or sell?
 hvd.products.option.01 = Alcohol
 hvd.products.option.02 = Tobacco

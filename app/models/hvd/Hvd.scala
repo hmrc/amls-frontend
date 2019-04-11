@@ -34,6 +34,7 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
                 hasChanged: Boolean = false,
                 hasAccepted: Boolean = false) {
 
+
   def cashPayment(p: CashPayment): Hvd =
     this.copy(cashPayment = Some(p), hasChanged = hasChanged || !this.cashPayment.contains(p), hasAccepted = hasAccepted && this.cashPayment.contains(p))
 

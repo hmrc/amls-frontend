@@ -109,7 +109,7 @@
         @cp.firstDate match {
             case Some(CashPaymentFirstDate(date)) => {
                 @checkYourAnswers(
-                    question = Messages("hvd.summary.payment.date.label"),
+                    question = Messages("hvd.cash.payment.date.title"),
                     editUrl = controllers.hvd.routes.CashPaymentFirstDateController.get(true).toString,
                     editLinkTag = "hvdcashpaymentfirstdate-edit"
                 ) {
