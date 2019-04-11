@@ -60,7 +60,7 @@
 
     @model.agentCompanyDetails.map { x =>
         @checkYourAnswers(
-            question = Messages("tradingpremises.agentcompanyname.title"),
+            question = Messages("tradingpremises.youragent.company.name"),
             editLinkTag = "tradingpremisesagentcompanyname-edit",
             editUrl = controllers.tradingpremises.routes.AgentCompanyDetailsController.get(index, true).toString
         ) {
@@ -153,8 +153,8 @@
                 editLinkTag = "tradingpremisedsummaryservices-edit",
                 editUrl = if(!hasOneService){controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(index, true).toString} else ""
             ) {
-                <ul class="list list--comma">
-                @ba.activities.map { a =>
+                <ul class="list">
+                @ba.activities.toList.sortBy(_.toString).map { a =>
                     <li>@a.getMessage()</li>
                 }
                 </ul>
@@ -168,8 +168,8 @@
                 editUrl = if(!hasOneMsbService){controllers.tradingpremises.routes.MSBServicesController.get(index, true).toString} else ""
             ) {
 
-                <ul class="list list--comma">
-                    @msb.services.map { line =>
+                <ul class="list">
+                    @msb.services.toList.sortBy(_.toString).map { line =>
                     <li>@line match {
                         case TransmittingMoney => {@Messages("msb.services.list.lbl.01")}
                         case CurrencyExchange => {@Messages("msb.services.list.lbl.02")}

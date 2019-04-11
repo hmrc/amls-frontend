@@ -79,7 +79,7 @@ class summary_detailsSpec extends TestHelper with HtmlAssertions with TableDrive
   "The summary details page" must {
     val sectionChecks = Table[String, Element => Boolean](
       ("title key", "check"),
-      ("tradingpremises.summary.address", checkElementTextIncludes(_, "Trading address (registered business address) Answer: 1 2 asdfasdf")),
+      ("tradingpremises.summary.address", checkElementTextIncludes(_, "Trading address Answer: 1 2 asdfasdf")),
       ("tradingpremises.startDate.title", checkElementTextIncludes(_, DateHelper.formatDate(new LocalDate(1990, 2, 24)))),
       ("tradingpremises.isResidential.title", checkElementTextIncludes(_, "lbl.yes")),
       ("tradingpremises.whatdoesyourbusinessdo.title", checkElementTextOnlyIncludes(_, "Bill payment services", "Estate agency services", "Money service business activities")),
@@ -88,7 +88,7 @@ class summary_detailsSpec extends TestHelper with HtmlAssertions with TableDrive
       ("tradingpremises.businessStructure.title", checkElementTextIncludes(_, "businessType.lbl.01")),
       ("tradingpremises.agentname.title", checkElementTextIncludes(_, "test")),
       ("tradingpremises.agentpartnership.title", checkElementTextIncludes(_, "test")),
-      ("tradingpremises.agentcompanyname.title", checkElementTextIncludes(_, "test"))
+      ("tradingpremises.youragent.company.name", checkElementTextIncludes(_, "test"))
     )
     "load summary details page when it is an msb" in new ViewFixture {
 
