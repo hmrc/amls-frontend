@@ -75,6 +75,19 @@ class summarySpec extends AmlsSpec with MustMatchers  {
       checkYourAnswersSection.get(3).html must include(Messages("lbl.no"))
     }
 
+    "display the business is not registered with redress scheme" in new TestFixture {
+
+      val business = validBusiness.copy(redressScheme = Some(RedressSchemedNo))
+
+      def view = views.html.estateagentbusiness.summary(EmptyForm, business)
+
+      val checkYourAnswersSection = doc.select("section.check-your-answers")
+
+      checkYourAnswersSection.size() must be(4)
+      checkYourAnswersSection.get(1).html must include(Messages("estateagentbusiness.registered.redress.title"))
+      checkYourAnswersSection.get(1).html must include(Messages("estateagentbusiness.redress.lbl.05"))
+    }
+
     "not display the residential section if the business does not offer residential services" in new TestFixture {
 
       val business = validBusiness.copy(services = Some(Services(Set(Commercial))))
