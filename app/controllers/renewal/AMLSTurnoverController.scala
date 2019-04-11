@@ -70,8 +70,8 @@ class AMLSTurnoverController @Inject()(
             } yield (edit, businessMatching) match {
               case (true, _) => Redirect(routes.SummaryController.get())
               case (false, Some(bm)) if bm.activities.isDefined => bm.activities.get.businessActivities match {
-                case x if x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideUKController.get())
                 case x if x.contains(MoneyServiceBusiness) => Redirect(routes.TotalThroughputController.get())
+                case x if x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideUKController.get())
                 case x if x.contains(HighValueDealing) => Redirect(routes.CustomersOutsideUKController.get())
                 case _ => Redirect(routes.SummaryController.get())
               }
