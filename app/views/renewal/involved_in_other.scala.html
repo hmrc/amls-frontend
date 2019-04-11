@@ -18,7 +18,7 @@
 @import forms2._
 @import models.renewal._
 
-@(f: forms.Form2[_], edit: Boolean, businessTypes: Option[String])(implicit request: Request[_],m:Messages)
+@(f: forms.Form2[_], edit: Boolean, businessTypes: Option[List[String]])(implicit request: Request[_],m:Messages)
 
 @target = @{
     s"""${f("details").id}-fieldset"""
@@ -35,7 +35,15 @@
     heading = header
 )  {
 
-    <p>@Messages("businessactivities.confirm-activities.subtitle") @businessTypes</p>
+    <p>@Messages("businessactivities.confirm-activities.subtitle")</p>
+
+    @businessTypes.map {
+        case x => {
+            <ul class="list list-bullet">
+                <li>@x</li>
+            </ul>
+        }
+    }
 
     <p>@Messages("renewal.involvedinother.example")</p>
     <ul class="list list-bullet">

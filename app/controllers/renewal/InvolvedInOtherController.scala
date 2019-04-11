@@ -54,7 +54,7 @@ class InvolvedInOtherController @Inject()(
         }
   }
 
-  private def businessTypes(activities: BusinessMatching): Option[String] = {
+  private def businessTypes(activities: BusinessMatching): Option[List[String]] = {
     val typesString = activities.activities map { a =>
       a.businessActivities.map {
         case AccountancyServices => Messages("businessmatching.registerservices.servicename.lbl.01")
@@ -69,7 +69,7 @@ class InvolvedInOtherController @Inject()(
     }
 
     typesString match {
-      case Some(x) => Some(s"${x.toList.sorted.mkString(", ")}.")
+      case Some(x) => Some(x.toList.sorted)
       case None => None
     }
 

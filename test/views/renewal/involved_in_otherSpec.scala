@@ -55,9 +55,10 @@ class involved_in_otherSpec extends AmlsSpec with MustMatchers {
     "correctly list business activities" in new ViewFixture {
       val form2: ValidForm[InvolvedInOther] = Form2(InvolvedInOtherNo)
 
-      def view = views.html.renewal.involved_in_other(form2, true, Some("test activities string"))
+      def view = views.html.renewal.involved_in_other(form2, true, Some(List("test activities string")))
 
-      html must include(Messages("businessactivities.confirm-activities.subtitle") + " " + "test activities string")
+      html must include(Messages("businessactivities.confirm-activities.subtitle"))
+      html must include("test activities string")
     }
 
     "show errors in the correct locations" in new ViewFixture {
