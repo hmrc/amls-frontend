@@ -57,6 +57,34 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
   }
 
   "InvolvedInOtherController" must {
+      "add a/an to sorted business type list" in new Fixture {
+        val businessMatching = BusinessMatching(
+          activities = Some(BMActivities(Set(
+            HighValueDealing,
+            AccountancyServices,
+            BillPaymentServices,
+            EstateAgentBusinessService
+          )))
+        )
+
+        when(mockDataCacheConnector.fetchAll(any(), any()))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(mockCacheMap.getEntry[Renewal](Renewal.key))
+          .thenReturn(None)
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(businessMatching))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        contentAsString(result) must include(s"an ${Messages("businessmatching.registerservices.servicename.lbl.01")}")
+        contentAsString(result) must include(s"a ${Messages("businessmatching.registerservices.servicename.lbl.02")}")
+        contentAsString(result) must include(s"an ${Messages("businessmatching.registerservices.servicename.lbl.03")}")
+        contentAsString(result) must include(s"a ${Messages("businessmatching.registerservices.servicename.lbl.04")}")
+      }
+  }
+
+  "InvolvedInOtherController" must {
 
     "when get is called" must {
       "display the is your business involved in other activities page" in new Fixture {
