@@ -38,10 +38,12 @@
     <p>@Messages("businessactivities.confirm-activities.subtitle")</p>
 
     @businessTypes.map {
-        case x => {
+        case types => {
+            @types.map{ x =>
             <ul class="list list-bullet">
                 <li>@x</li>
             </ul>
+            }
         }
     }
 

@@ -60,7 +60,10 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
       "add a/an to sorted business type list" in new Fixture {
         val businessMatching = BusinessMatching(
           activities = Some(BMActivities(Set(
+            TelephonePaymentService,
             HighValueDealing,
+            MoneyServiceBusiness,
+            TrustAndCompanyServices,
             AccountancyServices,
             BillPaymentServices,
             EstateAgentBusinessService
@@ -81,6 +84,9 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
         contentAsString(result) must include(s"a ${Messages("businessmatching.registerservices.servicename.lbl.02")}")
         contentAsString(result) must include(s"an ${Messages("businessmatching.registerservices.servicename.lbl.03")}")
         contentAsString(result) must include(s"a ${Messages("businessmatching.registerservices.servicename.lbl.04")}")
+        contentAsString(result) must include(s"a ${Messages("businessmatching.registerservices.servicename.lbl.05")}")
+        contentAsString(result) must include(s"a ${Messages("businessmatching.registerservices.servicename.lbl.07")}")
+        contentAsString(result) must include(s"a ${Messages("businessmatching.registerservices.servicename.lbl.06")}")
       }
   }
 

@@ -61,9 +61,9 @@ class InvolvedInOtherController @Inject()(
         case BillPaymentServices => s"a ${Messages("businessmatching.registerservices.servicename.lbl.02")}"
         case EstateAgentBusinessService => s"an ${Messages("businessmatching.registerservices.servicename.lbl.03")}"
         case HighValueDealing => s"a ${Messages("businessmatching.registerservices.servicename.lbl.04")}"
-        case MoneyServiceBusiness => Messages("businessmatching.registerservices.servicename.lbl.05")
-        case TrustAndCompanyServices => Messages("businessmatching.registerservices.servicename.lbl.06")
-        case TelephonePaymentService => Messages("businessmatching.registerservices.servicename.lbl.07")
+        case MoneyServiceBusiness => s"a ${Messages("businessmatching.registerservices.servicename.lbl.05")}"
+        case TrustAndCompanyServices => s"a ${Messages("businessmatching.registerservices.servicename.lbl.06")}"
+        case TelephonePaymentService => s"a ${Messages("businessmatching.registerservices.servicename.lbl.07")}"
       }
 
     }
