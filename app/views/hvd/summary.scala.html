@@ -94,25 +94,20 @@
     }
 
     @model.cashPayment.map { cp =>
+
         @checkYourAnswers(
             question = Messages("hvd.cash.payment.title"),
             editUrl = controllers.hvd.routes.CashPaymentController.get(true).toString,
             editLinkTag = "hvdcashpayment-edit"
         ) {
-            @cp match {
-                case CashPaymentYes(_) => {
-                    <p>@Messages("lbl.yes")</p>
-                }
-                case CashPaymentNo => {
-                    <p>@Messages("lbl.no")</p>
-                }
+            @cp.acceptedPayment match {
+                case CashPaymentOverTenThousandEuros(true) => { <p>@Messages("lbl.yes")</p> }
+                case _ => { <p>@Messages("lbl.no")</p> }
             }
         }
-    }
 
-    @model.cashPayment.map { cp =>
-        @cp match {
-            case CashPaymentYes(Some(date)) => {
+        @cp.firstDate match {
+            case Some(CashPaymentFirstDate(date)) => {
                 @checkYourAnswers(
                     question = Messages("hvd.summary.payment.date.label"),
                     editUrl = controllers.hvd.routes.CashPaymentFirstDateController.get(true).toString,
@@ -121,6 +116,7 @@
                     <p>@DateHelper.formatDate(date)</p>
                 }
             }
+            case _ => {}
         }
     }
 
@@ -171,7 +167,6 @@
                     }</li>
             </ul>
         }
-
     }
 
     @model.percentageOfCashPaymentOver15000.map { p =>
@@ -193,6 +188,4 @@
     @form(f, controllers.hvd.routes.SummaryController.post()) {
         @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
     }
-
-
 }

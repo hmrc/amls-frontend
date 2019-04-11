@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
-import models.hvd.{CashPayment, Hvd}
+import models.hvd.{CashPayment, CashPaymentFirstDate, CashPaymentOverTenThousandEuros, Hvd}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.hvd.cash_payment_first_date
 
@@ -35,10 +35,10 @@ class CashPaymentFirstDateController @Inject()(val dataCacheConnector: DataCache
       implicit authContext => implicit request =>
         dataCacheConnector.fetch[Hvd](Hvd.key) map {
           response =>
-            val form: Form2[CashPayment] = (for {
+            val form: Form2[CashPaymentFirstDate] = (for {
               hvd <- response
-              cashPayment <- hvd.cashPayment
-            } yield Form2[CashPayment](cashPayment)).getOrElse(EmptyForm)
+              cashPayment <- hvd.cashPayment.flatMap(p => p.firstDate)
+            } yield Form2[CashPaymentFirstDate](cashPayment)).getOrElse(EmptyForm)
             Ok(cash_payment_first_date(form, edit))
         }
     }
@@ -47,15 +47,18 @@ class CashPaymentFirstDateController @Inject()(val dataCacheConnector: DataCache
   def post(edit: Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request => {
-        Form2[CashPayment](request.body) match {
+        Form2[CashPaymentFirstDate](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(cash_payment_first_date(f, edit)))
           case ValidForm(_, data) =>
             for {
               hvd <- dataCacheConnector.fetch[Hvd](Hvd.key)
-              _ <- dataCacheConnector.save[Hvd](Hvd.key,
-                hvd.cashPayment(data)
-              )
+              _ <- dataCacheConnector.save[Hvd](Hvd.key, hvd.cashPayment(
+                hvd.cashPayment match {
+                  case Some(cp) => CashPayment.update(cp, data)
+                  case None => CashPayment(CashPaymentOverTenThousandEuros(false), None)
+                }
+              ))
             } yield edit match {
               case true => Redirect(routes.SummaryController.get())
               case false => Redirect(routes.LinkedCashPaymentsController.get())
