@@ -1,1 +1,0 @@
- + [AMLS-4799](https://jira.tools.tax.service.gov.uk/browse/AMLS-4799) - 'Remove address from URL string when removing trading premises'

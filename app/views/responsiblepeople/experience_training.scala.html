@@ -36,7 +36,7 @@
     <p>@Messages("responsiblepeople.experiencetraining.businessactivities")</p>
     <ul class="list list-bullet">
         @bamodel.businessActivities.map { ba =>
-            <li>@Messages("businessmatching.registerservices.servicename.lbl."+BusinessActivities.getValue(ba))</li>
+            <li>@Messages("businessactivities.registerservices.servicename.lbl."+BusinessActivities.getValue(ba))</li>
         }
     </ul>
 
@@ -69,7 +69,7 @@
         }
 
         @fieldset(
-            legend = "responsiblepeople.experiencetraining.information.lbl",
+            legend = Messages("responsiblepeople.experiencetraining.information.lbl", personName),
             jsHidden = false,
             panel = true,
             classes = Seq("more-information"),

@@ -16,22 +16,19 @@
 
 package services
 
-import javax.inject.Inject
-
-import cats.data.OptionT
-import cats.implicits._
+import config.ApplicationConfig
 import connectors.{AmlsConnector, PayApiConnector}
-import models.{FeeResponse, ReturnLocation}
-import models.confirmation.{BreakdownRow, Currency}
+import javax.inject.Inject
+import models.confirmation.Currency
 import models.payments._
+import models.{FeeResponse, ReturnLocation}
 import play.api.Logger
-import play.api.http.Status._
 import play.api.mvc.Request
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 
 class PaymentsService @Inject()(
@@ -44,13 +41,13 @@ class PaymentsService @Inject()(
                         (implicit hc: HeaderCarrier,
                          ec: ExecutionContext,
                          authContext: AuthContext,
-                         request: Request[_]): Future[CreatePaymentResponse] =
+                         request: Request[_]): Future[NextUrl] =
     fees match {
       case f:FeeResponse if f.difference.isDefined & f.paymentReference.isDefined =>
         paymentsUrlOrDefault(f.paymentReference.get, f.difference.get.toDouble, returnUrl, amlsRefNo, safeId)
       case f:FeeResponse if f.paymentReference.isDefined =>
         paymentsUrlOrDefault(f.paymentReference.get, f.totalFees.toDouble, returnUrl, amlsRefNo, safeId)
-      case _ => Future.successful(CreatePaymentResponse.default)
+      case _ => Future.successful(NextUrl(ApplicationConfig.paymentsUrl))
     }
 
   //noinspection ScalaStyle
@@ -62,20 +59,20 @@ class PaymentsService @Inject()(
                           (implicit hc: HeaderCarrier,
                            ec: ExecutionContext,
                            authContext: AuthContext,
-                           request: Request[_]): Future[CreatePaymentResponse] = {
+                           request: Request[_]): Future[NextUrl] = {
 
 
     val amountInPence = (amount * 100).toInt
 
     paymentsConnector.createPayment(CreatePaymentRequest("other", paymentReference, "AMLS Payment", amountInPence, ReturnLocation(returnUrl))) flatMap {
-      case Some(response) => savePaymentBeforeResponse(response, amlsRefNo, safeId)
+      case Some(response) =>
+        savePaymentBeforeResponse(response, amlsRefNo, safeId).map(_ => response.nextUrl)
       case _ =>
         // $COVERAGE-OFF$
         Logger.warn("[ConfirmationController.requestPaymentUrl] Did not get a redirect url from the payments service; using configured default")
         // $COVERAGE-ON$
-        Future.successful(CreatePaymentResponse.default)
+        Future.successful(NextUrl(ApplicationConfig.paymentsUrl))
     }
-
   }
 
   def updateBacsStatus(paymentReference: String, request: UpdateBacsRequest)
@@ -93,14 +90,11 @@ class PaymentsService @Inject()(
   }
 
   private def savePaymentBeforeResponse(response: CreatePaymentResponse, amlsRefNo: String, safeId: String)
-                                       (implicit hc: HeaderCarrier, authContext: AuthContext) = {
-    (for {
-      paymentId <- OptionT.fromOption[Future](response.paymentId)
-      payment <- OptionT.liftF(amlsConnector.savePayment(paymentId, amlsRefNo, safeId))
-    } yield payment.status).value flatMap {
-      case Some(CREATED) => Future.successful(response)
-      case res => Future.failed(new Exception(s"Payment details failed to save. Response: $res"))
-    }
+                                       (implicit hc: HeaderCarrier, authContext: AuthContext): Future[Unit] = {
+      amlsConnector
+        .savePayment(response.journeyId, amlsRefNo, safeId)
+        .recover {
+          case e => throw new Exception(s"Payment details failed to save. [paymentId:${response.journeyId}]", e)
+        }.map(_ =>())
   }
-
 }
