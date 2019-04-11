@@ -80,13 +80,13 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(s"an ${Messages("businessmatching.registerservices.servicename.lbl.01")}")
-        contentAsString(result) must include(s"a ${Messages("businessmatching.registerservices.servicename.lbl.02")}")
-        contentAsString(result) must include(s"an ${Messages("businessmatching.registerservices.servicename.lbl.03")}")
-        contentAsString(result) must include(s"a ${Messages("businessmatching.registerservices.servicename.lbl.04")}")
-        contentAsString(result) must include(s"a ${Messages("businessmatching.registerservices.servicename.lbl.05")}")
-        contentAsString(result) must include(s"a ${Messages("businessmatching.registerservices.servicename.lbl.07")}")
-        contentAsString(result) must include(s"a ${Messages("businessmatching.registerservices.servicename.lbl.06")}")
+        contentAsString(result) must include(s"an ${Messages("businessmatching.registerservices.servicename.lbl.01").toLowerCase}")
+        contentAsString(result) must include(s"a ${Messages("businessmatching.registerservices.servicename.lbl.02").toLowerCase}")
+        contentAsString(result) must include(s"an ${Messages("businessmatching.registerservices.servicename.lbl.03").toLowerCase}")
+        contentAsString(result) must include(s"a ${Messages("businessmatching.registerservices.servicename.lbl.04").toLowerCase}")
+        contentAsString(result) must include(s"a ${Messages("businessmatching.registerservices.servicename.lbl.05").toLowerCase}")
+        contentAsString(result) must include(s"a ${Messages("businessmatching.registerservices.servicename.lbl.07").toLowerCase}")
+        contentAsString(result) must include(s"a ${Messages("businessmatching.registerservices.servicename.lbl.06").toLowerCase}")
       }
   }
 
@@ -142,7 +142,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
           val result = controller.get()(request)
           status(result) must be(OK)
-          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.01"))
+          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.01").toLowerCase)
 
         }
 
@@ -162,7 +162,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
           val result = controller.get()(request)
           status(result) must be(OK)
-          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.02"))
+          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.02").toLowerCase)
 
         }
 
@@ -182,7 +182,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
           val result = controller.get()(request)
           status(result) must be(OK)
-          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.03"))
+          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.03").toLowerCase)
 
         }
 
@@ -203,7 +203,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
           val result = controller.get()(request)
           status(result) must be(OK)
-          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.04"))
+          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.04").toLowerCase)
 
         }
 
@@ -223,7 +223,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
           val result = controller.get()(request)
           status(result) must be(OK)
-          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.05"))
+          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.05").toLowerCase)
 
         }
 
@@ -243,7 +243,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
           val result = controller.get()(request)
           status(result) must be(OK)
-          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.06"))
+          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.06").toLowerCase)
 
         }
 
@@ -263,7 +263,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
           val result = controller.get()(request)
           status(result) must be(OK)
-          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.07"))
+          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.07").toLowerCase)
 
         }
       }
@@ -396,7 +396,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.01"))
+          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.01").toLowerCase)
 
           val document = Jsoup.parse(contentAsString(result))
           document.select("a[href=#involvedInOther]").html() must include(Messages("error.required.renewal.ba.involved.in.other"))
@@ -434,7 +434,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.01"))
+          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.01").toLowerCase)
 
           val document = Jsoup.parse(contentAsString(result))
           document.select("a[href=#details]").html() must include(Messages("error.required.renewal.ba.involved.in.other.text"))

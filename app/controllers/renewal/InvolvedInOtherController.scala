@@ -55,24 +55,32 @@ class InvolvedInOtherController @Inject()(
   }
 
   private def businessTypes(activities: BusinessMatching): Option[List[String]] = {
-    val typesString = activities.activities map { a =>
+    val typesString: Option[List[String]] = activities.activities map { a =>
       a.businessActivities.map {
-        case AccountancyServices => s"an ${Messages("businessmatching.registerservices.servicename.lbl.01")}"
-        case BillPaymentServices => s"a ${Messages("businessmatching.registerservices.servicename.lbl.02")}"
-        case EstateAgentBusinessService => s"an ${Messages("businessmatching.registerservices.servicename.lbl.03")}"
-        case HighValueDealing => s"a ${Messages("businessmatching.registerservices.servicename.lbl.04")}"
-        case MoneyServiceBusiness => s"a ${Messages("businessmatching.registerservices.servicename.lbl.05")}"
-        case TrustAndCompanyServices => s"a ${Messages("businessmatching.registerservices.servicename.lbl.06")}"
-        case TelephonePaymentService => s"a ${Messages("businessmatching.registerservices.servicename.lbl.07")}"
+        case AccountancyServices => Messages("businessmatching.registerservices.servicename.lbl.01")
+        case BillPaymentServices => Messages("businessmatching.registerservices.servicename.lbl.02")
+        case EstateAgentBusinessService => Messages("businessmatching.registerservices.servicename.lbl.03")
+        case HighValueDealing => Messages("businessmatching.registerservices.servicename.lbl.04")
+        case MoneyServiceBusiness => Messages("businessmatching.registerservices.servicename.lbl.05")
+        case TrustAndCompanyServices => Messages("businessmatching.registerservices.servicename.lbl.06")
+        case TelephonePaymentService => Messages("businessmatching.registerservices.servicename.lbl.07")
+      }.toList.sorted
+    }
+
+    typesString.map {
+      case t =>
+        t.map(item => {
+        if (item.toLowerCase.startsWith("a") ||
+          item.toLowerCase.startsWith("o") ||
+          item.toLowerCase.startsWith("i") ||
+          item.toLowerCase.startsWith("u") ||
+          item.toLowerCase.startsWith("e")) {
+          s"an ${item.toLowerCase}"
+        } else {
+          s"a ${item.toLowerCase}"
+        }
+        })
       }
-
-    }
-
-    typesString match {
-      case Some(x) => Some(x.toList.sorted)
-      case None => None
-    }
-
   }
 
   def post(edit: Boolean = false) = Authorised.async {
