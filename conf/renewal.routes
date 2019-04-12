@@ -18,8 +18,8 @@ POST        /customers-outside-uk                                             @c
 GET         /throughput-last-12-months                                        @controllers.renewal.TotalThroughputController.get(edit: Boolean ?= false)
 POST        /throughput-last-12-months                                        @controllers.renewal.TotalThroughputController.post(edit: Boolean ?= false)
 
-GET         /transfers                                                        @controllers.renewal.TransactionsInLast12MonthsController.get(edit: Boolean ?= false)
-POST        /transfers                                                        @controllers.renewal.TransactionsInLast12MonthsController.post(edit: Boolean ?= false)
+GET         /money-transfers-last-12-months                                                        @controllers.renewal.TransactionsInLast12MonthsController.get(edit: Boolean ?= false)
+POST        /money-transfers-last-12-months                                                        @controllers.renewal.TransactionsInLast12MonthsController.post(edit: Boolean ?= false)
 
 GET         /send-money                                                       @controllers.renewal.SendMoneyToOtherCountryController.get(edit: Boolean ?= false)
 POST        /send-money                                                       @controllers.renewal.SendMoneyToOtherCountryController.post(edit: Boolean ?= false)
