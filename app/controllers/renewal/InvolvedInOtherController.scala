@@ -70,11 +70,7 @@ class InvolvedInOtherController @Inject()(
     typesString.map {
       case t =>
         t.map(item => {
-        if (item.toLowerCase.startsWith("a") ||
-          item.toLowerCase.startsWith("o") ||
-          item.toLowerCase.startsWith("i") ||
-          item.toLowerCase.startsWith("u") ||
-          item.toLowerCase.startsWith("e")) {
+        if (item.toLowerCase.startsWith("a") || item.toLowerCase.startsWith("e")) {
           s"an ${item.toLowerCase}"
         } else {
           s"a ${item.toLowerCase}"

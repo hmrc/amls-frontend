@@ -1130,13 +1130,13 @@ businessmatching.registerservices.other.title = What other service do you need t
 businessmatching.registerservices.details = More information about these categories
 
 businessmatching.registerservices.existing = You’ve told us your business already does:
-businessmatching.registerservices.servicename.lbl.01 = Accountancy services
-businessmatching.registerservices.servicename.lbl.02 = Bill payment services
-businessmatching.registerservices.servicename.lbl.03 = Estate agency services
-businessmatching.registerservices.servicename.lbl.04 = High value dealing
-businessmatching.registerservices.servicename.lbl.05 = Money service business activities
-businessmatching.registerservices.servicename.lbl.06 = Trust or company services
-businessmatching.registerservices.servicename.lbl.07 = Telecommunications, digital and IT payment services
+businessmatching.registerservices.servicename.lbl.01 = Accountancy service provider
+businessmatching.registerservices.servicename.lbl.02 = Bill payment service provider
+businessmatching.registerservices.servicename.lbl.03 = Estate agency business
+businessmatching.registerservices.servicename.lbl.04 = High value dealer
+businessmatching.registerservices.servicename.lbl.05 = Money service business
+businessmatching.registerservices.servicename.lbl.06 = Trust or company service provider
+businessmatching.registerservices.servicename.lbl.07 = Telecommunications, digital and IT payment service provider
 
 businessactivities.registerservices.servicename.lbl.01 = accountancy service provider
 businessactivities.registerservices.servicename.lbl.02 = bill payment service provider
@@ -1391,7 +1391,7 @@ businessactivities.businessfranchise.subtitle = If your business is a franchise,
 businessactivities.confirm-activities.title = Does your business do anything else?
 businessactivities.confirm-activities.lbl.details = Describe activities
 businessactivities.confirm-activities.line1.text = Is your business involved in any other activities, which are not covered by Money Laundering Regulations?
-businessactivities.confirm-activities.subtitle = You’ve told us your business is:
+businessactivities.confirm-activities.subtitle = You have told us your business is:
 businessactivities.identify-suspicious-activity.title = Does your business have written guidance for staff on how to identify and report suspicious activity?
 businessactivities.turnover.title = How much total net profit does your business expect in the next 12 months, from the following activities?
 businessactivities.turnover.heading = How much total net profit does your business expect in the next 12 months, from the following activities?
@@ -2104,10 +2104,10 @@ progress.renewal.description = Information about your business over the last 12 
 progress.renewal.time = 7 and 10
 
 renewal.involvedinother.title = Was your business involved in any other activities in the last 12 months?
-renewal.involvedinother.example = For example, you‘d answer ‘yes’ if you‘re:
-renewal.involvedinother.listline1 = a Money Service Business that’s also a newsagents shop
-renewal.involvedinother.listline2 = a Trust or Company Service Provider that’s also an recruitment agency
-renewal.involvedinother.listline3 = an Accountancy Service Provider that also sells software packages
+renewal.involvedinother.example = Other activities include things like: 
+renewal.involvedinother.listline1 = a newsagents shop
+renewal.involvedinother.listline2 = a recruitment agency
+renewal.involvedinother.listline3 = selling software packages
 
 
 renewal.customer.outside.uk.title = In the last 12 months did you have customers who lived or worked outside of the UK?
