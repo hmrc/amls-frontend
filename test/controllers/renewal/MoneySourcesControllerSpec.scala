@@ -19,7 +19,7 @@ package controllers.renewal
 import cats.implicits._
 import connectors.DataCacheConnector
 import models.businessmatching._
-import models.renewal.{MoneySources, Renewal, UsesForeignCurrenciesYes, WhichCurrencies, BankMoneySource, WholesalerMoneySource}
+import models.renewal._
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -33,7 +33,7 @@ import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
-class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
+class MoneySourcesControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -42,7 +42,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
     val dataCacheConnector = mock[DataCacheConnector]
     val cacheMap = mock[CacheMap]
 
-    lazy val controller = new WhichCurrenciesController(self.authConnector, renewalService, dataCacheConnector)
+    lazy val controller = new MoneySourcesController(self.authConnector, renewalService, dataCacheConnector)
 
     when {
       renewalService.getRenewal(any(), any(), any())
@@ -71,7 +71,15 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
   }
 
   trait RoutingFixture extends FormSubmissionFixture {
-    val renewal = Renewal()
+    val whichCurrencies = WhichCurrencies(
+      Seq("USD", "GBP", "BOB"),
+      Some(UsesForeignCurrenciesYes),
+      Some(MoneySources(Some(BankMoneySource("Bank names")),
+        Some(WholesalerMoneySource("wholesaler names")),
+        Some(true)))
+    )
+
+    val renewal = Renewal(whichCurrencies = Some(whichCurrencies))
 
     val msbServices = Some(
       BusinessMatchingMsbServices(
@@ -85,12 +93,6 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
       BusinessActivities(Set(HighValueDealing,  AccountancyServices))
     )
 
-    val whichCurrencies = WhichCurrencies(
-      Seq("USD"),
-      Some(UsesForeignCurrenciesYes),
-      Some(MoneySources(None,
-      None,
-      Some(true))))
 
 
     val expectedRenewal = renewal.copy(
@@ -119,35 +121,46 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
         status(result) mustBe OK
 
         val doc = Jsoup.parse(contentAsString(result))
-        doc.select(".heading-xlarge").text mustBe Messages("renewal.msb.whichcurrencies.header")
-      }
-
-      "edit is true" in new Fixture {
-        val result = controller.get(true)(request)
-
-        status(result) mustBe OK
-
-        val doc = Jsoup.parse(contentAsString(result))
-        doc.select("form").first.attr("action") mustBe routes.WhichCurrenciesController.post(true).url
-      }
-
-      "reads the current value from the renewals model" in new Fixture {
-        when {
-          renewalService.getRenewal(any(), any(), any())
-        } thenReturn Future.successful(Renewal(whichCurrencies = WhichCurrencies(Seq("EUR"), None, MoneySources(None, None, None).some).some).some)
-
-        val result = controller.get(true)(request)
-        val doc = Jsoup.parse(contentAsString(result))
-
-        doc.select("select[name=currencies[0]] option[selected]").attr("value") mustBe "EUR"
-
-        verify(renewalService).getRenewal(any(), any(), any())
+        doc.select(".heading-xlarge").text mustBe Messages("renewal.msb.money_sources.header")
       }
     }
   }
 
   "Calling the POST action" when {
     "posting valid data" must {
+      "redirect to How many Foreign Exchange Controller" when {
+        "the business is FX" in new RoutingFixture {
+          setupBusinessMatching(Set(HighValueDealing, AccountancyServices), Set(ForeignExchange))
+
+          val result = controller.post()(validFormRequest)
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe controllers.renewal.routes.FXTransactionsInLast12MonthsController.get().url.some
+        }
+      }
+
+      "redirect to PercentageOfCashPaymentOver15000Controller" when {
+        "the business is HVD and ASP" in new RoutingFixture {
+          setupBusinessMatching(Set(HighValueDealing, AccountancyServices), Set(TransmittingMoney))
+
+          val result = controller.post()(validFormRequest)
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.get().url.some
+        }
+      }
+
+      "redirect to CustomersOutsideTheUKController" when {
+        "the business is HVD and not an ASP" in new RoutingFixture {
+          setupBusinessMatching(Set(HighValueDealing), Set(TransmittingMoney))
+
+          val result = controller.post()(validFormRequest)
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe controllers.renewal.routes.CustomersOutsideUKController.get().url.some
+        }
+      }
+
       "redirect to the summary page" when {
         "editing" in new RoutingFixture {
           setupBusinessMatching(Set(HighValueDealing), Set(TransmittingMoney))
@@ -160,21 +173,18 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
       }
 
       "save the model data into the renewal object" in new RoutingFixture {
-        val currentModel = WhichCurrencies(
-          Seq("USD", "GBP", "BOB"),
-          Some(UsesForeignCurrenciesYes),
-          Some(MoneySources(
-          Some(BankMoneySource("Bank names")),
-          Some(WholesalerMoneySource("wholesaler names")),
-          Some(true))))
-
         val result = await(controller.post()(validFormRequest))
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
 
         verify(renewalService).updateRenewal(captor.capture())(any(), any(), any())
 
         captor.getValue.whichCurrencies mustBe Some(WhichCurrencies(
-          Seq("USD", "GBP", "BOB")))
+          Seq("USD", "GBP", "BOB"),
+          Some(UsesForeignCurrenciesYes),
+          Some(MoneySources(Some(BankMoneySource("Bank names")),
+          Some(WholesalerMoneySource("wholesaler names")),
+          Some(true)))
+        ))
       }
     }
 
