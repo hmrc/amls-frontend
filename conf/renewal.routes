@@ -15,8 +15,8 @@ POST        /net-profit-registered-services                                   @c
 GET         /customers-outside-uk                                             @controllers.renewal.CustomersOutsideUKController.get(edit: Boolean ?= false)
 POST        /customers-outside-uk                                             @controllers.renewal.CustomersOutsideUKController.post(edit: Boolean ?= false)
 
-GET         /anticipated-totals                                               @controllers.renewal.TotalThroughputController.get(edit: Boolean ?= false)
-POST        /anticipated-totals                                               @controllers.renewal.TotalThroughputController.post(edit: Boolean ?= false)
+GET         /throughput-last-12-months                                        @controllers.renewal.TotalThroughputController.get(edit: Boolean ?= false)
+POST        /throughput-last-12-months                                        @controllers.renewal.TotalThroughputController.post(edit: Boolean ?= false)
 
 GET         /transfers                                                        @controllers.renewal.TransactionsInLast12MonthsController.get(edit: Boolean ?= false)
 POST        /transfers                                                        @controllers.renewal.TransactionsInLast12MonthsController.post(edit: Boolean ?= false)

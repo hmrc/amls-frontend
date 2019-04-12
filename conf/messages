@@ -2119,7 +2119,7 @@ renewal.receiving.title = In the last 12 months did you receive cash payments ov
 renewal.receiving.expect.to.receive = How did you receive these payments?
 
 renewal.msb.throughput.header = What was your total throughput in the last 12 months?
-renewal.msb.throughput.info = Throughput is the total value of the money you transmit, the currency you exchange, and the cheques you cash.
+renewal.msb.throughput.info = Throughput is the total value of money you transfer, currency you exchange, and cheques you cash.
 renewal.msb.throughput.selection.required = Select one option to show your total throughput in the last 12 months
 renewal.msb.throughput.selection.invalid = Select one option to show your total throughput in the last 12 months
 renewal.msb.throughput.selection.1 = £0 to £99,999
