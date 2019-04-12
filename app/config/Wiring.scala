@@ -16,6 +16,7 @@
 
 package config
 
+import akka.actor.ActorSystem
 import javax.inject.{Inject, Singleton}
 import com.typesafe.config.Config
 import play.api.Mode.Mode
@@ -40,28 +41,30 @@ trait Hooks extends HttpHooks with HttpAuditing {
 }
 
 class WSHttp @Inject()( application: Application,
-                        amlsAuditConnector: AMLSAuditConnector) extends HttpGet
+                        amlsAuditConnector: AMLSAuditConnector,
+                        val actorSystem: ActorSystem) extends HttpGet
   with WSGet with HttpPut with WSPut with HttpPost with WSPost with HttpDelete  with WSDelete
   with Hooks with HttpPatch with WSPatch with AppName with RunMode {
 
-    override lazy val auditConnector: AuditConnector = amlsAuditConnector
-    override protected def appNameConfiguration: Configuration = application.configuration
-    override protected def configuration: Option[Config] = Some(application.configuration.underlying)
-    override protected def mode: Mode = application.mode
-    override protected def runModeConfiguration: Configuration = application.configuration
+  override lazy val auditConnector: AuditConnector = amlsAuditConnector
+  override protected def appNameConfiguration: Configuration = application.configuration
+  override protected def configuration: Option[Config] = Some(application.configuration.underlying)
+  override protected def mode: Mode = application.mode
+  override protected def runModeConfiguration: Configuration = application.configuration
 }
 
 // TODO: Maintaining a WSHttp object for static references in twirl templates. Remove when upgrading to 2.6
-object StaticWSHttp extends HttpGet
+object StaticWSHttp  extends HttpGet
   with WSGet with HttpPut with WSPut with HttpPost with WSPost with HttpDelete  with WSDelete
   with Hooks with HttpPatch with WSPatch with AppName with RunMode {
 
-  lazy val wsHttp: WSHttp = new WSHttp(Play.current, new AMLSAuditConnector(Play.current))
+  lazy val wsHttp: WSHttp = new WSHttp(Play.current, new AMLSAuditConnector(Play.current), Play.current.actorSystem)
   override lazy val auditConnector: AuditConnector = wsHttp.auditConnector
   override protected def appNameConfiguration: Configuration = Play.current.configuration
   override protected def configuration: Option[Config] = Some(Play.current.configuration.underlying)
   override protected def mode: Mode = Play.current.mode
   override protected def runModeConfiguration: Configuration = Play.current.configuration
+  protected def actorSystem: ActorSystem = Play.current.actorSystem
 }
 
 class AMLSControllerConfig @Inject()(application: Application) extends ControllerConfig {
