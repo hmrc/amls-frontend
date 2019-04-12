@@ -36,7 +36,7 @@ class how_will_you_sell_goodsSpec extends AmlsSpec with MustMatchers  {
 
     "have the back link button" in new ViewFixture {
 
-      val form2: ValidForm[HowWillYouSellGoods] = Form2(HowWillYouSellGoods(Seq(Retail)))
+      val form2: ValidForm[HowWillYouSellGoods] = Form2(HowWillYouSellGoods(Set(Retail)))
 
       def view = views.html.hvd.how_will_you_sell_goods(form2, true)
 
@@ -45,7 +45,7 @@ class how_will_you_sell_goodsSpec extends AmlsSpec with MustMatchers  {
 
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[HowWillYouSellGoods] = Form2(HowWillYouSellGoods(Seq(Retail)))
+      val form2: ValidForm[HowWillYouSellGoods] = Form2(HowWillYouSellGoods(Set(Retail)))
 
       def view = views.html.hvd.how_will_you_sell_goods(form2, true)
 
@@ -54,7 +54,7 @@ class how_will_you_sell_goodsSpec extends AmlsSpec with MustMatchers  {
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[HowWillYouSellGoods] = Form2(HowWillYouSellGoods(Seq(Wholesale)))
+      val form2: ValidForm[HowWillYouSellGoods] = Form2(HowWillYouSellGoods(Set(Wholesale)))
 
       def view = views.html.hvd.how_will_you_sell_goods(form2, true)
 

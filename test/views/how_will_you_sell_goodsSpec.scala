@@ -31,7 +31,7 @@ class how_will_you_sell_goodsSpec extends AmlsSpec with MustMatchers with Mockit
 
   trait HowWillYouSellGoodsViewFixture {
     implicit val request : Request[_] = addToken(FakeRequest())
-    val view = views.html.hvd.how_will_you_sell_goods(forms.Form2[HowWillYouSellGoods](HowWillYouSellGoods(Seq(Retail))), false)
+    val view = views.html.hvd.how_will_you_sell_goods(forms.Form2[HowWillYouSellGoods](HowWillYouSellGoods(Set(Retail))), false)
     lazy val html = view.body
     lazy val doc = Jsoup.parse(html)
     lazy val form = doc.getElementsByTag("form").first()
@@ -49,7 +49,7 @@ class how_will_you_sell_goodsSpec extends AmlsSpec with MustMatchers with Mockit
       }
 
       "maintains the edit flag" in new HowWillYouSellGoodsViewFixture {
-          override val view = views.html.hvd.how_will_you_sell_goods(forms.Form2[HowWillYouSellGoods](HowWillYouSellGoods(Seq(Retail))), true)
+          override val view = views.html.hvd.how_will_you_sell_goods(forms.Form2[HowWillYouSellGoods](HowWillYouSellGoods(Set(Retail))), true)
           new URI(form.attr("action")).getQuery must include ("edit=true")
       }
     }
