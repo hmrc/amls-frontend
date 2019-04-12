@@ -19,6 +19,7 @@ package models.businessmatching
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, UnincorporatedBody}
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import play.api.i18n.Messages
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.ControllerHelper
 
@@ -105,6 +106,21 @@ case class BusinessMatching(
     case BusinessMatching(Some(x), Some(activity), _, _, _, _, _, true, _)
       if isbusinessTypeComplete(x.businessType) && msbComplete(activity) => true
     case _ => false
+  }
+
+  def createBusinessTypeOrderedList()(implicit message: Messages): Option[List[String]] = {
+
+    activities map { a =>
+      a.businessActivities.map {
+        case AccountancyServices => Messages("businessmatching.registerservices.servicename.lbl.01")
+        case BillPaymentServices => Messages("businessmatching.registerservices.servicename.lbl.02")
+        case EstateAgentBusinessService => Messages("businessmatching.registerservices.servicename.lbl.03")
+        case HighValueDealing => Messages("businessmatching.registerservices.servicename.lbl.04")
+        case MoneyServiceBusiness => Messages("businessmatching.registerservices.servicename.lbl.05")
+        case TrustAndCompanyServices => Messages("businessmatching.registerservices.servicename.lbl.06")
+        case TelephonePaymentService => Messages("businessmatching.registerservices.servicename.lbl.07")
+      }.toList.sorted
+    }
   }
 
 }

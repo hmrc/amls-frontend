@@ -3,14 +3,14 @@ POST        /progress                                                         @c
 
 GET         /what-you-need                                                    @controllers.renewal.WhatYouNeedController.get()
 
-GET         /other-activities                                               @controllers.renewal.InvolvedInOtherController.get(edit: Boolean ?= false)
-POST        /other-activities                                               @controllers.renewal.InvolvedInOtherController.post(edit: Boolean ?= false)
+GET         /other-activities                                                 @controllers.renewal.InvolvedInOtherController.get(edit: Boolean ?= false)
+POST        /other-activities                                                 @controllers.renewal.InvolvedInOtherController.post(edit: Boolean ?= false)
 
-GET         /business-turnover                                                @controllers.renewal.BusinessTurnoverController.get(edit: Boolean ?= false)
-POST        /business-turnover                                                @controllers.renewal.BusinessTurnoverController.post(edit: Boolean ?= false)
+GET         /net-profit-last-12-months                                        @controllers.renewal.BusinessTurnoverController.get(edit: Boolean ?= false)
+POST        /net-profit-last-12-months                                        @controllers.renewal.BusinessTurnoverController.post(edit: Boolean ?= false)
 
-GET         /turnover                                                         @controllers.renewal.AMLSTurnoverController.get(edit: Boolean ?= false)
-POST        /turnover                                                         @controllers.renewal.AMLSTurnoverController.post(edit: Boolean ?= false)
+GET         /net-profit-registered-services                                   @controllers.renewal.AMLSTurnoverController.get(edit: Boolean ?= false)
+POST        /net-profit-registered-services                                   @controllers.renewal.AMLSTurnoverController.post(edit: Boolean ?= false)
 
 GET         /employment                                                       @controllers.renewal.CustomersOutsideUKController.get(edit: Boolean ?= false)
 POST        /employment                                                       @controllers.renewal.CustomersOutsideUKController.post(edit: Boolean ?= false)
