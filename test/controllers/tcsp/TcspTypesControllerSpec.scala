@@ -126,9 +126,7 @@ class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
 
       "throw error an invalid data entry" in  new Fixture {
         val newrequest = request.withFormUrlEncodedBody(
-          "serviceProviders[]" -> "05",
-          "onlyOffTheShelfCompsSold" -> "",
-          "complexCorpStructureCreation" -> ""
+          "serviceProviders[]" -> "06"
         )
 
         val result =  controller.post() (newrequest)

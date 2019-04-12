@@ -35,13 +35,15 @@ class SummaryControllerSpec extends AmlsSpec {
     val defaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes("12345678")
 
     val defaultCompanyServiceProviders = TcspTypes(Set(RegisteredOfficeEtc,
-      CompanyFormationAgent(true, false)))
+      CompanyFormationAgent))
 
     val model = Tcsp(
-      tcspTypes = Some(defaultCompanyServiceProviders),
-      providedServices = Some(defaultProvidedServices),
-      doesServicesOfAnotherTCSP = Some(true),
-      servicesOfAnotherTCSP = Some(defaultServicesOfAnotherTCSP)
+      Some(defaultCompanyServiceProviders),
+      Some(OnlyOffTheShelfCompsSoldYes),
+      Some(ComplexCorpStructureCreationNo),
+      Some(defaultProvidedServices),
+      Some(true),
+      Some(defaultServicesOfAnotherTCSP)
     )
 
     val controller = new SummaryController(
@@ -66,7 +68,7 @@ class SummaryControllerSpec extends AmlsSpec {
           tcspTypes=Some(
             TcspTypes(
               Set(
-                CompanyFormationAgent(false,false),
+                CompanyFormationAgent,
                 TrusteeProvider,
                 RegisteredOfficeEtc,
                 NomineeShareholdersProvider,

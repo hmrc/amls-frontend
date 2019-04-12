@@ -21,7 +21,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import javax.inject.Inject
-import models.tcsp.{CompanyFormationAgent, Tcsp}
+import models.tcsp._
 import play.api.i18n.Messages
 import services.StatusService
 import services.businessmatching.ServiceFlow
@@ -45,11 +45,11 @@ class SummaryController @Inject()
       types <- data.tcspTypes
       providers <- Some(types.serviceProviders)
       labels <- Some(providers.collect {
-          case provider if !provider.isInstanceOf[CompanyFormationAgent] => Messages(s"tcsp.service.provider.lbl.${provider.value}")
+          case provider if !provider.value.eq("05") => Messages(s"tcsp.service.provider.lbl.${provider.value}")
         }
       )
       specialCase <- Some(providers.collect {
-          case _: CompanyFormationAgent => Messages(s"tcsp.service.provider.lbl.05")
+          case provider if provider.value.eq("05") => Messages(s"tcsp.service.provider.lbl.05")
         }
       )
     } yield labels.toList.sorted ++ specialCase.toList).getOrElse(List())
