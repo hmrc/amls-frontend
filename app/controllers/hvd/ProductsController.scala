@@ -64,17 +64,16 @@ class ProductsController @Inject() (val dataCacheConnector: DataCacheConnector,
                 _ <- dataCacheConnector.save[Hvd](Hvd.key, hvd.products(data))
                 isNewActivity <- serviceFlow.isNewActivity(HighValueDealing)
               } yield {
-                if (!isNewActivity && redirectToDateOfChange[Products](status, hvd.products, data)) {
-                  Redirect(routes.HvdDateOfChangeController.get())
-                } else {
-                  if (data.items.contains(Alcohol) | data.items.contains(Tobacco)) {
-                    Redirect(routes.ExciseGoodsController.get(edit))
-                  } else {
-                    edit match {
-                      case true => Redirect(routes.SummaryController.get())
-                      case false => Redirect(routes.HowWillYouSellGoodsController.get(edit))
-                    }
-                  }
+                val redirect = !isNewActivity && redirectToDateOfChange[Products](status, hvd.products, data)
+                val exciseGoods = data.items.contains(Alcohol) | data.items.contains(Tobacco)
+                (redirect, exciseGoods, edit) match {
+                  case (true, true, true) => Redirect(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.EXCISE_GOODS_EDIT))
+                  case (true, true, false) => Redirect(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.EXCISE_GOODS))
+                  case (true, false, true) => Redirect(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CHECK_YOUR_ANSWERS))
+                  case (true, false, false) => Redirect(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.HOW_WILL_YOU_SELL_GOODS))
+                  case (false, true, _) => Redirect(routes.ExciseGoodsController.get(edit))
+                  case (false, false, true) => Redirect(routes.SummaryController.get())
+                  case (false, false, false) => Redirect(routes.HowWillYouSellGoodsController.get())
                 }
               }
             }

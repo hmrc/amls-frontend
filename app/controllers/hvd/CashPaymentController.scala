@@ -61,8 +61,8 @@ class CashPaymentController @Inject() (val dataCacheConnector: DataCacheConnecto
               ))
             } yield (edit, data) match {
               case (true, CashPaymentOverTenThousandEuros(false)) => Redirect(routes.SummaryController.get())
-              case (_, CashPaymentOverTenThousandEuros(true)) => Redirect(routes.CashPaymentFirstDateController.get(edit))
               case (false, CashPaymentOverTenThousandEuros(false)) => Redirect(routes.LinkedCashPaymentsController.get())
+              case (_, CashPaymentOverTenThousandEuros(true)) => Redirect(routes.CashPaymentFirstDateController.get(edit))
           }
         }
       }

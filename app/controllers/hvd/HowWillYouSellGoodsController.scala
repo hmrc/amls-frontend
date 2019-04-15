@@ -62,13 +62,12 @@ class HowWillYouSellGoodsController @Inject()( val dataCacheConnector: DataCache
               _ <- dataCacheConnector.save[Hvd](Hvd.key, hvd.howWillYouSellGoods(model))
               isNewActivity <- serviceFlow.isNewActivity(HighValueDealing)
             } yield {
-              if (!isNewActivity && redirectToDateOfChange[HowWillYouSellGoods](status, hvd.howWillYouSellGoods, model)) {
-                Redirect(routes.HvdDateOfChangeController.get())
-              } else {
-                edit match {
-                  case true => Redirect(routes.SummaryController.get())
-                  case false => Redirect(routes.CashPaymentController.get())
-                }
+              val redirect = !isNewActivity && redirectToDateOfChange[HowWillYouSellGoods](status, hvd.howWillYouSellGoods, model)
+              (redirect, edit) match {
+                case (true, true) => Redirect(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CHECK_YOUR_ANSWERS))
+                case (true, false) => Redirect(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CASH_PAYMENT))
+                case (false, true)  => Redirect(routes.SummaryController.get())
+                case (false, false) => Redirect(routes.CashPaymentController.get())
               }
             }
         }

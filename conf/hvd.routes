@@ -30,5 +30,5 @@ POST        /receiving                                              @controllers
 GET         /expect-to-receive                                      @controllers.hvd.ExpectToReceiveCashPaymentsController.get(edit: Boolean ?= false)
 POST        /expect-to-receive                                      @controllers.hvd.ExpectToReceiveCashPaymentsController.post(edit: Boolean ?= false)
 
-GET         /date-change                                            @controllers.hvd.HvdDateOfChangeController.get
-POST        /date-change                                            @controllers.hvd.HvdDateOfChangeController.post
+GET         /date-change/:redirect                                  @controllers.hvd.HvdDateOfChangeController.get(redirect: String)
+POST        /date-change/:redirect                                  @controllers.hvd.HvdDateOfChangeController.post(redirect: String)

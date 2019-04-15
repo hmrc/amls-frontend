@@ -16,14 +16,41 @@
 
 package utils
 
+import controllers.hvd.routes
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved, SubmissionStatus}
 import models.tradingpremises.TradingPremises
 import org.joda.time.LocalDate
+import play.api.Logger
 import play.api.Play.current
 import play.api.i18n.Messages
 import play.api.i18n.Messages.Implicits._
+import play.api.mvc.Call
 
 trait DateOfChangeHelper {
+
+  case class DateOfChangeRedirect(call: Call)
+
+  object DateOfChangeRedirect {
+
+    val CHECK_YOUR_ANSWERS:String = "1"
+    val CASH_PAYMENT:String = "2"
+    val HOW_WILL_YOU_SELL_GOODS:String = "3"
+    val EXCISE_GOODS: String = "4"
+    val EXCISE_GOODS_EDIT: String = "5"
+
+    def getRedirect(key: String): DateOfChangeRedirect = {
+      key match {
+        case CHECK_YOUR_ANSWERS => DateOfChangeRedirect(routes.SummaryController.get())
+        case CASH_PAYMENT => DateOfChangeRedirect(routes.CashPaymentController.get())
+        case HOW_WILL_YOU_SELL_GOODS => DateOfChangeRedirect(routes.HowWillYouSellGoodsController.get())
+        case EXCISE_GOODS => DateOfChangeRedirect(routes.ExciseGoodsController.get())
+        case EXCISE_GOODS_EDIT => DateOfChangeRedirect(routes.ExciseGoodsController.get(true))
+        case _ =>
+          Logger.error("Could not retrieve Date of Change redirect key, redirecting to Check Your Answers")
+          DateOfChangeRedirect(routes.SummaryController.get())
+      }
+    }
+  }
 
   def isEligibleForDateOfChange(status: SubmissionStatus): Boolean = {
     status match {
