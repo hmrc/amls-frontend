@@ -475,8 +475,8 @@ lbl.country.line9 = Country 9 (if relevant)
 lbl.country.line10 = Country 10 (if relevant)
 
 lbl.currency.line1 = Currency 1
-lbl.currency.line2 = Currency 2 (if applicable)
-lbl.currency.line3 = Currency 3 (if applicable)
+lbl.currency.line2 = Currency 2 (if relevant)
+lbl.currency.line3 = Currency 3 (if relevant)
 
 businessType.lbl.01 = Sole proprietor
 businessType.lbl.02 = Limited partnership or limited liability partnership
