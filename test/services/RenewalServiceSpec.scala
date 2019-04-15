@@ -98,7 +98,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           Some(PercentageOfCashPaymentOver15000.First),
           Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
           Some(TotalThroughput("01")),
-          Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+          Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
           Some(TransactionsInLast12Months("1500")),
           Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
           Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
@@ -273,7 +273,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
       "MSB is selected business activity with CE subsector and w/o MT, FX subsectors and section is complete along with standard renewal flow questions" in new CEFixture {
         val model = preFilledModel.copy(
           totalThroughput = Some(TotalThroughput("01")),
-          whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+          whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
           ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("123"))
         )
         await(service.isRenewalComplete(model)) mustBe true
@@ -295,7 +295,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
             sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
             mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-            whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+            whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
             ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("123")),
             fxTransactionsInLast12Months = Some(FXTransactionsInLast12Months("456"))
           )
@@ -308,7 +308,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
             transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
             mostTransactions = None,
-            whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+            whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
             ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("123")),
             fxTransactionsInLast12Months = Some(FXTransactionsInLast12Months("456"))
           )
@@ -321,7 +321,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             sendMoneyToOtherCountry = None,
             transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
             mostTransactions = None,
-            whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+            whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
             ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("123")),
             fxTransactionsInLast12Months = Some(FXTransactionsInLast12Months("456"))
           )
@@ -542,7 +542,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
         "totalThroughput is not defined" in new CEFixture {
           val model = preFilledModel.copy(
             totalThroughput = None,
-            whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+            whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
             ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("123"))
           )
           await(service.isRenewalComplete(model)) mustBe false
@@ -560,7 +560,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
         "ceTransactionsInLast12Months is not defined" in new CEFixture {
           val model = preFilledModel.copy(
             totalThroughput = Some(TotalThroughput("01")),
-            whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+            whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
             ceTransactionsInLast12Months = None
           )
           await(service.isRenewalComplete(model)) mustBe false
@@ -681,7 +681,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
             mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
             sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
-            whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+            whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
             ceTransactionsInLast12Months = None
           )
           await(service.isRenewalComplete(model)) mustBe false
@@ -694,7 +694,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
             mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
             sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
-            whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+            whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
             ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("123")),
             fxTransactionsInLast12Months = None
           )

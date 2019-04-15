@@ -1,10 +1,10 @@
- + [AMLS-4123](https://jira.tools.tax.service.gov.uk/browse/AMLS-4123) - 'Currency exchange page split'
- + [AMLS-4238](https://jira.tools.tax.service.gov.uk/browse/AMLS-4238) - 'Reworked redress scheme question in EAB flow'
- + [AMLS-4515](https://jira.tools.tax.service.gov.uk/browse/AMLS-4515) - 'porting the frontend to latest protoype version - where the user status is set in text rather relying on colors and image'
- + [AMLS-4756](https://jira.tools.tax.service.gov.uk/browse/AMLS-4756) - 'Rename About the Business to Business Details'
- + [AMLS-4772](https://jira.tools.tax.service.gov.uk/browse/AMLS-4772) - 'Bug fix: empty responsible people when trying to change nominated officer'
- + [AMLS-4800](https://jira.tools.tax.service.gov.uk/browse/AMLS-4800) - | "Changed the address header on business details"
- + [AMLS-4815](https://jira.tools.tax.service.gov.uk/browse/AMLS-4815) - 'Changed 'Check details' to say 'Add or remove service' for approved application'
- + [AMLS-4818](https://jira.tools.tax.service.gov.uk/browse/AMLS-4818) - 'Incorrect text on Return to Summary button in PAV flow'
- + [AMLS-4822](https://jira.tools.tax.service.gov.uk/browse/AMLS-4822) - "Redirect back to start of RP flow were attempting remove an RP that has a line id however; is not complete"
- + [AMLS-4835](https://jira.tools.tax.service.gov.uk/browse/AMLS-4835) - 'fix to bug found when any supervised section is cleared it shows completed in the about your business page'
+ + [AMLS-4123] - 'Currency exchange page split'
+ + [AMLS-4238] - 'Reworked redress scheme question in EAB flow'
+ + [AMLS-4515] - 'porting the frontend to latest protoype version - where the user status is set in text rather relying on colors and image'
+ + [AMLS-4756] - 'Rename About the Business to Business Details'
+ + [AMLS-4772] - 'Bug fix: empty responsible people when trying to change nominated officer'
+ + [AMLS-4800] - | "Changed the address header on business details"
+ + [AMLS-4815] - 'Changed 'Check details' to say 'Add or remove service' for approved application'
+ + [AMLS-4818] - 'Incorrect text on Return to Summary button in PAV flow'
+ + [AMLS-4822] - "Redirect back to start of RP flow were attempting remove an RP that has a line id however; is not complete"
+ + [AMLS-4835] - 'fix to bug found when any supervised section is cleared it shows completed in the about your business page'
