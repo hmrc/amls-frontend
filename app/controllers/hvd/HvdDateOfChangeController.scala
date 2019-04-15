@@ -35,7 +35,6 @@ class HvdDateOfChangeController @Inject() ( val dataCacheConnector: DataCacheCon
                                             val authConnector: AuthConnector
                                           ) extends RepeatingSection with BaseController with DateOfChangeHelper {
 
-
   def get(redirect: String) = Authorised.async {
       implicit authContext => implicit request =>
         Future.successful(Ok(date_of_change(EmptyForm, "summary.hvd", routes.HvdDateOfChangeController.post(redirect))))
@@ -62,7 +61,7 @@ class HvdDateOfChangeController @Inject() ( val dataCacheConnector: DataCacheCon
           for {
           _ <- dataCacheConnector.save[Hvd](Hvd.key, compareAndUpdateDate(hvd , data))
           } yield {
-            Redirect(DateOfChangeRedirect.getRedirect(redirect).call)
+            Redirect(DateOfChangeRedirect(redirect).call)
           }
       }
     }

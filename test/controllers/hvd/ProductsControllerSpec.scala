@@ -24,7 +24,7 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DateOfChangeHelper, DependencyMocks}
 
 class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
 
@@ -150,7 +150,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
       document.select("a[href=#otherDetails]").html() must include(Messages("error.invalid.hvd.business.sell.other.details"))
     }
 
-    "redirect to dateOfChange when a change is made and decision is approved" in new Fixture {
+    "redirect to dateOfChange when a change is made and decision is approved" in new Fixture with DateOfChangeHelper {
       val newRequest = request.withFormUrlEncodedBody(
         "products[0]" -> "01",
         "products[1]" -> "02",
@@ -163,10 +163,10 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get().url))
+      redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.EXCISE_GOODS_EDIT).url))
     }
 
-    "redirect to dateOfChange when a change is made and decision is ready for renewal" in new Fixture {
+    "redirect to dateOfChange when a change is made and decision is ready for renewal" in new Fixture  with DateOfChangeHelper {
       val newRequest = request.withFormUrlEncodedBody(
         "products[0]" -> "01",
         "products[1]" -> "02",
@@ -179,7 +179,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get().url))
+      redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.EXCISE_GOODS_EDIT).url))
     }
   }
 

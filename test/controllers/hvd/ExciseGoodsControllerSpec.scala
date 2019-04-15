@@ -23,7 +23,7 @@ import org.jsoup.Jsoup
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DateOfChangeHelper, DependencyMocks}
 
 class ExciseGoodsControllerSpec extends AmlsSpec {
 
@@ -97,7 +97,7 @@ class ExciseGoodsControllerSpec extends AmlsSpec {
       contentAsString(result) must include(Messages("error.required.hvd.excise.goods"))
     }
 
-    "redirect to dateOfChange when the model has been changed and application is approved" in new Fixture{
+    "redirect to dateOfChange when the model has been changed and application is approved" in new Fixture with DateOfChangeHelper {
 
       val hvd = Hvd(exciseGoods = Some(ExciseGoods(true)))
       val newRequest = request.withFormUrlEncodedBody("exciseGoods" -> "false")
@@ -107,10 +107,10 @@ class ExciseGoodsControllerSpec extends AmlsSpec {
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get().url))
+      redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CHECK_YOUR_ANSWERS).url))
     }
 
-    "redirect to dateOfChange when the model has been changed and application is ready for renewal" in new Fixture{
+    "redirect to dateOfChange when the model has been changed and application is ready for renewal" in new Fixture with DateOfChangeHelper {
 
       val hvd = Hvd(exciseGoods = Some(ExciseGoods(true)))
       val newRequest = request.withFormUrlEncodedBody("exciseGoods" -> "false")
@@ -120,7 +120,7 @@ class ExciseGoodsControllerSpec extends AmlsSpec {
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get().url))
+      redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CHECK_YOUR_ANSWERS).url))
     }
   }
 

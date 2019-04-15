@@ -23,7 +23,7 @@ import org.jsoup.Jsoup
 import play.api.i18n.Messages
 import play.api.test.Helpers.{BAD_REQUEST, OK, SEE_OTHER, contentAsString, redirectLocation, status, _}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DateOfChangeHelper, DependencyMocks}
 
 class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
 
@@ -54,7 +54,7 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
   }
 
   "load UI from mongoCache" in new Fixture {
-    mockCacheFetch(Some(Hvd(howWillYouSellGoods = Some(HowWillYouSellGoods(Seq(Retail))))))
+    mockCacheFetch(Some(Hvd(howWillYouSellGoods = Some(HowWillYouSellGoods(Set(Retail))))))
 
     val result = controller.get()(request)
     status(result) must be(OK)
@@ -94,9 +94,9 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
     contentAsString(result) must include(Messages("error.required.hvd.how-will-you-sell-goods"))
   }
 
-  "redirect to dateOfChange when the model has been changed and application is approved" in new Fixture {
+  "redirect to dateOfChange when the model has been changed and application is approved" in new Fixture with DateOfChangeHelper {
 
-    val hvd = Hvd(howWillYouSellGoods = Some(HowWillYouSellGoods(Seq(Wholesale))))
+    val hvd = Hvd(howWillYouSellGoods = Some(HowWillYouSellGoods(Set(Wholesale))))
     val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
 
     mockApplicationStatus(SubmissionDecisionApproved)
@@ -104,12 +104,12 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
 
     val result = controller.post(true)(newRequest)
     status(result) must be(SEE_OTHER)
-    redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get().url))
+    redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CHECK_YOUR_ANSWERS).url))
   }
 
-  "redirect to dateOfChange when the model has been changed and application is ready for renewal" in new Fixture {
+  "redirect to dateOfChange when the model has been changed and application is ready for renewal" in new Fixture with DateOfChangeHelper {
 
-    val hvd = Hvd(howWillYouSellGoods = Some(HowWillYouSellGoods(Seq(Wholesale))))
+    val hvd = Hvd(howWillYouSellGoods = Some(HowWillYouSellGoods(Set(Wholesale))))
     val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
 
     mockApplicationStatus(ReadyForRenewal(None))
@@ -117,7 +117,7 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
 
     val result = controller.post(true)(newRequest)
     status(result) must be(SEE_OTHER)
-    redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get().url))
+    redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CHECK_YOUR_ANSWERS).url))
   }
 
   "Calling POST" when {

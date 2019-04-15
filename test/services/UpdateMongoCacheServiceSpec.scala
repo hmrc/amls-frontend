@@ -169,7 +169,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
         Some(CashPaymentFirstDate(new LocalDate(1956, 2, 15))))),
       Some(Products(Set(Cars))),
       None,
-      Some(HowWillYouSellGoods(Seq(Retail))),
+      Some(HowWillYouSellGoods(Set(Retail))),
       Some(PercentageOfCashPaymentOver15000.First),
       Some(true),
       Some(PaymentMethods(courier = true, direct = true, other = Some("foo"))),

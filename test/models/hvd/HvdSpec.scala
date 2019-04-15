@@ -35,7 +35,7 @@ sealed trait HvdTestFixture {
     cashPayment = Some(DefaultCashPayment),
     Some(Products(Set(Cars))),
     None,
-    Some(HowWillYouSellGoods(Seq(Retail))),
+    Some(HowWillYouSellGoods(Set(Retail))),
     Some(PercentageOfCashPaymentOver15000.First),
     Some(true),
     Some(paymentMethods),
@@ -122,13 +122,13 @@ class HvdSpec extends PlaySpec with MockitoSugar {
     }
 
     "Update how will you sell goods correctly" in new HvdTestFixture {
-      val sut = Hvd(cashPayment = Some(DefaultCashPayment), howWillYouSellGoods = Some(HowWillYouSellGoods(Seq(Retail))))
+      val sut = Hvd(cashPayment = Some(DefaultCashPayment), howWillYouSellGoods = Some(HowWillYouSellGoods(Set(Retail))))
       val expectedModel = Hvd(
         cashPayment = Some(DefaultCashPayment),
-        howWillYouSellGoods = Some(HowWillYouSellGoods(Seq(Wholesale))),
+        howWillYouSellGoods = Some(HowWillYouSellGoods(Set(Wholesale))),
         hasChanged = true
       )
-      sut.howWillYouSellGoods(HowWillYouSellGoods(Seq(Wholesale))) must be(expectedModel)
+      sut.howWillYouSellGoods(HowWillYouSellGoods(Set(Wholesale))) must be(expectedModel)
     }
   }
 

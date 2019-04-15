@@ -58,7 +58,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
     val completeModel = Hvd(Some(CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(new LocalDate(year, month, day))))),
       Some(Products(Set(Alcohol, Tobacco, Other("test")))),
       Some(ExciseGoods(true)),
-      Some(HowWillYouSellGoods(Seq(Wholesale, Retail, Auction))),
+      Some(HowWillYouSellGoods(Set(Wholesale, Retail, Auction))),
       Some(PercentageOfCashPaymentOver15000.Fifth),
       Some(true),
       Some(PaymentMethods(courier = true, direct = true, other = Some("foo"))),

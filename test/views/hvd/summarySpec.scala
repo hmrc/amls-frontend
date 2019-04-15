@@ -89,7 +89,7 @@ class summarySpec extends AmlsSpec
                           Other("Other Product")
                         ))),
           exciseGoods = Some(ExciseGoods(true)),
-          howWillYouSellGoods = Some(HowWillYouSellGoods(List(Retail, Wholesale, Auction))),
+          howWillYouSellGoods = Some(HowWillYouSellGoods(Set(Retail, Wholesale, Auction))),
           percentageOfCashPaymentOver15000 = Some(Third),
           receiveCashPayments = Some(true),
           cashPaymentMethods = Some(PaymentMethods(true, true, Some("Other payment method"))),

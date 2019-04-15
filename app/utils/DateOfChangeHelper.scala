@@ -38,7 +38,7 @@ trait DateOfChangeHelper {
     val EXCISE_GOODS: String = "4"
     val EXCISE_GOODS_EDIT: String = "5"
 
-    def getRedirect(key: String): DateOfChangeRedirect = {
+    def apply(key: String): DateOfChangeRedirect = {
       key match {
         case CHECK_YOUR_ANSWERS => DateOfChangeRedirect(routes.SummaryController.get())
         case CASH_PAYMENT => DateOfChangeRedirect(routes.CashPaymentController.get())
