@@ -60,11 +60,10 @@ class InvolvedInOtherController @Inject()(
     typesString.map {
       case t =>
         t.map(item => {
-        if (item.toLowerCase.startsWith("a") || item.toLowerCase.startsWith("e")) {
-          s"an ${item.toLowerCase}"
-        } else {
-          s"a ${item.toLowerCase}"
-        }
+          val prefix = if (List("a", "e", "i", "o", "u").exists(vowel => item.toLowerCase.startsWith(vowel))) { "an" }
+                       else { "a" }
+
+          s"$prefix ${item.toLowerCase}"
         })
       }
   }
