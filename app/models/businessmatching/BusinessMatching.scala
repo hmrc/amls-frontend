@@ -108,7 +108,7 @@ case class BusinessMatching(
     case _ => false
   }
 
-  def createBusinessTypeOrderedList()(implicit message: Messages): Option[List[String]] = {
+  def alphabeticalBusinessTypes()(implicit message: Messages): Option[List[String]] = {
 
     activities map { a =>
       a.businessActivities.map {

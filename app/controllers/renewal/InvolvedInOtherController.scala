@@ -55,7 +55,7 @@ class InvolvedInOtherController @Inject()(
   }
 
   private def businessTypes(activities: BusinessMatching): Option[List[String]] = {
-    val typesString: Option[List[String]] = activities.createBusinessTypeOrderedList
+    val typesString: Option[List[String]] = activities.alphabeticalBusinessTypes
 
     typesString.map {
       case t =>

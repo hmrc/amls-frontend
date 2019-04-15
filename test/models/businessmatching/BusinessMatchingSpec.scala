@@ -92,7 +92,7 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
           )
         )
 
-        businessMatching.createBusinessTypeOrderedList() must be (expectedList)
+        businessMatching.alphabeticalBusinessTypes() must be (expectedList)
       }
     }
 

@@ -48,7 +48,7 @@ class AMLSTurnoverController @Inject()(
                 turnover <- renewal.turnover
               } yield Form2[AMLSTurnover](turnover)) getOrElse EmptyForm
 
-              Ok(amls_turnover(form, edit, businessMatching.createBusinessTypeOrderedList))
+              Ok(amls_turnover(form, edit, businessMatching.alphabeticalBusinessTypes))
 
             }) getOrElse Ok(amls_turnover(EmptyForm, edit, None))
         }
@@ -61,7 +61,7 @@ class AMLSTurnoverController @Inject()(
           case f: InvalidForm =>
             for {
               businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
-            } yield BadRequest(amls_turnover(f, edit, businessMatching.createBusinessTypeOrderedList))
+            } yield BadRequest(amls_turnover(f, edit, businessMatching.alphabeticalBusinessTypes))
           case ValidForm(_, data) =>
             for {
               renewal <- renewalService.getRenewal
