@@ -30,7 +30,15 @@
     heading = header
 ) {
 
-    <span class="form-hint">@Messages("hvd.percentage.text")</span>
+    <p>@Messages("renewal.percentage.info.line1")</p>
+    <p>@Messages("renewal.percentage.info.line2")</p>
+
+    <ul class="list list-bullet">
+        <li>@Messages("renewal.percentage.info.line3")</li>
+        <li>@Messages("renewal.percentage.info.line4")</li>
+    </ul>
+
+    @legend(Messages("renewal.percentage.turnover.text"))
 
     @form(f, controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.post(edit)) {
 

@@ -1,1 +1,1 @@
- + [AMLS-4763](https://jira.tools.tax.service.gov.uk/browse/AMLS-4763) - 'update to contents of ASP and Supervised sections'
+ + [AMLS-4763] - 'update to contents of ASP and Supervised sections'

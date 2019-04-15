@@ -33,17 +33,23 @@ POST        /most-transactions                                                @c
 GET         /currency-exchange-transactions                                   @controllers.renewal.CETransactionsInLast12MonthsController.get(edit: Boolean ?= false)
 POST        /currency-exchange-transactions                                   @controllers.renewal.CETransactionsInLast12MonthsController.post(edit: Boolean ?= false)
 
-GET         /transaction-fx                                                   @controllers.renewal.FXTransactionsInLast12MonthsController.get(edit: Boolean ?= false)
-POST        /transaction-fx                                                   @controllers.renewal.FXTransactionsInLast12MonthsController.post(edit: Boolean ?= false)
+GET         /foreign-exchange-transaction                                     @controllers.renewal.FXTransactionsInLast12MonthsController.get(edit: Boolean ?= false)
+POST        /foreign-exchange-transaction                                     @controllers.renewal.FXTransactionsInLast12MonthsController.post(edit: Boolean ?= false)
 
-GET         /currency                                                         @controllers.renewal.WhichCurrenciesController.get(edit: Boolean ?= false)
-POST        /currency                                                         @controllers.renewal.WhichCurrenciesController.post(edit: Boolean ?= false)
+GET         /currencies-supply-most                                           @controllers.renewal.WhichCurrenciesController.get(edit: Boolean ?= false)
+POST        /currencies-supply-most                                           @controllers.renewal.WhichCurrenciesController.post(edit: Boolean ?= false)
 
-GET         /percentage                                                       @controllers.renewal.PercentageOfCashPaymentOver15000Controller.get(edit: Boolean ?= false)
-POST        /percentage                                                       @controllers.renewal.PercentageOfCashPaymentOver15000Controller.post(edit: Boolean ?= false)
+GET         /percentage-turnover-from-cash-payments                           @controllers.renewal.PercentageOfCashPaymentOver15000Controller.get(edit: Boolean ?= false)
+POST        /percentage-turnover-from-cash-payments                           @controllers.renewal.PercentageOfCashPaymentOver15000Controller.post(edit: Boolean ?= false)
 
 GET         /receiving                                                        @controllers.renewal.ReceiveCashPaymentsController.get(edit: Boolean ?= false)
 POST        /receiving                                                        @controllers.renewal.ReceiveCashPaymentsController.post(edit: Boolean ?= false)
 
 GET         /check-your-answers                                               @controllers.renewal.SummaryController.get()
 POST        /check-your-answers                                               @controllers.renewal.SummaryController.post()
+
+GET         /uses-foreign-currencies                                          @controllers.renewal.UsesForeignCurrenciesController.get(edit: Boolean ?= false)
+POST        /uses-foreign-currencies                                          @controllers.renewal.UsesForeignCurrenciesController.post(edit: Boolean ?= false)
+
+GET         /money-sources                                                    @controllers.renewal.MoneySourcesController.get(edit: Boolean ?= false)
+POST        /money-sources                                                    @controllers.renewal.MoneySourcesController.post(edit: Boolean ?= false)

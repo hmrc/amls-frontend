@@ -475,8 +475,8 @@ lbl.country.line9 = Country 9 (if relevant)
 lbl.country.line10 = Country 10 (if relevant)
 
 lbl.currency.line1 = Currency 1
-lbl.currency.line2 = Currency 2 (if applicable)
-lbl.currency.line3 = Currency 3 (if applicable)
+lbl.currency.line2 = Currency 2 (if relevant)
+lbl.currency.line3 = Currency 3 (if relevant)
 
 businessType.lbl.01 = Sole proprietor
 businessType.lbl.02 = Limited partnership or limited liability partnership
@@ -864,7 +864,7 @@ summary.declarationlocked.title = You can’t complete this section yet
 summary.businessmatching = Pre-application
 summary.start = Pre-application
 summary.tcsp = Trust or company service provider
-summary.asp = Accountancy Service Provider
+summary.asp = Accountancy service provider
 summary.supervision = Supervision
 summary.msb = Money Service Business
 summary.hvd = High Value Dealer
@@ -1799,9 +1799,9 @@ tcsp.anothertcspsupervision.title = Is your trust or company service provider re
 tcsp.anothertcspsupervision.header = Is your trust or company service provider registered with HMRC for anti-money laundering supervision?
 
 #ASP
-asp.whatyouneed.subheading = In this section, you’ll be asked for things like:
-asp.whatyouneed.line_1 = which services you provide 
-asp.whatyouneed.line_2 = if you’re registered with HMRC to handle other businesses’ tax matters 
+asp.whatyouneed.subheading = In this section you’ll be asked:
+asp.whatyouneed.line_1 = which services you provide
+asp.whatyouneed.line_2 = if you’re registered with HMRC to handle other businesses’ tax matters
 asp.other.business.tax.matters.title = Are you registered with HMRC to handle other businesses’ tax matters?
 asp.other.business.tax.matters.agentrefno.lbl = HMRC Agent Registration Number
 asp.other.business.tax.matters.lbl = If you act as a tax agent or adviser, you must have formal authorisation to deal with HMRC on your client’s behalf.
@@ -1853,9 +1853,9 @@ supervision.memberofprofessionalbody.lbl.04 = Association of Taxation Technician
 supervision.memberofprofessionalbody.lbl.05 = Chartered Institute of Management Accountants
 supervision.memberofprofessionalbody.lbl.06 = Chartered Institute of Taxation
 supervision.memberofprofessionalbody.lbl.07 = Institute of Certified Bookkeepers
-supervision.memberofprofessionalbody.lbl.08 = Institute of Chartered Accountants of England and Wales
-supervision.memberofprofessionalbody.lbl.09 = Institute of Chartered Accountants in Ireland
-supervision.memberofprofessionalbody.lbl.10 = Institute of Chartered Accountants in Scotland
+supervision.memberofprofessionalbody.lbl.08 = Institute of Chartered Accountants in Ireland
+supervision.memberofprofessionalbody.lbl.09 = Institute of Chartered Accountants in Scotland
+supervision.memberofprofessionalbody.lbl.10 = Institute of Chartered Accountants of England and Wales
 supervision.memberofprofessionalbody.lbl.11 = Institute of Financial Accountants
 supervision.memberofprofessionalbody.lbl.12 = International Association of Bookkeepers
 supervision.memberofprofessionalbody.lbl.13 = Law Society
@@ -1891,7 +1891,7 @@ msb.throughput.lbl.06 = £101 million to £1 billion
 msb.throughput.lbl.07 = More than £1 billion
 msb.which_currencies.title = Which currencies do you expect to supply the most to your customers?
 msb.which_currencies.uptoThree = List up to 3 currencies
-msb.which_currencies.uptoThree.hint = List up to 3 currencies
+msb.which_currencies.uptoThree.hint = List up to 3 currencies.
 msb.which_currencies.uptoThree.hint2 = For example: USD, EUR, CNY
 msb.which_currencies.who = Who supplied your foreign currency?
 msb.which_currencies.who.visuallyhidden = supplied your foreign currency
@@ -2113,6 +2113,11 @@ renewal.involvedinother.listline3 = selling software packages
 renewal.customer.outside.uk.title = In the last 12 months did you have customers who lived or worked outside of the UK?
 
 renewal.turnover.title = How much total net profit did your business make in the last 12 months, from the following services?
+renewal.percentage.turnover.text = If you do not use euros you’ll need to convert the amount to the currency you use.
+renewal.percentage.info.line1 = Cash can be physical money, notes and coins. It can be paid to you in person or directly into a bank account.
+renewal.percentage.info.line2 = This includes payment of €10,000 or more in:
+renewal.percentage.info.line3 = any single cash payment
+renewal.percentage.info.line4 = several related cash payments, including payment plans, payments on account, and deposits in any 90 day period
 
 renewal.business-turnover.title = How much total net profit did your business make in the last 12 months?
 renewal.receiving.title = In the last 12 months did you receive cash payments over €10,000 from customers you’ve not met in person?
@@ -2131,7 +2136,8 @@ renewal.msb.throughput.selection.6 = £101 million to £1 billion
 renewal.msb.throughput.selection.7 = More than £1 billion
 
 renewal.msb.whichcurrencies.header = Which currencies did you supply the most to your customers in the last 12 months?
-renewal.msb.which_currencies.foreign_currencies_question =  Did you deal in physical foreign currencies in the last 12 months?
+renewal.msb.foreign_currencies.header =  Did you deal in physical foreign currencies in the last 12 months?
+renewal.msb.money_sources.header =  Who supplied your physical foreign currency in the last 12 months?
 renewal.msb.ce.transactions.expected.title = How many currency exchange transactions did you make in the last 12 months?
 renewal.msb.fx.transactions.expected.title = How many foreign exchange transactions did you make in the last 12 months?
 
@@ -2145,7 +2151,7 @@ renewal.msb.transfers.value.invalid = Enter the number of money transfers you ma
 renewal.receiving.title = In the last 12 months did you receive cash payments over €10,000 from customers you’ve not met in person?
 renewal.receiving.expect.to.receive = How did you receive these payments?
 
-renewal.hvd.percentage.title = What proportion of your turnover in the last 12 months came from cash payments over €10,000?
+renewal.hvd.percentage.title = What percentage of your turnover came from cash payments of over €10,000?
 
 renewal.msb.largest.amounts.title = Which countries did you send the largest amounts of money to in the last 12 months?
 

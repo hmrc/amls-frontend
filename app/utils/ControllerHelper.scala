@@ -161,15 +161,12 @@ object ControllerHelper {
       Messages("error.not-found.message"))
   }
 
-  def anotherBodyComplete(cache: CacheMap)(implicit authContext: AuthContext, hc: HeaderCarrier): Option[(Boolean, Boolean)] = {
-    for {
-      supervision <- cache.getEntry[Supervision](Supervision.key)
+  def anotherBodyComplete(supervision: Supervision): Option[(Boolean, Boolean)] = (for {
       anotherBody <- supervision.anotherBody
-    } yield anotherBody match {
-      case AnotherBodyNo => (true, false)
-      case body => (body.asInstanceOf[AnotherBodyYes].isComplete(), true)
+    } yield anotherBody) match {
+      case Some(AnotherBodyNo) => Option((true, false))
+      case Some(body) => Option((body.asInstanceOf[AnotherBodyYes].isComplete(), true))
     }
-  }
 
   def isAnotherBodyYes(abCompleteAndYes: Option[(Boolean, Boolean)]) = {
     abCompleteAndYes match {
