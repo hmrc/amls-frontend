@@ -31,7 +31,8 @@
     heading = header
 ) {
     @form(f, controllers.renewal.routes.WhichCurrenciesController.post(edit)) {
-        <p>@Messages("msb.which_currencies.uptoThree.hint") @Messages("msb.which_currencies.uptoThree.hint2")</p>
+        <p>@Messages("msb.which_currencies.uptoThree.hint")</p>
+        @hint(Messages("msb.which_currencies.uptoThree.hint2"))
 
         @fieldset(
             f = f("currencies-fieldset"),
