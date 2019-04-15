@@ -24,7 +24,6 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching._
 import models.renewal.{Renewal, WhichCurrencies}
-import play.api.mvc.Result
 import services.RenewalService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.renewal.which_currencies
@@ -36,48 +35,54 @@ class WhichCurrenciesController @Inject()(val authConnector: AuthConnector,
                                           dataCacheConnector: DataCacheConnector) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      val block = for {
-        renewal <- OptionT(renewalService.getRenewal)
-        whichCurrencies <- OptionT.fromOption[Future](renewal.whichCurrencies)
-      } yield {
-        Ok(which_currencies(Form2[WhichCurrencies](whichCurrencies), edit))
-      }
+    implicit authContext =>
+      implicit request =>
+        val block = for {
+          renewal <- OptionT(renewalService.getRenewal)
+          whichCurrencies <- OptionT.fromOption[Future](renewal.whichCurrencies)
+        } yield {
+          Ok(which_currencies(Form2[WhichCurrencies](whichCurrencies), edit))
+        }
 
-      block getOrElse Ok(which_currencies(EmptyForm, edit))
+        block getOrElse Ok(which_currencies(EmptyForm, edit))
 
   }
 
   def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      Form2[WhichCurrencies](request.body) match {
-        case f: InvalidForm => Future.successful(BadRequest(which_currencies(f, edit)))
-        case ValidForm(_, model) =>
-          dataCacheConnector.fetchAll flatMap {
-            optMap =>
-              val result = for {
-                cacheMap <- optMap
-                renewal <- cacheMap.getEntry[Renewal](Renewal.key)
-                bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
-                services <- bm.msbServices
-                activities <- bm.activities
-              } yield {
-                renewalService.updateRenewal(renewal.whichCurrencies(model)) map { _ =>
-                  standardRouting(services.msbServices, activities.businessActivities, edit)
-                }
+    implicit authContext =>
+      implicit request =>
+        Form2[WhichCurrencies](request.body) match {
+          case f: InvalidForm => Future.successful(BadRequest(which_currencies(f, edit)))
+          case ValidForm(_, model) =>
+            dataCacheConnector.fetchAll flatMap {
+              optMap =>
+                val result = for {
+                  cacheMap <- optMap
+                  renewal <- cacheMap.getEntry[Renewal](Renewal.key)
+                } yield {
+                  renewalService.updateRenewal(updateWhichCurrencies(renewal, model)) map { _ =>
+                    edit match {
+                      case true => Redirect(routes.SummaryController.get())
+                      case _ => Redirect(routes.UsesForeignCurrenciesController.get())
+                    }
+                  }
 
-              }
-              result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
-          }
-      }
+                }
+                result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
+            }
+        }
   }
 
-  private def standardRouting(services: Set[BusinessMatchingMsbService], businessActivities: Set[BusinessActivity], edit: Boolean): Result =
-    (services, businessActivities, edit) match {
-      case (x, _, false) if x.contains(ForeignExchange) => Redirect(routes.FXTransactionsInLast12MonthsController.get())
-      case (_, x, false) if x.contains(HighValueDealing) && !x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideUKController.get())
-      case (_, x, false) if x.contains(HighValueDealing) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
-      case _ => Redirect(routes.SummaryController.get())
+  def updateWhichCurrencies(oldRenewal: Renewal, whichCurrencies: WhichCurrencies) = {
+    oldRenewal.whichCurrencies match {
+      case Some(wc) => {
+        val newWc = wc.currencies(whichCurrencies.currencies)
+        oldRenewal.whichCurrencies(newWc)
+      }
+      case None => {
+        val newWc = WhichCurrencies(whichCurrencies.currencies)
+        oldRenewal.whichCurrencies(newWc)
+      }
     }
-
+  }
 }
