@@ -18,20 +18,20 @@ POST        /customers-outside-uk                                             @c
 GET         /throughput-last-12-months                                        @controllers.renewal.TotalThroughputController.get(edit: Boolean ?= false)
 POST        /throughput-last-12-months                                        @controllers.renewal.TotalThroughputController.post(edit: Boolean ?= false)
 
-GET         /money-transfers-last-12-months                                                        @controllers.renewal.TransactionsInLast12MonthsController.get(edit: Boolean ?= false)
-POST        /money-transfers-last-12-months                                                        @controllers.renewal.TransactionsInLast12MonthsController.post(edit: Boolean ?= false)
+GET         /money-transfers-last-12-months                                   @controllers.renewal.TransactionsInLast12MonthsController.get(edit: Boolean ?= false)
+POST        /money-transfers-last-12-months                                   @controllers.renewal.TransactionsInLast12MonthsController.post(edit: Boolean ?= false)
 
-GET         /send-money                                                       @controllers.renewal.SendMoneyToOtherCountryController.get(edit: Boolean ?= false)
-POST        /send-money                                                       @controllers.renewal.SendMoneyToOtherCountryController.post(edit: Boolean ?= false)
+GET         /send-money-other-countries                                       @controllers.renewal.SendMoneyToOtherCountryController.get(edit: Boolean ?= false)
+POST        /send-money-other-countries                                       @controllers.renewal.SendMoneyToOtherCountryController.post(edit: Boolean ?= false)
 
-GET         /largest-amounts                                                  @controllers.renewal.SendTheLargestAmountsOfMoneyController.get(edit: Boolean ?= false)
-POST        /largest-amounts                                                  @controllers.renewal.SendTheLargestAmountsOfMoneyController.post(edit: Boolean ?= false)
+GET         /countries-send-largest-amounts-money                             @controllers.renewal.SendTheLargestAmountsOfMoneyController.get(edit: Boolean ?= false)
+POST        /countries-send-largest-amounts-money                             @controllers.renewal.SendTheLargestAmountsOfMoneyController.post(edit: Boolean ?= false)
 
 GET         /most-transactions                                                @controllers.renewal.MostTransactionsController.get(edit: Boolean ?= false)
 POST        /most-transactions                                                @controllers.renewal.MostTransactionsController.post(edit: Boolean ?= false)
 
-GET         /transaction-currency                                             @controllers.renewal.CETransactionsInLast12MonthsController.get(edit: Boolean ?= false)
-POST        /transaction-currency                                             @controllers.renewal.CETransactionsInLast12MonthsController.post(edit: Boolean ?= false)
+GET         /currency-exchange-transactions                                   @controllers.renewal.CETransactionsInLast12MonthsController.get(edit: Boolean ?= false)
+POST        /currency-exchange-transactions                                   @controllers.renewal.CETransactionsInLast12MonthsController.post(edit: Boolean ?= false)
 
 GET         /transaction-fx                                                   @controllers.renewal.FXTransactionsInLast12MonthsController.get(edit: Boolean ?= false)
 POST        /transaction-fx                                                   @controllers.renewal.FXTransactionsInLast12MonthsController.post(edit: Boolean ?= false)

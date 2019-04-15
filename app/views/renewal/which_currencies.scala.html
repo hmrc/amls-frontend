@@ -32,14 +32,14 @@
 ) {
 
     @form(f, controllers.renewal.routes.WhichCurrenciesController.post(edit)) {
-
+        <p>@Messages("msb.which_currencies.uptoThree.hint")</p>
+        <p>@Messages("renwal.progrss.which_currencies_example.lbl")</p>
         @fieldset(
             f = f("currencies-fieldset"),
             legend = "msb.which_currencies.title",
             legendHidden = true,
             panel = false,
-            classes = Seq("form-group"),
-            hint = "msb.which_currencies.uptoThree.hint"
+            classes = Seq("form-group")
         ) {
             @errorGroup(f("currencies")) {
                 @currency(field=f("currencies[0]"))
