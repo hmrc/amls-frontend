@@ -1,1 +1,1 @@
- + [AMLS-4198](https://jira.tools.tax.service.gov.uk/browse/AMLS-4198) - 'Split question in TCSP flow'
+ + [AMLS-4198] - 'Split question in TCSP flow'

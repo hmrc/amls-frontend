@@ -1,1 +1,1 @@
- + [AMLS-4769](https://jira.tools.tax.service.gov.uk/browse/AMLS-4769) - 'Updated payment API endpoint'
+ + [AMLS-4769] - 'Updated payment API endpoint'
