@@ -16,8 +16,8 @@
 
 package views.include
 
-import forms.ValidField
-import jto.validation.Path
+import forms.{InvalidField, ValidField}
+import jto.validation.{Path, ValidationError}
 import models.autocomplete.NameValuePair
 import org.jsoup.Jsoup
 import org.scalatestplus.play.PlaySpec
@@ -47,6 +47,17 @@ class country_autocompleteSpec extends PlaySpec with AmlsSpec {
       }
 
       html.select(s"[selected]").attr("value") mustBe "country:2"
+    }
+
+    "retain invalid entry" in new Fixture {
+      val result = country_autocomplete(
+        InvalidField(Path \ "country", Seq("invalid entry"), Seq(ValidationError("validation error"))),
+        data = listData
+      ).toString
+
+      val html = Jsoup.parse(result)
+
+      html.getElementsByTag("option").eq(0).text() mustBe "invalid entry"
     }
   }
 
