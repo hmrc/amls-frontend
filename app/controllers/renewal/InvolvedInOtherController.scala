@@ -58,8 +58,8 @@ class InvolvedInOtherController @Inject()(
     val vowels = List("a", "e", "i", "o", "u")
 
     activities.alphabeticalBusinessTypes.map {
-      case t =>
-        t.map(item => {
+      case businessType =>
+        businessType.map(item => {
           val prefix = if (vowels.exists(item.toLowerCase.startsWith(_))) { "an" }
                        else { "a" }
 
