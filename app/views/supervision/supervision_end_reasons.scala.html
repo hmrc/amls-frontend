@@ -26,7 +26,7 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("supervision.supervision_end_reasons.title", "summary.supervision")
+    @heading(section = "summary.supervision")
 }
 
 @main(
@@ -39,6 +39,7 @@
         @fieldset(
             f = f(s"$target"),
             legend = "supervision.supervision_end_reasons.description",
+            heading = "supervision.supervision_end_reasons.title",
             jsHidden = true
         ) {
             @textarea(
