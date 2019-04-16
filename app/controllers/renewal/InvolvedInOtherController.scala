@@ -56,11 +56,12 @@ class InvolvedInOtherController @Inject()(
 
   private def businessTypes(activities: BusinessMatching): Option[List[String]] = {
     val typesString: Option[List[String]] = activities.alphabeticalBusinessTypes
+    val vowels = List("a", "e", "i", "o", "u")
 
     typesString.map {
       case t =>
         t.map(item => {
-          val prefix = if (List("a", "e", "i", "o", "u").exists(vowel => item.toLowerCase.startsWith(vowel))) { "an" }
+          val prefix = if (vowels.exists(item.toLowerCase.startsWith(_))) { "an" }
                        else { "a" }
 
           s"$prefix ${item.toLowerCase}"
