@@ -1,1 +1,0 @@
- + [AMLS-4769] - 'Updated payment API endpoint'
