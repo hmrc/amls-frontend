@@ -20,10 +20,20 @@
 
 @(f: forms.Form2[_], edit: Boolean, businessTypes:Option[List[String]])(implicit lang:Lang,  m: Messages, request: Request[_])
 
+@placeHolder = @{
+    businessTypes.map { types =>
+        if (types.length > 1) {
+            "renewal.turnover.title"
+        } else {
+            "renewal.turnover.title.single.service"
+        }
+    }
+}
+
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("renewal.turnover.title", "summary.renewal")
+    @heading(placeHolder.getOrElse("renewal.turnover.title"), "summary.renewal")
 }
 
 @main(
