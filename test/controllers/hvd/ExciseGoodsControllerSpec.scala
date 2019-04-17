@@ -78,7 +78,7 @@ class ExciseGoodsControllerSpec extends AmlsSpec {
       redirectLocation(result) must be(Some(controllers.hvd.routes.HowWillYouSellGoodsController.get().url))
     }
 
-    "successfully redirect to nex page when submitted with valida data in edit mode" in new Fixture {
+    "successfully redirect to next page when submitted with valid data in edit mode" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody("exciseGoods" -> "false")
 
@@ -97,30 +97,59 @@ class ExciseGoodsControllerSpec extends AmlsSpec {
       contentAsString(result) must include(Messages("error.required.hvd.excise.goods"))
     }
 
-    "redirect to dateOfChange when the model has been changed and application is approved" in new Fixture with DateOfChangeHelper {
+    "redirect to dateOfChange" when {
 
-      val hvd = Hvd(exciseGoods = Some(ExciseGoods(true)))
-      val newRequest = request.withFormUrlEncodedBody("exciseGoods" -> "false")
+      "the model has been changed and application is approved and in edit mode" in new Fixture with DateOfChangeHelper {
 
-      mockApplicationStatus(SubmissionDecisionApproved)
-      mockCacheFetch(Some(hvd))
+        val hvd = Hvd(exciseGoods = Some(ExciseGoods(true)))
+        val newRequest = request.withFormUrlEncodedBody("exciseGoods" -> "false")
 
-      val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CHECK_YOUR_ANSWERS).url))
-    }
+        mockApplicationStatus(SubmissionDecisionApproved)
+        mockCacheFetch(Some(hvd))
 
-    "redirect to dateOfChange when the model has been changed and application is ready for renewal" in new Fixture with DateOfChangeHelper {
+        val result = controller.post(true)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CHECK_YOUR_ANSWERS).url))
+      }
 
-      val hvd = Hvd(exciseGoods = Some(ExciseGoods(true)))
-      val newRequest = request.withFormUrlEncodedBody("exciseGoods" -> "false")
+      "the model has been changed and application is ready for renewal and in edit mode" in new Fixture with DateOfChangeHelper {
 
-      mockApplicationStatus(ReadyForRenewal(None))
-      mockCacheFetch(Some(hvd))
+        val hvd = Hvd(exciseGoods = Some(ExciseGoods(true)))
+        val newRequest = request.withFormUrlEncodedBody("exciseGoods" -> "false")
 
-      val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CHECK_YOUR_ANSWERS).url))
+        mockApplicationStatus(ReadyForRenewal(None))
+        mockCacheFetch(Some(hvd))
+
+        val result = controller.post(true)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CHECK_YOUR_ANSWERS).url))
+      }
+
+        "the model has been changed and application is approved" in new Fixture with DateOfChangeHelper {
+
+        val hvd = Hvd(exciseGoods = Some(ExciseGoods(true)))
+        val newRequest = request.withFormUrlEncodedBody("exciseGoods" -> "false")
+
+        mockApplicationStatus(SubmissionDecisionApproved)
+        mockCacheFetch(Some(hvd))
+
+        val result = controller.post(false)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.HOW_WILL_YOU_SELL_GOODS).url))
+      }
+
+      "the model has been changed and application is ready for renewal" in new Fixture with DateOfChangeHelper {
+
+        val hvd = Hvd(exciseGoods = Some(ExciseGoods(true)))
+        val newRequest = request.withFormUrlEncodedBody("exciseGoods" -> "false")
+
+        mockApplicationStatus(ReadyForRenewal(None))
+        mockCacheFetch(Some(hvd))
+
+        val result = controller.post(false)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.HOW_WILL_YOU_SELL_GOODS).url))
+      }
     }
   }
 

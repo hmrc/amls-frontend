@@ -21,6 +21,7 @@ import models.hvd.{HowWillYouSellGoods, Hvd, Retail, Wholesale}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import play.api.test.Helpers.{BAD_REQUEST, OK, SEE_OTHER, contentAsString, redirectLocation, status, _}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DateOfChangeHelper, DependencyMocks}
@@ -48,42 +49,41 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
   "load UI for the first time" in new Fixture {
     val result = controller.get()(request)
     status(result) must be(OK)
-
     val htmlValue = Jsoup.parse(contentAsString(result))
     htmlValue.title mustBe Messages("hvd.how-will-you-sell-goods.title") + " - " + Messages("summary.hvd") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
   }
 
   "load UI from mongoCache" in new Fixture {
     mockCacheFetch(Some(Hvd(howWillYouSellGoods = Some(HowWillYouSellGoods(Set(Retail))))))
-
     val result = controller.get()(request)
     status(result) must be(OK)
-
     val htmlValue = Jsoup.parse(contentAsString(result))
     htmlValue.title mustBe Messages("hvd.how-will-you-sell-goods.title") + " - " + Messages("summary.hvd") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
     htmlValue.getElementById("salesChannels-Retail").`val`() mustBe "Retail"
   }
 
-  "redirect to next page when submitted with valid data" in new Fixture {
+  "redirect to next page" when {
+    "submitted with valid data" in new Fixture {
 
-    val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
+      val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
 
-    mockApplicationStatus(SubmissionDecisionRejected)
+      mockApplicationStatus(SubmissionDecisionRejected)
 
-    val result = controller.post()(newRequest)
-    status(result) must be(SEE_OTHER)
-    redirectLocation(result) must be(Some(controllers.hvd.routes.CashPaymentController.get().url))
-  }
+      val result = controller.post()(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.hvd.routes.CashPaymentController.get().url))
+    }
 
-  "redirect to nex page when submitted with valida data in edit mode" in new Fixture {
+    "submitted with valid data in edit mode" in new Fixture {
 
-    val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
+      val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
 
-    mockApplicationStatus(SubmissionDecisionRejected)
+      mockApplicationStatus(SubmissionDecisionRejected)
 
-    val result = controller.post(true)(newRequest)
-    status(result) must be(SEE_OTHER)
-    redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get().url))
+      val result = controller.post(true)(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get().url))
+    }
   }
 
   "fail with validation error when mandatory field is missing" in new Fixture {
@@ -94,30 +94,48 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
     contentAsString(result) must include(Messages("error.required.hvd.how-will-you-sell-goods"))
   }
 
-  "redirect to dateOfChange when the model has been changed and application is approved" in new Fixture with DateOfChangeHelper {
+  "redirect to dateOfChange" when {
 
-    val hvd = Hvd(howWillYouSellGoods = Some(HowWillYouSellGoods(Set(Wholesale))))
-    val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
+    "the model has been changed and" when {
 
-    mockApplicationStatus(SubmissionDecisionApproved)
-    mockCacheFetch(Some(hvd))
+      val hvd = Hvd(howWillYouSellGoods = Some(HowWillYouSellGoods(Set(Wholesale))))
 
-    val result = controller.post(true)(newRequest)
-    status(result) must be(SEE_OTHER)
-    redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CHECK_YOUR_ANSWERS).url))
-  }
+      "application is approved" in new Fixture with DateOfChangeHelper {
+        val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
+        mockApplicationStatus(SubmissionDecisionApproved)
+        mockCacheFetch(Some(hvd))
+        val result = controller.post(false)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CASH_PAYMENT).url))
+      }
 
-  "redirect to dateOfChange when the model has been changed and application is ready for renewal" in new Fixture with DateOfChangeHelper {
+      "application is approved and in edit mode" in new Fixture with DateOfChangeHelper {
+        val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
+        mockApplicationStatus(ReadyForRenewal(None))
+        mockCacheFetch(Some(hvd))
+        val result = controller.post(true)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CHECK_YOUR_ANSWERS).url))
+      }
 
-    val hvd = Hvd(howWillYouSellGoods = Some(HowWillYouSellGoods(Set(Wholesale))))
-    val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
+      "application is ready for renewal" in new Fixture with DateOfChangeHelper {
+        val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
+        mockApplicationStatus(ReadyForRenewal(None))
+        mockCacheFetch(Some(hvd))
+        val result = controller.post(false)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CASH_PAYMENT).url))
+      }
 
-    mockApplicationStatus(ReadyForRenewal(None))
-    mockCacheFetch(Some(hvd))
-
-    val result = controller.post(true)(newRequest)
-    status(result) must be(SEE_OTHER)
-    redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CHECK_YOUR_ANSWERS).url))
+      "application is ready for renewal and in edit mode" in new Fixture with DateOfChangeHelper {
+        val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
+        mockApplicationStatus(ReadyForRenewal(None))
+        mockCacheFetch(Some(hvd))
+        val result = controller.post(true)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CHECK_YOUR_ANSWERS).url))
+      }
+    }
   }
 
   "Calling POST" when {
@@ -136,5 +154,4 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
       }
     }
   }
-
 }
