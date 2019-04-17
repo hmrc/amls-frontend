@@ -66,7 +66,6 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
                     (edit, businessMatching) match {
                       case (true, _) => Redirect(routes.SummaryController.get())
                       case (false, bm) if bm.activities.isDefined => bm.activities.get.businessActivities match {
-                        case x if x.contains(MoneyServiceBusiness) && x.contains(AccountancyServices) => Redirect(routes.TotalThroughputController.get())
                         case x if x.contains(HighValueDealing) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
                         case _ => Redirect(routes.SummaryController.get())
                       }

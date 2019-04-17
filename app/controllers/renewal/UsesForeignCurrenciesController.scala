@@ -24,6 +24,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching._
 import models.renewal._
+import play.api.mvc.Result
 import services.RenewalService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -63,10 +64,14 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
                   cacheMap <- optMap
                   renewal <- cacheMap.getEntry[Renewal](Renewal.key)
                   bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+                  ba <- bm.activities
                   services <- bm.msbServices
                 } yield {
                   renewalService.updateRenewal(updateCurrencies(renewal, model)) map { _ =>
-                    routing(services.msbServices, edit, model)
+                    model match {
+                      case UsesForeignCurrenciesYes => Redirect(routes.MoneySourcesController.get(edit))
+                      case _ => routing(ba.businessActivities, services.msbServices, edit)
+                    }
                   }
                 }
                 result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
@@ -88,15 +93,13 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
     }
   }
 
-  def routing(msbServices: Set[BusinessMatchingMsbService],
-              edit: Boolean,
-              data: UsesForeignCurrencies)(implicit hc: HeaderCarrier, auth: AuthContext) = {
-    if (data == UsesForeignCurrenciesYes) {
-      Redirect(routes.MoneySourcesController.get(edit))
-    } else if (msbServices.contains(ForeignExchange) && !edit) {
+  def routing(services: Set[BusinessActivity], msbServices: Set[BusinessMatchingMsbService], edit: Boolean) =
+
+    if (msbServices.contains(ForeignExchange) && !edit) {
       Redirect(routes.FXTransactionsInLast12MonthsController.get(edit))
+    } else if ((services.contains(HighValueDealing) || services.contains(AccountancyServices)) && !edit) {
+      Redirect(routes.CustomersOutsideUKController.get(edit))
     } else {
       Redirect(routes.SummaryController.get())
     }
-  }
 }

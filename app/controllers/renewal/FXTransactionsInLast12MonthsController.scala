@@ -75,8 +75,7 @@ class FXTransactionsInLast12MonthsController @Inject()(
 
   private def standardRouting(businessActivities: Set[BusinessActivity], edit: Boolean): Result =
     (businessActivities, edit) match {
-      case (x, false) if x.contains(HighValueDealing) && !x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideUKController.get())
-      case (x, false) if x.contains(HighValueDealing) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
+      case (x, false) if x.contains(HighValueDealing) || x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideUKController.get())
       case _ => Redirect(routes.SummaryController.get())
     }
 }

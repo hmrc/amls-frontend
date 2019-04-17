@@ -190,11 +190,11 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
           }
         }
 
-        "redirect to the Msb Throughput page" when {
+        "redirect to the CYA page" when {
           "business is an msb and asp" in new FormSubmissionFixture {
             post(businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness, AccountancyServices))))) { result =>
               result.header.status mustBe SEE_OTHER
-              result.header.headers.get("Location") mustBe Some(routes.TotalThroughputController.get().url)
+              result.header.headers.get("Location") mustBe Some(routes.SummaryController.get().url)
             }
           }
         }
