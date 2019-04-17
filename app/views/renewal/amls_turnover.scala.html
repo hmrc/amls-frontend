@@ -37,7 +37,7 @@
 }
 
 @main(
-    title = Messages("renewal.turnover.title") + " - " + Messages("summary.renewal"),
+    title = Messages(placeHolder.getOrElse("renewal.turnover.title")) + " - " + Messages("summary.renewal"),
     heading = header
 ) {
 
