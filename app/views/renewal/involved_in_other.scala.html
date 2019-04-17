@@ -37,15 +37,15 @@
 
     <p>@Messages("businessactivities.confirm-activities.subtitle")</p>
 
-    @businessTypes.map {
-        case types => {
-            @types.map{ x =>
-            <ul class="list list-bullet">
-                <li>@x</li>
-            </ul>
+    <ul class="list list-bullet">
+        @businessTypes.map {
+            case types => {
+                @types.map{ x =>
+                    <li>@x</li>
+                }
             }
         }
-    }
+    </ul>
 
     <p>@Messages("renewal.involvedinother.example")</p>
     <ul class="list list-bullet">
