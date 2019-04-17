@@ -36,7 +36,7 @@ class summarySpec extends AmlsSpec with MustMatchers with HtmlAssertions with Ta
   "summary view" must {
     "have correct title, heading and subheading" in new ViewFixture {
 
-      def view = views.html.tcsp.summary(Tcsp())
+      def view = views.html.tcsp.summary(Tcsp(), List())
 
       val title = Messages("title.cya") + " - " + Messages("summary.tcsp") + " - " +
                   Messages("title.amls") + " - " + Messages("title.gov")
@@ -53,6 +53,10 @@ class summarySpec extends AmlsSpec with MustMatchers with HtmlAssertions with Ta
                                                                             "tcsp.service.provider.lbl.03",
                                                                             "tcsp.service.provider.lbl.04",
                                                                             "tcsp.service.provider.lbl.05"))),
+
+      ("tcsp.off-the-shelf.companies.lbl", checkElementTextIncludes(_, "lbl.yes")),
+      ("tcsp.create.complex.corporate.structures.lbl", checkElementTextIncludes(_, "lbl.no")),
+
       ("tcsp.provided_services.title", checkListContainsItems(_, Set("tcsp.provided_services.service.lbl.01",
                                                                      "tcsp.provided_services.service.lbl.02",
                                                                      "tcsp.provided_services.service.lbl.03",
@@ -60,7 +64,7 @@ class summarySpec extends AmlsSpec with MustMatchers with HtmlAssertions with Ta
                                                                      "tcsp.provided_services.service.lbl.05",
                                                                      "tcsp.provided_services.service.lbl.06",
                                                                      "tcsp.provided_services.service.lbl.07",
-                                                                     "Other:sfasfasef"))),
+                                                                     "Other: sfasfasef"))),
       ("tcsp.servicesOfAnotherTcsp.title", checkElementTextIncludes(_, "lbl.yes")),
       ("tcsp.anothertcspsupervision.title", checkElementTextIncludes(_, s"Money Laundering Regulation reference number: $amlsRegistrationNumber"))
     )
@@ -68,15 +72,24 @@ class summarySpec extends AmlsSpec with MustMatchers with HtmlAssertions with Ta
     "include the provided data" in new ViewFixture {
       def view = {
         val testdata = Tcsp(
-          Some(TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, RegisteredOfficeEtc, CompanyDirectorEtc, CompanyFormationAgent(true,false)))),
-          Some(ProvidedServices(Set(
-            PhonecallHandling,EmailHandling,EmailServer,SelfCollectMailboxes,MailForwarding,Receptionist,ConferenceRooms, Other("sfasfasef")
-          ))),
-          Some(true),
-          Some(ServicesOfAnotherTCSPYes(amlsRegistrationNumber))
-        )
+          Some(TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, RegisteredOfficeEtc, CompanyDirectorEtc, CompanyFormationAgent))),
+            Some(OnlyOffTheShelfCompsSoldYes),
+            Some(ComplexCorpStructureCreationNo),
+            Some(ProvidedServices(Set(
+              PhonecallHandling,EmailHandling,EmailServer,SelfCollectMailboxes,MailForwarding,Receptionist,ConferenceRooms, Other("sfasfasef")
+            ))),
+            Some(true),
+            Some(ServicesOfAnotherTCSPYes(amlsRegistrationNumber))
+          )
 
-        views.html.tcsp.summary(testdata)
+        val sortedList = List(
+          "Registered office, business address, or virtual office services provider",
+          "Trustee provider",
+          "Company director, secretary, or partner provider",
+          "Trust or company formation agent",
+          "Nominee shareholders provider"
+        )
+        views.html.tcsp.summary(testdata, sortedList)
       }
 
       forAll(sectionChecks) { (key, check) => {

@@ -176,7 +176,7 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
 
         post() { result =>
           result.header.status mustBe SEE_OTHER
-          result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.get().url)
+          result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.CustomersOutsideUKController.get().url)
         }
       }
 

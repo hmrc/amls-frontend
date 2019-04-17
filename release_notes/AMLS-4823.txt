@@ -1,1 +1,0 @@
- + [AMLS-4823](https://jira.tools.tax.service.gov.uk/browse/AMLS-4823) - 'Updated css to not display double line for newly added sections to registration progress'

@@ -30,97 +30,37 @@
     title = Messages("renewal.msb.whichcurrencies.header") + " - " + Messages("summary.renewal"),
     heading = header
 ) {
-
     @form(f, controllers.renewal.routes.WhichCurrenciesController.post(edit)) {
+
+        @hint(
+            hint = "msb.which_currencies.uptoThree.hint",
+            hint2 = "msb.which_currencies.uptoThree.hint2"
+        )
 
         @fieldset(
             f = f("currencies-fieldset"),
-            legend = "msb.which_currencies.title",
+            legend = "renewal.msb.whichcurrencies.header",
             legendHidden = true,
             panel = false,
-            classes = Seq("form-group"),
-            hint = "msb.which_currencies.uptoThree.hint"
+            classes = Seq("form-group")
         ) {
             @errorGroup(f("currencies")) {
-                @currency(field=f("currencies[0]"))
-                @currency(field=f("currencies[1]"))
-                @currency(field=f("currencies[2]"))
-            }
-        }
-
-        @fieldset(
-            f = f("usesForeignCurrencies-fieldset"),
-            legend = Messages("renewal.msb.which_currencies.foreign_currencies_question"),
-            panel = false,
-            classes = Seq("inline")
-        ) {
-
-            @errorGroup(f("usesForeignCurrencies")) {
-                @radio(
-                    f = f("usesForeignCurrencies"),
-                    labelText = "lbl.yes",
-                    value = "Yes",
-                    target = "#usesForeignCurrency-fieldset",
-                    inline = true
+                @currency(
+                    field = f("currencies[0]"),
+                    labelText = "lbl.currency.line1"
                 )
-
-                @radio(
-                    f = f("usesForeignCurrencies"),
-                    labelText = "lbl.no",
-                    value = "No",
-                    inline = true
+                @currency(
+                    field = f("currencies[1]"),
+                    labelText = "lbl.currency.line2"
+                )
+                @currency(
+                    field = f("currencies[2]"),
+                    labelText = "lbl.currency.line3"
                 )
             }
-
-            @panel(
-                field = Some(f("usesForeignCurrency-fieldset")),
-                jsHidden = false
-            ) {
-                @panelContents
-            }
-        }
-
-        <div class="clear">
+            <div class="clear">
             @submit(returnLocation = Some("renewal"))
-        </div>
-    }
-}
-
-@panelContents = {
-    <p class="form-label">@Messages("msb.which_currencies.who")</p>
-    <span class="form-hint">@Messages("lbl.select.all")</span>
-
-    @errorGroup(
-        field = f("WhoWillSupply")
-    ) {
-        @checkbox(
-            f = f("bankMoneySource"),
-            labelText = "msb.which_currencies.source.banks",
-            value = "Yes",
-            target = "[data-reveal='banks']"
-        )
-        @input(
-            field = f("bankNames"),
-            labelText = "msb.which_currencies.source.which_banks",
-            jsHidden = true,
-            data = "banks"
-        )
-        @checkbox(
-            f = f("wholesalerMoneySource"),
-            labelText = "msb.which_currencies.source.wholesalers",
-            value = "Yes",
-            target = "[data-reveal='wholesalers']"
-        )
-        @input(
-            field = f("wholesalerNames"),
-            labelText = "msb.which_currencies.source.which_wholesalers",
-            jsHidden = true,
-            data = "wholesalers"
-        )
-        @checkbox(
-            f = f("customerMoneySource"),
-            labelText = "msb.which_currencies.source.customers",
-            value = "Yes"
-        )
+            </div>
+        }
     }
 }

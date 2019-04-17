@@ -60,11 +60,13 @@ class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCach
           case f: InvalidForm =>
             Future.successful(BadRequest(supervision_end_reasons(f, edit)))
           case ValidForm(_, data) =>
-            for {
-              supervision: Option[Supervision] <- dataCacheConnector.fetch[Supervision](Supervision.key)
-              cache <- dataCacheConnector.save[Supervision](Supervision.key,
+            (for {
+              supervision <- dataCacheConnector.fetch[Supervision](Supervision.key)
+              maybeCache <- dataCacheConnector.save[Supervision](Supervision.key,
                 updateData(supervision, data))
-            } yield redirectTo(edit, cache)
+            } yield maybeCache) map {
+              cache => redirectTo(edit, cache)
+            }
         }
   }
 
@@ -79,9 +81,9 @@ class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCach
   private def redirectTo(edit: Boolean, cache: CacheMap)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
       import utils.ControllerHelper.supervisionComplete
 
-      supervisionComplete(cache) match {
-        case false => Redirect(routes.ProfessionalBodyMemberController.get())
-        case true => Redirect(routes.SummaryController.get())
-      }
-  }
+        supervisionComplete(cache) match {
+          case false => Redirect(routes.ProfessionalBodyMemberController.get())
+          case true => Redirect(routes.SummaryController.get())
+        }
+    }
 }

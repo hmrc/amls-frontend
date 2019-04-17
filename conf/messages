@@ -489,8 +489,8 @@ services.list.lbl.02 = Currency exchange
 services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
 services.list.lbl.04 = Cheque cashing (scrap metal dealers)
 
-hint.8.digits = It’s either 8 numbers, or a mix of 15 letters and numbers.
-hint.9.digits = This is 9 numbers, like 123456789
+hint.8.digits = This is 8 numbers, like 12345678, or a mix of 15 letters and numbers, like ABCD00000123456.
+hint.9.digits = It’s 9 numbers, like 123456789
 hint.10.digits = For example: 1234567890
 hint.255.chars = Enter 255 characters or less.
 
@@ -863,8 +863,8 @@ summary.declarationlocked = Declaration (locked)
 summary.declarationlocked.title = You can’t complete this section yet
 summary.businessmatching = Pre-application
 summary.start = Pre-application
-summary.tcsp = Trust or Company Service Provider
-summary.asp = Accountancy Service Provider
+summary.tcsp = Trust or company service provider
+summary.asp = Accountancy service provider
 summary.supervision = Supervision
 summary.msb = Money Service Business
 summary.hvd = High Value Dealer
@@ -1764,60 +1764,62 @@ responsiblepeople.country.of.birth.heading = Was {0} born in the UK?
 responsiblepeople.country.of.birth.txt.lbl = What country was {0} born in?
 
 #TCSP
-tcsp.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:
+tcsp.whatyouneed.requiredinfo.heading = In this section you’ll be asked things like:
 tcsp.whatyouneed.requiredinfo.text.1 = what services you provide
-tcsp.whatyouneed.requiredinfo.text.2 = if you create complex corporate structures for clients, or plan to do so
-tcsp.whatyouneed.requiredinfo.text.3 = if you use the services of another Trust or Company Service Provider and what their details are
+tcsp.whatyouneed.requiredinfo.text.2 = if you create complex corporate structures for clients
+tcsp.whatyouneed.requiredinfo.text.3 = if you use the services of another trust or company service provider
+tcsp.whatyouneed.requiredinfo.text.4 = your trust or company service provider’s Money Laundering Regulations number
 
-tcsp.kind.of.service.provider.title = What kind of Trust or Company Service Provider are you?
+tcsp.kind.of.service.provider.title = What type of trust or company service provider are you?
 tcsp.service.provider.lbl.01 = Nominee shareholders provider
 tcsp.service.provider.lbl.02 = Trustee provider
 tcsp.service.provider.lbl.03 = Registered office, business address, or virtual office services provider
 tcsp.service.provider.lbl.04 = Company director, secretary, or partner provider
 tcsp.service.provider.lbl.05 = Trust or company formation agent
+
 tcsp.off-the-shelf.companies.lbl = Do you sell only off-the-shelf companies?
 tcsp.create.complex.corporate.structures.lbl = Do you create complex corporate structures for clients, or are you planning to do so in the future?
-tcsp.servicesOfAnotherTcsp.title = Does your business use the services of another Trust or Company Service Provider?
+tcsp.servicesOfAnotherTcsp.title = Does your business use the services of another trust or company service provider?
 tcsp.servicesOfAnotherTcsp.other.hint = Only include companies which are based in the UK and supervised by HM Revenue and Customs for Money Laundering Regulations.
-tcsp.servicesOfAnotherTcsp.mlrregno.lbl = What’s that company’s Money Laundering Regulations registration number?
+tcsp.servicesOfAnotherTcsp.mlrregno.lbl = Money Laundering Regulations number.
 tcsp.cya.mlrregno = Money Laundering Regulation reference number
 
 tcsp.provided_services.title = Which services does your business provide?
-tcsp.provided_services.service.lbl.01 = Phonecall handling
+tcsp.provided_services.service.lbl.01 = Telephone call handling
 tcsp.provided_services.service.lbl.02 = Email handling
 tcsp.provided_services.service.lbl.03 = Email server
 tcsp.provided_services.service.lbl.04 = Self-collect mailboxes
 tcsp.provided_services.service.lbl.05 = Mail forwarding
 tcsp.provided_services.service.lbl.06 = Receptionist
-tcsp.provided_services.service.lbl.07 = Conference rooms
+tcsp.provided_services.service.lbl.07 = Conference room
 tcsp.provided_services.service.lbl.08 = Other
-tcsp.provided_services.service.lbl.details = Please give details
+tcsp.provided_services.service.lbl.details = Service type
 
-tcsp.anothertcspsupervision.title = Is that Trust or Company Service Provider registered with HMRC for anti-money laundering supervision?
-tcsp.anothertcspsupervision.header = Is that Trust or Company Service Provider registered with HMRC for anti-money laundering supervision?
+tcsp.anothertcspsupervision.title = Is your trust or company service provider registered with HMRC for anti-money laundering supervision?
+tcsp.anothertcspsupervision.header = Is your trust or company service provider registered with HMRC for anti-money laundering supervision?
 
 #ASP
-asp.whatyouneed.subheading = In this section, you’ll be asked for things like:
-asp.whatyouneed.line_1 = what services you provide
+asp.whatyouneed.subheading = In this section you’ll be asked:
+asp.whatyouneed.line_1 = which services you provide
 asp.whatyouneed.line_2 = if you’re registered with HMRC to handle other businesses’ tax matters
 asp.other.business.tax.matters.title = Are you registered with HMRC to handle other businesses’ tax matters?
 asp.other.business.tax.matters.agentrefno.lbl = HMRC Agent Registration Number
-asp.other.business.tax.matters.lbl = This refers to the HMRC Agent Registration Scheme.
+asp.other.business.tax.matters.lbl = If you act as a tax agent or adviser, you must have formal authorisation to deal with HMRC on your client’s behalf.
 asp.services.title = Which services does your business provide?
 asp.service.lbl.01 = Accountancy
 asp.service.lbl.02 = Payroll services
 asp.service.lbl.03 = Bookkeeping
 asp.service.lbl.04 = Auditing
-asp.service.lbl.05 = Financial advice and/or tax advice
+asp.service.lbl.05 = Financial or tax advice 
 asp.summary.registration.number = HMRC Registration number:
 
 #Supervision
 supervision.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:
-supervision.whatyouneed.requiredinfo.text.1 = details of any previous supervision by another body
+supervision.whatyouneed.requiredinfo.text.1 = details of any previous supervisors 
 supervision.whatyouneed.requiredinfo.text.2 = if your business is a member of any professional bodies
 supervision.whatyouneed.requiredinfo.text.3 = if your business has been penalised in the past
 
-supervision.another_body.title = Has your business ever been registered for anti-money laundering supervision with another supervising body?
+supervision.another_body.title = Has your business ever been registered with another supervising body for anti-money laundering supervision? 
 supervision.another_body.description = This only refers to registration for anti-money laundering supervision.
 supervision.another_body.lbl.supervisor = Name of your last supervisor
 supervision.another_body.startDate.lbl = Start date of supervision
@@ -1833,7 +1835,7 @@ supervision.supervision_end_reasons.lbl = Why did your previous supervision end?
 supervision.supervision_end_reasons.description = Give details of why your previous registration ended
 
 
-supervision.penalisedbyprofessional.title = Has the business, or anyone in the business, ever been penalised by a professional body?
+supervision.penalisedbyprofessional.title = Has your business, or anyone in your business, ever been penalised for business activities covered by Money Laundering Regulations?
 supervision.penalisedbyprofessional.subtitle = Examples of a penalty include:
 supervision.penalisedbyprofessional.line_1 = a fine
 supervision.penalisedbyprofessional.line_2 = a warning
@@ -1841,7 +1843,7 @@ supervision.penalisedbyprofessional.line_3 = suspension
 supervision.penalisedbyprofessional.line_4 = expulsion
 supervision.penalisedbyprofessional.line_5 = special terms or conditions imposed on your business
 supervision.penalisedbyprofessional.details = Only include penalties for business activities covered by Money Laundering Regulations.
-supervision.penalisedbyprofessional.details.lbl = Please provide details
+supervision.penalisedbyprofessional.details.lbl = Describe the penalty, when it occurred, and who was involved.
 
 supervision.memberofprofessionalbody.title = Is your business a member of a professional body?
 supervision.memberofprofessionalbody.lbl.01 = Association of Accounting Technicians
@@ -1859,7 +1861,7 @@ supervision.memberofprofessionalbody.lbl.12 = International Association of Bookk
 supervision.memberofprofessionalbody.lbl.13 = Law Society
 supervision.memberofprofessionalbody.lbl.14 = Other
 
-supervision.whichprofessionalbody.title = Which professional body are you a member of?
+supervision.whichprofessionalbody.title = Which professional bodies are you a member of?
 
 msb.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:
 msb.whatyouneed.line_1 = how much throughput you expect in the next 12 months
@@ -2127,7 +2129,8 @@ renewal.msb.throughput.selection.6 = £101 million to £1 billion
 renewal.msb.throughput.selection.7 = More than £1 billion
 
 renewal.msb.whichcurrencies.header = Which currencies did you supply the most to your customers in the last 12 months?
-renewal.msb.which_currencies.foreign_currencies_question =  Did you deal in physical foreign currencies in the last 12 months?
+renewal.msb.foreign_currencies.header =  Did you deal in physical foreign currencies in the last 12 months?
+renewal.msb.money_sources.header =  Who supplied your physical foreign currency in the last 12 months?
 renewal.msb.ce.transactions.expected.title = How many currency exchange transactions did you make in the last 12 months?
 renewal.msb.fx.transactions.expected.title = How many foreign exchange transactions did you make in the last 12 months?
 

@@ -172,10 +172,3 @@ object MoneySources {
         __.write(customerMoneySourceWriter))(x => (x.bankMoneySource, x.wholesalerMoneySource, x.customerMoneySource))
   }
 }
-
-
-
-
-
-
-

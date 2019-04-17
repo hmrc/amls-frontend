@@ -30,7 +30,7 @@ sealed trait ServiceProvider {
       case TrusteeProvider => "02"
       case RegisteredOfficeEtc => "03"
       case CompanyDirectorEtc => "04"
-      case CompanyFormationAgent(_, _) => "05"
+      case CompanyFormationAgent => "05"
     }
 }
 
@@ -38,10 +38,7 @@ case object NomineeShareholdersProvider extends ServiceProvider
 case object TrusteeProvider extends ServiceProvider
 case object RegisteredOfficeEtc extends ServiceProvider
 case object CompanyDirectorEtc extends ServiceProvider
-case class CompanyFormationAgent (
-                                onlyOffTheShelfCompsSold:Boolean,
-                                complexCorpStructureCreation: Boolean
-                              ) extends ServiceProvider
+case object CompanyFormationAgent extends ServiceProvider
 
 object TcspTypes {
 
@@ -56,10 +53,7 @@ object TcspTypes {
           case "02" => Rule[UrlFormEncoded, ServiceProvider](_ => Valid(TrusteeProvider))
           case "03" => Rule[UrlFormEncoded, ServiceProvider](_ => Valid(RegisteredOfficeEtc))
           case "04" => Rule[UrlFormEncoded, ServiceProvider](_ => Valid(CompanyDirectorEtc))
-          case "05" =>
-            ((__ \ "onlyOffTheShelfCompsSold").read[Boolean].withMessage("error.required.tcsp.off.the.shelf.companies") ~
-              (__ \ "complexCorpStructureCreation").read[Boolean].withMessage("error.required.tcsp.complex.corporate.structures")
-              ) (CompanyFormationAgent.apply _)
+          case "05" => Rule[UrlFormEncoded, ServiceProvider](_ => Valid(CompanyFormationAgent))
           case _ =>
             Rule[UrlFormEncoded, ServiceProvider] { _ =>
               Invalid(Seq((Path \ "serviceProviders") -> Seq(jto.validation.ValidationError("error.invalid"))))
@@ -83,9 +77,6 @@ object TcspTypes {
       Map(
         "serviceProviders[]" -> (services map { _.value }).toSeq
       ) ++ services.foldLeft[UrlFormEncoded](Map.empty) {
-        case (m, CompanyFormationAgent(sold, creation)) =>
-          m ++ Map("onlyOffTheShelfCompsSold" -> Seq(sold.toString),
-                    "complexCorpStructureCreation" -> Seq(creation.toString))
         case (m, _) =>
           m
       }
@@ -104,9 +95,7 @@ object TcspTypes {
         case "02" => Reads(_ => JsSuccess(TrusteeProvider)) map identity[ServiceProvider]
         case "03" => Reads(_ => JsSuccess(RegisteredOfficeEtc)) map identity[ServiceProvider]
         case "04" => Reads(_ => JsSuccess(CompanyDirectorEtc)) map identity[ServiceProvider]
-        case "05" =>
-          ((__ \ "onlyOffTheShelfCompsSold").read[Boolean] and
-            (__ \ "complexCorpStructureCreation").read[Boolean])(CompanyFormationAgent.apply _) map identity[ServiceProvider]
+        case "05" => Reads(_ => JsSuccess(CompanyFormationAgent)) map identity[ServiceProvider]
         case _ =>
           Reads(_ => JsError((JsPath \ "serviceProviders") -> ValidationError("error.invalid")))
       }.foldLeft[Reads[Set[ServiceProvider]]](
@@ -129,9 +118,6 @@ object TcspTypes {
           _.value
         }).toSeq
       ) ++ services.foldLeft[JsObject](Json.obj()) {
-        case (m, CompanyFormationAgent(sold, creation)) =>
-          m ++ Json.obj("onlyOffTheShelfCompsSold" -> sold,
-            "complexCorpStructureCreation" -> creation)
         case (m, _) =>
           m
       }

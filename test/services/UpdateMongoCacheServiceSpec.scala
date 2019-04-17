@@ -129,9 +129,12 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
 
     val responsiblePeople = responsiblePersonGen.sample.get
 
-    val tcsp = Tcsp(Some(TcspTypes(Set(
-      NomineeShareholdersProvider,
-      TrusteeProvider))),
+    val tcsp = Tcsp(
+      Some(TcspTypes(Set(
+        NomineeShareholdersProvider,
+        TrusteeProvider))),
+      None,
+      None,
       Some(ProvidedServices(Set(PhonecallHandling, Other("other service")))),
       Some(true),
       None,
