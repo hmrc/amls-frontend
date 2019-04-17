@@ -63,7 +63,7 @@ class InvolvedInOtherController @Inject()(
           val prefix = if (vowels.exists(item.toLowerCase.startsWith(_))) { "an" }
                        else { "a" }
 
-          s"$prefix ${item.toLowerCase}"
+          s"$prefix ${item(0).toLower + item.substring(1)}"
         })
       }
   }
