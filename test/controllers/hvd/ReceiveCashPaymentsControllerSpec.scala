@@ -65,16 +65,6 @@ class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
       }
     }
 
-    "respond with not found" when {
-      "application is in variation mode" in new Fixture {
-
-        mockApplicationStatus(SubmissionDecisionApproved)
-
-        val result = controller.get()(request)
-        status(result) mustBe NOT_FOUND
-      }
-    }
-
     "respond with bad request with an invalid request" in new Fixture {
 
       val result = controller.post()(request)

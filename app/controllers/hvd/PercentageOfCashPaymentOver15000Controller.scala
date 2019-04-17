@@ -20,12 +20,10 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import javax.inject.Inject
-import models.businessmatching.HighValueDealing
 import models.hvd.{Hvd, PercentageOfCashPaymentOver15000}
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
 import views.html.hvd.percentage
 
 import scala.concurrent.Future
@@ -38,18 +36,14 @@ class PercentageOfCashPaymentOver15000Controller @Inject() (val authConnector: A
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      ControllerHelper.allowedToEdit(HighValueDealing) flatMap {
-        case true =>
-          dataCacheConnector.fetch[Hvd](Hvd.key) map {
-          response =>
-            val form: Form2[PercentageOfCashPaymentOver15000] = (for {
-              hvd <- response
-              percentageOfCashPaymentOver15000 <- hvd.percentageOfCashPaymentOver15000
-            } yield Form2[PercentageOfCashPaymentOver15000](percentageOfCashPaymentOver15000)).getOrElse(EmptyForm)
-            Ok(percentage(form, edit))
-        }
-        case false => Future.successful(NotFound(notFoundView))
-      }
+      dataCacheConnector.fetch[Hvd](Hvd.key) map {
+      response =>
+        val form: Form2[PercentageOfCashPaymentOver15000] = (for {
+          hvd <- response
+          percentageOfCashPaymentOver15000 <- hvd.percentageOfCashPaymentOver15000
+        } yield Form2[PercentageOfCashPaymentOver15000](percentageOfCashPaymentOver15000)).getOrElse(EmptyForm)
+        Ok(percentage(form, edit))
+    }
   }
 
     def post(edit: Boolean = false) = Authorised.async {

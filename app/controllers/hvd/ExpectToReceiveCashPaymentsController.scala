@@ -21,12 +21,10 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import jto.validation.{Path, ValidationError}
-import models.businessmatching.HighValueDealing
 import models.hvd.{Hvd, PaymentMethods}
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
 import views.html.hvd.expect_to_receive
 
 import scala.concurrent.Future
@@ -40,20 +38,16 @@ class ExpectToReceiveCashPaymentsController @Inject()( val authConnector: AuthCo
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      ControllerHelper.allowedToEdit(HighValueDealing) flatMap {
-        case true =>
-          cacheConnector.fetch[Hvd](Hvd.key) map {
-            response =>
-              val form: Form2[PaymentMethods] = (for {
-                hvd <- response
-                receivePayments <- hvd.cashPaymentMethods
-              } yield {
-                Form2[PaymentMethods](receivePayments)
-              }).getOrElse(EmptyForm)
+      cacheConnector.fetch[Hvd](Hvd.key) map {
+        response =>
+          val form: Form2[PaymentMethods] = (for {
+            hvd <- response
+            receivePayments <- hvd.cashPaymentMethods
+          } yield {
+            Form2[PaymentMethods](receivePayments)
+          }).getOrElse(EmptyForm)
 
-              Ok(expect_to_receive(form, edit))
-          }
-        case false => Future.successful(NotFound(notFoundView))
+          Ok(expect_to_receive(form, edit))
       }
   }
 
