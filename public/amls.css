@@ -684,10 +684,9 @@ select {
 }
 
 
-/*.form-group {
-    padding-top: 0;
-    padding-bottom: 0;
-}*/
+.form-group {
+    clear: both;
+}
 
 
 /* Add some space under the last fieldset in a .panel-indent,
