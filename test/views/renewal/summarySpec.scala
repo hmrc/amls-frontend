@@ -126,7 +126,7 @@ class summarySpec extends AmlsSpec
           )
         )
 
-        views.html.renewal.summary(EmptyForm, renewalModel, Some(businessActivitiesModel), msbServices, true)
+        views.html.renewal.summary(EmptyForm, renewalModel, Some(List("Accountancy service provider", "Estate agency business", "Telecommunications, digital and IT payment service provider", "Bill payment service provider", "Trust or company service provider", "High value dealer", "Money service business")), msbServices, true)
       }
 
       forAll(sectionChecks) { (key, check, editLink) => {

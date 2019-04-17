@@ -54,7 +54,7 @@ class SummaryController @Inject()
             } yield {
               val variationSections = sectionsProvider.sections(cache).filter(_.name != BusinessMatching.messageKey)
               val canSubmit = renewalService.canSubmit(renewalSection, variationSections)
-              Ok(summary(EmptyForm, renewal, businessMatching.activities, businessMatching.msbServices, canSubmit))
+              Ok(summary(EmptyForm, renewal, businessMatching.alphabeticalBusinessTypes(), businessMatching.msbServices, canSubmit))
             }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
         }
   }
