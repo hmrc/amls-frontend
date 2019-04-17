@@ -493,6 +493,7 @@ hint.8.digits = This is 8 numbers, like 12345678, or a mix of 15 letters and num
 hint.9.digits = It’s 9 numbers, like 123456789
 hint.10.digits = For example: 1234567890
 hint.255.chars = Enter 255 characters or less.
+renewal.hint.255.chars = You have 255 characters or less.
 
 lbl.hint.crn = It’s 8 characters and can be just numbers, or a mix of numbers and capital letters. If yours is 7 characters, enter a 0 (zero) at the beginning.
 
@@ -2083,8 +2084,8 @@ notifications.nmrv.title = No longer considering revocation
 ############################### Renewal ###############################
 renewal.whatyouneed.requiredinfo.heading = In this section you’ll be asked for things like: 
 renewal.whatyouneed.line_1 = your business activities over the last 12 months
-renewal.whatyouneed.line_2 = your net profit
-renewal.whatyouneed.line_3 = your net profit on activities covered by Money Laundering Regulations
+renewal.whatyouneed.line_2 = net profit
+renewal.whatyouneed.line_3 = net profit on activities covered by Money Laundering Regulations
 renewal.progress.title = About your business
 renewal.progress.intro = If something has changed in your business that is relevant to Money Laundering Regulations you must update your information.\nYou’ll need to pay a fee for each of your trading premises. You may also need to pay a fee for any additional responsible people.
 renewal.progress.submit.header = Submit renewal
