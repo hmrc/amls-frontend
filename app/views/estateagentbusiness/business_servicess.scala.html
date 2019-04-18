@@ -23,20 +23,18 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("estateagentbusiness.services.title", "summary.estateagentbusiness")
+    @heading(section = "summary.estateagentbusiness")
 }
 
 @main(
     title = Messages("estateagentbusiness.services.title") + " - " + Messages("summary.estateagentbusiness"),
     heading = header
 ) {
-
-    <p>@Messages("lbl.select.all")</p>
     @form(f, controllers.estateagentbusiness.routes.BusinessServicesController.post(edit)) {
         @fieldset(
             f = f("services-fieldset"),
-            legend = "estateagentbusiness.services.title",
-            legendHidden = true,
+            legend = "lbl.select.all",
+            heading = "estateagentbusiness.services.title",
             panel = false
         ) {
             @errorGroup(

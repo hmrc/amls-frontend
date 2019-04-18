@@ -15,7 +15,7 @@
  *@
 
 @(
-    legend: String,
+    legend: String = "",
     legendHidden: Boolean = false,
     jsHidden: Boolean = false,
     panel: Boolean = true,
@@ -25,6 +25,7 @@
     bold: Boolean = false,
     hint: String = "",
     heading: String = "",
+    legendHtml: Html = HtmlFormat.empty,
     f: forms.Field
 )(content: Html)(implicit lang:Lang,  m: Messages)
 
@@ -32,7 +33,7 @@
     @if(f.id.nonEmpty){ id="@f.id"}
     class="@if(panel){ panel-indent}@if(f.hasErrors){ form-field--error}@if(jsHidden){js-hidden} @classes.mkString(" ")" @data.mkString(" ")>
 
-        @include.forms2.legend(legend, jsHidden, bold, hint, legendHidden, heading)
+        @include.forms2.legend(legend, jsHidden, bold, hint, legendHidden, heading, legendHtml)
         @if(f.hasErrors) {
             <span class="error-notification" data-journey="error - field:user input:@f.id">@f.error</span>
         }

@@ -22,7 +22,7 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("estateagentbusiness.registered.redress.title", "summary.estateagentbusiness")
+    @heading(section = "summary.estateagentbusiness")
 }
 
 @main(
@@ -32,12 +32,10 @@
 
     @form(f, controllers.estateagentbusiness.routes.ResidentialRedressSchemeController.post(edit)) {
 
-        <p>@Messages("estateagentbusiness.registered.redress.text")</p>
-
         @fieldset(
             f = f("propertyRedressScheme-fieldset"),
-            legend = "estateagentbusiness.which.redress.scheme.lbl",
-            legendHidden = true,
+            legend = "estateagentbusiness.registered.redress.text",
+            heading = "estateagentbusiness.registered.redress.heading",
             classes = Seq("propertyRedress-fieldset"),
             panel = false
         ) {

@@ -27,15 +27,10 @@ s"""${f("professionalBody").id}-fieldset"""
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("estateagentbusiness.penalisedbyprofessional.title", "summary.estateagentbusiness")
+    @heading(section = "summary.estateagentbusiness")
 }
 
-@main(
-title = Messages("estateagentbusiness.penalisedbyprofessional.title") + " - " + Messages("summary.estateagentbusiness"),
-heading = header
-) {
-
-
+@legendHtml = {
     @Messages("estateagentbusiness.penalisedbyprofessional.subtitle")
 
     <ul class="list list-bullet form-group">
@@ -45,16 +40,21 @@ heading = header
         <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_4")</li>
         <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_5")</li>
     </ul>
+}
 
+@main(
+title = Messages("estateagentbusiness.penalisedbyprofessional.title") + " - " + Messages("summary.estateagentbusiness"),
+heading = header
+) {
 
 @form(f, controllers.estateagentbusiness.routes.PenalisedByProfessionalController.post(edit)) {
 
     @fieldset(
         f = f("penalised-fieldset"),
-        legend = "estateagentbusiness.penalisedbyprofessional.title",
-        legendHidden = true,
+        heading = "estateagentbusiness.penalisedbyprofessional.title",
         panel = false,
-        classes = Seq("inline")
+        classes = Seq("inline"),
+        legendHtml = legendHtml
     ) {
         @errorGroup(
              field = f("penalised")
