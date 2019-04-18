@@ -21,10 +21,10 @@ import models.hvd.PercentageOfCashPaymentOver15000.Third
 import models.hvd._
 import org.joda.time.LocalDate
 import org.jsoup.nodes.Element
-import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.MustMatchers
-import utils.AmlsSpec
+import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
+import utils.AmlsSpec
 import views.{Fixture, HtmlAssertions}
 
 import scala.collection.JavaConversions._
@@ -67,7 +67,8 @@ class summarySpec extends AmlsSpec
 
     val sectionChecks = Table[String, Element=>Boolean](
       ("title key", "check"),
-      ("hvd.cash.payment.title",checkElementTextIncludes(_, "lbl.yes", "20 June 2012")),
+      ("hvd.cash.payment.title",checkElementTextIncludes(_, "lbl.yes")),
+      ("hvd.cash.payment.date.title",checkElementTextIncludes(_, "20 June 2012")),
       ("hvd.products.title", checkListContainsItems(_, fullProductSet)),
       ("hvd.excise.goods.title", checkElementTextIncludes(_, "lbl.yes")),
       ("hvd.how-will-you-sell-goods.title", checkListContainsItems(_, Set("Retail", "Auction", "Wholesale"))),
@@ -80,13 +81,15 @@ class summarySpec extends AmlsSpec
     "include the provided data" in new ViewFixture {
       def view = {
         val testdata = Hvd(
-          cashPayment = Some(CashPaymentYes(LocalDate.parse("2012-6-20"))),
+          cashPayment = Some(CashPayment(
+            CashPaymentOverTenThousandEuros(true),
+            Some(CashPaymentFirstDate(LocalDate.parse("2012-6-20"))))),
           products = Some(Products(Set(Alcohol,Tobacco,Antiques,Cars,OtherMotorVehicles,
                           Caravans,Jewellery,Gold,ScrapMetals,MobilePhones,Clothing,
                           Other("Other Product")
                         ))),
           exciseGoods = Some(ExciseGoods(true)),
-          howWillYouSellGoods = Some(HowWillYouSellGoods(List(Retail, Wholesale, Auction))),
+          howWillYouSellGoods = Some(HowWillYouSellGoods(Set(Retail, Wholesale, Auction))),
           percentageOfCashPaymentOver15000 = Some(Third),
           receiveCashPayments = Some(true),
           cashPaymentMethods = Some(PaymentMethods(true, true, Some("Other payment method"))),

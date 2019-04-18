@@ -20,15 +20,14 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
-import models.hvd._
-import play.api.mvc.Call
+import models.hvd.{CashPayment, CashPaymentFirstDate, CashPaymentOverTenThousandEuros, Hvd}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import views.html.hvd.cash_payment
+import views.html.hvd.cash_payment_first_date
 
 import scala.concurrent.Future
 
-class CashPaymentController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                       val authConnector: AuthConnector
+class CashPaymentFirstDateController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                               val authConnector: AuthConnector
                                         ) extends BaseController {
 
   def get(edit: Boolean = false) =
@@ -36,11 +35,11 @@ class CashPaymentController @Inject() (val dataCacheConnector: DataCacheConnecto
       implicit authContext => implicit request =>
         dataCacheConnector.fetch[Hvd](Hvd.key) map {
           response =>
-            val form: Form2[CashPaymentOverTenThousandEuros] = (for {
+            val form: Form2[CashPaymentFirstDate] = (for {
               hvd <- response
-              cashPayment <- hvd.cashPayment.map(p => p.acceptedPayment)
-            } yield Form2[CashPaymentOverTenThousandEuros](cashPayment)).getOrElse(EmptyForm)
-            Ok(cash_payment(form, edit))
+              cashPayment <- hvd.cashPayment.flatMap(p => p.firstDate)
+            } yield Form2[CashPaymentFirstDate](cashPayment)).getOrElse(EmptyForm)
+            Ok(cash_payment_first_date(form, edit))
         }
     }
 
@@ -48,28 +47,23 @@ class CashPaymentController @Inject() (val dataCacheConnector: DataCacheConnecto
   def post(edit: Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request => {
-        Form2[CashPaymentOverTenThousandEuros](request.body) match {
+        Form2[CashPaymentFirstDate](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(cash_payment(f, edit)))
+            Future.successful(BadRequest(cash_payment_first_date(f, edit)))
           case ValidForm(_, data) =>
             for {
               hvd <- dataCacheConnector.fetch[Hvd](Hvd.key)
               _ <- dataCacheConnector.save[Hvd](Hvd.key, hvd.cashPayment(
-                  hvd.cashPayment match {
-                    case Some(cp) => CashPayment.update(cp, data)
-                    case None =>  CashPayment(data, None)
-                  }
+                hvd.cashPayment match {
+                  case Some(cp) => CashPayment.update(cp, data)
+                  case None => CashPayment(CashPaymentOverTenThousandEuros(false), None)
+                }
               ))
-            } yield Redirect(getNextPage(edit, data))
-          }
+            } yield edit match {
+              case true => Redirect(routes.SummaryController.get())
+              case false => Redirect(routes.LinkedCashPaymentsController.get())
+            }
         }
       }
-
-  private def getNextPage(edit:Boolean, data: CashPaymentOverTenThousandEuros): Call = {
-    (edit, data) match {
-      case (true, CashPaymentOverTenThousandEuros(false)) => routes.SummaryController.get()
-      case (false, CashPaymentOverTenThousandEuros(false)) => routes.LinkedCashPaymentsController.get()
-      case (_, CashPaymentOverTenThousandEuros(true)) => routes.CashPaymentFirstDateController.get(edit)
     }
-  }
 }

@@ -18,7 +18,7 @@ package controllers.hvd
 
 import connectors.DataCacheConnector
 import models.DateOfChange
-import models.businessdetails.{BusinessDetails, ActivityStartDate}
+import models.businessdetails.{ActivityStartDate, BusinessDetails}
 import models.hvd.Hvd
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
@@ -29,7 +29,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.{AmlsSpec, AuthorisedFixture, DateOfChangeHelper}
 
 import scala.concurrent.Future
 
@@ -47,13 +47,13 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
 
   "HvdDateOfChangeController" must {
 
-    "on get display date of change view" in new Fixture {
-      val result = controller.get()(request)
+    "on get display date of change view" in new Fixture with DateOfChangeHelper {
+      val result = controller.get(DateOfChangeRedirect.checkYourAnswers)(request)
       status(result) must be(OK)
       contentAsString(result) must include(Messages("summary.hvd"))
     }
 
-    "submit with valid data" in new Fixture {
+    "submit with valid data" in new Fixture with DateOfChangeHelper {
 
       val newRequest = request.withFormUrlEncodedBody(
         "dateOfChange.day" -> "24",
@@ -74,7 +74,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
       when(controller.dataCacheConnector.save[Hvd](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = controller.post()(newRequest)
+      val result = controller.post(DateOfChangeRedirect.checkYourAnswers)(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get().url))
 
@@ -84,7 +84,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
 
     "submit request" when {
 
-      "dateOfChange is earlier than that in S4L" in new Fixture {
+      "dateOfChange is earlier than that in S4L" in new Fixture with DateOfChangeHelper {
 
         val newRequest = request.withFormUrlEncodedBody(
           "dateOfChange.day" -> "24",
@@ -107,7 +107,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
         when(controller.dataCacheConnector.save[Hvd](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-        val result = controller.post()(newRequest)
+        val result = controller.post(DateOfChangeRedirect.checkYourAnswers)(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get().url))
 
@@ -115,7 +115,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
           meq(hvd.copy(dateOfChange = Some(DateOfChange(new LocalDate(1990,1,24))))))(any(), any(), any())
       }
 
-      "dateOfChange is later than that in S4L" in new Fixture {
+      "dateOfChange is later than that in S4L" in new Fixture with DateOfChangeHelper {
 
         val newRequest = request.withFormUrlEncodedBody(
           "dateOfChange.day" -> "24",
@@ -138,7 +138,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
         when(controller.dataCacheConnector.save[Hvd](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-        val result = controller.post()(newRequest)
+        val result = controller.post(DateOfChangeRedirect.checkYourAnswers)(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get().url))
 
@@ -149,57 +149,62 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
 
     }
 
-    "fail submission when invalid date is supplied" in new Fixture {
+    "fail submission" when {
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "dateOfChange.day" -> "24",
-        "dateOfChange.month" -> "2",
-        "dateOfChange.year" -> "199000"
-      )
+      "invalid date is supplied" in new Fixture with DateOfChangeHelper {
 
-      val mockCacheMap = mock[CacheMap]
-      when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
-        .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
+        val newRequest = request.withFormUrlEncodedBody(
+          "dateOfChange.day" -> "24",
+          "dateOfChange.month" -> "2",
+          "dateOfChange.year" -> "199000"
+        )
 
-      when(mockCacheMap.getEntry[Hvd](Hvd.key))
-        .thenReturn(None)
+        val mockCacheMap = mock[CacheMap]
+        when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
+          .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
 
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
+        when(mockCacheMap.getEntry[Hvd](Hvd.key))
+          .thenReturn(None)
 
-      when(controller.dataCacheConnector.save[Hvd](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+        when(controller.dataCacheConnector.save[Hvd](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post(DateOfChangeRedirect.checkYourAnswers)(newRequest)
+        status(result) must be(BAD_REQUEST)
+        contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+      }
+
+      "input date is before activity start date" in new Fixture with DateOfChangeHelper {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "dateOfChange.day" -> "24",
+          "dateOfChange.month" -> "2",
+          "dateOfChange.year" -> "1980"
+        )
+
+        val mockCacheMap = mock[CacheMap]
+        when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
+          .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
+
+        when(mockCacheMap.getEntry[Hvd](Hvd.key))
+          .thenReturn(Some(Hvd()))
+
+        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(controller.dataCacheConnector.save[Hvd](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post(DateOfChangeRedirect.checkYourAnswers)(newRequest)
+        status(result) must be(BAD_REQUEST)
+        contentAsString(result) must include(Messages("error.expected.dateofchange.date.after.activitystartdate", "24-02-1990"))
+      }
     }
 
-    "fail submission when input date is before activity start date" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "dateOfChange.day" -> "24",
-        "dateOfChange.month" -> "2",
-        "dateOfChange.year" -> "1980"
-      )
-
-      val mockCacheMap = mock[CacheMap]
-      when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
-        .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
-
-      when(mockCacheMap.getEntry[Hvd](Hvd.key))
-        .thenReturn(Some(Hvd()))
-
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
-
-      when(controller.dataCacheConnector.save[Hvd](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.expected.dateofchange.date.after.activitystartdate", "24-02-1990"))
-    }
 
   }
 }

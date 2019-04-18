@@ -167,10 +167,12 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
     )
 
     val hvd = Hvd(
-      cashPayment = Some(CashPaymentYes(new LocalDate(1956, 2, 15))),
+      cashPayment = Some(CashPayment(
+        CashPaymentOverTenThousandEuros(true),
+        Some(CashPaymentFirstDate(new LocalDate(1956, 2, 15))))),
       Some(Products(Set(Cars))),
       None,
-      Some(HowWillYouSellGoods(Seq(Retail))),
+      Some(HowWillYouSellGoods(Set(Retail))),
       Some(PercentageOfCashPaymentOver15000.First),
       Some(true),
       Some(PaymentMethods(courier = true, direct = true, other = Some("foo"))),

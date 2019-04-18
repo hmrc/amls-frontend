@@ -16,8 +16,6 @@
 
 package controllers.hvd
 
-
-
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -28,18 +26,18 @@ import models.hvd.Hvd
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
+import utils.{DateOfChangeHelper, RepeatingSection}
 import views.html.date_of_change
 
 import scala.concurrent.Future
 
 class HvdDateOfChangeController @Inject() ( val dataCacheConnector: DataCacheConnector,
                                             val authConnector: AuthConnector
-                                          ) extends RepeatingSection with BaseController {
+                                          ) extends RepeatingSection with BaseController with DateOfChangeHelper {
 
-  def get = Authorised.async {
+  def get(redirect: String) = Authorised.async {
       implicit authContext => implicit request =>
-        Future.successful(Ok(date_of_change(EmptyForm, "summary.hvd", routes.HvdDateOfChangeController.post())))
+        Future.successful(Ok(date_of_change(EmptyForm, "summary.hvd", routes.HvdDateOfChangeController.post(redirect))))
   }
 
   def compareAndUpdateDate(hvd: Hvd, newDate: DateOfChange): Hvd = {
@@ -52,20 +50,19 @@ class HvdDateOfChangeController @Inject() ( val dataCacheConnector: DataCacheCon
     }
   }
 
-  def post = Authorised.async {
+  def post(redirect: String) = Authorised.async {
     implicit authContext => implicit request =>
     getModelWithDateMap() flatMap {
       case (hvd, startDate) =>
       Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDate) match {
         case f: InvalidForm =>
-      Future.successful(BadRequest(date_of_change(f, "summary.hvd", routes.HvdDateOfChangeController.post())))
-        case ValidForm(_, data) => {
+      Future.successful(BadRequest(date_of_change(f, "summary.hvd", routes.HvdDateOfChangeController.post(redirect))))
+        case ValidForm(_, data) =>
           for {
           _ <- dataCacheConnector.save[Hvd](Hvd.key, compareAndUpdateDate(hvd , data))
           } yield {
-            Redirect(routes.SummaryController.get())
+            Redirect(DateOfChangeRedirect(redirect).call)
           }
-        }
       }
     }
   }

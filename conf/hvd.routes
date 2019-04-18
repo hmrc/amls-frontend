@@ -3,6 +3,9 @@ GET         /what-you-need                                          @controllers
 GET         /cash-payments                                          @controllers.hvd.CashPaymentController.get(edit: Boolean ?= false)
 POST        /cash-payments                                          @controllers.hvd.CashPaymentController.post(edit: Boolean ?= false)
 
+GET         /cash-payments-first-date                               @controllers.hvd.CashPaymentFirstDateController.get(edit: Boolean ?= false)
+POST        /cash-payments-first-date                               @controllers.hvd.CashPaymentFirstDateController.post(edit: Boolean ?= false)
+
 GET         /check-your-answers                                     @controllers.hvd.SummaryController.get()
 POST        /check-your-answers                                     @controllers.hvd.SummaryController.post()
 
@@ -27,5 +30,5 @@ POST        /receiving                                              @controllers
 GET         /expect-to-receive                                      @controllers.hvd.ExpectToReceiveCashPaymentsController.get(edit: Boolean ?= false)
 POST        /expect-to-receive                                      @controllers.hvd.ExpectToReceiveCashPaymentsController.post(edit: Boolean ?= false)
 
-GET         /date-change                                            @controllers.hvd.HvdDateOfChangeController.get
-POST        /date-change                                            @controllers.hvd.HvdDateOfChangeController.post
+GET         /date-change/:redirect                                  @controllers.hvd.HvdDateOfChangeController.get(redirect: String)
+POST        /date-change/:redirect                                  @controllers.hvd.HvdDateOfChangeController.post(redirect: String)

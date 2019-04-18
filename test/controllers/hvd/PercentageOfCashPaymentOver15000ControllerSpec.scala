@@ -79,16 +79,6 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
       document.select("input[value=01]").hasAttr("checked") must be(true)
     }
 
-    "redirect to Page not found" when {
-      "application is in variation mode" in new Fixture {
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved))
-
-        val result = controller.get()(request)
-        status(result) must be(NOT_FOUND)
-      }
-    }
-
     "continue to show the correct view" when {
       "application is in variation mode but the service has just been added" in new Fixture {
         when(controller.statusService.getStatus(any(), any(), any()))

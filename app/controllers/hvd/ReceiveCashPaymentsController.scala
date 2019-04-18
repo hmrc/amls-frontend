@@ -43,17 +43,13 @@ class ReceiveCashPaymentsController @Inject()(val authConnector: AuthConnector,
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        ControllerHelper.allowedToEdit(HighValueDealing) flatMap {
-          case true =>
-            cacheConnector.fetch[Hvd](Hvd.key) map {
-              response =>
-                val form: Form2[Boolean] = (for {
-                  hvd <- response
-                  receivePayments <- hvd.receiveCashPayments
-                } yield Form2[Boolean](receivePayments)).getOrElse(EmptyForm)
-                Ok(receiving(form, edit))
-            }
-          case false => Future.successful(NotFound(notFoundView))
+        cacheConnector.fetch[Hvd](Hvd.key) map {
+          response =>
+            val form: Form2[Boolean] = (for {
+              hvd <- response
+              receivePayments <- hvd.receiveCashPayments
+            } yield Form2[Boolean](receivePayments)).getOrElse(EmptyForm)
+            Ok(receiving(form, edit))
         }
   }
 

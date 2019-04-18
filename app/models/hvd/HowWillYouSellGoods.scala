@@ -23,7 +23,7 @@ import utils.TraversableValidators
 import utils.MappingUtils.Implicits._
 
 
-case class HowWillYouSellGoods(channels : Seq[SalesChannel])
+case class HowWillYouSellGoods(channels : Set[SalesChannel])
 
 trait HowWillYouSellGoods0 {
   private implicit def rule[A]
@@ -40,14 +40,14 @@ trait HowWillYouSellGoods0 {
             case "Auction" => Auction
           }
           sc
-      })}
+      }.toSet)}
   }
 
   private implicit def write[A]
   (implicit
     a : Path => WriteLike[Seq[String], A])= To[A] { __ =>
     (__ \ "salesChannels").write[Seq[String]].contramap { hwysg:HowWillYouSellGoods =>
-      hwysg.channels.map {
+      hwysg.channels.toSeq.map {
         case Retail => "Retail"
         case Wholesale => "Wholesale"
         case Auction => "Auction"

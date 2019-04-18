@@ -17,169 +17,177 @@
 package controllers.hvd
 
 import models.businessmatching.HighValueDealing
-import models.hvd.{Alcohol, Hvd, Products, Tobacco}
+import models.hvd._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
+import play.api.mvc.AnyContentAsFormUrlEncoded
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DateOfChangeHelper, DependencyMocks}
 
 class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
-
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
-    self => val request = addToken(authRequest)
-
-    val controller = new ProductsController(mockCacheConnector,
-                                            mockStatusService,
-                                            self.authConnector,
-                                            mockServiceFlow
-                                          )
-
-    mockIsNewActivity(false)
-    mockCacheSave[Hvd]
-  }
 
   val emptyCache = CacheMap("", Map.empty)
 
   "ProductsController" must {
 
     "load the 'What will your business sell?' page" in new Fixture  {
-
       mockCacheFetch[Hvd](None)
-
       val result = controller.get()(request)
       status(result) must be(OK)
       contentAsString(result) must include(Messages("hvd.products.title"))
-
     }
 
     "pre-populate the 'What will your business sell?' page" in new Fixture  {
-
       mockCacheFetch(Some(Hvd(products = Some(Products(Set(Alcohol, Tobacco))))))
-
       val result = controller.get()(request)
       status(result) must be(OK)
-
       val document = Jsoup.parse(contentAsString(result))
       document.select("input[value=01]").hasAttr("checked") must be(true)
       document.select("input[value=02]").hasAttr("checked") must be(true)
-
     }
 
-    "Successfully post the data when the option alcohol is selected" in new Fixture {
+    "redirect successfully" when  {
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "products[0]" -> "01",
-        "products[1]" -> "02"
-      )
+      "alcohol is selected" in new Fixture with RequestModifiers {
+        val newRequest = requestWithAlcohol(request)
+        mockCacheFetch[Hvd](None)
+        mockApplicationStatus(SubmissionDecisionRejected)
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.ExciseGoodsController.get().url))
+      }
 
-      mockCacheFetch[Hvd](None)
-      mockApplicationStatus(SubmissionDecisionRejected)
+      "alcohol is selected in edit mode" in new Fixture with RequestModifiers {
+        val newRequest = requestWithAlcohol(request)
+        mockCacheFetch[Hvd](None)
+        mockApplicationStatus(SubmissionDecisionRejected)
+        val result = controller.post(true)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.ExciseGoodsController.get(true).url))
+      }
 
-      val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.ExciseGoodsController.get().url))
+      "alcohol and tobacco are not selected" in new Fixture with RequestModifiers {
+        val newRequest = requestWithoutAlcohol(request)
+        mockCacheFetch[Hvd](None)
+        mockApplicationStatus(SubmissionDecisionRejected)
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.HowWillYouSellGoodsController.get().url))
+      }
+
+      "alcohol and tobacco are not selected in edit mode" in new Fixture with RequestModifiers {
+        val newRequest = requestWithoutAlcohol(request)
+        mockCacheFetch[Hvd](None)
+        mockApplicationStatus(SubmissionDecisionRejected)
+        val result = controller.post(true)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+      }
     }
 
-    "successfully navigate to next page when the option other than alcohol and tobacco selected " in new Fixture {
+    "display errors" when {
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "products[0]" -> "03",
-        "products[1]" -> "04"
-      )
+      "other selected but no text" in new Fixture with RequestModifiers {
+        val newRequest = invalidRequestWithEmptyOther(request)
+        mockCacheFetch[Hvd](None)
+        val result = controller.post()(newRequest)
+        status(result) must be(BAD_REQUEST)
+        val document = Jsoup.parse(contentAsString(result))
+        document.select("a[href=#otherDetails]").html() must include(Messages("error.required.hvd.business.sell.other.details"))
+      }
 
-      mockCacheFetch[Hvd](None)
-      mockApplicationStatus(SubmissionDecisionRejected)
+      "other selected but text over valid length" in new Fixture with RequestModifiers {
+        val newRequest = invalidRequestWithTooLongOther(request)
+        mockCacheFetch[Hvd](None)
+        val result = controller.post()(newRequest)
+        status(result) must be(BAD_REQUEST)
+        val document = Jsoup.parse(contentAsString(result))
+        document.select("a[href=#otherDetails]").html() must include(Messages("error.invalid.hvd.business.sell.other.details"))
+      }
+    }
+  }
 
-      val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.HowWillYouSellGoodsController.get().url))
+  "redirect to dateOfChange when a change is made and" when {
+
+    "decision is approved" when {
+
+      "alcohol is selected" in new Fixture with DateOfChangeHelper with RequestModifiers {
+        val newRequest = requestWithAlcohol(request)
+        mockCacheFetch[Hvd](None)
+        mockApplicationStatus(SubmissionDecisionApproved)
+        val result = controller.post(false)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoods).url))
+      }
+
+      "alcohol is selected and in edit mode" in new Fixture with DateOfChangeHelper with RequestModifiers {
+        val newRequest = requestWithAlcohol(request)
+        mockCacheFetch[Hvd](None)
+        mockApplicationStatus(SubmissionDecisionApproved)
+        val result = controller.post(true)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoodsEdit).url))
+      }
+
+      "alcohol is not selected" in new Fixture with DateOfChangeHelper with RequestModifiers {
+        val newRequest = requestWithoutAlcohol(request)
+        mockCacheFetch[Hvd](None)
+        mockApplicationStatus(SubmissionDecisionApproved)
+        val result = controller.post(false)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.howWillYouSellGoods).url))
+      }
+
+      "alcohol is not selected and in edit mode" in new Fixture with DateOfChangeHelper with RequestModifiers {
+        val newRequest = requestWithoutAlcohol(request)
+        mockCacheFetch[Hvd](None)
+        mockApplicationStatus(SubmissionDecisionApproved)
+        val result = controller.post(true)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers).url))
+      }
     }
 
-    "on post with valid data in edit mode" in new Fixture {
+    "decision is ready for renewal" when {
+      "alcohol is selected" in new Fixture with DateOfChangeHelper with RequestModifiers {
+        val newRequest = requestWithAlcohol(request)
+        mockCacheFetch[Hvd](None)
+        mockApplicationStatus(ReadyForRenewal(None))
+        val result = controller.post(false)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoods).url))
+      }
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "products[0]" -> "01",
-        "products[1]" -> "02",
-        "products[2]" -> "12",
-        "otherDetails" -> "test"
-      )
+      "alcohol is selected and in edit mode" in new Fixture with DateOfChangeHelper with RequestModifiers {
+        val newRequest = requestWithAlcohol(request)
+        mockCacheFetch[Hvd](None)
+        mockApplicationStatus(ReadyForRenewal(None))
+        val result = controller.post(true)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoodsEdit).url))
+      }
 
-      mockCacheFetch[Hvd](None)
-      mockApplicationStatus(SubmissionDecisionRejected)
+      "alcohol is not selected" in new Fixture with DateOfChangeHelper with RequestModifiers {
+        val newRequest = requestWithoutAlcohol(request)
+        mockCacheFetch[Hvd](None)
+        mockApplicationStatus(ReadyForRenewal(None))
+        val result = controller.post(false)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.howWillYouSellGoods).url))
+      }
 
-      val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.ExciseGoodsController.get(true).url))
-    }
-
-    "on post with invalid data" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "products[0]" -> "01",
-        "products[1]" -> "12",
-        "otherDetails" -> ""
-      )
-
-      mockCacheFetch[Hvd](None)
-
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-
-      val document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#otherDetails]").html() must include(Messages("error.required.hvd.business.sell.other.details"))
-    }
-
-    "on post with invalid data1" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "products[0]" -> "01",
-        "products[1]" -> "02",
-        "products[2]" -> "12",
-        "otherDetails" -> "g"*256
-      )
-
-      mockCacheFetch[Hvd](None)
-
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-
-      val document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#otherDetails]").html() must include(Messages("error.invalid.hvd.business.sell.other.details"))
-    }
-
-    "redirect to dateOfChange when a change is made and decision is approved" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
-        "products[0]" -> "01",
-        "products[1]" -> "02",
-        "products[2]" -> "12",
-        "otherDetails" -> "test"
-      )
-
-      mockCacheFetch(Some(Hvd(products = Some(Products(Set(Alcohol, Tobacco))))))
-      mockApplicationStatus(SubmissionDecisionApproved)
-
-      val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get().url))
-    }
-
-    "redirect to dateOfChange when a change is made and decision is ready for renewal" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
-        "products[0]" -> "01",
-        "products[1]" -> "02",
-        "products[2]" -> "12",
-        "otherDetails" -> "test"
-      )
-
-      mockCacheFetch(Some(Hvd(products = Some(Products(Set(Alcohol, Tobacco))))))
-      mockApplicationStatus(ReadyForRenewal(None))
-
-      val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get().url))
+      "alcohol is not selected and in edit mode" in new Fixture with DateOfChangeHelper with RequestModifiers {
+        val newRequest = requestWithoutAlcohol(request)
+        mockCacheFetch[Hvd](None)
+        mockApplicationStatus(ReadyForRenewal(None))
+        val result = controller.post(true)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers).url))
+      }
     }
   }
 
@@ -218,6 +226,54 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
           }
         }
       }
+    }
+  }
+
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self => val request = addToken(authRequest)
+
+    val controller = new ProductsController(mockCacheConnector,
+      mockStatusService,
+      self.authConnector,
+      mockServiceFlow
+    )
+
+    mockIsNewActivity(false)
+    mockCacheSave[Hvd]
+  }
+
+  trait RequestModifiers {
+    def requestWithAlcohol(request: FakeRequest[_]): FakeRequest[AnyContentAsFormUrlEncoded] = {
+      request.withFormUrlEncodedBody(
+        "products[0]" -> "01",
+        "products[1]" -> "02",
+        "products[2]" -> "12",
+        "otherDetails" -> "test"
+      )
+    }
+
+    def requestWithoutAlcohol(request: FakeRequest[_]): FakeRequest[AnyContentAsFormUrlEncoded] = {
+      request.withFormUrlEncodedBody(
+        "products[0]" -> "03",
+        "products[1]" -> "04"
+      )
+    }
+
+    def invalidRequestWithTooLongOther(request: FakeRequest[_]): FakeRequest[AnyContentAsFormUrlEncoded] = {
+      request.withFormUrlEncodedBody(
+        "products[0]" -> "01",
+        "products[1]" -> "02",
+        "products[2]" -> "12",
+        "otherDetails" -> "g" * 256
+      )
+    }
+
+    def invalidRequestWithEmptyOther(request: FakeRequest[_]): FakeRequest[AnyContentAsFormUrlEncoded] = {
+      request.withFormUrlEncodedBody(
+        "products[0]" -> "01",
+        "products[1]" -> "12",
+        "otherDetails" -> ""
+      )
     }
   }
 

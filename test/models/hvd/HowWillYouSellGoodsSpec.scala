@@ -25,7 +25,7 @@ import play.api.libs.json.Json
 
 class HowWillYouSellGoodsSpec extends WordSpec with MustMatchers{
 
-  val fullData = HowWillYouSellGoods(Seq(Wholesale, Retail, Auction))
+  val fullData = HowWillYouSellGoods(Set(Wholesale, Retail, Auction))
   val fullForm = Map (
       "salesChannels[]" -> Seq("Wholesale","Retail","Auction")
   )
@@ -48,7 +48,7 @@ class HowWillYouSellGoodsSpec extends WordSpec with MustMatchers{
       HowWillYouSellGoods.formW.writes(
         HowWillYouSellGoods.formR.validate(fullForm) match {
           case Valid(x) => x
-          case _ => HowWillYouSellGoods(Seq.empty)
+          case _ => HowWillYouSellGoods(Set.empty)
         }
       ) must be (fullForm)
 

@@ -16,18 +16,17 @@
 
 package views.hvd
 
-import forms.{InvalidForm, ValidForm, Form2}
-import models.hvd.{CashPaymentYes, CashPayment}
-import org.joda.time.LocalDate
-import org.scalatest.{MustMatchers}
-import  utils.AmlsSpec
-import jto.validation.Path
-import jto.validation.ValidationError
+import forms.{Form2, InvalidForm, ValidForm}
+import jto.validation.{Path, ValidationError}
+import models.hvd
+import models.hvd.CashPaymentOverTenThousandEuros
+import org.scalatest.MustMatchers
 import play.api.i18n.Messages
+import utils.AmlsSpec
 import views.Fixture
 
 
-class cash_paymentSpec extends AmlsSpec with MustMatchers  {
+class cash_payment_over_ten_thousand_eurosSpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
@@ -37,7 +36,7 @@ class cash_paymentSpec extends AmlsSpec with MustMatchers  {
 
     "have the back link button" in new ViewFixture {
 
-      val form2: ValidForm[CashPayment] = Form2(CashPaymentYes(LocalDate.parse("2016-3-20")))
+      val form2: ValidForm[CashPaymentOverTenThousandEuros] = Form2(CashPaymentOverTenThousandEuros(true))
 
       def view = views.html.hvd.cash_payment(form2, true)
 
@@ -46,7 +45,7 @@ class cash_paymentSpec extends AmlsSpec with MustMatchers  {
 
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[CashPayment] = Form2(CashPaymentYes(LocalDate.parse("2016-3-20")))
+      val form2: ValidForm[CashPaymentOverTenThousandEuros] = Form2(hvd.CashPaymentOverTenThousandEuros(true))
 
       def view = views.html.hvd.cash_payment(form2, true)
 
@@ -55,7 +54,7 @@ class cash_paymentSpec extends AmlsSpec with MustMatchers  {
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[CashPayment] = Form2(CashPaymentYes(LocalDate.parse("2016-3-24")))
+      val form2: ValidForm[CashPaymentOverTenThousandEuros] = Form2(hvd.CashPaymentOverTenThousandEuros(true))
 
       def view = views.html.hvd.cash_payment(form2, true)
 
@@ -68,20 +67,15 @@ class cash_paymentSpec extends AmlsSpec with MustMatchers  {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "acceptedAnyPayment") -> Seq(ValidationError("not a message Key")),
-          (Path \ "paymentDate") -> Seq(ValidationError("second not a message Key"))
+          (Path \ "acceptedAnyPayment") -> Seq(ValidationError("not a message Key"))
         ))
 
       def view = views.html.hvd.cash_payment(form2, true)
 
       errorSummary.html() must include("not a message Key")
-      errorSummary.html() must include("second not a message Key")
 
       doc.getElementById("acceptedAnyPayment")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
-
-      doc.getElementById("paymentDate")
-        .getElementsByClass("error-notification").first().html() must include("second not a message Key")
 
     }
   }

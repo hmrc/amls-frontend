@@ -71,18 +71,6 @@ class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSug
 
         Jsoup.parse(contentAsString(result)).title() must include(Messages("hvd.expect.to.receive.title"))
       }
-
-      "return NOT_FOUND" when {
-        "registration is supervised" in new Fixture {
-
-          mockApplicationStatus(SubmissionDecisionApproved)
-
-          val result = controller.get()(request)
-
-          status(result) must be(NOT_FOUND)
-
-        }
-      }
     }
 
     "post is called" when {

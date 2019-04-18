@@ -16,50 +16,50 @@
 
 package views.hvd
 
-import forms.{InvalidForm, ValidForm, Form2}
-import models.hvd.{Wholesale, Retail, HowWillYouSellGoods}
-import org.scalatest.{MustMatchers}
-import  utils.AmlsSpec
-import jto.validation.Path
-import jto.validation.ValidationError
+import forms.{Form2, InvalidForm, ValidForm}
+import jto.validation.{Path, ValidationError}
+import models.hvd.CashPaymentFirstDate
+import org.joda.time.LocalDate
+import org.scalatest.MustMatchers
 import play.api.i18n.Messages
+import utils.AmlsSpec
 import views.Fixture
 
 
-class how_will_you_sell_goodsSpec extends AmlsSpec with MustMatchers  {
+class cash_payment_first_dateSpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
   }
 
-  "how_will_you_sell_goods view" must {
+  "cash_payment view" must {
 
     "have the back link button" in new ViewFixture {
 
-      val form2: ValidForm[HowWillYouSellGoods] = Form2(HowWillYouSellGoods(Set(Retail)))
+      val form2: ValidForm[CashPaymentFirstDate] = Form2(CashPaymentFirstDate(LocalDate.parse("2016-3-20")))
 
-      def view = views.html.hvd.how_will_you_sell_goods(form2, true)
+      def view = views.html.hvd.cash_payment_first_date(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[HowWillYouSellGoods] = Form2(HowWillYouSellGoods(Set(Retail)))
+      val form2: ValidForm[CashPaymentFirstDate] = Form2(CashPaymentFirstDate(LocalDate.parse("2016-3-20")))
 
-      def view = views.html.hvd.how_will_you_sell_goods(form2, true)
+      def view = views.html.hvd.cash_payment_first_date(form2, true)
 
-      doc.title must startWith(Messages("hvd.how-will-you-sell-goods.title") + " - " + Messages("summary.hvd"))
+      doc.title must startWith(Messages("hvd.cash.payment.date.title") + " - " + Messages("summary.hvd"))
     }
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[HowWillYouSellGoods] = Form2(HowWillYouSellGoods(Set(Wholesale)))
+      val form2: ValidForm[CashPaymentFirstDate] = Form2(CashPaymentFirstDate(LocalDate.parse("2016-3-24")))
 
-      def view = views.html.hvd.how_will_you_sell_goods(form2, true)
+      def view = views.html.hvd.cash_payment_first_date(form2, true)
 
-      heading.html must be(Messages(Messages("hvd.how-will-you-sell-goods.title")))
-      subHeading.html must include(Messages(Messages("summary.hvd")))
+      heading.html must be(Messages("hvd.cash.payment.date.title"))
+      subHeading.html must include(Messages("summary.hvd"))
 
     }
 
@@ -67,15 +67,17 @@ class how_will_you_sell_goodsSpec extends AmlsSpec with MustMatchers  {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "salesChannels") -> Seq(ValidationError("not a message Key"))
+          (Path \ "paymentDate") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.hvd.how_will_you_sell_goods(form2, true)
+      def view = views.html.hvd.cash_payment_first_date(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
-      doc.getElementById("salesChannels")
+
+      doc.getElementById("paymentDate")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
+
     }
   }
 }
