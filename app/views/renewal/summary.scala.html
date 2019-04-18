@@ -188,7 +188,7 @@
             @model.whichCurrencies.map { wc =>
                 @wc.usesForeignCurrencies.map { ufc =>
                     @checkYourAnswers(
-                        question = Messages("msb.deal_foreign_currencies.title"),
+                        question = Messages("renewal.msb.foreign_currencies.header"),
                         editLinkTag = "msbwhichcurrencies-edit",
                         editUrl = controllers.renewal.routes.UsesForeignCurrenciesController.get(true).toString
                     ) {
@@ -208,7 +208,7 @@
                 @wc.moneySources.map { ms =>
                     @if(ms.bankMoneySource.isDefined | ms.wholesalerMoneySource.isDefined | ms.customerMoneySource.isDefined) {
                         @checkYourAnswers(
-                            question = Messages("msb.supply_foreign_currencies.title"),
+                            question = Messages("renewal.msb.money_sources.header"),
                             editLinkTag = "msbwhichcurrencies-edit",
                             editUrl = controllers.renewal.routes.MoneySourcesController.get(true).toString
                         ) {
