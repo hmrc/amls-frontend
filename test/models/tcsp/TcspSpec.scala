@@ -30,12 +30,18 @@ trait TcspValues {
     private val complexStructure = false
 
     val DefaultProvidedServices = ProvidedServices(Set(PhonecallHandling, Other("other service")))
+
     val DefaultCompanyServiceProviders = TcspTypes(Set(
       NomineeShareholdersProvider,
       TrusteeProvider,
       CompanyDirectorEtc,
-      CompanyFormationAgent(offTheShelf, complexStructure)))
+      CompanyFormationAgent))
     val DefaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes("12345678")
+
+    val DefaultCompanyServiceProvidersNoFormationAgent = TcspTypes(Set(
+      NomineeShareholdersProvider,
+      TrusteeProvider,
+      CompanyDirectorEtc))
 
   }
 
@@ -46,15 +52,19 @@ trait TcspValues {
 
     val NewProvidedServices = ProvidedServices(Set(EmailHandling))
     val NewCompanyServiceProviders = TcspTypes(Set(NomineeShareholdersProvider,
-      CompanyFormationAgent(offTheShelf, complexStructure)))
+      CompanyFormationAgent))
     val NewServicesOfAnotherTCSP = ServicesOfAnotherTCSPNo
 
   }
 
   val completeJson = Json.obj(
     "tcspTypes" -> Json.obj(
-      "serviceProviders" -> Seq("01", "02", "04", "05"),
-      "onlyOffTheShelfCompsSold" -> true,
+      "serviceProviders" -> Seq("01", "02", "04", "05")
+    ),
+    "onlyOffTheShelfCompsSold" -> Json.obj(
+      "onlyOffTheShelfCompsSold" -> true
+    ),
+    "complexCorpStructureCreation" -> Json.obj(
       "complexCorpStructureCreation" -> false
     ),
     "providedServices" -> Json.obj(
@@ -72,6 +82,8 @@ trait TcspValues {
 
   val completeModel = Tcsp(
     Some(DefaultValues.DefaultCompanyServiceProviders),
+    Some(OnlyOffTheShelfCompsSoldYes),
+    Some(ComplexCorpStructureCreationNo),
     Some(DefaultValues.DefaultProvidedServices),
     Some(true),
     Some(DefaultValues.DefaultServicesOfAnotherTCSP),
@@ -151,6 +163,38 @@ class TcspSpec extends AmlsSpec with TcspValues {
 
         val completeJson = Json.obj(
           "tcspTypes" -> Json.obj(
+            "serviceProviders" -> Seq("01", "02", "04", "05")
+          ),
+          "onlyOffTheShelfCompsSold" -> Json.obj(
+            "onlyOffTheShelfCompsSold" -> true
+          ),
+          "complexCorpStructureCreation" -> Json.obj(
+            "complexCorpStructureCreation" -> false
+          ),
+          "providedServices" -> Json.obj(
+            "services" -> Seq("01", "08"),
+            "details" -> "other service"
+          ),
+          "servicesOfAnotherTCSP" -> Json.obj(
+            "servicesOfAnotherTCSP" -> true,
+            "mlrRefNumber" -> "12345678"
+          ),
+          "hasChanged" -> false,
+          "hasAccepted" -> true
+        )
+
+        completeJson.as[Tcsp] must be(completeModel)
+      }
+    }
+
+    "Deserialise old format" when {
+      "complete json is present" in {
+        completeJson.as[Tcsp] must be(completeModel)
+      }
+      "doesServicesOfAnotherTCSP is absent" in {
+
+        val completeJson = Json.obj(
+          "tcspTypes" -> Json.obj(
             "serviceProviders" -> Seq("01", "02", "04", "05"),
             "onlyOffTheShelfCompsSold" -> true,
             "complexCorpStructureCreation" -> false
@@ -159,6 +203,7 @@ class TcspSpec extends AmlsSpec with TcspValues {
             "services" -> Seq("01", "08"),
             "details" -> "other service"
           ),
+          "doesServicesOfAnotherTCSP" -> true,
           "servicesOfAnotherTCSP" -> Json.obj(
             "servicesOfAnotherTCSP" -> true,
             "mlrRefNumber" -> "12345678"
@@ -205,6 +250,8 @@ class TcspSpec extends AmlsSpec with TcspValues {
         "tcspTypes does not contain RegisteredOfficeEtc" in {
           val completeModel = Tcsp(
             Some(DefaultValues.DefaultCompanyServiceProviders),
+            Some(OnlyOffTheShelfCompsSoldYes),
+            Some(ComplexCorpStructureCreationNo),
             None,
             Some(true),
             Some(DefaultValues.DefaultServicesOfAnotherTCSP),
@@ -213,10 +260,71 @@ class TcspSpec extends AmlsSpec with TcspValues {
           completeModel.isComplete must be(true)
         }
       }
+
+      "onlyOffTheShelfCompsSold is not defined" when {
+        "tcspTypes does contain CompanyFormationAgent" in {
+          val completeModel = Tcsp(
+            tcspTypes = Some(DefaultValues.DefaultCompanyServiceProviders),
+            onlyOffTheShelfCompsSold = None,
+            complexCorpStructureCreation = Some(ComplexCorpStructureCreationNo),
+            providedServices = None,
+            doesServicesOfAnotherTCSP = Some(true),
+            servicesOfAnotherTCSP = Some(DefaultValues.DefaultServicesOfAnotherTCSP),
+            hasAccepted = true
+          )
+          completeModel.isComplete must be(false)
+        }
+      }
+      "complexCorpStructureCreation is not defined" when {
+        "tcspTypes does contain CompanyFormationAgent" in {
+          val completeModel = Tcsp(
+            tcspTypes = Some(DefaultValues.DefaultCompanyServiceProviders),
+            onlyOffTheShelfCompsSold = Some(OnlyOffTheShelfCompsSoldYes),
+            complexCorpStructureCreation = None,
+            providedServices = None,
+            doesServicesOfAnotherTCSP = Some(true),
+            servicesOfAnotherTCSP = Some(DefaultValues.DefaultServicesOfAnotherTCSP),
+            hasAccepted = true
+          )
+          completeModel.isComplete must be(false)
+        }
+      }
+
+      "onlyOffTheShelfCompsSold is not defined" when {
+        "tcspTypes does not contain CompanyFormationAgent" in {
+          val completeModel = Tcsp(
+            tcspTypes = Some(DefaultValues.DefaultCompanyServiceProvidersNoFormationAgent),
+            onlyOffTheShelfCompsSold = None,
+            complexCorpStructureCreation = None,
+            providedServices = None,
+            doesServicesOfAnotherTCSP = Some(true),
+            servicesOfAnotherTCSP = Some(DefaultValues.DefaultServicesOfAnotherTCSP),
+            hasAccepted = true
+          )
+          completeModel.isComplete must be(true)
+        }
+      }
+      "complexCorpStructureCreation is not defined" when {
+        "tcspTypes does not contain CompanyFormationAgent" in {
+          val completeModel = Tcsp(
+            tcspTypes = Some(DefaultValues.DefaultCompanyServiceProvidersNoFormationAgent),
+            onlyOffTheShelfCompsSold = None,
+            complexCorpStructureCreation = None,
+            providedServices = None,
+            doesServicesOfAnotherTCSP = Some(true),
+            servicesOfAnotherTCSP = Some(DefaultValues.DefaultServicesOfAnotherTCSP),
+            hasAccepted = true
+          )
+          completeModel.isComplete must be(true)
+        }
+      }
+
       "servicesOfAnotherTCSP is not defined" when {
         "doesServicesOfAnotherTCSP is false" in {
           val completeModel = Tcsp(
             Some(DefaultValues.DefaultCompanyServiceProviders),
+            Some(OnlyOffTheShelfCompsSoldYes),
+            Some(ComplexCorpStructureCreationNo),
             Some(DefaultValues.DefaultProvidedServices),
             Some(false),
             None,
@@ -238,6 +346,8 @@ class TcspSpec extends AmlsSpec with TcspValues {
         "tcspTypes does contain RegisteredOfficeEtc" in {
           val completeModel = Tcsp(
             Some(DefaultValues.DefaultCompanyServiceProviders),
+            Some(OnlyOffTheShelfCompsSoldYes),
+            Some(ComplexCorpStructureCreationNo),
             None,
             Some(true),
             Some(DefaultValues.DefaultServicesOfAnotherTCSP),
@@ -250,6 +360,8 @@ class TcspSpec extends AmlsSpec with TcspValues {
         "doesServicesOfAnotherTCSP is true" in {
           val completeModel = Tcsp(
             Some(DefaultValues.DefaultCompanyServiceProviders),
+            Some(OnlyOffTheShelfCompsSoldYes),
+            Some(ComplexCorpStructureCreationNo),
             Some(DefaultValues.DefaultProvidedServices),
             Some(true),
             None,

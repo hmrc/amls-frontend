@@ -1,0 +1,1 @@
+ + [AMLS-4870] - "Fix to backwards compatability reading business details section from view response"

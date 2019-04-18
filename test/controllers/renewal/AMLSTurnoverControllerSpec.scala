@@ -291,28 +291,6 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         }
 
         "go to renewal CustomerOutsideUK" when {
-
-          "it has business type of ASP" in new Fixture {
-            val newRequest = request.withFormUrlEncodedBody(
-              "turnover" -> "01"
-            )
-
-            val bMatching = BusinessMatching(
-              activities = Some(Activities(Set(AccountancyServices, MoneyServiceBusiness)))
-            )
-
-            mockCacheFetch(Some(bMatching))
-
-            when(mockRenewalService.getRenewal(any(), any(), any()))
-              .thenReturn(Future.successful(None))
-            when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
-              .thenReturn(Future.successful(mockCacheMap))
-
-            val result = controller.post()(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.renewal.routes.CustomersOutsideUKController.get().url))
-          }
-
           "it has business type of HVD and not (ASP or MSB)" in new Fixture {
             val newRequest = request.withFormUrlEncodedBody(
               "turnover" -> "01"

@@ -1,1 +1,0 @@
- + [AMLS-4822](https://jira.tools.tax.service.gov.uk/browse/AMLS-4822) - "Redirect back to start of RP flow were attempting remove an RP that has a line id however; is not complete"

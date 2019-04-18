@@ -483,8 +483,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
           val html = Jsoup.parse(contentAsString(result))
 
-          html.select("#new-sections-list").text() must include(Messages("progress.hvd.name"))
-          html.select("#existing-sections-list").text() must not include Messages("progress.hvd.name")
+          html.select("#existing-sections-list").text() must include(Messages("progress.hvd.name"))
         }
       }
     }
