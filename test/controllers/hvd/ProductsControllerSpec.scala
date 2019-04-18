@@ -121,7 +121,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
         mockApplicationStatus(SubmissionDecisionApproved)
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.EXCISE_GOODS).url))
+        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoods).url))
       }
 
       "alcohol is selected and in edit mode" in new Fixture with DateOfChangeHelper with RequestModifiers {
@@ -130,7 +130,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
         mockApplicationStatus(SubmissionDecisionApproved)
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.EXCISE_GOODS_EDIT).url))
+        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoodsEdit).url))
       }
 
       "alcohol is not selected" in new Fixture with DateOfChangeHelper with RequestModifiers {
@@ -139,7 +139,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
         mockApplicationStatus(SubmissionDecisionApproved)
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.HOW_WILL_YOU_SELL_GOODS).url))
+        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.howWillYouSellGoods).url))
       }
 
       "alcohol is not selected and in edit mode" in new Fixture with DateOfChangeHelper with RequestModifiers {
@@ -148,7 +148,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
         mockApplicationStatus(SubmissionDecisionApproved)
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CHECK_YOUR_ANSWERS).url))
+        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers).url))
       }
     }
 
@@ -159,7 +159,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
         mockApplicationStatus(ReadyForRenewal(None))
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.EXCISE_GOODS).url))
+        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoods).url))
       }
 
       "alcohol is selected and in edit mode" in new Fixture with DateOfChangeHelper with RequestModifiers {
@@ -168,7 +168,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
         mockApplicationStatus(ReadyForRenewal(None))
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.EXCISE_GOODS_EDIT).url))
+        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoodsEdit).url))
       }
 
       "alcohol is not selected" in new Fixture with DateOfChangeHelper with RequestModifiers {
@@ -177,7 +177,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
         mockApplicationStatus(ReadyForRenewal(None))
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.HOW_WILL_YOU_SELL_GOODS).url))
+        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.howWillYouSellGoods).url))
       }
 
       "alcohol is not selected and in edit mode" in new Fixture with DateOfChangeHelper with RequestModifiers {
@@ -186,7 +186,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
         mockApplicationStatus(ReadyForRenewal(None))
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CHECK_YOUR_ANSWERS).url))
+        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers).url))
       }
     }
   }

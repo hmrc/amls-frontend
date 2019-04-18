@@ -32,29 +32,14 @@
 
     @form(f, controllers.hvd.routes.CashPaymentFirstDateController.post(edit)) {
 
-        <div class="form-group">
-
-        @fieldset(
-            f = f("paymentDate-fieldset"),
-            legend = "hvd.cash.payment.date.title",
+        @date(
+            f = f,
+            p = "paymentDate",
+            labelText = "hvd.cash.payment.date.title",
+            hintText = "hvd.cash.payment.date.example",
             legendHidden = true,
-            panel = false,
-            classes = Seq("inline")
-        ) {
-            @errorGroup(
-                field = f("paymentDate")
-            ) {
-                @date(
-                    f = f,
-                    p = "paymentDate",
-                    labelText = "hvd.cash.payment.date.title",
-                    hintText = "hvd.cash.payment.date.example",
-                    example = false
-                )
-            }
-        }
-
-        </div>
+            example = false
+        )
 
         @submit(edit)
    }

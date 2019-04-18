@@ -32,21 +32,21 @@ trait DateOfChangeHelper {
 
   object DateOfChangeRedirect {
 
-    val CHECK_YOUR_ANSWERS:String = "1"
-    val CASH_PAYMENT:String = "2"
-    val HOW_WILL_YOU_SELL_GOODS:String = "3"
-    val EXCISE_GOODS: String = "4"
-    val EXCISE_GOODS_EDIT: String = "5"
+    val checkYourAnswers:String = "1"
+    val cashPayment:String = "2"
+    val howWillYouSellGoods:String = "3"
+    val exciseGoods: String = "4"
+    val exciseGoodsEdit: String = "5"
 
     def apply(key: String): DateOfChangeRedirect = {
       key match {
-        case CHECK_YOUR_ANSWERS => DateOfChangeRedirect(routes.SummaryController.get())
-        case CASH_PAYMENT => DateOfChangeRedirect(routes.CashPaymentController.get())
-        case HOW_WILL_YOU_SELL_GOODS => DateOfChangeRedirect(routes.HowWillYouSellGoodsController.get())
-        case EXCISE_GOODS => DateOfChangeRedirect(routes.ExciseGoodsController.get())
-        case EXCISE_GOODS_EDIT => DateOfChangeRedirect(routes.ExciseGoodsController.get(true))
+        case `checkYourAnswers` => DateOfChangeRedirect(routes.SummaryController.get())
+        case `cashPayment` => DateOfChangeRedirect(routes.CashPaymentController.get())
+        case `howWillYouSellGoods` => DateOfChangeRedirect(routes.HowWillYouSellGoodsController.get())
+        case `exciseGoods` => DateOfChangeRedirect(routes.ExciseGoodsController.get())
+        case `exciseGoodsEdit` => DateOfChangeRedirect(routes.ExciseGoodsController.get(true))
         case _ =>
-          Logger.error("Could not retrieve Date of Change redirect key, redirecting to Check Your Answers")
+          Logger.error(s"Could not retrieve Date of Change redirect for '$key', redirecting to Check Your Answers")
           DateOfChangeRedirect(routes.SummaryController.get())
       }
     }

@@ -48,7 +48,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
   "HvdDateOfChangeController" must {
 
     "on get display date of change view" in new Fixture with DateOfChangeHelper {
-      val result = controller.get(DateOfChangeRedirect.CHECK_YOUR_ANSWERS)(request)
+      val result = controller.get(DateOfChangeRedirect.checkYourAnswers)(request)
       status(result) must be(OK)
       contentAsString(result) must include(Messages("summary.hvd"))
     }
@@ -74,7 +74,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
       when(controller.dataCacheConnector.save[Hvd](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = controller.post(DateOfChangeRedirect.CHECK_YOUR_ANSWERS)(newRequest)
+      val result = controller.post(DateOfChangeRedirect.checkYourAnswers)(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get().url))
 
@@ -107,7 +107,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
         when(controller.dataCacheConnector.save[Hvd](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-        val result = controller.post(DateOfChangeRedirect.CHECK_YOUR_ANSWERS)(newRequest)
+        val result = controller.post(DateOfChangeRedirect.checkYourAnswers)(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get().url))
 
@@ -138,7 +138,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
         when(controller.dataCacheConnector.save[Hvd](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-        val result = controller.post(DateOfChangeRedirect.CHECK_YOUR_ANSWERS)(newRequest)
+        val result = controller.post(DateOfChangeRedirect.checkYourAnswers)(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get().url))
 
@@ -172,7 +172,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
         when(controller.dataCacheConnector.save[Hvd](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-        val result = controller.post(DateOfChangeRedirect.CHECK_YOUR_ANSWERS)(newRequest)
+        val result = controller.post(DateOfChangeRedirect.checkYourAnswers)(newRequest)
         status(result) must be(BAD_REQUEST)
         contentAsString(result) must include(Messages("error.expected.jodadate.format"))
       }
@@ -198,7 +198,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
         when(controller.dataCacheConnector.save[Hvd](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-        val result = controller.post(DateOfChangeRedirect.CHECK_YOUR_ANSWERS)(newRequest)
+        val result = controller.post(DateOfChangeRedirect.checkYourAnswers)(newRequest)
         status(result) must be(BAD_REQUEST)
         contentAsString(result) must include(Messages("error.expected.dateofchange.date.after.activitystartdate", "24-02-1990"))
       }

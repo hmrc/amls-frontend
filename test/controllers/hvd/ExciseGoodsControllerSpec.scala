@@ -109,7 +109,7 @@ class ExciseGoodsControllerSpec extends AmlsSpec {
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CHECK_YOUR_ANSWERS).url))
+        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers).url))
       }
 
       "the model has been changed and application is ready for renewal and in edit mode" in new Fixture with DateOfChangeHelper {
@@ -122,7 +122,7 @@ class ExciseGoodsControllerSpec extends AmlsSpec {
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CHECK_YOUR_ANSWERS).url))
+        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers).url))
       }
 
         "the model has been changed and application is approved" in new Fixture with DateOfChangeHelper {
@@ -135,7 +135,7 @@ class ExciseGoodsControllerSpec extends AmlsSpec {
 
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.HOW_WILL_YOU_SELL_GOODS).url))
+        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.howWillYouSellGoods).url))
       }
 
       "the model has been changed and application is ready for renewal" in new Fixture with DateOfChangeHelper {
@@ -148,7 +148,7 @@ class ExciseGoodsControllerSpec extends AmlsSpec {
 
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.HOW_WILL_YOU_SELL_GOODS).url))
+        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.howWillYouSellGoods).url))
       }
     }
   }

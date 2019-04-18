@@ -22,6 +22,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching.HighValueDealing
 import models.hvd.{Alcohol, Hvd, Products, Tobacco}
+import play.api.mvc.Call
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -66,17 +67,21 @@ class ProductsController @Inject() (val dataCacheConnector: DataCacheConnector,
               } yield {
                 val redirect = !isNewActivity && redirectToDateOfChange[Products](status, hvd.products, data)
                 val exciseGoods = data.items.contains(Alcohol) | data.items.contains(Tobacco)
-                (redirect, exciseGoods, edit) match {
-                  case (true, true, true) => Redirect(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.EXCISE_GOODS_EDIT))
-                  case (true, true, false) => Redirect(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.EXCISE_GOODS))
-                  case (true, false, true) => Redirect(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CHECK_YOUR_ANSWERS))
-                  case (true, false, false) => Redirect(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.HOW_WILL_YOU_SELL_GOODS))
-                  case (false, true, _) => Redirect(routes.ExciseGoodsController.get(edit))
-                  case (false, false, true) => Redirect(routes.SummaryController.get())
-                  case (false, false, false) => Redirect(routes.HowWillYouSellGoodsController.get())
-                }
+                Redirect(getNextPage(redirect, exciseGoods, edit))
               }
             }
           }
     }
+
+  private def getNextPage(redirect: Boolean, exciseGoods: Boolean, edit:Boolean): Call = {
+    (redirect, exciseGoods, edit) match {
+      case (true, true, true) => routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoodsEdit)
+      case (true, true, false) => routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoods)
+      case (true, false, true) => routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers)
+      case (true, false, false) => routes.HvdDateOfChangeController.get(DateOfChangeRedirect.howWillYouSellGoods)
+      case (false, true, _) => routes.ExciseGoodsController.get(edit)
+      case (false, false, true) => routes.SummaryController.get()
+      case (false, false, false) => routes.HowWillYouSellGoodsController.get()
+    }
+  }
 }

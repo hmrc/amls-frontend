@@ -106,7 +106,7 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
         mockCacheFetch(Some(hvd))
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CASH_PAYMENT).url))
+        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.cashPayment).url))
       }
 
       "application is approved and in edit mode" in new Fixture with DateOfChangeHelper {
@@ -115,7 +115,7 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
         mockCacheFetch(Some(hvd))
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CHECK_YOUR_ANSWERS).url))
+        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers).url))
       }
 
       "application is ready for renewal" in new Fixture with DateOfChangeHelper {
@@ -124,7 +124,7 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
         mockCacheFetch(Some(hvd))
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CASH_PAYMENT).url))
+        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.cashPayment).url))
       }
 
       "application is ready for renewal and in edit mode" in new Fixture with DateOfChangeHelper {
@@ -133,7 +133,7 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
         mockCacheFetch(Some(hvd))
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CHECK_YOUR_ANSWERS).url))
+        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers).url))
       }
     }
   }

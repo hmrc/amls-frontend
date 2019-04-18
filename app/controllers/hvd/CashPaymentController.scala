@@ -21,6 +21,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.hvd._
+import play.api.mvc.Call
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.hvd.cash_payment
 
@@ -59,12 +60,16 @@ class CashPaymentController @Inject() (val dataCacheConnector: DataCacheConnecto
                     case None =>  CashPayment(data, None)
                   }
               ))
-            } yield (edit, data) match {
-              case (true, CashPaymentOverTenThousandEuros(false)) => Redirect(routes.SummaryController.get())
-              case (false, CashPaymentOverTenThousandEuros(false)) => Redirect(routes.LinkedCashPaymentsController.get())
-              case (_, CashPaymentOverTenThousandEuros(true)) => Redirect(routes.CashPaymentFirstDateController.get(edit))
+            } yield Redirect(getNextPage(edit, data))
           }
         }
       }
+
+  private def getNextPage(edit:Boolean, data: CashPaymentOverTenThousandEuros): Call = {
+    (edit, data) match {
+      case (true, CashPaymentOverTenThousandEuros(false)) => routes.SummaryController.get()
+      case (false, CashPaymentOverTenThousandEuros(false)) => routes.LinkedCashPaymentsController.get()
+      case (_, CashPaymentOverTenThousandEuros(true)) => routes.CashPaymentFirstDateController.get(edit)
     }
+  }
 }

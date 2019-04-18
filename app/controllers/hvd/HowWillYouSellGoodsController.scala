@@ -22,6 +22,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching.HighValueDealing
 import models.hvd.{HowWillYouSellGoods, Hvd}
+import play.api.mvc.Call
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -63,14 +64,18 @@ class HowWillYouSellGoodsController @Inject()( val dataCacheConnector: DataCache
               isNewActivity <- serviceFlow.isNewActivity(HighValueDealing)
             } yield {
               val redirect = !isNewActivity && redirectToDateOfChange[HowWillYouSellGoods](status, hvd.howWillYouSellGoods, model)
-              (redirect, edit) match {
-                case (true, true) => Redirect(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CHECK_YOUR_ANSWERS))
-                case (true, false) => Redirect(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.CASH_PAYMENT))
-                case (false, true)  => Redirect(routes.SummaryController.get())
-                case (false, false) => Redirect(routes.CashPaymentController.get())
-              }
+              Redirect(getNextPage(redirect, edit))
             }
         }
       }
+  }
+
+  private def getNextPage(redirect: Boolean, edit:Boolean): Call = {
+    (redirect,  edit) match {
+      case (true, true) => routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers)
+      case (true, false) => routes.HvdDateOfChangeController.get(DateOfChangeRedirect.cashPayment)
+      case (false, true)  => routes.SummaryController.get()
+      case (false, false) => routes.CashPaymentController.get()
+    }
   }
 }
