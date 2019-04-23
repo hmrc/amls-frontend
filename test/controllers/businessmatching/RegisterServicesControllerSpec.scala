@@ -960,7 +960,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
     }
     "shouldPromptForApproval" must {
       "reset approval flag to none" when {
-        "business activity is changes to not have MSB or TCSP and FitandProper flag has a value of false" in new Fixture {
+        "business activity is removal and does not have MSB or TCSP and FitandProper flag has a value of false" in new Fixture {
 
           val rp = responsiblePerson.copy(
             approvalFlags = ApprovalFlags(
@@ -969,8 +969,9 @@ class RegisterServicesControllerSpec extends AmlsSpec
             )
           )
           val bm = BMBusinessActivities(businessActivities=Set(HighValueDealing))
+          val isRemoving = true
 
-          val result = controller.shouldPromptForApproval(rp, bm)
+          val result = controller.shouldPromptForApproval(rp, bm, isRemoving)
 
           val expectedRp = responsiblePerson.copy(
             approvalFlags = ApprovalFlags(
@@ -980,6 +981,27 @@ class RegisterServicesControllerSpec extends AmlsSpec
             hasAccepted = false,
             hasChanged = true
           )
+          val expectedBm = bm
+
+          result mustEqual((expectedRp, expectedBm))
+        }
+      }
+
+      "not handle any approvalFlags" when {
+        "not removing a service" in new Fixture {
+
+          val rp = responsiblePerson.copy(
+            approvalFlags = ApprovalFlags(
+              hasAlreadyPassedFitAndProper = Some(false),
+              hasAlreadyPaidApprovalCheck= Some(false)
+            )
+          )
+          val bm = BMBusinessActivities(businessActivities=Set(HighValueDealing))
+          val isRemoving = false
+
+          val result = controller.shouldPromptForApproval(rp, bm, isRemoving)
+
+          val expectedRp = rp
           val expectedBm = bm
 
           result mustEqual((expectedRp, expectedBm))
@@ -997,8 +1019,9 @@ class RegisterServicesControllerSpec extends AmlsSpec
             )
           )
           val bm = BMBusinessActivities(businessActivities=Set(HighValueDealing))
+          val isRemoving = true
 
-          val result = controller.shouldPromptForApproval(rp, bm)
+          val result = controller.shouldPromptForApproval(rp, bm, isRemoving)
 
           val expectedRp = rp
           val expectedBm = bm

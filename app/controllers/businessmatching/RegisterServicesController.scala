@@ -116,14 +116,22 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                 ).businessActivities,
                 savedModel.businessActivities
               )
-            } yield savedModel) flatMap { savedActivities =>
+              isRemoving <- isRemovingActivity(
+                businessMatching.activities.getOrElse(
+                  BusinessMatchingActivities(
+                    Set()
+                  )
+                ).businessActivities,
+                savedModel.businessActivities
+              )
+            } yield (isRemoving, savedModel)) flatMap { action =>
               getData[ResponsiblePerson] flatMap { responsiblePeople =>
 
                 val workFlow =
                   shouldPromptForApproval.tupled andThen
                   shouldPromptForFitAndProper.tupled
 
-                val rps = responsiblePeople.map(rp => workFlow((rp, savedActivities)))
+                val rps = responsiblePeople.map(rp => workFlow((rp, action._2, action._1)))
 
                 updateResponsiblePeople(rps) map { _ =>
                   redirectTo(data.businessActivities)
@@ -150,6 +158,13 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
       _ <- clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, TrustAndCompanyServices)
       _ <- clearSupervisionIfNoLongerRequired(previousBusinessActivities, currentBusinessActivities)
     } yield true
+  }
+
+  private def isRemovingActivity(previousBusinessActivities: Set[BusinessActivity],
+                                 currentBusinessActivities: Set[BusinessActivity]
+                                )(implicit ac: AuthContext, hc: HeaderCarrier) = {
+
+    Future.successful((previousBusinessActivities.size > currentBusinessActivities.size))
   }
 
   private def clearSectionIfRemoved(previousBusinessActivities: Set[BusinessActivity],
@@ -296,12 +311,16 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
     }
 
   val shouldPromptForApproval:
-  (ResponsiblePerson, BusinessMatchingActivities) => (ResponsiblePerson, BusinessMatchingActivities) =
-  (rp, activities) => {
+  (ResponsiblePerson, BusinessMatchingActivities, Boolean) => (ResponsiblePerson, BusinessMatchingActivities) =
+  (rp, activities, isRemoving) => {
 
-    def approvalIsRequired(rp: ResponsiblePerson, businessActivities: BusinessMatchingActivities) =
+    def approvalIsRequired(rp: ResponsiblePerson, businessActivities: BusinessMatchingActivities, isRemoving: Boolean) = {
       rp.approvalFlags.hasAlreadyPassedFitAndProper.contains(false) &
-      !(containsTcspOrMsb(businessActivities.businessActivities))
+        !(containsTcspOrMsb(businessActivities.businessActivities)) &
+        isRemoving
+    }
+
+
 
     def setResponsiblePeopleForApproval(rp: ResponsiblePerson)
     : ResponsiblePerson = {
@@ -318,7 +337,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
       }
     }
 
-    if (approvalIsRequired(rp, activities)) {
+    if (approvalIsRequired(rp, activities, isRemoving)) {
       (setResponsiblePeopleForApproval(rp), activities)
     } else {
       (rp, activities)
