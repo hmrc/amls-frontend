@@ -57,6 +57,43 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
   }
 
   "InvolvedInOtherController" must {
+      "add a/an to sorted business type list" in new Fixture {
+        val businessMatching = BusinessMatching(
+          activities = Some(BMActivities(Set(
+            TelephonePaymentService,
+            HighValueDealing,
+            MoneyServiceBusiness,
+            TrustAndCompanyServices,
+            AccountancyServices,
+            BillPaymentServices,
+            EstateAgentBusinessService
+          )))
+        )
+
+        when(mockDataCacheConnector.fetchAll(any(), any()))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(mockCacheMap.getEntry[Renewal](Renewal.key))
+          .thenReturn(None)
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(businessMatching))
+
+        val result = controller.get()(request)
+
+        val expectedSpecialCase: String = Messages("businessmatching.registerservices.servicename.lbl.07")
+
+        status(result) must be(OK)
+        contentAsString(result) must include(s"an ${Messages("businessmatching.registerservices.servicename.lbl.01").toLowerCase}")
+        contentAsString(result) must include(s"a ${Messages("businessmatching.registerservices.servicename.lbl.02").toLowerCase}")
+        contentAsString(result) must include(s"an ${Messages("businessmatching.registerservices.servicename.lbl.03").toLowerCase}")
+        contentAsString(result) must include(s"a ${Messages("businessmatching.registerservices.servicename.lbl.04").toLowerCase}")
+        contentAsString(result) must include(s"a ${Messages("businessmatching.registerservices.servicename.lbl.05").toLowerCase}")
+        contentAsString(result) must include(s"a ${expectedSpecialCase(0).toLower}")
+        contentAsString(result) must include(s"a ${Messages("businessmatching.registerservices.servicename.lbl.06").toLowerCase}")
+      }
+  }
+
+  "InvolvedInOtherController" must {
 
     "when get is called" must {
       "display the is your business involved in other activities page" in new Fixture {
@@ -90,150 +127,6 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
         contentAsString(result) must include("test")
 
       }
-
-      "display the correct business type" when {
-        "the business type is AccountancyServices" in new Fixture {
-
-          val businessMatching = BusinessMatching(
-            activities = Some(BMActivities(Set(AccountancyServices)))
-          )
-
-          when(mockDataCacheConnector.fetchAll(any(), any()))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          when(mockCacheMap.getEntry[Renewal](Renewal.key))
-            .thenReturn(None)
-          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-            .thenReturn(Some(businessMatching))
-
-          val result = controller.get()(request)
-          status(result) must be(OK)
-          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.01"))
-
-        }
-
-        "the business type is BillPaymentServices" in new Fixture {
-
-          val businessMatching = BusinessMatching(
-            activities = Some(BMActivities(Set(BillPaymentServices)))
-          )
-
-          when(mockCacheMap.getEntry[Renewal](Renewal.key))
-            .thenReturn(None)
-          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-            .thenReturn(Some(businessMatching))
-
-          when(mockDataCacheConnector.fetchAll(any(), any()))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          val result = controller.get()(request)
-          status(result) must be(OK)
-          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.02"))
-
-        }
-
-        "the business type is EstateAgentBusinessService" in new Fixture {
-
-          val businessMatching = BusinessMatching(
-            activities = Some(BMActivities(Set(EstateAgentBusinessService)))
-          )
-
-          when(mockCacheMap.getEntry[Renewal](Renewal.key))
-            .thenReturn(None)
-          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-            .thenReturn(Some(businessMatching))
-
-          when(mockDataCacheConnector.fetchAll(any(), any()))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          val result = controller.get()(request)
-          status(result) must be(OK)
-          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.03"))
-
-        }
-
-        "the business type is HighValueDealing" in new Fixture {
-
-          val businessMatching = BusinessMatching(
-            activities = Some(BMActivities(Set(HighValueDealing)))
-          )
-
-          when(mockCacheMap.getEntry[Renewal](Renewal.key))
-            .thenReturn(None)
-
-          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-            .thenReturn(Some(businessMatching))
-
-          when(mockDataCacheConnector.fetchAll(any(), any()))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          val result = controller.get()(request)
-          status(result) must be(OK)
-          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.04"))
-
-        }
-
-        "the business type is MoneyServiceBusiness" in new Fixture {
-
-          val businessMatching = BusinessMatching(
-            activities = Some(BMActivities(Set(MoneyServiceBusiness)))
-          )
-
-          when(mockCacheMap.getEntry[Renewal](Renewal.key))
-            .thenReturn(None)
-          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-            .thenReturn(Some(businessMatching))
-
-          when(mockDataCacheConnector.fetchAll(any(), any()))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          val result = controller.get()(request)
-          status(result) must be(OK)
-          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.05"))
-
-        }
-
-        "the business type is TrustAndCompanyServices" in new Fixture {
-
-          val businessMatching = BusinessMatching(
-            activities = Some(BMActivities(Set(TrustAndCompanyServices)))
-          )
-
-          when(mockCacheMap.getEntry[Renewal](Renewal.key))
-            .thenReturn(None)
-          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-            .thenReturn(Some(businessMatching))
-
-          when(mockDataCacheConnector.fetchAll(any(), any()))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          val result = controller.get()(request)
-          status(result) must be(OK)
-          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.06"))
-
-        }
-
-        "the business type is TelephonePaymentService" in new Fixture {
-
-          val businessMatching = BusinessMatching(
-            activities = Some(BMActivities(Set(TelephonePaymentService)))
-          )
-
-          when(mockCacheMap.getEntry[Renewal](Renewal.key))
-            .thenReturn(None)
-          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-            .thenReturn(Some(businessMatching))
-
-          when(mockDataCacheConnector.fetchAll(any(), any()))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          val result = controller.get()(request)
-          status(result) must be(OK)
-          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.07"))
-
-        }
-      }
-
     }
 
     "when post is called" must {
@@ -362,7 +255,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.01"))
+          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.01").toLowerCase)
 
           val document = Jsoup.parse(contentAsString(result))
           document.select("a[href=#involvedInOther]").html() must include(Messages("error.required.renewal.ba.involved.in.other"))
@@ -400,7 +293,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.01"))
+          contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.01").toLowerCase)
 
           val document = Jsoup.parse(contentAsString(result))
           document.select("a[href=#details]").html() must include(Messages("error.required.renewal.ba.involved.in.other.text"))

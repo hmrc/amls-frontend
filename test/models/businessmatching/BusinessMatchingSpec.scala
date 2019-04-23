@@ -82,6 +82,20 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
       hasAccepted = true,
       preAppComplete = true)
 
+    "createBusinessTypeOrderedList" must {
+      "return the business activities ordered alphabetically" in {
+        val expectedList = Some(
+          List(
+            "Money service business",
+            "Telecommunications, digital and IT payment service provider",
+            "Trust or company service provider"
+          )
+        )
+
+        businessMatching.alphabeticalBusinessTypes() must be (expectedList)
+      }
+    }
+
     "READ the JSON successfully and return the domain Object" in {
       Json.fromJson[BusinessMatching](jsonBusinessMatching - "hasChanged") must be(JsSuccess(businessMatching))
     }

@@ -57,9 +57,9 @@ class amls_turnoverSpec extends AmlsSpec with MustMatchers  {
 
       val form2: ValidForm[AMLSTurnover] = Form2(AMLSTurnover.Fifth)
 
-      def view = views.html.renewal.amls_turnover(form2, true, Some(BusinessActivities(Set(AccountancyServices))))
+      def view = views.html.renewal.amls_turnover(form2, true, Some(List("a service provider")))
 
-      html must include("Accountancy services")
+      html must include("a service provider")
     }
 
     "show errors in the correct locations" in new ViewFixture {

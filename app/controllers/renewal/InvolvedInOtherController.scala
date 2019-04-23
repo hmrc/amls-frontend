@@ -54,25 +54,18 @@ class InvolvedInOtherController @Inject()(
         }
   }
 
-  private def businessTypes(activities: BusinessMatching): Option[String] = {
-    val typesString = activities.activities map { a =>
-      a.businessActivities.map {
-        case AccountancyServices => Messages("businessmatching.registerservices.servicename.lbl.01")
-        case BillPaymentServices => Messages("businessmatching.registerservices.servicename.lbl.02")
-        case EstateAgentBusinessService => Messages("businessmatching.registerservices.servicename.lbl.03")
-        case HighValueDealing => Messages("businessmatching.registerservices.servicename.lbl.04")
-        case MoneyServiceBusiness => Messages("businessmatching.registerservices.servicename.lbl.05")
-        case TrustAndCompanyServices => Messages("businessmatching.registerservices.servicename.lbl.06")
-        case TelephonePaymentService => Messages("businessmatching.registerservices.servicename.lbl.07")
+  private def businessTypes(activities: BusinessMatching): Option[List[String]] = {
+    val vowels = List("a", "e", "i", "o", "u")
+
+    activities.alphabeticalBusinessTypes.map {
+      case businessType =>
+        businessType.map(item => {
+          val prefix = if (vowels.exists(item.toLowerCase.startsWith(_))) { "an" }
+                       else { "a" }
+
+          s"$prefix ${item(0).toLower + item.substring(1)}"
+        })
       }
-
-    }
-
-    typesString match {
-      case Some(_) => Some(typesString.getOrElse(Set()).mkString(", ") + ".")
-      case None => None
-    }
-
   }
 
   def post(edit: Boolean = false) = Authorised.async {
