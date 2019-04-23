@@ -20,41 +20,43 @@
 
 @(f: forms.Form2[_], edit: Boolean, businessTypes:Option[List[String]])(implicit lang:Lang,  m: Messages, request: Request[_])
 
-@placeHolder = @{
+@headingText = @{
     businessTypes.map { types =>
-        if (types.length > 1) {
-            "renewal.turnover.title"
-        } else {
+        if (types.length == 1) {
             "renewal.turnover.title.single.service"
+        } else {
+            "renewal.turnover.title"
         }
-    }
+    }.getOrElse("renewal.turnover.title")
 }
 
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(placeHolder.getOrElse("renewal.turnover.title"), "summary.renewal")
+    @heading(section = "summary.renewal")
+}
+
+@legendHtml = {
+    <ul class="list list-bullet">
+        @businessTypes.map { types =>
+            @types.map {activity =>
+                <li>@activity</li>
+            }
+        }
+    </ul>
 }
 
 @main(
-    title = Messages(placeHolder.getOrElse("renewal.turnover.title")) + " - " + Messages("summary.renewal"),
+    title = Messages(headingText) + " - " + Messages("summary.renewal"),
     heading = header
 ) {
-
-        <ul class="list list-bullet">
-            @businessTypes.map { types =>
-                @types.map {activity =>
-                    <li>@activity</li>
-                }
-            }
-        </ul>
 
         @form(f, controllers.renewal.routes.AMLSTurnoverController.post(edit)) {
 
             @fieldset(
                 f = f("turnover-fieldset"),
-                legend = "renewal.turnover.title",
-                legendHidden = true,
+                heading = headingText,
+                legendHtml = legendHtml,
                 panel = false
             ) {
                 @errorGroup(

@@ -24,4 +24,5 @@ object HtmlElementHelpers {
     def toDataAttributes = map.map(t => s"data-${t._1}=${t._2}")
   }
 
+  case class AttrMinMax(attrMin: String = "", attrMax: String = "")
 }

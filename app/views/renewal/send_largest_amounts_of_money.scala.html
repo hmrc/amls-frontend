@@ -23,7 +23,7 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("renewal.msb.largest.amounts.title", "summary.renewal")
+    @heading(section = "summary.renewal")
 }
 
 @main(
@@ -31,15 +31,12 @@
     heading = header
 ) {
 
-
-    <p>@Messages("lbl.list.upto.3.countries")</p>
-
     @form(f, controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.post(edit)) {
 
         @fieldset(
-            legend = "renewal.msb.largest.amounts.title",
+            legend = "lbl.list.upto.3.countries",
+            heading = "renewal.msb.largest.amounts.title",
             f = f("countries"),
-            legendHidden = true,
             panel = false
         ) {
             @for(i <- 1 until 4) {

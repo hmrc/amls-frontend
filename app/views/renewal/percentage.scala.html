@@ -22,14 +22,10 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("renewal.hvd.percentage.title", "summary.renewal")
+    @heading(section = "summary.renewal")
 }
 
-@main(
-    title = Messages("renewal.hvd.percentage.title") + " - " + Messages("summary.renewal"),
-    heading = header
-) {
-
+@legendHtml = {
     <p>@Messages("renewal.percentage.info.line1")</p>
     <p>@Messages("renewal.percentage.info.line2")</p>
 
@@ -39,13 +35,19 @@
     </ul>
 
     @legend(Messages("renewal.percentage.turnover.text"))
+}
+
+@main(
+    title = Messages("renewal.hvd.percentage.title") + " - " + Messages("summary.renewal"),
+    heading = header
+) {
 
     @form(f, controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.post(edit)) {
 
         @fieldset(
             f = f("percentage-fieldset"),
-            legend = "renewal.hvd.percentage.title",
-            legendHidden = true,
+            heading = "renewal.hvd.percentage.title",
+            legendHtml = legendHtml,
             panel = false
         ) {
             @errorGroup(

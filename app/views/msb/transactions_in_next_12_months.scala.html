@@ -17,6 +17,7 @@
 @import forms.{Form2, ValidField, InvalidField}
 @import include._
 @import include.forms2._
+@import utils.HtmlElementHelpers.AttrMinMax
 
 @(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
 
@@ -34,7 +35,7 @@
     @form(f, controllers.msb.routes.TransactionsInNext12MonthsController.post(edit)) {
 
         @input(
-            attrMin = "1",
+            attrMinMax = AttrMinMax(attrMin = "1"),
             attrStep = "1",
             attrType = "number",
             bold = false,

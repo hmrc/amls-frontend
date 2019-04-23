@@ -23,7 +23,7 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("renewal.msb.most.transactions.title", "summary.renewal")
+    @heading(section = "summary.renewal")
 }
 
 @main(
@@ -31,14 +31,12 @@
     heading = header
 ) {
 
-    <span>@Messages("lbl.list.upto.3.countries")</span>
-
     @form(f, controllers.renewal.routes.MostTransactionsController.post(edit)) {
 
         @fieldset(
             f = f("mostTransactionsCountries-fieldset"),
-            legend = "renewal.msb.most.transactions.title",
-            legendHidden = true,
+            legend = "lbl.list.upto.3.countries",
+            heading = "renewal.msb.most.transactions.title",
             panel = false
         ) {
             @errorGroup(

@@ -761,11 +761,8 @@ form .inline .block-label {
   display: table;
 }
 
-.clear:after {
-  clear: both;
-}
-
 .clear {
+  clear: both;
   *zoom: 1;
 }
 

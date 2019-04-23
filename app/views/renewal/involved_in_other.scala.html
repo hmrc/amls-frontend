@@ -27,14 +27,10 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("renewal.involvedinother.title", "summary.renewal")
+    @heading(section = "summary.renewal")
 }
 
-@main(
-    title = Messages("renewal.involvedinother.title") + " - " + Messages("summary.renewal"),
-    heading = header
-)  {
-
+@legendHtml = {
     <p>@Messages("businessactivities.confirm-activities.subtitle")</p>
 
     <ul class="list list-bullet">
@@ -53,13 +49,19 @@
         <li>@Messages("renewal.involvedinother.listline2")</li>
         <li>@Messages("renewal.involvedinother.listline3")</li>
     </ul>
+}
+
+@main(
+    title = Messages("renewal.involvedinother.title") + " - " + Messages("summary.renewal"),
+    heading = header
+)  {
 
     @form(f, controllers.renewal.routes.InvolvedInOtherController.post(edit)) {
 
         @fieldset(
             f = f("involvedInOther-fieldset"),
-            legend = "renewal.involvedinother.title",
-            legendHidden = true,
+            heading = "renewal.involvedinother.title",
+            legendHtml = legendHtml,
             panel = false,
             classes = Seq("inline")
         ) {

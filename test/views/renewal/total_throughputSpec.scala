@@ -48,7 +48,7 @@ class total_throughputSpec extends AmlsSpec with MustMatchers {
 
   "The MSB total throughput view" must {
     "display the correct header" in new ViewFixture {
-      doc.select("header .heading-xlarge").text mustBe Messages("renewal.msb.throughput.header")
+      doc.select(".heading-xlarge").text mustBe Messages("renewal.msb.throughput.header")
     }
 
     "display the correct secondary header" in new ViewFixture {

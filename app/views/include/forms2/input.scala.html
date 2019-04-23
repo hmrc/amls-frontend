@@ -28,8 +28,7 @@
     labelHidden: Boolean = false,
     parentDateAttr: String = "",
     attrType: String = "",
-    attrMin: String = "",
-    attrMax: String = "",
+    attrMinMax: AttrMinMax = AttrMinMax(),
     attrMinlength: String = "",
     attrMaxlength: String = "",
     attrPattern: String = "",
@@ -37,7 +36,8 @@
     attrTitle: String = "",
     attrDescribedBy: String = "",
     data: String = "",
-    dataAttrs: Map[String, String] = Map.empty[String, String]
+    dataAttrs: Map[String, String] = Map.empty[String, String],
+    headingText: String = ""
 )(implicit lang:Lang,  m: Messages)
 
 
@@ -60,8 +60,8 @@
             @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint" }
             @if(attrDescribedBy.nonEmpty) { aria-describedby="@attrDescribedBy-hint" }
             @if(attrType.nonEmpty) { type="@attrType" } else { type="text" }
-            @if(attrMin.nonEmpty) { min="@attrMin" }
-            @if(attrMax.nonEmpty) { max="@attrMax" }
+            @if(attrMinMax.attrMin.nonEmpty) { min="@attrMinMax.attrMin" }
+            @if(attrMinMax.attrMax.nonEmpty) { max="@attrMinMax.attrMax" }
             @if(attrMinlength.nonEmpty) { minlength="@attrMinlength" }
             @if(attrMaxlength.nonEmpty) { maxlength="@attrMaxlength" }
             @if(attrPattern.nonEmpty) { pattern="@attrPattern" }

@@ -28,7 +28,7 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("renewal.customer.outside.uk.title", "summary.renewal")
+    @heading(section = "summary.renewal")
 }
 
 @main(
@@ -37,19 +37,20 @@
 ) {
     @form(f, controllers.renewal.routes.CustomersOutsideUKController.post(edit)) {
 
-        @fieldset(
-            legend = "renewal.customer.outside.uk.title",
-            legendHidden = true,
-            panel = false,
-            classes = Seq("inline"),
-            f = f("isOutside")
+    @fieldset(
+        heading = "renewal.customer.outside.uk.title",
+        panel = false,
+        classes = Seq("inline"),
+        f = f("isOutside-fieldset")
+    ) {
+        @errorGroup(
+            field = f("isOutside")
         ) {
-
             @radio(
                 f = f("isOutside"),
                 labelText = "lbl.yes",
                 value = "true",
-                target = s"#$target",
+                target = s".countries-fieldset",
                 inline = true
             )
             @radio(
@@ -59,30 +60,28 @@
                 inline = true
             )
         }
+    }
 
-        @panel(
-            field = Some(f(s"$target")),
-            jsHidden = false,
-            data = Seq("data-toggle-new")
+    @fieldset(
+        f = f("countries-fieldset"),
+        legend = "renewal.customers.outside.uk.hint.lbl",
+        classes = Seq("countries-fieldset")
+    ) {
+        @errorGroup(
+            field = f("countries")
         ) {
-
-            @fieldset(
-                legend = "renewal.customers.outside.uk.hint.lbl",
-                f = f("countries"),
-                hint = "businessactivities.hight.value.customer.lbl.hint",
-                panel = false
-            ) {
-                @for(i <- 0 until 10) {
-                    @defining(
-                        f(s"countries[$i]")
-                    ) { field => @country_autocomplete(
-                        field = field,
-                        labelText = s"lbl.country.line${i+1}",
-                        data = countryData.getOrElse(Seq.empty)
-                    ) }
-                }
+            @for(i <- 0 until 10) {
+                @defining(
+                    f(s"countries[$i]")
+                ) { field => @country_autocomplete(
+                    field = field,
+                    labelText = s"lbl.country.line${i+1}",
+                    data = countryData.getOrElse(Seq.empty)
+                ) }
             }
         }
-        @submit(edit, returnLocation = Some("renewal"))
     }
+
+    @submit(edit, returnLocation = Some("renewal"))
+}
 }
