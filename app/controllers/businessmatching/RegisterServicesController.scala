@@ -96,40 +96,12 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
               }
             }
           case ValidForm(_, data) =>
-            (for {
-              isPreSubmission <- statusService.isPreSubmission
-              businessMatching <- businessMatchingService.getModel.value
-              savedModel <- updateModel(
-                businessMatching,
-                newModel(businessMatching.activities,
-                  data,
-                  isPreSubmission
-                ),
-                isMsb(data, businessMatching.activities)
-              )
-              _ <- maybeRemoveAccountantForAMLSRegulations(savedModel)
-              _ <- clearRemovedSections(
-                businessMatching.activities.getOrElse(
-                  BusinessMatchingActivities(
-                    Set()
-                  )
-                ).businessActivities,
-                savedModel.businessActivities
-              )
-              isRemoving <- isRemovingActivity(
-                businessMatching.activities.getOrElse(
-                  BusinessMatchingActivities(
-                    Set()
-                  )
-                ).businessActivities,
-                savedModel.businessActivities
-              )
-            } yield (isRemoving, savedModel)) flatMap { action =>
+            formatServices(data) flatMap { action =>
               getData[ResponsiblePerson] flatMap { responsiblePeople =>
 
                 val workFlow =
                   shouldPromptForApproval.tupled andThen
-                  shouldPromptForFitAndProper.tupled
+                    shouldPromptForFitAndProper.tupled
 
                 val rps = responsiblePeople.map(rp => workFlow((rp, action._2, action._1)))
 
@@ -139,6 +111,39 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
               }
             }
         }
+  }
+
+  private def formatServices(data: BusinessMatchingActivities)
+                        (implicit ac: AuthContext, hc: HeaderCarrier) = {
+    (for {
+      isPreSubmission <- statusService.isPreSubmission
+      businessMatching <- businessMatchingService.getModel.value
+      savedModel <- updateModel(
+        businessMatching,
+        newModel(businessMatching.activities,
+          data,
+          isPreSubmission
+        ),
+        isMsb(data, businessMatching.activities)
+      )
+      _ <- maybeRemoveAccountantForAMLSRegulations(savedModel)
+      _ <- clearRemovedSections(
+        businessMatching.activities.getOrElse(
+          BusinessMatchingActivities(
+            Set()
+          )
+        ).businessActivities,
+        savedModel.businessActivities
+      )
+      isRemoving <- isRemovingActivity(
+        businessMatching.activities.getOrElse(
+          BusinessMatchingActivities(
+            Set()
+          )
+        ).businessActivities,
+        savedModel.businessActivities
+      )
+    } yield (isRemoving, savedModel))
   }
 
   private def withoutAccountantForAMLSRegulations(activities: BusinessActivities): BusinessActivities =
