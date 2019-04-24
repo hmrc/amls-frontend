@@ -18,7 +18,6 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import models.renewal.{PercentageOfCashPaymentOver15000, Renewal}
-import models.status.NotCompleted
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -26,9 +25,9 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.{RenewalService, StatusService}
+import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -65,7 +64,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("hvd.percentage.title"))
+        contentAsString(result) must include("What percentage of your turnover came from cash payments of over €10,000?")
       }
 
       "display the Percentage Of CashPayment Over 15000 page with pre populated data" in new Fixture {
