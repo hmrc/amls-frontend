@@ -528,7 +528,7 @@ start.utr.line1 = If we can’t find your business automatically, we’ll ask fo
 
 ############################### Status page ###############################
 status.title = Your registration
-status.business = Your business:
+status.business = Your business
 status.referenceno = Anti-money laundering supervision registration number:
 status.referenceno.short = Registration number:
 status.incomplete = Incomplete
