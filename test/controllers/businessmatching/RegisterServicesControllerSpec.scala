@@ -988,7 +988,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
       }
 
       "not handle any approvalFlags" when {
-        "not removing a service" in new Fixture {
+        "business activity is adding a service" in new Fixture {
 
           val rp = responsiblePerson.copy(
             approvalFlags = ApprovalFlags(
