@@ -45,9 +45,9 @@ class summarySpec extends AmlsSpec
 
       def view = views.html.businessmatching.summary(EmptyForm, BusinessMatching(), defaultActivitiesUrl, true)
 
-      doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.businessmatching"))
-      heading.html must be(Messages("title.cya"))
-      subHeading.html must include(Messages("summary.businessmatching"))
+      doc.title must startWith("Check your answers before starting your application" + " - " + "Pre-application")
+      heading.html must be("Check your answers before starting your application")
+      subHeading.html must include("Pre-application")
 
     }
 
@@ -55,9 +55,9 @@ class summarySpec extends AmlsSpec
 
       def view = views.html.businessmatching.summary(EmptyForm, BusinessMatching(), defaultActivitiesUrl, false)
 
-      doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.updateservice"))
-      heading.html must be(Messages("title.cya"))
-      subHeading.html must include(Messages("summary.updateservice"))
+      doc.title must startWith("Check your answers" + " - " + "Update information")
+      heading.html must be("Check your answers")
+      subHeading.html must include("Update information")
     }
 
     def checkElementTextIncludes(el:Element, keys : String*) = {
