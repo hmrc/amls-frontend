@@ -96,7 +96,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
               }
             }
           case ValidForm(_, data) =>
-            formatServices(data) flatMap { action =>
+            formatBusinessActivities(data) flatMap { action =>
               getData[ResponsiblePerson] flatMap { responsiblePeople =>
 
                 val workFlow =
@@ -113,7 +113,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
         }
   }
 
-  private def formatServices(data: BusinessMatchingActivities)
+  private def formatBusinessActivities(data: BusinessMatchingActivities)
                         (implicit ac: AuthContext, hc: HeaderCarrier) = {
     (for {
       isPreSubmission <- statusService.isPreSubmission
