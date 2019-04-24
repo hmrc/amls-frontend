@@ -18,32 +18,36 @@
 @import forms2._
 @import models.businessmatching._
 
-@(f: forms.Form2[_], edit: Boolean, bmBusinessActivities:Option[BusinessActivities])(implicit lang:Lang,  m: Messages, request: Request[_])
+@(f: forms.Form2[_], edit: Boolean, businessTypes:Option[List[String]])(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@placeHolder = @{
+    businessTypes.map { types =>
+        if (types.length > 1) {
+            "renewal.turnover.title"
+        } else {
+            "renewal.turnover.title.single.service"
+        }
+    }
+}
 
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("renewal.turnover.title", "summary.renewal")
+    @heading(placeHolder.getOrElse("renewal.turnover.title"), "summary.renewal")
 }
 
 @main(
-    title = Messages("renewal.turnover.title") + " - " + Messages("summary.renewal"),
+    title = Messages(placeHolder.getOrElse("renewal.turnover.title")) + " - " + Messages("summary.renewal"),
     heading = header
 ) {
 
-    @panel(
-        jsHidden = false,
-        wide = true,
-        gutter = true
-        ) {
-            <ul class="list list--comma">
-                @bmBusinessActivities.map { ba =>
-                    @ba.businessActivities.map {activity =>
-                        <li>@Messages("businessmatching.registerservices.servicename.lbl."+BusinessActivities.getValue(activity))</li>
-                    }
+        <ul class="list list-bullet">
+            @businessTypes.map { types =>
+                @types.map {activity =>
+                    <li>@activity</li>
                 }
-            </ul>
-        }
+            }
+        </ul>
 
         @form(f, controllers.renewal.routes.AMLSTurnoverController.post(edit)) {
 

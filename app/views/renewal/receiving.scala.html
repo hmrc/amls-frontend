@@ -30,13 +30,13 @@
   heading = header
 ) {
 
-  <span class="form-hint">@Messages("hvd.receiving.convert.currency.text")</span>
+  <p>@Messages("hvd.receiving.convert.currency.text")</p>
 
   @form(f, controllers.renewal.routes.ReceiveCashPaymentsController.post(edit)) {
 
     @fieldset(
         f = f("receivePayments-fieldset"),
-        legend = "hvd.receiving.title",
+        legend = "renewal.receiving.title",
         legendHidden = true,
         panel = false,
         classes = Seq("inline")

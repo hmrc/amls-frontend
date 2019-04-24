@@ -82,7 +82,7 @@ class summary_detailsSpec extends TestHelper with HtmlAssertions with TableDrive
       ("tradingpremises.summary.address", checkElementTextIncludes(_, "Trading address Answer: 1 2 asdfasdf")),
       ("tradingpremises.startDate.title", checkElementTextIncludes(_, DateHelper.formatDate(new LocalDate(1990, 2, 24)))),
       ("tradingpremises.isResidential.title", checkElementTextIncludes(_, "lbl.yes")),
-      ("tradingpremises.whatdoesyourbusinessdo.title", checkElementTextOnlyIncludes(_, "Bill payment services", "Estate agency services", "Money service business activities")),
+      ("tradingpremises.whatdoesyourbusinessdo.title", checkElementTextOnlyIncludes(_, "Bill payment service provider", "Estate agency business", "Money service business")),
       ("tradingpremises.msb.services.title", checkElementTextIncludes(_, "Transmitting money","Currency exchange")),
       ("tradingpremises.agent.premises.title", checkElementTextIncludes(_, "lbl.yes")),
       ("tradingpremises.businessStructure.title", checkElementTextIncludes(_, "businessType.lbl.01")),

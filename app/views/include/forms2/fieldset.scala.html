@@ -24,6 +24,7 @@
     data: Seq[String] = Seq.empty,
     bold: Boolean = false,
     hint: String = "",
+    heading: String = "",
     f: forms.Field
 )(content: Html)(implicit lang:Lang,  m: Messages)
 
@@ -31,7 +32,7 @@
     @if(f.id.nonEmpty){ id="@f.id"}
     class="@if(panel){ panel-indent}@if(f.hasErrors){ form-field--error}@if(jsHidden){js-hidden} @classes.mkString(" ")" @data.mkString(" ")>
 
-        @include.forms2.legend(legend, jsHidden, bold, hint, legendHidden)
+        @include.forms2.legend(legend, jsHidden, bold, hint, legendHidden, heading)
         @if(f.hasErrors) {
             <span class="error-notification" data-journey="error - field:user input:@f.id">@f.error</span>
         }
