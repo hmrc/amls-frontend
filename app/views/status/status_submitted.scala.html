@@ -42,20 +42,18 @@
 
     <div class="grid-layout grid-layout--stacked">
         <div class="grid-layout__column grid-layout__column--2-3">
-            <div class="panel-indent panel-indent--gutter panel-border-wide">
                 @businessName.map { bn =>
                     <p id="status-submitted-business" class="heading-small">@Messages("status.business")</p>
                     <p id="status-submitted-business-name">@bn</p>
                 }
                 @feeResponse.map { fees =>
-                    <p class="heading-small">@Messages("status.status"):</p>
+                    <p class="heading-small">@Messages("status.status")</p>
                     <p>@Messages("status.submittedForReview.submitteddate.text", DateHelper.formatDate(fees.createdAt.toLocalDate))</p>
                 }
                 <p class="no-print">
                     <a id="withdraw-application" href="@controllers.withdrawal.routes.WithdrawApplicationController.get()">@Messages("status.withdraw.link-text")</a>
                 </p>
 
-            </div>
         </div>
         <div class="grid-layout__column grid-layout__column--1-3">
             <div class="govuk-box-highlight messaging">
