@@ -49,7 +49,7 @@ class status_incompleteSpec extends AmlsSpec with MustMatchers {
       doc.getElementsContainingOwnText("business Name").hasText must be(true)
       doc.getElementsContainingOwnText(Messages("status.business")).hasText must be(true)
       doc.getElementsByClass("heading-secondary").first().html() must include(Messages("summary.status"))
-      doc.getElementsByClass("panel-indent").first().child(0).html() must be(Messages("status.business"))
+      doc.getElementById("status-incomplete-business").html() must be(Messages("status.business"))
 
       doc.getElementsByClass("list").first().child(0).html() must include(Messages("status.incomplete"))
       doc.getElementsByClass("list").first().child(1).html() must include(Messages("status.submitted"))
