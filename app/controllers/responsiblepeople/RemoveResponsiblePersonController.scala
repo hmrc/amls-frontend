@@ -84,9 +84,12 @@ class RemoveResponsiblePersonController @Inject () (
                 case Some(person) if person.lineId.isEmpty => removeWithoutDate
                 case Some(person) =>
                   val name = person.personName.fold("")(_.fullName)
-
+                  val startDate = person.positions
+                    .flatMap(p => p.startDate)
+                    .map(d => Seq(d.startDate.toString("yyyy-MM-dd")))
+                    .getOrElse(Seq())
                   val extraFields = Map(
-                    "positionStartDate" -> Seq(person.positions.get.startDate.get.toString("yyyy-MM-dd")),
+                    "positionStartDate" -> startDate,
                     "userName" -> Seq(name)
                   )
 

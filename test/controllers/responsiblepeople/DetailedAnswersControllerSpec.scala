@@ -19,7 +19,7 @@ package controllers.responsiblepeople
 import config.{AMLSAuthConnector, AppConfig}
 import connectors.DataCacheConnector
 import models.businessmatching.BusinessMatching
-import models.responsiblepeople.{BeneficialOwner, PersonName, Positions, ResponsiblePerson}
+import models.responsiblepeople._
 import models.status._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -166,7 +166,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
 
           private val testStartDate = new LocalDate(1999,1,1)
 
-          val model = ResponsiblePerson(positions = Some(Positions(Set(BeneficialOwner),Some(testStartDate))))
+          val model = ResponsiblePerson(positions = Some(Positions(Set(BeneficialOwner),Some(PositionStartDate(testStartDate)))))
           setupMocksFor(model)
 
           val result = controller.get(1)(request)

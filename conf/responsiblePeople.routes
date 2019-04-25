@@ -72,6 +72,9 @@ POST        /time-at-other-previous-address/:index/                @controllers.
 GET         /role-in-the-business/:index/                          @controllers.responsiblepeople.PositionWithinBusinessController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /role-in-the-business/:index/                          @controllers.responsiblepeople.PositionWithinBusinessController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
+GET         /role-in-the-business-start-date/:index/               @controllers.responsiblepeople.PositionWithinBusinessStartDateController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /role-in-the-business-start-date/:index/               @controllers.responsiblepeople.PositionWithinBusinessStartDateController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+
 GET         /sole-proprietor-of-another-business/:index/           @controllers.responsiblepeople.SoleProprietorOfAnotherBusinessController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /sole-proprietor-of-another-business/:index/           @controllers.responsiblepeople.SoleProprietorOfAnotherBusinessController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 

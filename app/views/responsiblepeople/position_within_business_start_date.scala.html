@@ -24,23 +24,21 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @headingWithPlaceholder(("responsiblepeople.position_within_business.heading", personName), "summary.responsiblepeople")
+    @headingWithPlaceholder(("responsiblepeople.position_within_business.startDate.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("responsiblepeople.position_within_business.title") + " - " + Messages("summary.responsiblepeople"),
+    title = Messages("responsiblepeople.position_within_business.startDate.title") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 
-    <p>@Messages("lbl.select.all")</p>
+    @form(f, controllers.responsiblepeople.routes.PositionWithinBusinessStartDateController.post(index, edit, flow)) {
 
-    @form(f, controllers.responsiblepeople.routes.PositionWithinBusinessController.post(index, edit, flow)) {
-
-        @roles_within_business(
-            f,
-            businessType,
-            displayNominatedOfficer,
-            isDeclaration = false
+        @date(
+            f = f,
+            p = "startDate",
+            hintText = "responsiblepeople.position_within_business.startDate.hint",
+            example = false
         )
 
         @submit()

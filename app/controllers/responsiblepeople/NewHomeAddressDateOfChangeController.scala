@@ -16,15 +16,11 @@
 
 package controllers.responsiblepeople
 
-import javax.inject.{Inject, Singleton}
-
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{Path, ValidationError}
-import models.responsiblepeople.{NewHomeAddress, NewHomeDateOfChange, ResponsiblePerson}
-import org.joda.time.LocalDate
+import javax.inject.{Inject, Singleton}
+import models.responsiblepeople.{NewHomeDateOfChange, ResponsiblePerson}
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -59,7 +55,7 @@ class NewHomeAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
 
   private def activityStartDateField(index: Int)(implicit authContext: AuthContext, request: Request[AnyContent]) = {
     getData[ResponsiblePerson](index) map { x =>
-      val startDate = x.fold[Option[LocalDate]](None)(_.positions.fold[Option[LocalDate]](None)(_.startDate))
+      val startDate = x.flatMap(rp => rp.positions).flatMap(p => p.startDate).map(sd => sd.startDate)
       val personName = ControllerHelper.rpTitleName(x)
       (startDate, personName)
     }

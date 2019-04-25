@@ -360,7 +360,7 @@
             editUrl = controllers.responsiblepeople.routes.PositionWithinBusinessController.get(idx, true, flow).toString(),
             dataItem = person.positions
         ) { pos =>
-            <p>@pos.startDate.map(DateHelper.formatDate(_))</p>
+            <p>@pos.startDate.map(sd => sd.startDate).map(DateHelper.formatDate(_)).getOrElse("")</p>
         }
 
         @person.soleProprietorOfAnotherBusiness.map { anotherBusiness =>

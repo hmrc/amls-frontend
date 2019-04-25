@@ -29,18 +29,18 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
     "PositionInBusiness" must {
 
       "successfully validate" in {
-        PositionWithinBusiness.formRule.validate((Set("01"), None)) mustBe Valid(Set(BeneficialOwner))
-        PositionWithinBusiness.formRule.validate((Set("02"), None)) mustBe Valid(Set(Director))
-        PositionWithinBusiness.formRule.validate((Set("03"), None)) mustBe Valid(Set(InternalAccountant))
-        PositionWithinBusiness.formRule.validate((Set("04"), None)) mustBe Valid(Set(NominatedOfficer))
-        PositionWithinBusiness.formRule.validate((Set("05"), None)) mustBe Valid(Set(Partner))
-        PositionWithinBusiness.formRule.validate((Set("06"), None)) mustBe Valid(Set(SoleProprietor))
-        PositionWithinBusiness.formRule.validate((Set("07"), None)) mustBe Valid(Set(DesignatedMember))
-        PositionWithinBusiness.formRule.validate((Set("other"), Some("some other role"))) mustBe Valid(Set(Other("some other role")))
+        PositionWithinBusiness.validatePositionSelection.validate((Set("01"), None)) mustBe Valid(Set(BeneficialOwner))
+        PositionWithinBusiness.validatePositionSelection.validate((Set("02"), None)) mustBe Valid(Set(Director))
+        PositionWithinBusiness.validatePositionSelection.validate((Set("03"), None)) mustBe Valid(Set(InternalAccountant))
+        PositionWithinBusiness.validatePositionSelection.validate((Set("04"), None)) mustBe Valid(Set(NominatedOfficer))
+        PositionWithinBusiness.validatePositionSelection.validate((Set("05"), None)) mustBe Valid(Set(Partner))
+        PositionWithinBusiness.validatePositionSelection.validate((Set("06"), None)) mustBe Valid(Set(SoleProprietor))
+        PositionWithinBusiness.validatePositionSelection.validate((Set("07"), None)) mustBe Valid(Set(DesignatedMember))
+        PositionWithinBusiness.validatePositionSelection.validate((Set("other"), Some("some other role"))) mustBe Valid(Set(Other("some other role")))
       }
 
       "fail to validate an empty string" in {
-        Positions.positionReader.validate(Set.empty[String]) must
+        PositionWithinBusiness.positionReader.validate(Set.empty[String]) must
           be(Invalid(Seq(
             Path -> Seq(ValidationError("error.required.positionWithinBusiness"))
           )))
@@ -61,59 +61,65 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
   }
 
   "Positions" must {
+
     "successfully read whole form" in {
       val form = Map(
         "positions[0]" -> Seq("01"),
         "positions[1]" -> Seq("other"),
-        "otherPosition" -> Seq("some other position"),
-        "startDate.day" -> Seq("1"),
-        "startDate.month" -> Seq("1"),
-        "startDate.year" -> Seq("1970")
+        "otherPosition" -> Seq("some other position")//,
+//        "startDate.day" -> Seq("1"),
+//        "startDate.month" -> Seq("1"),
+//        "startDate.year" -> Seq("1970")
       )
 
       //noinspection ScalaStyle
-      Positions.formReads.validate(form) mustBe
-        Valid(Positions(
-          Set(BeneficialOwner, Other("some other position")),
-          Some(new LocalDate(1970, 1, 1))))
+      PositionWithinBusiness.validatePositionsSet.validate(form) mustBe
+        Valid(
+          Set(BeneficialOwner, Other("some other position"))//,
+        //  Some(PositionStartDate(new LocalDate(1970, 1, 1)))
+        )
     }
 
     "successfully write whole form" in {
       //noinspection ScalaStyle
-      val model = Positions(Set(InternalAccountant, Other("some other position")), Some(new LocalDate(1999, 5, 1)))
+      val model = Set(InternalAccountant, Other("some other position")).asInstanceOf[Set[PositionWithinBusiness]]
+        //, Some(PositionStartDate(new LocalDate(1999, 5, 1)))
 
-      Positions.formWrites.writes(model) mustBe Map(
+
+      PositionWithinBusiness.formWrites.writes(model) mustBe Map(
         "positions[]" -> Seq("03", "other"),
-        "otherPosition" -> Seq("some other position"),
-        "startDate.day" -> Seq("1"),
-        "startDate.month" -> Seq("5"),
-        "startDate.year" -> Seq("1999")
+        "otherPosition" -> Seq("some other position")
+//        ,
+//        "startDate.day" -> Seq("1"),
+//        "startDate.month" -> Seq("5"),
+//        "startDate.year" -> Seq("1999")
       )
     }
 
     "fail to validate when no 'other' value is given" in {
       val form = Map(
         "positions[0]" -> Seq("01"),
-        "positions[1]" -> Seq("other"),
-        "startDate.day" -> Seq("1"),
-        "startDate.month" -> Seq("1"),
-        "startDate.year" -> Seq("1970")
+        "positions[1]" -> Seq("other")
+//        ,
+//        "startDate.day" -> Seq("1"),
+//        "startDate.month" -> Seq("1"),
+//        "startDate.year" -> Seq("1970")
       )
 
-      Positions.formReads.validate(form) mustBe
+      PositionWithinBusiness.validatePositionsSet.validate(form) mustBe
         Invalid(Seq((Path \ "otherPosition") -> Seq(ValidationError("responsiblepeople.position_within_business.other_position.othermissing"))))
     }
 
     "fail to validate when an invalid valid was given" in {
       val form = Map(
-        "positions[0]" -> Seq("10"),
-        "startDate.day" -> Seq("1"),
-        "startDate.month" -> Seq("1"),
-        "startDate.year" -> Seq("1970")
+        "positions[0]" -> Seq("10")
+//        "startDate.day" -> Seq("1"),
+//        "startDate.month" -> Seq("1"),
+//        "startDate.year" -> Seq("1970")
       )
 
       intercept[Exception] {
-        Positions.formReads.validate(form)
+        PositionWithinBusiness.validatePositionsSet.validate(form)
       }
     }
   }
@@ -121,13 +127,13 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
   "Positions hasNominatedOfficer" must {
 
     "return true when there is a nominated officer RP" in {
-      val positions = Positions(Set(NominatedOfficer,InternalAccountant),Some(new LocalDate()))
+      val positions = Positions(Set(NominatedOfficer,InternalAccountant),Some(PositionStartDate(new LocalDate())))
       positions.isNominatedOfficer must be(true)
 
     }
 
     "return false when there is no nominated officer RP" in {
-      val positions = Positions(Set(InternalAccountant),Some(new LocalDate()))
+      val positions = Positions(Set(InternalAccountant),Some(PositionStartDate(new LocalDate())))
       positions.isNominatedOfficer must be(false)
 
     }
@@ -136,7 +142,7 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
   "JSON validation" must {
 
     "convert to json" in {
-      val model = Positions(Set(BeneficialOwner, Other("some other role")), Some(new LocalDate(1970, 1, 1)))
+      val model = Positions(Set(BeneficialOwner, Other("some other role")), Some(PositionStartDate(new LocalDate(1970, 1, 1))))
 
       Json.toJson(model) mustBe Json.obj(
         "positions" -> JsArray(Seq(JsString("01"), Json.obj("other" -> "some other role"))),

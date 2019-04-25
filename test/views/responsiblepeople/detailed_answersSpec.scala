@@ -470,7 +470,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
 
   val positions = Positions(
     positions = Set(BeneficialOwner, NominatedOfficer),
-    startDate = Some(new LocalDate(1990, 2, 24))
+    startDate = Some(PositionStartDate(new LocalDate(1990, 2, 24)))
   )
 
   val responsiblePeopleModel = ResponsiblePerson(

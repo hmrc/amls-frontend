@@ -16,24 +16,12 @@
 
 package models.responsiblepeople
 
-import cats.data.Validated.{Invalid, Valid}
-import jto.validation.{ValidationError, _}
-import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
-import models.FormTypes._
+import jto.validation.{From, Invalid, Path, Rule, Valid, ValidationError, Write}
+import models.FormTypes.basicPunctuationPattern
 import models.businessmatching.BusinessType
-import org.joda.time.LocalDate
-import play.api.libs.json.{Json, Reads, Writes, _}
-import utils.TraversableValidators._
-
-case class Positions(positions: Set[PositionWithinBusiness], startDate: Option[LocalDate]) {
-
-  def isNominatedOfficer = positions.contains(NominatedOfficer)
-
-  def isComplete = positions.nonEmpty
-
-  def personalTax = this.positions.exists(a => a == SoleProprietor || a == Partner)
-}
+import play.api.libs.json._
+import utils.TraversableValidators.minLengthR
 
 sealed trait PositionWithinBusiness
 
@@ -55,22 +43,6 @@ case class Other(value: String) extends PositionWithinBusiness
 
 object PositionWithinBusiness {
 
-  protected[responsiblepeople] val formRule = Rule[(Set[String], Option[String]), Set[PositionWithinBusiness]] {
-    case (s, None) if s.contains("other") =>
-      Invalid(Seq((Path \ "otherPosition") -> Seq(ValidationError("responsiblepeople.position_within_business.other_position.othermissing"))))
-    case (s, o) => Valid(s map {
-      case "01" => BeneficialOwner
-      case "02" => Director
-      case "03" => InternalAccountant
-      case "04" => NominatedOfficer
-      case "05" => Partner
-      case "06" => SoleProprietor
-      case "07" => DesignatedMember
-      case "other" => Other(o.get)
-      case v => throw new Exception(s"Invalid form value '$v'")
-    })
-  }
-
   implicit val formWrite = Write[PositionWithinBusiness, String] {
     case BeneficialOwner => "01"
     case Director => "02"
@@ -80,6 +52,26 @@ object PositionWithinBusiness {
     case SoleProprietor => "06"
     case DesignatedMember => "07"
     case Other(_) => "other"
+  }
+
+  implicit def formWrites(implicit w: Write[PositionWithinBusiness, String]) =
+    Write[Set[PositionWithinBusiness], UrlFormEncoded] { data =>
+      Map("positions[]" -> data.toSeq.map(w.writes)) ++ {
+        data.collectFirst {
+          case Other(v) => "otherPosition" -> Seq(v)
+        }
+      }
+    }
+
+  implicit val jsonWrites = Writes[PositionWithinBusiness] {
+    case BeneficialOwner => JsString("01")
+    case Director => JsString("02")
+    case InternalAccountant => JsString("03")
+    case NominatedOfficer => JsString("04")
+    case Partner => JsString("05")
+    case SoleProprietor => JsString("06")
+    case DesignatedMember => JsString("07")
+    case Other(value) => Json.obj("other" -> value)
   }
 
   implicit val jsonReads: Reads[PositionWithinBusiness] =
@@ -95,17 +87,6 @@ object PositionWithinBusiness {
       case _ => JsError((JsPath \ "positions") -> play.api.data.validation.ValidationError("error.invalid"))
     }
 
-  implicit val jsonWrites = Writes[PositionWithinBusiness] {
-    case BeneficialOwner => JsString("01")
-    case Director => JsString("02")
-    case InternalAccountant => JsString("03")
-    case NominatedOfficer => JsString("04")
-    case Partner => JsString("05")
-    case SoleProprietor => JsString("06")
-    case DesignatedMember => JsString("07")
-    case Other(value) => Json.obj("other" -> value)
-  }
-
   val positionsPerBusinessType = {
     List(
       BusinessType.SoleProprietor -> List(NominatedOfficer, SoleProprietor),
@@ -115,43 +96,36 @@ object PositionWithinBusiness {
       BusinessType.LPrLLP -> List(NominatedOfficer, Partner, DesignatedMember)
     )
   }
-}
 
-object Positions {
 
+  import jto.validation.forms.Rules._
   import utils.MappingUtils.Implicits.RichRule
 
-  protected[responsiblepeople] val positionReader = minLengthR[Set[String]](1).withMessage("error.required.positionWithinBusiness")
+  val positionReader = minLengthR[Set[String]](1).withMessage("error.required.positionWithinBusiness")
+  val otherLength = 255
+  val otherPositionReader = optionR(maxLength(otherLength) andThen basicPunctuationPattern())
 
-  private val otherLength = 255
-  private val otherPositionReader = optionR(maxLength(otherLength) andThen basicPunctuationPattern())
-
-  implicit def formReads: Rule[UrlFormEncoded, Positions] = From[UrlFormEncoded] { __ =>
-    (((__ \ "positions").read(positionReader) ~
-        (__ \ "otherPosition").read(otherPositionReader))
-        .tupled.andThen(PositionWithinBusiness.formRule) ~ (__ \ "startDate").read(localDateFutureRule).map(Some(_))
-    )(Positions.apply)
-
+  val validatePositionSelection = Rule[(Set[String], Option[String]), Set[PositionWithinBusiness]]  {
+    case (s, None) if s.contains("other") =>
+      Invalid(Seq(Path \ "otherPosition" -> Seq(ValidationError("responsiblepeople.position_within_business.other_position.othermissing"))))
+    case (s, o) =>
+      Valid(s.map {
+        case "01" => BeneficialOwner
+        case "02" => Director
+        case "03" => InternalAccountant
+        case "04" => NominatedOfficer
+        case "05" => Partner
+        case "06" => SoleProprietor
+        case "07" => DesignatedMember
+        case "other" => Other(o.get)
+        case _ => throw new IllegalArgumentException("!")
+      })
   }
 
-  implicit def formWrites
-  (implicit
-   w: Write[PositionWithinBusiness, String]
-  ) = Write[Positions, UrlFormEncoded] { data =>
-    Map("positions[]" -> data.positions.toSeq.map(w.writes)) ++ {
-      data.startDate match {
-        case Some(startDate) => localDateWrite.writes(startDate) map {
-          case (key, value) =>
-            s"startDate.$key" -> value
-        }
-        case _ => Nil
-      }
-    } ++ {
-      data.positions.collectFirst {
-        case Other(v) => "otherPosition" -> Seq(v)
-      }
-    }
+  implicit val validatePositionsSet:Rule[UrlFormEncoded, Set[PositionWithinBusiness]] = From[UrlFormEncoded] { __ =>
+    ((__ \ "positions").read(positionReader)  ~
+      (__ \ "otherPosition").read(otherPositionReader)).tupled.andThen(validatePositionSelection)
   }
 
-  implicit val formats = Json.format[Positions]
+
 }

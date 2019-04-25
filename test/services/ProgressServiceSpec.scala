@@ -51,7 +51,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
     "return fee guidance url" when {
       "business is a partnership and there are 2 partners and 1 nominated officer" in new Fixture {
 
-        val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(new LocalDate()))
+        val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(PositionStartDate(new LocalDate())))
         val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None,None, None, None, None, None, None, Some(positions))
         val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
@@ -77,7 +77,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
       }
 
       "business is not a partnership and at least one of the person in responsible people is the nominated officer" in new Fixture {
-        val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
+        val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(PositionStartDate(new LocalDate())))
         val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
         val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
@@ -104,7 +104,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
 
     "return register partners url" when {
       "business is a partnership and there are less than 2 partners" in new Fixture {
-        val positions = Positions(Set(BeneficialOwner, NominatedOfficer), Some(new LocalDate()))
+        val positions = Positions(Set(BeneficialOwner, NominatedOfficer), Some(PositionStartDate(new LocalDate())))
         val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
         val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
@@ -131,7 +131,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
 
     "return who is registering url" when {
       "status is amendment and there is a nominated officer" in new Fixture {
-        val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
+        val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(PositionStartDate(new LocalDate())))
         val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
         val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
@@ -156,7 +156,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
       }
 
       "status is variation and there is a nominated officer" in new Fixture {
-        val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
+        val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(PositionStartDate(new LocalDate())))
         val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
         val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
@@ -181,7 +181,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
       }
 
       "status is renewal and there is a nominated officer" in new Fixture {
-        val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
+        val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(PositionStartDate(new LocalDate())))
         val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
         val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
@@ -210,7 +210,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
 
           override val builder = defaultBuilder.configure("microservice.services.feature-toggle.show-fees" -> false)
 
-          val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(new LocalDate()))
+          val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(PositionStartDate(new LocalDate())))
           val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
           val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
           val responsiblePeople = Seq(rp1, rp2)
@@ -239,7 +239,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
 
           override val builder = defaultBuilder.configure("microservice.services.feature-toggle.show-fees" -> false)
 
-          val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
+          val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(PositionStartDate(new LocalDate())))
           val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
           val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
           val responsiblePeople = Seq(rp1, rp2)
@@ -268,7 +268,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
 
     "return Who is the business’s nominated officer? url" when {
       "there is no selected nominated officer" in new Fixture {
-        val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
+        val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(PositionStartDate(new LocalDate())))
         val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
         val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
@@ -293,7 +293,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
       }
 
       "there is no selected nominated officer and status is amendment" in new Fixture {
-        val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
+        val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(PositionStartDate(new LocalDate())))
         val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
         val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
