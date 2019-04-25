@@ -20,6 +20,7 @@ import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Invalid, Path, Rule, Valid, ValidationError, Write}
 import models.FormTypes.basicPunctuationPattern
 import models.businessmatching.BusinessType
+import play.api.i18n.Messages
 import play.api.libs.json._
 import utils.TraversableValidators.minLengthR
 
@@ -41,7 +42,24 @@ case object DesignatedMember extends PositionWithinBusiness
 
 case class Other(value: String) extends PositionWithinBusiness
 
-object PositionWithinBusiness {
+object PositionWithinBusiness
+ {
+
+  def toString(position:PositionWithinBusiness)(implicit message: Messages): String = {
+    import scala.language.implicitConversions
+    import play.api.i18n.Messages
+    position match {
+      case BeneficialOwner => Messages("declaration.addperson.lbl.01")
+      case Director => Messages("responsiblepeople.position_within_business.lbl.02")
+      case InternalAccountant => Messages("responsiblepeople.position_within_business.lbl.03")
+      case NominatedOfficer => Messages("responsiblepeople.position_within_business.lbl.04")
+      case Partner => Messages("responsiblepeople.position_within_business.lbl.05")
+      case SoleProprietor => Messages("responsiblepeople.position_within_business.lbl.06")
+      case DesignatedMember => Messages("responsiblepeople.position_within_business.lbl.07")
+      case Other(other) => other
+      case _ => ""
+    }
+  }
 
   implicit val formWrite = Write[PositionWithinBusiness, String] {
     case BeneficialOwner => "01"

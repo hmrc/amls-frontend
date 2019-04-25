@@ -334,11 +334,11 @@
         }
 
         @detailedAnswers(
-            question = Messages("responsiblepeople.detailed_answers.position"),
+            question = Messages("responsiblepeople.position_within_business.heading", personName),
             editUrl = controllers.responsiblepeople.routes.PositionWithinBusinessController.get(idx, true, flow).toString(),
             dataItem = person.positions
         ) { pos =>
-            <ul class="list list--comma">
+            <ul class="list">
             @pos.positions.map { i =>
                 <li>@i match {
                     case BeneficialOwner => {@Messages("responsiblepeople.position_within_business.lbl.01")}
@@ -350,14 +350,13 @@
                     case DesignatedMember => {@Messages("responsiblepeople.position_within_business.lbl.07")}
                     case Other(value) => {@value}
                 }</li>
-
             }
             </ul>
         }
 
         @detailedAnswers(
-            question = Messages("responsiblepeople.detailed_answers.position_start"),
-            editUrl = controllers.responsiblepeople.routes.PositionWithinBusinessController.get(idx, true, flow).toString(),
+            question = Messages("responsiblepeople.position_within_business.startDate.heading", personName),
+            editUrl = controllers.responsiblepeople.routes.PositionWithinBusinessStartDateController.get(idx, true, flow).toString(),
             dataItem = person.positions
         ) { pos =>
             <p>@pos.startDate.map(sd => sd.startDate).map(DateHelper.formatDate(_)).getOrElse("")</p>

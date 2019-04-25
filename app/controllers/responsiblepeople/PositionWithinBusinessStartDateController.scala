@@ -46,10 +46,10 @@ class PositionWithinBusinessStartDateController @Inject ()(
               val data = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
 
               getResponsiblePersonFromData(data,index) match {
-                case Some(rp@ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_, Some(Positions(_, Some(startDate))),_,_,_,_,_,_,_,_,_,_,_))
-                  => Ok(position_within_business_start_date(Form2[PositionStartDate](startDate), edit, index, bt, personName.titleName, displayNominatedOfficer(rp, hasNominatedOfficer(data)), flow))
-                case Some(rp@ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-                  => Ok(position_within_business_start_date(EmptyForm, edit, index, bt, personName.titleName, displayNominatedOfficer(rp, hasNominatedOfficer(data)), flow))
+                case Some(rp@ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_, Some(Positions(positions, Some(startDate))),_,_,_,_,_,_,_,_,_,_,_))
+                  => Ok(position_within_business_start_date(Form2[PositionStartDate](startDate), edit, index, bt,  personName.titleName, positions, displayNominatedOfficer(rp, hasNominatedOfficer(data)), flow))
+                case Some(rp@ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_, Some(Positions(positions, None)),_,_,_,_,_,_,_,_,_,_,_))
+                  => Ok(position_within_business_start_date(EmptyForm, edit, index, bt, personName.titleName, positions, displayNominatedOfficer(rp, hasNominatedOfficer(data)), flow))
                 case _
                   => NotFound(notFoundView)
               }

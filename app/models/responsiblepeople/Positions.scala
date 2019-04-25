@@ -54,15 +54,13 @@ object Positions {
   }
 
   def update(positions:Positions, positionSet: Set[PositionWithinBusiness]): Positions = {
-    if(positions.positions == positionSet) {
-      positions
-    } else {
-      Positions(positionSet, None)
+    positions match {
+      case Positions(_, Some(date)) => Positions(positionSet, Some(date))
+      case Positions(_, None) => Positions(positionSet, None)
     }
   }
 
   def update(positions:Positions, startDate: PositionStartDate): Positions = {
     Positions(positions.positions, Some(startDate))
   }
-
 }
