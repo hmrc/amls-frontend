@@ -454,7 +454,7 @@ lbl.none.of.the.above = None of the above
 lbl.give.details = Please give details
 
 lbl.registration.status = Registration status:
-lbl.registration.status.short = Status:
+lbl.registration.status.short = Status
 
 legend.address = Address
 lbl.address.line1 = Address line 1
@@ -530,7 +530,7 @@ start.utr.line1 = If we can’t find your business automatically, we’ll ask fo
 status.title = Your registration
 status.business = Your business
 status.referenceno = Anti-money laundering supervision registration number:
-status.referenceno.short = Registration number:
+status.referenceno.short = Registration number
 status.incomplete = Incomplete
 status.status = Status
 status.complete = Completed
@@ -566,8 +566,8 @@ status.submissionreadyforreview.bacs = Your application will be reviewed when HM
 status.submissiondecisionapproved.heading = Application approved
 status.submissiondecisionsupervised.heading = Supervised
 status.submissiondecisionsupervised.renewal.btn = Renew supervision
-status.submissiondecisionsupervised.enddate.text = Currently supervised to {0}
-status.submissiondecisionsupervised.success.description = Your business is registered for supervision with HM Revenue and Customs (HMRC).
+status.submissiondecisionsupervised.enddate.text = Supervised to {0}
+status.submissiondecisionsupervised.success.description = Your business is registered for supervision with HMRC.
 status.submissiondecisionsupervised.renewal.advice.text = When you submit your renewal you’ll need to pay a fee for each of your trading premises.
 status.submissiondecisionapproved.description = Your application for anti-money laundering supervision has been approved.
 status.submissiondecisionapproved.description2 = Your business is now registered for 12 months with HM Revenue and Customs.
@@ -619,14 +619,14 @@ status.deregister.button-text = De-register
 status.deregister.body-content = De-register your business if you no longer want to be supervised by HM Revenue and Customs (HMRC).\n\
   We’ll delete any information you have provided. We won’t refund any fees you have paid.\n\
   You mustn’t carry out activities covered by the Money Laundering Regulations if you aren’t supervised.
-status.deregister.services = Registered services:
+status.deregister.services = Your services
 status.deregister.button.change = Change
 status.deregister.regnumber = Registration number:
 status.deregister.visuallyhidden.change = Change your registered services
 
 status.newsubmission.btn = Start a new application
 status.amendment.edit = about your business page
-status.amendment.edit.uppercase.start = Update or view your information
+status.amendment.edit.uppercase.start = about your business page
 status.fee.link = If you haven’t paid the fee
 status.fee.link = If you haven’t paid the fee
 status.readyforrenewal.warning = Your supervision will expire on {0} unless you renew.
@@ -2021,7 +2021,7 @@ changeofficer.removeresponsibleperson.info = This will permanently remove {0} fr
 changeofficer.removeresponsibleperson.lbl = When did {0} stop being a responsible person for your business?
 changeofficer.remove.responsibleperson.btn = Remove responsible person
 
-changeofficer.changelink.heading = Nominated Officer:
+changeofficer.changelink.heading = Nominated officer
 changeofficer.changelink.text = Change
 
 changeofficer.furtherupdates.title = Do you need to make other updates to your information?

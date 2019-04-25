@@ -51,8 +51,8 @@ class status_supervisedSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), false, None, activities)
 
-      doc.getElementsByClass("panel-indent").html() must include(Messages("status.hassomethingchanged"))
-      doc.getElementsByClass("panel-indent").html() must include(Messages("status.amendment.edit.uppercase.start"))
+      doc.getElementsByTag("h2").html() must include(Messages("status.hassomethingchanged"))
+      doc.getElementsByTag("a").html() must include(Messages("status.amendment.edit.uppercase.start"))
 
       html must include (Messages("status.submissiondecisionsupervised.success.description"))
       doc.getElementsByClass("messaging").size() mustBe 2 // 1 for desktop, 1 for mobile
@@ -66,7 +66,7 @@ class status_supervisedSpec extends AmlsSpec with MustMatchers {
 
       html must include(controllers.changeofficer.routes.StillEmployedController.get.url)
 
-      html must include("Registered services:")
+      html must include("Your services")
 
       for (activity <- activities) {
         doc.getElementsByClass("list").html() must include("<li>" + activity + "</li>")
