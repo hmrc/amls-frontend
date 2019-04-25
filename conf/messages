@@ -604,7 +604,7 @@ status.renewalincomplete.description2 = You’ve started the renewal application
 status.renewalnotsubmitted.description = Renewal not submitted
 status.renewalnotsubmitted.description2 = You’ve completed all sections of the renewal form, but you haven’t submitted it or paid the fee.
 status.renewalnotsubmitted.description3 = Your renewal application won’t be reviewed until the fee has been paid. Your supervision will expire on {0} unless you renew before then.
-status.withdraw.link-text = Withdraw application
+status.withdraw.link-text = Withdraw your application
 status.withdraw.title = Withdraw your application
 status.withdraw.registration-date.label = Registration submitted {0}
 status.withdraw.button-text = Withdraw application
@@ -625,7 +625,7 @@ status.deregister.regnumber = Registration number:
 status.deregister.visuallyhidden.change = Change your registered services
 
 status.newsubmission.btn = Start a new application
-status.amendment.edit = update or view your information
+status.amendment.edit = about your business page
 status.amendment.edit.uppercase.start = Update or view your information
 status.fee.link = If you haven’t paid the fee
 status.fee.link = If you haven’t paid the fee
@@ -2176,7 +2176,7 @@ survey.satisfaction.lbl.03 = Neither satisfied or dissatisfied
 survey.satisfaction.lbl.04 = Dissatisfied
 survey.satisfaction.lbl.05 = Very dissatisfied
 
-survey.satisfaction.beforeyougo = Before you go
+survey.satisfaction.beforeyougo = Give feedback on the service.
 survey.satisfaction.please = We use your feedback to make our services better. Please take the 
 survey.satisfaction.answer = feedback survey
 survey.satisfaction.helpus = now.
