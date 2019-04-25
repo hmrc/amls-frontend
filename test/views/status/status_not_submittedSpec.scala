@@ -84,7 +84,7 @@ class status_not_submittedSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.status.status_not_submitted("XAML00000000000", None, call)
 
-      doc.getElementsContainingOwnText(Messages("status.business")).isEmpty must be(true)
+      doc.getElementById("status-not-submitted-business") must be(null)
 
 
     }

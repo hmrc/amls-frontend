@@ -97,9 +97,8 @@ class status_renewal_submittedSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.status.status_renewal_submitted("XAML00000567890", None, None, None)
 
-      doc.getElementsContainingOwnText(Messages("status.business")).isEmpty must be(true)
-
-      doc.getElementsContainingOwnText(Messages("status.business")).isEmpty must be(true)
+      doc.getElementById("status-renewal-submitted-business") must be(null)
+      doc.getElementById("status-renewal-submitted-business-name") must be(null)
       doc.getElementsContainingOwnText(Messages("status.submittedForReview.submitteddate.text")).isEmpty must be(true)
       doc.getElementsByTag("details").html() must be("")
     }

@@ -44,8 +44,8 @@
         <div class="grid-layout__column grid-layout__column--2-3">
             <div class="panel-indent panel-indent--gutter panel-border-wide">
                 @businessName.map { bn =>
-                    <p class="heading-small">@Messages("status.business")</p>
-                    <p>@bn</p>
+                    <p id="status-submitted-business" class="heading-small">@Messages("status.business")</p>
+                    <p id="status-submitted-business-name">@bn</p>
                 }
                 @feeResponse.map { fees =>
                     <p class="heading-small">@Messages("status.status"):</p>

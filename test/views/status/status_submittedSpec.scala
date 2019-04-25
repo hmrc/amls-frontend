@@ -149,7 +149,8 @@ class status_submittedSpec extends AmlsSpec with MustMatchers with AmlsReference
 
         def view = views.html.status.status_submitted(amlsRegistrationNumber, None, None)
 
-        doc.getElementsContainingOwnText(Messages("status.business")).isEmpty must be(true)
+        doc.getElementById("status-submitted-business") must be(null)
+        doc.getElementById("status-submitted-business-name") must be(null)
 
         doc.getElementsContainingOwnText(Messages("status.submittedForReview.submitteddate.text")).isEmpty must be(true)
 

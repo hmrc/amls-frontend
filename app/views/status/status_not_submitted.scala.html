@@ -39,7 +39,8 @@
     <div class="grid-layout grid-layout--stacked">
         <div class="grid-layout__column grid-layout__column--2-3">
             @businessName.map {bn =>
-                <p class="heading-small">@Messages("status.business")</p><p>@bn</p>
+                <p id="status-not-submitted-business" class="heading-small">@Messages("status.business")</p>
+                <p id="status-not-submitted-business-name">@bn</p>
             }
         </div>
         <div class="grid-layout__column grid-layout__column--1-3">
