@@ -65,7 +65,7 @@ class status_incompleteSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.status.status_incomplete("XAML00000000000", None)
 
-      doc.getElementsContainingOwnText(Messages("status.business")).isEmpty must be(true)
+      doc.getElementById("status-incomplete-business-name") must be (null)
 
     }
   }

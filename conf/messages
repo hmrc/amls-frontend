@@ -540,8 +540,9 @@ status.feepaid = Fee paid
 status.underreview = Decision pending
 status.decisionmade = Decision made
 status.incomplete.heading = Application incomplete
-status.incomplete.description = You’ve started the application form but you haven’t finished it. You have 28 days to finish the application, from when you last saved your progress.
-status.incomplete.buttontext = Return to saved application
+status.incomplete.description = You have started your application but have not finished it. You need to complete all sections on the about your business page.
+status.incomplete.description1 = You have 28 days to finish the application from when you last saved your progress.
+status.incomplete.buttontext = Return to your application
 status.submissionready.heading = Application not submitted
 status.submissionready.description = You’ve completed all sections of the form, but you haven’t submitted it or paid the fee.
 status.submissionready.description2 = Your application won’t be reviewed until the fee has been paid.
@@ -2064,7 +2065,7 @@ notifications.previousReg = Messages from your previous registrations
 
 notifications.header = Your messages
 notifications.unread = You have unread messages
-notifications.youHaveMessages = View your messages
+notifications.youHaveMessages = Check your messages
 notifications.title = Your business
 
 notifications.table.header.subject = Subject
