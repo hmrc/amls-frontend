@@ -19,7 +19,7 @@ package controllers.businessmatching
 import cats.data.OptionT
 import cats.implicits._
 import config.AppConfig
-import connectors.{DataCacheConnector, KeystoreConnector}
+import connectors.DataCacheConnector
 import forms.{EmptyForm, Form2}
 import generators.ResponsiblePersonGenerator
 import models.businessactivities.{AccountantForAMLSRegulations, BusinessActivities, TaxMatters, WhoIsYourAccountant}
@@ -1004,6 +1004,20 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val expectedBm = bm
 
           result mustEqual((expectedRp, expectedBm))
+        }
+      }
+    }
+    "sortActivities" must {
+      "return activities in alphabetical order mapped to values" when {
+        "given values in numerical order" in new Fixture {
+          val activities = Set("01", "02", "03", "04", "05", "06", "07")
+          val sortedActivities = Seq("01", "02", "03", "04", "05", "07", "06")
+
+          val sortActivities = PrivateMethod[Seq[String]]('sortActivities)
+
+          val result = controller invokePrivate sortActivities(activities)
+
+          result must be(sortedActivities)
         }
       }
     }
