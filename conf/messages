@@ -631,8 +631,8 @@ status.deregister.regnumber = Registration number:
 status.deregister.visuallyhidden.change = Change your registered services
 
 status.newsubmission.btn = Start a new application
-status.amendment.edit = about your business page
-status.amendment.edit.uppercase.start = about your business page
+status.amendment.edit = Check or update your business information
+status.amendment.edit.uppercase.start = Check or update your business information
 status.fee.link = If you haven’t paid the fee
 status.fee.link = If you haven’t paid the fee
 status.readyforrenewal.warning = Your supervision will expire on {0} unless you renew.
