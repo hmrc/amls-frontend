@@ -12,8 +12,8 @@ POST        /check-your-answers                                     @controllers
 GET         /how-will-you-sell                                      @controllers.hvd.HowWillYouSellGoodsController.get(edit: Boolean ?= false)
 POST        /how-will-you-sell                                      @controllers.hvd.HowWillYouSellGoodsController.post(edit: Boolean ?= false)
 
-GET         /selling                                                @controllers.hvd.ProductsController.get(edit: Boolean ?= false)
-POST        /selling                                                @controllers.hvd.ProductsController.post(edit: Boolean ?= false)
+GET         /buying-selling                                         @controllers.hvd.ProductsController.get(edit: Boolean ?= false)
+POST        /buying-selling                                         @controllers.hvd.ProductsController.post(edit: Boolean ?= false)
 
 GET         /linked-cash-payments                                   @controllers.hvd.LinkedCashPaymentsController.get(edit: Boolean ?= false)
 POST        /linked-cash-payments                                   @controllers.hvd.LinkedCashPaymentsController.post(edit: Boolean ?= false)

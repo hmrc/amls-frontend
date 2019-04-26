@@ -30,7 +30,7 @@
     heading = header
 ) {
 
-    <p>@Messages("lbl.select.all")</p>
+    <p>@hint(Messages("lbl.select.all"))</p>
 
     @form(f, controllers.hvd.routes.ProductsController.post(edit)) {
 
@@ -44,16 +44,16 @@
                 field = f("products")
             ) {
                 @checkbox(f = f("products[]"), labelText = "hvd.products.option.01", value = "01")
-                @checkbox(f = f("products[]"), labelText = "hvd.products.option.02", value = "02")
                 @checkbox(f = f("products[]"), labelText = "hvd.products.option.03", value = "03")
-                @checkbox(f = f("products[]"), labelText = "hvd.products.option.04", value = "04")
-                @checkbox(f = f("products[]"), labelText = "hvd.products.option.05", value = "05")
                 @checkbox(f = f("products[]"), labelText = "hvd.products.option.06", value = "06")
-                @checkbox(f = f("products[]"), labelText = "hvd.products.option.07", value = "07")
-                @checkbox(f = f("products[]"), labelText = "hvd.products.option.08", value = "08")
-                @checkbox(f = f("products[]"), labelText = "hvd.products.option.09", value = "09")
-                @checkbox(f = f("products[]"), labelText = "hvd.products.option.10", value = "10")
+                @checkbox(f = f("products[]"), labelText = "hvd.products.option.04", value = "04")
                 @checkbox(f = f("products[]"), labelText = "hvd.products.option.11", value = "11")
+                @checkbox(f = f("products[]"), labelText = "hvd.products.option.08", value = "08")
+                @checkbox(f = f("products[]"), labelText = "hvd.products.option.07", value = "07")
+                @checkbox(f = f("products[]"), labelText = "hvd.products.option.10", value = "10")
+                @checkbox(f = f("products[]"), labelText = "hvd.products.option.05", value = "05")
+                @checkbox(f = f("products[]"), labelText = "hvd.products.option.09", value = "09")
+                @checkbox(f = f("products[]"), labelText = "hvd.products.option.02", value = "02")
                 @checkbox(f = f("products[]"), labelText = "hvd.products.option.12", value = "12", target = s".otherDetails-fieldset")
             }
         }
