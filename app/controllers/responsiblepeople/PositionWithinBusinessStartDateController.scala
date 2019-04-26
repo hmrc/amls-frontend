@@ -24,7 +24,7 @@ import models.businessmatching.{BusinessMatching, BusinessType}
 import models.responsiblepeople._
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.{position_within_business, position_within_business_start_date}
+import views.html.responsiblepeople.position_within_business_start_date
 
 import scala.concurrent.Future
 
@@ -71,8 +71,10 @@ class PositionWithinBusinessStartDateController @Inject ()(
                 val data = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
 
                 getResponsiblePersonFromData(data,index) match {
-                  case s@Some(rp) =>
-                    BadRequest(position_within_business(f, edit, index, bt, ControllerHelper.rpTitleName(s), displayNominatedOfficer(rp, hasNominatedOfficer(data)), flow))
+                  case s@Some(rp@ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_, Some(Positions(positions,_)),_,_,_,_,_,_,_,_,_,_,_)) =>
+                    BadRequest(position_within_business_start_date(f, edit, index, bt, ControllerHelper.rpTitleName(s), positions, displayNominatedOfficer(rp, hasNominatedOfficer(data)), flow))
+                  case _
+                    => NotFound(notFoundView)
                 }
               }).getOrElse(NotFound(notFoundView))
             }
