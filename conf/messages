@@ -603,10 +603,13 @@ status.renewalincomplete.description2 = You’ve started the renewal application
 status.renewalincomplete.description3 = Your supervision will expire on {0} unless you renew before then.
 status.renewalincomplete.description4 = When you submit your renewal you’ll need to pay a fee for each of your trading premises. You may also need to pay a fee for any additional responsible people.
 status.renewal.incomplete.buttontext = Return to your renewal application
+status.renewalnotsubmitted.buttontext = Continue
 
 status.renewalnotsubmitted.description = Renewal not submitted
-status.renewalnotsubmitted.description2 = You’ve completed all sections of the renewal form, but you haven’t submitted it or paid the fee.
-status.renewalnotsubmitted.description3 = Your renewal application won’t be reviewed until the fee has been paid. Your supervision will expire on {0} unless you renew before then.
+status.renewalnotsubmitted.description2 = You’ve completed all sections of the renewal form, but you haven’t submitted it.
+status.renewalnotsubmitted.description3 = Your supervision will expire on {0} unless you renew before then.
+status.renewalnotsubmitted.description4 = You’ll need to pay a fee for each of your trading premises. You may also need to pay a fee for any additional responsible people.
+status.renewalnotsubmitted.description5 = To submit your renewal you need to complete a declaration, and pay the fees.
 status.withdraw.link-text = Withdraw your application
 status.withdraw.title = Withdraw your application
 status.withdraw.registration-date.label = Registration submitted {0}
