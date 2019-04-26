@@ -96,14 +96,17 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
               }
             }
           case ValidForm(_, data) =>
-            formatBusinessActivities(data) flatMap { action =>
+            businessActivities(data) flatMap { ba =>
               getData[ResponsiblePerson] flatMap { responsiblePeople =>
 
                 val workFlow =
                   shouldPromptForApproval.tupled andThen
                     shouldPromptForFitAndProper.tupled
 
-                val rps = responsiblePeople.map(rp => workFlow((rp, action._2, action._1)))
+                val activities = ba._1
+                val isRemovingActivity = ba._2
+
+                val rps = responsiblePeople.map(rp => workFlow((rp, activities, isRemovingActivity)))
 
                 updateResponsiblePeople(rps) map { _ =>
                   redirectTo(data.businessActivities)
@@ -113,37 +116,28 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
         }
   }
 
-  private def formatBusinessActivities(data: BusinessMatchingActivities)
+  private def businessActivities(data: BusinessMatchingActivities)
                         (implicit ac: AuthContext, hc: HeaderCarrier) = {
-    (for {
+
+    lazy val empty = BusinessMatchingActivities(Set())
+
+    for {
       isPreSubmission <- statusService.isPreSubmission
       businessMatching <- businessMatchingService.getModel.value
-      savedModel <- updateModel(
+      businessActivitiesModel <- updateModel(
         businessMatching,
-        newModel(businessMatching.activities,
-          data,
-          isPreSubmission
-        ),
+        newModel(businessMatching.activities, data, isPreSubmission),
         isMsb(data, businessMatching.activities)
       )
-      _ <- maybeRemoveAccountantForAMLSRegulations(savedModel)
+      _ <- maybeRemoveAccountantForAMLSRegulations(businessActivitiesModel)
       _ <- clearRemovedSections(
-        businessMatching.activities.getOrElse(
-          BusinessMatchingActivities(
-            Set()
-          )
-        ).businessActivities,
-        savedModel.businessActivities
+        businessMatching.activities.getOrElse(empty).businessActivities,
+        businessActivitiesModel.businessActivities
       )
-      isRemoving <- isRemovingActivity(
-        businessMatching.activities.getOrElse(
-          BusinessMatchingActivities(
-            Set()
-          )
-        ).businessActivities,
-        savedModel.businessActivities
+      isRemovingActivity <- Future.successful(
+        businessMatching.activities.getOrElse(empty).businessActivities > businessActivitiesModel.businessActivities
       )
-    } yield (isRemoving, savedModel))
+    } yield (businessActivitiesModel, isRemovingActivity)
   }
 
   private def withoutAccountantForAMLSRegulations(activities: BusinessActivities): BusinessActivities =
@@ -163,13 +157,6 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
       _ <- clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, TrustAndCompanyServices)
       _ <- clearSupervisionIfNoLongerRequired(previousBusinessActivities, currentBusinessActivities)
     } yield true
-  }
-
-  private def isRemovingActivity(previousBusinessActivities: Set[BusinessActivity],
-                                 currentBusinessActivities: Set[BusinessActivity]
-                                )(implicit ac: AuthContext, hc: HeaderCarrier) = {
-
-    Future.successful((previousBusinessActivities.size > currentBusinessActivities.size))
   }
 
   private def clearSectionIfRemoved(previousBusinessActivities: Set[BusinessActivity],

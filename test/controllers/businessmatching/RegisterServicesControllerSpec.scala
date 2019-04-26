@@ -960,7 +960,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
     }
     "shouldPromptForApproval" must {
       "reset approval flag to none" when {
-        "business activity is removal and does not have MSB or TCSP and FitandProper flag has a value of false" in new Fixture {
+        "removing a business activity and does not have MSB or TCSP and FitandProper flag has a value of false" in new Fixture {
 
           val rp = responsiblePerson.copy(
             approvalFlags = ApprovalFlags(
@@ -988,7 +988,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
       }
 
       "not handle any approvalFlags" when {
-        "business activity is adding a service" in new Fixture {
+        "adding a business activity" in new Fixture {
 
           val rp = responsiblePerson.copy(
             approvalFlags = ApprovalFlags(
