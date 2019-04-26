@@ -453,7 +453,7 @@ lbl.none.of.the.above = None of the above
 
 lbl.give.details = Please give details
 
-lbl.registration.status = Registration status:
+lbl.registration.status = Registration status
 lbl.registration.status.short = Status
 
 legend.address = Address
@@ -529,7 +529,7 @@ start.utr.line1 = If we can’t find your business automatically, we’ll ask fo
 ############################### Status page ###############################
 status.title = Your registration
 status.business = Your business
-status.referenceno = Anti-money laundering supervision registration number:
+status.referenceno = Anti-money laundering supervision registration number
 status.referenceno.short = Registration number
 status.incomplete = Incomplete
 status.status = Status
@@ -565,10 +565,10 @@ status.submissionreadyforreview.duplicate.description2 = If you’ve paid, there
 status.submissionreadyforreview.bacs = Your application will be reviewed when HM Revenue and Customs receives your payment.
 status.submissiondecisionapproved.heading = Application approved
 status.submissiondecisionsupervised.heading = Supervised
-status.submissiondecisionsupervised.renewal.btn = Renew supervision
+status.submissiondecisionsupervised.renewal.btn = Continue
 status.submissiondecisionsupervised.enddate.text = Supervised to {0}
 status.submissiondecisionsupervised.success.description = Your business is registered for supervision with HMRC.
-status.submissiondecisionsupervised.renewal.advice.text = When you submit your renewal you’ll need to pay a fee for each of your trading premises.
+status.submissiondecisionsupervised.renewal.advice.text = When you submit your renewal you’ll need to pay a fee for each of your trading premises.  You may also need to pay a fee for new responsible people you add.
 status.submissiondecisionapproved.description = Your application for anti-money laundering supervision has been approved.
 status.submissiondecisionapproved.description2 = Your business is now registered for 12 months with HM Revenue and Customs.
 status.submissiondecision.not.supervised.heading = Not supervised
@@ -599,7 +599,10 @@ status.renewalsubmitted.description3 = The review process can take up to 45 days
 status.renewalsubmitted.description4 = You’re still registered for anti-money laundering supervision and can continue trading while your application is reviewed.
 
 status.renewalincomplete.description = Renewal incomplete
-status.renewalincomplete.description2 = You’ve started the renewal application but you haven’t finished it. Your supervision will expire on {0} unless you renew before then.
+status.renewalincomplete.description2 = You’ve started the renewal application but you haven’t finished it.
+status.renewalincomplete.description3 = Your supervision will expire on {0} unless you renew before then.
+status.renewalincomplete.description4 = When you submit your renewal you’ll need to pay a fee for each of your trading premises. You may also need to pay a fee for any additional responsible people.
+status.renewal.incomplete.buttontext = Return to your renewal application
 
 status.renewalnotsubmitted.description = Renewal not submitted
 status.renewalnotsubmitted.description2 = You’ve completed all sections of the renewal form, but you haven’t submitted it or paid the fee.

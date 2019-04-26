@@ -69,10 +69,12 @@
 
             <a id="change-registered-services" href="@controllers.businessmatching.updateservice.routes.ChangeBusinessTypesController.get()">@Messages("status.deregister.button.change") <span class="visuallyhidden"> @Messages("status.deregister.visuallyhidden.change")</span></a>
 
-            <h2 class="heading-small">@Messages("status.hassomethingchanged")</h2>
-            <ul>
-                <li><a id="update-information" href="@controllers.routes.RegistrationProgressController.get()">@Messages("status.amendment.edit.uppercase.start")</a></li>
-            </ul>
+            <div id="supervised-panel">
+                <h2 class="heading-small">@Messages("status.hassomethingchanged")</h2>
+                <ul>
+                    <li><a id="update-information" href="@controllers.routes.RegistrationProgressController.get()">@Messages("status.amendment.edit.uppercase.start")</a></li>
+                </ul>
+            </div>
         </div>
         <div class="grid-layout__column grid-layout__column--1-3">
             <div class="hide-if-mobile">
