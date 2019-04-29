@@ -50,13 +50,16 @@
                 @roles_within_business_checkbox(f, "02")
                 @if(isDeclaration) {  @roles_within_business_checkbox(f, "08") }
                 @if(displayNominatedOfficer) { @roles_within_business_checkbox(f, "04") }
-    }
+            }
             case BusinessType.LPrLLP => {
                 @roles_within_business_checkbox(f, "07")
                 @if(isDeclaration) {  @roles_within_business_checkbox(f, "08") }
                 @if(displayNominatedOfficer) { @roles_within_business_checkbox(f, "04") }
             }
-            case BusinessType.UnincorporatedBody => {}
+            case BusinessType.UnincorporatedBody => {
+                @if(isDeclaration) {  @roles_within_business_checkbox(f, "08") }
+                @if(displayNominatedOfficer) { @roles_within_business_checkbox(f, "04") }
+            }
         }
 
         @checkbox(

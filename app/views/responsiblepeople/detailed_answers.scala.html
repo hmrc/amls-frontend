@@ -339,7 +339,7 @@
             dataItem = person.positions
         ) { pos =>
             <ul class="list">
-            @pos.positions.map(p => PositionWithinBusiness.toString(p)).toList.sorted.map(p => <li>{p}</li>)
+            @pos.positions.map(p => PositionWithinBusiness.getPrettyName(p)).toList.sorted.map(p => <li>{p}</li>)
             </ul>
         }
 

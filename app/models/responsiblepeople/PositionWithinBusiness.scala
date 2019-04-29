@@ -43,9 +43,12 @@ case object DesignatedMember extends PositionWithinBusiness
 case class Other(value: String) extends PositionWithinBusiness
 
 object PositionWithinBusiness
- {
+{
 
-  def toString(position:PositionWithinBusiness)(implicit message: Messages): String = {
+  import jto.validation.forms.Rules._
+  import utils.MappingUtils.Implicits.RichRule
+
+  def getPrettyName(position:PositionWithinBusiness)(implicit message: Messages): String = {
     import scala.language.implicitConversions
     import play.api.i18n.Messages
     position match {
@@ -116,8 +119,6 @@ object PositionWithinBusiness
   }
 
 
-  import jto.validation.forms.Rules._
-  import utils.MappingUtils.Implicits.RichRule
 
   val positionReader = minLengthR[Set[String]](1).withMessage("error.required.positionWithinBusiness")
   val otherLength = 255
