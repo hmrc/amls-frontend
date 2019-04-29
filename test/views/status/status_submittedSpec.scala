@@ -133,10 +133,11 @@ class status_submittedSpec extends AmlsSpec with MustMatchers with AmlsReference
     "contain survey link for supervised status" in new ViewFixture {
       def view =  views.html.status.status_submitted(amlsRegistrationNumber, Some("business Name"), Some(feeResponse))
 
-      doc.getElementsMatchingOwnText(Messages("survey.satisfaction.please")).text() must
-        be(Messages("survey.satisfaction.please") + " " + Messages("survey.satisfaction.answer") + " " + Messages("survey.satisfaction.helpus"))
-      doc.getElementsMatchingOwnText(Messages("survey.satisfaction.answer")).hasAttr("href") must be(true)
-      doc.getElementsMatchingOwnText(Messages("survey.satisfaction.answer")).attr("href") must be("/anti-money-laundering/satisfaction-survey")
+      doc.getElementsMatchingOwnText(Messages("survey.satisfaction.beforeyougo")).text() must
+        be(Messages("survey.satisfaction.beforeyougo"))
+
+      doc.getElementsMatchingOwnText(Messages("survey.satisfaction.beforeyougo")).hasAttr("href") must be(true)
+      doc.getElementsMatchingOwnText(Messages("survey.satisfaction.beforeyougo")).attr("href") must be("/anti-money-laundering/satisfaction-survey")
     }
 
     "show specific content" when {

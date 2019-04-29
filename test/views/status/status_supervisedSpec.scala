@@ -106,11 +106,13 @@ class status_supervisedSpec extends AmlsSpec with MustMatchers {
     "contains expected survey link for supervised status" in new ViewFixture {
       def view = views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), false, None, activities)
 
-      doc.getElementsMatchingOwnText(Messages("survey.satisfaction.please")).text() must
-        be(Messages("survey.satisfaction.please") + " " + Messages("survey.satisfaction.answer") + " " + Messages("survey.satisfaction.helpus"))
+      doc.getElementsMatchingOwnText(Messages("survey.satisfaction.beforeyougo")).text() must
+        be(Messages("survey.satisfaction.beforeyougo"))
 
-      doc.getElementsMatchingOwnText(Messages("survey.satisfaction.answer")).hasAttr("href") must be(true)
-      doc.getElementsMatchingOwnText(Messages("survey.satisfaction.answer")).attr("href") must be("/anti-money-laundering/satisfaction-survey")
+      doc.getElementsMatchingOwnText(Messages("survey.satisfaction.beforeyougo")).hasAttr("href") must be(true)
+      doc.getElementsMatchingOwnText(Messages("survey.satisfaction.beforeyougo")).attr("href") must be("/anti-money-laundering/satisfaction-survey")
+//      doc.getElementsMatchingOwnText(Messages("survey.satisfaction.answer")).hasAttr("href") must be(true)
+//      doc.getElementsMatchingOwnText(Messages("survey.satisfaction.answer")).attr("href") must be("/anti-money-laundering/satisfaction-survey")
     }
 
   }
