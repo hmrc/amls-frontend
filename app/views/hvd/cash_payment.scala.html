@@ -30,7 +30,13 @@
     heading = header
 )  {
 
-    <p>@Messages("hvd.cash.payment.convert.currency.text")</p>
+    <p>@Messages("hvd.cash.payment.summary.details")</p>
+    <ul class="list list-bullet">
+         <li>@Messages("hvd.cash.payment.data.summary.details.01")</li>
+         <li>@Messages("hvd.cash.payment.data.summary.details.02")</li>
+         <li>@Messages("hvd.cash.payment.data.summary.details.03")</li>
+    </ul>
+    <p>@Messages("hvd.cash.payment.convert.currency.summary")</p>
 
     @form(f, controllers.hvd.routes.CashPaymentController.post(edit)) {
 
@@ -60,24 +66,6 @@
             }
         }
         </div>
-
-        @detailsSummary(
-            summary = Messages("hvd.cash.payment.data.details.summary")
-        ) {
-            @panel(
-                jsHidden = false
-            ) {
-            <p>@Messages("hvd.cash.payment.data.details.summary.details")</p>
-            <p>@Messages("hvd.cash.payment.data.details.summary.details.start")</p>
-
-            <ul class="list list-bullet">
-                <li>@Messages("hvd.cash.payment.data.details.summary.details.01")</li>
-                <li>@Messages("hvd.cash.payment.data.details.summary.details.02")</li>
-                <li>@Messages("hvd.cash.payment.data.details.summary.details.03")</li>
-            </ul>
-            }
-        }
-
-        @submit(edit)
+    @submit(edit)
    }
 }

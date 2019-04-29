@@ -18,8 +18,8 @@ POST        /buying-selling                                         @controllers
 GET         /linked-cash-payments                                   @controllers.hvd.LinkedCashPaymentsController.get(edit: Boolean ?= false)
 POST        /linked-cash-payments                                   @controllers.hvd.LinkedCashPaymentsController.post(edit: Boolean ?= false)
 
-GET         /duty-suspended-excise-goods                                           @controllers.hvd.ExciseGoodsController.get(edit: Boolean ?= false)
-POST        /duty-suspended-excise-goods                                           @controllers.hvd.ExciseGoodsController.post(edit: Boolean ?= false)
+GET         /duty-suspended-excise-goods                            @controllers.hvd.ExciseGoodsController.get(edit: Boolean ?= false)
+POST        /duty-suspended-excise-goods                            @controllers.hvd.ExciseGoodsController.post(edit: Boolean ?= false)
 
 GET         /percentage                                             @controllers.hvd.PercentageOfCashPaymentOver15000Controller.get(edit: Boolean ?= false)
 POST        /percentage                                             @controllers.hvd.PercentageOfCashPaymentOver15000Controller.post(edit: Boolean ?= false)
