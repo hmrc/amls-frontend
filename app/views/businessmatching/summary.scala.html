@@ -107,7 +107,7 @@
         @if(activity.businessActivities.contains(MoneyServiceBusiness)) {
             @model.msbServices.map { services =>
                 @checkYourAnswers(
-                    question = Messages("msb.services.title"),
+                    question = Messages("businessmatching.services.title"),
                     allowEdit = !isPending,
                     editUrl = controllers.businessmatching.routes.MsbSubSectorsController.get(true).toString,
                     editLinkTag="msbservices-edit"

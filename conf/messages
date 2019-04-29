@@ -1180,7 +1180,7 @@ businessmatching.confirm.postcode.title = Confirm the postcode for your business
 
 
 businessmatching.summary.noedit.anchortext = Return to about your business
-businessmatching.services.title = Which services does your business provide?
+businessmatching.services.title = Which money service business activities does your business carry out?
 businessmatching.services.list.heading = Select all that apply
 businessmatching.services.list.lbl.01 = Transmitting money
 businessmatching.services.list.lbl.02 = Currency exchange
@@ -1235,8 +1235,8 @@ businessmatching.updateservice.updateotherinformation.text = As a result some se
 
 
 #   Add route Start  ###################################################################################################
-businessmatching.updateservice.msb.services.title = Which services does your business provide?
-businessmatching.updateservice.msb.services.heading = Which services does your business provide?
+businessmatching.updateservice.msb.services.title = Which money service business activities does your business carry out?
+businessmatching.updateservice.msb.services.heading = Which money service business activities does your business carry out?
 businessmatching.updateservice.msb.services.list.heading = Choose at least one
 businessmatching.updateservice.msb.services.list.lbl.01 = Transmitting money
 businessmatching.updateservice.msb.services.list.lbl.02 = Currency exchange
@@ -1877,7 +1877,6 @@ msb.whatyouneed.line_6 = how many currency exchange transactions you expect to m
 msb.whatyouneed.line_7 = how many foreign exchange transactions you expect to make in the next 12 months
 msb.whatyouneed.line_8 = if you use an intermediary payment service provider
 msb.whatyouneed.line_9 = where you expect to send the most transactions
-msb.services.title = Which services does your business provide?
 msb.services.list.heading = Select all that apply
 msb.services.list.lbl.01 = Transmitting money
 msb.services.list.lbl.02 = Currency exchange
@@ -1934,7 +1933,7 @@ msb.wholesaler.names = Wholesaler names
 msb.bank.names.hint = asd
 
 msb.services.title = Which money service business activities does your business carry out?
-msb.services.heading = Which services does your business provide?
+msb.services.heading = Which money service business activities does your business carry out?
 msb.services.list.heading = Select all that apply
 msb.services.list.lbl.01 = Transmitting money
 msb.services.list.lbl.02 = Currency exchange
