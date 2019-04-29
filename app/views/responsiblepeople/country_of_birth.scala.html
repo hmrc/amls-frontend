@@ -41,8 +41,7 @@
             f = f("countryOfBirth-fieldset"),
             legend = "responsiblepeople.country.of.birth.title",
             legendHidden = true,
-            panel = false,
-            classes = Seq("inline")
+            panel = false
         ) {
             @errorGroupWithPlaceholder(
                 field = f("bornInUk"),
@@ -62,19 +61,18 @@
                     inline = true,
                     target = s"#$target"
                 )
+                @panel(
+                    field = Some(f(s"$target"))
+                ) {
+
+                    @country_autocomplete(
+                        field = f("country"),
+                        labelText = Messages("responsiblepeople.country.of.birth.txt.lbl", personName),
+                        data = countryData.getOrElse(Seq.empty)
+                    )
+
+                }
             }
-        }
-
-        @panel(
-            field = Some(f(s"$target"))
-        ) {
-
-            @country_autocomplete(
-                field = f("country"),
-                labelText = Messages("responsiblepeople.country.of.birth.txt.lbl", personName),
-                data = countryData.getOrElse(Seq.empty)
-            )
-
         }
 
         @submit()

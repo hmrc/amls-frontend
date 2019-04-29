@@ -37,8 +37,7 @@
             f = f("hasOtherNames-fieldset"),
             legend = "responsiblepeople.knownby.title",
             legendHidden = true,
-            panel = false,
-            classes = Seq("inline")
+            panel = false
 
         ) {
             @errorGroup(
@@ -51,6 +50,12 @@
                     target = ".otherNames-panel",
                     inline = true
                 )
+                @panel(
+                    jsHidden = true,
+                    classes = Seq("otherNames-panel")
+                ) {
+                    @input(f("otherNames"), "responsiblepeople.personName.alternativeName")
+                }
                 @radio(
                     f = f("hasOtherNames"),
                     labelText = "lbl.no",
@@ -58,14 +63,6 @@
                     inline = true
                 )
             }
-        }
-
-
-        @panel(
-            jsHidden = true,
-            classes = Seq("otherNames-panel")
-        ) {
-            @input(f("otherNames"), "responsiblepeople.personName.alternativeName")
         }
 
         @submit(edit)

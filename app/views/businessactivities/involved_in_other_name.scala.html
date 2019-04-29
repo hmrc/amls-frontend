@@ -57,8 +57,7 @@
             f = f("involvedInOther-fieldset"),
             legend = "businessactivities.involved.other.title",
             legendHidden = true,
-            panel = false,
-            classes = Seq("inline")
+            panel = false
         ) {
             @errorGroup(
                 field = f("involvedInOther")
@@ -70,6 +69,21 @@
                     target = s"#$target",
                     inline = true
                 )
+                @panel(
+                  field = Some(f(s"$target")),
+                  jsHidden = false,
+                  id = target
+                ) {
+                    @textarea(
+                      field = f("details"),
+                      labelText = "businessactivities.confirm-activities.lbl.details",
+                      hintText = "businessactivities.involved.hint",
+                      bold = false,
+                      largeWidth = true,
+                      rows = "6",
+                      cols = "30"
+                    )
+                }
                 @radio(
                     f = f("involvedInOther"),
                     labelText = "lbl.no",
@@ -77,22 +91,6 @@
                     inline = true
                 )
             }
-        }
-
-        @panel(
-            field = Some(f(s"$target")),
-            jsHidden = false,
-            id = target
-        ) {
-            @textarea(
-                field = f("details"),
-                labelText = "businessactivities.confirm-activities.lbl.details",
-                hintText = "businessactivities.involved.hint",
-                bold = false,
-                largeWidth = true,
-                rows = "6",
-                cols = "30"
-            )
         }
 
         @submit(false)
