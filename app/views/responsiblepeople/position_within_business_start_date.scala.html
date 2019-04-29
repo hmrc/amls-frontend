@@ -36,11 +36,11 @@
     @form(f, controllers.responsiblepeople.routes.PositionWithinBusinessStartDateController.post(index, edit, flow)) {
 
         @if(positions.size == 1) {
-            <p>@Messages("responsiblepeople.position_within_business.startDate.toldus.single", personName, PositionWithinBusiness.toString(positions.head).toLowerCase)</p>
+            <p>@Messages("responsiblepeople.position_within_business.startDate.toldus.single", personName, PositionWithinBusiness.getPrettyName(positions.head).toLowerCase)</p>
         } else {
             <p>@Messages("responsiblepeople.position_within_business.startDate.toldus.multiple", personName)</p>
-            <ul class="list list-bullet">
-                @positions.map(p => PositionWithinBusiness.getPrettyName(p).toLowerCase).toList.sorted.map(p => <li>{p}</li>)
+            <ul class="list list-bullet business-roles">
+                @positions.map(p => PositionWithinBusiness.getPrettyName(p).toLowerCase).toList.sorted.map(p => <li class="business-role">{p}</li>)
             </ul>
             <p>@Messages("responsiblepeople.position_within_business.startDate.toldus.selectfirst", personName)</p>
         }

@@ -19,7 +19,6 @@ package models.responsiblepeople
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Invalid, Path, Rule, Valid, ValidationError, Write}
 import models.FormTypes.basicPunctuationPattern
-import models.businessmatching.BusinessType
 import play.api.i18n.Messages
 import play.api.libs.json._
 import utils.TraversableValidators.minLengthR
@@ -49,8 +48,9 @@ object PositionWithinBusiness
   import utils.MappingUtils.Implicits.RichRule
 
   def getPrettyName(position:PositionWithinBusiness)(implicit message: Messages): String = {
-    import scala.language.implicitConversions
     import play.api.i18n.Messages
+
+    import scala.language.implicitConversions
     position match {
       case BeneficialOwner => Messages("declaration.addperson.lbl.01")
       case Director => Messages("responsiblepeople.position_within_business.lbl.02")
@@ -84,7 +84,7 @@ object PositionWithinBusiness
       }
     }
 
-  implicit val jsonWrites = Writes[PositionWithinBusiness] {
+  private[responsiblepeople] implicit val jsonWrites = Writes[PositionWithinBusiness] {
     case BeneficialOwner => JsString("01")
     case Director => JsString("02")
     case InternalAccountant => JsString("03")
@@ -95,7 +95,7 @@ object PositionWithinBusiness
     case Other(value) => Json.obj("other" -> value)
   }
 
-  implicit val jsonReads: Reads[PositionWithinBusiness] =
+  private[responsiblepeople] implicit val jsonReads: Reads[PositionWithinBusiness] =
     Reads {
       case JsString("01") => JsSuccess(BeneficialOwner)
       case JsString("02") => JsSuccess(Director)
@@ -108,23 +108,11 @@ object PositionWithinBusiness
       case _ => JsError((JsPath \ "positions") -> play.api.data.validation.ValidationError("error.invalid"))
     }
 
-  val positionsPerBusinessType = {
-    List(
-      BusinessType.SoleProprietor -> List(NominatedOfficer, SoleProprietor),
-      BusinessType.Partnership -> List(NominatedOfficer, Partner),
-      BusinessType.LimitedCompany -> List(BeneficialOwner, Director, NominatedOfficer),
-      BusinessType.UnincorporatedBody -> List(BeneficialOwner, Director, NominatedOfficer),
-      BusinessType.LPrLLP -> List(NominatedOfficer, Partner, DesignatedMember)
-    )
-  }
+  private[responsiblepeople] val atLeastOneRule = minLengthR[Set[String]](1).withMessage("error.required.positionWithinBusiness")
+  private val otherLength = 255
+  private val maxLengthRule = optionR(maxLength(otherLength) andThen basicPunctuationPattern())
 
-
-
-  val positionReader = minLengthR[Set[String]](1).withMessage("error.required.positionWithinBusiness")
-  val otherLength = 255
-  val otherPositionReader = optionR(maxLength(otherLength) andThen basicPunctuationPattern())
-
-  val validatePositionSelection = Rule[(Set[String], Option[String]), Set[PositionWithinBusiness]]  {
+  private[responsiblepeople] val fullySpecifiedRule = Rule[(Set[String], Option[String]), Set[PositionWithinBusiness]]  {
     case (s, None) if s.contains("other") =>
       Invalid(Seq(Path \ "otherPosition" -> Seq(ValidationError("responsiblepeople.position_within_business.other_position.othermissing"))))
     case (s, o) =>
@@ -141,10 +129,9 @@ object PositionWithinBusiness
       })
   }
 
-  implicit val validatePositionsSet:Rule[UrlFormEncoded, Set[PositionWithinBusiness]] = From[UrlFormEncoded] { __ =>
-    ((__ \ "positions").read(positionReader)  ~
-      (__ \ "otherPosition").read(otherPositionReader)).tupled.andThen(validatePositionSelection)
+  implicit val positionsRule:Rule[UrlFormEncoded, Set[PositionWithinBusiness]] = From[UrlFormEncoded] { __ =>
+    ((__ \ "positions").read(atLeastOneRule)  ~
+      (__ \ "otherPosition").read(maxLengthRule)).tupled
+      .andThen(fullySpecifiedRule)
   }
-
-
 }

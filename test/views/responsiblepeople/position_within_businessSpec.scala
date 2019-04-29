@@ -32,31 +32,35 @@ class position_within_businessSpec extends AmlsSpec with MustMatchers {
   }
 
   "position_within_business view" must {
-    "have correct title, headings" in new ViewFixture {
+
+    "have back link" in new ViewFixture {
       val form2 = EmptyForm
-
       def view = views.html.responsiblepeople.position_within_business(form2, true, 1, BusinessType.SoleProprietor, name, true, None)
-
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
 
+    "have correct title" in new ViewFixture {
+      val form2 = EmptyForm
+      def view = views.html.responsiblepeople.position_within_business(form2, true, 1, BusinessType.SoleProprietor, name, true, None)
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
       doc.title must be(Messages("responsiblepeople.position_within_business.title") +
         " - " + Messages("summary.responsiblepeople") +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
+    }
+
+    "have correct headings" in new ViewFixture {
+      val form2 = EmptyForm
+      def view = views.html.responsiblepeople.position_within_business(form2, true, 1, BusinessType.SoleProprietor, name, true, None)
       heading.html must be(Messages("responsiblepeople.position_within_business.heading", name))
       subHeading.html must include(Messages("summary.responsiblepeople"))
-
-      doc.getElementsByAttributeValue("name", "positions[]") must not be empty
     }
 
     "show errors in the correct locations" in new ViewFixture {
       val form2: InvalidForm = InvalidForm(Map.empty,
-        Seq(
-          (Path \ "positions") -> Seq(ValidationError("not a message Key"))
-        ))
+        Seq((Path \ "positions") -> Seq(ValidationError("not a message Key"))))
 
       def view = views.html.responsiblepeople.position_within_business(form2, true, 1, BusinessType.SoleProprietor, name, true, None)
-
       errorSummary.html() must include("not a message Key")
     }
   }
