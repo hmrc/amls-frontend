@@ -38,7 +38,7 @@
             editUrl = controllers.hvd.routes.ProductsController.get(true).toString,
             editLinkTag = "hvdproducts-edit"
         ) {
-            <ul class="list list--comma">
+            <ul class="list">
                 @p.items.map { i =>
                     <li>@i match {
                         case Alcohol => {@Messages("hvd.products.option.01")}
@@ -81,7 +81,7 @@
             editUrl = controllers.hvd.routes.HowWillYouSellGoodsController.get(true).toString,
             editLinkTag = "hvdsellgoods-edit"
         ) {
-            <ul class="list list--comma">
+            <ul class="list">
                 @goods.channels.map { i =>
                     <li>@i match {
                     case Retail => {@Messages("hvd.how-will-you-sell-goods.channels.retail")}
