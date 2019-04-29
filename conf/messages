@@ -1951,7 +1951,7 @@ hvd.how-will-you-sell-goods.channels.retail = Retail
 hvd.how-will-you-sell-goods.channels.wholesale = Wholesale
 
 hvd.cash.payment.title = Has your business made or accepted any cash payments of €10,000 or more?
-hvd.cash.payment.data.summary.details = A cash payment can be physical money, notes and coins. It can be paid to you in person or directly into a bank account. This includes payment of €10,000 or more in:
+hvd.cash.data.payment.summary.details = A cash payment can be physical money, notes and coins. It can be paid to you in person or directly into a bank account. This includes payment of €10,000 or more in:
 hvd.cash.payment.data.summary.details.01 = any single cash payment
 hvd.cash.payment.data.summary.details.02 = several related cash payments, including payment plans, payments on account, and deposits
 hvd.cash.payment.data.summary.details.03 = any 90 day period
