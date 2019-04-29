@@ -80,6 +80,9 @@ class status_renewal_submittedSpec extends AmlsSpec with MustMatchers {
       doc.getElementsMatchingOwnText(Messages("status.renewalsubmitted.description4")).text() must be(
         Messages("status.renewalsubmitted.description4"))
 
+      doc.getElementsMatchingOwnText(Messages("status.renewalsubmitted.description5")).text() must be(
+        Messages("status.renewalsubmitted.description5"))
+
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") mustBe controllers.routes.NotificationController.getMessages().url
 

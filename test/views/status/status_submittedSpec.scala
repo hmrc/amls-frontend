@@ -158,7 +158,7 @@ class status_submittedSpec extends AmlsSpec with MustMatchers with AmlsReference
         doc.getElementsContainingOwnText(Messages("status.submittedForReview.submitteddate.text")).isEmpty must be(true)
 
         doc.getElementsByTag("details").text() must include(Messages("fee.details.dup_nofees.heading"))
-        doc.html must include(Messages("status.fee.link"))
+        doc.html must include(Messages("status.submissionreadyforreview.nofee.description.link"))
         doc.html must include(Messages("fee.details.dup_nofees.heading"))
       }
 
