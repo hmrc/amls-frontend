@@ -38,8 +38,9 @@
             editUrl = controllers.hvd.routes.ProductsController.get(true).toString,
             editLinkTag = "hvdproducts-edit"
         ) {
+
             <ul class="list">
-                @p.items.map { i =>
+                @p.sorted.map { i =>
                     <li>@i match {
                         case Alcohol => {@Messages("hvd.products.option.01")}
                         case Tobacco => {@Messages("hvd.products.option.02")}

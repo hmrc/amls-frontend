@@ -451,7 +451,7 @@ lbl.nonresidential = Non-Residential
 lbl.1200.character.limit=1200 character limit
 lbl.none.of.the.above = None of the above
 
-lbl.give.details = Please give details
+lbl.give.details = Add what your business will buy or sell
 
 lbl.registration.status = Registration status:
 lbl.registration.status.short = Status:
@@ -1960,7 +1960,7 @@ hvd.cash.payment.convert.currency.summary = If you do not use euros you’ll nee
 hvd.cash.payment.date.title = What was the date of the first payment?
 hvd.cash.payment.date.example = For example, 31 03 2015.
 
-hvd.products.title = Add what your business will buy or sell
+hvd.products.title = What will your business buy or sell?
 hvd.products.option.01 = Alcohol
 hvd.products.option.02 = Tobacco
 hvd.products.option.03 = Antiques
