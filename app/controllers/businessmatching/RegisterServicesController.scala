@@ -94,34 +94,17 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
               }
             }
           case ValidForm(_, data) =>
-            (for {
-              isPreSubmission <- statusService.isPreSubmission
-              businessMatching <- businessMatchingService.getModel.value
-              savedModel <- updateModel(
-                businessMatching,
-                newModel(businessMatching.activities,
-                  data,
-                  isPreSubmission
-                ),
-                isMsb(data, businessMatching.activities)
-              )
-              _ <- maybeRemoveAccountantForAMLSRegulations(savedModel)
-              _ <- clearRemovedSections(
-                businessMatching.activities.getOrElse(
-                  BusinessMatchingActivities(
-                    Set()
-                  )
-                ).businessActivities,
-                savedModel.businessActivities
-              )
-            } yield savedModel) flatMap { savedActivities =>
+            businessActivities(data) flatMap { ba =>
               getData[ResponsiblePerson] flatMap { responsiblePeople =>
 
                 val workFlow =
                   shouldPromptForApproval.tupled andThen
-                  shouldPromptForFitAndProper.tupled
+                    shouldPromptForFitAndProper.tupled
 
-                val rps = responsiblePeople.map(rp => workFlow((rp, savedActivities)))
+                val activities = ba._1
+                val isRemovingActivity = ba._2
+
+                val rps = responsiblePeople.map(rp => workFlow((rp, activities, isRemovingActivity)))
 
                 updateResponsiblePeople(rps) map { _ =>
                   redirectTo(data.businessActivities)
@@ -129,6 +112,30 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
               }
             }
         }
+  }
+
+  private def businessActivities(data: BusinessMatchingActivities)
+                        (implicit ac: AuthContext, hc: HeaderCarrier) = {
+
+    lazy val empty = BusinessMatchingActivities(Set())
+
+    for {
+      isPreSubmission <- statusService.isPreSubmission
+      businessMatching <- businessMatchingService.getModel.value
+      businessActivitiesModel <- updateModel(
+        businessMatching,
+        newModel(businessMatching.activities, data, isPreSubmission),
+        isMsb(data, businessMatching.activities)
+      )
+      _ <- maybeRemoveAccountantForAMLSRegulations(businessActivitiesModel)
+      _ <- clearRemovedSections(
+        businessMatching.activities.getOrElse(empty).businessActivities,
+        businessActivitiesModel.businessActivities
+      )
+      isRemovingActivity <- Future.successful(
+        businessMatching.activities.getOrElse(empty).businessActivities > businessActivitiesModel.businessActivities
+      )
+    } yield (businessActivitiesModel, isRemovingActivity)
   }
 
   private def withoutAccountantForAMLSRegulations(activities: BusinessActivities): BusinessActivities =
@@ -294,12 +301,16 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
     }
 
   val shouldPromptForApproval:
-  (ResponsiblePerson, BusinessMatchingActivities) => (ResponsiblePerson, BusinessMatchingActivities) =
-  (rp, activities) => {
+  (ResponsiblePerson, BusinessMatchingActivities, Boolean) => (ResponsiblePerson, BusinessMatchingActivities) =
+  (rp, activities, isRemoving) => {
 
-    def approvalIsRequired(rp: ResponsiblePerson, businessActivities: BusinessMatchingActivities) =
+    def approvalIsRequired(rp: ResponsiblePerson, businessActivities: BusinessMatchingActivities, isRemoving: Boolean) = {
       rp.approvalFlags.hasAlreadyPassedFitAndProper.contains(false) &
-      !(containsTcspOrMsb(businessActivities.businessActivities))
+        !(containsTcspOrMsb(businessActivities.businessActivities)) &
+        isRemoving
+    }
+
+
 
     def setResponsiblePeopleForApproval(rp: ResponsiblePerson)
     : ResponsiblePerson = {
@@ -316,7 +327,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
       }
     }
 
-    if (approvalIsRequired(rp, activities)) {
+    if (approvalIsRequired(rp, activities, isRemoving)) {
       (setResponsiblePeopleForApproval(rp), activities)
     } else {
       (rp, activities)
