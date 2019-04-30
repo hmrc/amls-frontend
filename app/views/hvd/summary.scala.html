@@ -43,7 +43,6 @@
                 @p.sorted.map { i =>
                     <li>@i match {
                         case Alcohol => {@Messages("hvd.products.option.01")}
-                        case Tobacco => {@Messages("hvd.products.option.02")}
                         case Antiques => {@Messages("hvd.products.option.03")}
                         case Cars => {@Messages("hvd.products.option.04")}
                         case OtherMotorVehicles => {@Messages("hvd.products.option.05")}
@@ -53,6 +52,7 @@
                         case ScrapMetals => {@Messages("hvd.products.option.09")}
                         case MobilePhones => {@Messages("hvd.products.option.10")}
                         case Clothing => {@Messages("hvd.products.option.11")}
+                        case Tobacco => {@Messages("hvd.products.option.02")}
                         case Other(x) => {@x}
                     }</li>
                 }

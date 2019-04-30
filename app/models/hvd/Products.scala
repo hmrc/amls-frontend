@@ -28,7 +28,7 @@ import cats.data.Validated.{Invalid, Valid}
 
 case class Products(items: Set[ItemType]) {
   def sorted = {
-    items.toSeq.sortBy( it => it.value)
+    items.toList.sortBy( it => it.toString)
   }
 }
 
