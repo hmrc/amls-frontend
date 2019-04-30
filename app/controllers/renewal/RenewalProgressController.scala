@@ -59,12 +59,13 @@ class RenewalProgressController @Inject()
               cache <- OptionT(dataCacheConnector.fetchAll)
               businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
             } yield {
-
+              val businessName = businessMatching.reviewDetails.map(r => r.businessName).getOrElse("")
+              val activities = businessMatching.activities.fold(Seq.empty[String])(_.businessActivities.map(_.getMessage()).toSeq)
               val variationSections = sectionsProvider.sections(cache).filter(_.name != BusinessMatching.messageKey)
               val canSubmit = renewals.canSubmit(renewalSection, variationSections)
               val msbOrTcspExists = ControllerHelper.isMSBSelected(Some(businessMatching)) ||
                 ControllerHelper.isTCSPSelected(Some(businessMatching))
-              Ok(renewal_progress(variationSections, canSubmit, msbOrTcspExists, r, renewalSection.status == Completed))
+              Ok(renewal_progress(variationSections, businessName, activities, canSubmit, msbOrTcspExists, r, renewalSection.status == Completed))
             }
           }
           case (r:RenewalSubmitted, _) => OptionT.fromOption[Future](Some(Redirect(controllers.routes.RegistrationProgressController.get)))
