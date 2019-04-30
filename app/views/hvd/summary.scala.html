@@ -39,7 +39,7 @@
             editLinkTag = "hvdproducts-edit"
         ) {
             <ul class="list">
-                @p.items.map { i =>
+                @p.sorted.map { i =>
                     <li>@i match {
                         case Alcohol => {@Messages("hvd.products.option.01")}
                         case Tobacco => {@Messages("hvd.products.option.02")}
@@ -52,7 +52,7 @@
                         case ScrapMetals => {@Messages("hvd.products.option.09")}
                         case MobilePhones => {@Messages("hvd.products.option.10")}
                         case Clothing => {@Messages("hvd.products.option.11")}
-                        case Other(x) => {@x}
+                        case Other(x) => {Other: @x}
                     }</li>
                 }
             </ul>
@@ -154,8 +154,8 @@
             editLinkTag = "hvdcashpaymentmethods-edit",
             editUrl = if(isEditable){controllers.hvd.routes.ExpectToReceiveCashPaymentsController.get(true).toString} else ""
         ) {
-            <ul class="list list--comma">
-                <li>@pm match {
+            <ul class="list">
+                @pm match {
                     case PaymentMethods(false, false, None) => { Unknown }
                     case PaymentMethods(false, false, Some(txt)) => { @txt }
                     case PaymentMethods(false, true, None) => { @Messages("hvd.receiving.option.02") }
@@ -163,8 +163,10 @@
                     case PaymentMethods(true, false, None) => { @Messages("hvd.receiving.option.01") }
                     case PaymentMethods(true, false, Some(txt)) => { @Messages("hvd.receiving.option.01"), @txt }
                     case PaymentMethods(true, true, None) => { @Messages("hvd.receiving.option.01"), @Messages("hvd.receiving.option.02") }
-                    case PaymentMethods(true, true, Some(txt)) => { @Messages("hvd.receiving.option.01"), @Messages("hvd.receiving.option.02"), @txt }
-                    }</li>
+                    case PaymentMethods(true, true, Some(txt)) => { <li>@Messages("hvd.receiving.option.01")</li>
+                                                                    <li>@Messages("hvd.receiving.option.02")</li>
+                                                                    <li>@txt</li> }
+                    }
             </ul>
         }
     }

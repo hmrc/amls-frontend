@@ -28,7 +28,7 @@ import cats.data.Validated.{Invalid, Valid}
 
 case class Products(items: Set[ItemType]) {
   def sorted = {
-    items.toSeq.sortBy( it => it.value)
+    items.toSeq.sortBy( it => it.sortIndex)
   }
 }
 
@@ -46,6 +46,22 @@ sealed trait ItemType {
       case ScrapMetals => "09"
       case MobilePhones => "10"
       case Clothing => "11"
+      case Other(_) => "12"
+    }
+
+  val sortIndex: String =
+    this match {
+      case Alcohol => "01"
+      case Antiques => "02"
+      case Caravans => "03"
+      case Cars => "04"
+      case Clothing => "05"
+      case Gold => "06"
+      case Jewellery => "07"
+      case MobilePhones => "08"
+      case OtherMotorVehicles => "09"
+      case ScrapMetals => "10"
+      case Tobacco => "11"
       case Other(_) => "12"
     }
 }
