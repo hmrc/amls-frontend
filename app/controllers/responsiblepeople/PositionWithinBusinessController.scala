@@ -46,11 +46,13 @@ class PositionWithinBusinessController @Inject () (
 
               val data = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
 
-              getResponsiblePersonFromData(data,index) match {
+              ResponsiblePerson.getResponsiblePersonFromData(data,index) match {
                 case Some(rp@ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_, Some(Positions(positions, _)),_,_,_,_,_,_,_,_,_,_,_))
-                => Ok(position_within_business(Form2[Set[PositionWithinBusiness]](positions), edit, index, bt, personName.titleName, displayNominatedOfficer(rp, hasNominatedOfficer(data)), flow))
+                => Ok(position_within_business(Form2[Set[PositionWithinBusiness]](positions), edit, index, bt, personName.titleName,
+                  ResponsiblePerson.displayNominatedOfficer(rp, ResponsiblePerson.hasNominatedOfficer(data)), flow))
                 case Some(rp@ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-                => Ok(position_within_business(EmptyForm, edit, index, bt, personName.titleName, displayNominatedOfficer(rp, hasNominatedOfficer(data)), flow))
+                => Ok(position_within_business(EmptyForm, edit, index, bt, personName.titleName,
+                  ResponsiblePerson.displayNominatedOfficer(rp, ResponsiblePerson.hasNominatedOfficer(data)), flow))
                 case _
                 => NotFound(notFoundView)
               }
@@ -71,10 +73,10 @@ class PositionWithinBusinessController @Inject () (
 
                 val data = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
 
-                getResponsiblePersonFromData(data,index) match {
+                ResponsiblePerson.getResponsiblePersonFromData(data,index) match {
                   case s@Some(rp) =>
-                    BadRequest(position_within_business(
-                      f, edit, index, bt, ControllerHelper.rpTitleName(s), displayNominatedOfficer(rp, hasNominatedOfficer(data)), flow))
+                    BadRequest(position_within_business(f, edit, index, bt, ControllerHelper.rpTitleName(s),
+                      ResponsiblePerson.displayNominatedOfficer(rp, ResponsiblePerson.hasNominatedOfficer(data)), flow))
                 }
               }).getOrElse(NotFound(notFoundView))
             }
@@ -95,29 +97,5 @@ class PositionWithinBusinessController @Inject () (
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
         }
-  }
-
-  private[controllers] def hasNominatedOfficer(rpSeqOption: Option[Seq[ResponsiblePerson]]): Boolean = {
-    rpSeqOption match {
-      case Some(rps) => ResponsiblePerson.filter(rps).exists {
-        rp =>
-          rp.positions match {
-            case Some(position) => position.isNominatedOfficer
-            case _ => false
-          }
-      }
-      case _ => false
-    }
-  }
-
-  private[controllers] def displayNominatedOfficer(rp: ResponsiblePerson, hasNominatedOfficer: Boolean): Boolean = {
-    rp.positions.exists { positions =>
-      positions.positions.contains(NominatedOfficer)
-    } || !hasNominatedOfficer
-  }
-
-  private def getResponsiblePersonFromData(data: Option[Seq[ResponsiblePerson]], index: Int) = data.flatMap{
-    case sq if index > 0 && index <= sq.length + 1 => sq.lift(index - 1)
-    case _ => None
   }
 }

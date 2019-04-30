@@ -22,6 +22,7 @@ import controllers.BaseController
 import forms._
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.responsiblepeople._
+import play.api.Logger
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.position_within_business_start_date
@@ -45,11 +46,11 @@ class PositionWithinBusinessStartDateController @Inject ()(
 
               val data = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
 
-              getResponsiblePersonFromData(data,index) match {
+              ResponsiblePerson.getResponsiblePersonFromData(data,index) match {
                 case Some(rp@ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_, Some(Positions(positions, Some(startDate))),_,_,_,_,_,_,_,_,_,_,_))
-                  => Ok(position_within_business_start_date(Form2[PositionStartDate](startDate), edit, index, bt,  personName.titleName, positions, displayNominatedOfficer(rp, hasNominatedOfficer(data)), flow))
+                  => Ok(position_within_business_start_date(Form2[PositionStartDate](startDate), edit, index, bt,  personName.titleName, positions, ResponsiblePerson.displayNominatedOfficer(rp, ResponsiblePerson.hasNominatedOfficer(data)), flow))
                 case Some(rp@ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_, Some(Positions(positions, None)),_,_,_,_,_,_,_,_,_,_,_))
-                  => Ok(position_within_business_start_date(EmptyForm, edit, index, bt, personName.titleName, positions, displayNominatedOfficer(rp, hasNominatedOfficer(data)), flow))
+                  => Ok(position_within_business_start_date(EmptyForm, edit, index, bt, personName.titleName, positions, ResponsiblePerson.displayNominatedOfficer(rp, ResponsiblePerson.hasNominatedOfficer(data)), flow))
                 case _
                   => NotFound(notFoundView)
               }
@@ -70,9 +71,10 @@ class PositionWithinBusinessStartDateController @Inject ()(
 
                 val data = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
 
-                getResponsiblePersonFromData(data,index) match {
+                ResponsiblePerson.getResponsiblePersonFromData(data,index) match {
                   case s@Some(rp@ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_, Some(Positions(positions,_)),_,_,_,_,_,_,_,_,_,_,_)) =>
-                    BadRequest(position_within_business_start_date(f, edit, index, bt, ControllerHelper.rpTitleName(s), positions, displayNominatedOfficer(rp, hasNominatedOfficer(data)), flow))
+                    BadRequest(position_within_business_start_date(f, edit, index, bt, ControllerHelper.rpTitleName(s), positions,
+                      ResponsiblePerson.displayNominatedOfficer(rp, ResponsiblePerson.hasNominatedOfficer(data)), flow))
                   case _
                     => NotFound(notFoundView)
                 }
@@ -82,7 +84,10 @@ class PositionWithinBusinessStartDateController @Inject ()(
             for {
               _ <- updateDataStrict[ResponsiblePerson](index) { rp => rp.positions match {
                   case Some(x) => rp.positions(Positions.update(x, data))
-                  case None => throw new IllegalStateException("Positions does not exist, cannot update start date")
+                  case _ => {
+                    Logger.error(s"Positions does not exist for ${rp.personName.getOrElse("[NAME MISSING]")}")
+                    throw new IllegalStateException("Positions does not exist, cannot update start date")
+                  }
                 }
               }
               rpSeqOption <- dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key)
@@ -98,27 +103,5 @@ class PositionWithinBusinessStartDateController @Inject ()(
         }
   }
 
-  private[controllers] def hasNominatedOfficer(rpSeqOption: Option[Seq[ResponsiblePerson]]): Boolean = {
-    rpSeqOption match {
-      case Some(rps) => ResponsiblePerson.filter(rps).exists {
-        rp =>
-          rp.positions match {
-            case Some(position) => position.isNominatedOfficer
-            case _ => false
-          }
-      }
-      case _ => false
-    }
-  }
 
-  private[controllers] def displayNominatedOfficer(rp: ResponsiblePerson, hasNominatedOfficer: Boolean): Boolean = {
-    (rp.positions.map{ positions =>
-      positions.positions.contains(NominatedOfficer)
-    } contains true) || !hasNominatedOfficer
-  }
-
-  private def getResponsiblePersonFromData(data: Option[Seq[ResponsiblePerson]], index: Int) = data.flatMap{
-    case sq if index > 0 && index <= sq.length + 1 => sq.lift(index - 1)
-    case _ => None
-  }
 }

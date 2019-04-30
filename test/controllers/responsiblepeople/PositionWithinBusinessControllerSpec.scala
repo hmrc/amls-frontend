@@ -275,21 +275,21 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
   "hasNominatedOfficer" must {
     "return true" when {
       "there is nominated officer" in new Fixture {
-        controller.hasNominatedOfficer(Some(Seq(hasNominatedOfficer))) must be(true)
+        ResponsiblePerson.hasNominatedOfficer(Some(Seq(hasNominatedOfficer))) must be(true)
       }
 
       "one rp is nominated officer" in new Fixture {
-        controller.hasNominatedOfficer(Some(Seq(hasNominatedOfficer, noNominatedOfficer))) must be(true)
+        ResponsiblePerson.hasNominatedOfficer(Some(Seq(hasNominatedOfficer, noNominatedOfficer))) must be(true)
       }
     }
 
     "return false" when {
       "there are no responsible people" in new Fixture {
-        controller.hasNominatedOfficer(Some(Nil)) must be(false)
+        ResponsiblePerson.hasNominatedOfficer(Some(Nil)) must be(false)
       }
 
       "there is no nominated officer" in new Fixture {
-        controller.hasNominatedOfficer(Some(Seq(noNominatedOfficer.copy(
+        ResponsiblePerson.hasNominatedOfficer(Some(Seq(noNominatedOfficer.copy(
           positions = Some(DefaultValues.noNominatedOfficerPositions))
         ))) must be(false)
       }
@@ -300,13 +300,13 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
     "return true" when {
       "this responsible person is the nominated officer" in new Fixture {
         val rp = responsiblePersonWithPositionsGen(Some(Set(NominatedOfficer))).sample.get
-        controller.displayNominatedOfficer(rp, true) mustBe true
+        ResponsiblePerson.displayNominatedOfficer(rp, true) mustBe true
       }
 
       "this responsible person is not the nominated officer" when {
         "hasNominatedOfficer is false" in new Fixture {
           val rp = responsiblePersonWithPositionsGen(None).sample.get
-          controller.displayNominatedOfficer(rp, false) mustBe true
+          ResponsiblePerson.displayNominatedOfficer(rp, false) mustBe true
         }
       }
     }
@@ -314,7 +314,7 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
       "this responsible person is not the nominated officer" when {
         "hasNominatedOfficer is true" in new Fixture {
           val rp = responsiblePersonWithPositionsGen(None).sample.get
-          controller.displayNominatedOfficer(rp, true) mustBe false
+          ResponsiblePerson.displayNominatedOfficer(rp, true) mustBe false
         }
       }
     }
