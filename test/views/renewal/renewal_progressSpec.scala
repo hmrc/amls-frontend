@@ -21,7 +21,7 @@ import org.joda.time.LocalDate
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.Strings.TextHelpers
-import utils.{DateHelper, AmlsSpec}
+import utils.{AmlsSpec, DateHelper}
 import views.Fixture
 
 class renewal_progressSpec extends AmlsSpec with MustMatchers{
@@ -30,16 +30,17 @@ class renewal_progressSpec extends AmlsSpec with MustMatchers{
     implicit val requestWithToken = addToken(request)
 
     val renewalDate = LocalDate.now().plusDays(15)
-
     val readyForRenewal = ReadyForRenewal(Some(renewalDate))
     val renewalSubmitted = RenewalSubmitted(Some(renewalDate))
+    val businessName = "BusinessName"
+    val serviceNames = Seq("Service 1", "Service 2", "Service 3")
   }
 
   "The renewal progress view" must {
 
     "Have the correct title and headings " in new ViewFixture {
 
-      override def view = views.html.renewal.renewal_progress(Seq.empty, true, true, readyForRenewal)
+      override def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, true, true, readyForRenewal)
 
       doc.title must startWith(Messages("renewal.progress.title"))
 
@@ -49,8 +50,24 @@ class renewal_progressSpec extends AmlsSpec with MustMatchers{
       heading.html must be(Messages("renewal.progress.title"))
     }
 
+    "show intro text" in new ViewFixture {
+
+      override def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, false, true, readyForRenewal)
+
+      html must include (Messages("renewal.progress.intro", DateHelper.formatDate(renewalDate)).convertLineBreaks)
+    }
+
+    "show the business name and services" in new ViewFixture {
+      override def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, false, true, readyForRenewal)
+      val element = doc.getElementsByClass("business-info").first()
+      element.text() must include { serviceNames.head }
+      element.text() must include { serviceNames(1) }
+      element.text() must include { serviceNames(2) }
+    }
+
     "enable the submit registration button when can submit and renewal section complete" in new ViewFixture {
-      override def view = views.html.renewal.renewal_progress(Seq.empty, canSubmit = true, msbOrTcspExists = true, readyForRenewal, renewalSectionCompleted = true)
+      override def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, canSubmit = true,
+        msbOrTcspExists = true, readyForRenewal, renewalSectionCompleted = true)
 
       doc.select("form button[name=submit]").hasAttr("disabled") mustBe false
 
@@ -60,7 +77,8 @@ class renewal_progressSpec extends AmlsSpec with MustMatchers{
     }
 
     "not have the submit registration button when cannot submit because renewal section not complete" in new ViewFixture {
-      override def view = views.html.renewal.renewal_progress(Seq.empty, canSubmit = false, msbOrTcspExists = true, readyForRenewal, renewalSectionCompleted = false)
+      override def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, canSubmit = false,
+        msbOrTcspExists = true, readyForRenewal, renewalSectionCompleted = false)
 
       html must include (Messages("renewal.progress.submit.intro"))
 
@@ -70,30 +88,24 @@ class renewal_progressSpec extends AmlsSpec with MustMatchers{
     }
 
     "not show the submit registration button when cannot submit and renewal section complete" in new ViewFixture {
-      override def view = views.html.renewal.renewal_progress(Seq.empty, canSubmit = false, msbOrTcspExists = true, readyForRenewal, renewalSectionCompleted = true)
+      override def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, canSubmit = false,
+        msbOrTcspExists = true, readyForRenewal, renewalSectionCompleted = true)
 
       doc.select("form button[name=submit]").isEmpty mustBe true
 
       doc.getElementsMatchingOwnText(Messages("renewal.progress.edit")).attr("href") must be(controllers.renewal.routes.SummaryController.get().url)
     }
 
-    "show intro text" in new ViewFixture {
-
-      override def view = views.html.renewal.renewal_progress(Seq.empty, false, true, readyForRenewal)
-
-      html must include (Messages("renewal.progress.intro", DateHelper.formatDate(renewalDate)).convertLineBreaks)
-    }
-
     "show ready to submit renewal when information are completed" in new ViewFixture {
 
-      override def view = views.html.renewal.renewal_progress(Seq.empty, false, true, readyForRenewal, true)
+      override def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, false, true, readyForRenewal, true)
 
       doc.select("#renewal-information-completed").get(0).text() must be(Messages("renewal.progress.information.completed.info"))
     }
 
     "show submit renewal link and text when information are not completed yet" in new ViewFixture {
 
-      override def view = views.html.renewal.renewal_progress(Seq.empty, false, true, readyForRenewal, false)
+      override def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, false, true, readyForRenewal, false)
 
       val space = " "
       val fullStop = "."
