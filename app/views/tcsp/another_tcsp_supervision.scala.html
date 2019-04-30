@@ -40,8 +40,7 @@
             f = f("servicesOfAnotherTCSP-fieldset"),
             legend = "tcsp.anothertcspsupervision.field-title",
             legendHidden = true,
-            panel = false,
-            classes = Seq("inline")
+            panel = false
         ) {
             @errorGroup(
                 field = f("servicesOfAnotherTCSP")
@@ -53,6 +52,19 @@
                     target = s"#$target",
                     inline = true
                 )
+                @fieldset(
+                    f = f(target),
+                    legend = "tcsp.servicesOfAnotherTcsp.mlrregno.lbl",
+                    legendHidden = true
+                ) {
+                    @input(f("mlrRefNumber"),
+                        labelText = "tcsp.servicesOfAnotherTcsp.mlrregno.lbl",
+                        hintText = "hint.8.digits",
+                        bold = false,
+                        attrMaxlength = "15",
+                        attrPattern = "[0-9a-z-A-Z]{1,15}"
+                   )
+                }
                 @radio(
                     f = f("servicesOfAnotherTCSP"),
                     labelText = "lbl.no",
@@ -60,20 +72,6 @@
                     inline = true
                 )
             }
-        }
-
-        @fieldset(
-            f = f(target),
-            legend = "tcsp.servicesOfAnotherTcsp.mlrregno.lbl",
-            legendHidden = true
-        ) {
-            @input(f("mlrRefNumber"),
-                labelText = "tcsp.servicesOfAnotherTcsp.mlrregno.lbl",
-                hintText = "hint.8.digits",
-                bold = false,
-                attrMaxlength = "15",
-                attrPattern = "[0-9a-z-A-Z]{1,15}"
-           )
         }
 
         @submit(edit)

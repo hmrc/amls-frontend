@@ -40,8 +40,7 @@
             f = f("hasPolicy-fieldset"),
             legend = "businessactivities.riskassessment.policy.title",
             legendHidden = true,
-            panel = false,
-            classes = Seq("inline")
+            panel = false
         ) {
             @errorGroup(
                 field = f("hasPolicy")
@@ -53,33 +52,32 @@
                     inline = true,
                     target = s"#$target"
                 )
+                @fieldset(
+                    f = f(s"$target"),
+                    legend = "businessactivities.paper.or.digital",
+                    hint = "lbl.select.all",
+                    jsHidden = true
+                ) {
+                    @errorGroup(
+                        field = f("riskassessments")
+                    ) {
+                        @checkbox(
+                            f = f("riskassessments[]"),
+                            labelText = "businessactivities.RiskAssessmentType.lbl.01",
+                            value = "01"
+                        )
+                        @checkbox(
+                            f = f("riskassessments[]"),
+                            labelText = "businessactivities.RiskAssessmentType.lbl.02",
+                            value = "02"
+                        )
+                    }
+                }
                 @radio(
                     f = f("hasPolicy"),
                     labelText = "lbl.no",
                     value = "false",
                     inline = true
-                )
-            }
-        }
-
-        @fieldset(
-            f = f(s"$target"),
-            legend = "businessactivities.paper.or.digital",
-            hint = "lbl.select.all",
-            jsHidden = true
-        ) {
-            @errorGroup(
-                field = f("riskassessments")
-            ) {
-                @checkbox(
-                    f = f("riskassessments[]"),
-                    labelText = "businessactivities.RiskAssessmentType.lbl.01",
-                    value = "01"
-                )
-                @checkbox(
-                    f = f("riskassessments[]"),
-                    labelText = "businessactivities.RiskAssessmentType.lbl.02",
-                    value = "02"
                 )
             }
         }

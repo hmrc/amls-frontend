@@ -43,8 +43,7 @@
             f = f("training-fieldset"),
             legend = "responsiblepeople.training.title",
             legendHidden = true,
-            panel = false,
-            classes = Seq("inline")
+            panel = false
         ) {
             @errorGroup(
                 field = f("training")
@@ -56,6 +55,21 @@
                     inline = true,
                     target = s"#$target"
                 )
+                @fieldset(
+                    f = f(s"$target"),
+                    legend = Messages("responsiblepeople.training.information.lbl", personName),
+                    hint = "responsiblepeople.training.information.hint",
+                    jsHidden = false
+                ) {
+                    @textarea(
+                        field = f("information"),
+                        hintText = "hint.255.chars",
+                        bold = false,
+                        largeWidth = true,
+                        cols = "30",
+                        rows ="8"
+                    )
+                }
                 @radio(
                     f = f("training"),
                     labelText = "lbl.no",
@@ -63,22 +77,6 @@
                     inline = true
                 )
             }
-        }
-
-        @fieldset(
-            f = f(s"$target"),
-            legend = Messages("responsiblepeople.training.information.lbl", personName),
-            hint = "responsiblepeople.training.information.hint",
-            jsHidden = false
-        ) {
-            @textarea(
-                field = f("information"),
-                hintText = "hint.255.chars",
-                bold = false,
-                largeWidth = true,
-                cols = "30",
-                rows ="8"
-            )
         }
 
         @submit(edit)
