@@ -65,6 +65,13 @@ class renewal_progressSpec extends AmlsSpec with MustMatchers{
       element.text() must include { serviceNames(2) }
     }
 
+    "not show the view details link under services section" in new ViewFixture {
+      override def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, false, true, readyForRenewal)
+      val element = Option(doc.getElementById("view-details"))
+      element mustBe None
+    }
+
+
     "enable the submit registration button when can submit and renewal section complete" in new ViewFixture {
       override def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, canSubmit = true,
         msbOrTcspExists = true, readyForRenewal, renewalSectionCompleted = true)
