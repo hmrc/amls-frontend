@@ -16,7 +16,6 @@
 
 package controllers.businessmatching.updateservice
 
-import connectors.KeystoreConnector
 import models.asp.Asp
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
@@ -32,7 +31,6 @@ import org.mockito.Mockito.{never, verify}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.Application
-import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import utils._
@@ -765,6 +763,15 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
         verify(mockCacheConnector, never).save[MoneyServiceBusinessSection](eqTo(MoneyServiceBusinessSection.key), any())(any(), any(), any())
         verify(mockCacheConnector, never).save[Asp](eqTo(Asp.key), any())(any(), any(), any())
         verify(mockCacheConnector, never).save[Hvd](eqTo(Hvd.key), any())(any(), any(), any())
+      }
+    }
+    "not raise an exception" when {
+      "removing BPS" in new Fixture {
+        val result = await(helper.removeSectionData(RemoveBusinessTypeFlowModel(Some(Set(BillPaymentServices)))).value)
+      }
+
+      "removing TDI" in new Fixture {
+        val result = await(helper.removeSectionData(RemoveBusinessTypeFlowModel(Some(Set(TelephonePaymentService)))).value)
       }
     }
   }
