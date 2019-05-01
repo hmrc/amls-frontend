@@ -34,11 +34,11 @@
 
     @fieldset(
         f = f("receivePayments-fieldset"),
-        legend = "hvd.receiving.convert.currency.text",
         heading = "renewal.receiving.title",
         panel = false,
         classes = Seq("inline")
     ) {
+        <p class="form-hint">@Messages("hvd.receiving.convert.currency.text")</p>
         @errorGroup(
             field = f("receivePayments")
         ) {

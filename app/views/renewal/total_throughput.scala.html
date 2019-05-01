@@ -35,10 +35,10 @@
     @form(f, controllers.renewal.routes.TotalThroughputController.post(edit)) {
         @fieldset(
             f = f("throughput-fieldset"),
-            legend = "renewal.msb.throughput.info",
             heading = "renewal.msb.throughput.header",
             panel = false
         ) {
+            <p class="form-hint">@Messages("renewal.msb.throughput.info")</p>
             @errorGroup(
                 field = f("throughput")
             ) {
