@@ -60,9 +60,7 @@ class renewal_progressSpec extends AmlsSpec with MustMatchers{
     "show the business name and services" in new ViewFixture {
       override def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, false, true, readyForRenewal)
       val element = doc.getElementsByClass("business-info").first()
-      element.text() must include { serviceNames.head }
-      element.text() must include { serviceNames(1) }
-      element.text() must include { serviceNames(2) }
+      serviceNames.foreach(name => element.text() must include { name } )
     }
 
     "not show the view details link under services section" in new ViewFixture {

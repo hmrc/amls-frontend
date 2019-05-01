@@ -46,7 +46,7 @@ title = Messages("progress.title")
     </div>
 
     @* registration progress *@
-    @services_sidebar(canEditPreApplication, true, businessName, serviceNames)
+    @services_sidebar(canEditPreApplication, displayLink = true, businessName, serviceNames)
 
     @if(!declarationAvailable) {
         <div class="grid-layout grid-layout--stacked">

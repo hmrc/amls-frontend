@@ -42,11 +42,11 @@
             }
 
             @if(displayLink) {
-            <p class="sidebar-top-spacing">
-                <a id="view-details" href="@controllers.businessmatching.routes.SummaryController.get.url" class="edit-preapp">
-                    @(if(canEditPreApplication) Messages("progress.preapplication.canedit") else Messages("progress.preapplication.readonly"))
-                </a>
-            </p>
+                <p class="sidebar-top-spacing">
+                    <a id="view-details" href="@controllers.businessmatching.routes.SummaryController.get.url" class="edit-preapp">
+                        @(if(canEditPreApplication) Messages("progress.preapplication.canedit") else Messages("progress.preapplication.readonly"))
+                    </a>
+                </p>
             }
         </div>
     </div>
