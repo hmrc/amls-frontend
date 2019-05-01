@@ -27,14 +27,6 @@
     @heading(section = "summary.estateagentbusiness")
 }
 
-@legendHtml = {
-    @Messages("estateagentbusiness.penalisedunderestateagentsact.subtitle")
-    <ul class="list list-bullet">
-        <li>@Messages("estateagentbusiness.penalisedunderestateagentsact.warning")</li>
-        <li>@Messages("estateagentbusiness.penalisedunderestateagentsact.banned")</li>
-    </ul>
-}
-
 @main(
     title = Messages("estateagentbusiness.penalisedunderestateagentsact.title") + " - " + Messages("summary.estateagentbusiness"),
     heading = header
@@ -46,9 +38,13 @@
             f = f("penalisedUnderEstateAgentsAct-fieldset"),
             heading = "estateagentbusiness.penalisedunderestateagentsact.title",
             panel = false,
-            classes = Seq("inline"),
-            legendHtml = legendHtml
+            classes = Seq("inline")
         ) {
+            @Messages("estateagentbusiness.penalisedunderestateagentsact.subtitle")
+            <ul class="list list-bullet">
+                <li>@Messages("estateagentbusiness.penalisedunderestateagentsact.warning")</li>
+                <li>@Messages("estateagentbusiness.penalisedunderestateagentsact.banned")</li>
+            </ul>
             @errorGroup(
                 field = f("penalisedUnderEstateAgentsAct")
             ) {

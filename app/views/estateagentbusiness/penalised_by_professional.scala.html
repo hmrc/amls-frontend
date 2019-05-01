@@ -30,21 +30,9 @@ s"""${f("professionalBody").id}-fieldset"""
     @heading(section = "summary.estateagentbusiness")
 }
 
-@legendHtml = {
-    @Messages("estateagentbusiness.penalisedbyprofessional.subtitle")
-
-    <ul class="list list-bullet form-group">
-        <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_1")</li>
-        <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_2")</li>
-        <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_3")</li>
-        <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_4")</li>
-        <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_5")</li>
-    </ul>
-}
-
 @main(
-title = Messages("estateagentbusiness.penalisedbyprofessional.title") + " - " + Messages("summary.estateagentbusiness"),
-heading = header
+    title = Messages("estateagentbusiness.penalisedbyprofessional.title") + " - " + Messages("summary.estateagentbusiness"),
+    heading = header
 ) {
 
 @form(f, controllers.estateagentbusiness.routes.PenalisedByProfessionalController.post(edit)) {
@@ -53,9 +41,17 @@ heading = header
         f = f("penalised-fieldset"),
         heading = "estateagentbusiness.penalisedbyprofessional.title",
         panel = false,
-        classes = Seq("inline"),
-        legendHtml = legendHtml
+        classes = Seq("inline")
     ) {
+        @Messages("estateagentbusiness.penalisedbyprofessional.subtitle")
+
+        <ul class="list list-bullet form-group">
+            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_1")</li>
+            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_2")</li>
+            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_3")</li>
+            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_4")</li>
+            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_5")</li>
+        </ul>
         @errorGroup(
              field = f("penalised")
         ) {
