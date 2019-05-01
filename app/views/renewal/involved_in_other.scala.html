@@ -30,27 +30,6 @@
     @heading(section = "summary.renewal")
 }
 
-@legendHtml = {
-    <p>@Messages("businessactivities.confirm-activities.subtitle")</p>
-
-    <ul class="list list-bullet">
-        @businessTypes.map {
-            case types => {
-                @types.map{ x =>
-                    <li>@x</li>
-                }
-            }
-        }
-    </ul>
-
-    <p>@Messages("renewal.involvedinother.example")</p>
-    <ul class="list list-bullet">
-        <li>@Messages("renewal.involvedinother.listline1")</li>
-        <li>@Messages("renewal.involvedinother.listline2")</li>
-        <li>@Messages("renewal.involvedinother.listline3")</li>
-    </ul>
-}
-
 @main(
     title = Messages("renewal.involvedinother.title") + " - " + Messages("summary.renewal"),
     heading = header
@@ -61,10 +40,27 @@
         @fieldset(
             f = f("involvedInOther-fieldset"),
             heading = "renewal.involvedinother.title",
-            legendHtml = legendHtml,
             panel = false,
             classes = Seq("inline")
         ) {
+            <p>@Messages("businessactivities.confirm-activities.subtitle")</p>
+
+            <ul class="list list-bullet">
+                @businessTypes.map {
+                    case types => {
+                        @types.map{ x =>
+                            <li>@x</li>
+                        }
+                    }
+                }
+            </ul>
+
+            <p>@Messages("renewal.involvedinother.example")</p>
+            <ul class="list list-bullet">
+                <li>@Messages("renewal.involvedinother.listline1")</li>
+                <li>@Messages("renewal.involvedinother.listline2")</li>
+                <li>@Messages("renewal.involvedinother.listline3")</li>
+            </ul>
             @errorGroup(
                 field = f("involvedInOther")
             ) {

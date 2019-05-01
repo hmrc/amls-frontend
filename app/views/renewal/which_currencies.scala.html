@@ -26,11 +26,6 @@
     @heading(section = "summary.renewal")
 }
 
-@legendHtml = {
-    <p>@Messages("msb.which_currencies.uptoThree.hint")</p>
-    @hint(Messages("msb.which_currencies.uptoThree.hint2"))
-}
-
 @main(
     title = Messages("renewal.msb.whichcurrencies.header") + " - " + Messages("summary.renewal"),
     heading = header
@@ -39,10 +34,11 @@
         @fieldset(
             f = f("currencies-fieldset"),
             heading = "renewal.msb.whichcurrencies.header",
-            legendHtml = legendHtml,
             panel = false,
             classes = Seq("form-group")
         ) {
+            <p>@Messages("msb.which_currencies.uptoThree.hint")</p>
+            @hint(Messages("msb.which_currencies.uptoThree.hint2"))
             @errorGroup(f("currencies")) {
                 @currency(
                     field = f("currencies[0]"),

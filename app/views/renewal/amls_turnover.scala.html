@@ -36,16 +36,6 @@
     @heading(section = "summary.renewal")
 }
 
-@legendHtml = {
-    <ul class="list list-bullet">
-        @businessTypes.map { types =>
-            @types.map {activity =>
-                <li>@activity</li>
-            }
-        }
-    </ul>
-}
-
 @main(
     title = Messages(headingText) + " - " + Messages("summary.renewal"),
     heading = header
@@ -56,9 +46,15 @@
             @fieldset(
                 f = f("turnover-fieldset"),
                 heading = headingText,
-                legendHtml = legendHtml,
                 panel = false
             ) {
+                <ul class="list list-bullet">
+                    @businessTypes.map { types =>
+                        @types.map {activity =>
+                            <li>@activity</li>
+                        }
+                    }
+                </ul>
                 @errorGroup(
                     field = f("turnover")
                 ) {
