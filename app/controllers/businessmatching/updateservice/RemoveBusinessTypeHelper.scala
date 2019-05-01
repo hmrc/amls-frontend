@@ -72,6 +72,8 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
           dataCacheConnector.removeByKey[Asp](Asp.key)
         case EstateAgentBusinessService =>
           dataCacheConnector.removeByKey[EstateAgentBusiness](EstateAgentBusiness.key)
+        case _ =>
+          dataCacheConnector.fetchAllWithDefault
       }
     }
 
