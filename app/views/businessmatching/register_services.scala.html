@@ -18,8 +18,9 @@
 @import include._
 @import include.forms2._
 @import config.ApplicationConfig
+@import models.businessmatching.{BusinessActivities, BusinessActivity}
 
-@(f: Form2[_], edit: Boolean, newActivities: Set[String], existing: Set[String], isPreSubmission: Boolean, showReturnLink: Boolean = true)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean, newActivities: Seq[String], existing: Set[String], isPreSubmission: Boolean, showReturnLink: Boolean = true)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = { @isPreSubmission match {
     case true => {
@@ -61,28 +62,7 @@
         }
     }
 
-    <p>@Messages("lbl.select.all")</p>
-
     @form(f, controllers.businessmatching.routes.RegisterServicesController.post(edit)) {
-
-        <div class="form-group">
-            @fieldset(
-                f = f("businessActivities-fieldset"),
-                legend = "businessmatching.registerservices.title",
-                legendHidden = true,
-                panel = false
-            ) {
-                @errorGroup(
-                    field = f("businessActivities")
-                ) {
-                    @{newActivities map( value => checkbox(
-                        f = f("businessActivities[]"),
-                        labelText = s"businessmatching.registerservices.servicename.lbl.$value",
-                        value = value
-                    ))}
-                }
-            }
-        </div>
 
         @detailsSummary(
             summary = Messages("businessmatching.registerservices.details")
@@ -101,6 +81,26 @@
                 </ul>
             }
         }
+
+        <div class="form-group">
+            @fieldset(
+                f = f("businessActivities-fieldset"),
+                legend = "businessmatching.registerservices.title",
+                legendHidden = true,
+                panel = false,
+                hint = "lbl.select.all"
+            ) {
+                @errorGroup(
+                    field = f("businessActivities")
+                ) {
+                    @{newActivities map( value => checkbox(
+                        f = f("businessActivities[]"),
+                        labelText = s"businessmatching.registerservices.servicename.lbl.$value",
+                        value = value
+                    ))}
+                }
+            }
+        </div>
 
         @submit(edit, returnLink = showReturnLink)
 

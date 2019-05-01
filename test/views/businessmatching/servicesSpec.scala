@@ -82,9 +82,9 @@ class servicesSpec extends AmlsSpec with MustMatchers  {
     }
 
     "show the correct label for the checkboxes" in new ViewFixture {
-      def view = views.html.businessmatching.services(EmptyForm, edit = false)
+      def view = views.html.businessmatching.services(EmptyForm, fxEnabledToggle = true, edit = false)
       val checkboxes = doc.body().getElementsByAttributeValue("type", "checkbox")
-      val labels = Seq("01", "02", "03", "04")
+      val labels = Seq("03", "04", "02","05", "01")
       (0 until checkboxes.size()) foreach { i =>
         checkboxes.get(i).attr("value") mustEqual labels(i)
       }
@@ -95,7 +95,7 @@ class servicesSpec extends AmlsSpec with MustMatchers  {
       def view = views.html.businessmatching.services(form2, edit = true)
       val checkboxes = doc.body().getElementsByAttributeValue("type", "checkbox")
       (0 until checkboxes.size()) foreach { i =>
-        checkboxes.get(i).attr("checked") mustEqual (if (i == 0) "checked" else "")
+        checkboxes.get(i).attr("checked") mustEqual (if (i == 3) "checked" else "")
       }
     }
 
@@ -129,7 +129,7 @@ class servicesFxEnabledSpec extends AmlsSpec with MustMatchers  {
     "show the correct label for the checkboxes" in new ViewFixture {
       def view = views.html.businessmatching.services(EmptyForm, edit = false, fxEnabledToggle = true)
       val checkboxes = doc.body().getElementsByAttributeValue("type", "checkbox")
-      val labels = Seq("01", "02", "05", "03", "04")
+      val labels = Seq("03", "04", "02","05", "01")
       (0 until checkboxes.size()) foreach { i =>
         checkboxes.get(i).attr("value") mustEqual labels(i)
       }

@@ -23,11 +23,9 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
-
 import models.businessactivities.BusinessActivities
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
-import models.moneyservicebusiness.{MoneyServiceBusiness => MSBModel}
-import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
+import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
@@ -58,10 +56,10 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
             val form = Form2[BusinessMatchingActivities](businessActivities)
             val (newActivities, existing) = getActivityValues(form, isPreSubmission, Some(businessActivities.businessActivities))
 
-            Ok(register_services(form, edit, newActivities, existing, isPreSubmission, businessMatching.preAppComplete))
+            Ok(register_services(form, edit, sortActivities(newActivities), existing, isPreSubmission, businessMatching.preAppComplete))
           }) getOrElse {
             val (newActivities, existing) = getActivityValues(EmptyForm, isPreSubmission, None)
-            Ok(register_services(EmptyForm, edit, newActivities, existing, isPreSubmission, showReturnLink = false))
+            Ok(register_services(EmptyForm, edit, sortActivities(newActivities), existing, isPreSubmission, showReturnLink = false))
           }
         }
   }
@@ -88,7 +86,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                   register_services(
                     invalidForm,
                     edit,
-                    newActivities,
+                    sortActivities(newActivities),
                     existing,
                     isPreSubmission
                   )
@@ -334,5 +332,10 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
     } else {
       (rp, activities)
     }
+  }
+
+
+  private def sortActivities(activities: Set[String]): Seq[String] = {
+    (activities map BusinessMatchingActivities.getBusinessActivity).toSeq.sortBy(_.getMessage()) map BusinessMatchingActivities.getValue
   }
 }
