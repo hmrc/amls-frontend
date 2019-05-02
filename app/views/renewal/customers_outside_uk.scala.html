@@ -70,7 +70,7 @@
         @errorGroup(
             field = f("countries")
         ) {
-            <p class="form-hint">@Messages("businessactivities.hight.value.customer.lbl.hint")</p>
+            @hint("businessactivities.hight.value.customer.lbl.hint")
             @for(i <- 0 until 10) {
                 @defining(
                     f(s"countries[$i]")

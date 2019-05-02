@@ -38,7 +38,7 @@
             f = f("countries"),
             panel = false
         ) {
-            <p class="form-hint">@Messages("lbl.list.upto.3.countries")</p>
+            @hint("lbl.list.upto.3.countries")
             @for(i <- 1 until 4) {
                 @defining(
                     f(s"country_$i")

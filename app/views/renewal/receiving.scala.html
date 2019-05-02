@@ -38,7 +38,7 @@
         panel = false,
         classes = Seq("inline")
     ) {
-        <p class="form-hint">@Messages("hvd.receiving.convert.currency.text")</p>
+        @hint("hvd.receiving.convert.currency.text")
         @errorGroup(
             field = f("receivePayments")
         ) {
