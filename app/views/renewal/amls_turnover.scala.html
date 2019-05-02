@@ -21,13 +21,10 @@
 @(f: forms.Form2[_], edit: Boolean, businessTypes:Option[List[String]])(implicit lang:Lang,  m: Messages, request: Request[_])
 
 @headingText = @{
-    businessTypes.map { types =>
-        if (types.length == 1) {
-            "renewal.turnover.title.single.service"
-        } else {
-            "renewal.turnover.title"
-        }
-    }.getOrElse("renewal.turnover.title")
+    businessTypes match {
+        case Some(types) if types.length == 1 => "renewal.turnover.title.single.service"
+        case _ => "renewal.turnover.title"
+    }
 }
 
 @header = {

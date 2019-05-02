@@ -50,7 +50,7 @@
                 f = f("isOutside"),
                 labelText = "lbl.yes",
                 value = "true",
-                target = s".countries-fieldset",
+                target = ".countries-fieldset",
                 inline = true
             )
             @radio(
@@ -70,6 +70,7 @@
         @errorGroup(
             field = f("countries")
         ) {
+            <p class="form-hint">@Messages("businessactivities.hight.value.customer.lbl.hint")</p>
             @for(i <- 0 until 10) {
                 @defining(
                     f(s"countries[$i]")
