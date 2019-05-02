@@ -27,34 +27,30 @@ s"""${f("professionalBody").id}-fieldset"""
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("estateagentbusiness.penalisedbyprofessional.title", "summary.estateagentbusiness")
+    @heading(section = "summary.estateagentbusiness")
 }
 
 @main(
-title = Messages("estateagentbusiness.penalisedbyprofessional.title") + " - " + Messages("summary.estateagentbusiness"),
-heading = header
+    title = Messages("estateagentbusiness.penalisedbyprofessional.title") + " - " + Messages("summary.estateagentbusiness"),
+    heading = header
 ) {
-
-
-    @Messages("estateagentbusiness.penalisedbyprofessional.subtitle")
-
-    <ul class="list list-bullet form-group">
-        <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_1")</li>
-        <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_2")</li>
-        <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_3")</li>
-        <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_4")</li>
-        <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_5")</li>
-    </ul>
-
 
 @form(f, controllers.estateagentbusiness.routes.PenalisedByProfessionalController.post(edit)) {
 
     @fieldset(
         f = f("penalised-fieldset"),
-        legend = "estateagentbusiness.penalisedbyprofessional.title",
-        legendHidden = true,
+        heading = "estateagentbusiness.penalisedbyprofessional.title",
         panel = false
     ) {
+        @Messages("estateagentbusiness.penalisedbyprofessional.subtitle")
+
+        <ul class="list list-bullet form-group">
+            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_1")</li>
+            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_2")</li>
+            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_3")</li>
+            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_4")</li>
+            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_5")</li>
+        </ul>
         @errorGroup(
              field = f("penalised")
         ) {

@@ -22,22 +22,24 @@
 @(f: forms.Form2[_], model: BusinessMatching, changeActivitiesUrl: String, isPreSubmission: Boolean = true, isPending: Boolean = false)(implicit request: Request[_],messages:Messages)
 
 @header = {
-    @heading("title.cya", if(isPreSubmission) "summary.businessmatching" else "summary.updateservice")
+    @if(isPreSubmission) {
+        @heading("title.cya.pre.application", "summary.businessmatching")
+    }else {
+        @heading("title.cya", "summary.updateservice")
+    }
 }
 
 @main(
-    title = Messages("title.cya") + " - " + (if(isPreSubmission) Messages("summary.businessmatching") else Messages("summary.updateservice")),
+    title = if(isPreSubmission) {
+        Messages("title.cya.pre.application") + " - " + Messages("summary.businessmatching")
+    }else {
+        Messages("title.cya") + " - " + Messages("summary.updateservice")
+    },
     heading = header
 ) {
 
     @if(isPreSubmission) {
-        @panel(
-            jsHidden = false,
-            wide = true,
-            gutter = true
-        ) {
-            @Messages("businessmatching.summary.icon.title")
-        }
+        <p>@Messages("businessmatching.summary.icon.title")</p>
     }
 
     @model.reviewDetails.map { review =>
@@ -87,16 +89,16 @@
             classes = Seq("register-services"),
             editLinkTag = "businessactivities-edit"
         ) {
-            <ul class="list list--comma">
-                @activity.businessActivities.map { line =>
+            <ul class="list">
+                @activity.businessActivities.toList.sortBy(_.toString).map { line =>
                     <li>@line match {
                         case AccountancyServices => {@Messages("businessmatching.registerservices.servicename.lbl.01")}
                         case BillPaymentServices => {@Messages("businessmatching.registerservices.servicename.lbl.02")}
                         case EstateAgentBusinessService => {@Messages("businessmatching.registerservices.servicename.lbl.03")}
                         case HighValueDealing => {@Messages("businessmatching.registerservices.servicename.lbl.04")}
                         case MoneyServiceBusiness => {@Messages("businessmatching.registerservices.servicename.lbl.05")}
-                        case TrustAndCompanyServices => {@Messages("businessmatching.registerservices.servicename.lbl.06")}
                         case TelephonePaymentService => {@Messages("businessmatching.registerservices.servicename.lbl.07")}
+                        case TrustAndCompanyServices => {@Messages("businessmatching.registerservices.servicename.lbl.06")}
                     }</li>
                 }
             </ul>
@@ -110,14 +112,14 @@
                     editUrl = controllers.businessmatching.routes.MsbSubSectorsController.get(true).toString,
                     editLinkTag="msbservices-edit"
                 ) {
-                    <ul class="list list--comma">
-                    @services.msbServices.map { svc =>
+                    <ul class="list">
+                    @services.msbServices.toList.sortBy(_.toString).map { svc =>
                         <li>@svc match {
-                            case TransmittingMoney => {@Messages("businessmatching.services.list.lbl.01")}
-                            case CurrencyExchange => {@Messages("businessmatching.services.list.lbl.02")}
                             case ChequeCashingNotScrapMetal => {@Messages("businessmatching.services.list.lbl.03")}
                             case ChequeCashingScrapMetal => {@Messages("businessmatching.services.list.lbl.04")}
+                            case CurrencyExchange => {@Messages("businessmatching.services.list.lbl.02")}
                             case ForeignExchange => {@Messages("businessmatching.services.list.lbl.05")}
+                            case TransmittingMoney => {@Messages("businessmatching.services.list.lbl.01")}
                         }</li>
                     }
                     </ul>

@@ -19,7 +19,7 @@ package controllers.businessmatching
 import cats.data.OptionT
 import cats.implicits._
 import config.AppConfig
-import connectors.{DataCacheConnector, KeystoreConnector}
+import connectors.DataCacheConnector
 import forms.{EmptyForm, Form2}
 import generators.ResponsiblePersonGenerator
 import models.businessactivities.{AccountantForAMLSRegulations, BusinessActivities, TaxMatters, WhoIsYourAccountant}
@@ -960,7 +960,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
     }
     "shouldPromptForApproval" must {
       "reset approval flag to none" when {
-        "business activity is changes to not have MSB or TCSP and FitandProper flag has a value of false" in new Fixture {
+        "removing a business activity and does not have MSB or TCSP and FitandProper flag has a value of false" in new Fixture {
 
           val rp = responsiblePerson.copy(
             approvalFlags = ApprovalFlags(
@@ -969,8 +969,9 @@ class RegisterServicesControllerSpec extends AmlsSpec
             )
           )
           val bm = BMBusinessActivities(businessActivities=Set(HighValueDealing))
+          val isRemoving = true
 
-          val result = controller.shouldPromptForApproval(rp, bm)
+          val result = controller.shouldPromptForApproval(rp, bm, isRemoving)
 
           val expectedRp = responsiblePerson.copy(
             approvalFlags = ApprovalFlags(
@@ -980,6 +981,27 @@ class RegisterServicesControllerSpec extends AmlsSpec
             hasAccepted = false,
             hasChanged = true
           )
+          val expectedBm = bm
+
+          result mustEqual((expectedRp, expectedBm))
+        }
+      }
+
+      "not handle any approvalFlags" when {
+        "adding a business activity" in new Fixture {
+
+          val rp = responsiblePerson.copy(
+            approvalFlags = ApprovalFlags(
+              hasAlreadyPassedFitAndProper = Some(false),
+              hasAlreadyPaidApprovalCheck= Some(false)
+            )
+          )
+          val bm = BMBusinessActivities(businessActivities=Set(HighValueDealing))
+          val isRemoving = false
+
+          val result = controller.shouldPromptForApproval(rp, bm, isRemoving)
+
+          val expectedRp = rp
           val expectedBm = bm
 
           result mustEqual((expectedRp, expectedBm))
@@ -997,13 +1019,28 @@ class RegisterServicesControllerSpec extends AmlsSpec
             )
           )
           val bm = BMBusinessActivities(businessActivities=Set(HighValueDealing))
+          val isRemoving = true
 
-          val result = controller.shouldPromptForApproval(rp, bm)
+          val result = controller.shouldPromptForApproval(rp, bm, isRemoving)
 
           val expectedRp = rp
           val expectedBm = bm
 
           result mustEqual((expectedRp, expectedBm))
+        }
+      }
+    }
+    "sortActivities" must {
+      "return activities in alphabetical order mapped to values" when {
+        "given values in numerical order" in new Fixture {
+          val activities = Set("01", "02", "03", "04", "05", "06", "07")
+          val sortedActivities = Seq("01", "02", "03", "04", "05", "07", "06")
+
+          val sortActivities = PrivateMethod[Seq[String]]('sortActivities)
+
+          val result = controller invokePrivate sortActivities(activities)
+
+          result must be(sortedActivities)
         }
       }
     }

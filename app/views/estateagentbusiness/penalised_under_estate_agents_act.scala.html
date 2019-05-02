@@ -24,7 +24,7 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("estateagentbusiness.penalisedunderestateagentsact.title", "summary.estateagentbusiness")
+    @heading(section = "summary.estateagentbusiness")
 }
 
 @main(
@@ -32,22 +32,18 @@
     heading = header
 ) {
 
-
-        @Messages("estateagentbusiness.penalisedunderestateagentsact.subtitle")
-        <ul class="list list-bullet">
-            <li>@Messages("estateagentbusiness.penalisedunderestateagentsact.warning")</li>
-            <li>@Messages("estateagentbusiness.penalisedunderestateagentsact.banned")</li>
-        </ul>
-
-
     @form(f, controllers.estateagentbusiness.routes.PenalisedUnderEstateAgentsActController.post(edit)) {
 
         @fieldset(
             f = f("penalisedUnderEstateAgentsAct-fieldset"),
-            legend = "estateagentbusiness.penalisedunderestateagentsact.title",
-            legendHidden = true,
+            heading = "estateagentbusiness.penalisedunderestateagentsact.title",
             panel = false
         ) {
+            @Messages("estateagentbusiness.penalisedunderestateagentsact.subtitle")
+            <ul class="list list-bullet">
+                <li>@Messages("estateagentbusiness.penalisedunderestateagentsact.warning")</li>
+                <li>@Messages("estateagentbusiness.penalisedunderestateagentsact.banned")</li>
+            </ul>
             @errorGroup(
                 field = f("penalisedUnderEstateAgentsAct")
             ) {

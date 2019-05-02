@@ -23,11 +23,9 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
-
 import models.businessactivities.BusinessActivities
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
-import models.moneyservicebusiness.{MoneyServiceBusiness => MSBModel}
-import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
+import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
@@ -58,10 +56,10 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
             val form = Form2[BusinessMatchingActivities](businessActivities)
             val (newActivities, existing) = getActivityValues(form, isPreSubmission, Some(businessActivities.businessActivities))
 
-            Ok(register_services(form, edit, newActivities, existing, isPreSubmission, businessMatching.preAppComplete))
+            Ok(register_services(form, edit, sortActivities(newActivities), existing, isPreSubmission, businessMatching.preAppComplete))
           }) getOrElse {
             val (newActivities, existing) = getActivityValues(EmptyForm, isPreSubmission, None)
-            Ok(register_services(EmptyForm, edit, newActivities, existing, isPreSubmission, showReturnLink = false))
+            Ok(register_services(EmptyForm, edit, sortActivities(newActivities), existing, isPreSubmission, showReturnLink = false))
           }
         }
   }
@@ -88,7 +86,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                   register_services(
                     invalidForm,
                     edit,
-                    newActivities,
+                    sortActivities(newActivities),
                     existing,
                     isPreSubmission
                   )
@@ -96,34 +94,17 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
               }
             }
           case ValidForm(_, data) =>
-            (for {
-              isPreSubmission <- statusService.isPreSubmission
-              businessMatching <- businessMatchingService.getModel.value
-              savedModel <- updateModel(
-                businessMatching,
-                newModel(businessMatching.activities,
-                  data,
-                  isPreSubmission
-                ),
-                isMsb(data, businessMatching.activities)
-              )
-              _ <- maybeRemoveAccountantForAMLSRegulations(savedModel)
-              _ <- clearRemovedSections(
-                businessMatching.activities.getOrElse(
-                  BusinessMatchingActivities(
-                    Set()
-                  )
-                ).businessActivities,
-                savedModel.businessActivities
-              )
-            } yield savedModel) flatMap { savedActivities =>
+            businessActivities(data) flatMap { ba =>
               getData[ResponsiblePerson] flatMap { responsiblePeople =>
 
                 val workFlow =
                   shouldPromptForApproval.tupled andThen
-                  shouldPromptForFitAndProper.tupled
+                    shouldPromptForFitAndProper.tupled
 
-                val rps = responsiblePeople.map(rp => workFlow((rp, savedActivities)))
+                val activities = ba._1
+                val isRemovingActivity = ba._2
+
+                val rps = responsiblePeople.map(rp => workFlow((rp, activities, isRemovingActivity)))
 
                 updateResponsiblePeople(rps) map { _ =>
                   redirectTo(data.businessActivities)
@@ -131,6 +112,30 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
               }
             }
         }
+  }
+
+  private def businessActivities(data: BusinessMatchingActivities)
+                        (implicit ac: AuthContext, hc: HeaderCarrier) = {
+
+    lazy val empty = BusinessMatchingActivities(Set())
+
+    for {
+      isPreSubmission <- statusService.isPreSubmission
+      businessMatching <- businessMatchingService.getModel.value
+      businessActivitiesModel <- updateModel(
+        businessMatching,
+        newModel(businessMatching.activities, data, isPreSubmission),
+        isMsb(data, businessMatching.activities)
+      )
+      _ <- maybeRemoveAccountantForAMLSRegulations(businessActivitiesModel)
+      _ <- clearRemovedSections(
+        businessMatching.activities.getOrElse(empty).businessActivities,
+        businessActivitiesModel.businessActivities
+      )
+      isRemovingActivity <- Future.successful(
+        businessMatching.activities.getOrElse(empty).businessActivities > businessActivitiesModel.businessActivities
+      )
+    } yield (businessActivitiesModel, isRemovingActivity)
   }
 
   private def withoutAccountantForAMLSRegulations(activities: BusinessActivities): BusinessActivities =
@@ -296,12 +301,16 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
     }
 
   val shouldPromptForApproval:
-  (ResponsiblePerson, BusinessMatchingActivities) => (ResponsiblePerson, BusinessMatchingActivities) =
-  (rp, activities) => {
+  (ResponsiblePerson, BusinessMatchingActivities, Boolean) => (ResponsiblePerson, BusinessMatchingActivities) =
+  (rp, activities, isRemoving) => {
 
-    def approvalIsRequired(rp: ResponsiblePerson, businessActivities: BusinessMatchingActivities) =
+    def approvalIsRequired(rp: ResponsiblePerson, businessActivities: BusinessMatchingActivities, isRemoving: Boolean) = {
       rp.approvalFlags.hasAlreadyPassedFitAndProper.contains(false) &
-      !(containsTcspOrMsb(businessActivities.businessActivities))
+        !(containsTcspOrMsb(businessActivities.businessActivities)) &
+        isRemoving
+    }
+
+
 
     def setResponsiblePeopleForApproval(rp: ResponsiblePerson)
     : ResponsiblePerson = {
@@ -318,10 +327,15 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
       }
     }
 
-    if (approvalIsRequired(rp, activities)) {
+    if (approvalIsRequired(rp, activities, isRemoving)) {
       (setResponsiblePeopleForApproval(rp), activities)
     } else {
       (rp, activities)
     }
+  }
+
+
+  private def sortActivities(activities: Set[String]): Seq[String] = {
+    (activities map BusinessMatchingActivities.getBusinessActivity).toSeq.sortBy(_.getMessage()) map BusinessMatchingActivities.getValue
   }
 }

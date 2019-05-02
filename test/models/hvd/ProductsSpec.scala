@@ -27,6 +27,23 @@ class ProductsSpec extends PlaySpec with MockitoSugar {
 
   "Products" must {
 
+    "sort itemtypes alphabetically" when {
+      "other value is defined" in {
+        val products = Products(Set(Alcohol, Tobacco, Antiques, Cars, OtherMotorVehicles,
+          Caravans, Jewellery, Gold, ScrapMetals, MobilePhones, Clothing, Other("Nougat")))
+
+        products.sorted mustBe Seq(Alcohol, Antiques, Caravans, Cars, Clothing, Gold,
+          Jewellery, MobilePhones, OtherMotorVehicles, ScrapMetals, Tobacco, Other("Nougat"))
+      }
+      "other value is not defined" in {
+        val products = Products(Set(Alcohol, Tobacco, Antiques, Cars, OtherMotorVehicles,
+          Caravans, Jewellery, Gold, ScrapMetals, MobilePhones, Clothing))
+
+        products.sorted mustBe Seq(Alcohol, Antiques, Caravans, Cars, Clothing, Gold,
+          Jewellery, MobilePhones, OtherMotorVehicles, ScrapMetals, Tobacco)
+      }
+    }
+
     "validate model with few check box selected" in {
 
       val model = Map(

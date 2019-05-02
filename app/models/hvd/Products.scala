@@ -27,8 +27,18 @@ import utils.TraversableValidators.minLengthR
 import cats.data.Validated.{Invalid, Valid}
 
 case class Products(items: Set[ItemType]) {
+
+
   def sorted = {
-    items.toSeq.sortBy( it => it.value)
+    val sortedItemTypes = Seq(Alcohol, Antiques, Caravans, Cars, Clothing, Gold,
+      Jewellery, MobilePhones, OtherMotorVehicles, ScrapMetals, Tobacco)
+
+    def otherValue(items: Set[ItemType]): Option[ItemType] = items.collectFirst { case Other(itemType) => Other(itemType) }
+
+    val sortedListItems = sortedItemTypes intersect items.toSeq
+    otherValue(items) map { other =>
+      sortedListItems :+ other
+    } getOrElse sortedListItems
   }
 }
 
