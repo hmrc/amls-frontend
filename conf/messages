@@ -591,7 +591,7 @@ status.submissionderegistered.description = Your business is now de-registered.
 status.submissionderegistered.description2 = Your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
 status.submissionderegistered.button-text = Submit new application
 
-status.renewalsubmitted.text = Currently supervised, renewal under review
+status.renewalsubmitted.text = Supervised, renewal under review
 status.renewalsubmitted.description = Renewal under review
 status.renewalsubmitted.description2 = You have submitted your renewal application, and have 28 days to pay the fees. If you have not already paid, pay your fees now.
 status.renewalsubmitted.description3 = HMRC will then review your renewal application.
