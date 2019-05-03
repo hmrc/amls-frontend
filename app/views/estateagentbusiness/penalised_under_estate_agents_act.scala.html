@@ -53,7 +53,7 @@
                     labelText = "lbl.yes",
                     value = "true",
                     inline = true,
-                    target = s".professionalBodyAct-fieldset"
+                    target = "[data-reveal='penalised-estate-agents-act']"
                 )
                 @radio(
                     f = f("penalisedUnderEstateAgentsAct"),
@@ -61,30 +61,22 @@
                     value = "false",
                     inline = true
                 )
-            }
-        }
-
-        @fieldset(
-            legend = "estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl",
-            legendHidden = true,
-            jsHidden = true,
-            classes = Seq("professionalBodyAct-fieldset"),
-            f = f("penalisedUnderEstateAgentsActDetails-fieldset")
-        ) {
-            @panel(
-                jsHidden = false,
-                wide = false,
-                gutter = true
-            ) {
-                @textarea(
-                    f("penalisedUnderEstateAgentsActDetails"),
-                    labelText = "estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl",
-                    hintText = "hint.255.chars",
-                    bold = false,
-                    largeWidth = true,
-                    cols = "30",
-                    rows = "8"
-                )
+                @panel(
+                    jsHidden = true,
+                    dataReveal = "penalised-estate-agents-act",
+                    wide = false,
+                    gutter = true
+                ) {
+                    @textarea(
+                        f("penalisedUnderEstateAgentsActDetails"),
+                        labelText = "estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl",
+                        hintText = "hint.255.chars",
+                        bold = false,
+                        largeWidth = true,
+                        cols = "30",
+                        rows = "8"
+                    )
+                }
             }
         }
 
