@@ -18,7 +18,7 @@ package views.registrationprogress
 
 import forms.EmptyForm
 import generators.businesscustomer.AddressGenerator
-import models.registrationprogress.{Completed, Section, Started}
+import models.registrationprogress.{Completed, Section}
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.mvc.Call
@@ -26,6 +26,9 @@ import utils.AmlsSpec
 import views.Fixture
 
 class registration_progressSpec extends AmlsSpec with MockitoSugar with AddressGenerator {
+
+  val businessName = "BusinessName"
+  val serviceNames = Seq("Service 1", "Service 2", "Service 3")
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
@@ -46,6 +49,18 @@ class registration_progressSpec extends AmlsSpec with MockitoSugar with AddressG
       heading.html must be(Messages("progress.title"))
 
       doc.select("h2.heading-small").first().ownText() must be("Your business")
+    }
+
+    "show the business name and services" in new ViewFixture {
+      def view = views.html.registrationprogress.registration_progress(sections, true, businessName, serviceNames, true)
+      val element = doc.getElementsByClass("business-info").first()
+      serviceNames.foreach(name => element.text() must include { name } )
+    }
+
+    "show the view details link under services section" in new ViewFixture {
+      def view = views.html.registrationprogress.registration_progress(sections, true, businessName, serviceNames, true)
+      val element = Option(doc.getElementById("view-details"))
+      element mustNot be(None)
     }
   }
 }
