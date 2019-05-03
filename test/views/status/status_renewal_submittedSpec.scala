@@ -53,7 +53,7 @@ class status_renewal_submittedSpec extends AmlsSpec with MustMatchers {
       doc.getElementsContainingOwnText(Messages("status.business")).hasText must be(true)
 
       doc.getElementsByClass("heading-secondary").first().html() must include(Messages("summary.status"))
-      doc.getElementsByClass("panel-indent").first().child(0).html() must be(Messages("status.business"))
+      doc.getElementsByTag("p").text() must include(Messages("status.business"))
 
       doc.getElementsByClass("list").first().child(0).html() must include(Messages("status.complete"))
       doc.getElementsByClass("list").first().child(0).attr("class") must be("status-list--complete")
@@ -80,6 +80,9 @@ class status_renewal_submittedSpec extends AmlsSpec with MustMatchers {
       doc.getElementsMatchingOwnText(Messages("status.renewalsubmitted.description4")).text() must be(
         Messages("status.renewalsubmitted.description4"))
 
+      doc.getElementsMatchingOwnText(Messages("status.renewalsubmitted.description5")).text() must be(
+        Messages("status.renewalsubmitted.description5"))
+
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") mustBe controllers.routes.NotificationController.getMessages().url
 
@@ -97,9 +100,8 @@ class status_renewal_submittedSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.status.status_renewal_submitted("XAML00000567890", None, None, None)
 
-      doc.getElementsContainingOwnText(Messages("status.business")).isEmpty must be(true)
-
-      doc.getElementsContainingOwnText(Messages("status.business")).isEmpty must be(true)
+      doc.getElementById("status-renewal-submitted-business") must be(null)
+      doc.getElementById("status-renewal-submitted-business-name") must be(null)
       doc.getElementsContainingOwnText(Messages("status.submittedForReview.submitteddate.text")).isEmpty must be(true)
       doc.getElementsByTag("details").html() must be("")
     }
@@ -108,11 +110,11 @@ class status_renewal_submittedSpec extends AmlsSpec with MustMatchers {
 
       def view =  views.html.status.status_renewal_submitted("XAML00000567890", Some("business Name"), None, None)
 
-      doc.getElementsMatchingOwnText(Messages("survey.satisfaction.please")).text() must
-        be(Messages("survey.satisfaction.please") +" "+ Messages("survey.satisfaction.answer")+ " "+Messages("survey.satisfaction.helpus"))
+      doc.getElementsMatchingOwnText(Messages("survey.satisfaction.beforeyougo")).text() must
+        be(Messages("survey.satisfaction.beforeyougo"))
 
-      doc.getElementsMatchingOwnText(Messages("survey.satisfaction.answer")).hasAttr("href") must be(true)
-      doc.getElementsMatchingOwnText(Messages("survey.satisfaction.answer")).attr("href") must be("/anti-money-laundering/satisfaction-survey")
+      doc.getElementsMatchingOwnText(Messages("survey.satisfaction.beforeyougo")).hasAttr("href") must be(true)
+      doc.getElementsMatchingOwnText(Messages("survey.satisfaction.beforeyougo")).attr("href") must be("/anti-money-laundering/satisfaction-survey")
     }
   }
 }

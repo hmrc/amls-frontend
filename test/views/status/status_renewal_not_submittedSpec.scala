@@ -53,7 +53,7 @@ class status_renewal_not_submittedSpec extends AmlsSpec with MustMatchers {
       doc.getElementsContainingOwnText("business Name").hasText must be(true)
       doc.getElementsContainingOwnText(Messages("status.business")).hasText must be(true)
       doc.getElementsByClass("heading-secondary").first().html() must include(Messages("summary.status"))
-      doc.getElementsByClass("panel-indent").first().child(0).html() must be(Messages("status.business"))
+      doc.getElementsByTag("p").html() must include(Messages("status.business"))
 
       doc.getElementsByClass("list").first().child(0).html() must include(Messages("status.complete"))
       doc.getElementsByClass("list").first().child(0).attr("class") must be("status-list--complete")
@@ -65,6 +65,8 @@ class status_renewal_not_submittedSpec extends AmlsSpec with MustMatchers {
       doc.getElementsMatchingOwnText(Messages("status.renewalnotsubmitted.description")).text must be(Messages("status.renewalnotsubmitted.description"))
       doc.getElementsMatchingOwnText(Messages("status.renewalnotsubmitted.description2")).text must be(Messages("status.renewalnotsubmitted.description2"))
       doc.getElementsMatchingOwnText(Messages("status.renewalnotsubmitted.description3", endDateFormatted)).text must be(Messages("status.renewalnotsubmitted.description3", endDateFormatted))
+      doc.getElementsMatchingOwnText(Messages("status.renewalnotsubmitted.description4")).text must be(Messages("status.renewalnotsubmitted.description4"))
+      doc.getElementsMatchingOwnText(Messages("status.renewalnotsubmitted.description5")).text must be(Messages("status.renewalnotsubmitted.description5"))
     }
   }
 }

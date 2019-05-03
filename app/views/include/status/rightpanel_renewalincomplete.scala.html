@@ -16,5 +16,7 @@
 
 @(endDate: String)(implicit request: Request[_],m:Messages)
 <h2 class="heading-medium no-margin">@Messages("status.renewalincomplete.description")</h2>
-<p>@Messages("status.renewalincomplete.description2", endDate)</p>
-<a id="return-to-saved-application" href="@controllers.routes.RegistrationProgressController.get()" class="button" type="submit">@Messages("status.incomplete.buttontext")</a>
+<p>@Messages("status.renewalincomplete.description2")</p>
+<p>@Messages("status.renewalincomplete.description3", endDate)</p>
+<p>@Messages("status.renewalincomplete.description4")</p>
+<a id="return-to-saved-application" href="@controllers.routes.RegistrationProgressController.get()" class="button" type="submit">@Messages("status.renewal.incomplete.buttontext")</a>

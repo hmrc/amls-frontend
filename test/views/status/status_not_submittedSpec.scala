@@ -53,7 +53,7 @@ class status_not_submittedSpec extends AmlsSpec with MustMatchers {
       doc.getElementsContainingOwnText(Messages("status.business")).hasText must be(true)
 
       doc.getElementsByClass("heading-secondary").first().html() must include(Messages("summary.status"))
-      doc.getElementsByClass("panel-indent").first().child(0).html() must be(Messages("status.business"))
+      doc.html() must include(Messages("status.business"))
 
       doc.getElementsByClass("list").first().child(0).html() must include(Messages("status.complete"))
       doc.getElementsByClass("list").first().child(1).html() must include(Messages("status.notsubmitted"))
@@ -84,7 +84,7 @@ class status_not_submittedSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.status.status_not_submitted("XAML00000000000", None, call)
 
-      doc.getElementsContainingOwnText(Messages("status.business")).isEmpty must be(true)
+      doc.getElementById("status-not-submitted-business") must be(null)
 
 
     }
