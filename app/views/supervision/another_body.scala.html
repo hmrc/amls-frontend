@@ -40,8 +40,7 @@
             legend = "supervision.another_body.title",
             f = f("anotherBody"),
             legendHidden = true,
-            panel = false,
-            classes = Seq("inline")
+            panel = false
         ) {
             @radio(
                 f = f("anotherBody"),
@@ -50,29 +49,28 @@
                 target = s"#$target",
                 inline = true
             )
+            @panel(
+                field = Some(f(s"$target"))
+            ) {
+
+                @errorGroup(
+                    field = f("supervisor-panel"),
+                    classes = Seq("form-field")
+                ) {
+                    @input(
+                        field = f("supervisorName"),
+                        labelText = "supervision.another_body.lbl.supervisor",
+                        bold = false,
+                        panel = false
+                    )
+                }
+            }
             @radio(
                 f = f("anotherBody"),
                 labelText = "lbl.no",
                 value = "false",
                 inline = true
             )
-        }
-
-        @panel(
-            field = Some(f(s"$target"))
-        ) {
-
-            @errorGroup(
-                field = f("supervisor-panel"),
-                classes = Seq("form-field")
-            ) {
-                @input(
-                    field = f("supervisorName"),
-                    labelText = "supervision.another_body.lbl.supervisor",
-                    bold = false,
-                    panel = false
-                )
-            }
         }
 
         @submit(edit)

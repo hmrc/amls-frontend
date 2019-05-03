@@ -51,8 +51,7 @@
                 legend = "supervision.penalisedbyprofessional.title",
                 legendHidden = true,
                 f = f("penalised"),
-                panel = false,
-                classes = Seq("inline")
+                panel = false
             ) {
                 @radio(
                     f = f("penalised"),
@@ -61,19 +60,19 @@
                     target = s"#$target",
                     inline = true
                 )
+                @fieldset(
+                    legend = "supervision.penalisedbyprofessional.details.lbl",
+                    f = f(target),
+                    legendHidden = true
+                ) {
+                    @textarea(f("professionalBody"), "supervision.penalisedbyprofessional.details.lbl", bold = false, largeWidth = true, cols = "30", rows = "8")
+                }
                 @radio(
                     f = f("penalised"),
                     labelText = "lbl.no",
                     value = "false",
                     inline = true
                 )
-            }
-            @fieldset(
-                legend = "supervision.penalisedbyprofessional.details.lbl",
-                f = f(target),
-                legendHidden = true
-            ) {
-                @textarea(f("professionalBody"), "supervision.penalisedbyprofessional.details.lbl", bold = false, largeWidth = true, cols = "30", rows = "8")
             }
 
         @submit(edit)

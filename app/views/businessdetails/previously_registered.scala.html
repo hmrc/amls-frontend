@@ -40,8 +40,7 @@
             legend = "businessdetails.registeredformlr.title",
             legendHidden = true,
             panel = false,
-            f = f("previouslyRegistered-fieldset"),
-            classes = Seq("inline")
+            f = f("previouslyRegistered-fieldset")
         ) {
 
             @errorGroup(
@@ -54,6 +53,21 @@
                     value = "true",
                     target = s"#$target",
                     inline = true)
+                @panel(
+                    field = Some(f(s"$target")),
+                    jsHidden = false,
+                    id = target
+                ) {
+                    @input(
+                        field = f("prevMLRRegNo"),
+                        labelText = "businessdetails.registeredformlr.mlrregno.lbl",
+                        hintText = "businessdetails.registeredformlr.taxReferenceHint",
+                        bold = false,
+                        attrType = "number",
+                        attrMaxlength = "8",
+                        attrPattern = "[0-9]{1,8}"
+                    )
+                }
                 @radio(
                     f = f("previouslyRegistered"),
                     labelText = "lbl.no",
@@ -61,22 +75,6 @@
                     inline = true
                 )
             }
-        }
-
-        @panel(
-            field = Some(f(s"$target")),
-            jsHidden = false,
-            id = target
-        ) {
-            @input(
-                field = f("prevMLRRegNo"),
-                labelText = "businessdetails.registeredformlr.mlrregno.lbl",
-                hintText = "businessdetails.registeredformlr.taxReferenceHint",
-                bold = false,
-                attrType = "number",
-                attrMaxlength = "8",
-                attrPattern = "[0-9]{1,8}"
-            )
         }
 
         @submit(false)

@@ -40,8 +40,7 @@ s"""${f("professionalBody").id}-fieldset"""
     @fieldset(
         f = f("penalised-fieldset"),
         heading = "estateagentbusiness.penalisedbyprofessional.title",
-        panel = false,
-        classes = Seq("inline")
+        panel = false
     ) {
         @Messages("estateagentbusiness.penalisedbyprofessional.subtitle")
 
@@ -55,47 +54,44 @@ s"""${f("professionalBody").id}-fieldset"""
         @errorGroup(
              field = f("penalised")
         ) {
-            @radio(
-                f = f("penalised"),
-                labelText = "lbl.yes",
-                value = "true",
-                inline = true,
-                target = s".professionalBody-fieldset"
-            )
-            @radio(
-                f = f("penalised"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true
-            )
+              @radio(
+                  f = f("penalised"),
+                  labelText = "lbl.yes",
+                  value = "true",
+                  target = s".professionalBody-fieldset"
+              )
+              @fieldset(
+                    legend = "estateagentbusiness.penalisedbyprofessional.lbl.detailslbl",
+                    legendHidden = true,
+                    jsHidden = true,
+                    classes = Seq("professionalBody-fieldset"),
+                    f = f(target)
+                ) {
+                    @panel(
+                        jsHidden = false,
+                        wide = false,
+                        gutter = true
+                    ) {
+                        @textarea(
+                            field = f("professionalBody"),
+                            labelText = "estateagentbusiness.penalisedbyprofessional.lbl.detailslbl",
+                            hintText = "hint.255.chars",
+                            bold = false,
+                            largeWidth = true,
+                            cols = "30",
+                            rows = "8"
+                        )
+                    }
+                }
+                @radio(
+                    f = f("penalised"),
+                    labelText = "lbl.no",
+                    value = "false"
+                )
         }
     }
 
-    @fieldset(
-        legend = "estateagentbusiness.penalisedbyprofessional.lbl.detailslbl",
-        legendHidden = true,
-        jsHidden = true,
-        classes = Seq("professionalBody-fieldset"),
-        f = f(target)
-    ) {
-        @panel(
-            jsHidden = false,
-            wide = false,
-            gutter = true
-        ) {
-            @textarea(
-                field = f("professionalBody"),
-                labelText = "estateagentbusiness.penalisedbyprofessional.lbl.detailslbl",
-                hintText = "hint.255.chars",
-                bold = false,
-                largeWidth = true,
-                cols = "30",
-                rows = "8"
-            )
-        }
-    }
+   @submit(edit)
 
-@submit(edit)
-
-}
+  }
 }

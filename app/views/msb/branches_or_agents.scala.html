@@ -40,8 +40,7 @@
             f = f("hasCountries-fieldset"),
             legend = "msb.branchesoragents.title",
             legendHidden = true,
-            panel = false,
-            classes = Seq("inline")
+            panel = false
         ) {
             @errorGroup(
                 field = f("hasCountries")
@@ -53,35 +52,34 @@
                     target = s"#countries",
                     inline = true
                 )
+                @panel(
+                    field = Some(f("countries")),
+                    jsHidden = false,
+                    data = Seq("data-toggle-new")
+                ) {
+                    <p>@Messages("msb.branchesoragents.hint")</p>
+                    @fieldset(
+                        f = f("countries-fieldset"),
+                        legend = "msb.branchesoragents.legend",
+                        panel = false
+                    ) {
+                        @for(i <- 0 until 10) {
+                            @defining(
+                                f(s"countries[$i]")
+                            ) { field => @country_autocomplete(
+                                field = field,
+                                labelText = s"lbl.country.line${i + 1}",
+                                data = countryData.getOrElse(Seq.empty)
+                            ) }
+                        }
+                    }
+                }
                 @radio(
                     f = f("hasCountries"),
                     labelText = "lbl.no",
                     value = "false",
                     inline = true
                 )
-            }
-        }
-
-        @panel(
-            field = Some(f("countries")),
-            jsHidden = false,
-            data = Seq("data-toggle-new")
-        ) {
-            <p>@Messages("msb.branchesoragents.hint")</p>
-            @fieldset(
-                f = f("countries-fieldset"),
-                legend = "msb.branchesoragents.legend",
-                panel = false
-            ) {
-                @for(i <- 0 until 10) {
-                    @defining(
-                        f(s"countries[$i]")
-                    ) { field => @country_autocomplete(
-                        field = field,
-                        labelText = s"lbl.country.line${i + 1}",
-                        data = countryData.getOrElse(Seq.empty)
-                    ) }
-                }
             }
         }
 

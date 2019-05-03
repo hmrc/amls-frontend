@@ -40,8 +40,7 @@
             f = f("nonUKPassport-fieldset"),
             legend = "",
             legendHidden = true,
-            panel = false,
-            classes = Seq("inline")
+            panel = false
         ) {
             @errorGroupWithPlaceholder(
                 field = f("nonUKPassport"),
@@ -54,6 +53,16 @@
                     inline = true,
                     target = s"#$target"
                 )
+               @panel(
+                    field = Some(f(s"$target"))
+                ) {
+                    @input(
+                        field = f("nonUKPassportNumber"),
+                        labelText = "lbl.passport.number",
+                        bold = false,
+                        hintText = "hint.9.digits"
+                    )
+                }
                 @radio(
                     f = f("nonUKPassport"),
                     labelText = "lbl.no",
@@ -61,17 +70,6 @@
                     inline = true
                 )
             }
-        }
-
-        @panel(
-            field = Some(f(s"$target"))
-        ) {
-            @input(
-                field = f("nonUKPassportNumber"),
-                labelText = "lbl.passport.number",
-                bold = false,
-                hintText = "hint.9.digits"
-            )
         }
 
         @submit()
