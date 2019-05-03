@@ -64,12 +64,12 @@ class CurrentAddressDateOfChangeController @Inject () (
 
       extraInfo.flatMap {
         case Some((date, name, responsiblePeople)) => {
-          val extraFields = Map("activityStartDate" -> Seq(date.toString("yyyy-MM-dd")))
+          val extraFields = Map("activityStartDate" -> Seq(date.startDate.toString("yyyy-MM-dd")))
 
           Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
             case f: InvalidForm => {
               val fullName = name.fullName
-              val dateFormatted = date.toString("d MMMM yyyy")
+              val dateFormatted = date.startDate.toString("d MMMM yyyy")
               Future.successful(BadRequest(
                 views.html.date_of_change(
                   f.withMessageFor(DateOfChange.errorPath, Messages("error.expected.rp.date.after.start", fullName, dateFormatted)),

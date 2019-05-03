@@ -22,17 +22,17 @@ import controllers.BaseController
 import forms._
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.responsiblepeople._
+import play.api.Logger
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.position_within_business
+import views.html.responsiblepeople.position_within_business_start_date
 
 import scala.concurrent.Future
 
-class PositionWithinBusinessController @Inject () (
+class PositionWithinBusinessStartDateController @Inject ()(
                                                   val dataCacheConnector: DataCacheConnector,
                                                   val authConnector: AuthConnector
                                                   )extends RepeatingSection with BaseController {
-
 
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
@@ -47,14 +47,12 @@ class PositionWithinBusinessController @Inject () (
               val data = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
 
               ResponsiblePerson.getResponsiblePersonFromData(data,index) match {
-                case Some(rp@ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_, Some(Positions(positions, _)),_,_,_,_,_,_,_,_,_,_,_))
-                => Ok(position_within_business(Form2[Set[PositionWithinBusiness]](positions), edit, index, bt, personName.titleName,
-                  ResponsiblePerson.displayNominatedOfficer(rp, ResponsiblePerson.hasNominatedOfficer(data)), flow))
-                case Some(rp@ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-                => Ok(position_within_business(EmptyForm, edit, index, bt, personName.titleName,
-                  ResponsiblePerson.displayNominatedOfficer(rp, ResponsiblePerson.hasNominatedOfficer(data)), flow))
+                case Some(rp@ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_, Some(Positions(positions, Some(startDate))),_,_,_,_,_,_,_,_,_,_,_))
+                  => Ok(position_within_business_start_date(Form2[PositionStartDate](startDate), edit, index, bt,  personName.titleName, positions, ResponsiblePerson.displayNominatedOfficer(rp, ResponsiblePerson.hasNominatedOfficer(data)), flow))
+                case Some(rp@ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_, Some(Positions(positions, None)),_,_,_,_,_,_,_,_,_,_,_))
+                  => Ok(position_within_business_start_date(EmptyForm, edit, index, bt, personName.titleName, positions, ResponsiblePerson.displayNominatedOfficer(rp, ResponsiblePerson.hasNominatedOfficer(data)), flow))
                 case _
-                => NotFound(notFoundView)
+                  => NotFound(notFoundView)
               }
             }).getOrElse(NotFound(notFoundView))
           }
@@ -63,7 +61,7 @@ class PositionWithinBusinessController @Inject () (
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        Form2[Set[PositionWithinBusiness]](request.body) match {
+        Form2[PositionStartDate](request.body) match {
           case f: InvalidForm =>
             dataCacheConnector.fetchAll map { optionalCache =>
               (optionalCache map { cache =>
@@ -74,28 +72,36 @@ class PositionWithinBusinessController @Inject () (
                 val data = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
 
                 ResponsiblePerson.getResponsiblePersonFromData(data,index) match {
-                  case s@Some(rp) =>
-                    BadRequest(position_within_business(f, edit, index, bt, ControllerHelper.rpTitleName(s),
+                  case s@Some(rp@ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_, Some(Positions(positions,_)),_,_,_,_,_,_,_,_,_,_,_)) =>
+                    BadRequest(position_within_business_start_date(f, edit, index, bt, ControllerHelper.rpTitleName(s), positions,
                       ResponsiblePerson.displayNominatedOfficer(rp, ResponsiblePerson.hasNominatedOfficer(data)), flow))
+                  case _
+                    => NotFound(notFoundView)
                 }
               }).getOrElse(NotFound(notFoundView))
             }
           case ValidForm(_, data) => {
             for {
-              _ <- updateDataStrict[ResponsiblePerson](index) { rp => {
-                  rp.positions match {
-                    case Some(x) => rp.positions(Positions.update(x, data))
-                    case None => rp.positions(Positions(data, None))
+              _ <- updateDataStrict[ResponsiblePerson](index) { rp => rp.positions match {
+                  case Some(x) => rp.positions(Positions.update(x, data))
+                  case _ => {
+                    Logger.error(s"Positions does not exist for ${rp.personName.getOrElse("[NAME MISSING]")}")
+                    throw new IllegalStateException("Positions does not exist, cannot update start date")
                   }
                 }
               }
               rpSeqOption <- dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key)
             } yield {
-                  Redirect(routes.PositionWithinBusinessStartDateController.get(index, edit, flow))
+                edit match {
+                  case true => Redirect(routes.DetailedAnswersController.get(index, flow))
+                  case _ => Redirect(routes.SoleProprietorOfAnotherBusinessController.get(index, edit, flow))
+                }
             }
           } recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
         }
   }
+
+
 }

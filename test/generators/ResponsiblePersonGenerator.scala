@@ -38,7 +38,7 @@ trait ResponsiblePersonGenerator extends BaseGenerator {
 
   val positionsGen = for {
     positions <- positionInBusinessGen
-  } yield Positions(positions.toSet, Some(new LocalDate()))
+  } yield Positions(positions.toSet, Some(PositionStartDate(new LocalDate())))
 
   val personNameGen: Gen[PersonName] = for {
     firstName <- stringOfLengthGen(FormTypes.maxNameTypeLength)

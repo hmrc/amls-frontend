@@ -528,7 +528,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           val emptyCache = CacheMap("", Map.empty)
 
-          val position = Positions(Set(InternalAccountant), Some(new LocalDate(1999, 5, 1)))
+          val position = Positions(Set(InternalAccountant), Some(PositionStartDate(new LocalDate(1999, 5, 1))))
           val peopleList = Seq(CompleteResponsiblePeople1.copy(positions = Some(position)))
 
           val newRequest = request.withFormUrlEncodedBody(
@@ -575,7 +575,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
   val experienceTraining = ExperienceTrainingYes("Some training")
 
   //scalastyle:off magic.number
-  val positions = Positions(Set(BeneficialOwner, InternalAccountant),Some(new LocalDate(2005, 3, 15)))
+  val positions = Positions(Set(BeneficialOwner, InternalAccountant),Some(PositionStartDate(new LocalDate(2005, 3, 15))))
 
   val CompleteResponsiblePeople1 = ResponsiblePerson(
     personName = Some(personName),

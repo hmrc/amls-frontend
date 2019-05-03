@@ -68,7 +68,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
        mock[FeeResponseService]
     )
 
-    val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(new LocalDate()))
+    val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(PositionStartDate(new LocalDate())))
     val rp1 = ResponsiblePerson(
       personName = Some(PersonName("first1",Some("middle"), "last1")),
       legalName = None,
