@@ -70,7 +70,7 @@
                     f = f("involvedInOther"),
                     labelText = "lbl.yes",
                     value = "true",
-                    target = s"#$target",
+                    target = "[data-reveal='involved-in-other']",
                     inline = true
                 )
                 @radio(
@@ -79,24 +79,24 @@
                     value = "false",
                     inline = true
                 )
+                @panel(
+                    jsHidden = true,
+                    dataReveal = "involved-in-other",
+                    id = target
+                ) {
+                    @textarea(
+                        field = f("details"),
+                        labelText = "businessactivities.confirm-activities.lbl.details",
+                        hintText = "renewal.hint.255.chars",
+                        bold = false,
+                        largeWidth = true,
+                        rows = "6",
+                        cols = "30"
+                    )
+                }
             }
         }
 
-        @panel(
-            field = Some(f(s"$target")),
-            jsHidden = false,
-            id = target
-        ) {
-            @textarea(
-                field = f("details"),
-                labelText = "businessactivities.confirm-activities.lbl.details",
-                hintText = "renewal.hint.255.chars",
-                bold = false,
-                largeWidth = true,
-                rows = "6",
-                cols = "30"
-            )
-        }
 
         @submit(returnLocation = Some("renewal"))
     }

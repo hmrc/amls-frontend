@@ -67,7 +67,8 @@
           hint = "lbl.select.all"
       ) {
         @errorGroup(
-            field = f("paymentMethods")
+            field = f("paymentMethods"),
+            classes = Seq("form-group")
         ) {
             @checkbox(
                 f = f("paymentMethods.courier"),
