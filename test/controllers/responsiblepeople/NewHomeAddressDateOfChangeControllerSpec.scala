@@ -52,7 +52,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
 
     val responsiblePeople = ResponsiblePerson(personName = Some(PersonName("FirstName",
       None, "lastName")),
-      positions = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2009,1,1)))))
+      positions = Some(Positions(Set(BeneficialOwner),Some(PositionStartDate(new LocalDate(2009,1,1))))))
 
     "Get:" must {
       "successfully load when the person moved to new address page" when {
@@ -132,7 +132,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
           "dateOfChange.day" -> "01"
         )
 
-        val position = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2011,1,1))))
+        val position = Some(Positions(Set(BeneficialOwner),Some(PositionStartDate(new LocalDate(2011,1,1)))))
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(responsiblePeople.copy(positions = position)))))
         when(controller.dataCacheConnector.save[NewHomeDateOfChange](any(), any())(any(), any(), any()))
@@ -150,7 +150,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
           "dateOfChange.day" -> "01"
         )
 
-        val position = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2011,1,1))))
+        val position = Some(Positions(Set(BeneficialOwner),Some(PositionStartDate(new LocalDate(2011,1,1)))))
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
         when(controller.dataCacheConnector.save[NewHomeDateOfChange](any(), any())(any(), any(), any()))

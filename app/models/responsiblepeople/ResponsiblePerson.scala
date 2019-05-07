@@ -20,7 +20,6 @@ import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 import org.joda.time.LocalDate
-import play.Logger
 import play.api.libs.json.Reads
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -292,6 +291,30 @@ object ResponsiblePerson {
         }
       }
     }
+  }
+
+  def hasNominatedOfficer(rpSeqOption: Option[Seq[ResponsiblePerson]]): Boolean = {
+    rpSeqOption match {
+      case Some(rps) => ResponsiblePerson.filter(rps).exists {
+        rp =>
+          rp.positions match {
+            case Some(position) => position.isNominatedOfficer
+            case _ => false
+          }
+      }
+      case _ => false
+    }
+  }
+
+  def displayNominatedOfficer(rp: ResponsiblePerson, hasNominatedOfficer: Boolean): Boolean = {
+    rp.positions.exists { positions =>
+      positions.positions.contains(NominatedOfficer)
+    } || !hasNominatedOfficer
+  }
+
+  def getResponsiblePersonFromData(data: Option[Seq[ResponsiblePerson]], index: Int) = data.flatMap{
+    case sq if index > 0 && index <= sq.length + 1 => sq.lift(index - 1)
+    case _ => None
   }
 
   def findResponsiblePersonByName(name: String, responsiblePeople: Seq[ResponsiblePerson]): Option[(ResponsiblePerson, Int)] = {

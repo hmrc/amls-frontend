@@ -32,7 +32,7 @@
 
     @form(f, controllers.hvd.routes.ExpectToReceiveCashPaymentsController.post(edit)) {
 
-        <p>@Messages("lbl.select.all")</p>
+        <p>@hint(Messages("lbl.select.all"))</p>
 
         @fieldset(
             f = f("paymentMethods-fieldset"),

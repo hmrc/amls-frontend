@@ -53,7 +53,7 @@ class status_renewal_incompleteSpec extends AmlsSpec with MustMatchers {
       doc.getElementsContainingOwnText("business Name").hasText must be(true)
       doc.getElementsContainingOwnText(Messages("status.business")).hasText must be(true)
       doc.getElementsByClass("heading-secondary").first().html() must include(Messages("summary.status"))
-      doc.getElementsByClass("panel-indent").first().child(0).html() must be(Messages("status.business"))
+      doc.getElementsByTag("p").html() must include(Messages("status.business"))
 
       doc.getElementsByClass("list").first().child(0).html() must include(Messages("status.incomplete"))
       doc.getElementsByClass("list").first().child(0).attr("class") must be("status-list--pending status-list--start")
@@ -63,7 +63,9 @@ class status_renewal_incompleteSpec extends AmlsSpec with MustMatchers {
       doc.getElementsByClass("list").first().child(2).attr("class") must be("status-list--upcoming")
 
       doc.getElementsMatchingOwnText(Messages("status.renewalincomplete.description")).text must be(Messages("status.renewalincomplete.description"))
-      doc.getElementsMatchingOwnText(Messages("status.renewalincomplete.description2", endDateFormatted)).text must be(Messages("status.renewalincomplete.description2", endDateFormatted))
+      doc.getElementsMatchingOwnText(Messages("status.renewalincomplete.description2")).text must be(Messages("status.renewalincomplete.description2"))
+      doc.getElementsMatchingOwnText(Messages("status.renewalincomplete.description3", endDateFormatted)).text must be(Messages("status.renewalincomplete.description3", endDateFormatted))
+      doc.getElementsMatchingOwnText(Messages("status.renewalincomplete.description4")).text must be(Messages("status.renewalincomplete.description4"))
 
       html must include(controllers.changeofficer.routes.StillEmployedController.get.url)
 

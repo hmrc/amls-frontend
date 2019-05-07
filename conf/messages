@@ -385,6 +385,7 @@ title.services = Which services does your business provide?
 title.contact = Your contact details
 title.wyn = What you need
 title.cya = Check your answers
+title.cya.pre.application = Check your answers before starting your application
 title.ya = Your answers
 title.yapp = Your application
 
@@ -451,10 +452,10 @@ lbl.nonresidential = Non-Residential
 lbl.1200.character.limit=1200 character limit
 lbl.none.of.the.above = None of the above
 
-lbl.give.details = Please give details
+lbl.give.details = Add what your business will buy or sell
 
-lbl.registration.status = Registration status:
-lbl.registration.status.short = Status:
+lbl.registration.status = Registration status
+lbl.registration.status.short = Status
 
 legend.address = Address
 lbl.address.line1 = Address line 1
@@ -495,7 +496,7 @@ hint.10.digits = For example: 1234567890
 hint.255.chars = Enter 255 characters or less.
 renewal.hint.255.chars = You have 255 characters or less.
 
-lbl.hint.crn = It’s 8 characters and can be just numbers, or a mix of numbers and capital letters. If yours is 7 characters, enter a 0 (zero) at the beginning.
+lbl.hint.crn = This is 8 characters and can be a mix of numbers and capital letters. Find it on your certificate of incorporation.
 
 lbl.hint.vat = This is 9 numbers, sometimes with ‘GB’ at the start, for example 123456789 or GB123456789. You can find it on your VAT registration certificate.
 
@@ -528,9 +529,9 @@ start.utr.line1 = If we can’t find your business automatically, we’ll ask fo
 
 ############################### Status page ###############################
 status.title = Your registration
-status.business = Your business:
-status.referenceno = Anti-money laundering supervision registration number:
-status.referenceno.short = Registration number:
+status.business = Your business
+status.referenceno = Anti-money laundering supervision registration number
+status.referenceno.short = Registration number
 status.incomplete = Incomplete
 status.status = Status
 status.complete = Completed
@@ -540,34 +541,34 @@ status.feepaid = Fee paid
 status.underreview = Decision pending
 status.decisionmade = Decision made
 status.incomplete.heading = Application incomplete
-status.incomplete.description = You’ve started the application form but you haven’t finished it. You have 28 days to finish the application, from when you last saved your progress.
-status.incomplete.buttontext = Return to saved application
+status.incomplete.description = You have started your application but have not finished it. You need to complete all sections on the about your business page.
+status.incomplete.description1 = You have 28 days to finish the application from when you last saved your progress.
+status.incomplete.buttontext = Return to your application
 status.submissionready.heading = Application not submitted
-status.submissionready.description = You’ve completed all sections of the form, but you haven’t submitted it or paid the fee.
-status.submissionready.description2 = Your application won’t be reviewed until the fee has been paid.
-status.submissionready.description3 = You have 28 days to submit the application and pay the fee, from when you last saved your progress.
-status.hassomethingchanged = Has something changed?
-status.submissionready.changelink1 = edit your application
-status.submissionready.buttontext = Submit application
+status.submissionready.description = You have completed your application but have not submitted it.
+status.submissionready.description2 = You have 28 days to submit your application from when you last saved your progress.
+status.submissionready.description3 = To submit your application you need to complete a declaration, and pay the fees. HMRC will then review your application.
+status.hassomethingchanged = About your business
+status.submissionready.changelink1 = Check or update your business information
+status.submissionready.buttontext = Continue
 status.submissionreadyforreview.heading = Application pending
-status.submissionreadyforreview.description = HMRC will review your application after you have paid the relevant fees. Fees will need to be paid within 28 days. If you have not paid yet you can
+status.submissionreadyforreview.description = You have submitted your application. You have 28 days to pay the fees from the date you submitted. If you have not already paid, 
 status.submissionreadyforreview.description.2 = now.
-status.submissionreadyforreview.description.3 = After you have applied your application can take up to 45 days. For renewals this can take longer. You will get an email when the decision has been made. You will need to sign into your anti-money laundering supervision account to see the decision
-status.submissionreadyforreview.description.link = pay the fee
-status.submissionreadyforreview.nofee.description = HMRC will review your application after you have paid the relevant fees. Fees will need to be paid within 28 days.
-status.submissionreadyforreview.nofee.description.2 = now.
-status.submissionreadyforreview.nofee.description.3 = After you have applied your application can take up to 45 days. For renewals this can take longer. You will get an email when the decision has been made. You will need to sign into your anti-money laundering supervision account to see the decision
-status.submissionreadyforreview.nofee.description.link = If you haven’t paid the fee
+status.submissionreadyforreview.description.3 = HMRC will then review your application, which can take up to 45 days.
+status.submissionreadyforreview.description.4 = You’ll get an email when HMRC has made a decision. You’ll need to sign into your anti-money laundering supervision account to see the decision.
+status.submissionreadyforreview.description.link = pay your fees 
+status.submissionreadyforreview.nofee.description = You have submitted your application. You have 28 days to pay the fees from the date you submitted.
+status.submissionreadyforreview.nofee.description.link = If you have not already paid
 status.submissionreadyforreview.duplicate.title = Something went wrong with your submission
 status.submissionreadyforreview.duplicate.description = We’ve definitely received your application, but we can’t tell if you paid your application fee.
 status.submissionreadyforreview.duplicate.description2 = If you’ve paid, there’s nothing to worry about. When HMRC deals with your application they’ll be able to match your payment to your submission.
 status.submissionreadyforreview.bacs = Your application will be reviewed when HM Revenue and Customs receives your payment.
 status.submissiondecisionapproved.heading = Application approved
 status.submissiondecisionsupervised.heading = Supervised
-status.submissiondecisionsupervised.renewal.btn = Renew supervision
-status.submissiondecisionsupervised.enddate.text = Currently supervised to {0}
-status.submissiondecisionsupervised.success.description = Your business is registered for supervision with HM Revenue and Customs (HMRC).
-status.submissiondecisionsupervised.renewal.advice.text = When you submit your renewal you’ll need to pay a fee for each of your trading premises.
+status.submissiondecisionsupervised.renewal.btn = Continue
+status.submissiondecisionsupervised.enddate.text = Supervised to {0}
+status.submissiondecisionsupervised.success.description = Your business is registered for supervision with HMRC.
+status.submissiondecisionsupervised.renewal.advice.text = When you submit your renewal you’ll need to pay a fee for each of your trading premises.  You may also need to pay a fee for new responsible people you add.
 status.submissiondecisionapproved.description = Your application for anti-money laundering supervision has been approved.
 status.submissiondecisionapproved.description2 = Your business is now registered for 12 months with HM Revenue and Customs.
 status.submissiondecision.not.supervised.heading = Not supervised
@@ -591,19 +592,26 @@ status.submissionderegistered.description = Your business is now de-registered.
 status.submissionderegistered.description2 = Your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
 status.submissionderegistered.button-text = Submit new application
 
-status.renewalsubmitted.text = Currently supervised, renewal under review
+status.renewalsubmitted.text = Supervised, renewal under review
 status.renewalsubmitted.description = Renewal under review
-status.renewalsubmitted.description2 = Your renewal application will be reviewed by HM Revenue and Customs.
-status.renewalsubmitted.description3 = The review process can take up to 45 days. You’ll get an email when the decision has been made. You’ll need to sign in to this website to see the decision.
-status.renewalsubmitted.description4 = You’re still registered for anti-money laundering supervision and can continue trading while your application is reviewed.
+status.renewalsubmitted.description2 = You have submitted your renewal application. You have 28 days to pay the fees from the date you submitted. If you have not already paid, pay your fees now.
+status.renewalsubmitted.description3 = HMRC will then review your renewal application.
+status.renewalsubmitted.description4 = You’ll get an email when HMRC has made a decision. You’ll need to sign into your anti-money laundering supervision account to see the decision.
+status.renewalsubmitted.description5 = You’re still registered for anti-money laundering supervision, and can continue trading while your application is reviewed.
 
 status.renewalincomplete.description = Renewal incomplete
-status.renewalincomplete.description2 = You’ve started the renewal application but you haven’t finished it. Your supervision will expire on {0} unless you renew before then.
+status.renewalincomplete.description2 = You have started the renewal application but you have not finished it.
+status.renewalincomplete.description3 = Your supervision will expire on {0} unless you renew before then.
+status.renewalincomplete.description4 = When you submit your renewal you’ll need to pay a fee for each of your trading premises. You may also need to pay a fee for new responsible people you add.
+status.renewal.incomplete.buttontext = Return to your renewal application
+status.renewalnotsubmitted.buttontext = Continue
 
 status.renewalnotsubmitted.description = Renewal not submitted
-status.renewalnotsubmitted.description2 = You’ve completed all sections of the renewal form, but you haven’t submitted it or paid the fee.
-status.renewalnotsubmitted.description3 = Your renewal application won’t be reviewed until the fee has been paid. Your supervision will expire on {0} unless you renew before then.
-status.withdraw.link-text = withdraw application
+status.renewalnotsubmitted.description2 = You have completed the renewal application but you have not submitted it.
+status.renewalnotsubmitted.description3 = Your supervision will expire on {0} unless you renew before then.
+status.renewalnotsubmitted.description4 = You’ll need to pay a fee for each of your trading premises. You may also need to pay a fee for new responsible people you add.
+status.renewalnotsubmitted.description5 = To submit your renewal you need to complete a declaration, and pay the fees.
+status.withdraw.link-text = Withdraw your application
 status.withdraw.title = Withdraw your application
 status.withdraw.registration-date.label = Registration submitted {0}
 status.withdraw.button-text = Withdraw application
@@ -618,15 +626,14 @@ status.deregister.button-text = De-register
 status.deregister.body-content = De-register your business if you no longer want to be supervised by HM Revenue and Customs (HMRC).\n\
   We’ll delete any information you have provided. We won’t refund any fees you have paid.\n\
   You mustn’t carry out activities covered by the Money Laundering Regulations if you aren’t supervised.
-status.deregister.services = Registered services:
+status.deregister.services = Your services
 status.deregister.button.change = Change
 status.deregister.regnumber = Registration number:
 status.deregister.visuallyhidden.change = Change your registered services
 
 status.newsubmission.btn = Start a new application
-status.amendment.edit = update or view your information
-status.amendment.edit.uppercase.start = Update or view your information
-status.fee.link = If you haven’t paid the fee
+status.amendment.edit = Check or update your business information
+status.amendment.edit.uppercase.start = Check or update your business information
 status.fee.link = If you haven’t paid the fee
 status.readyforrenewal.warning = Your supervision will expire on {0} unless you renew.
 status.submittedForReview.submitteddate.text = Application submitted {0}
@@ -868,7 +875,7 @@ summary.tcsp = Trust or company service provider
 summary.asp = Accountancy service provider
 summary.supervision = Supervision
 summary.msb = Money service business
-summary.hvd = High Value Dealer
+summary.hvd = High value dealer
 summary.renewal = Renewal
 summary.status = Your registration
 summary.visuallyhidden.answer = Answer
@@ -1128,9 +1135,9 @@ businessmatching.businessType.lbl.01 = Limited company
 businessmatching.businessType.lbl.03 = Partnership
 businessmatching.businessType.lbl.04 = Limited partnership or limited liability partnership
 businessmatching.businessType.lbl.05 = Unincorporated association or trust
-businessmatching.registerservices.title = What do you need to register?
+businessmatching.registerservices.title = What type of services do you need to register?
 businessmatching.registerservices.other.title = What other service do you need to register?
-businessmatching.registerservices.details = More information about these categories
+businessmatching.registerservices.details = What these service types mean
 
 businessmatching.registerservices.existing = You’ve told us your business already does:
 businessmatching.registerservices.servicename.lbl.01 = Accountancy service provider
@@ -1156,42 +1163,42 @@ businessmatching.registerservices.servicename.lbl.04.phrased = high value dealin
 businessmatching.registerservices.servicename.lbl.05.phrased = money service business
 businessmatching.registerservices.servicename.lbl.06.phrased = trust or company services
 businessmatching.registerservices.servicename.lbl.07.phrased = telecommunications, digital and IT payment services
-businessmatching.registerservices.servicename.details.01 = Accountancy service providers provide professional bookkeeping services, accounts preparation and signing, or tax advice.
+businessmatching.registerservices.servicename.details.01 = Accountancy service providers supply professional bookkeeping services, accounts preparation and signing, or tax advice.
 businessmatching.registerservices.servicename.details.02 = Bill payment service providers work on behalf of businesses to handle household bill payments from customers.
 businessmatching.registerservices.servicename.details.03 = Estate agency businesses introduce people who want to buy or sell property, and facilitate the purchase or sale of property.
-businessmatching.registerservices.servicename.details.04 = High value dealers accept cash payments of €10,000 or more (or equivalent in any currency) in exchange for goods. Estate agents are not classed as High Value Dealers.
+businessmatching.registerservices.servicename.details.04 = High value dealers accept cash payments of €10,000 or more (or equivalent in any currency) in exchange for goods. Estate agents are not classed as high value dealers.
 businessmatching.registerservices.servicename.details.05 = Money service businesses exchange currency, transmit money, or cash cheques for their customers.
 businessmatching.registerservices.servicename.details.06 = Telecommunications, digital and IT payment service providers work on behalf of businesses to handle payments made with phones, computers, smart TVs, and other similar devices.
 businessmatching.registerservices.servicename.details.07 = Trust or company service providers form companies. They also provide other services such as acting - or arranging for another person to act - in a certain role in a company.
-businessmatching.registrationnumber.title = What’s your company registration number?
+businessmatching.registrationnumber.title = What is your company registration number?
 businessmatching.registrationnumber.lbl = Company registration number
-businessmatching.typeofbusiness.title = What’s your type of business?
+businessmatching.typeofbusiness.title = What type of unincorporated association or trust are you registering?
 businessmatching.typeofbusiness.lbl = Type of business
-businessmatching.typeofbusiness.lbl.hint = For example, association, charity, trust
+businessmatching.typeofbusiness.lbl.hint = For example, association, charity, trust.
 businessmatching.psr.number.title = Does your business have a Payment Services Regulations (PSR) registration number?
 businessmatching.psr.number.lbl = PSR registration number
-businessmatching.psr.number.hint = It’s 6 numbers, like 123456. You received it when you registered with the Financial Conduct Authority (FCA).
+businessmatching.psr.number.hint = This is 6 numbers, for example 123456. You can find on your registration letter from the the Financial Conduct Authority (FCA).
 businessmatching.cannotcontinuewiththeapplication.heading = You can’t continue with your application
-businessmatching.summary.icon.title = You’re applying to register the following business for anti-money laundering supervision
+businessmatching.summary.icon.title = You’re applying to register the following business for anti-money laundering supervision with HM Revenue and Customs (HMRC).
 businessmatching.summary.business.address.lbl = Your business
 businessmatching.button.confirm.start = Confirm and start application
 businessmatching.confirm.postcode.title = Confirm the postcode for your business
 
 
 businessmatching.summary.noedit.anchortext = Return to about your business
-businessmatching.services.title = Which services does your business provide?
+businessmatching.services.title = Which money service business activities does your business carry out?
 businessmatching.services.list.heading = Select all that apply
 businessmatching.services.list.lbl.01 = Transmitting money
 businessmatching.services.list.lbl.02 = Currency exchange
 businessmatching.services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
 businessmatching.services.list.lbl.04 = Cheque cashing (scrap metal dealers)
 businessmatching.services.list.lbl.05 = Foreign exchange
-businessmatching.cannotcontinuewiththeapplication.title = You can’t continue with your application
-businessmatching.cannotcontinuewiththeapplication.requiredinfo.first = Your business must have a Payment Services Regulations (PSR) reference number in order to apply for anti-money laundering supervision from HM Revenue and Customs.
+businessmatching.cannotcontinuewiththeapplication.title = You cannot continue with your application
+businessmatching.cannotcontinuewiththeapplication.requiredinfo.first = You need to have a Payment Services Regulations (PSR) reference number to apply for anti-money laundering supervision with HM Revenue and Customs (HMRC).
 businessmatching.cannotcontinuewiththeapplication.requiredinfo.second = You can apply for a PSR reference number from the Financial Conduct Authority (FCA).
 businessmatching.cannotcontinuewiththeapplication.requiredinfo.third = The information you have given so far in this application has been saved. You have 28 days to return and complete your application.
 
-businessmatching.cannotchangeservices.title = You can’t continue with your change
+businessmatching.cannotchangeservices.title = You cannot continue with your change
 businessmatching.cannotchangeservices.requiredinfo = Your business must have a Payment Services Regulations (PSR) reference number in order\
   to register for Money Service Business as part of your anti-money laundering supervision from HM Revenue and Customs.\n\
   You can apply for a PSR reference number from the Financial Conduct Authority (FCA).
@@ -1234,8 +1241,8 @@ businessmatching.updateservice.updateotherinformation.text = As a result some se
 
 
 #   Add route Start  ###################################################################################################
-businessmatching.updateservice.msb.services.title = Which services does your business provide?
-businessmatching.updateservice.msb.services.heading = Which services does your business provide?
+businessmatching.updateservice.msb.services.title = Which money service business activities does your business carry out?
+businessmatching.updateservice.msb.services.heading = Which money service business activities does your business carry out?
 businessmatching.updateservice.msb.services.list.heading = Choose at least one
 businessmatching.updateservice.msb.services.list.lbl.01 = Transmitting money
 businessmatching.updateservice.msb.services.list.lbl.02 = Currency exchange
@@ -1247,9 +1254,9 @@ businessmatching.updateservice.psr.number.title = Does your business have a Paym
 businessmatching.updateservice.psr.number.lbl = PSR registration number
 businessmatching.updateservice.psr.number.hint = It’s 6 numbers, like 123456. You received it when you registered with the Financial Conduct Authority (FCA).
 
-businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.heading = You can’t continue with your change
-businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title = You can’t continue with your change
-businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.1 = Your business must have a PSR reference number to include a money service business as part of your anti-money laundering supervision.
+businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.heading = You cannot continue with your change
+businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title = You cannot continue with your change
+businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.1 = Your business must have a Payment Services Regulations (PSR) reference number to include a money service business as part of your anti-money laundering supervision.
 businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.2 = You can apply for a PSR reference number from the Financial Conduct Authority (FCA).
 businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.button.text = Return to about your business
 
@@ -1615,10 +1622,15 @@ responsiblepeople.additional_extra_address.0_5_months = 0 to 5 months
 responsiblepeople.additional_extra_address.6_11_months = 6 to 11 months
 responsiblepeople.additional_extra_address.1_3_years = 1 to 3 years
 responsiblepeople.additional_extra_address.more_3_years = More than 3 years
+
 responsiblepeople.position_within_business.heading = What is {0}’s role in the business?
 responsiblepeople.position_within_business.title = What is this person’s role in the business?
-responsiblepeople.position_within_business.startDate.lbl = When did this position start? If there is more than one position, give the date of the earliest.
+responsiblepeople.position_within_business.startDate.heading = When did {0} start their role in the business?
+responsiblepeople.position_within_business.startDate.title = When did this person start their role in the business?
 responsiblepeople.position_within_business.startDate.hint = For example, 31 03 1980.
+responsiblepeople.position_within_business.startDate.toldus.single = You have told us {0} is a {1}.
+responsiblepeople.position_within_business.startDate.toldus.multiple = You have told us {0} is a:
+responsiblepeople.position_within_business.startDate.toldus.selectfirst = If the start dates of these positions are different, give the earliest.
 responsiblepeople.position_within_business.important = The business must have a nominated officer. Only one person can register as the nominated officer.
 responsiblepeople.position_within_business.lbl.01 = Beneficial owner (holding more than 25% of shares)
 responsiblepeople.position_within_business.lbl.02 = Director
@@ -1629,8 +1641,9 @@ responsiblepeople.position_within_business.lbl.06 = Sole proprietor
 responsiblepeople.position_within_business.lbl.07 = Designated member (partner)
 responsiblepeople.position_within_business.lbl.08 = External accountant
 responsiblepeople.position_within_business.lbl.09 = Other
-responsiblepeople.position_within_business.other_position.lbl = Add your role in the business
+responsiblepeople.position_within_business.other_position.lbl = Add role in the business
 responsiblepeople.position_within_business.other_position.othermissing = You haven’t specified their role in the business. Enter their role in the business
+
 responsiblepeople.aretheynominatedofficer.heading = Is {0} the nominated officer for the business?
 responsiblepeople.aretheynominatedofficer.title = Is this person the nominated officer for the business?
 responsiblepeople.person.a.resident.heading = Is {0} a UK resident?
@@ -1876,7 +1889,6 @@ msb.whatyouneed.line_6 = how many currency exchange transactions you expect to m
 msb.whatyouneed.line_7 = how many foreign exchange transactions you expect to make in the next 12 months
 msb.whatyouneed.line_8 = if you use an intermediary payment service provider
 msb.whatyouneed.line_9 = where you expect to send the most transactions
-msb.services.title = Which services does your business provide?
 msb.services.list.heading = Select all that apply
 msb.services.list.lbl.01 = Transmitting money
 msb.services.list.lbl.02 = Currency exchange
@@ -1932,15 +1944,15 @@ msb.bank.names = Bank names
 msb.wholesaler.names = Wholesaler names
 msb.bank.names.hint = asd
 
-msb.services.title = Which services does your business provide?
-msb.services.heading = Which services does your business provide?
+msb.services.title = Which money service business activities does your business carry out?
+msb.services.heading = Which money service business activities does your business carry out?
 msb.services.list.heading = Select all that apply
 msb.services.list.lbl.01 = Transmitting money
 msb.services.list.lbl.02 = Currency exchange
 msb.services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
 msb.services.list.lbl.04 = Cheque cashing (scrap metal dealers)
 
-hvd.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:
+hvd.whatyouneed.requiredinfo.heading = In this section you’ll be asked things like:
 hvd.whatyouneed.line_1 = what your business will sell
 hvd.whatyouneed.line_2 = if you’ll be buying or selling duty-suspended excise goods
 hvd.whatyouneed.line_3 = how your business deals with cash payments of €10,000 or more
@@ -1951,23 +1963,21 @@ hvd.how-will-you-sell-goods.channels.retail = Retail
 hvd.how-will-you-sell-goods.channels.wholesale = Wholesale
 
 hvd.cash.payment.title = Has your business made or accepted any cash payments of €10,000 or more?
-hvd.cash.payment.convert.currency.text = If you don’t use euros, please convert to the currency you use.
+hvd.cash.data.payment.summary.details = A cash payment can be physical money, notes and coins. It can be paid to you in person or directly into a bank account. This includes payment of €10,000 or more in:
+hvd.cash.payment.data.summary.details.01 = any single cash payment
+hvd.cash.payment.data.summary.details.02 = several related cash payments, including payment plans, payments on account, and deposits
+hvd.cash.payment.data.summary.details.03 = any 90 day period
+hvd.cash.payment.convert.currency.summary = If you do not use euros you’ll need to convert the amount to the currency you use.
 
 hvd.cash.payment.date.title = What was the date of the first payment?
-hvd.cash.payment.date.example = For example, 31 03 2015
-hvd.cash.payment.data.details.summary = What a cash payment is
-hvd.cash.payment.data.details.summary.details = A cash payment is physical money, notes and coins, either paid to you in person or paid directly into a bank account.
-hvd.cash.payment.data.details.summary.details.start = This includes:
-hvd.cash.payment.data.details.summary.details.01 = any single cash payment of €10,000 or more
-hvd.cash.payment.data.details.summary.details.02 = several related cash payments totalling €10,000 or more including things like payment plans, payments on account and deposits
-hvd.cash.payment.data.details.summary.details.03 = cash paid by a customer totalling €10,000 or more in any 90 day period
+hvd.cash.payment.date.example = For example, 31 03 2015.
 
 hvd.products.title = What will your business buy or sell?
 hvd.products.option.01 = Alcohol
 hvd.products.option.02 = Tobacco
 hvd.products.option.03 = Antiques
 hvd.products.option.04 = Cars
-hvd.products.option.05 = Other motor vehicles
+hvd.products.option.05 = Motor vehicles (except cars)
 hvd.products.option.06 = Caravans
 hvd.products.option.07 = Jewellery
 hvd.products.option.08 = Gold
@@ -1977,23 +1987,22 @@ hvd.products.option.11 = Clothing
 hvd.products.option.12 = Other
 
 hvd.identify.linked.cash.payment.title = Are you able to automatically identify linked cash payments which come to €10,000 or more?
-hvd.identify.linked.cash.payments.subtitle = If you do not use euros, please convert to the currency you use.
+hvd.identify.linked.cash.payments.subtitle = If you do not use euros you’ll need to convert the amount to the currency you use.
 
-hvd.receiving.title = Do you expect to receive cash payments over €10,000 from customers you’ve not met in person?
+hvd.receiving.title = Do you expect to receive cash payments of over €10,000 from customers you’ve not met in person?
 hvd.receiving.convert.currency.text = If you do not use euros you’ll need to convert the amount to the currency you use.
 hvd.receiving.expect.to.receive = How do you expect to receive these payments?
 hvd.receiving.option.01 = By courier
 hvd.receiving.option.02 = Directly into a bank account
 hvd.receiving.option.03 = Other
-hvd.receiving.give.details = Please give details
-hvd.receiving.give.details.lbl = Please give details
+hvd.receiving.give.details.lbl = Add how you will receive payments
 
 hvd.expect.to.receive.title = How do you expect to receive these payments?
 
 hvd.excise.goods.title = Will you be buying or selling duty-suspended excise goods?
 
-hvd.percentage.title = What proportion of your turnover do you expect to come from cash payments over €10,000?
-hvd.percentage.text = If you do not use euros, please convert to the currency you use.
+hvd.percentage.title = What percentage of your turnover do you expect to come from cash payments of over €10,000?
+hvd.percentage.text = If you do not use euros you’ll need to convert the amount to the currency you use.
 hvd.percentage.lbl.01 = 0% to 20%
 hvd.percentage.lbl.02 = 21% to 40%
 hvd.percentage.lbl.03 = 41% to 60%
@@ -2020,7 +2029,7 @@ changeofficer.removeresponsibleperson.info = This will permanently remove {0} fr
 changeofficer.removeresponsibleperson.lbl = When did {0} stop being a responsible person for your business?
 changeofficer.remove.responsibleperson.btn = Remove responsible person
 
-changeofficer.changelink.heading = Nominated Officer:
+changeofficer.changelink.heading = Nominated officer
 changeofficer.changelink.text = Change
 
 changeofficer.furtherupdates.title = Do you need to make other updates to your information?
@@ -2064,7 +2073,7 @@ notifications.previousReg = Messages from your previous registrations
 
 notifications.header = Your messages
 notifications.unread = You have unread messages
-notifications.youHaveMessages = View your messages
+notifications.youHaveMessages = Check your messages
 notifications.title = Your business
 
 notifications.table.header.subject = Subject
@@ -2175,7 +2184,7 @@ survey.satisfaction.lbl.03 = Neither satisfied or dissatisfied
 survey.satisfaction.lbl.04 = Dissatisfied
 survey.satisfaction.lbl.05 = Very dissatisfied
 
-survey.satisfaction.beforeyougo = Before you go
+survey.satisfaction.beforeyougo = Give feedback on the service
 survey.satisfaction.please = We use your feedback to make our services better. Please take the 
 survey.satisfaction.answer = feedback survey
 survey.satisfaction.helpus = now.

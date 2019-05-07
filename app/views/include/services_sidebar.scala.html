@@ -18,6 +18,7 @@
 
 @(
     canEditPreApplication: Boolean,
+    displayLink: Boolean,
     businessName: String,
     serviceNames: Seq[String]
 )(implicit request: Request[_], messages: Messages)
@@ -39,10 +40,13 @@
                     @serviceNames.map(name => Html("<li>" + name + "</li>"))
                 </ul>
             }
-            <p class="sidebar-top-spacing">
-                <a id="view-details" href="@controllers.businessmatching.routes.SummaryController.get.url" class="edit-preapp">
-                    @(if(canEditPreApplication) Messages("progress.preapplication.canedit") else Messages("progress.preapplication.readonly"))
-                </a>
-            </p>
+
+            @if(displayLink) {
+                <p class="sidebar-top-spacing">
+                    <a id="view-details" href="@controllers.businessmatching.routes.SummaryController.get.url" class="edit-preapp">
+                        @(if(canEditPreApplication) Messages("progress.preapplication.canedit") else Messages("progress.preapplication.readonly"))
+                    </a>
+                </p>
+            }
         </div>
     </div>

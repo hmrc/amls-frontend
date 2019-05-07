@@ -20,6 +20,5 @@
 @()(implicit messages: Messages, request: Request[_])
 
 <div class="no-print">
-  <h3 class="heading-small">@Messages("survey.satisfaction.beforeyougo")</h3>
-  <p>@Messages("survey.satisfaction.please") <a id="satisfaction-survey" href="@controllers.routes.SatisfactionSurveyController.get()">@Messages("survey.satisfaction.answer")</a> @Messages("survey.satisfaction.helpus")</p>
+  <p><a id="satisfaction-survey" href="@controllers.routes.SatisfactionSurveyController.get()">@Messages("survey.satisfaction.beforeyougo")</a></p>
 </div>

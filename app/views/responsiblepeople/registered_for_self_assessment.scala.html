@@ -39,8 +39,7 @@ s"""${f("utrNumber").id}-fieldset"""
             f = f("saRegistered-fieldset"),
             legend = "responsiblepeople.registeredforselfassessment.title",
             panel=false,
-            legendHidden = true,
-            classes = Seq("inline")
+            legendHidden = true
         ) {
             @errorGroupWithPlaceholder(
                 field = f("saRegistered"),
@@ -53,6 +52,18 @@ s"""${f("utrNumber").id}-fieldset"""
                     inline = true,
                     target = s"#utrNumber-panel"
                 )
+                @panel(
+                    field = Some(f("utrNumber-panel"))
+                ) {
+                    @input(
+                        attrMaxlength = "10",
+                        attrPattern = "[0-9]{1,10}",
+                        bold = false,
+                        field = f("utrNumber"),
+                        hintText = "responsiblepeople.registeredforselfassessment.lbl.utrnumber.hint",
+                        labelText = "responsiblepeople.registeredforselfassessment.lbl.utrnumber"
+                    )
+                }
                 @radio(
                     f = f("saRegistered"),
                     labelText = "lbl.no",
@@ -60,19 +71,6 @@ s"""${f("utrNumber").id}-fieldset"""
                     inline = true
                 )
             }
-        }
-
-        @panel(
-            field = Some(f("utrNumber-panel"))
-        ) {
-            @input(
-                attrMaxlength = "10",
-                attrPattern = "[0-9]{1,10}",
-                bold = false,
-                field = f("utrNumber"),
-                hintText = "responsiblepeople.registeredforselfassessment.lbl.utrnumber.hint",
-                labelText = "responsiblepeople.registeredforselfassessment.lbl.utrnumber"
-            )
         }
 
         @submit(edit)

@@ -69,7 +69,8 @@ class status_submittedSpec extends AmlsSpec with MustMatchers with AmlsReference
       doc.getElementsContainingOwnText(Messages("status.business")).hasText must be(true)
 
       doc.getElementsByClass("heading-secondary").first().html() must include(Messages("summary.status"))
-      doc.getElementsByClass("panel-indent").first().child(0).html() must be(Messages("status.business"))
+      doc.getElementById("status-submitted-business").html() must be(Messages("status.business"))
+      doc.getElementById("status-submitted-business-name").html() must be("business Name")
 
       doc.getElementsByClass("list").first().child(0).html() must include(Messages("status.complete"))
       doc.getElementsByClass("list").first().child(1).html() must include(Messages("status.submitted"))
@@ -97,7 +98,8 @@ class status_submittedSpec extends AmlsSpec with MustMatchers with AmlsReference
       doc.getElementsContainingOwnText(Messages("status.business")).hasText must be(true)
 
       doc.getElementsByClass("heading-secondary").first().html() must include(Messages("summary.status"))
-      doc.getElementsByClass("panel-indent").first().child(0).html() must be(Messages("status.business"))
+      doc.getElementById("status-submitted-business").html() must be(Messages("status.business"))
+      doc.getElementById("status-submitted-business-name").html() must be("business Name")
 
       doc.getElementsByClass("list").first().child(0).html() must include(Messages("status.complete"))
       doc.getElementsByClass("list").first().child(1).html() must include(Messages("status.submitted"))
@@ -110,7 +112,8 @@ class status_submittedSpec extends AmlsSpec with MustMatchers with AmlsReference
       doc.getElementsByClass("status-list").first().child(2).hasClass("status-list--end") must be(true)
 
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.nofee.description"))
-      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.nofee.description.3"))
+      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.3"))
+      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.4"))
       Option(doc.getElementsByClass("partial-deskpro-form").first()) mustBe defined
 
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
@@ -130,10 +133,11 @@ class status_submittedSpec extends AmlsSpec with MustMatchers with AmlsReference
     "contain survey link for supervised status" in new ViewFixture {
       def view =  views.html.status.status_submitted(amlsRegistrationNumber, Some("business Name"), Some(feeResponse))
 
-      doc.getElementsMatchingOwnText(Messages("survey.satisfaction.please")).text() must
-        be(Messages("survey.satisfaction.please") + " " + Messages("survey.satisfaction.answer") + " " + Messages("survey.satisfaction.helpus"))
-      doc.getElementsMatchingOwnText(Messages("survey.satisfaction.answer")).hasAttr("href") must be(true)
-      doc.getElementsMatchingOwnText(Messages("survey.satisfaction.answer")).attr("href") must be("/anti-money-laundering/satisfaction-survey")
+      doc.getElementsMatchingOwnText(Messages("survey.satisfaction.beforeyougo")).text() must
+        be(Messages("survey.satisfaction.beforeyougo"))
+
+      doc.getElementsMatchingOwnText(Messages("survey.satisfaction.beforeyougo")).hasAttr("href") must be(true)
+      doc.getElementsMatchingOwnText(Messages("survey.satisfaction.beforeyougo")).attr("href") must be("/anti-money-laundering/satisfaction-survey")
     }
 
     "show specific content" when {
@@ -149,12 +153,13 @@ class status_submittedSpec extends AmlsSpec with MustMatchers with AmlsReference
 
         def view = views.html.status.status_submitted(amlsRegistrationNumber, None, None)
 
-        doc.getElementsContainingOwnText(Messages("status.business")).isEmpty must be(true)
+        doc.getElementById("status-submitted-business") must be(null)
+        doc.getElementById("status-submitted-business-name") must be(null)
 
         doc.getElementsContainingOwnText(Messages("status.submittedForReview.submitteddate.text")).isEmpty must be(true)
 
         doc.getElementsByTag("details").text() must include(Messages("fee.details.dup_nofees.heading"))
-        doc.html must include(Messages("status.fee.link"))
+        doc.html must include(Messages("status.submissionreadyforreview.nofee.description.link"))
         doc.html must include(Messages("fee.details.dup_nofees.heading"))
       }
 

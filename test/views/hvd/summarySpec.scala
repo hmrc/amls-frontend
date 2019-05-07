@@ -59,10 +59,10 @@ class summarySpec extends AmlsSpec
       true
     }
 
-    val fullProductSet = Set("hvd.products.option.01","hvd.products.option.02","hvd.products.option.03",
-      "hvd.products.option.04","hvd.products.option.05","hvd.products.option.06","hvd.products.option.07",
-      "hvd.products.option.08","hvd.products.option.09","hvd.products.option.10","hvd.products.option.11",
-      "Other Product"
+    val fullProductSet = Set("hvd.products.option.01","hvd.products.option.03","hvd.products.option.06",
+      "hvd.products.option.04","hvd.products.option.11","hvd.products.option.08","hvd.products.option.07",
+      "hvd.products.option.10","hvd.products.option.05","hvd.products.option.09","hvd.products.option.02",
+      "Other: Other Product"
     )
 
     val sectionChecks = Table[String, Element=>Boolean](

@@ -334,33 +334,21 @@
         }
 
         @detailedAnswers(
-            question = Messages("responsiblepeople.detailed_answers.position"),
+            question = Messages("responsiblepeople.position_within_business.heading", personName),
             editUrl = controllers.responsiblepeople.routes.PositionWithinBusinessController.get(idx, true, flow).toString(),
             dataItem = person.positions
         ) { pos =>
-            <ul class="list list--comma">
-            @pos.positions.map { i =>
-                <li>@i match {
-                    case BeneficialOwner => {@Messages("responsiblepeople.position_within_business.lbl.01")}
-                    case Director => {@Messages("responsiblepeople.position_within_business.lbl.02")}
-                    case InternalAccountant => {@Messages("responsiblepeople.position_within_business.lbl.03")}
-                    case NominatedOfficer => {@Messages("responsiblepeople.position_within_business.lbl.04")}
-                    case Partner => {@Messages("responsiblepeople.position_within_business.lbl.05")}
-                    case SoleProprietor => {@Messages("responsiblepeople.position_within_business.lbl.06")}
-                    case DesignatedMember => {@Messages("responsiblepeople.position_within_business.lbl.07")}
-                    case Other(value) => {@value}
-                }</li>
-
-            }
+            <ul class="list">
+            @pos.positions.map(p => PositionWithinBusiness.getPrettyName(p)).toList.sorted.map(p => <li>{p}</li>)
             </ul>
         }
 
         @detailedAnswers(
-            question = Messages("responsiblepeople.detailed_answers.position_start"),
-            editUrl = controllers.responsiblepeople.routes.PositionWithinBusinessController.get(idx, true, flow).toString(),
+            question = Messages("responsiblepeople.position_within_business.startDate.heading", personName),
+            editUrl = controllers.responsiblepeople.routes.PositionWithinBusinessStartDateController.get(idx, true, flow).toString(),
             dataItem = person.positions
         ) { pos =>
-            <p>@pos.startDate.map(DateHelper.formatDate(_))</p>
+            <p>@pos.startDate.map(sd => sd.startDate).map(DateHelper.formatDate(_)).getOrElse("")</p>
         }
 
         @person.soleProprietorOfAnotherBusiness.map { anotherBusiness =>

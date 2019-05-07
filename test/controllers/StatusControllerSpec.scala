@@ -68,7 +68,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
        mock[FeeResponseService]
     )
 
-    val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(new LocalDate()))
+    val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(PositionStartDate(new LocalDate())))
     val rp1 = ResponsiblePerson(
       personName = Some(PersonName("first1",Some("middle"), "last1")),
       legalName = None,
@@ -201,7 +201,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.getElementsByClass("panel-indent").first().child(1).html() must be("Test Company")
+      document.getElementById("status-incomplete-business-name").html() must be("Test Company")
     }
 
     "show correct content" when {

@@ -37,8 +37,7 @@
         @fieldset(
             f = f("penalisedUnderEstateAgentsAct-fieldset"),
             heading = "estateagentbusiness.penalisedunderestateagentsact.title",
-            panel = false,
-            classes = Seq("inline")
+            panel = false
         ) {
             @Messages("estateagentbusiness.penalisedunderestateagentsact.subtitle")
             <ul class="list list-bullet">
@@ -52,38 +51,35 @@
                     f = f("penalisedUnderEstateAgentsAct"),
                     labelText = "lbl.yes",
                     value = "true",
-                    inline = true,
                     target = s".professionalBodyAct-fieldset"
                 )
+                @fieldset(
+                    legend = "estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl",
+                    legendHidden = true,
+                    jsHidden = true,
+                    classes = Seq("professionalBodyAct-fieldset"),
+                    f = f("penalisedUnderEstateAgentsActDetails-fieldset")
+                ) {
+                    @panel(
+                        jsHidden = false,
+                        wide = false,
+                        gutter = true
+                    ) {
+                        @textarea(
+                            f("penalisedUnderEstateAgentsActDetails"),
+                            labelText = "estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl",
+                            hintText = "hint.255.chars",
+                            bold = false,
+                            largeWidth = true,
+                            cols = "30",
+                            rows = "8"
+                        )
+                    }
+                }
                 @radio(
                     f = f("penalisedUnderEstateAgentsAct"),
                     labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
-            }
-        }
-
-        @fieldset(
-            legend = "estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl",
-            legendHidden = true,
-            jsHidden = true,
-            classes = Seq("professionalBodyAct-fieldset"),
-            f = f("penalisedUnderEstateAgentsActDetails-fieldset")
-        ) {
-            @panel(
-                jsHidden = false,
-                wide = false,
-                gutter = true
-            ) {
-                @textarea(
-                    f("penalisedUnderEstateAgentsActDetails"),
-                    labelText = "estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl",
-                    hintText = "hint.255.chars",
-                    bold = false,
-                    largeWidth = true,
-                    cols = "30",
-                    rows = "8"
+                    value = "false"
                 )
             }
         }

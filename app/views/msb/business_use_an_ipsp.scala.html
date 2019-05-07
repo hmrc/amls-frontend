@@ -38,8 +38,7 @@
             f = f("useAnIPSP-fieldset"),
             legend = "msb.ipsp.title",
             legendHidden = true,
-            panel = false,
-            classes = Seq("inline")
+            panel = false
         ) {
             @errorGroup(
                 field = f("useAnIPSP")
@@ -51,6 +50,25 @@
                     target = s"#${f("name").id}-panel",
                     inline = true
                 )
+                @panel(
+                    field = Some(f(s"${f("name").id}-panel")),
+                    jsHidden = true
+                ) {
+                    @input(
+                        f("name"),
+                        labelText = "msb.ipsp.name.lbl",
+                        bold = false
+                    )
+
+                    @input(
+                        attrMaxlength = "15",
+                        attrPattern = "[0-9a-z-A-Z]{1,15}",
+                        bold = false,
+                        field = f("referenceNumber"),
+                        hintText = "msb.ipsp.referenceNumber.hint",
+                        labelText = "msb.ipsp.referenceNumber.lbl"
+                    )
+                }
                 @radio(
                     f = f("useAnIPSP"),
                     labelText = "lbl.no",
@@ -58,26 +76,6 @@
                     inline = true
                 )
             }
-        }
-
-        @panel(
-            field = Some(f(s"${f("name").id}-panel")),
-            jsHidden = true
-        ) {
-            @input(
-                f("name"),
-                labelText = "msb.ipsp.name.lbl",
-                bold = false
-            )
-
-            @input(
-                attrMaxlength = "15",
-                attrPattern = "[0-9a-z-A-Z]{1,15}",
-                bold = false,
-                field = f("referenceNumber"),
-                hintText = "msb.ipsp.referenceNumber.hint",
-                labelText = "msb.ipsp.referenceNumber.lbl"
-            )
         }
 
         @submit(edit)

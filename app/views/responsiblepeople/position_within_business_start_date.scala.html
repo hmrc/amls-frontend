@@ -1,0 +1,59 @@
+@*
+ * Copyright 2019 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+@import config.ApplicationConfig
+@import models.businessmatching.{BusinessType, BusinessMatching}
+@import models.responsiblepeople.PositionWithinBusiness
+
+@(f: forms.Form2[_], edit: Boolean, index: Int, businessType: BusinessType, personName: String, positions: Set[PositionWithinBusiness], displayNominatedOfficer: Boolean, flow: Option[String])(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@header = {
+    @components.back_link()
+    @errorSummary(f)
+    @headingWithPlaceholder(("responsiblepeople.position_within_business.startDate.heading", personName), "summary.responsiblepeople")
+}
+
+@main(
+    title = Messages("responsiblepeople.position_within_business.startDate.title") + " - " + Messages("summary.responsiblepeople"),
+    heading = header
+) {
+
+    @form(f, controllers.responsiblepeople.routes.PositionWithinBusinessStartDateController.post(index, edit, flow)) {
+
+        @if(positions.size == 1) {
+            <p>@Messages("responsiblepeople.position_within_business.startDate.toldus.single", personName, PositionWithinBusiness.getPrettyName(positions.head).toLowerCase)</p>
+        } else {
+            <p>@Messages("responsiblepeople.position_within_business.startDate.toldus.multiple", personName)</p>
+            <ul class="list list-bullet business-roles">
+                @positions.map(p => PositionWithinBusiness.getPrettyName(p).toLowerCase).toList.sorted.map(p => <li class="business-role">{p}</li>)
+            </ul>
+            <p>@Messages("responsiblepeople.position_within_business.startDate.toldus.selectfirst", personName)</p>
+        }
+
+        @date(
+            f = f,
+            p = "startDate",
+            labelText = "responsiblepeople.position_within_business.startDate.title",
+            legendHidden = true,
+            hintText = "responsiblepeople.position_within_business.startDate.hint",
+            example = false
+        )
+
+        @submit()
+    }
+}

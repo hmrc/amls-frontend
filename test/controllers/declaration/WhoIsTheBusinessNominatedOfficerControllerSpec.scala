@@ -54,7 +54,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
     val personName = PersonName("firstName", Some("middleName"), "lastName")
     val personName1 = PersonName("firstName1", Some("middleName1"), "lastName1")
-    val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
+    val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(PositionStartDate(new LocalDate())))
     val rp = ResponsiblePerson (
       personName = Some(personName),
       positions = Some(positions),

@@ -37,8 +37,7 @@
                 f = f("isUKResidence-fieldset"),
                 legend = "responsiblepeople.person.a.resident.title",
                 legendHidden = true,
-                panel = false,
-                classes = Seq("inline")
+                panel = false
             ) {
                 @errorGroupWithPlaceholder(
                     field = f("isUKResidence"),
@@ -51,6 +50,17 @@
                         target = ".ukResident-fieldset",
                         inline = true
                     )
+                    @panel(
+                        jsHidden = true,
+                        classes = Seq("ukResident-fieldset")
+                    ) {
+                        @input(
+                            bold = false,
+                            field = f("nino"),
+                            hintText = "lbl.nino.hint",
+                            labelText = "lbl.nino"
+                        )
+                    }
                     @radio(
                         f = f("isUKResidence"),
                         labelText = "lbl.no",
@@ -58,18 +68,6 @@
                         inline = true
                     )
                 }
-            }
-
-            @panel(
-                jsHidden = true,
-                classes = Seq("ukResident-fieldset")
-            ) {
-                @input(
-                    bold = false,
-                    field = f("nino"),
-                    hintText = "lbl.nino.hint",
-                    labelText = "lbl.nino"
-                )
             }
 
         </div>
