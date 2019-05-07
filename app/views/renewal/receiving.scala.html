@@ -49,7 +49,7 @@
               labelText = "lbl.yes",
               value = "true",
               inline = true,
-              target = s".paymentMethods-fieldset"
+              target = "[data-reveal='payment-methods']"
           )
           @radio(
               f = f("receivePayments"),
@@ -57,19 +57,14 @@
               value = "false",
               inline = true
           )
-        }
-    }
-
-    @fieldset(
-          f = f("paymentMethods-fieldset"),
-          legend = "renewal.receiving.expect.to.receive",
-          classes = Seq("paymentMethods-fieldset"),
-          hint = "lbl.select.all"
-      ) {
-        @errorGroup(
-            field = f("paymentMethods"),
+        @panel(
+            field = Some(f("paymentMethods")),
+            jsHidden = true,
+            dataReveal = "payment-methods",
             classes = Seq("form-group")
         ) {
+            <p class="form-label">@Messages("renewal.receiving.expect.to.receive")</p>
+            <p class="form-hint">@Messages("lbl.select.all")</p>
             @checkbox(
                 f = f("paymentMethods.courier"),
                 labelText = "hvd.receiving.option.01",
@@ -86,7 +81,6 @@
                 value = "true",
                 target = s"#paymentMethods-details-fieldset"
             )
-
             @panel(
                 field = Some(f("paymentMethods-details-fieldset")),
                 jsHidden = true,
@@ -97,6 +91,7 @@
                     labelText = "hvd.receiving.give.details.lbl"
                 )
             }
+        }
         }
     }
 
