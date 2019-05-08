@@ -941,12 +941,12 @@ aboutyou.rolewithinbusiness.lbl.06 = Partner
 aboutyou.rolewithinbusiness.lbl.07 = Sole proprietor
 aboutyou.rolewithinbusiness.lbl.08 = Other
 
-businessdetails.whatyouneed.subheading = In this section, you’ll be asked for things like:
+businessdetails.whatyouneed.subheading = In this section you’ll be asked for things like:
 businessdetails.whatyouneed.subheading_2 = You’ll also need:
-businessdetails.whatyouneed.line_1 = your Money Laundering Regulations registration number, if you are already registered for supervision
-businessdetails.whatyouneed.line_2 = your VAT registration number, if you are registered for VAT
+businessdetails.whatyouneed.line_1 = your Money Laundering Regulations registration number, if you’re already registered for supervision
+businessdetails.whatyouneed.line_2 = your VAT registration number, if you’re registered for VAT
 businessdetails.whatyouneed.line_3 = your registered office or main place of business address
-businessdetails.whatyouneed.line_4 = a contact email, telephone number and postal address
+businessdetails.whatyouneed.line_4 = a contact email, telephone number, and postal address
 businessdetails.registeredforvat.title = Is your business registered for VAT in the UK?
 businessdetails.registeredforvat.lbl.vatNumber = VAT registration number
 businessdetails.registeredforvat.lbl.vatNumber.hint = This is 9 numbers, sometimes with ‘GB’ at the start, for example 123456789 or GB123456789. You can find it on your VAT registration certificate.
@@ -971,7 +971,7 @@ businessdetails.correspondenceaddress.title = What is the right address to send 
 businessdetails.correspondenceaddress.lbl = Is this a UK address?
 businessdetails.correspondenceaddress.p = We’ll send letters about your supervision to this address.
 businessdetails.correspondenceaddress.contact.info = Contact person or business
-businessdetails.correspondenceaddress.yourName = Your name
+businessdetails.correspondenceaddress.yourName = Name of the person
 businessdetails.correspondenceaddress.businessName = Name of the business
 businessdetails.correspondenceaddress.ukAddress = Yes
 businessdetails.correspondenceaddress.nonUkAddress = No
@@ -1242,7 +1242,7 @@ businessmatching.updateservice.updateotherinformation.text = As a result some se
 
 #   Add route Start  ###################################################################################################
 businessmatching.updateservice.msb.services.title = Which money service business activities does your business carry out?
-businessmatching.updateservice.msb.services.heading = Which money service business activities does your bx`usiness carry out?
+businessmatching.updateservice.msb.services.heading = Which money service business activities does your business carry out?
 businessmatching.updateservice.msb.services.list.heading = Choose at least one
 businessmatching.updateservice.msb.services.list.lbl.01 = Transmitting money
 businessmatching.updateservice.msb.services.list.lbl.02 = Currency exchange
