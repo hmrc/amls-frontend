@@ -1135,9 +1135,9 @@ businessmatching.businessType.lbl.01 = Limited company
 businessmatching.businessType.lbl.03 = Partnership
 businessmatching.businessType.lbl.04 = Limited partnership or limited liability partnership
 businessmatching.businessType.lbl.05 = Unincorporated association or trust
-businessmatching.registerservices.title = What type of services do you need to register?
+businessmatching.registerservices.title = Which services do you need to register?
 businessmatching.registerservices.other.title = What other service do you need to register?
-businessmatching.registerservices.details = What these service types mean
+businessmatching.registerservices.details = What these services mean
 
 businessmatching.registerservices.existing = You’ve told us your business already does:
 businessmatching.registerservices.servicename.lbl.01 = Accountancy service provider
@@ -1242,7 +1242,7 @@ businessmatching.updateservice.updateotherinformation.text = As a result some se
 
 #   Add route Start  ###################################################################################################
 businessmatching.updateservice.msb.services.title = Which money service business activities does your business carry out?
-businessmatching.updateservice.msb.services.heading = Which money service business activities does your business carry out?
+businessmatching.updateservice.msb.services.heading = Which money service business activities does your bx`usiness carry out?
 businessmatching.updateservice.msb.services.list.heading = Choose at least one
 businessmatching.updateservice.msb.services.list.lbl.01 = Transmitting money
 businessmatching.updateservice.msb.services.list.lbl.02 = Currency exchange
@@ -1472,7 +1472,7 @@ businessactivities.tax.matters.title = Does this professional adviser manage you
 businessactivities.tax.matters.heading = Does {0} manage your tax affairs with HM Revenue and Customs (HMRC)?
 businessactivities.tax.matters.summary.title = Does {0} manage your tax affairs with HM Revenue and Customs (HMRC)?
 businessactivities.summary.directly.involved.text = directly involved in MLR activities
-businessactivities.involved.hint = Do not include personal or financial information, like your National Insurance number or credit card details.\n\
+businessactivities.involved.hint = Do not include any personal or financial information, like your National Insurance or credit card details.\n\
   Enter 255 characters or less.
 
 submit.registration = Submit application
