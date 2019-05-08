@@ -40,10 +40,9 @@ s"""${f("professionalBody").id}-fieldset"""
     @fieldset(
         f = f("penalised-fieldset"),
         heading = "estateagentbusiness.penalisedbyprofessional.title",
-        panel = false,
-        classes = Seq("inline")
+        panel = false
     ) {
-        @Messages("estateagentbusiness.penalisedbyprofessional.subtitle")
+        <p>@Messages("estateagentbusiness.penalisedbyprofessional.subtitle")</p>
 
         <ul class="list list-bullet form-group">
             <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_1")</li>
@@ -59,14 +58,7 @@ s"""${f("professionalBody").id}-fieldset"""
                 f = f("penalised"),
                 labelText = "lbl.yes",
                 value = "true",
-                inline = true,
                 target = "[data-reveal='other-professional-body']"
-            )
-            @radio(
-                f = f("penalised"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true
             )
             @panel(
                 jsHidden = true,
@@ -84,10 +76,15 @@ s"""${f("professionalBody").id}-fieldset"""
                     rows = "8"
                 )
             }
+            @radio(
+                f = f("penalised"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
     }
 
-@submit(edit)
+    @submit(edit)
 
-}
+  }
 }

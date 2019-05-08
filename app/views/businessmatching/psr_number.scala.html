@@ -56,8 +56,7 @@
             f = f("appliedfor-fieldset"),
             legend = "businessmatching.psr.number.title",
             legendHidden = true,
-            panel = false,
-            classes = Seq("inline")
+            panel = false
         ) {
 
             @if(edit && !isPreSubmission) {
@@ -71,21 +70,18 @@
                         f = f("appliedFor"),
                         labelText = "lbl.yes",
                         value = "true",
-                        target = s"#$target",
-                        inline = true
+                        target = s"#$target"
                     )
+                      @panel(
+                        field = Some(f(s"$target")),
+                        id = target
+                      ) { @psrInput }
                     @radio(
                         f = f("appliedFor"),
                         labelText = "lbl.no",
-                        value = "false",
-                        inline = true
+                        value = "false"
                     )
                 }
-
-                @panel(
-                    field = Some(f(s"$target")),
-                    id = target
-                ) { @psrInput }
             }
         }
 

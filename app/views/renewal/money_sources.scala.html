@@ -21,25 +21,24 @@
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages)
 
 @header = {
-@components.back_link()
-@errorSummary(f)
-@heading("renewal.msb.money_sources.header", "summary.renewal")
+    @components.back_link()
+    @errorSummary(f)
+    @heading(section = "summary.renewal")
 }
 
 @main(
-title = Messages("renewal.msb.money_sources.header") + " - " + Messages("summary.renewal"),
-heading = header
+    title = Messages("renewal.msb.money_sources.header") + " - " + Messages("summary.renewal"),
+    heading = header
 ) {
     @form(f, controllers.renewal.routes.MoneySourcesController.post(edit)) {
 
         @fieldset(
             f = f("usesForeignCurrencies-fieldset"),
-            legend = "renewal.msb.money_sources.header",
-            hint = "lbl.select.all",
+            heading = "renewal.msb.money_sources.header",
             jsHidden = false,
-            panel = false,
-            legendHidden = true
+            panel = false
         ) {
+            <p class="form-hint">@Messages("lbl.select.all")</p>
             @errorGroup(
                 field = f("WhoWillSupply")
             ) {

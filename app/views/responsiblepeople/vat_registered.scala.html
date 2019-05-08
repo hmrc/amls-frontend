@@ -40,8 +40,7 @@
             f = f("registeredForVAT-fieldset"),
             legend = "responsiblepeople.registeredforvat.title",
             legendHidden = true,
-            panel = false,
-            classes = Seq("inline")
+            panel = false
         ) {
             @errorGroupWithPlaceholder(
                 field = f("registeredForVAT"),
@@ -54,6 +53,19 @@
                     inline = true,
                     target = s"#$target"
                 )
+                @panel(
+                    field = Some(f(s"$target"))
+                ) {
+                    @input(
+                        field = f("vrnNumber"),
+                        labelText = "responsiblepeople.registeredforvat.lbl.vatNumber",
+                        attrMaxlength = "9",
+                        attrPattern = "[0-9]{1,9}",
+                        bold = false,
+                        hintText = "lbl.hint.vat"
+
+                    )
+                }
                 @radio(
                     f = f("registeredForVAT"),
                     labelText = "lbl.no",
@@ -61,20 +73,6 @@
                     inline = true
                 )
             }
-        }
-
-        @panel(
-            field = Some(f(s"$target"))
-        ) {
-            @input(
-                field = f("vrnNumber"),
-                labelText = "responsiblepeople.registeredforvat.lbl.vatNumber",
-                attrMaxlength = "9",
-                attrPattern = "[0-9]{1,9}",
-                bold = false,
-                hintText = "lbl.hint.vat"
-
-            )
         }
 
         @submit()

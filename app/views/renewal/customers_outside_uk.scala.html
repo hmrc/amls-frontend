@@ -28,7 +28,7 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("renewal.customer.outside.uk.title", "summary.renewal")
+    @heading(section = "summary.renewal")
 }
 
 @main(
@@ -38,24 +38,15 @@
     @form(f, controllers.renewal.routes.CustomersOutsideUKController.post(edit)) {
 
         @fieldset(
-            legend = "renewal.customer.outside.uk.title",
-            legendHidden = true,
+            heading = "renewal.customer.outside.uk.title",
             panel = false,
-            classes = Seq("inline"),
             f = f("isOutside")
         ) {
-
             @radio(
                 f = f("isOutside"),
                 labelText = "lbl.yes",
                 value = "true",
                 target = "[data-reveal='customers-outside-uk']",
-                inline = true
-            )
-            @radio(
-                f = f("isOutside"),
-                labelText = "lbl.no",
-                value = "false",
                 inline = true
             )
             @panel(
@@ -76,6 +67,12 @@
                     ) }
                 }
             }
+            @radio(
+                f = f("isOutside"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
         }
 
         @submit(edit, returnLocation = Some("renewal"))

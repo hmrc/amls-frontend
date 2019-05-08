@@ -37,7 +37,6 @@
             legend = Messages("responsiblepeople.legalName.heading", personName),
             legendHidden = true,
             panel=false,
-            classes = Seq("inline"),
             hint = Messages("responsiblepeople.legalnamechangedate.hint")
         ) {
             @errorGroup(
@@ -50,6 +49,28 @@
                     target = "#previous-panel",
                     inline = true
                 )
+                @panel(
+                    field = Some(f("previous-panel")),
+                    panel = false,
+                    jsHidden = true
+                ) {
+                    @fieldset(
+                        f = f("previous-fieldset"),
+                        legend = "responsiblepeople.personName.isknownbyothernames",
+                        legendHidden = true,
+                        panel = true
+                    ) {
+                        @errorGroup(
+                            f("previous"),
+                            classes = Seq("section")
+                        ) {
+                            @input(f("firstName"), "responsiblepeople.personName.otherfirstnames")
+                            @input(f("middleName"), "responsiblepeople.personName.othermiddlenames")
+                            @input(f("lastName"), "responsiblepeople.personName.otherlastnames")
+                        }
+                    }
+
+                }
                 @radio(
                     f = f("hasPreviousName"),
                     labelText = "lbl.no",
@@ -57,29 +78,6 @@
                     inline = true
                 )
             }
-        }
-
-        @panel(
-            field = Some(f("previous-panel")),
-            panel = false,
-            jsHidden = true
-        ) {
-            @fieldset(
-                f = f("previous-fieldset"),
-                legend = "responsiblepeople.personName.isknownbyothernames",
-                legendHidden = true,
-                panel = true
-            ) {
-                @errorGroup(
-                    f("previous"),
-                    classes = Seq("section")
-                ) {
-                    @input(f("firstName"), "responsiblepeople.personName.otherfirstnames")
-                    @input(f("middleName"), "responsiblepeople.personName.othermiddlenames")
-                    @input(f("lastName"), "responsiblepeople.personName.otherlastnames")
-                }
-            }
-
         }
 
         @submit(edit)

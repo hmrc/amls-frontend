@@ -762,11 +762,8 @@ form .inline .block-label {
   display: table;
 }
 
-.clear:after {
-  clear: both;
-}
-
 .clear {
+  clear: both;
   *zoom: 1;
 }
 
@@ -822,7 +819,7 @@ table caption {
 }
 
 fieldset .panel-indent {
-  margin-bottom: 0;
+  margin-bottom: 20px;
 }
 
 .check-your-answers {
@@ -1316,6 +1313,7 @@ button,
 
 .form-hint {
   margin-top: 0;
+  margin-bottom: 10px;
 }
 
 .form-field,

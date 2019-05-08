@@ -27,7 +27,7 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("renewal.involvedinother.title", "summary.renewal")
+    @heading(section = "summary.renewal")
 }
 
 @main(
@@ -35,34 +35,31 @@
     heading = header
 )  {
 
-    <p>@Messages("businessactivities.confirm-activities.subtitle")</p>
-
-    <ul class="list list-bullet">
-        @businessTypes.map {
-            case types => {
-                @types.map{ x =>
-                    <li>@x</li>
-                }
-            }
-        }
-    </ul>
-
-    <p>@Messages("renewal.involvedinother.example")</p>
-    <ul class="list list-bullet">
-        <li>@Messages("renewal.involvedinother.listline1")</li>
-        <li>@Messages("renewal.involvedinother.listline2")</li>
-        <li>@Messages("renewal.involvedinother.listline3")</li>
-    </ul>
-
     @form(f, controllers.renewal.routes.InvolvedInOtherController.post(edit)) {
 
         @fieldset(
             f = f("involvedInOther-fieldset"),
-            legend = "renewal.involvedinother.title",
-            legendHidden = true,
-            panel = false,
-            classes = Seq("inline")
+            heading = "renewal.involvedinother.title",
+            panel = false
         ) {
+            <p>@Messages("businessactivities.confirm-activities.subtitle")</p>
+
+            <ul class="list list-bullet">
+                @businessTypes.map {
+                    case types => {
+                        @types.map{ x =>
+                            <li>@x</li>
+                        }
+                    }
+                }
+            </ul>
+
+            <p>@Messages("renewal.involvedinother.example")</p>
+            <ul class="list list-bullet">
+                <li>@Messages("renewal.involvedinother.listline1")</li>
+                <li>@Messages("renewal.involvedinother.listline2")</li>
+                <li>@Messages("renewal.involvedinother.listline3")</li>
+            </ul>
             @errorGroup(
                 field = f("involvedInOther")
             ) {
@@ -71,12 +68,6 @@
                     labelText = "lbl.yes",
                     value = "true",
                     target = "[data-reveal='involved-in-other']",
-                    inline = true
-                )
-                @radio(
-                    f = f("involvedInOther"),
-                    labelText = "lbl.no",
-                    value = "false",
                     inline = true
                 )
                 @panel(
@@ -94,9 +85,14 @@
                         cols = "30"
                     )
                 }
+                @radio(
+                    f = f("involvedInOther"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
             }
         }
-
 
         @submit(returnLocation = Some("renewal"))
     }

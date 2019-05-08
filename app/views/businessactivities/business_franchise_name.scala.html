@@ -42,8 +42,7 @@
             f = f("businessfranchise-fieldset"),
             legend = "businessactivities.businessfranchise.title",
             legendHidden = true,
-            panel = false,
-            classes = Seq("inline")
+            panel = false
         ) {
 
             @errorGroup(
@@ -57,6 +56,17 @@
                     target = s"#$target",
                     inline = true
                 )
+                @panel(
+                  field = Some(f(s"$target")),
+                  jsHidden = false
+                ) {
+                    @input(
+                      field = f("franchiseName"),
+                      labelText = "businessactivities.businessfranchise.lbl.franchisename",
+                      hintText = "businessactivities.businessfranchise.lbl.hint",
+                      bold = false
+                    )
+                }
                 @radio(
                     f = f("businessFranchise"),
                     labelText = "lbl.no",
@@ -64,18 +74,6 @@
                     inline = true
                 )
             }
-        }
-
-        @panel(
-            field = Some(f(s"$target")),
-            jsHidden = false
-        ) {
-            @input(
-                field = f("franchiseName"),
-                labelText = "businessactivities.businessfranchise.lbl.franchisename",
-                hintText = "businessactivities.businessfranchise.lbl.hint",
-                bold = false
-            )
         }
 
         @submit(edit)
