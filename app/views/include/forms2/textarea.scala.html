@@ -35,21 +35,21 @@
         @if(labelText.nonEmpty) {
             <span class="form-label@if(bold){-bold}@if(labelHidden){ visuallyhidden}">@Messages(labelText)</span>
         }
-        @if(hintText.nonEmpty) {
-            <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
-        }
-        @if(field.hasErrors) {
-            <span class="error-notification" data-journey="error - field:user input:@field.name">@field.error</span>
-        }
-        <textarea @if(charCount){data-char-field} name="@field.name" id="@field.id"
-            @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint"}
-            @if(cols.nonEmpty) { cols="@cols" }
-            @if(rows.nonEmpty) { rows="@rows" }
-            @if(maxLength.nonEmpty) { maxlength="@maxLength" }
-            @if(largeWidth) { class="textarea--3-4" }
-            >@field.value</textarea>
-        @if(charCount) {
-            <p class="char-counter-text flush js-hidden">@Messages("lbl.1200.character.limit")</p>
-        }
     </label>
+    @if(hintText.nonEmpty) {
+        <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
+    }
+    @if(field.hasErrors) {
+        <span class="error-notification" data-journey="error - field:user input:@field.name">@field.error</span>
+    }
+    <textarea @if(charCount){data-char-field} name="@field.name" id="@field.id"
+        @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint"}
+        @if(cols.nonEmpty) { cols="@cols" }
+        @if(rows.nonEmpty) { rows="@rows" }
+        @if(maxLength.nonEmpty) { maxlength="@maxLength" }
+        @if(largeWidth) { class="textarea--3-4" }
+        >@field.value</textarea>
+    @if(charCount) {
+        <p class="char-counter-text flush js-hidden">@Messages("lbl.1200.character.limit")</p>
+    }
 </div>
