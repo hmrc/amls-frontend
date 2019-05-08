@@ -24,7 +24,7 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("renewal.msb.fx.transactions.expected.title", "summary.renewal")
+    @heading(section = "summary.renewal")
 }
 
 @main(
@@ -39,8 +39,7 @@
             attrStep = "1",
             attrType = "number",
             field = f("fxTransaction"),
-            labelText = "renewal.msb.fx.transactions.expected.title",
-            labelHidden = true
+            headingText = "renewal.msb.fx.transactions.expected.title"
         )
 
         @submit(edit)
