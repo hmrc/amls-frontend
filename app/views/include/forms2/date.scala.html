@@ -15,6 +15,7 @@
  *@
 
 @import forms.{Field, Form2}
+@import utils.HtmlElementHelpers.AttrMinMax
 
 @(
     f: Form2[_],
@@ -51,8 +52,7 @@
         classes = Seq("input--no-spinner"),
         parentDateAttr = "day",
         attrType = "number",
-        attrMin = "1",
-        attrMax = "31",
+        attrMinMax = AttrMinMax(attrMin = "1", attrMax = "31"),
         attrPattern = "[0-9]{2}",
         attrStep = "1",
         attrDescribedBy = s"${hintId}"
@@ -64,8 +64,7 @@
         classes = Seq("input--no-spinner"),
         parentDateAttr = "month",
         attrType = "number",
-        attrMin = "1",
-        attrMax = "12",
+        attrMinMax = AttrMinMax(attrMin = "1", attrMax = "12"),
         attrStep = "1",
         attrPattern = "[0-9]{2}"
     )
@@ -76,7 +75,7 @@
         classes = Seq("input--no-spinner"),
         parentDateAttr = "year",
         attrType = "number",
-        attrMin = "1800",
+        attrMinMax = AttrMinMax(attrMin = "1800"),
         attrStep = "1",
         attrPattern = "[1-9][0-9]{3}"
     )

@@ -16,6 +16,7 @@
 
 @import include._
 @import forms2._
+@import utils.HtmlElementHelpers.AttrMinMax
 
 @(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages)
 
@@ -43,7 +44,7 @@
             panel = false
         ) {
             @input(
-                attrMin = "1",
+                attrMinMax = AttrMinMax(attrMin = "1"),
                 attrPattern = "[0-9]*",
                 attrStep = "1",
                 attrType = "number",

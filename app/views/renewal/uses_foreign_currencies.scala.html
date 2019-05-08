@@ -21,23 +21,22 @@
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages)
 
 @header = {
-@components.back_link()
-@errorSummary(f)
-@heading("renewal.msb.foreign_currencies.header", "summary.renewal")
+    @components.back_link()
+    @errorSummary(f)
+    @heading(section = "summary.renewal")
 }
 
 @main(
-title = Messages("renewal.msb.foreign_currencies.header") + " - " + Messages("summary.renewal"),
-heading = header
+    title = Messages("renewal.msb.foreign_currencies.header") + " - " + Messages("summary.renewal"),
+    heading = header
 ) {
     @form(f, controllers.renewal.routes.UsesForeignCurrenciesController.post(edit)) {
 
     @fieldset(
         f = f("usesForeignCurrencies-fieldset"),
-        legend = Messages("renewal.msb.foreign_currencies.header"),
+        heading = Messages("renewal.msb.foreign_currencies.header"),
         panel = false,
-        classes = Seq("inline"),
-        legendHidden = true
+        classes = Seq("inline")
     ) {
 
         @errorGroup(f("usesForeignCurrencies")) {

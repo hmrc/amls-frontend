@@ -22,7 +22,7 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("renewal.receiving.title", "summary.renewal")
+    @heading(section = "summary.renewal")
 }
 
 @main(
@@ -30,16 +30,14 @@
   heading = header
 ) {
 
-  <p>@Messages("hvd.receiving.convert.currency.text")</p>
-
   @form(f, controllers.renewal.routes.ReceiveCashPaymentsController.post(edit)) {
 
     @fieldset(
         f = f("receivePayments-fieldset"),
-        legend = "renewal.receiving.title",
-        legendHidden = true,
+        heading = "renewal.receiving.title",
         panel = false
     ) {
+        @hint("hvd.receiving.convert.currency.text")
         @errorGroup(
             field = f("receivePayments")
         ) {

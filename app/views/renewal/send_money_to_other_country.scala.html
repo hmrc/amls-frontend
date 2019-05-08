@@ -22,7 +22,7 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("renewal.msb.send.money.title", "summary.renewal")
+    @heading(section = "summary.renewal")
 }
 
 @main(
@@ -34,8 +34,7 @@
 
         @fieldset(
             f = f("money-fieldset"),
-            legend = "renewal.msb.send.money.title",
-            legendHidden = true,
+            heading = "renewal.msb.send.money.title",
             panel = false,
             classes = Seq("inline")
         ) {

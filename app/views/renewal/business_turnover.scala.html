@@ -22,7 +22,7 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("renewal.business-turnover.title", "summary.renewal")
+    @heading(section = "summary.renewal")
 }
 
 @main(
@@ -34,8 +34,7 @@
 
         @fieldset(
             f = f("BusinessTurnover-fieldset"),
-            legend = "renewal.business-turnover.title",
-            legendHidden = true,
+            heading = "renewal.business-turnover.title",
             panel = false
         ) {
             @errorGroup(
