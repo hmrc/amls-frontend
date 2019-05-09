@@ -43,33 +43,30 @@
 
 <div class="form-group@if(field.hasErrors){ form-field--error}@if(parentDateAttr){ form-group-@parentDateAttr} @if(panel){ panel-indent}@if(jsHidden){ js-hidden}"@if(data){ data-reveal="@data"}>
     <label class="form-label@if(bold){-bold}" for="@field.id">
-        @if(headingText.nonEmpty) {
-            <h1 class="heading-xlarge">@Messages(headingText)</h1>
-        }
-        @if(!headingText.nonEmpty && labelText.nonEmpty) {
+        @if(labelText.nonEmpty) {
             @if(labelHidden) {<span class="visuallyhidden">}
             @Messages(labelText)
             @if(labelHidden){</span>}
         }
+        @if(hintText.nonEmpty) {
+            <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
+        }
+        @if(field.hasErrors) {
+            <span class="error-notification" data-journey="error - field:user input:@field.name">@field.error</span>
+        }
+        <input name="@field.name" class="form-control @if(attrType=="number"){ input--no-spinner} @classes.mkString(" ")"
+                value="@field.value" id="@field.id"
+                @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint" }
+                @if(attrDescribedBy.nonEmpty) { aria-describedby="@attrDescribedBy-hint" }
+                @if(attrType.nonEmpty) { type="@attrType" } else { type="text" }
+                @if(attrMinMax.attrMin.nonEmpty) { min="@attrMinMax.attrMin" }
+                @if(attrMinMax.attrMax.nonEmpty) { max="@attrMinMax.attrMax" }
+                @if(attrMinlength.nonEmpty) { minlength="@attrMinlength" }
+                @if(attrMaxlength.nonEmpty) { maxlength="@attrMaxlength" }
+                @if(attrPattern.nonEmpty) { pattern="@attrPattern" }
+                @if(attrStep.nonEmpty) { step="@attrStep" }
+                @if(attrTitle.nonEmpty) { title="@Messages(attrTitle)" }
+                @if(dataAttrs.nonEmpty) { @dataAttrs.toDataAttributes.mkString(" ") }
+            />
     </label>
-    @if(hintText.nonEmpty) {
-        <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
-    }
-    @if(field.hasErrors) {
-        <span class="error-notification" data-journey="error - field:user input:@field.name">@field.error</span>
-    }
-    <input name="@field.name" class="form-control @if(attrType=="number"){ input--no-spinner} @classes.mkString(" ")"
-            value="@field.value" id="@field.id"
-            @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint" }
-            @if(attrDescribedBy.nonEmpty) { aria-describedby="@attrDescribedBy-hint" }
-            @if(attrType.nonEmpty) { type="@attrType" } else { type="text" }
-            @if(attrMinMax.attrMin.nonEmpty) { min="@attrMinMax.attrMin" }
-            @if(attrMinMax.attrMax.nonEmpty) { max="@attrMinMax.attrMax" }
-            @if(attrMinlength.nonEmpty) { minlength="@attrMinlength" }
-            @if(attrMaxlength.nonEmpty) { maxlength="@attrMaxlength" }
-            @if(attrPattern.nonEmpty) { pattern="@attrPattern" }
-            @if(attrStep.nonEmpty) { step="@attrStep" }
-            @if(attrTitle.nonEmpty) { title="@Messages(attrTitle)" }
-            @if(dataAttrs.nonEmpty) { @dataAttrs.toDataAttributes.mkString(" ") }
-        />
 </div>
