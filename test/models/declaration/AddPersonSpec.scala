@@ -116,6 +116,23 @@ class AddPersonRelease7Spec extends AmlsSpec {
         )
       }
 
+      "middlename contain invalid character" in {
+        val formNames = Map(
+          "firstName" -> Seq("Abe"),
+          "middleName" -> Seq(">>"),
+          "lastName" -> Seq("Lincoln"),
+          "positions" -> Seq("01")
+        )
+
+        AddPerson.formRule.validate(formNames) must be(
+          Invalid(
+            Seq(
+              (Path \ "middleName") -> Seq(ValidationError("error.invalid.middlename.validation"))
+            )
+          )
+        )
+      }
+
       "role within business is missing" in {
 
         val urlFormEncoded = Map(
