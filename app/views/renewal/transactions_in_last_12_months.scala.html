@@ -25,7 +25,7 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.renewal")
+    @heading("renewal.msb.transfers.header", "summary.renewal")
 }
 
 @main(
@@ -38,7 +38,8 @@
         @input(
             classes = Seq("form-control-1-4"),
             field = f("txnAmount"),
-            headingText = "renewal.msb.transfers.header",
+            labelText = "renewal.msb.transfers.header",
+            labelHidden = true,
             attrType = "number",
             dataAttrs = digitsOnlyAttributes
         )
