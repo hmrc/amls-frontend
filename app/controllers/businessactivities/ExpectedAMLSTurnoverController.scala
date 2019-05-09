@@ -94,7 +94,7 @@ class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCach
       }
     }
 
-    val blah = typesString match {
+    typesString match {
       case Some(types) => Some(typesString.getOrElse(List()).toList.sorted.mkString("|"))
       case None => None
     }
