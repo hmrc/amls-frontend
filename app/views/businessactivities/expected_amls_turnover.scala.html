@@ -18,7 +18,7 @@
 @import forms2._
 @import models.businessmatching._
 
-@(f: forms.Form2[_], edit: Boolean, bmBusinessActivities:Option[String])(implicit lang:Lang,  m: Messages, request: Request[_])
+@(f: forms.Form2[_], edit: Boolean, bmModel: BusinessMatching, businessTypes:Option[String])(implicit lang:Lang,  m: Messages, request: Request[_])
 
 @header = {
     @components.back_link()
@@ -31,13 +31,21 @@
     heading = header
 ) {
 
-        <ul class="list list-bullet">
-            @bmBusinessActivities.map {activity =>
-              @activity.split('|').map {a =>
-                <li>@a</li>
-              }
+    @bmModel.activities.map { a =>
+        @if(a.businessActivities.size > 1) {
+            <p>@Messages("businessactivities.confirm-activities.subtitle")</p>
+
+            <ul class="list list-bullet">
+            @businessTypes.map { activity =>
+                @activity.split('|').map { a =>
+                    <li>@if(a.charAt(0) == 'a' || a.charAt(0) == 'e') { an @a } else { a @a}</li>
+                }
             }
-        </ul>
+            </ul>
+        } else {
+            <p>@Messages("businessactivities.confirm-activities.subtitle_2") @businessTypes.map { a => @if(a.charAt(0) == 'a' || a.charAt(0) == 'e') {an @a } else { a @a}} </p>
+        }
+    }
 
         @form(f, controllers.businessactivities.routes.ExpectedAMLSTurnoverController.post(edit)) {
 

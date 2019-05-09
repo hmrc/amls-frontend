@@ -47,9 +47,9 @@ class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCach
               (for {
                 businessActivities <- cache.getEntry[BusinessActivities](BusinessActivities.key)
                 expectedTurnover <- businessActivities.expectedAMLSTurnover
-              } yield Ok(expected_amls_turnover(Form2[ExpectedAMLSTurnover](expectedTurnover), edit, businessTypes(businessMatching))))
-                .getOrElse (Ok(expected_amls_turnover(EmptyForm, edit, businessTypes(businessMatching))))
-            }) getOrElse Ok(expected_amls_turnover(EmptyForm, edit, None))
+              } yield Ok(expected_amls_turnover(Form2[ExpectedAMLSTurnover](expectedTurnover), edit, businessMatching, businessTypes(businessMatching))))
+                .getOrElse (Ok(expected_amls_turnover(EmptyForm, edit, businessMatching, businessTypes(businessMatching))))
+            }) getOrElse Ok(expected_amls_turnover(EmptyForm, edit, None, None))
         }
         case false => Future.successful(NotFound(notFoundView))
       }
@@ -62,7 +62,7 @@ class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCach
           for {
             businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
           } yield {
-            BadRequest(expected_amls_turnover(f, edit, businessTypes(businessMatching)))
+            BadRequest(expected_amls_turnover(f, edit, None, businessTypes(businessMatching)))
           }
 
         case ValidForm(_, data) =>
@@ -94,10 +94,9 @@ class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCach
       }
     }
 
-    typesString match {
+    val blah = typesString match {
       case Some(types) => Some(typesString.getOrElse(List()).toList.sorted.mkString("|"))
       case None => None
     }
-
   }
 }

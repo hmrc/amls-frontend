@@ -113,8 +113,20 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
           override def model = Some(BusinessActivities(expectedAMLSTurnover = Some(First)))
 
           val businessMatching = BusinessMatching(
-            activities = Some(Activities(Set.empty))
+            activities = Some(Activities(Set(
+              AccountancyServices,
+              BillPaymentServices,
+              EstateAgentBusinessService,
+              HighValueDealing,
+              MoneyServiceBusiness,
+              TrustAndCompanyServices,
+              TelephonePaymentService
+            )))
           )
+
+//          val businessMatching = BusinessMatching(
+//            activities = Some(Activities(Set.empty))
+//          )
 
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(NotCompleted))

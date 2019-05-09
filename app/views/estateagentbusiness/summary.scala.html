@@ -35,7 +35,7 @@
             question = Messages("estateagentbusiness.services.title"),
             editUrl = controllers.estateagentbusiness.routes.BusinessServicesController.get(true).toString
         ) {
-            <ul class="list list--comma">
+            <ul>
             @a.services.map { line =>
                 <li>@line match {
                     case Residential => {@Messages("estateagentbusiness.service.lbl.01")}
