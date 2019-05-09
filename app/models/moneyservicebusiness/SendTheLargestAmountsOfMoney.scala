@@ -73,6 +73,7 @@ private sealed trait SendTheLargestAmountsOfMoney0 {
       case (a, Some(b), Some(c)) => SendTheLargestAmountsOfMoney(Seq(a, b, c))
       case (a, Some(b), None) => SendTheLargestAmountsOfMoney(Seq(a, b))
       case (a, None, None) => SendTheLargestAmountsOfMoney(Seq(a))
+      case (_, _, _) => SendTheLargestAmountsOfMoney(Seq())
       }
     }
 
@@ -87,6 +88,7 @@ private sealed trait SendTheLargestAmountsOfMoney0 {
       case Seq(a, b, c) => Json.obj("country_1" -> a, "country_2" -> b, "country_3" -> c)
       case Seq(a, b) => Json.obj("country_1" -> a, "country_2" -> b)
       case Seq(a) => Json.obj("country_1" -> a)
+      case _ => Json.obj()
     }
   }
 }
