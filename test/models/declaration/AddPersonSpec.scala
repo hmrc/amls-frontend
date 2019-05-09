@@ -47,6 +47,7 @@ class AddPersonRelease7Spec extends AmlsSpec {
     }
 
     "fail validation" when {
+
       "fields are missing represented by an empty Map" in {
 
         AddPerson.formRule.validate(Map.empty) must
@@ -97,6 +98,22 @@ class AddPersonRelease7Spec extends AmlsSpec {
           be(Invalid(Seq(
             (Path \ "lastName") -> Seq(ValidationError("error.required"))
           )))
+      }
+
+      "firstname contain invalid character" in {
+        val formNames = Map(
+          "firstName" -> Seq("Abe>>"),
+          "lastName" -> Seq("Lincoln"),
+          "positions" -> Seq("01")
+        )
+
+        AddPerson.formRule.validate(formNames) must be(
+          Invalid(
+            Seq(
+              (Path \ "firstName") -> Seq(ValidationError("error.invalid.firstname.validation"))
+            )
+          )
+        )
       }
 
       "role within business is missing" in {

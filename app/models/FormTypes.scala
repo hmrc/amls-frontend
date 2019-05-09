@@ -286,10 +286,10 @@ object FormTypes {
     .andThen(maxLength(maxNameTypeLength))
     .andThen(regexWithMsg(commonNameRegex, "err.text.validation"))
 
-  def genericNameRule(requiredMsg: String = "", maxLengthMsg: String = "error.invalid.common_name.length") =
+  def genericNameRule(requiredMsg: String = "", maxLengthMsg: String = "error.invalid.common_name.length", regExMessage: String="error.invalid.common_name.validation") =
     notEmptyStrip
       .andThen(notEmpty.withMessage(requiredMsg))
-      .andThen(regexWithMsg(commonNameRegex, "error.invalid.common_name.validation"))
+      .andThen(regexWithMsg(commonNameRegex, regExMessage))
       .andThen(maxWithMsg(maxNameTypeLength, maxLengthMsg))
 
   val accountNameType = notEmptyStrip
