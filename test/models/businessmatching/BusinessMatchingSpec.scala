@@ -86,9 +86,9 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
       "return the business activities ordered alphabetically" in {
         val expectedList = Some(
           List(
-            "Money service business",
-            "Telecommunications, digital and IT payment service provider",
-            "Trust or company service provider"
+            "money service business",
+            "telecommunications, digital and IT payment service provider",
+            "trust or company service provider"
           )
         )
 
