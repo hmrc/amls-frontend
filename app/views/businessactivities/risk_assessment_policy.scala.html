@@ -26,7 +26,7 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessactivities.riskassessment.policy.title", "summary.businessactivities")
+    @heading(section = "summary.businessactivities")
 }
 
 @main(
@@ -38,8 +38,7 @@
 
         @fieldset(
             f = f("hasPolicy-fieldset"),
-            legend = "businessactivities.riskassessment.policy.title",
-            legendHidden = true,
+            heading = "businessactivities.riskassessment.policy.title",
             panel = false
         ) {
             @errorGroup(
@@ -49,16 +48,15 @@
                     f = f("hasPolicy"),
                     labelText = "lbl.yes",
                     value = "true",
-                    inline = true,
                     target = s"#$target"
                 )
                 @fieldset(
                     f = f(s"$target"),
                     legend = "businessactivities.paper.or.digital",
-                    hint = "lbl.select.all",
                     jsHidden = true,
                     classes = Seq("panel-indent")
                 ) {
+                    <span class="form-hint">@Messages("lbl.select.all")</span>
                     @errorGroup(
                         field = f("riskassessments")
                     ) {
@@ -77,8 +75,7 @@
                 @radio(
                     f = f("hasPolicy"),
                     labelText = "lbl.no",
-                    value = "false",
-                    inline = true
+                    value = "false"
                 )
             }
         }
