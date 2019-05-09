@@ -18,7 +18,7 @@ package controllers.businessdetails
 
 import connectors.DataCacheConnector
 import models.businessdetails._
-import models.{Country, DateOfChange}
+import models.{Country, DateOfChange, NonUKCountry}
 import org.joda.time.LocalDate
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -92,7 +92,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with  MockitoS
         "dateOfChange.day" -> "26"
       )
 
-      val office = RegisteredOfficeNonUK("305", "address line", Some("address line2"), Some("address line3"), Country("Finland", "FIN"))
+      val office = RegisteredOfficeNonUK("305", "address line", Some("address line2"), Some("address line3"), NonUKCountry("Finland", "FIN"))
       val updatedOffice = office.copy(dateOfChange = Some(DateOfChange(new LocalDate(2005, 4, 26))))
 
       val business = BusinessDetails(registeredOffice = Some(office))

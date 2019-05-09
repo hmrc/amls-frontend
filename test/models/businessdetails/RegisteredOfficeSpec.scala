@@ -16,7 +16,7 @@
 
 package models.businessdetails
 
-import models.{Country, DateOfChange}
+import models.{Country, NonUKCountry, DateOfChange}
 import models.businesscustomer.Address
 import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
@@ -58,7 +58,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
           "addressLineNonUK2" -> Seq("building"),
           "addressLineNonUK3" -> Seq("street"),
           "addressLineNonUK4" -> Seq("Area"),
-          "country" -> Seq("GB")
+          "country" -> Seq("AL")
         )
 
         RegisteredOffice.formRule.validate(nonUKModel) must
@@ -68,8 +68,24 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
               "building",
               Some("street"),
               Some("Area"),
-              Country("United Kingdom", "GB"),
+              NonUKCountry("Albania", "AL"),
               None)))
+      }
+
+      "given a non valid non UK address" in {
+        val nonUKModel = Map(
+          "isUK" -> Seq("false"),
+          "addressLineNonUK1" -> Seq("38B"),
+          "addressLineNonUK2" -> Seq("building"),
+          "addressLineNonUK3" -> Seq("street"),
+          "addressLineNonUK4" -> Seq("Area"),
+          "country" -> Seq("GB")
+        )
+
+        RegisteredOffice.formRule.validate(nonUKModel) must
+          be(Invalid(Seq(
+            (Path \ "country") -> Seq(ValidationError("error.required.non.uk.country"))
+          )))
       }
     }
 
@@ -181,7 +197,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
     }
 
     "validate toLines for Non UK address" in {
-      RegisteredOfficeNonUK("38B", "some street", None, None, Country("United Kingdom", "GB")).toLines must be(Seq("38B",
+      RegisteredOfficeNonUK("38B", "some street", None, None, NonUKCountry("United Kingdom", "GB")).toLines must be(Seq("38B",
         "some street",
         "United Kingdom"))
 
@@ -201,7 +217,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
 
     "write correct Non UK address to the model" in {
 
-      val data = RegisteredOfficeNonUK("38B", "Some Street", None, None, Country("United Kingdom", "GB"))
+      val data = RegisteredOfficeNonUK("38B", "Some Street", None, None, NonUKCountry("United Kingdom", "GB"))
 
       RegisteredOffice.formWrites.writes(data) mustBe Map("isUK" -> Seq("false"),
         "addressLineNonUK1" -> Seq("38B"),
@@ -261,7 +277,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
       "Test Address 2",
       Some("Test Address 3"),
       Some("Test Address 4"),
-      Country("United Kingdom", "GB")
+      NonUKCountry("Albania", "AL")
     )
 
     "Round trip a UK Address correctly through serialisation" in {
@@ -285,7 +301,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
     "convert Business Customer Address to RegisteredOfficeNonUK" in {
       val address = Address("addr1", "addr2", Some("line3"), Some("line4"), None, Country("United Kingdom", "GB"))
 
-      RegisteredOffice.convert(address) must be(RegisteredOfficeNonUK("addr1", "addr2", Some("line3"), Some("line4"), Country("United Kingdom", "GB")))
+      RegisteredOffice.convert(address) must be(RegisteredOfficeNonUK("addr1", "addr2", Some("line3"), Some("line4"), NonUKCountry("United Kingdom", "GB")))
     }
   }
 }

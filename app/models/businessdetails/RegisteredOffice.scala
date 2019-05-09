@@ -16,13 +16,12 @@
 
 package models.businessdetails
 
-import models.{Country, DateOfChange}
+import models.{Country, DateOfChange, NonUKCountry}
 import models.FormTypes._
 import models.businesscustomer.Address
-import org.joda.time.LocalDate
 import jto.validation._
 import jto.validation.forms._
-import play.api.libs.json.{JsNull, Json, Reads, Writes}
+import play.api.libs.json.{Json, Reads, Writes}
 
 sealed trait RegisteredOffice {
 
@@ -62,7 +61,7 @@ case class RegisteredOfficeNonUK(
                                   addressLine2: String,
                                   addressLine3: Option[String] = None,
                                   addressLine4: Option[String] = None,
-                                  country: Country,
+                                  country: NonUKCountry,
                                   dateOfChange: Option[DateOfChange] = None
                                 ) extends RegisteredOffice
 
@@ -89,8 +88,8 @@ object RegisteredOffice {
             (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
             (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
             (__ \ "addressLineNonUK4").read(optionR(validateAddress)) ~
-            (__ \ "country").read[Country]
-          ) ((addr1: String, addr2: String, addr3: Option[String], addr4: Option[String], country: Country) =>
+            (__ \ "country").read[NonUKCountry]
+          ) ((addr1: String, addr2: String, addr3: Option[String], addr4: Option[String], country: NonUKCountry) =>
           RegisteredOfficeNonUK(addr1, addr2, addr3, addr4, country, None))
     }
   }
@@ -136,7 +135,7 @@ object RegisteredOffice {
           (__ \ "addressLineNonUK2").read[String] and
           (__ \ "addressLineNonUK3").readNullable[String] and
           (__ \ "addressLineNonUK4").readNullable[String] and
-          (__ \ "country").read[Country] and
+          (__ \ "country").read[NonUKCountry] and
           (__ \ "dateOfChange").readNullable[DateOfChange]
         ) (RegisteredOfficeNonUK.apply _)
   }
@@ -175,7 +174,7 @@ object RegisteredOffice {
         address.line_2,
         address.line_3,
         address.line_4,
-        address.country)
+        new NonUKCountry(address.country.name, address.country.code))
     }
   }
 }

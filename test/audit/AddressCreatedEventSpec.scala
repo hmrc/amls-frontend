@@ -18,7 +18,7 @@ package audit
 
 import audit.AddressConversions._
 import cats.implicits._
-import models.Country
+import models.{Country, NonUKCountry}
 import models.businessdetails.{NonUKCorrespondenceAddress, RegisteredOfficeNonUK, RegisteredOfficeUK, UKCorrespondenceAddress}
 import models.responsiblepeople.{PersonAddressNonUK, PersonAddressUK}
 import models.tradingpremises.{Address => TradingPremisesAddress}
@@ -90,7 +90,7 @@ class AddressCreatedEventSpec extends AmlsSpec {
       }
 
       "given the address of a registered office outside the UK" in {
-        val address = RegisteredOfficeNonUK("RO Line 1", "RO Line 2", "RO Line 3".some, None, Country("Scotland", "SCO"))
+        val address = RegisteredOfficeNonUK("RO Line 1", "RO Line 2", "RO Line 3".some, None, NonUKCountry("Scotland", "SCO"))
         val event = AddressCreatedEvent(address)
         val expected = headerCarrier.toAuditDetails() ++ Map(
           "addressLine1" -> "RO Line 1",
