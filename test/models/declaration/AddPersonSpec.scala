@@ -123,9 +123,9 @@ class AddPersonRelease7Spec extends AmlsSpec {
 
         AddPerson.formRule.validate(urlFormEncoded) must
           be(Invalid(Seq(
-            (Path \ "firstName") -> Seq(ValidationError("error.invalid.common_name.length")),
-            (Path \ "middleName") -> Seq(ValidationError("error.invalid.common_name.length")),
-            (Path \ "lastName") -> Seq(ValidationError("error.invalid.common_name.length"))
+            (Path \ "firstName") -> Seq(ValidationError("error.invalid.firstname.length")),
+            (Path \ "middleName") -> Seq(ValidationError("error.invalid.middlename.length")),
+            (Path \ "lastName") -> Seq(ValidationError("error.invalid.lastname.length"))
           )))
       }
     }

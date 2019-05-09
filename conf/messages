@@ -33,6 +33,9 @@ error.required.yourname = Enter your name
 error.invalid.yourname = You can’t enter more than 140 characters
 error.invalid.common_name.validation = Only use letters A to Z, accented letters, spaces and dashes
 error.invalid.common_name.length = You can’t enter more than 35 characters
+error.invalid.firstname.length = First name must be 35 characters or less
+error.invalid.middlename.length = Middle name must be 35 characters or less
+error.invalid.lastname.length = Last name must be 35 characters or less
 
 error.required.vat.number = Enter a valid VAT registration number
 error.invalid.vat.number = Enter a valid VAT registration number
