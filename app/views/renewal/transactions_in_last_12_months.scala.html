@@ -41,7 +41,8 @@
             labelText = "renewal.msb.transfers.header",
             labelHidden = true,
             attrType = "number",
-            dataAttrs = digitsOnlyAttributes
+            attrMinMax = AttrMinMax(attrMin = "1"),
+            attrStep = "1"
         )
 
         @submit(returnLocation = Some("renewal"))
