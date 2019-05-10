@@ -33,13 +33,12 @@
     heading = header
 ) {
 
-    <p>@Messages("lbl.select.all")</p>
-
     @form(f, controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.post(index, edit)) {
 
         @fieldset(
             f = f("activities-fieldset"),
             legend = "tradingpremises.whatdoesyourbusinessdo.title",
+            hint = "lbl.select.all",
             legendHidden = true,
             panel = false
         ) {

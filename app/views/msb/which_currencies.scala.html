@@ -33,15 +33,10 @@
 
     @form(f, controllers.msb.routes.WhichCurrenciesController.post(edit)) {
 
-        <p>@Messages("msb.which_currencies.uptoThree.hint")</p>
-
-        @hint(
-            hint = "msb.which_currencies.uptoThree.hint2"
-        )
-
         @fieldset(
             f = f("currencies-fieldset"),
             legend = "msb.which_currencies.title",
+            hint = Messages("msb.which_currencies.uptoThree.hint"),
             legendHidden = true,
             panel = false,
             classes = Seq("form-group")
