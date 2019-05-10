@@ -64,7 +64,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
 
     "pre-populate the 'Where to Send The Largest Amounts Of Money' Page" in new Fixture  {
       val msb = Some(MoneyServiceBusiness(
-        sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB")))))
+        sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB"))))))
 
       mockIsNewActivity(false)
       mockApplicationStatus(NotCompleted)
@@ -74,7 +74,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("select[name=country_1] > option[value=GB]").hasAttr("selected") must be(true)
+      document.select("select[name=largestAmountsOfMoney[0]] > option[value=GB]").hasAttr("selected") must be(true)
 
     }
 
@@ -103,7 +103,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
     "on post with valid data" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "country_1" -> "GS"
+        "largestAmountsOfMoney[0]" -> "GS"
       )
 
       mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
@@ -117,7 +117,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
     "on post with valid data in edit mode when the next page's data is in the store" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "country_1" -> "GB"
+        "largestAmountsOfMoney[0]" -> "GB"
       )
 
       val incomingModel = MoneyServiceBusiness(
@@ -129,7 +129,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
       )
 
       val outgoingModel = incomingModel.copy(
-        sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "UK")))
+        sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "UK"))))
       )
 
       mockCacheFetch[MoneyServiceBusiness](Some(incomingModel), Some(MoneyServiceBusiness.key))
@@ -143,13 +143,13 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
     "on post with valid data in edit mode when the next page's data isn't in the store" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "country_1" -> "GB"
+        "largestAmountsOfMoney[0]" -> "GB"
       )
 
       val incomingModel = MoneyServiceBusiness()
 
       val outgoingModel = incomingModel.copy(
-        sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "UK")))
+        sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "UK"))))
       )
 
       mockCacheFetch[MoneyServiceBusiness](Some(incomingModel), Some(MoneyServiceBusiness.key))
@@ -163,7 +163,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
     "on post with invalid data" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "country_1" -> ""
+        "largestAmountsOfMoney[0]" -> ""
       )
 
       mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
@@ -173,7 +173,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
       status(result) must be(BAD_REQUEST)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#country_1]").html() must include(Messages("error.required.country.name"))
+      document.select("a[href=#largestAmountsOfMoney]").html() must include(Messages("error.required.country.name"))
     }
   }
 }
