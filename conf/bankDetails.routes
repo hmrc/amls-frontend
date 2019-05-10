@@ -1,7 +1,7 @@
 GET         /what-you-need                                               @controllers.bankdetails.WhatYouNeedController.get
 
-GET         /account-type/:index                                             @controllers.bankdetails.BankAccountTypeController.get(index:Int, edit: Boolean ?= false)
-POST        /account-type/:index                                             @controllers.bankdetails.BankAccountTypeController.post(index:Int, edit: Boolean ?= false)
+GET         /account-type/:index                                         @controllers.bankdetails.BankAccountTypeController.get(index:Int, edit: Boolean ?= false)
+POST        /account-type/:index                                         @controllers.bankdetails.BankAccountTypeController.post(index:Int, edit: Boolean ?= false)
 
 GET         /informal-account-name                                       @controllers.bankdetails.BankAccountNameController.getNoIndex
 GET         /informal-account-name/:index                                @controllers.bankdetails.BankAccountNameController.getIndex(index:Int, edit: Boolean ?= false)

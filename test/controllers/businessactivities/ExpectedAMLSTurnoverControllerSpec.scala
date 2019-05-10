@@ -124,10 +124,6 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
             )))
           )
 
-//          val businessMatching = BusinessMatching(
-//            activities = Some(Activities(Set.empty))
-//          )
-
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(NotCompleted))
 
