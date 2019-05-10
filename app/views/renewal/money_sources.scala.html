@@ -35,10 +35,10 @@
         @fieldset(
             f = f("usesForeignCurrencies-fieldset"),
             heading = "renewal.msb.money_sources.header",
-            hint = "lbl.select.all",
             jsHidden = false,
             panel = false
         ) {
+            <p class="form-hint">@Messages("lbl.select.all")</p>
             @errorGroup(
                 field = f("WhoWillSupply")
             ) {
@@ -76,9 +76,7 @@
                     value = "Yes"
                 )
             }
-            <div class="clear">
-            @submit(returnLocation = Some("renewal"))
-            </div>
         }
+        @submit(returnLocation = Some("renewal"))
     }
 }

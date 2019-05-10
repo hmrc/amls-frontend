@@ -67,21 +67,16 @@
                     f = f("propertyRedressScheme"),
                     labelText = "estateagentbusiness.redress.lbl.04",
                     value = "04",
-                    target = s".other-fieldset"
+                    target = "[data-reveal='other-redress-scheme']"
+                )
+                @input(
+                    field = f("other"),
+                    data = "other-redress-scheme",
+                    panel = true,
+                    jsHidden = true,
+                    labelText = "estateagentbusiness.redress.lbl.other"
                 )
             }
-        }
-
-        @fieldset(
-            legend = "estateagentbusiness.redress.lbl.other",
-            legendHidden = true,
-            classes = Seq("other-fieldset"),
-            f = f("other-fieldset")
-        ) {
-            @input(
-                field = f("other"),
-                labelText = "estateagentbusiness.redress.lbl.other"
-            )
         }
 
         @submit(edit)

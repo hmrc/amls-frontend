@@ -67,12 +67,12 @@
                     f = f("involvedInOther"),
                     labelText = "lbl.yes",
                     value = "true",
-                    target = s"#$target",
+                    target = "[data-reveal='involved-in-other']",
                     inline = true
                 )
                 @panel(
-                    field = Some(f(s"$target")),
-                    jsHidden = false,
+                    jsHidden = true,
+                    dataReveal = "involved-in-other",
                     id = target
                 ) {
                     @textarea(

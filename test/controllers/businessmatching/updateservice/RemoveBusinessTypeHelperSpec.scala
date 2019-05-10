@@ -16,7 +16,6 @@
 
 package controllers.businessmatching.updateservice
 
-import connectors.KeystoreConnector
 import models.asp.Asp
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
@@ -28,16 +27,17 @@ import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import models.tcsp.Tcsp
 import models.tradingpremises.{CurrencyExchange, TradingPremises, TradingPremisesMsbServices, WhatDoesYourBusinessDo}
 import org.mockito.Matchers.{any, eq => eqTo}
-import org.mockito.Mockito.{never, verify}
+import org.mockito.Mockito.{never, verify, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.Application
-import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils._
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with MockitoSugar with ScalaFutures {
 
@@ -46,6 +46,8 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
     .build()
 
   val MSBOnlyModel = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness)))
+
+  val cacheMap = CacheMap("", Map.empty)
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
@@ -765,6 +767,23 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
         verify(mockCacheConnector, never).save[MoneyServiceBusinessSection](eqTo(MoneyServiceBusinessSection.key), any())(any(), any(), any())
         verify(mockCacheConnector, never).save[Asp](eqTo(Asp.key), any())(any(), any(), any())
         verify(mockCacheConnector, never).save[Hvd](eqTo(Hvd.key), any())(any(), any(), any())
+      }
+    }
+    "not raise an exception" when {
+      "removing BPS" in new Fixture {
+        when {
+          mockCacheConnector.fetchAllWithDefault
+        } thenReturn Future.successful(cacheMap)
+
+        val result = await(helper.removeSectionData(RemoveBusinessTypeFlowModel(Some(Set(BillPaymentServices)))).value)
+      }
+
+      "removing TDI" in new Fixture {
+        when {
+          mockCacheConnector.fetchAllWithDefault
+        } thenReturn Future.successful(cacheMap)
+
+        val result = await(helper.removeSectionData(RemoveBusinessTypeFlowModel(Some(Set(TelephonePaymentService)))).value)
       }
     }
   }
