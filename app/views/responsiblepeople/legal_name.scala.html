@@ -39,10 +39,9 @@
             f = f("hasPreviousName-fieldset"),
             legend = Messages("responsiblepeople.legalName.heading", personName),
             legendHidden = true,
-            panel=false,
-            hint = Messages("responsiblepeople.legalnamechangedate.hint")
+            panel=false
         ) {
-
+            @hint("responsiblepeople.legalnamechangedate.hint")
             @errorGroup(
                 field = f("hasPreviousName")
             ) {

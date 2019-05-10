@@ -36,9 +36,9 @@
         @fieldset(
             heading = "renewal.msb.largest.amounts.title",
             f = f("countries"),
-            panel = false,
-            hint = "lbl.list.upto.3.countries"
+            panel = false
         ) {
+            @hint("lbl.list.upto.3.countries")
             @for(i <- 1 until 4) {
                 @defining(
                     f(s"country_$i")

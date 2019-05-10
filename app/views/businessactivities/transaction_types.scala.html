@@ -37,10 +37,11 @@
         @fieldset(
             f = f("transactions-fieldset"),
             legend = "businessactivities.do.keep.records",
-            hint = "businessactivities.do.keep.records.hint",
+            legendHidden = true,
             classes = Seq(s"$target"),
             panel = false
         ) {
+            @hint("businessactivities.do.keep.records.hint")
             @errorGroup(
                 field = f("types")
             ) {

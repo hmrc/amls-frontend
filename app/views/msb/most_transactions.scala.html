@@ -36,11 +36,11 @@
         @fieldset(
             f = f("mostTransactionsCountries-fieldset"),
             legend = "msb.most.transactions.list.countries",
-            hint = "lbl.list.upto.3.countries",
             legendHidden = true,
             panel = false,
             classes = Seq("inline")
         ) {
+            @hint("lbl.list.upto.3.countries")
             @errorGroup(
                 field = f("mostTransactionsCountries")
             ) {

@@ -34,10 +34,10 @@
         @fieldset(
             f = f("services-fieldset"),
             legend = "asp.services.title",
-            hint = "lbl.select.all",
             legendHidden = true,
             panel = false
         ) {
+            @hint("lbl.select.all")
             @errorGroup(
                  field = f("services")
             ) {

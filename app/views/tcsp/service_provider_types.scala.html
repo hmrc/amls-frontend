@@ -39,10 +39,10 @@
         @fieldset(
             f = f("serviceProviders-fieldset"),
             legend = "tcsp.kind.of.service.provider.title",
-            hint = "lbl.select.all",
             legendHidden = true,
             panel = false
         ) {
+            @hint("lbl.select.all")
             @errorGroup(
                 field = f("serviceProviders")
             ) {

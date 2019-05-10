@@ -36,11 +36,11 @@
         @fieldset(
             f = f("currencies-fieldset"),
             legend = "msb.which_currencies.title",
-            hint = Messages("msb.which_currencies.uptoThree.hint"),
             legendHidden = true,
             panel = false,
             classes = Seq("form-group")
         ) {
+            @hint("msb.which_currencies.uptoThree.hint")
             @errorGroup(f("currencies")) {
                 @currency(
                     field = f("currencies[0]"),
