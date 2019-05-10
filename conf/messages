@@ -495,7 +495,7 @@ hint.8.digits = This is 8 numbers, like 12345678, or a mix of 15 letters and num
 hint.9.digits = It’s 9 numbers, like 123456789
 hint.10.digits = For example: 1234567890
 hint.255.chars = Enter 255 characters or less.
-renewal.hint.255.chars = You have 255 characters or less.
+renewal.hint.255.chars = Enter 255 characters or less.
 
 lbl.hint.crn = This is 8 characters and can be a mix of numbers and capital letters. Find it on your certificate of incorporation.
 
@@ -1401,6 +1401,7 @@ businessactivities.businessfranchise.lbl.hint = Use their legal name if it is di
 businessactivities.businessfranchise.subtitle = If your business is a franchise, we need to check your registration against the franchisor’s registration.
 businessactivities.confirm-activities.title = Is your business involved in any other activities? 
 businessactivities.confirm-activities.lbl.details = Describe the other activities your business is involved in.
+businessactivities.renewal.confirm-activities.lbl.details = Describe the other activities your business was involved in.
 businessactivities.confirm-activities.line1.text = Is your business involved in any other activities, which are not covered by Money Laundering Regulations?
 businessactivities.confirm-activities.subtitle = You have told us you’re registering the following services for anti-money laundering supervision:
 businessactivities.confirm-activities.subtitle_2 = You're registering
@@ -2122,9 +2123,9 @@ progress.renewal.description = Information about your business over the last 12 
 progress.renewal.time = 7 and 10
 
 renewal.involvedinother.title = Was your business involved in any other activities in the last 12 months?
-renewal.involvedinother.example = Other activities include things like: 
-renewal.involvedinother.listline1 = a newsagents shop
-renewal.involvedinother.listline2 = a recruitment agency
+renewal.involvedinother.example = Anything else includes other activities or services, like:
+renewal.involvedinother.listline1 = running a newsagent’s
+renewal.involvedinother.listline2 = recruitment
 renewal.involvedinother.listline3 = selling software packages
 
 
