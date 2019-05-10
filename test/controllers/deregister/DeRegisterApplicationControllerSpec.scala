@@ -96,7 +96,7 @@ class DeRegisterApplicationControllerSpec extends AmlsSpec with MustMatchers wit
 
       "show the business activities" in new TestFixture {
         val result = controller.get()(request)
-        contentAsString(result) must include("accountancy service provider")
+        contentAsString(result) must include("Accountancy service provider")
       }
     }
 

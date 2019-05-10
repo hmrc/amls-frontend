@@ -1136,17 +1136,17 @@ businessmatching.businessType.lbl.03 = Partnership
 businessmatching.businessType.lbl.04 = Limited partnership or limited liability partnership
 businessmatching.businessType.lbl.05 = Unincorporated association or trust
 businessmatching.registerservices.title = Which services do you need to register?
-businessmatching.registerservices.other.title = What other service do you need to register?
+businessmatching.registerservices.other.title = What other service do you need to register?Ø
 businessmatching.registerservices.details = What these services mean
 
 businessmatching.registerservices.existing = You’ve told us your business already does:
-businessmatching.registerservices.servicename.lbl.01 = accountancy service provider
-businessmatching.registerservices.servicename.lbl.02 = bill payment service provider
-businessmatching.registerservices.servicename.lbl.03 = estate agency business
-businessmatching.registerservices.servicename.lbl.04 = high value dealer
-businessmatching.registerservices.servicename.lbl.05 = money service business
-businessmatching.registerservices.servicename.lbl.06 = trust or company service provider
-businessmatching.registerservices.servicename.lbl.07 = telecommunications, digital and IT payment service provider
+businessmatching.registerservices.servicename.lbl.01 = Accountancy service provider
+businessmatching.registerservices.servicename.lbl.02 = Bill payment service provider
+businessmatching.registerservices.servicename.lbl.03 = Estate agency business
+businessmatching.registerservices.servicename.lbl.04 = High value dealer
+businessmatching.registerservices.servicename.lbl.05 = Money service business
+businessmatching.registerservices.servicename.lbl.06 = Trust or company service provider
+businessmatching.registerservices.servicename.lbl.07 = Telecommunications, digital and IT payment service provider
 
 businessactivities.registerservices.servicename.lbl.01 = accountancy service provider
 businessactivities.registerservices.servicename.lbl.02 = bill payment service provider
