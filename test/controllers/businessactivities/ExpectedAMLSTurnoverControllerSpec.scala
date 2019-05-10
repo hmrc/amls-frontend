@@ -209,7 +209,15 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
       "on post with invalid data" in new Fixture {
 
         val businessMatching = BusinessMatching(
-          activities = Some(Activities(Set.empty))
+          activities = Some(Activities(Set(
+            AccountancyServices,
+            BillPaymentServices,
+            EstateAgentBusinessService,
+            HighValueDealing,
+            MoneyServiceBusiness,
+            TrustAndCompanyServices,
+            TelephonePaymentService
+          )))
         )
 
         when(controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
