@@ -22,7 +22,7 @@
 
 @headingText = @{
     businessTypes match {
-        case Some(types) if types.length == 1 => "renewal.turnover.title.single.service"
+        case Some(types) if types.length == 1 => "renewal.turnover.title"
         case _ => "renewal.turnover.title"
     }
 }
@@ -45,6 +45,7 @@
                 heading = headingText,
                 panel = false
             ) {
+                <p>@Messages("renewal.turnover.text")</p>
                 <ul class="list list-bullet">
                     @businessTypes.map { types =>
                         @types.map {activity =>
