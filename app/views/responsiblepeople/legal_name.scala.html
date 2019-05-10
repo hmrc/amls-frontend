@@ -32,6 +32,9 @@
 ) {
     @form(f, controllers.responsiblepeople.routes.LegalNameController.post(index, edit, flow)) {
 
+
+        <p>@Messages("responsiblepeople.legalnamechangedate.paragraph")</p>
+
         @fieldset(
             f = f("hasPreviousName-fieldset"),
             legend = Messages("responsiblepeople.legalName.heading", personName),
@@ -39,6 +42,7 @@
             panel=false,
             hint = Messages("responsiblepeople.legalnamechangedate.hint")
         ) {
+
             @errorGroup(
                 field = f("hasPreviousName")
             ) {
