@@ -351,7 +351,7 @@ error.invalid.renewal.msb.wc.moneySources = Select one or more options to show w
 
 error.required.renewal.country.name = Enter an official country name: for example, Holland is Netherlands
 
-error.required.renewal.ce.transactions.in.12months = Enter the number of currency exchange transactions you made in in the last 12 months
+error.required.renewal.ce.transactions.in.12months = Enter the number of currency exchange transactions you made in the last 12 months
 error.required.renewal.fx.transactions.in.12months = Enter the number of foreign exchange transactions you made in the last 12 months
 
 error.required.renewal.ba.select.country = Select yes if you had customers in the last 12 months who lived or worked outside of the UK
