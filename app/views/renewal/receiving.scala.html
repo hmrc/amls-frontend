@@ -37,7 +37,16 @@
         heading = "renewal.receiving.title",
         panel = false
     ) {
-        @hint("hvd.receiving.convert.currency.text")
+        <p>@Messages("renewal.receiving.info.line1")</p>
+        <p>@Messages("renewal.receiving.info.line2")</p>
+
+        <ul class="list list-bullet">
+            <li>@Messages("renewal.receiving.info.line3")</li>
+            <li>@Messages("renewal.receiving.info.line4")</li>
+            <li>@Messages("renewal.receiving.info.line5")</li>
+        </ul>
+
+        <p>@Messages("renewal.receiving.text")</p>
         @errorGroup(
             field = f("receivePayments")
         ) {

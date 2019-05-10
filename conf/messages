@@ -1919,9 +1919,9 @@ msb.which_currencies.uptoThree.hint2 = For example, USD, EUR, CNY.
 msb.which_currencies.who = Who supplied your foreign currency?
 msb.which_currencies.who.visuallyhidden = supplied your foreign currency
 msb.which_currencies.source.banks = Banks
-msb.which_currencies.source.which_banks = Which banks?
+msb.which_currencies.source.which_banks = Names of banks that supplied your foreign currency
 msb.which_currencies.source.wholesalers = Currency wholesalers
-msb.which_currencies.source.which_wholesalers = Which currency wholesalers?
+msb.which_currencies.source.which_wholesalers = Names of wholesalers that supplied your foreign currency
 msb.which_currencies.source.customers = Customers selling their foreign currency
 msb.deal_foreign_currencies.title = Do you expect to deal in physical foreign currencies?
 msb.supply_foreign_currencies.title = Who will supply your foreign currency?
@@ -2002,7 +2002,7 @@ hvd.receiving.expect.to.receive = How do you expect to receive these payments?
 hvd.receiving.option.01 = By courier
 hvd.receiving.option.02 = Directly into a bank account
 hvd.receiving.option.03 = Other
-hvd.receiving.give.details.lbl = Add how you will receive payments
+hvd.receiving.give.details.lbl = Describe how you received cash payments over €10,000 from customers you have not met
 
 hvd.expect.to.receive.title = How do you expect to receive these payments?
 
@@ -2134,14 +2134,21 @@ renewal.customer.outside.uk.title = In the last 12 months did you have customers
 renewal.turnover.title.single.service = How much total net profit did your business make in the last 12 months from the following service?
 renewal.turnover.title = How much total net profit did your business make from services registered for anti-money laundering supervision in the last 12 months?
 renewal.turnover.text = You have registered the following services for anti-money laundering supervision:
-renewal.percentage.turnover.text = If you do not use euros you’ll need to convert the amount to the currency you use.
+renewal.percentage.turnover.text = If you do not use euros, you’ll need to convert the amount to the currency you use.
 renewal.percentage.info.line1 = Cash can be physical money, notes and coins. It can be paid to you in person or directly into a bank account.
 renewal.percentage.info.line2 = This includes payment of €10,000 or more in:
-renewal.percentage.info.line3 = any single cash payment
-renewal.percentage.info.line4 = several related cash payments, including payment plans, payments on account, and deposits in any 90 day period
+renewal.percentage.info.line3 = any 90 day period
+renewal.percentage.info.line4 = any single cash payment
+renewal.percentage.info.line5 = several related cash payments, including payment plans, payments on account, and deposits
 
 renewal.business-turnover.title = How much total net profit did your business make in the last 12 months?
-renewal.receiving.title = In the last 12 months did you receive cash payments over €10,000 from customers you’ve not met in person?
+renewal.receiving.title = In the last 12 months did you receive cash payments over €10,000 from customers you have not met in person?
+renewal.receiving.text = If you do not use euros, you’ll need to convert the amount to the currency you use.
+renewal.receiving.info.line1 = Cash can be physical money, notes and coins. It can be paid to you in person or directly into a bank account.
+renewal.receiving.info.line2 = This includes payment of €10,000 or more in:
+renewal.receiving.info.line3 = any 90 day period
+renewal.receiving.info.line4 = any single cash payment
+renewal.receiving.info.line5 = several related cash payments, including payment plans, payments on account, and deposits
 renewal.receiving.expect.to.receive = How did you receive these payments?
 
 renewal.msb.throughput.header = What was your total throughput in the last 12 months?
