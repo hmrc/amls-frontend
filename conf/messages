@@ -2186,9 +2186,6 @@ renewal.msb.most.transactions.title = Where did you send the most transactions i
 renewal.msb.transfers.header = How many money transfers did you make in the last 12 months?
 renewal.msb.transfers.value.invalid = Enter the number of money transfers you made in the last 12 months
 
-renewal.receiving.title = In the last 12 months did you receive cash payments over €10,000 from customers you’ve not met in person?
-renewal.receiving.expect.to.receive = How did you receive these payments?
-
 renewal.hvd.percentage.title = What percentage of your turnover came from cash payments of over €10,000?
 
 renewal.msb.largest.amounts.title = Which countries did you send the largest amounts of money to in the last 12 months?
