@@ -22,7 +22,7 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessactivities.identify-suspicious-activity.title", "summary.businessactivities")
+    @heading(section = "summary.businessactivities")
 }
 
 @main(
@@ -34,8 +34,7 @@
 
         @fieldset(
             f = f("hasWrittenGuidance-fieldset"),
-            legend = "businessactivities.identify-suspicious-activity.title",
-            legendHidden = true,
+            heading = "businessactivities.identify-suspicious-activity.title",
             panel = false,
             classes = Seq("inline")
         ) {

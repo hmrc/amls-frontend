@@ -24,7 +24,7 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessactivities.employees.amls.supervision.title", "summary.businessactivities")
+    @heading(section = "summary.businessactivities")
 }
 
 @main(
@@ -36,10 +36,12 @@
 
         @fieldset(
             f = f("employees"),
-            legend = "businessactivities.employees.amls.supervision.title",
-            legendHidden = true,
+            heading = "businessactivities.employees.amls.supervision.title",
             panel = false
         ) {
+            <p class="form-label">@Messages("businessactivities.employees.line2.label")</p>
+            <p class="form-hint">@Messages("businessactivities.employees.line2.hint")</p>
+
             @input(
                 attrMinMax = AttrMinMax(attrMin = "1"),
                 attrPattern = "[0-9]*",
@@ -47,7 +49,8 @@
                 attrType = "number",
                 bold = false,
                 field = f("employeeCountAMLSSupervision"),
-                hintText = "businessactivities.employees.line2.hint"
+                labelText = "businessactivities.employees.amls.supervision.title",
+                labelHidden = true
             )
         }
 

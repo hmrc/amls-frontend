@@ -23,7 +23,7 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessactivities.turnover.heading", "summary.businessactivities")
+    @heading(section = "summary.businessactivities")
 }
 
 @main(
@@ -31,22 +31,21 @@
     heading = header
 ) {
 
-        <ul class="list list-bullet">
-            @bmBusinessActivities.map {activity =>
-              @activity.split('|').map {a =>
-                <li>@a</li>
-              }
-            }
-        </ul>
 
         @form(f, controllers.businessactivities.routes.ExpectedAMLSTurnoverController.post(edit)) {
 
             @fieldset(
                 f = f("expectedAMLSTurnover-fieldset"),
-                legend = "businessactivities.turnover.title",
-                legendHidden = true,
+                heading = "businessactivities.turnover.title",
                 panel = false
             ) {
+                <ul class="list list-bullet">
+                    @bmBusinessActivities.map {activity =>
+                      @activity.split('|').map {a =>
+                        <li>@a</li>
+                      }
+                    }
+                </ul>
                 @errorGroup(
                     field = f("expectedAMLSTurnover")
                 ) {

@@ -22,7 +22,11 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @headingWithPlaceholder(("businessactivities.tax.matters.heading", personName), "summary.businessactivities")
+    @heading(section = "summary.businessactivities")
+}
+
+@question = @{
+    Messages("businessactivities.tax.matters.heading", personName)
 }
 
 @main(
@@ -34,22 +38,19 @@
 
         @fieldset(
             f = f("manageYourTaxAffairs"),
-            legend = "businessactivities.tax.matters.title",
-            legendHidden = true,
+            heading = question,
             panel = false,
             classes = Seq("inline")
         ) {
             @radio(
                 f = f("manageYourTaxAffairs"),
                 labelText = "lbl.yes",
-                value = "true",
-                inline = true
+                value = "true"
             )
             @radio(
                 f = f("manageYourTaxAffairs"),
                 labelText = "lbl.no",
-                value = "false",
-                inline = true
+                value = "false"
             )
         }
 
