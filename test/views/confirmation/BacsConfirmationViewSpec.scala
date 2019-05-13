@@ -46,8 +46,10 @@ class BacsConfirmationViewSpec extends AmlsSpec with MustMatchers {
     }
 
     "contain the correct content" in new ViewFixture {
-      doc.html() must include(Messages("confirmation.payment.info.hmrc_review"))
-      doc.html() must include(Messages("confirmation.payment.info.hmrc_review2"))
+      doc.html() must include(Messages("confirmation.payment.renewal.info.hmrc_review"))
+      doc.html() must include(Messages("confirmation.payment.renewal.info.hmrc_review2"))
+      doc.html() must include(Messages("confirmation.payment.renewal.info.hmrc_review3"))
+      doc.html() must include(Messages("confirmation.payment.renewal.info.hmrc_review4"))
     }
 
     "have a footer with the correct information" in new ViewFixture {
