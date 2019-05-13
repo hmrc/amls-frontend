@@ -1530,7 +1530,14 @@ declaration.renewal.who.is.registering.heading = Who is declaring this renewal?
 declaration.renewal.who.is.registering.text = One person must take responsibility for the accuracy of this renewal.
 
 declaration.register.responsible.person.title = You need to register as a responsible person
-declaration.register.responsible.person.description = Because of your role in the business, you’ll need to add yourself to the list of responsible people.
+declaration.register.responsible.person.description = You will need to add yourself to the list of responsible people because of your role in the business.
+declaration.register.responsible.person.title = Who you need to register
+declaration.register.responsible.person.text = You must register:
+declaration.register.responsible.person.line_1 = owners, partners, directors, shadow directors, and designated members
+declaration.register.responsible.person.line_2 = the nominated officer
+declaration.register.responsible.person.line_3 = beneficial owners or shareholders who own or control more than 25% of the business
+declaration.register.responsible.person.line_4 = other officers of the business, like the company secretary
+declaration.register.responsible.person.line_5 = senior managers of activities covered by Money Laundering Regulations
 
 declaration.register.partners.none.text = You have no partners registered
 declaration.register.partners.one.text = You have already registered {0} as a partner
