@@ -14,7 +14,6 @@
 
 err.summary = There is a problem
 err.text.validation = Only use letters A to Z, numbers 0 to 9, and basic punctuation
-
 error.required.address.line1 = Enter the first line of the address
 error.required.address.line2 = Enter the second line of the address
 error.max.length.address.line = You can’t enter more than 35 characters
@@ -339,9 +338,9 @@ error.required.renewal.hvd.receive.cash.payments = Select yes if you received an
 error.required.renewal.hvd.choose.option = Select one or more options to show how you received these payments
 error.required.renewal.hvd.describe = Enter details of how you received these payments
 
-error.required.renewal.ba.turnover.from.mlr = Select one option to show how much net profit your business made in the last 12 months from activities related to anti-money laundering supervision
+error.required.renewal.ba.turnover.from.mlr = Select the total net profit your business made from services registered for anti-money laundering supervision
 
-error.required.renewal.ba.business.turnover = Select one option to show the total net profit your business made in the last 12 months
+error.required.renewal.ba.business.turnover = Select the total net profit your business made in the last 12 months
 
 error.invalid.renewal.msb.wc.bankNames = Enter the names of the banks that supplied your foreign currency
 error.invalid.renewal.msb.wc.wholesalerNames = Enter the names of the currency wholesalers that supplied your foreign currency
@@ -352,13 +351,15 @@ error.invalid.renewal.msb.wc.moneySources = Select one or more options to show w
 
 error.required.renewal.country.name = Enter an official country name: for example, Holland is Netherlands
 
-error.required.renewal.ce.transactions.in.12months = Enter the number of currency exchange transactions you made in in the last 12 months
+error.required.renewal.ce.transactions.in.12months = Enter the number of currency exchange transactions you made in the last 12 months
 error.required.renewal.fx.transactions.in.12months = Enter the number of foreign exchange transactions you made in the last 12 months
 
 error.required.renewal.ba.select.country = Select yes if you had customers in the last 12 months who lived or worked outside of the UK
 
 error.required.renewal.ba.involved.in.other = Select yes if your business was involved in any other activities in the last 12 months
-error.required.renewal.ba.involved.in.other.text = Give details of the other activities your business was involved in
+error.required.renewal.ba.involved.in.other.text = Enter the other activities your business was involved in
+error.text.validation.renewal.ba.involved.in.other = Activities must only include letters a to z, numbers 0 to 9, and basic punctuation
+error.invalid.maxlength.255.renewal.ba.involved.in.other = Activities must be 255 characters or less
 
 error.required.withdrawal.reason = You must select a reason for withdrawing your application
 error.required.withdrawal.reason.other = You haven’t specified the reason for withdrawing your application. Enter your reason for withdrawing
@@ -1449,10 +1450,12 @@ businessactivities.RiskAssessmentType.lbl.02 = Digital
 businessactivities.employees.title = How many people work for the business?
 businessactivities.employees.amls.supervision.title = How many people work on activities covered by the Money Laundering Regulations?
 businessactivities.employees.line1.text = How many people work for the business?
-businessactivities.employees.line1.hint = Include directors, temporary staff, and seasonal staff. If you’re a sole proprietor with no employees, enter 1.
+businessactivities.employees.line1.label = Include directors, temporary and seasonal staff.
+businessactivities.employees.line1.hint = If you are a sole proprietor with no employees, enter 1.
 businessactivities.employees.line1.cya = How many people work for the business?
 businessactivities.employees.line2.text = How many people work on activities covered by the Money Laundering Regulations?
-businessactivities.employees.line2.hint = Include directors, temporary and seasonal staff. If you are a sole proprietor with no employees, enter 1.
+businessactivities.employees.line2.label = Include directors, temporary and seasonal staff.
+businessactivities.employees.line2.hint = If you are a sole proprietor with no employees, enter 1.
 businessactivities.employees.line2.cya = How many people work on activities covered by the Money Laundering Regulations?
 businessactivities.whoisyouraccountant.title = Who advises you on Money Laundering Regulations and due diligence?
 businessactivities.involved.other.title = Is your business involved in any other activities?

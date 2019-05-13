@@ -26,7 +26,7 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessactivities.businessfranchise.title", "summary.businessactivities")
+    @heading(section = "summary.businessactivities")
 }
 
 @main(
@@ -36,14 +36,13 @@
 
     @form(f, controllers.businessactivities.routes.BusinessFranchiseController.post(edit)) {
 
-        <p>@Messages("businessactivities.businessfranchise.subtitle")</p>
-
         @fieldset(
             f = f("businessfranchise-fieldset"),
-            legend = "businessactivities.businessfranchise.title",
-            legendHidden = true,
+            heading = "businessactivities.businessfranchise.title",
             panel = false
         ) {
+
+            <p>@Messages("businessactivities.businessfranchise.subtitle")</p>
 
             @errorGroup(
                 field = f("businessFranchise")
@@ -61,10 +60,10 @@
                   jsHidden = false
                 ) {
                     @input(
-                      field = f("franchiseName"),
-                      labelText = "businessactivities.businessfranchise.lbl.franchisename",
-                      hintText = "businessactivities.businessfranchise.lbl.hint",
-                      bold = false
+                        field = f("franchiseName"),
+                        labelText = "businessactivities.businessfranchise.lbl.franchisename",
+                        hintText = "businessactivities.businessfranchise.lbl.hint",
+                        bold = false
                     )
                 }
                 @radio(

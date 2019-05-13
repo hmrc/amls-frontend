@@ -42,7 +42,7 @@ s"""${f("professionalBody").id}-fieldset"""
         heading = "estateagentbusiness.penalisedbyprofessional.title",
         panel = false
     ) {
-        @Messages("estateagentbusiness.penalisedbyprofessional.subtitle")
+        <p>@Messages("estateagentbusiness.penalisedbyprofessional.subtitle")</p>
 
         <ul class="list list-bullet form-group">
             <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_1")</li>
@@ -54,44 +54,37 @@ s"""${f("professionalBody").id}-fieldset"""
         @errorGroup(
              field = f("penalised")
         ) {
-              @radio(
-                  f = f("penalised"),
-                  labelText = "lbl.yes",
-                  value = "true",
-                  target = s".professionalBody-fieldset"
-              )
-              @fieldset(
-                    legend = "estateagentbusiness.penalisedbyprofessional.lbl.detailslbl",
-                    legendHidden = true,
-                    jsHidden = true,
-                    classes = Seq("professionalBody-fieldset"),
-                    f = f(target)
-                ) {
-                    @panel(
-                        jsHidden = false,
-                        wide = false,
-                        gutter = true
-                    ) {
-                        @textarea(
-                            field = f("professionalBody"),
-                            labelText = "estateagentbusiness.penalisedbyprofessional.lbl.detailslbl",
-                            hintText = "hint.255.chars",
-                            bold = false,
-                            largeWidth = true,
-                            cols = "30",
-                            rows = "8"
-                        )
-                    }
-                }
-                @radio(
-                    f = f("penalised"),
-                    labelText = "lbl.no",
-                    value = "false"
+            @radio(
+                f = f("penalised"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = "[data-reveal='other-professional-body']"
+            )
+            @panel(
+                jsHidden = true,
+                dataReveal = "other-professional-body",
+                wide = false,
+                gutter = true
+            ) {
+                @textarea(
+                    field = f("professionalBody"),
+                    labelText = "estateagentbusiness.penalisedbyprofessional.lbl.detailslbl",
+                    hintText = "hint.255.chars",
+                    bold = false,
+                    largeWidth = true,
+                    cols = "30",
+                    rows = "8"
                 )
+            }
+            @radio(
+                f = f("penalised"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
     }
 
-   @submit(edit)
+    @submit(edit)
 
   }
 }

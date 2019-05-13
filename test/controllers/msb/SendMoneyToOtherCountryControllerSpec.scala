@@ -152,7 +152,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
         sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
         sendTheLargestAmountsOfMoney = Some(
           SendTheLargestAmountsOfMoney(
-            Country("United Kingdom", "GB")
+            Seq(Country("United Kingdom", "GB"))
           )
         ),
         mostTransactions = Some(

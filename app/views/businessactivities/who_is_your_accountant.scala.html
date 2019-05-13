@@ -24,7 +24,7 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessactivities.whoisyouraccountant.title", "summary.businessactivities")
+    @heading(section = "summary.businessactivities")
 }
 
 @main(
@@ -35,8 +35,7 @@
     @form(f, controllers.businessactivities.routes.WhoIsYourAccountantController.post(edit)) {
 
         @fieldset(
-            legend = "businessactivities.whoisyouraccountant.title",
-            legendHidden = true,
+            heading = "businessactivities.whoisyouraccountant.title",
             panel = false,
             f = f("whoisyouraccountant-fieldset"),
             classes = Seq("form-group")

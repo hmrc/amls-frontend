@@ -115,7 +115,7 @@ class MoneyServiceBusinessSpec extends AmlsSpec with MoneyServiceBusinessTestDat
 trait MoneyServiceBusinessTestData {
 
   private val businessUseAnIPSP = BusinessUseAnIPSPYes("name", "123456789123456")
-  private val sendTheLargestAmountsOfMoney = SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))
+  private val sendTheLargestAmountsOfMoney = SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))
 
   val completeMsb = MoneyServiceBusiness(
     throughput = Some(ExpectedThroughput.Second),
@@ -162,7 +162,7 @@ trait MoneyServiceBusinessTestData {
     "transactionsInNext12Months" -> Json.obj("txnAmount" -> "12345678963"),
     "fundsTransfer" -> Json.obj("transferWithoutFormalSystems" -> true),
     "mostTransactions" -> Json.obj("mostTransactionsCountries" -> Seq("GB")),
-    "sendTheLargestAmountsOfMoney" -> Json.obj("country_1" ->"GB"),
+    "sendTheLargestAmountsOfMoney" -> Json.obj("country_1" -> "GB"),
     "ceTransactionsInNext12Months" -> Json.obj("ceTransaction" -> "12345678963"),
     "fxTransactionsInNext12Months" -> Json.obj("fxTransaction" -> "12345678963"),
     "hasChanged" -> false,
