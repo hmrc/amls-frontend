@@ -807,12 +807,12 @@ confirmation.payment.continue_button.text = Continue
 
 confirmation.payment.amendvariation.lede = You’ve updated your information
 confirmation.payment.amendvariation.title = You have submitted the application
-confirmation.payment.amendvariation.info.keep_up_to_date = If any of your information changes you’ll need to sign in to update your details within 30 days of the change. For example, you’ll need to update if:
+confirmation.payment.amendvariation.info.keep_up_to_date = If any of your information changes, you’ll need to sign in to update your details within 30 days of the change. For example, you’ll need to update if:
 
 confirmation.payment.bacs.title = You have submitted the application
 confirmation.payment.bacs.header = You have submitted
 
-confirmation.payment.renewal.lede = You’ve submitted your renewal and paid
+confirmation.payment.renewal.lede = You have submitted your renewal and paid
 confirmation.payment.renewal.title = You have submitted your renewal and paid
 
 confirmation.payment.info.transitional.renewal.hmrc_review = HM Revenue and Customs (HMRC) will review your application when we receive your payment. It can take more than 45 days to review your application or request further information. You can continue to trade whilst your renewal is being reviewed.
