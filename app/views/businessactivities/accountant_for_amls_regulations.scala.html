@@ -22,7 +22,7 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessactivities.accountantForAMLSRegulations.title", "summary.businessactivities")
+    @heading(section = "summary.businessactivities")
 }
 
 @main(
@@ -32,26 +32,22 @@
 
     @form(f, controllers.businessactivities.routes.AccountantForAMLSRegulationsController.post(edit)) {
 
-        <p>@Messages("businessactivities.accountantForAMLSRegulations.subtext")</p>
-
         @fieldset(
             f = f("accountantForAMLSRegulations"),
-            legend = "businessactivities.accountantForAMLSRegulations.title",
-            legendHidden = true,
+            heading = "businessactivities.accountantForAMLSRegulations.title",
             panel = false,
             classes = Seq("inline")
         ) {
+            <p>@Messages("businessactivities.accountantForAMLSRegulations.subtext")</p>
             @radio(
                 f = f("accountantForAMLSRegulations"),
                 labelText = "lbl.yes",
-                value = "true",
-                inline = true
+                value = "true"
             )
             @radio(
                 f = f("accountantForAMLSRegulations"),
                 labelText = "lbl.no",
-                value = "false",
-                inline = true
+                value = "false"
             )
         }
 
