@@ -1657,7 +1657,7 @@ responsiblepeople.position_within_business.lbl.05 = Partner
 responsiblepeople.position_within_business.lbl.06 = Sole proprietor
 responsiblepeople.position_within_business.lbl.07 = Designated member (partner)
 responsiblepeople.position_within_business.lbl.08 = External accountant
-responsiblepeople.position_within_business.lbl.09 = Other
+responsiblepeople.position_within_business.lbl.09 = Another role in the business
 responsiblepeople.position_within_business.other_position.lbl = Add role in the business
 responsiblepeople.position_within_business.other_position.othermissing = You haven’t specified their role in the business. Enter their role in the business
 
