@@ -840,7 +840,7 @@ payments.typeofbank.error = Select yes if you will be paying from a UK bank acco
 
 payments.bankdetails.title = Bacs payment details
 payments.bankdetails.header = Bacs payment details
-payments.bankdetails.hint = You’ll need these details to pay your fee by Bacs. Your payment may be delayed if you use the wrong reference.
+payments.bankdetails.hint = Make a note of the payment details as you’ll need them to pay your fee by Bacs. Your payment may be delayed if you use the wrong reference.
 payments.bankdetails.bics.name = Bank identifier code (BIC)
 payments.bankdetails.bics.value = BARCGB22
 payments.bankdetails.iban.name = Account number (IBAN)
