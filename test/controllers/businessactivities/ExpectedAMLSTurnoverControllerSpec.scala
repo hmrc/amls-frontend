@@ -98,13 +98,13 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
           document.select("input[value=06]").hasAttr("checked") must be(false)
           document.select("input[value=07]").hasAttr("checked") must be(false)
 
-          html must include(Messages("businessmatching.registerservices.servicename.lbl.01"))
-          html must include(Messages("businessmatching.registerservices.servicename.lbl.02"))
-          html must include(Messages("businessmatching.registerservices.servicename.lbl.03"))
-          html must include(Messages("businessmatching.registerservices.servicename.lbl.04"))
-          html must include(Messages("businessmatching.registerservices.servicename.lbl.05"))
-          html must include(Messages("businessmatching.registerservices.servicename.lbl.06"))
-          html must include(Messages("businessmatching.registerservices.servicename.lbl.07"))
+          html must include(Messages("businessactivities.registerservices.servicename.lbl.01"))
+          html must include(Messages("businessactivities.registerservices.servicename.lbl.02"))
+          html must include(Messages("businessactivities.registerservices.servicename.lbl.03"))
+          html must include(Messages("businessactivities.registerservices.servicename.lbl.04"))
+          html must include(Messages("businessactivities.registerservices.servicename.lbl.05"))
+          html must include(Messages("businessactivities.registerservices.servicename.lbl.06"))
+          html must include(Messages("businessactivities.registerservices.servicename.lbl.07"))
 
         }
 
@@ -209,7 +209,15 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
       "on post with invalid data" in new Fixture {
 
         val businessMatching = BusinessMatching(
-          activities = Some(Activities(Set.empty))
+          activities = Some(Activities(Set(
+            AccountancyServices,
+            BillPaymentServices,
+            EstateAgentBusinessService,
+            HighValueDealing,
+            MoneyServiceBusiness,
+            TrustAndCompanyServices,
+            TelephonePaymentService
+          )))
         )
 
         when(controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))

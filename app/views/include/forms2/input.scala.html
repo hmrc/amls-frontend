@@ -48,13 +48,13 @@
             @Messages(labelText)
             @if(labelHidden){</span>}
         }
-        @if(hintText.nonEmpty) {
-            <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
-        }
-        @if(field.hasErrors) {
-            <span class="error-notification" data-journey="error - field:user input:@field.name">@field.error</span>
-        }
     </label>
+    @if(hintText.nonEmpty) {
+        <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
+    }
+    @if(field.hasErrors) {
+        <span class="error-notification" data-journey="error - field:user input:@field.name">@field.error</span>
+    }
     <input name="@field.name" class="form-control @if(attrType=="number"){ input--no-spinner} @classes.mkString(" ")"
             value="@field.value" id="@field.id"
             @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint" }

@@ -18,7 +18,7 @@
 @import forms2._
 @import models.businessmatching._
 
-@(f: forms.Form2[_], edit: Boolean, bmModel: BusinessMatching, businessTypes: Option[String])(implicit request: Request[_],m:Messages)
+@(f: forms.Form2[_], edit: Boolean, businessTypes: Option[List[String]])(implicit request: Request[_],m:Messages)
 
 @target = @{
     s"""${f("details").id}-fieldset"""
@@ -27,45 +27,41 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessactivities.involved.other.title", "summary.businessactivities")
+    @heading(section = "summary.businessactivities")
 }
 
 @main(
     title = Messages("businessactivities.involved.other.title") + " - " + Messages("summary.businessactivities"),
     heading = header
 )  {
-    @bmModel.activities.map { a =>
-        @if(a.businessActivities.size > 1) {
-            <p>@Messages("businessactivities.confirm-activities.subtitle")</p>
-
-            <ul class="list list-bullet">
-            @businessTypes.map { activity =>
-                @activity.split('|').map { a =>
-                    <li>@if(a.charAt(0) == 'a' || a.charAt(0) == 'e') { an @a } else { a @a}</li>
-                }
-            }
-            </ul>
-        } else {
-            <p>@Messages("businessactivities.confirm-activities.subtitle_2") @businessTypes.map { a => @if(a.charAt(0) == 'a' || a.charAt(0) == 'e') {an @a } else { a @a}} </p>
-        }
-    }
-
-
-    <p>@Messages("businessactivities.involved.other.hint")</p>
-    <ul class="list list-bullet">
-        <li>@Messages("businessactivities.involved.listline1")</li>
-        <li>@Messages("businessactivities.involved.listline2")</li>
-        <li>@Messages("businessactivities.involved.listline3")</li>
-    </ul>
 
     @form(f, controllers.businessactivities.routes.InvolvedInOtherController.post(edit)) {
 
         @fieldset(
             f = f("involvedInOther-fieldset"),
-            legend = "businessactivities.involved.other.title",
-            legendHidden = true,
+            heading = "businessactivities.involved.other.title",
             panel = false
         ) {
+            @businessTypes.map { types =>
+                @if(types.size > 1) {
+                    <p>@Messages("businessactivities.confirm-activities.subtitle")</p>
+
+                    <ul class="list list-bullet">
+                        @types.map { businessType =>
+                            <li>@businessType</li>
+                        }
+                    </ul>
+                } else {
+                    <p>@Messages("businessactivities.confirm-activities.subtitle_2") @types.head </p>
+                }
+            }
+
+            <p>@Messages("businessactivities.involved.other.hint")</p>
+            <ul class="list list-bullet">
+                <li>@Messages("businessactivities.involved.listline1")</li>
+                <li>@Messages("businessactivities.involved.listline2")</li>
+                <li>@Messages("businessactivities.involved.listline3")</li>
+            </ul>
             @errorGroup(
                 field = f("involvedInOther")
             ) {

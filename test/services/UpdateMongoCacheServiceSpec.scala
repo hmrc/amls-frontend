@@ -157,7 +157,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
       sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
       fundsTransfer = Some(FundsTransfer(true)),
       branchesOrAgents = Some(BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))),
-      sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
+      sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))),
       mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
       transactionsInNext12Months = Some(TransactionsInNext12Months("12345678963")),
       ceTransactionsInNext12Months = Some(CETransactionsInNext12Months("12345678963")),

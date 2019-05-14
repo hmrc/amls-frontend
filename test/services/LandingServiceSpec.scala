@@ -62,7 +62,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
   val msbSection = MoneyServiceBusiness(
     throughput = Some(ExpectedThroughput.Second),
     transactionsInNext12Months = Some(TransactionsInNext12Months("12345678963")),
-    sendTheLargestAmountsOfMoney = Some(MsbSendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
+    sendTheLargestAmountsOfMoney = Some(MsbSendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))),
     mostTransactions = Some(MsbMostTransactions(Seq(Country("United Kingdom", "GB")))),
     ceTransactionsInNext12Months = Some(CETransactionsInNext12Months("12345678963")),
     whichCurrencies = Some(MsbWhichCurrencies(Seq("USD", "GBP", "EUR"),None, None)),
@@ -403,7 +403,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
     val msbSection = MoneyServiceBusiness(
       throughput = Some(ExpectedThroughput.Second),
       transactionsInNext12Months = Some(TransactionsInNext12Months("12345678963")),
-      sendTheLargestAmountsOfMoney = Some(MsbSendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
+      sendTheLargestAmountsOfMoney = Some(MsbSendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))),
       mostTransactions = Some(MsbMostTransactions(Seq(Country("United Kingdom", "GB")))),
       ceTransactionsInNext12Months = Some(CETransactionsInNext12Months("12345678963")),
       whichCurrencies = Some(MsbWhichCurrencies(Seq("USD", "GBP", "EUR"), None, None)),

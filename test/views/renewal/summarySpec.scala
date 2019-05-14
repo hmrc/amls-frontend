@@ -127,13 +127,13 @@ class summarySpec extends AmlsSpec
         )
         val businessTypesList = Some(
           List(
-            "accountancy service provider",
-            "estate agency business",
-            "telecommunications, digital and IT payment service provider",
-            "bill payment service provider",
-            "trust or company service provider",
-            "high value dealer",
-            "money service business"
+            "Accountancy service provider",
+            "Estate agency business",
+            "Telecommunications, digital and IT payment service provider",
+            "Bill payment service provider",
+            "Trust or company service provider",
+            "High value dealer",
+            "Money service business"
           ))
         views.html.renewal.summary(EmptyForm, renewalModel, businessTypesList, msbServices, true)
       }

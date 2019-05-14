@@ -22,7 +22,7 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessactivities.ncaRegistered.title", "summary.businessactivities")
+    @heading(section = "summary.businessactivities")
 }
 
 @main(
@@ -30,18 +30,17 @@
     heading = header
 ) {
 
-    <p>@Messages("businessactivities.ncaRegistered.p1")</p>
-    <p>@Messages("businessactivities.ncaRegistered.p2")</p>
 
     @form(f, controllers.businessactivities.routes.NCARegisteredController.post(edit)) {
 
         @fieldset(
             f = f("ncaRegistered-fieldset"),
-            legend = "businessactivities.ncaRegistered.title",
-            legendHidden = true,
+            heading = "businessactivities.ncaRegistered.title",
             panel = false,
             classes = Seq("inline")
         ) {
+            <p>@Messages("businessactivities.ncaRegistered.p1")</p>
+            <p>@Messages("businessactivities.ncaRegistered.p2")</p>
             @errorGroup(
                 field = f("ncaRegistered")
             ) {

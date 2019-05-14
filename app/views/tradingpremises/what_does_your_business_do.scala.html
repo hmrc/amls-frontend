@@ -33,8 +33,6 @@
     heading = header
 ) {
 
-    <p>@Messages("lbl.select.all")</p>
-
     @form(f, controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.post(index, edit)) {
 
         @fieldset(
@@ -43,6 +41,7 @@
             legendHidden = true,
             panel = false
         ) {
+            @hint("lbl.select.all")
             @errorGroup(
                 field = f("activities")
             ) {

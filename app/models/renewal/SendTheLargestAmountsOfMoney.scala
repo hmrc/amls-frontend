@@ -58,6 +58,6 @@ object SendTheLargestAmountsOfMoney {
     }
 
   implicit def convert(model: SendTheLargestAmountsOfMoney): models.moneyservicebusiness.SendTheLargestAmountsOfMoney = {
-    models.moneyservicebusiness.SendTheLargestAmountsOfMoney(model.country_1,model.country_2,model.country_3)
+    models.moneyservicebusiness.SendTheLargestAmountsOfMoney(model.countryList.toSeq)
   }
 }
