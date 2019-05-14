@@ -1785,7 +1785,7 @@ responsiblepeople.country.of.birth.txt.lbl = What country was {0} born in?
 
 #TCSP
 tcsp.whatyouneed.requiredinfo.heading = In this section you’ll be asked things like:
-tcsp.whatyouneed.requiredinfo.text.1 = what services you provide
+tcsp.whatyouneed.requiredinfo.text.1 = which services you provide
 tcsp.whatyouneed.requiredinfo.text.2 = if you create complex corporate structures for clients
 tcsp.whatyouneed.requiredinfo.text.3 = if you use the services of another trust or company service provider
 tcsp.whatyouneed.requiredinfo.text.4 = your trust or company service provider’s Money Laundering Regulations number
@@ -1801,7 +1801,7 @@ tcsp.off-the-shelf.companies.lbl = Do you sell only off-the-shelf companies?
 tcsp.create.complex.corporate.structures.lbl = Do you create complex corporate structures for clients, or are you planning to do so in the future?
 tcsp.servicesOfAnotherTcsp.title = Does your business use the services of another trust or company service provider?
 tcsp.servicesOfAnotherTcsp.other.hint = Only include companies which are based in the UK and supervised by HM Revenue and Customs for Money Laundering Regulations.
-tcsp.servicesOfAnotherTcsp.mlrregno.lbl = Money Laundering Regulations number.
+tcsp.servicesOfAnotherTcsp.mlrregno.lbl = Trust or company service provider’s Money Laundering Regulations number
 tcsp.cya.mlrregno = Money Laundering Regulation reference number
 
 tcsp.provided_services.title = Which services does your business provide?
@@ -1813,7 +1813,7 @@ tcsp.provided_services.service.lbl.05 = Mail forwarding
 tcsp.provided_services.service.lbl.06 = Receptionist
 tcsp.provided_services.service.lbl.07 = Conference room
 tcsp.provided_services.service.lbl.08 = Other
-tcsp.provided_services.service.lbl.details = Service type
+tcsp.provided_services.service.lbl.details = Services your business provides
 
 tcsp.anothertcspsupervision.title = Is your trust or company service provider registered with HMRC for anti-money laundering supervision?
 tcsp.anothertcspsupervision.header = Is your trust or company service provider registered with HMRC for anti-money laundering supervision?
