@@ -97,7 +97,7 @@ class summarySpec extends AmlsSpec
           Some(TotalThroughput("01")),
           Some(WhichCurrencies(Seq("EUR"),None,Some(MoneySources(None,None,None)))),
           Some(TransactionsInLast12Months("1500")),
-          Some(SendTheLargestAmountsOfMoney(Country("France", "FR"))),
+          Some(SendTheLargestAmountsOfMoney(Seq(Country("France", "FR")))),
           Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
           Some(CETransactionsInLast12Months("123")),
           Some(FXTransactionsInLast12Months("12")),

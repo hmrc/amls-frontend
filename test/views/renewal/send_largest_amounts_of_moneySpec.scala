@@ -36,7 +36,7 @@ class send_largest_amounts_of_moneySpec extends AmlsSpec with MustMatchers  {
   "expected_business_turnover view" must {
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[SendTheLargestAmountsOfMoney] = Form2(SendTheLargestAmountsOfMoney(Country("Country", "US")))
+      val form2: ValidForm[SendTheLargestAmountsOfMoney] = Form2(SendTheLargestAmountsOfMoney(Seq(Country("Country", "US"))))
 
       def view = views.html.renewal.send_largest_amounts_of_money(form2, true, mockAutoComplete.getCountries)
 
@@ -45,7 +45,7 @@ class send_largest_amounts_of_moneySpec extends AmlsSpec with MustMatchers  {
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[SendTheLargestAmountsOfMoney] = Form2(SendTheLargestAmountsOfMoney(Country("Country", "US")))
+      val form2: ValidForm[SendTheLargestAmountsOfMoney] = Form2(SendTheLargestAmountsOfMoney(Seq(Country("Country", "US"))))
 
       def view = views.html.renewal.send_largest_amounts_of_money(form2, true, mockAutoComplete.getCountries)
 

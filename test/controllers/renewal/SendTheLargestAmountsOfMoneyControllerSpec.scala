@@ -91,7 +91,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
 
         when(controller.dataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(
-            Renewal(sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))))
+            Renewal(sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))))
           )))
 
         val result = controller.get()(request)
