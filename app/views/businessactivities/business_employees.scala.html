@@ -27,7 +27,7 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessactivities.employees.title", "summary.businessactivities")
+    @heading(section = "summary.businessactivities")
 }
 
 @main(
@@ -39,18 +39,22 @@
 
         @fieldset(
             f = f("employees"),
-            legend = "businessactivities.employees.title",
-            legendHidden = true,
+            heading = "businessactivities.employees.title",
             panel = false
         ) {
+            <p class="form-label">@Messages("businessactivities.employees.line1.label")</p>
+            <p class="form-hint">@Messages("businessactivities.employees.line1.hint")</p>
+
             @input(
                 attrMinMax = AttrMinMax(attrMin = "1"),
                 attrPattern = "[0-9]*",
                 attrStep = "1",
                 attrType = "number",
                 bold = false,
+                classes = Seq("form-control-1-4"),
                 field = f("employeeCount"),
-                hintText = "businessactivities.employees.line1.hint"
+                labelText = "businessactivities.employees.title",
+                labelHidden = true
             )
         }
 

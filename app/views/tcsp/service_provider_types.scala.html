@@ -34,8 +34,6 @@
     heading = header
 ) {
 
-    <p>@Messages("lbl.select.all")</p>
-
     @form(f, controllers.tcsp.routes.TcspTypesController.post(edit)) {
 
         @fieldset(
@@ -44,6 +42,7 @@
             legendHidden = true,
             panel = false
         ) {
+            @hint("lbl.select.all")
             @errorGroup(
                 field = f("serviceProviders")
             ) {

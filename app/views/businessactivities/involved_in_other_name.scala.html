@@ -27,7 +27,7 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessactivities.involved.other.title", "summary.businessactivities")
+    @heading(section = "summary.businessactivities")
 }
 
 @main(
@@ -35,30 +35,28 @@
     heading = header
 )  {
 
-     <p>@Messages("businessactivities.confirm-activities.subtitle")</p>
-     <ul class="list list-bullet">
-       @businessTypes.map {activity =>
-         @activity.split('|').map {a =>
-           <li>@if(a.charAt(0) == 'a' || a.charAt(0) == 'e') { an @a } else { a @a }</li>
-         }
-       }
-     </ul>
-
-    <p>@Messages("businessactivities.involved.other.hint")</p>
-    <ul class="list list-bullet">
-        <li>@Messages("businessactivities.involved.listline1")</li>
-        <li>@Messages("businessactivities.involved.listline2")</li>
-        <li>@Messages("businessactivities.involved.listline3")</li>
-    </ul>
-
     @form(f, controllers.businessactivities.routes.InvolvedInOtherController.post(edit)) {
 
         @fieldset(
             f = f("involvedInOther-fieldset"),
-            legend = "businessactivities.involved.other.title",
-            legendHidden = true,
+            heading = "businessactivities.involved.other.title",
             panel = false
         ) {
+             <p>@Messages("businessactivities.confirm-activities.subtitle")</p>
+             <ul class="list list-bullet">
+               @businessTypes.map {activity =>
+                 @activity.split('|').map {a =>
+                   <li>@if(a.charAt(0) == 'a' || a.charAt(0) == 'e') { an @a } else { a @a }</li>
+                 }
+               }
+             </ul>
+
+            <p>@Messages("businessactivities.involved.other.hint")</p>
+            <ul class="list list-bullet">
+                <li>@Messages("businessactivities.involved.listline1")</li>
+                <li>@Messages("businessactivities.involved.listline2")</li>
+                <li>@Messages("businessactivities.involved.listline3")</li>
+            </ul>
             @errorGroup(
                 field = f("involvedInOther")
             ) {
