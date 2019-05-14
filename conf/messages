@@ -378,8 +378,8 @@ error.required.deregistration.reason.other = You haven’t specified the reason 
 error.updateanyInformation.validationerror = Select yes if you want to update any other information
 
 ################################# Declaration #####################################
-error.required.declaration.nominated.officer = Select your nominated officer or register a new one
-error.required.declaration.who.is.registering = Select one option to show who is registering the business
+error.required.declaration.nominated.officer = Select one of your responsible people or register someone else as the nominated officer for the business
+error.required.declaration.who.is.registering = Select who is registering this business
 error.required.declaration.first_name = Enter your first name
 error.required.declaration.last_name = Enter your last name
 error.required.declaration.specify.role = Enter your role in the business
