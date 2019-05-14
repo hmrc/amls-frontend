@@ -1405,6 +1405,7 @@ businessactivities.confirm-activities.line1.text = Is your business involved in 
 businessactivities.confirm-activities.subtitle = You have told us you’re registering the following services for anti-money laundering supervision:
 businessactivities.confirm-activities.subtitle_2 = You're registering
 businessactivities.confirm-activities.subtitle_3 = for anti-money laundering supervision
+businessactivities.confirm-activities.subtitle_4 = You have told us your business is:
 businessactivities.identify-suspicious-activity.title = Does your business have written guidance for staff on how to identify and report suspicious activity?
 businessactivities.turnover.title = How much total net profit does your business expect in the next 12 months from services you’re registering for anti-money laundering supervision?
 businessactivities.turnover.heading = How much total net profit does your business expect in the next 12 months from services you’re registering for anti-money laundering supervision?
