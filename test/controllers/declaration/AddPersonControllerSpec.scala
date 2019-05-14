@@ -280,7 +280,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
           status(result) must be(BAD_REQUEST)
 
           val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#positions]").html() must include("This field is required")
+          document.select("a[href=#positions]").html() must include("Select if you are a beneficial shareholder, director, nominated officer, an external accountant, or another role in the business")
 
         }
       }

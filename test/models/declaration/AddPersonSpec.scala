@@ -54,7 +54,7 @@ class AddPersonRelease7Spec extends AmlsSpec {
           be(Invalid(Seq(
             (Path \ "firstName") -> Seq(ValidationError("error.required")),
             (Path \ "lastName") -> Seq(ValidationError("error.required")),
-            (Path \ "positions") -> Seq(ValidationError("error.required"))
+            (Path \ "positions") -> Seq(ValidationError("error.invalid.position.validation"))
           )))
       }
 
@@ -159,7 +159,7 @@ class AddPersonRelease7Spec extends AmlsSpec {
 
         AddPerson.formRule.validate(urlFormEncoded) must
           be(Invalid(Seq(
-            (Path \ "positions") -> Seq(ValidationError("error.required"))
+            (Path \ "positions") -> Seq(ValidationError("error.invalid.position.validation"))
           )))
       }
 

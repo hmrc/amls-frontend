@@ -78,7 +78,7 @@ class RoleWithinBusinessRelease7Spec extends AmlsSpec {
         ), "otherPosition" -> Seq("t"*256)
       )
       RoleWithinBusinessRelease7.formRule.validate(model) must
-        be(Invalid(List(( Path \ "otherPosition", Seq(ValidationError("error.invalid.maxlength.255"))))))
+        be(Invalid(List(( Path \ "otherPosition", Seq(ValidationError("error.invalid.role.in.business.maxlength.255"))))))
     }
 
 
@@ -90,7 +90,7 @@ class RoleWithinBusinessRelease7Spec extends AmlsSpec {
         val (rep, model) = x
         s"represented by $rep" in {
           RoleWithinBusinessRelease7.formRule.validate(model) must
-            be(Invalid(List((Path \ "positions", List(ValidationError("error.required"))))))
+            be(Invalid(List((Path \ "positions", List(ValidationError("error.invalid.position.validation"))))))
         }
       }
     }
@@ -204,7 +204,7 @@ class RoleWithinBusinessRelease7Spec extends AmlsSpec {
     "fail validation" when {
       "more than 255 characters are entered" in {
         RoleWithinBusinessRelease7.otherDetailsType.validate("1" * 256) must be(
-          Invalid(Seq(Path -> Seq(ValidationError("error.invalid.maxlength.255")))))
+          Invalid(Seq(Path -> Seq(ValidationError("error.invalid.role.in.business.maxlength.255")))))
       }
       "given an empty string" in {
         RoleWithinBusinessRelease7.otherDetailsType.validate("") must be(
@@ -216,7 +216,7 @@ class RoleWithinBusinessRelease7Spec extends AmlsSpec {
       }
       "given invalid characters" in {
         RoleWithinBusinessRelease7.otherDetailsType.validate("{}") must be(
-          Invalid(Seq(Path -> Seq(ValidationError("err.text.validation")))))
+          Invalid(Seq(Path -> Seq(ValidationError("err.text.role.in.business.text.validation")))))
       }
     }
   }
