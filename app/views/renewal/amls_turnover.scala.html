@@ -45,14 +45,19 @@
                 heading = headingText,
                 panel = false
             ) {
-                <p>@Messages("renewal.turnover.text")</p>
-                <ul class="list list-bullet">
-                    @businessTypes.map { types =>
-                        @types.map {activity =>
-                            <li>@activity</li>
-                        }
+                @businessTypes.map { types =>
+                    @if(types.size > 1) {
+                        <p>@Messages("renewal.turnover.text")</p>
+
+                        <ul class="list list-bullet">
+                            @types.map { businessType =>
+                            <li>@businessType</li>
+                            }
+                        </ul>
+                    } else {
+                        <p>@Messages("businessactivities.confirm-activities.subtitle_4") @types.head </p>
                     }
-                </ul>
+                }
                 @errorGroup(
                     field = f("turnover")
                 ) {
