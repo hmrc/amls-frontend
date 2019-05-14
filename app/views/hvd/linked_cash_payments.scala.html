@@ -16,6 +16,7 @@
 
 @import include._
 @import forms2._
+@import views.html.hvd.cash_payment_text
 
 @(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
 
@@ -29,13 +30,7 @@
     title = Messages("hvd.identify.linked.cash.payment.title") + " - " + Messages("summary.hvd"),
     heading = header
 ) {
-    <p>@Messages("hvd.cash.data.payment.summary.details")</p>
-    <ul class="list list-bullet">
-        <li>@Messages("hvd.cash.payment.data.summary.details.03")</li>
-        <li>@Messages("hvd.cash.payment.data.summary.details.01")</li>
-        <li>@Messages("hvd.cash.payment.data.summary.details.02")</li>
-    </ul>
-    <p>@Messages("hvd.cash.payment.convert.currency.summary")</p>
+    @cash_payment_text()
 
     @form(f, controllers.hvd.routes.LinkedCashPaymentsController.post(edit)) {
 
