@@ -58,14 +58,14 @@ class send_largest_amounts_of_moneySpec extends AmlsSpec with MustMatchers  {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "countries") -> Seq(ValidationError("not a message Key"))
+          (Path \ "largestAmountsOfMoney") -> Seq(ValidationError("not a message Key"))
         ))
 
       def view = views.html.renewal.send_largest_amounts_of_money(form2, true, mockAutoComplete.getCountries)
 
       errorSummary.html() must include("not a message Key")
 
-      doc.getElementById("countries")
+      doc.getElementById("largestAmountsOfMoney")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
     }
 
