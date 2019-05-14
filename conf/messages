@@ -1830,18 +1830,18 @@ asp.service.lbl.01 = Accountancy
 asp.service.lbl.02 = Payroll services
 asp.service.lbl.03 = Bookkeeping
 asp.service.lbl.04 = Auditing
-asp.service.lbl.05 = Financial or tax advice 
+asp.service.lbl.05 = Financial or tax advice
 asp.summary.registration.number = HMRC Registration number:
 
 #Supervision
 supervision.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:
-supervision.whatyouneed.requiredinfo.text.1 = details of any previous supervisors 
+supervision.whatyouneed.requiredinfo.text.1 = details of any previous supervisors
 supervision.whatyouneed.requiredinfo.text.2 = if your business is a member of any professional bodies
 supervision.whatyouneed.requiredinfo.text.3 = if your business has been penalised in the past
 
 supervision.another_body.title = Has your business ever been registered with another supervising body for anti-money laundering supervision? 
 supervision.another_body.description = This only refers to registration for anti-money laundering supervision.
-supervision.another_body.lbl.supervisor = Name of your last supervisor
+supervision.another_body.lbl.supervisor = Name of your previous supervising body for anti-money laundering supervision
 supervision.another_body.startDate.lbl = Start date of supervision
 supervision.another_body.startDate.hint = For example, 31 03 2008.
 supervision.another_body.endDate.lbl = End date of supervision
@@ -1850,7 +1850,7 @@ supervision.another_body.endingReason.lbl = Why did the supervision end?
 
 supervision.supervision_start.title = When did your previous supervision start?
 supervision.supervision_end.title = When did your previous supervision end?
-supervision.supervision_end_reasons.title = Why did your previous supervision end?
+supervision.supervision_end_reasons.title = Why did your previous anti-money laundering supervision end?
 supervision.supervision_end_reasons.lbl = Why did your previous supervision end?
 supervision.supervision_end_reasons.description = Give details of why your previous registration ended
 
@@ -1863,7 +1863,7 @@ supervision.penalisedbyprofessional.line_3 = suspension
 supervision.penalisedbyprofessional.line_4 = expulsion
 supervision.penalisedbyprofessional.line_5 = special terms or conditions imposed on your business
 supervision.penalisedbyprofessional.details = Only include penalties for business activities covered by Money Laundering Regulations.
-supervision.penalisedbyprofessional.details.lbl = Describe the penalty, when it occurred, and who was involved.
+supervision.penalisedbyprofessional.details.lbl = Describe the penalty received for activities covered by Money Laundering Regulations, and when it occurred
 
 supervision.memberofprofessionalbody.title = Is your business a member of a professional body?
 supervision.memberofprofessionalbody.lbl.01 = Association of Accounting Technicians
@@ -1880,6 +1880,7 @@ supervision.memberofprofessionalbody.lbl.11 = Institute of Financial Accountants
 supervision.memberofprofessionalbody.lbl.12 = International Association of Bookkeepers
 supervision.memberofprofessionalbody.lbl.13 = Law Society
 supervision.memberofprofessionalbody.lbl.14 = Other
+supervision.memberofprofessionalbody.lbl.15 = Name of professional body you’re a member of
 
 supervision.whichprofessionalbody.title = Which professional bodies are you a member of?
 
