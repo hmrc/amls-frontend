@@ -1957,7 +1957,7 @@ msb.services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dea
 msb.services.list.lbl.04 = Cheque cashing (scrap metal dealers)
 
 hvd.whatyouneed.requiredinfo.heading = In this section you’ll be asked things like:
-hvd.whatyouneed.line_1 = what your business will sell
+hvd.whatyouneed.line_1 = what your business will buy or sell
 hvd.whatyouneed.line_2 = if you’ll be buying or selling duty-suspended excise goods
 hvd.whatyouneed.line_3 = how your business deals with cash payments of €10,000 or more
 
@@ -1967,7 +1967,7 @@ hvd.how-will-you-sell-goods.channels.retail = Retail
 hvd.how-will-you-sell-goods.channels.wholesale = Wholesale
 
 hvd.cash.payment.title = Has your business made or accepted any cash payments of €10,000 or more?
-hvd.cash.data.payment.summary.details = A cash payment can be physical money, notes and coins. It can be paid to you in person or directly into a bank account. This includes payment of €10,000 or more in:
+hvd.cash.data.payment.summary.details = Cash can be physical money, notes and coins. It can be paid to you in person or directly into a bank account. This includes payment of €10,000 or more in:
 hvd.cash.payment.data.summary.details.01 = any single cash payment
 hvd.cash.payment.data.summary.details.02 = several related cash payments, including payment plans, payments on account, and deposits
 hvd.cash.payment.data.summary.details.03 = any 90 day period
@@ -1995,11 +1995,11 @@ hvd.identify.linked.cash.payments.subtitle = If you do not use euros you’ll ne
 
 hvd.receiving.title = Do you expect to receive cash payments of over €10,000 from customers you’ve not met in person?
 hvd.receiving.convert.currency.text = If you do not use euros you’ll need to convert the amount to the currency you use.
-hvd.receiving.expect.to.receive = How do you expect to receive these payments?
+hvd.receiving.expect.to.receive = How do you expect to receive cash payments of over €10,000 from customers you have not met?
 hvd.receiving.option.01 = By courier
 hvd.receiving.option.02 = Directly into a bank account
 hvd.receiving.option.03 = Other
-hvd.receiving.give.details.lbl = Add how you will receive payments
+hvd.receiving.give.details.lbl = Add how you will receive cash payments over €10,000 from customers you have not met
 
 hvd.expect.to.receive.title = How do you expect to receive these payments?
 

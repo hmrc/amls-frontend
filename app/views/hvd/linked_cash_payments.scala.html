@@ -29,8 +29,13 @@
     title = Messages("hvd.identify.linked.cash.payment.title") + " - " + Messages("summary.hvd"),
     heading = header
 ) {
-
-    <p>@Messages("hvd.identify.linked.cash.payments.subtitle")</p>
+    <p>@Messages("hvd.cash.data.payment.summary.details")</p>
+    <ul class="list list-bullet">
+        <li>@Messages("hvd.cash.payment.data.summary.details.03")</li>
+        <li>@Messages("hvd.cash.payment.data.summary.details.01")</li>
+        <li>@Messages("hvd.cash.payment.data.summary.details.02")</li>
+    </ul>
+    <p>@Messages("hvd.cash.payment.convert.currency.summary")</p>
 
     @form(f, controllers.hvd.routes.LinkedCashPaymentsController.post(edit)) {
 
