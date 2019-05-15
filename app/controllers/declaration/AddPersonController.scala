@@ -90,7 +90,7 @@ class AddPersonController @Inject () (
     }
 
     val newErrors: Seq[(Path, Seq[ValidationError])] = f.errors.map {
-      case (p, _) if p == Path("positions") => (Path("positions"), Seq(ValidationError(Seq(message))))
+      case (p, _) if p == Path("positions") => (p, Seq(ValidationError(Seq(message))))
       case (p, s) => (p, s)
     }
 
