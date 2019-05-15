@@ -22,7 +22,7 @@ import connectors.DataCacheConnector
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
-import models.businessmatching.BusinessType.{LimitedCompany, SoleProprietor}
+import models.businessmatching.BusinessType.{LimitedCompany, Partnership, SoleProprietor}
 import models.declaration.AddPerson
 import models.status.{ReadyForRenewal, SubmissionReady, SubmissionReadyForReview}
 import org.joda.time.LocalDate
@@ -346,6 +346,47 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
 
           val document: Document = Jsoup.parse(contentAsString(result))
           document.select("a[href=#positions]").html() must include("Select if you are an external accountant, a nominated officer, a sole proprietor or other")
+        }
+
+        "business type is Partnership and position is not filled" in new Fixture {
+          val bm = BusinessMatching(
+            reviewDetails = Some(
+              ReviewDetails(
+                businessName = "",
+                businessType = Some(Partnership),
+                businessAddress = Address (
+                  line_1 = "",
+                  line_2 = "",
+                  line_3 = None,
+                  line_4 = None,
+                  postcode = None,
+                  country = Country(
+                    name = "",
+                    code = ""
+                  )),
+                safeId=""
+              )
+            )
+          )
+          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
+
+          val roleMissingInRequest = request.withFormUrlEncodedBody(
+            "firstName" -> "firstName",
+            "lastName" -> "lastName"
+          )
+
+          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          when(addPersonController.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionReady))
+
+          val result = addPersonController.post()(roleMissingInRequest)
+          status(result) must be(BAD_REQUEST)
+
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.select("a[href=#positions]").html() must include("Select if you are an external accountant, a nominated officer, a partner or other")
         }
       }
     }
