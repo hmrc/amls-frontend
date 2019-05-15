@@ -56,7 +56,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
 
     val emptyCache = CacheMap("", Map.empty)
 
-    val bm1 = BusinessMatching(
+    val defaultBM = BusinessMatching(
       reviewDetails = Some(
         ReviewDetails(
           businessName = "",
@@ -76,7 +76,11 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
       )
     )
     when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
-      (any(), any(), any())).thenReturn(Future.successful(Some(bm1)))
+      (any(), any(), any())).thenReturn(Future.successful(Some(defaultBM)))
+    when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(emptyCache))
+    when(addPersonController.statusService.getStatus(any(), any(), any()))
+      .thenReturn(Future.successful(SubmissionReady))
   }
 
   "AddPersonController" when {
@@ -91,12 +95,6 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             "roleWithinBusiness[]" -> "ExternalAccountant"
           )
 
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          when(addPersonController.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionReady))
-
           val result = addPersonController.get()(requestWithParams)
           status(result) must be(OK)
           contentAsString(result) must include(Messages("submit.registration"))
@@ -110,9 +108,6 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             "lastName" -> "lastName",
             "roleWithinBusiness[]" -> "ExternalAccountant"
           )
-
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
 
           when(addPersonController.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
@@ -130,9 +125,6 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             "roleWithinBusiness[]" -> "ExternalAccountant"
           )
 
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
           when(addPersonController.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(ReadyForRenewal(Some(new LocalDate))))
 
@@ -140,17 +132,9 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
           status(result) must be(OK)
           contentAsString(result) must include(Messages("submit.renewal.application"))
         }
-
-
       }
 
       "on get display the persons page with blank fields" in new Fixture {
-
-        when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
-
-        when(addPersonController.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionReady))
 
         val result = addPersonController.get()(request)
         status(result) must be(OK)
@@ -164,12 +148,6 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
 
 
       "on getWithAmendment display the persons page with blank fields" in new Fixture {
-
-        when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
-
-        when(addPersonController.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionReady))
 
         val result = addPersonController.getWithAmendment()(request)
         status(result) must be(OK)
@@ -192,12 +170,6 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             "positions" -> "02"
           )
 
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          when(addPersonController.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionReady))
-
           val result = addPersonController.post()(requestWithParams)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(routes.RegisterResponsiblePersonController.get().url)
@@ -212,9 +184,6 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             "lastName" -> "lastName",
             "positions" -> "08"
           )
-
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
 
           when(addPersonController.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
@@ -232,12 +201,6 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             "positions" -> "08"
           )
 
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          when(addPersonController.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionReady))
-
           val result = addPersonController.post()(requestWithParams)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(routes.DeclarationController.get().url)
@@ -252,12 +215,6 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             "positions" -> "08"
           )
 
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          when(addPersonController.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionReady))
-
           val result = addPersonController.post()(firstNameMissingInRequest)
           status(result) must be(BAD_REQUEST)
 
@@ -271,12 +228,6 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             "firstName" -> "firstName",
             "positions" -> "08"
           )
-
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          when(addPersonController.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionReady))
 
           val result = addPersonController.post()(lastNameNissingInRequest)
           status(result) must be(BAD_REQUEST)
@@ -313,12 +264,6 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             "lastName" -> "lastName"
           )
 
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          when(addPersonController.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionReady))
-
           val result = addPersonController.post()(roleMissingInRequest)
           status(result) must be(BAD_REQUEST)
 
@@ -353,12 +298,6 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             "firstName" -> "firstName",
             "lastName" -> "lastName"
           )
-
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          when(addPersonController.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionReady))
 
           val result = addPersonController.post()(roleMissingInRequest)
           status(result) must be(BAD_REQUEST)
@@ -395,12 +334,6 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             "lastName" -> "lastName"
           )
 
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          when(addPersonController.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionReady))
-
           val result = addPersonController.post()(roleMissingInRequest)
           status(result) must be(BAD_REQUEST)
 
@@ -436,12 +369,6 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             "lastName" -> "lastName"
           )
 
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          when(addPersonController.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionReady))
-
           val result = addPersonController.post()(roleMissingInRequest)
           status(result) must be(BAD_REQUEST)
 
@@ -476,12 +403,6 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             "firstName" -> "firstName",
             "lastName" -> "lastName"
           )
-
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          when(addPersonController.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionReady))
 
           val result = addPersonController.post()(roleMissingInRequest)
           status(result) must be(BAD_REQUEST)
