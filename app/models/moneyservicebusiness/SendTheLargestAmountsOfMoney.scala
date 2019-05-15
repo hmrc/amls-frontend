@@ -70,7 +70,7 @@ private sealed trait SendTheLargestAmountsOfMoney0 {
     ((__ \ "country_1").read[Country] and
     (__ \ "country_2").readNullable[Country] and
     (__ \ "country_3").readNullable[Country]).tupled map { countries =>
-      SendTheLargestAmountsOfMoney(Seq(countries._1) ++ Seq(countries._2, countries._3).flatten)
+      SendTheLargestAmountsOfMoney(countries._1 +: Seq(countries._2, countries._3).flatten)
       }
     }
 
