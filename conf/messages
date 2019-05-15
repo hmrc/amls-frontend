@@ -2002,7 +2002,7 @@ hvd.receiving.option.02 = Directly into a bank account
 hvd.receiving.option.03 = Other
 hvd.receiving.give.details.lbl = Add how you will receive cash payments over €10,000 from customers you have not met
 
-hvd.expect.to.receive.title = How do you expect to receive these payments?
+hvd.expect.to.receive.title = How do you expect to receive cash payments of over €10,000 from customers you have not met?
 
 hvd.excise.goods.title = Will you be buying or selling duty-suspended excise goods?
 
