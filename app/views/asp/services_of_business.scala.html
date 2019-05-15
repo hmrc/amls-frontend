@@ -30,8 +30,6 @@
     heading = header
 ) {
 
-    <p>@Messages("lbl.select.all")</p>
-
     @form(f, controllers.asp.routes.ServicesOfBusinessController.post(edit)) {
         @fieldset(
             f = f("services-fieldset"),
@@ -39,6 +37,7 @@
             legendHidden = true,
             panel = false
         ) {
+            @hint("lbl.select.all")
             @errorGroup(
                  field = f("services")
             ) {
