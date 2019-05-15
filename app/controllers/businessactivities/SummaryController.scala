@@ -47,7 +47,8 @@ class SummaryController @Inject() (val dataCache: DataCacheConnector,
             bmActivities <- businessMatching.activities
           } yield {
             val hideReceiveAdvice = bmActivities.businessActivities.contains(AccountancyServices)
-            ControllerHelper.allowedToEdit map(isEditable => Ok(summary(EmptyForm, businessActivity, businessMatching.activities, isEditable, hideReceiveAdvice)))
+            ControllerHelper.allowedToEdit map(isEditable =>
+              Ok(summary(EmptyForm, businessActivity, businessMatching.alphabeticalBusinessTypes, isEditable, hideReceiveAdvice)))
           }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
       }
   }
