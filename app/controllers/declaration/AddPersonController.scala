@@ -76,11 +76,7 @@ class AddPersonController @Inject () (
 
   def updateFormErrors(f: InvalidForm, businessType: Option[BusinessType]): InvalidForm = {
     val message = businessType match {
-      case Some(BusinessType.LimitedCompany) => Messages("error.required.declaration.add.position.for.limitedcompany")
-      case Some(BusinessType.SoleProprietor) => Messages("error.required.declaration.add.position.for.sole.proprietor")
-      case Some(BusinessType.Partnership) => Messages("error.required.declaration.add.position.for.partner.ship")
-      case Some(BusinessType.LPrLLP) => Messages("error.required.declaration.add.position.for.lprlpp")
-      case Some(BusinessType.UnincorporatedBody) => Messages("error.required.declaration.add.position.for.unicorporated.body")
+      case Some(bt) => BusinessType.errorMessageFor(bt)
       case _ => throw new IllegalArgumentException("[Controllers][AddPersonController] business type is not known")
     }
 
