@@ -68,7 +68,7 @@ class transactions_in_last_12_monthsSpec extends AmlsSpec with MustMatchers {
     }
 
     "display the validation error next to the field" in new InvalidFormFixture {
-      val validationMsg = doc.select("label[for=txnAmount] .error-notification").first
+      val validationMsg = doc.select(".error-notification").first
       Option(validationMsg) mustBe defined
       validationMsg.text must include(requiredMsg)
     }

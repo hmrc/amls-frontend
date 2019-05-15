@@ -36,7 +36,7 @@ import models.status.RenewalSubmitted
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import models.{AmendVariationRenewalResponse, SubscriptionResponse, ViewResponse}
+import models._
 import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -283,7 +283,11 @@ class LandingService @Inject() (
             (_.transactionsInNext12Months.map(t => TransactionsInLast12Months(t.txnAmount))),
 
           sendTheLargestAmountsOfMoney = viewResponse.msbSection.fold[Option[SendTheLargestAmountsOfMoney]](None)
-            (_.sendTheLargestAmountsOfMoney.map(s => SendTheLargestAmountsOfMoney(s.country_1, s.country_2, s.country_3))),
+            (_.sendTheLargestAmountsOfMoney.map (s => s.countries match {
+              case Seq(a, b, c) => SendTheLargestAmountsOfMoney(a, Some(b), Some(c))
+              case Seq(a, b) => SendTheLargestAmountsOfMoney(a, Some(b))
+              case Seq(a) => SendTheLargestAmountsOfMoney(a)
+            })),
 
           mostTransactions = viewResponse.msbSection.fold[Option[MostTransactions]](None)
             (_.mostTransactions.map(m => MostTransactions(m.countries))),

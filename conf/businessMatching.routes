@@ -7,14 +7,14 @@ POST        /postcode                                               @controllers
 GET         /type-of-business                                       @controllers.businessmatching.TypeOfBusinessController.get(edit: Boolean ?= false)
 POST        /type-of-business                                       @controllers.businessmatching.TypeOfBusinessController.post(edit: Boolean ?= false)
 
-GET         /activities                                             @controllers.businessmatching.RegisterServicesController.get(edit: Boolean ?= false)
-POST        /activities                                             @controllers.businessmatching.RegisterServicesController.post(edit: Boolean ?= false)
+GET         /services                                               @controllers.businessmatching.RegisterServicesController.get(edit: Boolean ?= false)
+POST        /services                                               @controllers.businessmatching.RegisterServicesController.post(edit: Boolean ?= false)
 
 GET         /registration-number                                    @controllers.businessmatching.CompanyRegistrationNumberController.get(edit: Boolean ?= false)
 POST        /registration-number                                    @controllers.businessmatching.CompanyRegistrationNumberController.post(edit: Boolean ?= false)
 
-GET         /services                                               @controllers.businessmatching.MsbSubSectorsController.get(edit: Boolean ?= false)
-POST        /services                                               @controllers.businessmatching.MsbSubSectorsController.post(edit: Boolean ?= false)
+GET         /money-service-business-activities                      @controllers.businessmatching.MsbSubSectorsController.get(edit: Boolean ?= false)
+POST        /money-service-business-activities                      @controllers.businessmatching.MsbSubSectorsController.post(edit: Boolean ?= false)
 
 GET         /psr-registration-number                                @controllers.businessmatching.PSRNumberController.get(edit: Boolean ?= false)
 POST        /psr-registration-number                                @controllers.businessmatching.PSRNumberController.post(edit: Boolean ?= false)

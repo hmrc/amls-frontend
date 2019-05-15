@@ -47,25 +47,10 @@ class InvolvedInOtherController @Inject()(
                 renewal <- cache.getEntry[Renewal](Renewal.key)
                 involvedInOther <- renewal.involvedInOtherActivities
               } yield {
-                Ok(involved_in_other(Form2[InvolvedInOther](involvedInOther),
-                  edit, businessTypes(businessMatching)))
-              }) getOrElse Ok(involved_in_other(EmptyForm, edit, businessTypes(businessMatching)))
+                Ok(involved_in_other(Form2[InvolvedInOther](involvedInOther), edit, businessMatching.prefixedAlphabeticalBusinessTypes))
+              }) getOrElse Ok(involved_in_other(EmptyForm, edit, businessMatching.prefixedAlphabeticalBusinessTypes))
             }) getOrElse Ok(involved_in_other(EmptyForm, edit, None))
         }
-  }
-
-  private def businessTypes(activities: BusinessMatching): Option[List[String]] = {
-    val vowels = List("a", "e", "i", "o", "u")
-
-    activities.alphabeticalBusinessTypes.map {
-      case businessType =>
-        businessType.map(item => {
-          val prefix = if (vowels.exists(item.toLowerCase.startsWith(_))) { "an" }
-                       else { "a" }
-
-          s"$prefix ${item(0).toLower + item.substring(1)}"
-        })
-      }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
@@ -75,7 +60,7 @@ class InvolvedInOtherController @Inject()(
             for {
               businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
             } yield businessMatching match {
-              case Some(_) => BadRequest(involved_in_other(f, edit, businessTypes(businessMatching)))
+              case Some(_) => BadRequest(involved_in_other(f, edit, businessMatching.prefixedAlphabeticalBusinessTypes))
               case None => BadRequest(involved_in_other(f, edit, None))
             }
           case ValidForm(_, data) =>

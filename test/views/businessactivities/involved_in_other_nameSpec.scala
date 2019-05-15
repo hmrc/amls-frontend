@@ -31,14 +31,12 @@ class involved_in_other_nameSpec extends AmlsSpec with MustMatchers {
     implicit val requestWithToken = addToken(request)
   }
 
-  val bmModel = BusinessMatching()
-
   "involved_in_other_name view" must {
     "have correct title" in new ViewFixture {
 
       val form2 = EmptyForm
 
-      def view = views.html.businessactivities.involved_in_other_name(form2, true, bmModel, None)
+      def view = views.html.businessactivities.involved_in_other_name(form2, true, None)
 
       doc.title must be(Messages("businessactivities.involved.other.title") + " - " +
         Messages("summary.businessactivities") +
@@ -50,7 +48,7 @@ class involved_in_other_nameSpec extends AmlsSpec with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.businessactivities.involved_in_other_name(form2, true, bmModel, None)
+      def view = views.html.businessactivities.involved_in_other_name(form2, true, None)
 
       heading.html must be(Messages("businessactivities.involved.other.title"))
       subHeading.html must include(Messages("summary.businessactivities"))
@@ -61,7 +59,7 @@ class involved_in_other_nameSpec extends AmlsSpec with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.businessactivities.involved_in_other_name(form2, true, bmModel, None)
+      def view = views.html.businessactivities.involved_in_other_name(form2, true, None)
 
       doc.getElementsByAttributeValue("name", "involvedInOther") must not be empty
       doc.getElementsByAttributeValue("name", "details") must not be empty
@@ -76,7 +74,7 @@ class involved_in_other_nameSpec extends AmlsSpec with MustMatchers {
           (Path \ "details") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.businessactivities.involved_in_other_name(form2, true, bmModel, None)
+      def view = views.html.businessactivities.involved_in_other_name(form2, true, None)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")
@@ -84,7 +82,7 @@ class involved_in_other_nameSpec extends AmlsSpec with MustMatchers {
     }
 
     "have a back link" in new ViewFixture {
-      def view = views.html.businessactivities.involved_in_other_name(EmptyForm, true, bmModel, None)
+      def view = views.html.businessactivities.involved_in_other_name(EmptyForm, true, None)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

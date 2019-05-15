@@ -35,14 +35,14 @@ class send_largest_amounts_of_moneySpec extends AmlsSpec with MustMatchers {
   "send_largest_amounts_of_money view" must {
 
     "have the back link button" in new ViewFixture {
-      val form2: ValidForm[SendTheLargestAmountsOfMoney] = Form2(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB")))
+      val form2: ValidForm[SendTheLargestAmountsOfMoney] = Form2(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB"))))
       def view = views.html.msb.send_largest_amounts_of_money(form2, true, mockAutoComplete.getCountries)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[SendTheLargestAmountsOfMoney] = Form2(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB")))
+      val form2: ValidForm[SendTheLargestAmountsOfMoney] = Form2(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB"))))
 
       def view = views.html.msb.send_largest_amounts_of_money(form2, true, mockAutoComplete.getCountries)
 
@@ -54,7 +54,7 @@ class send_largest_amounts_of_moneySpec extends AmlsSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[SendTheLargestAmountsOfMoney] = Form2(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB")))
+      val form2: ValidForm[SendTheLargestAmountsOfMoney] = Form2(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB"))))
 
       def view = views.html.msb.send_largest_amounts_of_money(form2, true, mockAutoComplete.getCountries)
 
@@ -67,14 +67,14 @@ class send_largest_amounts_of_moneySpec extends AmlsSpec with MustMatchers {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "countries") -> Seq(ValidationError("not a message Key"))
+          (Path \ "largestAmountsOfMoney") -> Seq(ValidationError("not a message Key"))
         ))
 
       def view = views.html.msb.send_largest_amounts_of_money(form2, true, mockAutoComplete.getCountries)
 
       errorSummary.html() must include("not a message Key")
 
-      doc.getElementById("countries")
+      doc.getElementById("largestAmountsOfMoney")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
     }
