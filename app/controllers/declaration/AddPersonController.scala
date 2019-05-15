@@ -54,9 +54,9 @@ class AddPersonController @Inject () (
         case f: InvalidForm =>
 
           dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) flatMap { bm =>
-            val bt = ControllerHelper.getBusinessType(bm)
-            val newForm = updateFormErrors(f, bt)
-            addPersonView(BadRequest, newForm)
+            val businessType = ControllerHelper.getBusinessType(bm)
+            val updatedForm = updateFormErrors(f, businessType)
+            addPersonView(BadRequest, updatedForm)
           }
 
         case ValidForm(_, data) =>
@@ -73,23 +73,14 @@ class AddPersonController @Inject () (
     }
   }
 
-  private def isResponsiblePerson(data: AddPerson): Boolean = { val roleList = data.roleWithinBusiness.items
-    roleList.contains(BeneficialShareholder) ||
-    roleList.contains(Director) ||
-    roleList.contains(Partner) ||
-    roleList.contains(SoleProprietor) ||
-    roleList.contains(DesignatedMember) ||
-    roleList.contains(NominatedOfficer)
-  }
-
-  private def updateFormErrors(f: InvalidForm, businessType: Option[BusinessType]) = {
+  def updateFormErrors(f: InvalidForm, businessType: Option[BusinessType]): InvalidForm = {
     val message = businessType match {
       case Some(BusinessType.LimitedCompany) => "Select if you are a beneficial shareholder, an external accountant, a director, a nominated officer, or other"
       case Some(BusinessType.SoleProprietor) => "Select if you are an external accountant, a nominated officer, a sole proprietor or other"
       case Some(BusinessType.Partnership) => "Select if you are an external accountant, a nominated officer, a partnership or other"
       case Some(BusinessType.LPrLLP) => "Select if you are a designated member, an external accountant, a nominated officer, or other"
       case Some(BusinessType.UnincorporatedBody) => "Select if you are an external accountant, a nominated officer, or other"
-      case _ => "not implemented yet"
+      case _ => throw new IllegalArgumentException("[Controllers][AddPersonController] business type is not known")
     }
 
     val newErrors: Seq[(Path, Seq[ValidationError])] = f.errors.map {
@@ -98,6 +89,15 @@ class AddPersonController @Inject () (
     }
 
     f.copy(errors = newErrors)
+  }
+
+  private def isResponsiblePerson(data: AddPerson): Boolean = { val roleList = data.roleWithinBusiness.items
+    roleList.contains(BeneficialShareholder) ||
+    roleList.contains(Director) ||
+    roleList.contains(Partner) ||
+    roleList.contains(SoleProprietor) ||
+    roleList.contains(DesignatedMember) ||
+    roleList.contains(NominatedOfficer)
   }
 
   private def addPersonView(status: Status, form: Form2[AddPerson])

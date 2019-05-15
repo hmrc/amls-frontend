@@ -19,6 +19,7 @@ package controllers.declaration
 import java.util.UUID
 
 import connectors.DataCacheConnector
+import forms.{EmptyForm, InvalidForm}
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
@@ -55,9 +56,27 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
 
     val emptyCache = CacheMap("", Map.empty)
 
+    val bm1 = BusinessMatching(
+      reviewDetails = Some(
+        ReviewDetails(
+          businessName = "",
+          businessType = Some(LimitedCompany),
+          businessAddress = Address (
+            line_1 = "",
+            line_2 = "",
+            line_3 = None,
+            line_4 = None,
+            postcode = None,
+            country = Country(
+              name = "",
+              code = ""
+            )),
+          safeId=""
+        )
+      )
+    )
     when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
-      (any(), any(), any())).thenReturn(Future.successful(Some(mock[BusinessMatching])))
-
+      (any(), any(), any())).thenReturn(Future.successful(Some(bm1)))
   }
 
   "AddPersonController" when {
@@ -272,7 +291,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
               ReviewDetails(
                 businessName = "",
                 businessType = Some(LimitedCompany),
-                businessAddress = Address (
+                businessAddress = Address(
                   line_1 = "",
                   line_2 = "",
                   line_3 = None,
@@ -282,7 +301,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
                     name = "",
                     code = ""
                   )),
-                safeId=""
+                safeId = ""
               )
             )
           )
@@ -313,7 +332,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
               ReviewDetails(
                 businessName = "",
                 businessType = Some(SoleProprietor),
-                businessAddress = Address (
+                businessAddress = Address(
                   line_1 = "",
                   line_2 = "",
                   line_3 = None,
@@ -323,7 +342,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
                     name = "",
                     code = ""
                   )),
-                safeId=""
+                safeId = ""
               )
             )
           )
@@ -354,7 +373,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
               ReviewDetails(
                 businessName = "",
                 businessType = Some(Partnership),
-                businessAddress = Address (
+                businessAddress = Address(
                   line_1 = "",
                   line_2 = "",
                   line_3 = None,
@@ -364,7 +383,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
                     name = "",
                     code = ""
                   )),
-                safeId=""
+                safeId = ""
               )
             )
           )
@@ -395,7 +414,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
               ReviewDetails(
                 businessName = "",
                 businessType = Some(LPrLLP),
-                businessAddress = Address (
+                businessAddress = Address(
                   line_1 = "",
                   line_2 = "",
                   line_3 = None,
@@ -405,7 +424,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
                     name = "",
                     code = ""
                   )),
-                safeId=""
+                safeId = ""
               )
             )
           )
@@ -436,7 +455,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
               ReviewDetails(
                 businessName = "",
                 businessType = Some(UnincorporatedBody),
-                businessAddress = Address (
+                businessAddress = Address(
                   line_1 = "",
                   line_2 = "",
                   line_3 = None,
@@ -446,7 +465,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
                     name = "",
                     code = ""
                   )),
-                safeId=""
+                safeId = ""
               )
             )
           )
@@ -469,6 +488,14 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
 
           val document: Document = Jsoup.parse(contentAsString(result))
           document.select("a[href=#positions]").html() must include("Select if you are an external accountant, a nominated officer, or other")
+        }
+
+        "throw an exception if business type is not defined" in new Fixture {
+          val invalidForm = InvalidForm(Map.empty, Seq.empty)
+
+          a[IllegalArgumentException] must be thrownBy {
+            addPersonController.updateFormErrors(invalidForm, None)
+          }
         }
       }
     }
