@@ -86,6 +86,7 @@ class AddPersonController @Inject () (
     val message = businessType match {
       case Some(BusinessType.LimitedCompany) => "Select if you are a beneficial shareholder, an external accountant, a director, a nominated officer, or other"
       case Some(BusinessType.SoleProprietor) => "Select if you are an external accountant, a nominated officer, a sole proprietor or other"
+      case Some(BusinessType.Partnership) => "Select if you are an external accountant, a nominated officer, a partnership or other"
       case _ => "not implemented yet"
     }
 
