@@ -71,6 +71,7 @@ private sealed trait SendTheLargestAmountsOfMoney0 {
     (__ \ "country_2").readNullable[Country] and
     (__ \ "country_3").readNullable[Country]).tupled map {
       case (a, Some(b), Some(c)) => SendTheLargestAmountsOfMoney(Seq(a, b, c))
+      case (a, None, Some(c)) => SendTheLargestAmountsOfMoney(Seq(a, c))
       case (a, Some(b), None) => SendTheLargestAmountsOfMoney(Seq(a, b))
       case (a, None, None) => SendTheLargestAmountsOfMoney(Seq(a))
       case (_, _, _) => SendTheLargestAmountsOfMoney(Seq())

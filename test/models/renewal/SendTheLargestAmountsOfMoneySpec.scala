@@ -38,6 +38,13 @@ class SendTheLargestAmountsOfMoneySpec extends PlaySpec {
       Json.fromJson[SendTheLargestAmountsOfMoney](Json.toJson(model)) mustEqual JsSuccess(model)
     }
 
+    "correctly parse the json if country_1 and country_3 fields provided" in {
+      val json = Json.obj("country_1" -> "GB", "country_3" -> "IN")
+      val expected = SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB"), Country("India", "IN")))
+
+      Json.fromJson[SendTheLargestAmountsOfMoney](json) mustEqual JsSuccess(expected)
+    }
+
     "roundtrip through forms" in {
 
       val model: SendTheLargestAmountsOfMoney =
