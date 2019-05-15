@@ -25,6 +25,7 @@ import models.businessmatching.{BusinessMatching, BusinessType}
 import models.declaration.AddPerson
 import models.declaration.release7._
 import models.status._
+import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, Request, Result}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -75,11 +76,11 @@ class AddPersonController @Inject () (
 
   def updateFormErrors(f: InvalidForm, businessType: Option[BusinessType]): InvalidForm = {
     val message = businessType match {
-      case Some(BusinessType.LimitedCompany) => "Select if you are a beneficial shareholder, an external accountant, a director, a nominated officer, or other"
-      case Some(BusinessType.SoleProprietor) => "Select if you are an external accountant, a nominated officer, a sole proprietor or other"
-      case Some(BusinessType.Partnership) => "Select if you are an external accountant, a nominated officer, a partnership or other"
-      case Some(BusinessType.LPrLLP) => "Select if you are a designated member, an external accountant, a nominated officer, or other"
-      case Some(BusinessType.UnincorporatedBody) => "Select if you are an external accountant, a nominated officer, or other"
+      case Some(BusinessType.LimitedCompany) => Messages("error.required.declaration.add.position.for.limitedcompany")
+      case Some(BusinessType.SoleProprietor) => Messages("error.required.declaration.add.position.for.sole.proprietor")
+      case Some(BusinessType.Partnership) => Messages("error.required.declaration.add.position.for.partner.ship")
+      case Some(BusinessType.LPrLLP) => Messages("error.required.declaration.add.position.for.lprlpp")
+      case Some(BusinessType.UnincorporatedBody) => Messages("error.required.declaration.add.position.for.unicorporated.body")
       case _ => throw new IllegalArgumentException("[Controllers][AddPersonController] business type is not known")
     }
 
