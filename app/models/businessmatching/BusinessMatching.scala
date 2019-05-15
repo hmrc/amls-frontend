@@ -123,6 +123,18 @@ case class BusinessMatching(
     }
   }
 
+  def prefixedAlphabeticalBusinessTypes()(implicit message: Messages): Option[List[String]] = {
+    val vowels = List("a", "e", "i", "o", "u")
+
+    alphabeticalBusinessTypes.map {
+      businessType =>
+        businessType.map(item => {
+          val prefix = if (vowels.exists(item.toLowerCase.startsWith(_))) "an" else "a"
+          s"$prefix ${item(0).toLower + item.substring(1)}"
+        })
+    }
+  }
+
 }
 
 object BusinessMatching {

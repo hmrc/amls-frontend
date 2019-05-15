@@ -125,7 +125,7 @@ class summarySpec extends AmlsSpec
             )
           )
         )
-        val businessTypesList =Some(
+        val businessTypesList = Some(
           List(
             "Accountancy service provider",
             "Estate agency business",

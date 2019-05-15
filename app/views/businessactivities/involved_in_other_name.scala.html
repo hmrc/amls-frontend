@@ -18,7 +18,7 @@
 @import forms2._
 @import models.businessmatching._
 
-@(f: forms.Form2[_], edit: Boolean, bmModel: BusinessMatching, businessTypes: Option[String])(implicit request: Request[_],m:Messages)
+@(f: forms.Form2[_], edit: Boolean, businessTypes: Option[List[String]])(implicit request: Request[_],m:Messages)
 
 @target = @{
     s"""${f("details").id}-fieldset"""
@@ -42,14 +42,19 @@
             heading = "businessactivities.involved.other.title",
             panel = false
         ) {
-             <p>@Messages("businessactivities.confirm-activities.subtitle")</p>
-             <ul class="list list-bullet">
-               @businessTypes.map {activity =>
-                 @activity.split('|').map {a =>
-                   <li>@if(a.charAt(0) == 'a' || a.charAt(0) == 'e') { an @a } else { a @a }</li>
-                 }
-               }
-             </ul>
+            @businessTypes.map { types =>
+                @if(types.size > 1) {
+                    <p>@Messages("businessactivities.confirm-activities.subtitle_4"):</p>
+
+                    <ul class="list list-bullet">
+                        @types.map { businessType =>
+                            <li>@businessType</li>
+                        }
+                    </ul>
+                } else {
+                    <p>@Messages("businessactivities.confirm-activities.subtitle_4") @types.head </p>
+                }
+            }
 
             <p>@Messages("businessactivities.involved.other.hint")</p>
             <ul class="list list-bullet">
