@@ -88,6 +88,7 @@ class AddPersonController @Inject () (
       case Some(BusinessType.SoleProprietor) => "Select if you are an external accountant, a nominated officer, a sole proprietor or other"
       case Some(BusinessType.Partnership) => "Select if you are an external accountant, a nominated officer, a partnership or other"
       case Some(BusinessType.LPrLLP) => "Select if you are a designated member, an external accountant, a nominated officer, or other"
+      case Some(BusinessType.UnincorporatedBody) => "Select if you are an external accountant, a nominated officer, or other"
       case _ => "not implemented yet"
     }
 
