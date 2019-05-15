@@ -20,7 +20,8 @@ import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.BusinessMatching
+import jto.validation.{Path, ValidationError}
+import models.businessmatching.{BusinessMatching, BusinessType}
 import models.declaration.AddPerson
 import models.declaration.release7._
 import models.status._
@@ -51,7 +52,13 @@ class AddPersonController @Inject () (
     implicit authContext => implicit request => {
       Form2[AddPerson](request.body) match {
         case f: InvalidForm =>
-          addPersonView(BadRequest,f)
+
+          dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) flatMap { bm =>
+            val bt = ControllerHelper.getBusinessType(bm)
+            val newForm = updateFormErrors(f, bt)
+            addPersonView(BadRequest, newForm)
+          }
+
         case ValidForm(_, data) =>
           dataCacheConnector.save[AddPerson](AddPerson.key, data) flatMap { _ =>
             statusService.getStatus map {
@@ -66,10 +73,7 @@ class AddPersonController @Inject () (
     }
   }
 
-  private def isResponsiblePerson(data: AddPerson): Boolean = {
-
-    val roleList = data.roleWithinBusiness.items
-
+  private def isResponsiblePerson(data: AddPerson): Boolean = { val roleList = data.roleWithinBusiness.items
     roleList.contains(BeneficialShareholder) ||
     roleList.contains(Director) ||
     roleList.contains(Partner) ||
@@ -78,18 +82,35 @@ class AddPersonController @Inject () (
     roleList.contains(NominatedOfficer)
   }
 
+  private def updateFormErrors(f: InvalidForm, businessType: Option[BusinessType]) = {
+    val message = businessType match {
+      case Some(BusinessType.LimitedCompany) => "Select if you are a beneficial shareholder, an external accountant, a director, a nominated officer, or other"
+      case Some(BusinessType.SoleProprietor) => "Select if you are an external accountant, a nominated officer, a sole proprietor or other"
+      case _ => "not implemented yet"
+    }
+
+    val newErrors: Seq[(Path, Seq[ValidationError])] = f.errors.map {
+      case (p, _) if p == Path("positions") => (Path("positions"), Seq(ValidationError(Seq(message))))
+      case (p, s) => (p, s)
+    }
+
+    f.copy(errors = newErrors)
+  }
+
   private def addPersonView(status: Status, form: Form2[AddPerson])
                            (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] = {
 
     dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) flatMap { bm =>
       val businessType = ControllerHelper.getBusinessType(bm)
+      val formWithModifiedErrors = form
+
         statusService.getStatus map {
           case SubmissionReady =>
-            status(views.html.declaration.add_person("declaration.addperson.title", "submit.registration", businessType, form))
+            status(views.html.declaration.add_person("declaration.addperson.title", "submit.registration", businessType, formWithModifiedErrors))
           case SubmissionReadyForReview | SubmissionDecisionApproved =>
-            status(views.html.declaration.add_person("declaration.addperson.amendment.title", "submit.amendment.application", businessType, form))
-          case RenewalSubmitted(_) => status(views.html.declaration.add_person("declaration.addperson.title", "submit.amendment.application", businessType, form))
-          case ReadyForRenewal(_) => status(views.html.declaration.add_person("declaration.addperson.title", "submit.renewal.application", businessType, form))
+            status(views.html.declaration.add_person("declaration.addperson.amendment.title", "submit.amendment.application", businessType, formWithModifiedErrors))
+          case RenewalSubmitted(_) => status(views.html.declaration.add_person("declaration.addperson.title", "submit.amendment.application", businessType, formWithModifiedErrors))
+          case ReadyForRenewal(_) => status(views.html.declaration.add_person("declaration.addperson.title", "submit.renewal.application", businessType, formWithModifiedErrors))
           case _ => throw new Exception("Incorrect status - Page not permitted for this status")
 
         }

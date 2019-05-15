@@ -19,7 +19,10 @@ package controllers.declaration
 import java.util.UUID
 
 import connectors.DataCacheConnector
+import models.Country
+import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
+import models.businessmatching.BusinessType.{LimitedCompany, SoleProprietor}
 import models.declaration.AddPerson
 import models.status.{ReadyForRenewal, SubmissionReady, SubmissionReadyForReview}
 import org.joda.time.LocalDate
@@ -263,7 +266,28 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
           document.select("a[href=#lastName]").html() must include("This field is required")
         }
 
-        "positions not supplied" in new Fixture {
+        "business type is LimitedCompany and position is not filled" in new Fixture {
+          val bm = BusinessMatching(
+            reviewDetails = Some(
+              ReviewDetails(
+                businessName = "",
+                businessType = Some(LimitedCompany),
+                businessAddress = Address (
+                  line_1 = "",
+                  line_2 = "",
+                  line_3 = None,
+                  line_4 = None,
+                  postcode = None,
+                  country = Country(
+                    name = "",
+                    code = ""
+                  )),
+                safeId=""
+              )
+            )
+          )
+          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
 
           val roleMissingInRequest = request.withFormUrlEncodedBody(
             "firstName" -> "firstName",
@@ -280,8 +304,48 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
           status(result) must be(BAD_REQUEST)
 
           val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#positions]").html() must include("Select if you are a beneficial shareholder, director, nominated officer, an external accountant, or another role in the business")
+          document.select("a[href=#positions]").html() must include("Select if you are a beneficial shareholder, an external accountant, a director, a nominated officer, or other")
+        }
 
+        "business type is SoleProprietor and position is not filled" in new Fixture {
+          val bm = BusinessMatching(
+            reviewDetails = Some(
+              ReviewDetails(
+                businessName = "",
+                businessType = Some(SoleProprietor),
+                businessAddress = Address (
+                  line_1 = "",
+                  line_2 = "",
+                  line_3 = None,
+                  line_4 = None,
+                  postcode = None,
+                  country = Country(
+                    name = "",
+                    code = ""
+                  )),
+                safeId=""
+              )
+            )
+          )
+          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
+
+          val roleMissingInRequest = request.withFormUrlEncodedBody(
+            "firstName" -> "firstName",
+            "lastName" -> "lastName"
+          )
+
+          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          when(addPersonController.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionReady))
+
+          val result = addPersonController.post()(roleMissingInRequest)
+          status(result) must be(BAD_REQUEST)
+
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.select("a[href=#positions]").html() must include("Select if you are an external accountant, a nominated officer, a sole proprietor or other")
         }
       }
     }
