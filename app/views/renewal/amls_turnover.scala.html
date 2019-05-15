@@ -20,13 +20,6 @@
 
 @(f: forms.Form2[_], edit: Boolean, businessTypes:Option[List[String]])(implicit lang:Lang,  m: Messages, request: Request[_])
 
-@headingText = @{
-    businessTypes match {
-        case Some(types) if types.length == 1 => "renewal.turnover.title"
-        case _ => "renewal.turnover.title"
-    }
-}
-
 @header = {
     @components.back_link()
     @errorSummary(f)
@@ -34,7 +27,7 @@
 }
 
 @main(
-    title = Messages(headingText) + " - " + Messages("summary.renewal"),
+    title = Messages("renewal.turnover.title") + " - " + Messages("summary.renewal"),
     heading = header
 ) {
 
@@ -42,7 +35,7 @@
 
             @fieldset(
                 f = f("turnover-fieldset"),
-                heading = headingText,
+                heading = "renewal.turnover.title",
                 panel = false
             ) {
                 @businessTypes.map { types =>

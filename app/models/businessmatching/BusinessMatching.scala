@@ -109,7 +109,6 @@ case class BusinessMatching(
   }
 
   def alphabeticalBusinessTypes()(implicit message: Messages): Option[List[String]] = {
-    val blah = activities.getOrElse(BusinessActivities(Set())).businessActivities
     activities map { a =>
       a.businessActivities.map {
         case AccountancyServices => Messages("businessmatching.registerservices.servicename.lbl.01")
