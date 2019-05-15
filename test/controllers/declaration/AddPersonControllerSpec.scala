@@ -20,6 +20,7 @@ import java.util.UUID
 
 import connectors.DataCacheConnector
 import forms.{EmptyForm, InvalidForm}
+import javax.swing.plaf.synth.SynthPopupMenuUI
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
@@ -56,9 +57,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
 
     val emptyCache = CacheMap("", Map.empty)
 
-    val defaultBM = BusinessMatching(
-      reviewDetails = Some(
-        ReviewDetails(
+    val defaultReviewDetails = ReviewDetails(
           businessName = "",
           businessType = Some(LimitedCompany),
           businessAddress = Address (
@@ -73,8 +72,8 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             )),
           safeId=""
         )
-      )
-    )
+
+    val defaultBM = BusinessMatching(reviewDetails = Some(defaultReviewDetails))
     when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
       (any(), any(), any())).thenReturn(Future.successful(Some(defaultBM)))
     when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
@@ -237,25 +236,8 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
         }
 
         "business type is LimitedCompany and position is not filled" in new Fixture {
-          val bm = BusinessMatching(
-            reviewDetails = Some(
-              ReviewDetails(
-                businessName = "",
-                businessType = Some(LimitedCompany),
-                businessAddress = Address(
-                  line_1 = "",
-                  line_2 = "",
-                  line_3 = None,
-                  line_4 = None,
-                  postcode = None,
-                  country = Country(
-                    name = "",
-                    code = ""
-                  )),
-                safeId = ""
-              )
-            )
-          )
+          val rd = defaultReviewDetails.copy(businessType = Some(LimitedCompany))
+          val bm = BusinessMatching(reviewDetails = Some(rd))
           when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
             (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
 
@@ -272,25 +254,8 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
         }
 
         "business type is SoleProprietor and position is not filled" in new Fixture {
-          val bm = BusinessMatching(
-            reviewDetails = Some(
-              ReviewDetails(
-                businessName = "",
-                businessType = Some(SoleProprietor),
-                businessAddress = Address(
-                  line_1 = "",
-                  line_2 = "",
-                  line_3 = None,
-                  line_4 = None,
-                  postcode = None,
-                  country = Country(
-                    name = "",
-                    code = ""
-                  )),
-                safeId = ""
-              )
-            )
-          )
+          val rd = defaultReviewDetails.copy(businessType = Some(SoleProprietor))
+          val bm = BusinessMatching(reviewDetails = Some(rd))
           when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
             (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
 
@@ -307,25 +272,8 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
         }
 
         "business type is Partnership and position is not filled" in new Fixture {
-          val bm = BusinessMatching(
-            reviewDetails = Some(
-              ReviewDetails(
-                businessName = "",
-                businessType = Some(Partnership),
-                businessAddress = Address(
-                  line_1 = "",
-                  line_2 = "",
-                  line_3 = None,
-                  line_4 = None,
-                  postcode = None,
-                  country = Country(
-                    name = "",
-                    code = ""
-                  )),
-                safeId = ""
-              )
-            )
-          )
+          val rd = defaultReviewDetails.copy(businessType = Some(Partnership))
+          val bm = BusinessMatching(reviewDetails = Some(rd))
           when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
             (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
 
@@ -342,25 +290,8 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
         }
 
         "business type is LPrLLP and position is not filled" in new Fixture {
-          val bm = BusinessMatching(
-            reviewDetails = Some(
-              ReviewDetails(
-                businessName = "",
-                businessType = Some(LPrLLP),
-                businessAddress = Address(
-                  line_1 = "",
-                  line_2 = "",
-                  line_3 = None,
-                  line_4 = None,
-                  postcode = None,
-                  country = Country(
-                    name = "",
-                    code = ""
-                  )),
-                safeId = ""
-              )
-            )
-          )
+          val rd = defaultReviewDetails.copy(businessType = Some(LPrLLP))
+          val bm = BusinessMatching(reviewDetails = Some(rd))
           when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
             (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
 
@@ -377,25 +308,8 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
         }
 
         "business type is UnincorporatedBody and position is not filled" in new Fixture {
-          val bm = BusinessMatching(
-            reviewDetails = Some(
-              ReviewDetails(
-                businessName = "",
-                businessType = Some(UnincorporatedBody),
-                businessAddress = Address(
-                  line_1 = "",
-                  line_2 = "",
-                  line_3 = None,
-                  line_4 = None,
-                  postcode = None,
-                  country = Country(
-                    name = "",
-                    code = ""
-                  )),
-                safeId = ""
-              )
-            )
-          )
+          val rd = defaultReviewDetails.copy(businessType = Some(UnincorporatedBody))
+          val bm = BusinessMatching(reviewDetails = Some(rd))
           when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
             (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
 

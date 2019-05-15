@@ -36,12 +36,15 @@ object BusinessType {
   case object UnincorporatedBody extends BusinessType
 
   def errorMessageFor(businessType: BusinessType)(implicit messages: Messages): String = {
+
+    val common = "error.required.declaration.add.position.for"
+
     businessType match {
-      case BusinessType.LimitedCompany => Messages("error.required.declaration.add.position.for.limitedcompany")
-      case BusinessType.SoleProprietor => Messages("error.required.declaration.add.position.for.sole.proprietor")
-      case BusinessType.Partnership => Messages("error.required.declaration.add.position.for.partner.ship")
-      case BusinessType.LPrLLP => Messages("error.required.declaration.add.position.for.lprlpp")
-      case BusinessType.UnincorporatedBody => Messages("error.required.declaration.add.position.for.unicorporated.body")
+      case BusinessType.LimitedCompany => Messages(s"$common.limitedcompany")
+      case BusinessType.SoleProprietor => Messages(s"$common.sole.proprietor")
+      case BusinessType.Partnership => Messages(s"$common.partner.ship")
+      case BusinessType.LPrLLP => Messages(s"$common.lprlpp")
+      case BusinessType.UnincorporatedBody => Messages(s"$common.unicorporated.body")
     }
 
   }

@@ -88,7 +88,8 @@ class AddPersonController @Inject () (
     f.copy(errors = newErrors)
   }
 
-  private def isResponsiblePerson(data: AddPerson): Boolean = { val roleList = data.roleWithinBusiness.items
+  private def isResponsiblePerson(data: AddPerson): Boolean = {
+    val roleList = data.roleWithinBusiness.items
     roleList.contains(BeneficialShareholder) ||
     roleList.contains(Director) ||
     roleList.contains(Partner) ||
@@ -102,15 +103,14 @@ class AddPersonController @Inject () (
 
     dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) flatMap { bm =>
       val businessType = ControllerHelper.getBusinessType(bm)
-      val formWithModifiedErrors = form
 
         statusService.getStatus map {
           case SubmissionReady =>
-            status(views.html.declaration.add_person("declaration.addperson.title", "submit.registration", businessType, formWithModifiedErrors))
+            status(views.html.declaration.add_person("declaration.addperson.title", "submit.registration", businessType, form))
           case SubmissionReadyForReview | SubmissionDecisionApproved =>
-            status(views.html.declaration.add_person("declaration.addperson.amendment.title", "submit.amendment.application", businessType, formWithModifiedErrors))
-          case RenewalSubmitted(_) => status(views.html.declaration.add_person("declaration.addperson.title", "submit.amendment.application", businessType, formWithModifiedErrors))
-          case ReadyForRenewal(_) => status(views.html.declaration.add_person("declaration.addperson.title", "submit.renewal.application", businessType, formWithModifiedErrors))
+            status(views.html.declaration.add_person("declaration.addperson.amendment.title", "submit.amendment.application", businessType, form))
+          case RenewalSubmitted(_) => status(views.html.declaration.add_person("declaration.addperson.title", "submit.amendment.application", businessType, form))
+          case ReadyForRenewal(_) => status(views.html.declaration.add_person("declaration.addperson.title", "submit.renewal.application", businessType, form))
           case _ => throw new Exception("Incorrect status - Page not permitted for this status")
 
         }
