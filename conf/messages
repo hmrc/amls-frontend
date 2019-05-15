@@ -492,7 +492,7 @@ services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers
 services.list.lbl.04 = Cheque cashing (scrap metal dealers)
 
 hint.8.digits = This is 8 numbers, like 12345678, or a mix of 15 letters and numbers, like ABCD00000123456.
-hint.9.digits = It’s 9 numbers, like 123456789
+hint.9.digits = It is 9 numbers, like 123456789.
 hint.10.digits = For example: 1234567890
 hint.255.chars = Enter 255 characters or less.
 renewal.hint.255.chars = You have 255 characters or less.
@@ -1684,7 +1684,7 @@ responsiblepeople.registeredforvat.lbl.vatNumber = VAT registration number
 responsiblepeople.experiencetraining.heading = Does {0} have previous experience in these services?
 responsiblepeople.experiencetraining.title = Does this person have previous experience in these services?
 responsiblepeople.experiencetraining.businessactivities = These services include:
-responsiblepeople.experiencetraining.information.lbl = Please give a brief description of {0}’s previous experience.
+responsiblepeople.experiencetraining.information.lbl = Describe {0}’s previous experience, including dates and duration of experience.
 responsiblepeople.experiencetraining.information.hint = Include dates and duration of current or previous experience.
 responsiblepeople.training.heading = Has {0} had training in anti-money laundering or counter-terrorism funding?
 responsiblepeople.training.title = Has this person had training in anti-money laundering or counter-terrorism funding?
@@ -1782,7 +1782,7 @@ responsiblepeople.movedaddress.heading = Has {0} moved from this home address?
 responsiblepeople.movedaddress.title = Has this person moved from this home address?
 responsiblepeople.country.of.birth.title = Was this person born in the UK?
 responsiblepeople.country.of.birth.heading = Was {0} born in the UK?
-responsiblepeople.country.of.birth.txt.lbl = What country was {0} born in?
+responsiblepeople.country.of.birth.txt.lbl = Country was {0} born in
 
 #TCSP
 tcsp.whatyouneed.requiredinfo.heading = In this section you’ll be asked things like:
