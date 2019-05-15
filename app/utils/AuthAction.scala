@@ -19,7 +19,6 @@ package utils
 import java.net.URLEncoder
 
 import config.ApplicationConfig
-import controllers.AuthorisedRequest
 import javax.inject.Inject
 import models.ReturnLocation
 import play.api.mvc._
@@ -31,6 +30,8 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
+
+final case class AuthorisedRequest[A](request: Request[A], amlsRefNumber: Option[String], cacheId: String) extends WrappedRequest[A](request)
 
 class AuthAction @Inject() (
                              val authConnector: NewAuthConnector

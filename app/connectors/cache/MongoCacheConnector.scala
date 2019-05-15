@@ -35,12 +35,18 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory)
     */
   def fetch[T](key: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
     mongoCache.find(authContext.user.oid, key)
+  def fetch[T](id: String, key: String)(implicit hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
+    // TODO IMPORTANT! What is oid in new auth? - mongoCache.find(authContext.user.oid, key)
+    ???
+
 
   /**
     * Saves the data item in the mongo store with the specified key
     */
   def save[T](key: String, data: T)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
     mongoCache.createOrUpdate(authContext.user.oid, data, key).map(toCacheMap)
+  def save[T](id: String, key: String, data: T)(implicit hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
+     ??? // TODO IMPORTANT! What is oid in new auth? mongoCache.createOrUpdate(authContext.user.oid, data, key).map(toCacheMap)
 
   /**
     * Saves the data item in the in-memory cache with the specified key
@@ -57,6 +63,8 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory)
     */
   def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =
     mongoCache.fetchAll(authContext.user.oid).map(_.map(toCacheMap))
+  def fetchAll(id: String)(implicit hc: HeaderCarrier): Future[Option[CacheMap]] =
+    ??? // TODO IMPORTANT! What is oid in new auth? mongoCache.fetchAll(authContext.user.oid).map(_.map(toCacheMap))
 
   /**
     * Fetches the entire cache from the mongo store and returns an empty cache where not exists
