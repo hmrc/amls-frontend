@@ -323,7 +323,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
           status(result) must be(BAD_REQUEST)
 
           val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#positions]").html() must include("Select if you are a beneficial shareholder, an external accountant, a director, a nominated officer, or other")
+          document.select("a[href=#positions]").html() must include("Select if you are a beneficial shareholder, a director, an external accountant, a nominated officer, or other")
         }
 
         "business type is SoleProprietor and position is not filled" in new Fixture {
@@ -405,7 +405,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
           status(result) must be(BAD_REQUEST)
 
           val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#positions]").html() must include("Select if you are an external accountant, a nominated officer, a partnership or other")
+          document.select("a[href=#positions]").html() must include("Select if you are an external accountant, a nominated officer, a partner or other")
         }
 
         "business type is LPrLLP and position is not filled" in new Fixture {

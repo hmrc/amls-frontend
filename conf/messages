@@ -383,9 +383,9 @@ error.required.declaration.who.is.registering = Select who is registering this b
 error.required.declaration.first_name = Enter your first name
 error.required.declaration.last_name = Enter your last name
 error.required.declaration.specify.role = Enter your role in the business
-error.required.declaration.add.position.for.limitedcompany = Select if you are a beneficial shareholder, an external accountant, a director, a nominated officer, or other
+error.required.declaration.add.position.for.limitedcompany = Select if you are a beneficial shareholder, a director, an external accountant, a nominated officer, or other
 error.required.declaration.add.position.for.sole.proprietor = Select if you are an external accountant, a nominated officer, a sole proprietor or other
-error.required.declaration.add.position.for.partner.ship = Select if you are an external accountant, a nominated officer, a partnership or other
+error.required.declaration.add.position.for.partner.ship = Select if you are an external accountant, a nominated officer, a partner or other
 error.required.declaration.add.position.for.lprlpp = Select if you are a designated member, an external accountant, a nominated officer, or other
 error.required.declaration.add.position.for.unicorporated.body = Select if you are an external accountant, a nominated officer, or other
 ########################################################################################################################
@@ -844,7 +844,7 @@ payments.waystopay.lead.time = Payments normally take 3 working days.
 payments.waystopay.card = Debit or credit card
 payments.waystopay.bacs = Bacs
 
-payments.waystopay.error = You must select a payment method. Please select how you want to pay your fee
+payments.waystopay.error = Select if you want to pay your fee by debit or credit card, or Bacs
 
 payments.typeofbank.title = Will you be paying from a UK bank account?
 payments.typeofbank.header = Will you be paying from a UK bank account?
