@@ -21,6 +21,7 @@ private object AppDependencies {
   private val okHttpVersion = "3.9.1"
   private val jsonEncryptionVersion = "3.2.0"
   private val playReactivemongoVersion = "6.2.0"
+  private val authVersion = "2.21.0-play-25"
 
   private val playJars = ExclusionRule(organization = "com.typesafe.play")
 
@@ -32,6 +33,7 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "play-whitelist-filter" % playWhitelistFilterVersion,
     "uk.gov.hmrc" %% "json-encryption" % jsonEncryptionVersion,
     "uk.gov.hmrc" %% "play-reactivemongo" % playReactivemongoVersion,
+    "uk.gov.hmrc" %% "auth-client" % authVersion,
 
     "io.github.jto" %% "validation-core"      % validationVersion excludeAll playJars,
     "io.github.jto" %% "validation-playjson"  % validationVersion excludeAll playJars,
