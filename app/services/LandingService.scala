@@ -283,11 +283,7 @@ class LandingService @Inject() (
             (_.transactionsInNext12Months.map(t => TransactionsInLast12Months(t.txnAmount))),
 
           sendTheLargestAmountsOfMoney = viewResponse.msbSection.fold[Option[SendTheLargestAmountsOfMoney]](None)
-            (_.sendTheLargestAmountsOfMoney.map (s => s.countries match {
-              case Seq(a, b, c) => SendTheLargestAmountsOfMoney(a, Some(b), Some(c))
-              case Seq(a, b) => SendTheLargestAmountsOfMoney(a, Some(b))
-              case Seq(a) => SendTheLargestAmountsOfMoney(a)
-            })),
+            (_.sendTheLargestAmountsOfMoney.map(s => SendTheLargestAmountsOfMoney(s.countries))),
 
           mostTransactions = viewResponse.msbSection.fold[Option[MostTransactions]](None)
             (_.mostTransactions.map(m => MostTransactions(m.countries))),
