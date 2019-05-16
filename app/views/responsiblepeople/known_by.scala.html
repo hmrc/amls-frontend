@@ -54,7 +54,7 @@
                     jsHidden = true,
                     classes = Seq("otherNames-panel")
                 ) {
-                    @input(f("otherNames"), "responsiblepeople.personName.alternativeName")
+                    @input(f("otherNames"), Messages("responsiblepeople.personName.alternativeName", personName))
                 }
                 @radio(
                     f = f("hasOtherNames"),
