@@ -35,18 +35,23 @@
 
         @fieldset(
             heading = "renewal.msb.largest.amounts.title",
-            f = f("countries"),
+            f = f("largestAmountsOfMoney-fieldset"),
             panel = false
         ) {
             @hint("lbl.list.upto.3.countries")
-            @for(i <- 1 until 4) {
-                @defining(
-                    f(s"country_$i")
-                ) { field => @country_autocomplete(
-                    field = field,
-                    labelText = s"lbl.country.line$i",
-                    data = countryData.getOrElse(Seq.empty)
-                ) }
+            @errorGroup(
+                field = f("largestAmountsOfMoney")
+            ) {
+                @for(i <- 0 until 3) {
+                    @defining(
+                        f(s"largestAmountsOfMoney[$i]")
+                    ) { field => @country_autocomplete(
+                            field = field,
+                            labelText = s"lbl.country.line${i + 1}",
+                            data = countryData.getOrElse(Seq.empty)
+                        )
+                    }
+                }
             }
         }
         @submit(edit, returnLocation = Some("renewal"))

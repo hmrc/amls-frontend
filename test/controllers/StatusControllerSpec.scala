@@ -563,7 +563,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
           Some(TotalThroughput("01")),
           Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
           Some(TransactionsInLast12Months("1500")),
-          Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
+          Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))),
           Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
           Some(CETransactionsInLast12Months("123")),
           hasChanged = true

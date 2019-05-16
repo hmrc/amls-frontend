@@ -426,7 +426,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       Some(RPercentageOfCashPaymentOver15000.First),Some(RReceiveCashPayments(Some(renewalPaymentMethods))),
       Some(TotalThroughput("02")),Some(RenWhichCurrencies(Seq("USD"), None, Some(RMoneySources(None, None, None)))),
       Some(TransactionsInLast12Months("12345678963")),
-      Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"),None,None)),
+      Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))),
       Some(MostTransactions(List(Country("United Kingdom", "GB")))),
       Some(CETransactionsInLast12Months("12345678963")),
       Some(FXTransactionsInLast12Months("3987654321")),
