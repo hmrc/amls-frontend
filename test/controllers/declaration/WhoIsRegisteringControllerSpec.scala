@@ -254,14 +254,14 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
 
         val actualForm = controller.updateFormErrors(invalidForm, NotCompleted, true)
 
-        val expectedErrors = Seq((Path("person"), Seq(ValidationError(Seq("SSelect who is registering this business")))))
+        val expectedErrors = Seq((Path("person"), Seq(ValidationError(Seq("Select who is registering this business")))))
         actualForm.errors must be(expectedErrors)
       }
 
       "show who is declaring this update error when status is RenewalSubmitted" in new Fixture {
         val invalidForm = InvalidForm(Map.empty, Seq.empty)
 
-        val actualForm = controller.updateFormErrors(invalidForm, RenewalSubmitted, true)
+        val actualForm = controller.updateFormErrors(invalidForm, RenewalSubmitted(Some(LocalDate.now)), true)
 
         val expectedErrors = Seq((Path("person"), Seq(ValidationError(Seq("Select who is declaring this update")))))
         actualForm.errors must be(expectedErrors)
