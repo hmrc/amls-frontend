@@ -237,6 +237,16 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
         }
       }
 
+      "show who is declaring this update error when invalid data is posted for update" in new Fixture {
+        run(SubmissionReadyForReview) { _ =>
+          val newRequest = request.withFormUrlEncodedBody()
+          val result = controller.post()(newRequest)
+
+          status(result) must be(BAD_REQUEST)
+          contentAsString(result) must include("Select who is declaring this update")
+        }
+      }
+
       "redirect to the declaration page" when {
         "status is pending" in new Fixture {
           run(SubmissionReadyForReview) { _ =>

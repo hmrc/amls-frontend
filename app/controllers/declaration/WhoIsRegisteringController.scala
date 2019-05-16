@@ -20,11 +20,12 @@ import com.google.inject.Inject
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import jto.validation.{Path, ValidationError}
 import models.declaration._
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.responsiblepeople.{PositionWithinBusiness, ResponsiblePerson}
 import models.status._
-
+import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, Request, Result}
 import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -59,7 +60,9 @@ class WhoIsRegisteringController @Inject () (
       Form2[WhoIsRegistering](request.body) match {
         case f: InvalidForm =>
           dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key) flatMap {
-            case Some(data) => whoIsRegisteringView(BadRequest, f, ResponsiblePerson.filter(data))
+            case Some(data) =>
+              val updatedForm = f.copy(errors = Seq((Path("person"), Seq(ValidationError(Seq(Messages("error.required.declaration.who.is.declaring.this.update")))))))
+              whoIsRegisteringView(BadRequest, updatedForm, ResponsiblePerson.filter(data))
             case None => whoIsRegisteringView(BadRequest, f, Seq.empty)
           }
         case ValidForm(_, data) =>
