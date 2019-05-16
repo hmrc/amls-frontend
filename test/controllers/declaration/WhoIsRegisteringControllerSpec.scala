@@ -249,6 +249,24 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
         }
       }
 
+      "show who is declaring this update error when status is where there is no add person view shown" in new Fixture {
+        val invalidForm = InvalidForm(Map.empty, Seq.empty)
+
+        val actualForm = controller.updateFormErrors(invalidForm, NotCompleted, true)
+
+        val expectedErrors = Seq((Path("person"), Seq(ValidationError(Seq("SSelect who is registering this business")))))
+        actualForm.errors must be(expectedErrors)
+      }
+
+      "show who is declaring this update error when status is RenewalSubmitted" in new Fixture {
+        val invalidForm = InvalidForm(Map.empty, Seq.empty)
+
+        val actualForm = controller.updateFormErrors(invalidForm, RenewalSubmitted, true)
+
+        val expectedErrors = Seq((Path("person"), Seq(ValidationError(Seq("Select who is declaring this update")))))
+        actualForm.errors must be(expectedErrors)
+      }
+
       "show who is declaring this renewal error when there is variation and status is SubmissionReadyForReview or SubmissionDecisionApproved or ReadyForRenewal" in new Fixture {
         val invalidForm = InvalidForm(Map.empty, Seq.empty)
 

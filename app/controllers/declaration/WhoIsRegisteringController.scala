@@ -118,7 +118,7 @@ class WhoIsRegisteringController @Inject () (
       case RenewalSubmitted(_) =>
         f.copy(errors = Seq((Path("person"), Seq(ValidationError(Seq(Messages(s"$common.update")))))))
       case _ =>
-        f.copy(errors = Seq((Path("person"), Seq(ValidationError(Seq(Messages(s"$common.update")))))))
+        f.copy(errors = Seq((Path("person"), Seq(ValidationError(Seq(Messages("error.required.declaration.who.is.registering")))))))
     }
   }
 
