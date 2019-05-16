@@ -309,8 +309,8 @@ class SubmissionServiceSpec extends AmlsSpec
         customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("Test", "T"))))),
         involvedInOtherActivities = Some(InvolvedInOtherNo),
         mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-        sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(
-          Country("United Kingdom", "GB"), Some(Country("France", "FR")), Some(Country("us", "US")))),
+        sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(
+          Country("United Kingdom", "GB"), Country("France", "FR"), Country("us", "US")))),
         whichCurrencies = Some(WhichCurrencies(
           Seq("USD", "CHF", "EUR"), Some(UsesForeignCurrenciesYes), Some(MoneySources(Some(models.renewal.BankMoneySource("Bank Names")), Some(models.renewal.WholesalerMoneySource("wholesaler")), Some(true))))),
         ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("12345678963")),
@@ -362,8 +362,8 @@ class SubmissionServiceSpec extends AmlsSpec
         customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("Test", "T"))))),
         involvedInOtherActivities = Some(InvolvedInOtherNo),
         mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-        sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(
-          Country("United Kingdom", "GB"), Some(Country("France", "FR")), Some(Country("us", "US")))),
+        sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(
+          Country("United Kingdom", "GB"), Country("France", "FR"), Country("us", "US")))),
         whichCurrencies = Some(WhichCurrencies(
           Seq("USD", "CHF", "EUR"), Some(UsesForeignCurrenciesYes), Some(MoneySources(Some(models.renewal.BankMoneySource("Bank Names")), Some(models.renewal.WholesalerMoneySource("Wholesaler")), Some(true))))),
         ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("12345678963")),

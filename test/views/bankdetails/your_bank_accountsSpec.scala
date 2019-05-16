@@ -134,7 +134,7 @@ class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChe
       doc.getElementById("incomplete-detail-1").text must include(Messages("bankdetails.yourbankaccounts.noaccountname"))
 
       doc.getElementById("incomplete-detail-2").text mustNot include(Messages("bankdetails.yourbankaccount.accountnumber"))
-      doc.getElementById("incomplete-detail-2").text must include(Messages("bankdetails.accounttype.lbl.01"))
+      doc.getElementById("incomplete-detail-2").text must include(Messages("bankdetails.accounttype.lbl.02"))
       doc.getElementById("incomplete-detail-2").text mustNot include(Messages("bankdetails.yourbankaccount.sortcode"))
       doc.getElementById("incomplete-detail-2").text must include("Incomplete Second Account Name")
 

@@ -44,7 +44,7 @@
         ) {
             @businessTypes.map { types =>
                 @if(types.size > 1) {
-                    <p>@Messages("businessactivities.confirm-activities.subtitle")</p>
+                    <p>@Messages("businessactivities.confirm-activities.subtitle_4"):</p>
 
                     <ul class="list list-bullet">
                         @types.map { businessType =>
@@ -52,7 +52,7 @@
                         }
                     </ul>
                 } else {
-                    <p>@Messages("businessactivities.confirm-activities.subtitle_2") @types.head </p>
+                    <p>@Messages("businessactivities.confirm-activities.subtitle_4") @types.head </p>
                 }
             }
 
