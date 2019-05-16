@@ -2133,7 +2133,7 @@ progress.renewal.description = Information about your business over the last 12 
 progress.renewal.time = 7 and 10
 
 renewal.involvedinother.title = Was your business involved in any other activities in the last 12 months?
-renewal.involvedinother.example = Anything else includes other activities or services, like:
+renewal.involvedinother.example = Other activities include things like:
 renewal.involvedinother.listline1 = running a newsagent’s
 renewal.involvedinother.listline2 = recruitment
 renewal.involvedinother.listline3 = selling software packages
