@@ -92,7 +92,7 @@ class WhoIsRegisteringController @Inject () (
     statusService.getStatus flatMap {
       case a@(SubmissionReadyForReview | SubmissionDecisionApproved | ReadyForRenewal(_)) =>
         renewalService.getRenewal map {
-          case Some(x) =>
+          case Some(_) =>
             val updatedForm = updateFormErrors(form, a, renewal = true)
             status(who_is_registering_this_renewal(updatedForm, rp))
           case _ =>
