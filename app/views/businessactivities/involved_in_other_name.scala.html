@@ -27,7 +27,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.businessactivities")
 }
 
 @main(
@@ -37,40 +36,43 @@
 
     @form(f, controllers.businessactivities.routes.InvolvedInOtherController.post(edit)) {
 
-        @fieldset(
-            f = f("involvedInOther-fieldset"),
-            heading = "businessactivities.involved.other.title",
-            panel = false
+        @errorGroup(
+            field = f("involvedInOther"),
+            showError = false
         ) {
-            @businessTypes.map { types =>
-                @if(types.size > 1) {
-                    <p>@Messages("businessactivities.confirm-activities.subtitle_4"):</p>
-
-                    <ul class="list list-bullet">
-                        @types.map { businessType =>
-                            <li>@businessType</li>
-                        }
-                    </ul>
-                } else {
-                    <p>@Messages("businessactivities.confirm-activities.subtitle_4") @types.head </p>
-                }
-            }
-
-            <p>@Messages("businessactivities.involved.other.hint")</p>
-            <ul class="list list-bullet">
-                <li>@Messages("businessactivities.involved.listline1")</li>
-                <li>@Messages("businessactivities.involved.listline2")</li>
-                <li>@Messages("businessactivities.involved.listline3")</li>
-            </ul>
-            @errorGroup(
-                field = f("involvedInOther")
+            @fieldset(
+                f = f("involvedInOther"),
+                heading = "businessactivities.involved.other.title",
+                section = "summary.businessactivities",
+                panel = false,
+                showErrorStyling = false
             ) {
+                @businessTypes.map { types =>
+                    @if(types.size > 1) {
+                        <p>@Messages("businessactivities.confirm-activities.subtitle_4"):</p>
+
+                        <ul class="list list-bullet">
+                            @types.map { businessType =>
+                                <li>@businessType</li>
+                            }
+                        </ul>
+                    } else {
+                        <p>@Messages("businessactivities.confirm-activities.subtitle_4") @types.head </p>
+                    }
+                }
+
+                <p>@Messages("businessactivities.involved.other.hint")</p>
+                <ul class="list list-bullet">
+                    <li>@Messages("businessactivities.involved.listline1")</li>
+                    <li>@Messages("businessactivities.involved.listline2")</li>
+                    <li>@Messages("businessactivities.involved.listline3")</li>
+                </ul>
                 @radio(
                     f = f("involvedInOther"),
                     labelText = "lbl.yes",
                     value = "true",
                     target = s"#$target",
-                    inline = true
+                    attrDescribedBy = "involvedInOther-error-notification"
                 )
                 @panel(
                   field = Some(f(s"$target")),
@@ -91,7 +93,7 @@
                     f = f("involvedInOther"),
                     labelText = "lbl.no",
                     value = "false",
-                    inline = true
+                    attrDescribedBy = "involvedInOther-error-notification"
                 )
             }
         }
