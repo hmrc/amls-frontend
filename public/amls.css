@@ -1608,3 +1608,11 @@ h2.override-heading-medium {
 .sidebar-top-spacing {
   margin-top: -0.75em;
 }
+
+.page-header + fieldset h1 {
+  margin-top: .15em;
+}
+
+.form-field--error .page-header {
+  margin-top: 0;
+}
