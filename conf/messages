@@ -1531,7 +1531,6 @@ declaration.renewal.who.is.registering.text = One person must take responsibilit
 
 declaration.register.responsible.person.title = You need to register as a responsible person
 declaration.register.responsible.person.description = You will need to add yourself to the list of responsible people because of your role in the business.
-declaration.register.responsible.person.title = Who you need to register
 declaration.register.responsible.person.text = You must register:
 declaration.register.responsible.person.line_1 = owners, partners, directors, shadow directors, and designated members
 declaration.register.responsible.person.line_2 = the nominated officer
