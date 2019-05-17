@@ -31,58 +31,52 @@
 
     @form(f, controllers.estateagentbusiness.routes.ResidentialRedressSchemeController.post(edit)) {
 
-        @errorGroup(
-            field = f("propertyRedressScheme"),
-            showError = false
+        @fieldsetWithErrorGroup(
+            f = f("propertyRedressScheme"),
+            heading = "estateagentbusiness.registered.redress.heading",
+            section = "summary.estateagentbusiness",
+            classes = Seq("propertyRedress-fieldset"),
+            panel = false
         ) {
-            @fieldset(
+            <p>@Messages("estateagentbusiness.registered.redress.text")</p>
+            @radio(
                 f = f("propertyRedressScheme"),
-                heading = "estateagentbusiness.registered.redress.heading",
-                section = "summary.estateagentbusiness",
-                classes = Seq("propertyRedress-fieldset"),
-                panel = false,
-                showErrorStyling = false
-            ) {
-                <p>@Messages("estateagentbusiness.registered.redress.text")</p>
-                @radio(
-                    f = f("propertyRedressScheme"),
-                    labelText = "estateagentbusiness.redress.lbl.05",
-                    value = "05",
-                    attrDescribedBy = "propertyRedressScheme-error-notification"
-                )
-                @radio(
-                    f = f("propertyRedressScheme"),
-                    labelText = "estateagentbusiness.redress.lbl.02",
-                    value = "02",
-                    attrDescribedBy = "propertyRedressScheme-error-notification"
-                )
-                @radio(
-                    f = f("propertyRedressScheme"),
-                    labelText = "estateagentbusiness.redress.lbl.03",
-                    value = "03",
-                    attrDescribedBy = "propertyRedressScheme-error-notification"
-                )
-                @radio(
-                    f = f("propertyRedressScheme"),
-                    labelText = "estateagentbusiness.redress.lbl.01",
-                    value = "01",
-                    attrDescribedBy = "propertyRedressScheme-error-notification"
-                )
-                @radio(
-                    f = f("propertyRedressScheme"),
-                    labelText = "estateagentbusiness.redress.lbl.04",
-                    value = "04",
-                    target = "[data-reveal='other-redress-scheme']",
-                    attrDescribedBy = "propertyRedressScheme-error-notification"
-                )
-                @input(
-                    field = f("other"),
-                    data = "other-redress-scheme",
-                    panel = true,
-                    jsHidden = true,
-                    labelText = "estateagentbusiness.redress.lbl.other"
-                )
-            }
+                labelText = "estateagentbusiness.redress.lbl.05",
+                value = "05",
+                attrDescribedBy = "propertyRedressScheme-error-notification"
+            )
+            @radio(
+                f = f("propertyRedressScheme"),
+                labelText = "estateagentbusiness.redress.lbl.02",
+                value = "02",
+                attrDescribedBy = "propertyRedressScheme-error-notification"
+            )
+            @radio(
+                f = f("propertyRedressScheme"),
+                labelText = "estateagentbusiness.redress.lbl.03",
+                value = "03",
+                attrDescribedBy = "propertyRedressScheme-error-notification"
+            )
+            @radio(
+                f = f("propertyRedressScheme"),
+                labelText = "estateagentbusiness.redress.lbl.01",
+                value = "01",
+                attrDescribedBy = "propertyRedressScheme-error-notification"
+            )
+            @radio(
+                f = f("propertyRedressScheme"),
+                labelText = "estateagentbusiness.redress.lbl.04",
+                value = "04",
+                target = "[data-reveal='other-redress-scheme']",
+                attrDescribedBy = "propertyRedressScheme-error-notification"
+            )
+            @input(
+                field = f("other"),
+                data = "other-redress-scheme",
+                panel = true,
+                jsHidden = true,
+                labelText = "estateagentbusiness.redress.lbl.other"
+            )
         }
 
         @submit(edit)

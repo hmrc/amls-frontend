@@ -33,52 +33,46 @@
 
     @form(f, controllers.estateagentbusiness.routes.PenalisedUnderEstateAgentsActController.post(edit)) {
 
-        @errorGroup(
-            field = f("penalisedUnderEstateAgentsAct"),
-            showError = false
+        @fieldsetWithErrorGroup(
+            f = f("penalisedUnderEstateAgentsAct"),
+            heading = "estateagentbusiness.penalisedunderestateagentsact.title",
+            section = "summary.estateagentbusiness",
+            panel = false
         ) {
-            @fieldset(
+            <p>@Messages("estateagentbusiness.penalisedunderestateagentsact.subtitle")</p>
+            <ul class="list list-bullet">
+                <li>@Messages("estateagentbusiness.penalisedunderestateagentsact.warning")</li>
+                <li>@Messages("estateagentbusiness.penalisedunderestateagentsact.banned")</li>
+            </ul>
+            @radio(
                 f = f("penalisedUnderEstateAgentsAct"),
-                heading = "estateagentbusiness.penalisedunderestateagentsact.title",
-                section = "summary.estateagentbusiness",
-                panel = false,
-                showErrorStyling = false
+                labelText = "lbl.yes",
+                value = "true",
+                target = "[data-reveal='penalised-estate-agents-act']",
+                attrDescribedBy = "penalisedUnderEstateAgentsAct-error-notification"
+            )
+            @panel(
+                jsHidden = true,
+                dataReveal = "penalised-estate-agents-act",
+                wide = false,
+                gutter = true
             ) {
-                <p>@Messages("estateagentbusiness.penalisedunderestateagentsact.subtitle")</p>
-                <ul class="list list-bullet">
-                    <li>@Messages("estateagentbusiness.penalisedunderestateagentsact.warning")</li>
-                    <li>@Messages("estateagentbusiness.penalisedunderestateagentsact.banned")</li>
-                </ul>
-                @radio(
-                    f = f("penalisedUnderEstateAgentsAct"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    target = "[data-reveal='penalised-estate-agents-act']",
-                    attrDescribedBy = "penalisedUnderEstateAgentsAct-error-notification"
-                )
-                @panel(
-                    jsHidden = true,
-                    dataReveal = "penalised-estate-agents-act",
-                    wide = false,
-                    gutter = true
-                ) {
-                    @textarea(
-                        f("penalisedUnderEstateAgentsActDetails"),
-                        labelText = "estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl",
-                        hintText = "hint.255.chars",
-                        bold = false,
-                        largeWidth = true,
-                        cols = "30",
-                        rows = "8"
-                    )
-                }
-                @radio(
-                    f = f("penalisedUnderEstateAgentsAct"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    attrDescribedBy = "penalisedUnderEstateAgentsAct-error-notification"
+                @textarea(
+                    f("penalisedUnderEstateAgentsActDetails"),
+                    labelText = "estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl",
+                    hintText = "hint.255.chars",
+                    bold = false,
+                    largeWidth = true,
+                    cols = "30",
+                    rows = "8"
                 )
             }
+            @radio(
+                f = f("penalisedUnderEstateAgentsAct"),
+                labelText = "lbl.no",
+                value = "false",
+                attrDescribedBy = "penalisedUnderEstateAgentsAct-error-notification"
+            )
         }
 
         @submit(edit)
