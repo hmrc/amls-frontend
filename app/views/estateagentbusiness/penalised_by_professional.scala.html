@@ -27,7 +27,6 @@ s"""${f("professionalBody").id}-fieldset"""
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.estateagentbusiness")
 }
 
 @main(
@@ -37,28 +36,32 @@ s"""${f("professionalBody").id}-fieldset"""
 
 @form(f, controllers.estateagentbusiness.routes.PenalisedByProfessionalController.post(edit)) {
 
-    @fieldset(
-        f = f("penalised-fieldset"),
-        heading = "estateagentbusiness.penalisedbyprofessional.title",
-        panel = false
+    @errorGroup(
+        field = f("penalised"),
+        showError = false
     ) {
-        <p>@Messages("estateagentbusiness.penalisedbyprofessional.subtitle")</p>
-
-        <ul class="list list-bullet form-group">
-            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_1")</li>
-            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_2")</li>
-            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_3")</li>
-            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_4")</li>
-            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_5")</li>
-        </ul>
-        @errorGroup(
-             field = f("penalised")
+        @fieldset(
+            f = f("penalised"),
+            heading = "estateagentbusiness.penalisedbyprofessional.title",
+            section = "summary.estateagentbusiness",
+            panel = false,
+            showErrorStyling = false
         ) {
+            <p>@Messages("estateagentbusiness.penalisedbyprofessional.subtitle")</p>
+
+            <ul class="list list-bullet form-group">
+                <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_1")</li>
+                <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_2")</li>
+                <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_3")</li>
+                <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_4")</li>
+                <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_5")</li>
+            </ul>
             @radio(
                 f = f("penalised"),
                 labelText = "lbl.yes",
                 value = "true",
-                target = "[data-reveal='other-professional-body']"
+                target = "[data-reveal='other-professional-body']",
+                attrDescribedBy = "penalised-error-notification"
             )
             @panel(
                 jsHidden = true,
@@ -79,7 +82,8 @@ s"""${f("professionalBody").id}-fieldset"""
             @radio(
                 f = f("penalised"),
                 labelText = "lbl.no",
-                value = "false"
+                value = "false",
+                attrDescribedBy = "penalised-error-notification"
             )
         }
     }

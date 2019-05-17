@@ -22,7 +22,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.estateagentbusiness")
 }
 
 @main(
@@ -32,42 +31,49 @@
 
     @form(f, controllers.estateagentbusiness.routes.ResidentialRedressSchemeController.post(edit)) {
 
-        @fieldset(
-            f = f("propertyRedressScheme-fieldset"),
-            heading = "estateagentbusiness.registered.redress.heading",
-            classes = Seq("propertyRedress-fieldset"),
-            panel = false
+        @errorGroup(
+            field = f("propertyRedressScheme"),
+            showError = false
         ) {
-            <p>@Messages("estateagentbusiness.registered.redress.text")</p>
-
-            @errorGroup(
-                field = f("propertyRedressScheme")
+            @fieldset(
+                f = f("propertyRedressScheme"),
+                heading = "estateagentbusiness.registered.redress.heading",
+                section = "summary.estateagentbusiness",
+                classes = Seq("propertyRedress-fieldset"),
+                panel = false,
+                showErrorStyling = false
             ) {
+                <p>@Messages("estateagentbusiness.registered.redress.text")</p>
                 @radio(
                     f = f("propertyRedressScheme"),
                     labelText = "estateagentbusiness.redress.lbl.05",
-                    value = "05"
+                    value = "05",
+                    attrDescribedBy = "propertyRedressScheme-error-notification"
                 )
                 @radio(
                     f = f("propertyRedressScheme"),
                     labelText = "estateagentbusiness.redress.lbl.02",
-                    value = "02"
+                    value = "02",
+                    attrDescribedBy = "propertyRedressScheme-error-notification"
                 )
                 @radio(
                     f = f("propertyRedressScheme"),
                     labelText = "estateagentbusiness.redress.lbl.03",
-                    value = "03"
+                    value = "03",
+                    attrDescribedBy = "propertyRedressScheme-error-notification"
                 )
                 @radio(
                     f = f("propertyRedressScheme"),
                     labelText = "estateagentbusiness.redress.lbl.01",
-                    value = "01"
+                    value = "01",
+                    attrDescribedBy = "propertyRedressScheme-error-notification"
                 )
                 @radio(
                     f = f("propertyRedressScheme"),
                     labelText = "estateagentbusiness.redress.lbl.04",
                     value = "04",
-                    target = "[data-reveal='other-redress-scheme']"
+                    target = "[data-reveal='other-redress-scheme']",
+                    attrDescribedBy = "propertyRedressScheme-error-notification"
                 )
                 @input(
                     field = f("other"),
