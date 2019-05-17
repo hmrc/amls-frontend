@@ -17,13 +17,14 @@
 @import forms.{Field, Form2}
 
 @(
-  field: Field,
-  classes: Seq[String] = Seq.empty
+    field: Field,
+    showError: Boolean = true,
+    classes: Seq[String] = Seq.empty
 )(content: Html)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @if(field.hasErrors) {
     <div id="@field.id" class="clear @classes.mkString(" ") form-field--error">
-        <span class="error-notification" data-journey="error - field:user input:@field.id">@field.error</span>
+        @if(showError) {<span class="error-notification" data-journey="error - field:user input:@field.id">@field.error</span>}
         @content
     </div>
 } else {

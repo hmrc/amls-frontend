@@ -31,13 +31,15 @@
 ) {
     @form(f, controllers.estateagentbusiness.routes.BusinessServicesController.post(edit)) {
         @errorGroup(
-            field = f("services")
+            field = f("services"),
+            showError = false
         ) {
             @fieldset(
-                f = f("services-fieldset"),
+                f = f("services"),
                 heading = "estateagentbusiness.services.title",
                 section = "summary.estateagentbusiness",
-                panel = false
+                panel = false,
+                showErrorStyling = false
             ) {
                 @hint("lbl.select.all")
                     @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.06", value = "06")
