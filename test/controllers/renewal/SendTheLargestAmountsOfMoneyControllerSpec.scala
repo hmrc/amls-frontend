@@ -57,7 +57,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
   }
 
   trait FormSubmissionFixture extends Fixture {
-    def formData(valid: Boolean) = if (valid) "country_1" -> "GB" else "country_1" -> ""
+    def formData(valid: Boolean) = if (valid) "largestAmountsOfMoney[0]" -> "GB" else "largestAmountsOfMoney[0]" -> ""
     def formRequest(valid: Boolean) = request.withFormUrlEncodedBody(formData(valid))
 
     when(mockRenewalService.getRenewal(any(), any(), any()))
@@ -91,15 +91,14 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
 
         when(controller.dataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(
-            Renewal(sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))))
+            Renewal(sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))))
           )))
 
         val result = controller.get()(request)
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("select[name=country_1] > option[value=GB]").hasAttr("selected") must be(true)
-
+        document.select("select[name=largestAmountsOfMoney[0]] > option[value=GB]").hasAttr("selected") must be(true)
       }
     }
 
@@ -142,14 +141,14 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
       "given invalid data, must respond with BAD_REQUEST" in new FormSubmissionFixture {
 
         val newRequest = request.withFormUrlEncodedBody(
-          "country_1" -> ""
+          "largestAmountsOfMoney[0]" -> ""
         )
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("a[href=#country_1]").html() must include(Messages("error.required.renewal.country.name"))
+        document.select("a[href=#largestAmountsOfMoney]").html() must include(Messages("error.required.renewal.country.name"))
       }
     }
   }

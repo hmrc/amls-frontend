@@ -52,13 +52,16 @@ class register_responsible_personSpec extends AmlsSpec with MustMatchers {
       def view = views.html.declaration.register_responsible_person("subheading")
 
       html must include(Messages("declaration.register.responsible.person.description"))
-      html must include(Messages("responsiblepeople.whomustregister.title"))
+      html must include(Messages("declaration.register.responsible.person.title"))
 
       html must include(Messages("subheading"))
 
-      html must include(Messages("responsiblepeople.whomustregister.line_1"))
-      html must include(Messages("responsiblepeople.whomustregister.line_2"))
-      html must include(Messages("responsiblepeople.whomustregister.line_3"))
+      html must include(Messages("declaration.register.responsible.person.text"))
+      html must include(Messages("declaration.register.responsible.person.line_1"))
+      html must include(Messages("declaration.register.responsible.person.line_2"))
+      html must include(Messages("declaration.register.responsible.person.line_3"))
+      html must include(Messages("declaration.register.responsible.person.line_4"))
+      html must include(Messages("declaration.register.responsible.person.line_5"))
     }
   }
 }

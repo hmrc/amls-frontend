@@ -69,11 +69,8 @@ private sealed trait SendTheLargestAmountsOfMoney0 {
     import play.api.libs.json._
     ((__ \ "country_1").read[Country] and
     (__ \ "country_2").readNullable[Country] and
-    (__ \ "country_3").readNullable[Country]).tupled map {
-      case (a, Some(b), Some(c)) => SendTheLargestAmountsOfMoney(Seq(a, b, c))
-      case (a, Some(b), None) => SendTheLargestAmountsOfMoney(Seq(a, b))
-      case (a, None, None) => SendTheLargestAmountsOfMoney(Seq(a))
-      case (_, _, _) => SendTheLargestAmountsOfMoney(Seq())
+    (__ \ "country_3").readNullable[Country]).tupled map { countries =>
+      SendTheLargestAmountsOfMoney(countries._1 +: Seq(countries._2, countries._3).flatten)
       }
     }
 
