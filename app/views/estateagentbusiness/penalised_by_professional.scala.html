@@ -55,8 +55,7 @@ s"""${f("professionalBody").id}-fieldset"""
             f = f("penalised"),
             labelText = "lbl.yes",
             value = "true",
-            target = "[data-reveal='other-professional-body']",
-            attrDescribedBy = "penalised-error-notification"
+            target = "[data-reveal='other-professional-body']"
         )
         @panel(
             jsHidden = true,
@@ -77,8 +76,7 @@ s"""${f("professionalBody").id}-fieldset"""
         @radio(
             f = f("penalised"),
             labelText = "lbl.no",
-            value = "false",
-            attrDescribedBy = "penalised-error-notification"
+            value = "false"
         )
     }
 

@@ -20,8 +20,7 @@
     value: String,
     target: String = "",
     inline: Boolean = false,
-    spaced: Boolean = false,
-    attrDescribedBy: String = ""
+    spaced: Boolean = false
 )(implicit lang:Lang, m: Messages)
 
     <div class="@if(inline){} @if(spaced){spaced} multiple-choice">
@@ -30,7 +29,7 @@
                 name="@f.name"
                 id="@{f.id}-@value"
                 value="@value"
-                @if(attrDescribedBy.nonEmpty){ aria-describedby="@attrDescribedBy"}
+                aria-describedby="@{f.id}-error-notification"
                 @if(f.value.contains(value)){ checked="checked"}
                 @if(target.nonEmpty){ data-toggle="@target"} />
         <label class="block-label" for="@{f.id}-@value">@Messages(labelText)</label>
