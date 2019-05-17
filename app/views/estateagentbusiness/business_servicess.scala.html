@@ -23,7 +23,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.estateagentbusiness")
 }
 
 @main(
@@ -31,25 +30,26 @@
     heading = header
 ) {
     @form(f, controllers.estateagentbusiness.routes.BusinessServicesController.post(edit)) {
-        @fieldset(
-            f = f("services-fieldset"),
-            heading = "estateagentbusiness.services.title",
-            panel = false
+        @errorGroup(
+            field = f("services")
         ) {
-            @hint("lbl.select.all")
-            @errorGroup(
-                field = f("services")
+            @fieldset(
+                f = f("services-fieldset"),
+                heading = "estateagentbusiness.services.title",
+                section = "summary.estateagentbusiness",
+                panel = false
             ) {
-                @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.06", value = "06")
-                @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.03", value = "03")
-                @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.05", value = "05")
-                @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.02", value = "02")
-                @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.08", value = "08")
-                @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.07", value = "07")
-                @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.04", value = "04")
-                @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.01", value = "01")
-                @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.09", value = "09")
-            }
+                @hint("lbl.select.all")
+                    @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.06", value = "06")
+                    @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.03", value = "03")
+                    @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.05", value = "05")
+                    @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.02", value = "02")
+                    @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.08", value = "08")
+                    @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.07", value = "07")
+                    @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.04", value = "04")
+                    @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.01", value = "01")
+                    @checkbox(f = f("services[]"), labelText = "estateagentbusiness.service.lbl.09", value = "09")
+                }
         }
 
         @submit(false)
