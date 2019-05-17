@@ -38,7 +38,7 @@
     class="@if(panel){ panel-indent}@if(f.hasErrors && showErrorStyling){ form-field--error}@if(jsHidden){js-hidden} @classes.mkString(" ")" @data.mkString(" ")>
         @include.forms2.legend(legend, jsHidden, bold, hint, legendHidden, heading)
         @if(f.hasErrors) {
-            <span class="error-notification" data-journey="error - field:user input:@f.id">@f.error</span>
+            <span class="error-notification" id="@f.id-error-notification" data-journey="error - field:user input:@f.id">@f.error</span>
         }
         @content
 </fieldset>
