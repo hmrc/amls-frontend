@@ -75,7 +75,7 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
 
     val cache = mock[CacheMap]
 
-    val sendTheLargestAmountsOfMoney = SendTheLargestAmountsOfMoney(Country("GB","GB"))
+    val sendTheLargestAmountsOfMoney = SendTheLargestAmountsOfMoney(Seq(Country("GB","GB")))
     val mostTransactions = MostTransactions(Seq(Country("GB","GB")))
     val customersOutsideUK = CustomersOutsideUK(Some(Seq(Country("GB", "GB"))))
 

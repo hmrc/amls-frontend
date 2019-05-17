@@ -136,11 +136,11 @@
                     editLinkTag = "msblargestamounts-edit",
                     editUrl = controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get(edit = true).toString
                 ) {
-                <ul class="list list--comma">
-                    @lom.countryList.map { country =>
-                        <li>@country.name</li>
-                    }
-                </ul>
+                    <ul class="list list--comma">
+                        @lom.countries.map { country =>
+                            <li>@country.name</li>
+                        }
+                    </ul>
                 }
             }
 

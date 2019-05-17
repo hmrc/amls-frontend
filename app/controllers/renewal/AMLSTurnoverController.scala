@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.businessmatching.{AccountancyServices, BusinessMatching, HighValueDealing, MoneyServiceBusiness}
+import models.businessmatching._
 import models.renewal.{AMLSTurnover, Renewal}
 import services.RenewalService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -47,8 +47,12 @@ class AMLSTurnoverController @Inject()(
                 renewal <- cache.getEntry[Renewal](Renewal.key)
                 turnover <- renewal.turnover
               } yield Form2[AMLSTurnover](turnover)) getOrElse EmptyForm
-
-              Ok(amls_turnover(form, edit, businessMatching.alphabeticalBusinessTypes))
+              val businessTypes = if (businessMatching.activities.getOrElse(BusinessActivities(Set())).businessActivities.size > 1) {
+                businessMatching.alphabeticalBusinessTypes
+              } else {
+                businessMatching.prefixedAlphabeticalBusinessTypes
+              }
+              Ok(amls_turnover(form, edit, businessTypes))
 
             }) getOrElse Ok(amls_turnover(EmptyForm, edit, None))
         }

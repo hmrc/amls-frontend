@@ -57,7 +57,7 @@ class WaysToPayController @Inject()(
                 progressToPayment{ (fees, paymentReference, safeId) =>
                   paymentsService.requestPaymentsUrl(
                     fees,
-                    controllers.routes.ConfirmationController.paymentConfirmation(paymentReference).url,
+                    controllers.routes.PaymentConfirmationController.paymentConfirmation(paymentReference).url,
                     fees.amlsReferenceNumber,
                     safeId
                   ) map { nextUrl =>
