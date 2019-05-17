@@ -185,9 +185,11 @@ class BacsConfirmationControllerSpec extends AmlsSpec
         status(result) mustBe OK
 
         val doc = Jsoup.parse(contentAsString(result))
+        doc.html() must include(Messages("confirmation.payment.renewal.info.hmrc_review"))
+        doc.html() must include(Messages("confirmation.payment.renewal.info.hmrc_review2"))
+        doc.html() must include(Messages("confirmation.payment.renewal.info.hmrc_review3"))
+        doc.html() must include(Messages("confirmation.payment.renewal.info.hmrc_review4"))
 
-        doc.html() must include(Messages("confirmation.payment.info.transitional.renewal.hmrc_review"))
-        doc.html() must include(Messages("confirmation.payment.info.transitional.renewal.hmrc_review2"))
       }
     }
   }
