@@ -32,7 +32,7 @@ class wrong_credential_typeSpec extends AmlsSpec with MustMatchers {
   "The 'wrong credential type' template" must {
     "have the correct title, headings and content" in new ViewFixture {
       doc.title mustBe s"${Messages("error.submission.problem.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
-      doc.select("header h1").text mustBe Messages("error.submission.problem.title")
+      doc.select("h1").text mustBe Messages("error.submission.problem.title")
 
       validateParagraphizedContent("error.submission.wrong_credentials.content")
     }

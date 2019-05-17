@@ -35,7 +35,7 @@ class duplicate_submissionSpec extends AmlsSpec with MustMatchers {
     "display the correct title and headings" in new ViewFixture {
 
       doc.title mustBe s"${Messages("error.submission.duplicate.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
-      doc.select("header h1").text() mustBe Messages("error.submission.duplicate.title")
+      doc.select("h1").text() mustBe Messages("error.submission.duplicate.title")
 
       Option(doc.getElementsByClass("partial-deskpro-form").first()) mustBe defined
       doc.getElementsByClass("partial-deskpro-form").first().attr("data-error-value") mustBe(errorMsg)
