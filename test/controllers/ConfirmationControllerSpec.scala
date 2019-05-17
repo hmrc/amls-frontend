@@ -65,10 +65,7 @@ class ConfirmationControllerSpec extends AmlsSpec
       authEnrolmentsService = mock[AuthEnrolmentsService],
       feeResponseService = mock[FeeResponseService],
       authenticator = mock[AuthenticatorConnector],
-      paymentsConnector = mock[PayApiConnector],
-      confirmationService = mock[ConfirmationService],
-      paymentsService = mock[PaymentsService],
-      auditConnector = mock[AuditConnector]
+      confirmationService = mock[ConfirmationService]
     )
 
     val response = subscriptionResponseGen(hasFees = true).sample.get
@@ -84,20 +81,12 @@ class ConfirmationControllerSpec extends AmlsSpec
     } thenReturn Future.successful(HttpResponse(OK))
 
     when {
-      controller.auditConnector.sendEvent(any())(any(), any())
-    } thenReturn Future.successful(mock[AuditResult])
-
-    when {
       controller.keystoreConnector.setConfirmationStatus(any(), any())
     } thenReturn Future.successful()
 
     when {
       controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
     } thenReturn Future.successful(Some(amlsRegistrationNumber))
-
-    when {
-      controller.paymentsConnector.createPayment(any())(any(), any())
-    } thenReturn Future.successful(Some(CreatePaymentResponse(NextUrl("/payments"), amlsRegistrationNumber)))
 
     when {
       controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
@@ -147,7 +136,7 @@ class ConfirmationControllerSpec extends AmlsSpec
       controller.dataCacheConnector.fetch[BusinessDetails](eqTo(BusinessDetails.key))(any(), any(), any())
     } thenReturn Future.successful(Some(businessDetails))
 
-    def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(ref))
+    def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))
 
     def setupBusinessMatching(companyName: String) = {
 
@@ -393,305 +382,6 @@ class ConfirmationControllerSpec extends AmlsSpec
         Jsoup.parse(contentAsString(result)).title must include(Messages("confirmation.variation.title"))
         contentAsString(result) must include(Messages("confirmation.no.fee"))
         contentAsString(result) must include(companyNameFromRegistration)
-      }
-    }
-
-    "allow a payment to be retried" in new Fixture {
-      val amountInPence = 8765
-      val postData = "paymentRef" -> paymentReferenceNumber
-      val payment = paymentGen.sample.get
-      val paymentResponse = paymentResponseGen.sample.get
-
-      when {
-        controller.amlsConnector.getPaymentByPaymentReference(eqTo(paymentReferenceNumber))(any(), any(), any())
-      } thenReturn Future.successful(Some(payment.copy(reference = paymentReferenceNumber, amountInPence = amountInPence)))
-
-      when {
-        controller.paymentsService.paymentsUrlOrDefault(any(), any(), any(), any(), any())(any(), any(), any(), any())
-      } thenReturn Future.successful(paymentResponse.nextUrl)
-
-      val result = controller.retryPayment()(request.withFormUrlEncodedBody(postData))
-
-      status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(paymentResponse.nextUrl.value)
-    }
-
-    "fail if a payment cannot be retried" in new Fixture {
-
-      val postData = "paymentRef" -> paymentReferenceNumber
-
-      when {
-        controller.amlsConnector.getPaymentByPaymentReference(eqTo(paymentReferenceNumber))(any(), any(), any())
-      } thenReturn Future.successful(None)
-
-      val result = controller.retryPayment()(request.withFormUrlEncodedBody(postData))
-
-      status(result) mustBe INTERNAL_SERVER_ERROR
-    }
-
-    "show the correct payment confirmation page" when {
-
-      "the application status is 'new submission'" in new Fixture {
-
-        setupStatus(SubmissionReady)
-
-        when {
-          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
-        } thenReturn Future.successful(None)
-
-        val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
-
-        status(result) mustBe OK
-
-        val doc = Jsoup.parse(contentAsString(result))
-
-        doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.lede")
-        doc.select(".confirmation").text must include(paymentReferenceNumber)
-        doc.select(".confirmation").text must include(companyNameFromRegistration)
-      }
-
-      "the application status is 'new submission' and has been previously registered" in new Fixture {
-
-        setupStatus(SubmissionReady)
-
-        when {
-          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
-        } thenReturn Future.successful(None)
-
-
-        val businessDetailsYes = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredYes("123456")))
-
-        when {
-          controller.dataCacheConnector.fetch[BusinessDetails](eqTo(BusinessDetails.key))(any(), any(), any())
-        } thenReturn Future.successful(Some(businessDetailsYes))
-
-        val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
-
-        status(result) mustBe OK
-
-        val doc = Jsoup.parse(contentAsString(result))
-
-        doc.html() must include(Messages("confirmation.payment.info.transitional.renewal.hmrc_review"))
-        doc.html() must include(Messages("confirmation.payment.info.transitional.renewal.hmrc_review2"))
-      }
-
-      "the application status is 'pending'" in new Fixture {
-
-        setupStatus(SubmissionReadyForReview)
-
-        when {
-          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
-        } thenReturn Future.successful(None)
-
-        val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
-
-        status(result) mustBe OK
-
-        val doc = Jsoup.parse(contentAsString(result))
-
-        doc.title must include(Messages("confirmation.payment.amendvariation.title"))
-        doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.amendvariation.lede")
-        doc.select(".confirmation").text must include(paymentReferenceNumber)
-        doc.select(".confirmation").text must include(companyNameFromRegistration)
-        contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
-      }
-
-      "the application status is 'approved'" in new Fixture {
-
-        setupStatus(SubmissionDecisionApproved)
-
-        when {
-          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
-        } thenReturn Future.successful(None)
-
-        val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
-
-        status(result) mustBe OK
-
-        val doc = Jsoup.parse(contentAsString(result))
-
-        doc.title must include(Messages("confirmation.payment.amendvariation.title"))
-        doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.amendvariation.lede")
-        doc.select(".confirmation").text must include(paymentReferenceNumber)
-        doc.select(".confirmation").text must include(companyNameFromRegistration)
-        contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
-      }
-
-      "the application status is 'Renewal Submitted'" in new Fixture {
-
-        setupStatus(RenewalSubmitted(None))
-
-        when {
-          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
-        } thenReturn Future.successful(None)
-
-        val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
-
-        status(result) mustBe OK
-
-        val doc = Jsoup.parse(contentAsString(result))
-
-        doc.title must include(Messages("confirmation.payment.amendvariation.title"))
-        doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.amendvariation.lede")
-        doc.select(".confirmation").text must include(paymentReferenceNumber)
-        doc.select(".confirmation").text must include(companyNameFromRegistration)
-        contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
-      }
-
-      "the application status is 'ready for renewal'" in new Fixture {
-
-        setupStatus(ReadyForRenewal(Some(new LocalDate())))
-
-        when {
-          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
-        }.thenReturn(Future.successful(Some(Renewal(Some(InvolvedInOtherNo)))))
-
-        val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
-
-        status(result) mustBe OK
-
-        val doc = Jsoup.parse(contentAsString(result))
-
-        doc.title must include(Messages("confirmation.payment.renewal.title"))
-        doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.renewal.lede")
-        doc.select(".confirmation").text must include(paymentReferenceNumber)
-        doc.select(".confirmation").text must include(companyNameFromRegistration)
-        contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
-      }
-
-      "the application status is 'ready for renewal' and user has done only variation" in new Fixture {
-
-        setupStatus(ReadyForRenewal(Some(new LocalDate())))
-
-        when {
-          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
-        } thenReturn Future.successful(None)
-
-        val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
-
-        status(result) mustBe OK
-
-        val doc = Jsoup.parse(contentAsString(result))
-
-        doc.title must include(Messages("confirmation.payment.amendvariation.title"))
-        doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.amendvariation.lede")
-        doc.select(".confirmation").text must include(paymentReferenceNumber)
-        doc.select(".confirmation").text must include(companyNameFromRegistration)
-        contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
-      }
-
-      "the payment failed" in new Fixture {
-
-        setupStatus(SubmissionReadyForReview)
-
-        when {
-          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
-        } thenReturn Future.successful(None)
-
-        val payment = paymentGen.sample.get.copy(status = Failed)
-        val paymentStatus = paymentStatusResultGen.sample.get.copy(currentStatus = payment.status)
-
-        when {
-          controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
-        } thenReturn Future.successful(paymentStatus)
-
-        val failedRequest = addToken(authRequest).copyFakeRequest(uri = baseUrl + "?paymentStatus=Failed")
-        val result = controller.paymentConfirmation(payment.reference)(failedRequest)
-
-        status(result) mustBe OK
-
-        verify(controller.amlsConnector).refreshPaymentStatus(eqTo(payment.reference))(any(), any(), any())
-        contentAsString(result) must include(Messages("confirmation.payment.failed.header"))
-        contentAsString(result) must include(Messages("confirmation.payment.failed.reason.failure"))
-      }
-
-      "the payment was cancelled" in new Fixture {
-
-        setupStatus(SubmissionReadyForReview)
-
-        when {
-          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
-        } thenReturn Future.successful(None)
-
-        val payment = paymentGen.sample.get.copy(status = Cancelled)
-        val paymentStatus = paymentStatusResultGen.sample.get.copy(currentStatus = payment.status)
-
-        when {
-          controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
-        } thenReturn Future.successful(paymentStatus)
-
-        val cancelledRequest = request.copyFakeRequest(uri = baseUrl + "?paymentStatus=Cancelled")
-        val result = controller.paymentConfirmation(payment.reference)(cancelledRequest)
-
-        status(result) mustBe OK
-
-        verify(controller.amlsConnector).refreshPaymentStatus(eqTo(payment.reference))(any(), any(), any())
-        contentAsString(result) must include(Messages("confirmation.payment.failed.header"))
-        contentAsString(result) must include(Messages("confirmation.payment.failed.reason.cancelled"))
-      }
-
-      "payment data says 'Created' but querystring says 'Cancelled'" in new Fixture {
-        setupStatus(SubmissionReadyForReview)
-
-        when {
-          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
-        } thenReturn Future.successful(None)
-
-        val payment = paymentGen.sample.get.copy(status = Created)
-        val paymentStatus = paymentStatusResultGen.sample.get.copy(currentStatus = payment.status)
-
-        when {
-          controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
-        } thenReturn Future.successful(paymentStatus)
-
-        when {
-          controller.amlsConnector.getPaymentByAmlsReference(any())(any(), any(), any())
-        } thenReturn Future.successful(Some(payment))
-
-        val cancelledRequest = request.copyFakeRequest(uri = baseUrl + "?paymentStatus=Cancelled")
-        val result = controller.paymentConfirmation(payment.reference)(cancelledRequest)
-
-        status(result) mustBe OK
-
-        verify(controller.amlsConnector).refreshPaymentStatus(eqTo(payment.reference))(any(), any(), any())
-        contentAsString(result) must include(Messages("confirmation.payment.failed.header"))
-        contentAsString(result) must include(Messages("confirmation.payment.failed.reason.cancelled"))
-      }
-
-      "bacs confirmation is requested" in new Fixture {
-
-        when {
-          controller.statusService.getReadStatus(any())(any(), any(), any())
-        } thenReturn Future.successful(ReadStatusResponse(LocalDateTime.now(), "", None, None, None, None, false))
-
-        val result = controller.bacsConfirmation()(request)
-
-        status(result) mustBe OK
-
-        Jsoup.parse(contentAsString(result)).select("h1.heading-large").text must include(Messages("confirmation.payment.bacs.header"))
-
-      }
-
-      "bacs confirmation is requested and is a transitional renewal" in new Fixture {
-
-        val businessDetailsYes = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredYes("123456")))
-
-        when {
-          controller.statusService.getReadStatus(any())(any(), any(), any())
-        } thenReturn Future.successful(ReadStatusResponse(LocalDateTime.now(), "", None, None, None, None, false))
-
-        when {
-          controller.dataCacheConnector.fetch[BusinessDetails](eqTo(BusinessDetails.key))(any(), any(), any())
-        } thenReturn Future.successful(Some(businessDetailsYes))
-
-        val result = controller.bacsConfirmation()(request)
-
-        status(result) mustBe OK
-
-        val doc = Jsoup.parse(contentAsString(result))
-
-        doc.html() must include(Messages("confirmation.payment.info.transitional.renewal.hmrc_review"))
-        doc.html() must include(Messages("confirmation.payment.info.transitional.renewal.hmrc_review2"))
       }
     }
   }

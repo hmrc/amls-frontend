@@ -35,7 +35,7 @@ class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector, aut
     val exclusionSet = Seq(
       controllers.routes.LandingController.get().url,
       controllers.routes.ConfirmationController.get().url,
-      controllers.routes.ConfirmationController.bacsConfirmation().url,
+      controllers.routes.BacsConfirmationController.bacsConfirmation().url,
       controllers.payments.routes.WaysToPayController.get().url,
       controllers.payments.routes.TypeOfBankController.get().url,
       controllers.payments.routes.BankDetailsController.get(true).url,

@@ -57,7 +57,7 @@ class involved_in_otherSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.renewal.involved_in_other(form2, true, Some(List("test activities string")))
 
-      html must include(Messages("businessactivities.confirm-activities.subtitle"))
+      html must include(Messages("businessactivities.confirm-activities.subtitle_4"))
       html must include("test activities string")
     }
 

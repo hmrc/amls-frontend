@@ -54,7 +54,7 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
       feeResponseService = mock[FeeResponseService]
     )
 
-    def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(ref))
+    def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))
 
     val fees = FeeResponse(SubscriptionResponseType, amlsRegistrationNumber, 100, None, None, 0, 100, Some(paymentReferenceNumber), None, DateTime.now())
 
@@ -140,7 +140,7 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
 
           verify(controller.paymentsService).requestPaymentsUrl(
             eqTo(fees),
-            eqTo(controllers.routes.ConfirmationController.paymentConfirmation(paymentReferenceNumber).url),
+            eqTo(paymentsReturnLocation(paymentReferenceNumber).url),
             eqTo(amlsRegistrationNumber),
             eqTo(safeId)
           )(any(), any(), any(), any())
