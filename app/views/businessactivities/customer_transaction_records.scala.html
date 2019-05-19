@@ -39,29 +39,22 @@
 ) {
     @form(f, controllers.businessactivities.routes.TransactionRecordController.post(edit)) {
 
-        @fieldset(
+        @fieldsetWithErrorGroup(
             heading = "businessactivities.keep.customer.records.title",
             panel = false,
             classes = Seq("inline"),
-            f = f("isRecorded-field")
+            f = f("isRecorded")
         ) {
-            @errorGroup(
-                field = f("isRecorded")
-            ) {
-                @radio(
-                    f = f("isRecorded"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    target = s".$target",
-                    inline = true
-                )
-                @radio(
-                    f = f("isRecorded"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
-            }
+            @radio(
+                f = f("isRecorded"),
+                labelText = "lbl.yes",
+                value = "true"
+            )
+            @radio(
+                f = f("isRecorded"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
 
         @submit(edit)

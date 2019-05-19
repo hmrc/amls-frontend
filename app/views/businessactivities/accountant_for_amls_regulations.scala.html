@@ -32,7 +32,7 @@
 
     @form(f, controllers.businessactivities.routes.AccountantForAMLSRegulationsController.post(edit)) {
 
-        @fieldset(
+        @fieldsetWithErrorGroup(
             f = f("accountantForAMLSRegulations"),
             heading = "businessactivities.accountantForAMLSRegulations.title",
             panel = false,

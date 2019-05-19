@@ -32,28 +32,22 @@
 
     @form(f, controllers.businessactivities.routes.IdentifySuspiciousActivityController.post(edit)) {
 
-        @fieldset(
-            f = f("hasWrittenGuidance-fieldset"),
+        @fieldsetWithErrorGroup(
+            f = f("hasWrittenGuidance"),
             heading = "businessactivities.identify-suspicious-activity.title",
             panel = false,
             classes = Seq("inline")
         ) {
-            @errorGroup(
-                field = f("hasWrittenGuidance")
-            ) {
-                @radio(
-                    f = f("hasWrittenGuidance"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true
-                )
-                @radio(
-                    f = f("hasWrittenGuidance"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
-            }
+            @radio(
+                f = f("hasWrittenGuidance"),
+                labelText = "lbl.yes",
+                value = "true"
+            )
+            @radio(
+                f = f("hasWrittenGuidance"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
 
         @submit(edit)

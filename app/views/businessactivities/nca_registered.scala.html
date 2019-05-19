@@ -33,30 +33,24 @@
 
     @form(f, controllers.businessactivities.routes.NCARegisteredController.post(edit)) {
 
-        @fieldset(
-            f = f("ncaRegistered-fieldset"),
+        @fieldsetWithErrorGroup(
+            f = f("ncaRegistered"),
             heading = "businessactivities.ncaRegistered.title",
             panel = false,
             classes = Seq("inline")
         ) {
             <p>@Messages("businessactivities.ncaRegistered.p1")</p>
             <p>@Messages("businessactivities.ncaRegistered.p2")</p>
-            @errorGroup(
-                field = f("ncaRegistered")
-            ) {
-                @radio(
-                    f = f("ncaRegistered"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true
-                )
-                @radio(
-                    f = f("ncaRegistered"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
-            }
+            @radio(
+                f = f("ncaRegistered"),
+                labelText = "lbl.yes",
+                value = "true"
+            )
+            @radio(
+                f = f("ncaRegistered"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
 
         @submit(edit)
