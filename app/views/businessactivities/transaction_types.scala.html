@@ -26,7 +26,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.businessactivities")
 }
 
 @main(
@@ -37,10 +36,11 @@
         @fieldsetWithErrorGroup(
             f = f("types"),
             heading = "businessactivities.do.keep.records",
-            hint = "businessactivities.do.keep.records.hint",
+            section = "summary.businessactivities",
             classes = Seq(s"$target"),
             panel = false
         ) {
+            <p>@hint("businessactivities.do.keep.records.hint")</p>
             @checkbox(
                 f = f("types[]"),
                 labelText = "businessactivities.transactiontype.lbl.01",

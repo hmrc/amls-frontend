@@ -26,7 +26,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.businessactivities")
 }
 
 @main(
@@ -39,6 +38,7 @@
         @fieldsetWithErrorGroup(
             f = f("hasPolicy"),
             heading = "businessactivities.riskassessment.policy.title",
+            section = "summary.businessactivities",
             panel = false
         ) {
             @radio(

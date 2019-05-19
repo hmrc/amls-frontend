@@ -22,7 +22,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.businessactivities")
 }
 
 @main(
@@ -35,6 +34,7 @@
         @fieldsetWithErrorGroup(
             f = f("accountantForAMLSRegulations"),
             heading = "businessactivities.accountantForAMLSRegulations.title",
+            section = "summary.businessactivities",
             panel = false,
             classes = Seq("inline")
         ) {

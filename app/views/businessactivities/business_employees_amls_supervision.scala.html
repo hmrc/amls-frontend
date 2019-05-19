@@ -24,7 +24,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.businessactivities")
 }
 
 @main(
@@ -37,6 +36,7 @@
         @fieldset(
             f = f("employees"),
             heading = "businessactivities.employees.amls.supervision.title",
+            section = "summary.businessactivities",
             panel = false
         ) {
             <p class="form-label">@Messages("businessactivities.employees.line2.label")</p>

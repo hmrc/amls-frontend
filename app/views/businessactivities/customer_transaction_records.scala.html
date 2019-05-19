@@ -30,7 +30,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.businessactivities")
 }
 
 @main(
@@ -41,6 +40,7 @@
 
         @fieldsetWithErrorGroup(
             heading = "businessactivities.keep.customer.records.title",
+            section = "summary.businessactivities",
             panel = false,
             classes = Seq("inline"),
             f = f("isRecorded")
