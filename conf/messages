@@ -1153,9 +1153,9 @@ businessmatching.businessType.lbl.01 = Limited company
 businessmatching.businessType.lbl.03 = Partnership
 businessmatching.businessType.lbl.04 = Limited partnership or limited liability partnership
 businessmatching.businessType.lbl.05 = Unincorporated association or trust
-businessmatching.registerservices.title = What type of services do you need to register?
+businessmatching.registerservices.title = Which services do you need to register?
 businessmatching.registerservices.other.title = What other service do you need to register?
-businessmatching.registerservices.details = What these service types mean
+businessmatching.registerservices.details = What these services mean
 
 businessmatching.registerservices.existing = You’ve told us your business already does:
 businessmatching.registerservices.servicename.lbl.01 = Accountancy service provider
