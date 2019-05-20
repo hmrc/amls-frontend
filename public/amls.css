@@ -1616,3 +1616,16 @@ h2.override-heading-medium {
 .form-field--error .page-header {
   margin-top: 0;
 }
+
+.error-notification {
+  clear: both;
+}
+
+.error-margin {
+  margin-bottom: 20px;
+}
+
+.error-margin .panel-indent {
+  padding: 0px;
+  border: none;
+}

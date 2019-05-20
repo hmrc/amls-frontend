@@ -45,29 +45,25 @@
                 f = f("hasPolicy"),
                 labelText = "lbl.yes",
                 value = "true",
-                target = s"#$target"
+                target = "#riskassessments"
             )
-            @fieldset(
-                f = f(s"$target"),
+            @fieldsetWithErrorGroup(
+                f = f("riskassessments"),
                 legend = "businessactivities.paper.or.digital",
-                jsHidden = true,
-                classes = Seq("panel-indent")
+                hint = "lbl.select.all",
+                panel = true,
+                errorClasses = Seq("error-margin")
             ) {
-                <span class="form-hint" style="clear:both;">@Messages("lbl.select.all")</span>
-                @errorGroup(
-                    field = f("riskassessments")
-                ) {
-                    @checkbox(
-                        f = f("riskassessments[]"),
-                        labelText = "businessactivities.RiskAssessmentType.lbl.01",
-                        value = "01"
-                    )
-                    @checkbox(
-                        f = f("riskassessments[]"),
-                        labelText = "businessactivities.RiskAssessmentType.lbl.02",
-                        value = "02"
-                    )
-                }
+                @checkbox(
+                    f = f("riskassessments[]"),
+                    labelText = "businessactivities.RiskAssessmentType.lbl.01",
+                    value = "01"
+                )
+                @checkbox(
+                    f = f("riskassessments[]"),
+                    labelText = "businessactivities.RiskAssessmentType.lbl.02",
+                    value = "02"
+                )
             }
             @radio(
                 f = f("hasPolicy"),
