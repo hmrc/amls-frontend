@@ -23,7 +23,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.renewal")
 }
 
 @main(
@@ -33,9 +32,10 @@
 
         @form(f, controllers.renewal.routes.AMLSTurnoverController.post(edit)) {
 
-            @fieldset(
-                f = f("turnover-fieldset"),
+            @fieldsetWithErrorGroup(
+                f = f("turnover"),
                 heading = "renewal.turnover.title",
+                section = "summary.renewal",
                 panel = false
             ) {
                 @businessTypes.map { types =>
@@ -51,45 +51,41 @@
                         <p>@Messages("businessactivities.confirm-activities.subtitle_4") @types.head </p>
                     }
                 }
-                @errorGroup(
-                    field = f("turnover")
-                ) {
-                    @radio(
-                        f = f("turnover"),
-                        labelText = "businessactivities.turnover.lbl.01",
-                        value = "01"
-                    )
-                    @radio(
-                        f = f("turnover"),
-                        labelText = "businessactivities.turnover.lbl.02",
-                        value = "02"
-                    )
-                    @radio(
-                        f = f("turnover"),
-                        labelText = "businessactivities.turnover.lbl.03",
-                        value = "03"
-                    )
-                    @radio(
-                        f = f("turnover"),
-                        labelText = "businessactivities.turnover.lbl.04",
-                        value = "04"
-                    )
-                    @radio(
-                        f = f("turnover"),
-                        labelText = "businessactivities.turnover.lbl.05",
-                        value = "05"
-                    )
-                    @radio(
-                        f = f("turnover"),
-                        labelText = "businessactivities.turnover.lbl.06",
-                        value = "06"
-                    )
-                    @radio(
-                        f = f("turnover"),
-                        labelText = "businessactivities.turnover.lbl.07",
-                        value = "07"
-                    )
-                }
+                @radio(
+                    f = f("turnover"),
+                    labelText = "businessactivities.turnover.lbl.01",
+                    value = "01"
+                )
+                @radio(
+                    f = f("turnover"),
+                    labelText = "businessactivities.turnover.lbl.02",
+                    value = "02"
+                )
+                @radio(
+                    f = f("turnover"),
+                    labelText = "businessactivities.turnover.lbl.03",
+                    value = "03"
+                )
+                @radio(
+                    f = f("turnover"),
+                    labelText = "businessactivities.turnover.lbl.04",
+                    value = "04"
+                )
+                @radio(
+                    f = f("turnover"),
+                    labelText = "businessactivities.turnover.lbl.05",
+                    value = "05"
+                )
+                @radio(
+                    f = f("turnover"),
+                    labelText = "businessactivities.turnover.lbl.06",
+                    value = "06"
+                )
+                @radio(
+                    f = f("turnover"),
+                    labelText = "businessactivities.turnover.lbl.07",
+                    value = "07"
+                )
             }
 
         @submit(edit, returnLocation = Some("renewal"))
