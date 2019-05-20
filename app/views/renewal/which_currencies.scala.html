@@ -23,7 +23,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.renewal")
 }
 
 @main(
@@ -31,28 +30,27 @@
     heading = header
 ) {
     @form(f, controllers.renewal.routes.WhichCurrenciesController.post(edit)) {
-        @fieldset(
-            f = f("currencies-fieldset"),
+        @fieldsetWithErrorGroup(
+            f = f("currencies"),
             heading = "renewal.msb.whichcurrencies.header",
+            section = "summary.renewal",
             panel = false,
             classes = Seq("form-group")
         ) {
             <p>@Messages("msb.which_currencies.uptoThree.hint")</p>
             <p>@hint("msb.which_currencies.uptoThree.hint2")</p>
-            @errorGroup(f("currencies")) {
-                @currency(
-                    field = f("currencies[0]"),
-                    labelText = "lbl.currency.line1"
-                )
-                @currency(
-                    field = f("currencies[1]"),
-                    labelText = "lbl.currency.line2"
-                )
-                @currency(
-                    field = f("currencies[2]"),
-                    labelText = "lbl.currency.line3"
-                )
-            }
+            @currency(
+                field = f("currencies[0]"),
+                labelText = "lbl.currency.line1"
+            )
+            @currency(
+                field = f("currencies[1]"),
+                labelText = "lbl.currency.line2"
+            )
+            @currency(
+                field = f("currencies[2]"),
+                labelText = "lbl.currency.line3"
+            )
         }
 
         @submit(returnLocation = Some("renewal"))
