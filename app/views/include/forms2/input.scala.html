@@ -21,7 +21,6 @@
     field: Field,
     labelText: String = "",
     hintText: String = "",
-    bold: Boolean = false,
     classes: Seq[String] = Seq.empty,
     panel: Boolean = false,
     jsHidden: Boolean = false,
@@ -37,12 +36,13 @@
     attrDescribedBy: String = "",
     data: String = "",
     dataAttrs: Map[String, String] = Map.empty[String, String],
-    headingText: String = ""
+    heading: String = "",
+    section: String = ""
 )(implicit lang:Lang,  m: Messages)
 
 
 <div class="form-group@if(field.hasErrors){ form-field--error}@if(parentDateAttr){ form-group-@parentDateAttr} @if(panel){ panel-indent}@if(jsHidden){ js-hidden}"@if(data){ data-reveal="@data"}>
-    <label class="form-label@if(bold){-bold}" for="@field.id">
+    <label class="form-label" for="@field.id">
         @if(labelText.nonEmpty) {
             @if(labelHidden) {<span class="visuallyhidden">}
             @Messages(labelText)
