@@ -22,7 +22,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("asp.other.business.tax.matters.title", "summary.asp")
 }
 
 @main(
@@ -30,33 +29,26 @@
     heading = header
 ) {
 
-    <p>@Messages("asp.other.business.tax.matters.lbl")</p>
-
     @form(f, controllers.asp.routes.OtherBusinessTaxMattersController.post(edit)) {
 
-        @fieldset(
-            f = f("otherBusinessTaxMatters-fieldset"),
-            legend = "asp.other.business.tax.matters.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("otherBusinessTaxMatters"),
+            heading = "asp.other.business.tax.matters.title",
+            section = "summary.asp",
             panel = false,
             classes = Seq("inline")
         ) {
-            @errorGroup(
-                field = f("otherBusinessTaxMatters")
-            ) {
-                @radio(
-                    f = f("otherBusinessTaxMatters"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true
-                )
-                @radio(
-                    f = f("otherBusinessTaxMatters"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
-            }
+            <p>@Messages("asp.other.business.tax.matters.lbl")</p>
+            @radio(
+                f = f("otherBusinessTaxMatters"),
+                labelText = "lbl.yes",
+                value = "true"
+            )
+            @radio(
+                f = f("otherBusinessTaxMatters"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
 
         @submit(edit)
