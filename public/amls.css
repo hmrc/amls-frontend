@@ -44,6 +44,10 @@ a.block-link {
   margin: .15em 0 1.25em;
 }
 
+form .page-header h1 {
+  margin-top: 0;
+}
+
 .page-header .heading-secondary {
   color: #6f777b;
   display: table-header-group;
