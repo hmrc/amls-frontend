@@ -1629,3 +1629,7 @@ h2.override-heading-medium {
   padding: 0px;
   border: none;
 }
+
+.form-field--error input, .form-field--error textarea {
+    border-color: #b10e1e;
+}
