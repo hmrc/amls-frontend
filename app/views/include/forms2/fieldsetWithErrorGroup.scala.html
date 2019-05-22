@@ -42,7 +42,7 @@
     <fieldset
             @if(f.id.nonEmpty){ id="@f.id"}
             class="@if(panel){ panel-indent}@if(jsHidden){js-hidden} @classes.mkString(" ")" @data.mkString(" ")>
-        @include.forms2.legend(legend, jsHidden, bold, hint, legendHidden, heading)
+        @include.forms2.legend(legend, jsHidden, bold, hint, legendHidden, heading, f.id)
         @supportingContent
         @if(f.hasErrors) {
             <span class="error-notification" id="@f.id-error-notification" data-journey="error - field:user input:@f.id">
