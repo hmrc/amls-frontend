@@ -47,7 +47,7 @@
         <span class="error-notification" id="@{field.id}-error-notification" data-journey="error - field:user input:@field.name">@field.error</span>
     }
     <textarea @if(charCount){data-char-field} name="@field.name" id="@field.id"
-        aria-describedby="@if(hintText.nonEmpty) {@{field.id}-hint} @if(field.hasErrors) {@{field.id}-error-notification}"
+        @if(hintText.nonEmpty || field.hasErrors) { aria-describedby="@if(hintText.nonEmpty) {@{field.id}-hint} @if(field.hasErrors) {@{field.id}-error-notification}" }
         @if(cols.nonEmpty) { cols="@cols" }
         @if(rows.nonEmpty) { rows="@rows" }
         @if(maxLength.nonEmpty) { maxlength="@maxLength" }
