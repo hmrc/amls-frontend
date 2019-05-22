@@ -16,8 +16,9 @@
 
 package views.changeofficer
 
-import forms.EmptyForm
+import forms.{EmptyForm, InvalidForm}
 import generators.ResponsiblePersonGenerator
+import jto.validation.{Path, ValidationError}
 import org.scalacheck.Gen
 import org.scalatest.MustMatchers
 import utils.AmlsSpec
@@ -56,33 +57,33 @@ class new_nominated_officerSpec extends AmlsSpec with MustMatchers with Responsi
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
-//    "have correct form fields" in new ViewFixture {
-//
-//      val form2 = EmptyForm
-//
-//      def view = views.html.changeofficer.new_nominated_officer(form2, true)
-//
-//      noException must be thrownBy doc.getElementById("id1")
-//      noException must be thrownBy doc.getElementById("id2")
-//      noException must be thrownBy doc.getElementById("id3")
-//
-//    }
-//
-//    "show errors in the correct locations" in new ViewFixture {
-//
-//      val form2: InvalidForm = InvalidForm(Map.empty,
-//        Seq(
-//          (Path \ "blah") -> Seq(ValidationError("not a message Key")),
-//          (Path \ "blah2") -> Seq(ValidationError("second not a message Key")),
-//          (Path \ "blah3") -> Seq(ValidationError("third not a message Key"))
-//        ))
-//
-//      def view = views.html.changeofficer.new_nominated_officer(form2, true)
-//
-//      errorSummary.html() must include("not a message Key")
-//      errorSummary.html() must include("second not a message Key")
-//      errorSummary.html() must include("third not a message Key")
-//
-//    }
+    "have correct form fields" in new ViewFixture {
+
+      val form2 = EmptyForm
+
+      def view = views.html.changeofficer.new_nominated_officer(form2, Nil)
+
+      noException must be thrownBy doc.getElementById("id1")
+      noException must be thrownBy doc.getElementById("id2")
+      noException must be thrownBy doc.getElementById("id3")
+
+    }
+
+    "show errors in the correct locations" in new ViewFixture {
+
+      val form2: InvalidForm = InvalidForm(Map.empty,
+        Seq(
+          (Path \ "blah") -> Seq(ValidationError("not a message Key")),
+          (Path \ "blah2") -> Seq(ValidationError("second not a message Key")),
+          (Path \ "blah3") -> Seq(ValidationError("third not a message Key"))
+        ))
+
+      def view = views.html.changeofficer.new_nominated_officer(form2, Nil)
+
+      errorSummary.html() must include("not a message Key")
+      errorSummary.html() must include("second not a message Key")
+      errorSummary.html() must include("third not a message Key")
+
+    }
   }
 }

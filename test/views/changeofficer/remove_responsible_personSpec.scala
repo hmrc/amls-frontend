@@ -16,10 +16,8 @@
 
 package views.changeofficer
 
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
-import models.businessdetails.{VATRegistered, VATRegisteredYes}
-import models.changeofficer.StillEmployed
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
