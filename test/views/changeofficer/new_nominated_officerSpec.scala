@@ -19,7 +19,7 @@ package views.changeofficer
 import forms.EmptyForm
 import generators.ResponsiblePersonGenerator
 import org.scalacheck.Gen
-import org.scalatest.{MustMatchers}
+import org.scalatest.MustMatchers
 import utils.AmlsSpec
 import play.api.i18n.Messages
 import views.Fixture
@@ -50,7 +50,11 @@ class new_nominated_officerSpec extends AmlsSpec with MustMatchers with Responsi
       subHeading.html must include(Messages("summary.updateinformation"))
 
     }
+    "have a back link" in new ViewFixture {
+      def view = views.html.changeofficer.new_nominated_officer(EmptyForm, Nil)
 
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
 
 //    "have correct form fields" in new ViewFixture {
 //

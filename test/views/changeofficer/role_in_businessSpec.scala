@@ -59,5 +59,11 @@ class role_in_businessSpec extends AmlsSpec with MustMatchers {
 
       errorSummary.html() must include("not a message Key")
     }
+
+    "have a back link" in new ViewFixture {
+      def view = views.html.changeofficer.role_in_business(EmptyForm, BusinessType.SoleProprietor, name)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
   }
 }

@@ -68,5 +68,11 @@ class still_employedSpec extends AmlsSpec with MustMatchers  {
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
     }
 
+    "have a back link" in new ViewFixture {
+      def view = views.html.changeofficer.still_employed(EmptyForm, "test")
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
   }
 }
