@@ -29,7 +29,8 @@
     bold: Boolean = false,
     hint: String = "",
     heading: String = "",
-    section: String = ""
+    section: String = "",
+    associatedContent: Html = HtmlFormat.empty
 )(content: Html)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @fieldsetContent = {
@@ -42,6 +43,7 @@
             @if(f.id.nonEmpty){ id="@f.id"}
             class="@if(panel){ panel-indent}@if(jsHidden){js-hidden} @classes.mkString(" ")" @data.mkString(" ")>
         @include.forms2.legend(legend, jsHidden, bold, hint, legendHidden, heading)
+        @associatedContent
         @if(f.hasErrors) {
             <span class="error-notification" id="@f.id-error-notification" data-journey="error - field:user input:@f.id">
                 <span class="visuallyhidden">Error: </span>@f.error

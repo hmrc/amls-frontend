@@ -29,6 +29,29 @@
     @errorSummary(f)
 }
 
+@associatedContent = {
+    @businessTypes.map { types =>
+        @if(types.size > 1) {
+            <p>@Messages("businessactivities.confirm-activities.subtitle_4"):</p>
+
+            <ul class="list list-bullet">
+                @types.map { businessType =>
+                    <li>@businessType</li>
+                }
+            </ul>
+        } else {
+            <p>@Messages("businessactivities.confirm-activities.subtitle_4") @types.head </p>
+        }
+    }
+
+    <p>@Messages("businessactivities.involved.other.hint")</p>
+    <ul class="list list-bullet">
+        <li>@Messages("businessactivities.involved.listline1")</li>
+        <li>@Messages("businessactivities.involved.listline2")</li>
+        <li>@Messages("businessactivities.involved.listline3")</li>
+    </ul>
+}
+
 @main(
     title = Messages("businessactivities.involved.other.title") + " - " + Messages("summary.businessactivities"),
     heading = header
@@ -36,32 +59,14 @@
 
     @form(f, controllers.businessactivities.routes.InvolvedInOtherController.post(edit)) {
 
+
         @fieldsetWithErrorGroup(
             f = f("involvedInOther"),
             heading = "businessactivities.involved.other.title",
             section = "summary.businessactivities",
-            panel = false
+            panel = false,
+            associatedContent = associatedContent
         ) {
-            @businessTypes.map { types =>
-                @if(types.size > 1) {
-                    <p>@Messages("businessactivities.confirm-activities.subtitle_4"):</p>
-
-                    <ul class="list list-bullet">
-                        @types.map { businessType =>
-                            <li>@businessType</li>
-                        }
-                    </ul>
-                } else {
-                    <p>@Messages("businessactivities.confirm-activities.subtitle_4") @types.head </p>
-                }
-            }
-
-            <p>@Messages("businessactivities.involved.other.hint")</p>
-            <ul class="list list-bullet">
-                <li>@Messages("businessactivities.involved.listline1")</li>
-                <li>@Messages("businessactivities.involved.listline2")</li>
-                <li>@Messages("businessactivities.involved.listline3")</li>
-            </ul>
             @radio(
                 f = f("involvedInOther"),
                 labelText = "lbl.yes",
