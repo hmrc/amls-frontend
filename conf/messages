@@ -14,6 +14,8 @@
 
 err.summary = There is a problem
 err.text.validation = Only use letters A to Z, numbers 0 to 9, and basic punctuation
+err.text.role.in.business.text.validation = Role in the business must only include letters a to z, numbers 0 to 9, and basic punctuation
+
 error.required.address.line1 = Enter the first line of the address
 error.required.address.line2 = Enter the second line of the address
 error.max.length.address.line = You can’t enter more than 35 characters
@@ -32,6 +34,13 @@ error.required.yourname = Enter your name
 error.invalid.yourname = You can’t enter more than 140 characters
 error.invalid.common_name.validation = Only use letters A to Z, accented letters, spaces and dashes
 error.invalid.common_name.length = You can’t enter more than 35 characters
+error.invalid.firstname.length = First name must be 35 characters or less
+error.invalid.middlename.length = Middle name must be 35 characters or less
+error.invalid.lastname.length = Last name must be 35 characters or less
+error.invalid.firstname.validation = First name must only include letters a to z, hyphens, spaces, and apostrophes
+error.invalid.middlename.validation = Middle name must only include letters a to z, hyphens, spaces, and apostrophes
+error.invalid.lastname.validation = Last name must only include letters a to z, hyphens, spaces, and apostrophes
+error.invalid.position.validation = Select if you are a beneficial shareholder, director, nominated officer, an external accountant, or another role in the business
 
 error.required.vat.number = Enter a valid VAT registration number
 error.invalid.vat.number = Enter a valid VAT registration number
@@ -65,6 +74,7 @@ error.invalid.maxlength.120 = You can’t enter more than 120 characters
 error.invalid.maxlength.140 = You can’t enter more than 140 characters
 error.invalid.maxlength.255 = You can’t enter more than 255 characters
 error.invalid.maxlength.1200 = You can’t enter more than 1200 characters
+error.invalid.role.in.business.maxlength.255 = Role in the business must be 255 characters or less
 
 error.survey.satisfaction.required = Select one option to show how you feel about using the service
 
@@ -370,12 +380,18 @@ error.required.deregistration.reason.other = You haven’t specified the reason 
 error.updateanyInformation.validationerror = Select yes if you want to update any other information
 
 ################################# Declaration #####################################
-error.required.declaration.nominated.officer = Select your nominated officer or register a new one
-error.required.declaration.who.is.registering = Select one option to show who is registering the business
+error.required.declaration.nominated.officer = Select one of your responsible people or register someone else as the nominated officer for the business
+error.required.declaration.who.is.registering = Select who is registering this business
+error.required.declaration.who.is.declaring.this.update = Select who is declaring this update
+error.required.declaration.who.is.declaring.this.renewal = Select who is declaring this renewal
 error.required.declaration.first_name = Enter your first name
 error.required.declaration.last_name = Enter your last name
-error.required.declaration.specify.role = Specify your role in the business
-
+error.required.declaration.specify.role = Enter your role in the business
+error.required.declaration.add.position.for.limitedcompany = Select if you are a beneficial shareholder, a director, an external accountant, a nominated officer, or other
+error.required.declaration.add.position.for.sole.proprietor = Select if you are an external accountant, a nominated officer, a sole proprietor or other
+error.required.declaration.add.position.for.partner.ship = Select if you are an external accountant, a nominated officer, a partner or other
+error.required.declaration.add.position.for.lprlpp = Select if you are a designated member, an external accountant, a nominated officer, or other
+error.required.declaration.add.position.for.unicorporated.body = Select if you are an external accountant, a nominated officer, or other
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
 ########################################################################################################################
@@ -835,7 +851,7 @@ payments.waystopay.lead.time = Payments normally take 3 working days.
 payments.waystopay.card = Debit or credit card
 payments.waystopay.bacs = Bacs
 
-payments.waystopay.error = You must select a payment method. Please select how you want to pay your fee
+payments.waystopay.error = Select if you want to pay your fee by debit or credit card, or Bacs
 
 payments.typeofbank.title = Will you be paying from a UK bank account?
 payments.typeofbank.header = Will you be paying from a UK bank account?
@@ -1140,7 +1156,7 @@ businessmatching.businessType.lbl.03 = Partnership
 businessmatching.businessType.lbl.04 = Limited partnership or limited liability partnership
 businessmatching.businessType.lbl.05 = Unincorporated association or trust
 businessmatching.registerservices.title = Which services do you need to register?
-businessmatching.registerservices.other.title = What other service do you need to register?Ø
+businessmatching.registerservices.other.title = What other service do you need to register?
 businessmatching.registerservices.details = What these services mean
 
 businessmatching.registerservices.existing = You’ve told us your business already does:
@@ -1198,7 +1214,7 @@ businessmatching.services.list.lbl.03 = Cheque cashing (all businesses except sc
 businessmatching.services.list.lbl.04 = Cheque cashing (scrap metal dealers)
 businessmatching.services.list.lbl.05 = Foreign exchange
 businessmatching.cannotcontinuewiththeapplication.title = You cannot continue with your application
-businessmatching.cannotcontinuewiththeapplication.requiredinfo.first = You need to have a Payment Services Regulations (PSR) reference number to apply for anti-money laundering supervision with HM Revenue and Customs (HMRC).
+businessmatching.cannotcontinuewiththeapplication.requiredinfo.first = You need to have a Payment Services Regulations (PSR) reference number to apply for anti-money laundering supervision with HM Revenue and Customs (HMRC).
 businessmatching.cannotcontinuewiththeapplication.requiredinfo.second = You can apply for a PSR reference number from the Financial Conduct Authority (FCA).
 businessmatching.cannotcontinuewiththeapplication.requiredinfo.third = The information you have given so far in this application has been saved. You have 28 days to return and complete your application.
 
