@@ -73,9 +73,9 @@ class new_nominated_officerSpec extends AmlsSpec with MustMatchers with Responsi
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "blah") -> Seq(ValidationError("not a message Key")),
-          (Path \ "blah2") -> Seq(ValidationError("second not a message Key")),
-          (Path \ "blah3") -> Seq(ValidationError("third not a message Key"))
+          (Path \ "test") -> Seq(ValidationError("not a message Key")),
+          (Path \ "test2") -> Seq(ValidationError("second not a message Key")),
+          (Path \ "test3") -> Seq(ValidationError("third not a message Key"))
         ))
 
       def view = views.html.changeofficer.new_nominated_officer(form2, Nil)
