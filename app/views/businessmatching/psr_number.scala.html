@@ -27,7 +27,10 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessmatching.psr.number.title", if(isPreSubmission)  "summary.businessmatching" else "summary.updateinformation")
+}
+
+@section = @{
+   if(isPreSubmission)  "summary.businessmatching" else "summary.updateinformation"
 }
 
 @psrInput = {
@@ -41,20 +44,22 @@
         labelText = "businessmatching.psr.number.lbl"
     )
 }
-
+@supportingContent = {
+    <p>
+    @m("businessmatching.psr.number.hint")
+    </p>
+}
 @main(
     title = Messages("businessmatching.psr.number.title") + " - " + {if(isPreSubmission) Messages("summary.businessmatching") else Messages("summary.updateinformation")},
     heading = header
 )  {
 
     @form(f, controllers.businessmatching.routes.PSRNumberController.post(edit)) {
-        <p>
-            @m("businessmatching.psr.number.hint")
-        </p>
-        @fieldset(
+        @fieldsetWithErrorGroup(
             f = f("appliedfor-fieldset"),
-            legend = "businessmatching.psr.number.title",
-            legendHidden = true,
+            heading = "businessmatching.psr.number.title",
+            supportingContent = supportingContent,
+            section = section,
             panel = false
         ) {
 

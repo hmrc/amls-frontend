@@ -40,46 +40,40 @@
     @form(f, controllers.businessmatching.routes.MsbSubSectorsController.post(edit)) {
 
       @fieldsetWithErrorGroup(
-        f = f("msbServices-fieldset"),
-        legend = "msb.services.title",
+        f = f("msbServices"),
         heading = "msb.services.title",
         section = section,
-        legendHidden = true,
         panel = false,
         hint = "lbl.select.all"
       ) {
 
-          @errorGroup(
-                field = f("msbServices")
-            ) {
+          @checkbox(
+              f = f("msbServices[]"),
+              labelText = "msb.services.list.lbl.03",
+              value = "03"
+          )
+          @checkbox(
+              f = f("msbServices[]"),
+              labelText = "msb.services.list.lbl.04",
+              value = "04"
+          )
+          @checkbox(
+              f = f("msbServices[]"),
+              labelText = "msb.services.list.lbl.02",
+              value = "02"
+          )
+          @if(fxEnabledToggle) {
               @checkbox(
                   f = f("msbServices[]"),
-                  labelText = "msb.services.list.lbl.03",
-                  value = "03"
+                  labelText = "msb.services.list.lbl.05",
+                  value = "05"
               )
-              @checkbox(
-                  f = f("msbServices[]"),
-                  labelText = "msb.services.list.lbl.04",
-                  value = "04"
-              )
-              @checkbox(
-                  f = f("msbServices[]"),
-                  labelText = "msb.services.list.lbl.02",
-                  value = "02"
-              )
-              @if(fxEnabledToggle) {
-                  @checkbox(
-                      f = f("msbServices[]"),
-                      labelText = "msb.services.list.lbl.05",
-                      value = "05"
-                  )
-              }
-              @checkbox(
-                f = f("msbServices[]"),
-                labelText = "msb.services.list.lbl.01",
-                value = "01"
-              )
-            }
+          }
+          @checkbox(
+            f = f("msbServices[]"),
+            labelText = "msb.services.list.lbl.01",
+            value = "01"
+          )
       }
 
       @submit(edit, returnLink = showReturnLink)
