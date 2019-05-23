@@ -25,6 +25,19 @@
     @heading(section = "summary.renewal")
 }
 
+@supportingContent = {
+    <p>@Messages("renewal.receiving.info.line1")</p>
+    <p>@Messages("renewal.receiving.info.line2")</p>
+
+    <ul class="list list-bullet">
+        <li>@Messages("renewal.receiving.list.line1")</li>
+        <li>@Messages("renewal.receiving.list.line2")</li>
+        <li>@Messages("renewal.receiving.list.line3")</li>
+    </ul>
+
+    <p>@Messages("renewal.receiving.text")</p>
+}
+
 @main(
     title = Messages("renewal.receiving.title") + " - " + Messages("summary.renewal"),
     heading = header
@@ -36,28 +49,20 @@
         f = f("receivePayments"),
         heading = "renewal.receiving.title",
         section = "summary.renewal",
-        panel = false
+        panel = false,
+        supportingContent = supportingContent
     ) {
-        <p>@Messages("renewal.receiving.info.line1")</p>
-        <p>@Messages("renewal.receiving.info.line2")</p>
-
-        <ul class="list list-bullet">
-            <li>@Messages("renewal.receiving.list.line1")</li>
-            <li>@Messages("renewal.receiving.list.line2")</li>
-            <li>@Messages("renewal.receiving.list.line3")</li>
-        </ul>
-
-        <p>@Messages("renewal.receiving.text")</p>
         @radio(
             f = f("receivePayments"),
             labelText = "lbl.yes",
             value = "true",
-            target = s".paymentMethods-fieldset"
+            target = "#paymentMethods"
         )
-        @fieldset(
+        @fieldsetWithErrorGroup(
             f = f("paymentMethods"),
             legend = "renewal.receiving.expect.to.receive",
-            classes = Seq("paymentMethods-fieldset"),
+            panel = true,
+            errorClasses = Seq("error-margin"),
             hint = "lbl.select.all"
         ) {
             @checkbox(
@@ -79,7 +84,7 @@
             @panel(
                 field = Some(f("paymentMethods-details-fieldset")),
                 jsHidden = true,
-                panel = false
+                panel = true
             ) {
                 @input(
                     field = f("paymentMethods.details"),
