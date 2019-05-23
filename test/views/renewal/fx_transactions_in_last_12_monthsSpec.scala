@@ -50,8 +50,8 @@ class fx_transactions_in_last_12_monthsSpec extends AmlsSpec with MustMatchers  
 
       def view = fx_transaction_in_last_12_months(form2, true)
 
-      heading.html must be(Messages("renewal.msb.fx.transactions.expected.title"))
-      subHeading.html must include(Messages("summary.renewal"))
+      heading.text() must be(Messages("renewal.msb.fx.transactions.expected.title"))
+      subHeading.text() must include(Messages("summary.renewal"))
 
     }
 
