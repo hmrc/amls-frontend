@@ -24,6 +24,10 @@
     @errorSummary(f)
 }
 
+@supportingContent = {
+    <p>@Messages("asp.other.business.tax.matters.lbl")</p>
+}
+
 @main(
     title = Messages("asp.other.business.tax.matters.title") + " - " + Messages("summary.asp"),
     heading = header
@@ -36,9 +40,9 @@
             heading = "asp.other.business.tax.matters.title",
             section = "summary.asp",
             panel = false,
-            classes = Seq("inline")
+            classes = Seq("inline"),
+            supportingContent = supportingContent
         ) {
-            <p>@Messages("asp.other.business.tax.matters.lbl")</p>
             @radio(
                 f = f("otherBusinessTaxMatters"),
                 labelText = "lbl.yes",
