@@ -28,7 +28,7 @@
                 id="@{f.id}-@value"
                 name="@{f.name}"
                 value="@value"
-                aria-describedby="@{f.id}-error-notification"
+                @if(f.hasErrors) { aria-describedby="@{f.id}-error-notification" }
                 @if(f.value.contains(value)){ checked="checked"}
                 @if(target.nonEmpty){ data-toggle="@target"}
                 @if(disabled){ disabled}
