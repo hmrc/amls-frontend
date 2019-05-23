@@ -44,7 +44,9 @@
         <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
     }
     @if(field.hasErrors) {
-        <span class="error-notification" id="@{field.id}-error-notification" data-journey="error - field:user input:@field.name">@field.error</span>
+        <span class="error-notification" id="@{field.id}-error-notification" data-journey="error - field:user input:@field.name">
+            <span class="visuallyhidden">Error: </span>@field.error
+        </span>
     }
     <textarea @if(charCount){data-char-field} name="@field.name" id="@field.id"
         @if(hintText.nonEmpty || field.hasErrors) { aria-describedby="@if(hintText.nonEmpty) {@{field.id}-hint} @if(field.hasErrors) {@{field.id}-error-notification}" }
