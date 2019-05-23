@@ -30,7 +30,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("supervision.memberofprofessionalbody.title", "summary.supervision")
 }
 
 @main(
@@ -40,12 +39,12 @@
 
     @form(f, controllers.supervision.routes.ProfessionalBodyMemberController.post(edit)) {
 
-        @fieldset(
-            legend = "supervision.memberofprofessionalbody.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
             f = f("isAMember"),
             panel = false,
-            classes = Seq("inline")
+            classes = Seq("inline"),
+            heading="supervision.memberofprofessionalbody.title",
+            section="summary.supervision"
         ) {
             @radio(
                 f = f("isAMember"),

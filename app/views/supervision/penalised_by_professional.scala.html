@@ -27,7 +27,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("supervision.penalisedbyprofessional.title", "summary.supervision")
 }
 
 @main(
@@ -35,24 +34,28 @@
     heading = header
 ) {
 
-    <p>@Messages("supervision.penalisedbyprofessional.subtitle")</p>
-    <ul class="list list-bullet">
-        <li>@Messages("supervision.penalisedbyprofessional.line_1")</li>
-        <li>@Messages("supervision.penalisedbyprofessional.line_2")</li>
-        <li>@Messages("supervision.penalisedbyprofessional.line_3")</li>
-        <li>@Messages("supervision.penalisedbyprofessional.line_4")</li>
-        <li>@Messages("supervision.penalisedbyprofessional.line_5")</li>
-    </ul>
-    <p>@Messages("supervision.penalisedbyprofessional.details")</p>
-
     @form(f, controllers.supervision.routes.PenalisedByProfessionalController.post(edit)) {
 
-            @fieldset(
-                legend = "supervision.penalisedbyprofessional.title",
-                legendHidden = true,
+            @supportingContent = {
+                <p>@Messages("supervision.penalisedbyprofessional.subtitle")</p>
+                <ul class="list list-bullet">
+                    <li>@Messages("supervision.penalisedbyprofessional.line_1")</li>
+                    <li>@Messages("supervision.penalisedbyprofessional.line_2")</li>
+                    <li>@Messages("supervision.penalisedbyprofessional.line_3")</li>
+                    <li>@Messages("supervision.penalisedbyprofessional.line_4")</li>
+                    <li>@Messages("supervision.penalisedbyprofessional.line_5")</li>
+                </ul>
+                <p>@Messages("supervision.penalisedbyprofessional.details")</p>
+            }
+
+            @fieldsetWithErrorGroup(
                 f = f("penalised"),
-                panel = false
+                panel = false,
+                heading="supervision.penalisedbyprofessional.title",
+                section="summary.supervision",
+                supportingContent = supportingContent
             ) {
+
                 @radio(
                     f = f("penalised"),
                     labelText = "lbl.yes",
