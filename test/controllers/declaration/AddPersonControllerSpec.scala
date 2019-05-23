@@ -19,7 +19,12 @@ package controllers.declaration
 import java.util.UUID
 
 import connectors.DataCacheConnector
+import forms.{EmptyForm, InvalidForm}
+import javax.swing.plaf.synth.SynthPopupMenuUI
+import models.Country
+import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
+import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, Partnership, SoleProprietor, UnincorporatedBody}
 import models.declaration.AddPerson
 import models.status.{ReadyForRenewal, SubmissionReady, SubmissionReadyForReview}
 import org.joda.time.LocalDate
@@ -52,9 +57,29 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
 
     val emptyCache = CacheMap("", Map.empty)
 
-    when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
-      (any(), any(), any())).thenReturn(Future.successful(Some(mock[BusinessMatching])))
+    val defaultReviewDetails = ReviewDetails(
+          businessName = "",
+          businessType = Some(LimitedCompany),
+          businessAddress = Address (
+            line_1 = "",
+            line_2 = "",
+            line_3 = None,
+            line_4 = None,
+            postcode = None,
+            country = Country(
+              name = "",
+              code = ""
+            )),
+          safeId=""
+        )
 
+    val defaultBM = BusinessMatching(reviewDetails = Some(defaultReviewDetails))
+    when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
+      (any(), any(), any())).thenReturn(Future.successful(Some(defaultBM)))
+    when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(emptyCache))
+    when(addPersonController.statusService.getStatus(any(), any(), any()))
+      .thenReturn(Future.successful(SubmissionReady))
   }
 
   "AddPersonController" when {
@@ -69,12 +94,6 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             "roleWithinBusiness[]" -> "ExternalAccountant"
           )
 
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          when(addPersonController.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionReady))
-
           val result = addPersonController.get()(requestWithParams)
           status(result) must be(OK)
           contentAsString(result) must include(Messages("submit.registration"))
@@ -88,9 +107,6 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             "lastName" -> "lastName",
             "roleWithinBusiness[]" -> "ExternalAccountant"
           )
-
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
 
           when(addPersonController.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
@@ -108,9 +124,6 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             "roleWithinBusiness[]" -> "ExternalAccountant"
           )
 
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
           when(addPersonController.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(ReadyForRenewal(Some(new LocalDate))))
 
@@ -118,17 +131,9 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
           status(result) must be(OK)
           contentAsString(result) must include(Messages("submit.renewal.application"))
         }
-
-
       }
 
       "on get display the persons page with blank fields" in new Fixture {
-
-        when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
-
-        when(addPersonController.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionReady))
 
         val result = addPersonController.get()(request)
         status(result) must be(OK)
@@ -142,12 +147,6 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
 
 
       "on getWithAmendment display the persons page with blank fields" in new Fixture {
-
-        when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
-
-        when(addPersonController.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionReady))
 
         val result = addPersonController.getWithAmendment()(request)
         status(result) must be(OK)
@@ -170,12 +169,6 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             "positions" -> "02"
           )
 
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          when(addPersonController.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionReady))
-
           val result = addPersonController.post()(requestWithParams)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(routes.RegisterResponsiblePersonController.get().url)
@@ -190,9 +183,6 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             "lastName" -> "lastName",
             "positions" -> "08"
           )
-
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
 
           when(addPersonController.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
@@ -210,12 +200,6 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             "positions" -> "08"
           )
 
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          when(addPersonController.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionReady))
-
           val result = addPersonController.post()(requestWithParams)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(routes.DeclarationController.get().url)
@@ -229,12 +213,6 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             "lastName" -> "lastName",
             "positions" -> "08"
           )
-
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          when(addPersonController.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionReady))
 
           val result = addPersonController.post()(firstNameMissingInRequest)
           status(result) must be(BAD_REQUEST)
@@ -250,12 +228,6 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             "positions" -> "08"
           )
 
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          when(addPersonController.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionReady))
-
           val result = addPersonController.post()(lastNameNissingInRequest)
           status(result) must be(BAD_REQUEST)
 
@@ -263,25 +235,102 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
           document.select("a[href=#lastName]").html() must include("This field is required")
         }
 
-        "positions not supplied" in new Fixture {
+        "business type is LimitedCompany and position is not filled" in new Fixture {
+          val rd = defaultReviewDetails.copy(businessType = Some(LimitedCompany))
+          val bm = BusinessMatching(reviewDetails = Some(rd))
+          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
 
           val roleMissingInRequest = request.withFormUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName"
           )
 
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
+          val result = addPersonController.post()(roleMissingInRequest)
+          status(result) must be(BAD_REQUEST)
 
-          when(addPersonController.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionReady))
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.select("a[href=#positions]").html() must include("Select if you are a beneficial shareholder, a director, an external accountant, a nominated officer, or other")
+        }
+
+        "business type is SoleProprietor and position is not filled" in new Fixture {
+          val rd = defaultReviewDetails.copy(businessType = Some(SoleProprietor))
+          val bm = BusinessMatching(reviewDetails = Some(rd))
+          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
+
+          val roleMissingInRequest = request.withFormUrlEncodedBody(
+            "firstName" -> "firstName",
+            "lastName" -> "lastName"
+          )
 
           val result = addPersonController.post()(roleMissingInRequest)
           status(result) must be(BAD_REQUEST)
 
           val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#positions]").html() must include("This field is required")
+          document.select("a[href=#positions]").html() must include("Select if you are an external accountant, a nominated officer, a sole proprietor or other")
+        }
 
+        "business type is Partnership and position is not filled" in new Fixture {
+          val rd = defaultReviewDetails.copy(businessType = Some(Partnership))
+          val bm = BusinessMatching(reviewDetails = Some(rd))
+          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
+
+          val roleMissingInRequest = request.withFormUrlEncodedBody(
+            "firstName" -> "firstName",
+            "lastName" -> "lastName"
+          )
+
+          val result = addPersonController.post()(roleMissingInRequest)
+          status(result) must be(BAD_REQUEST)
+
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.select("a[href=#positions]").html() must include("Select if you are an external accountant, a nominated officer, a partner or other")
+        }
+
+        "business type is LPrLLP and position is not filled" in new Fixture {
+          val rd = defaultReviewDetails.copy(businessType = Some(LPrLLP))
+          val bm = BusinessMatching(reviewDetails = Some(rd))
+          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
+
+          val roleMissingInRequest = request.withFormUrlEncodedBody(
+            "firstName" -> "firstName",
+            "lastName" -> "lastName"
+          )
+
+          val result = addPersonController.post()(roleMissingInRequest)
+          status(result) must be(BAD_REQUEST)
+
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.select("a[href=#positions]").html() must include("Select if you are a designated member, an external accountant, a nominated officer, or other")
+        }
+
+        "business type is UnincorporatedBody and position is not filled" in new Fixture {
+          val rd = defaultReviewDetails.copy(businessType = Some(UnincorporatedBody))
+          val bm = BusinessMatching(reviewDetails = Some(rd))
+          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
+
+          val roleMissingInRequest = request.withFormUrlEncodedBody(
+            "firstName" -> "firstName",
+            "lastName" -> "lastName"
+          )
+
+          val result = addPersonController.post()(roleMissingInRequest)
+          status(result) must be(BAD_REQUEST)
+
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.select("a[href=#positions]").html() must include("Select if you are an external accountant, a nominated officer, or other")
+        }
+
+        "throw an exception if business type is not defined" in new Fixture {
+          val invalidForm = InvalidForm(Map.empty, Seq.empty)
+
+          a[IllegalArgumentException] must be thrownBy {
+            addPersonController.updateFormErrors(invalidForm, None)
+          }
         }
       }
     }
