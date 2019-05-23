@@ -30,10 +30,6 @@
     largeWidth: Boolean = false
 )(implicit lang:Lang,  m: Messages)
 
-@ariaDescribedBy = {
-
-}
-
 <div class="form-group@if(charCount){ char-counter}@if(field.hasErrors) { form-field--error}" @if(charCount) {data-char-counter}>
     <label>
         @if(labelText.nonEmpty) {

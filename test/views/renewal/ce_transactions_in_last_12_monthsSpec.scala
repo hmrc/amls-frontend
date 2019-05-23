@@ -49,8 +49,8 @@ class ce_transactions_in_last_12_monthsSpec extends AmlsSpec with MustMatchers  
 
       def view = views.html.renewal.ce_transactions_in_last_12_months(form2, true)
 
-      heading.html must be(Messages("renewal.msb.ce.transactions.expected.title"))
-      subHeading.html must include(Messages("summary.renewal"))
+      heading.text() must be(Messages("renewal.msb.ce.transactions.expected.title"))
+      subHeading.text() must include(Messages("summary.renewal"))
 
     }
 
