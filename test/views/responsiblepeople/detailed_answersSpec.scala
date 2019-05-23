@@ -222,8 +222,10 @@ class detailed_answersSpec extends AmlsSpec
 
         override val sectionChecks = Table[String, Element => Boolean](
           ("title key", "check"),
-          (Messages("responsiblepeople.detailed_answers.uk_resident", personName.fullName), checkElementTextIncludes(_, "No")),
-          (Messages("responsiblepeople.detailed_answers.uk.passport", personName.fullName), checkElementTextIncludes(_, "Passport Number: 0000000000")))
+          (Messages("responsiblepeople.detailed_answers.uk_resident", personName.fullName),
+            checkElementTextIncludes(_, "No")),
+          (Messages("responsiblepeople.detailed_answers.uk.passport", personName.fullName),
+            checkElementTextIncludes(_, s"${personName.fullName}’s passport number: 0000000000")))
 
         def view = {
           views.html.responsiblepeople.detailed_answers(Some(ukPassportResponsiblePeopleModel), 1, false, personName.fullName)
