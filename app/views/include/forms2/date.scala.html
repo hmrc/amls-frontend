@@ -25,7 +25,9 @@
     example: Boolean = true,
     hintId: String = "",
     jsHidden: Boolean = false,
-    legendHidden: Boolean = false
+    legendHidden: Boolean = false,
+    heading: String = "",
+    section: String = ""
 )(implicit lang:Lang,  m: Messages)
 
 @field = @{ f(p) }
@@ -33,7 +35,9 @@
 <fieldset class="form-field form-date" id="@field.id">
     @legend(
         legend = labelText,
-        legendHidden = legendHidden
+        legendHidden = legendHidden,
+        heading = heading,
+        section = section
     )
     @if(hintText.nonEmpty) {
         <span class="form-field--hint">@Messages(hintText)</span>
