@@ -32,12 +32,14 @@
 
 @field = @{ f(p) }
 
+@if(section.nonEmpty) {
+    <div class="page-header"><p class="heading-secondary"><span class="visuallyhidden">This section is: </span>@Messages(section)</p></div>
+}
 <fieldset class="form-field form-date" id="@field.id">
     @legend(
         legend = labelText,
         legendHidden = legendHidden,
-        heading = heading,
-        section = section
+        heading = heading
     )
     @if(hintText.nonEmpty) {
         <span class="form-field--hint">@Messages(hintText)</span>
