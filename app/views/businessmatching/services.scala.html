@@ -23,7 +23,13 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("msb.services.title", if(isPreSubmission) "summary.businessmatching" else "summary.updateinformation")
+}
+
+@section = @{
+    if(isPreSubmission)
+    "summary.businessmatching"
+    else
+    "summary.updateinformation"
 }
 
 @main(
@@ -33,9 +39,11 @@
 
     @form(f, controllers.businessmatching.routes.MsbSubSectorsController.post(edit)) {
 
-      @fieldset(
+      @fieldsetWithErrorGroup(
         f = f("msbServices-fieldset"),
         legend = "msb.services.title",
+        heading = "msb.services.title",
+        section = section,
         legendHidden = true,
         panel = false,
         hint = "lbl.select.all"
