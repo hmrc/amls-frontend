@@ -25,6 +25,10 @@
     @errorSummary(f)
 }
 
+@supportingContent = {
+    <p>@hint("lbl.list.upto.3.countries")</p>
+}
+
 @main(
     title = Messages("renewal.msb.largest.amounts.title") + " - " + Messages("summary.renewal"),
     heading = header
@@ -36,9 +40,9 @@
             heading = "renewal.msb.largest.amounts.title",
             section = "summary.renewal",
             f = f("largestAmountsOfMoney"),
-            panel = false
+            panel = false,
+            supportingContent = supportingContent
         ) {
-            <p>@hint("lbl.list.upto.3.countries")</p>
             @for(i <- 0 until 3) {
                 @defining(
                     f(s"largestAmountsOfMoney[$i]")
