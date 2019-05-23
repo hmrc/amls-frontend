@@ -42,17 +42,19 @@
             heading = "renewal.involvedinother.title",
             panel = false
         ) {
-            <p>@Messages("businessactivities.confirm-activities.subtitle")</p>
+            @businessTypes.map { types =>
+                @if(types.size > 1) {
+                    <p>@Messages("businessactivities.confirm-activities.subtitle_4"):</p>
 
-            <ul class="list list-bullet">
-                @businessTypes.map {
-                    case types => {
-                        @types.map{ x =>
-                            <li>@x</li>
+                    <ul class="list list-bullet">
+                        @types.map { businessType =>
+                        <li>@businessType</li>
                         }
-                    }
+                    </ul>
+                } else {
+                    <p>@Messages("businessactivities.confirm-activities.subtitle_4") @types.head </p>
                 }
-            </ul>
+            }
 
             <p>@Messages("renewal.involvedinother.example")</p>
             <ul class="list list-bullet">
@@ -67,18 +69,18 @@
                     f = f("involvedInOther"),
                     labelText = "lbl.yes",
                     value = "true",
-                    target = s"#$target",
+                    target = "[data-reveal='involved-in-other']",
                     inline = true
                 )
                 @panel(
-                    field = Some(f(s"$target")),
-                    jsHidden = false,
+                    jsHidden = true,
+                    dataReveal = "involved-in-other",
                     id = target
                 ) {
                     @textarea(
                         field = f("details"),
-                        labelText = "businessactivities.confirm-activities.lbl.details",
-                        hintText = "renewal.hint.255.chars",
+                        labelText = "businessactivities.renewal.confirm-activities.lbl.details",
+                        hintText = "hint.255.chars",
                         bold = false,
                         largeWidth = true,
                         rows = "6",

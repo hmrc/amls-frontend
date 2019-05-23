@@ -48,10 +48,9 @@ class InvolvedInOtherController @Inject() ( val dataCacheConnector: DataCacheCon
                 (for {
                   businessActivities <- cache.getEntry[BusinessActivities](BusinessActivities.key)
                   involvedInOther <- businessActivities.involvedInOther
-                } yield Ok(involved_in_other_name(Form2[InvolvedInOther](involvedInOther),
-                  edit, businessMatching, businessTypes(businessMatching))))
-                  .getOrElse(Ok(involved_in_other_name(EmptyForm, edit, businessMatching, businessTypes(businessMatching))))
-              }) getOrElse Ok(involved_in_other_name(EmptyForm, edit, None, None))
+                } yield Ok(involved_in_other_name(Form2[InvolvedInOther](involvedInOther), edit, businessMatching.prefixedAlphabeticalBusinessTypes)))
+                  .getOrElse(Ok(involved_in_other_name(EmptyForm, edit, businessMatching.prefixedAlphabeticalBusinessTypes)))
+              }) getOrElse Ok(involved_in_other_name(EmptyForm, edit, None))
           }
         case false => Future.successful(NotFound(notFoundView))
       }
@@ -64,8 +63,8 @@ class InvolvedInOtherController @Inject() ( val dataCacheConnector: DataCacheCon
           for {
             businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
           } yield businessMatching match {
-            case Some(x) => BadRequest(involved_in_other_name(f, edit, None, businessTypes(businessMatching)))
-            case None => BadRequest(involved_in_other_name(f, edit, None, None))
+            case Some(x) => BadRequest(involved_in_other_name(f, edit, businessMatching.prefixedAlphabeticalBusinessTypes))
+            case None => BadRequest(involved_in_other_name(f, edit, None))
           }
         case ValidForm(_, data) =>
           for {
@@ -91,27 +90,5 @@ class InvolvedInOtherController @Inject() ( val dataCacheConnector: DataCacheCon
       case false => Redirect(routes.ExpectedAMLSTurnoverController.get(edit))
       case true => Redirect(routes.SummaryController.get())
     }
-  }
-
-  private def businessTypes(activities: BusinessMatching): Option[String] = {
-    val typesString = activities.activities map { a =>
-      a.businessActivities.map { line =>
-        line match {
-          case AccountancyServices => Messages("businessactivities.registerservices.servicename.lbl.01")
-          case BillPaymentServices => Messages("businessactivities.registerservices.servicename.lbl.02")
-          case EstateAgentBusinessService => Messages("businessactivities.registerservices.servicename.lbl.03")
-          case HighValueDealing => Messages("businessactivities.registerservices.servicename.lbl.04")
-          case MoneyServiceBusiness => Messages("businessactivities.registerservices.servicename.lbl.05")
-          case TrustAndCompanyServices => Messages("businessactivities.registerservices.servicename.lbl.06")
-          case TelephonePaymentService => Messages("businessactivities.registerservices.servicename.lbl.07")
-        }
-      }
-    }
-
-    typesString match {
-      case Some(types) => Some(typesString.getOrElse(List()).toList.sorted.mkString("|"))
-      case None => None
-    }
-
   }
 }

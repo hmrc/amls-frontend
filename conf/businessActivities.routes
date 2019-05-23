@@ -3,17 +3,17 @@ GET         /what-you-need                                        @controllers.b
 GET         /franchise                                            @controllers.businessactivities.BusinessFranchiseController.get(edit: Boolean ?= false)
 POST        /franchise                                            @controllers.businessactivities.BusinessFranchiseController.post(edit: Boolean ?= false)
 
-GET         /confirm-activities                                   @controllers.businessactivities.InvolvedInOtherController.get(edit: Boolean ?= false)
-POST        /confirm-activities                                   @controllers.businessactivities.InvolvedInOtherController.post(edit: Boolean ?= false)
+GET         /other-activities                                     @controllers.businessactivities.InvolvedInOtherController.get(edit: Boolean ?= false)
+POST        /other-activities                                     @controllers.businessactivities.InvolvedInOtherController.post(edit: Boolean ?= false)
 
-GET         /procedures                                           @controllers.businessactivities.IdentifySuspiciousActivityController.get(edit: Boolean ?= false)
-POST        /procedures                                           @controllers.businessactivities.IdentifySuspiciousActivityController.post(edit: Boolean ?= false)
+GET         /written-guidance-suspicious-activity                 @controllers.businessactivities.IdentifySuspiciousActivityController.get(edit: Boolean ?= false)
+POST        /written-guidance-suspicious-activity                 @controllers.businessactivities.IdentifySuspiciousActivityController.post(edit: Boolean ?= false)
 
-GET         /turnover                                             @controllers.businessactivities.ExpectedAMLSTurnoverController.get(edit: Boolean ?= false)
-POST        /turnover                                             @controllers.businessactivities.ExpectedAMLSTurnoverController.post(edit: Boolean ?= false)
+GET         /net-profit-services-next-12-months                   @controllers.businessactivities.ExpectedAMLSTurnoverController.get(edit: Boolean ?= false)
+POST        /net-profit-services-next-12-months                   @controllers.businessactivities.ExpectedAMLSTurnoverController.post(edit: Boolean ?= false)
 
-GET         /business-turnover                                    @controllers.businessactivities.ExpectedBusinessTurnoverController.get(edit: Boolean ?= false)
-POST        /business-turnover                                    @controllers.businessactivities.ExpectedBusinessTurnoverController.post(edit: Boolean ?= false)
+GET         /net-profit-next-12-months                            @controllers.businessactivities.ExpectedBusinessTurnoverController.get(edit: Boolean ?= false)
+POST        /net-profit-next-12-months                            @controllers.businessactivities.ExpectedBusinessTurnoverController.post(edit: Boolean ?= false)
 
 GET         /records                                              @controllers.businessactivities.TransactionRecordController.get(edit: Boolean ?= false)
 POST        /records                                              @controllers.businessactivities.TransactionRecordController.post(edit: Boolean ?= false)
@@ -33,8 +33,8 @@ POST        /risk-assessment                                      @controllers.b
 GET         /employees                                            @controllers.businessactivities.HowManyEmployeesController.get(edit: Boolean ?= false)
 POST        /employees                                            @controllers.businessactivities.HowManyEmployeesController.post(edit: Boolean ?= false)
 
-GET         /employees-amls                                       @controllers.businessactivities.EmployeeCountAMLSSupervisionController.get(edit: Boolean ?= false)
-POST        /employees-amls                                       @controllers.businessactivities.EmployeeCountAMLSSupervisionController.post(edit: Boolean ?= false)
+GET         /people-working-on-anti-money-laundering-activities   @controllers.businessactivities.EmployeeCountAMLSSupervisionController.get(edit: Boolean ?= false)
+POST        /people-working-on-anti-money-laundering-activities   @controllers.businessactivities.EmployeeCountAMLSSupervisionController.post(edit: Boolean ?= false)
 
 GET         /accountant-details                                   @controllers.businessactivities.WhoIsYourAccountantController.get(edit: Boolean ?= false)
 POST        /accountant-details                                   @controllers.businessactivities.WhoIsYourAccountantController.post(edit: Boolean ?= false)

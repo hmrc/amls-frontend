@@ -30,18 +30,17 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessactivities.keep.customer.records.title", "summary.businessactivities")
+    @heading(section = "summary.businessactivities")
 }
 
 @main(
     title = Messages("businessactivities.keep.customer.records.title") + " - " + Messages("summary.businessactivities"),
     heading = header
 ) {
-        @form(f, controllers.businessactivities.routes.TransactionRecordController.post(edit)) {
+    @form(f, controllers.businessactivities.routes.TransactionRecordController.post(edit)) {
 
         @fieldset(
-            legend = "businessactivities.keep.customer.records.title",
-            legendHidden = true,
+            heading = "businessactivities.keep.customer.records.title",
             panel = false,
             classes = Seq("inline"),
             f = f("isRecorded-field")

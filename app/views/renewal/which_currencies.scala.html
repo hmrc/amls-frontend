@@ -38,7 +38,7 @@
             classes = Seq("form-group")
         ) {
             <p>@Messages("msb.which_currencies.uptoThree.hint")</p>
-            @hint(Messages("msb.which_currencies.uptoThree.hint2"))
+            <p>@hint("msb.which_currencies.uptoThree.hint2")</p>
             @errorGroup(f("currencies")) {
                 @currency(
                     field = f("currencies[0]"),
@@ -53,9 +53,8 @@
                     labelText = "lbl.currency.line3"
                 )
             }
-            <div class="clear">
-            @submit(returnLocation = Some("renewal"))
-            </div>
         }
+
+        @submit(returnLocation = Some("renewal"))
     }
 }

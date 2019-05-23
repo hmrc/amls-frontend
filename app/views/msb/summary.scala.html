@@ -177,7 +177,7 @@
                             editUrl = controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true).toString
                         ) {
                             <ul class="list list--comma">
-                            @lom.countryList.map { country =>
+                            @lom.countries.map { country =>
                                 <li>@country.name</li>
                             }
                             </ul>
