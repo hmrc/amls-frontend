@@ -16,6 +16,7 @@
 
 package utils
 
+import controllers.hvd.routes
 import models.businessdetails.{RegisteredOffice, RegisteredOfficeUK}
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved, SubmissionReadyForReview}
 
@@ -36,6 +37,53 @@ class DateOfChangeHelperSpec extends AmlsSpec {
     )
 
     val changeModel = RegisteredOfficeUK("","",None, None, "", None)
+    "DateOfChangeHelper" must {
+
+      "redirect to Summary Controller" when {
+        "not supported key is passed" in {
+          DateOfChangeHelperTest.DateOfChangeRedirect("blah").call.url mustBe routes.SummaryController.get().url
+        }
+      }
+
+
+      "redirect to Summary Controller" when {
+        "1 is passed" in {
+          DateOfChangeHelperTest.DateOfChangeRedirect("1").call.url mustBe routes.SummaryController.get().url
+        }
+      }
+
+      "redirect to CashPayment Controller" when {
+        "2 is passed" in {
+          DateOfChangeHelperTest.DateOfChangeRedirect("2").call.url mustBe routes.CashPaymentController.get().url
+        }
+      }
+
+      "redirect to HowWillYouSellGoods Controller" when {
+        "3 is passed" in {
+          DateOfChangeHelperTest.DateOfChangeRedirect("3").call.url mustBe routes.HowWillYouSellGoodsController.get().url
+        }
+      }
+
+      "redirect to ExciseGoods Controller" when {
+        "4 is passed" in {
+          DateOfChangeHelperTest.DateOfChangeRedirect("4").call.url mustBe routes.ExciseGoodsController.get().url
+        }
+
+        "redirect to ExciseGoods Controller with edit set to true" when {
+          "5 is passed" in {
+            DateOfChangeHelperTest.DateOfChangeRedirect("5").call.url mustBe s"${routes.ExciseGoodsController.get().url}?edit=true"
+          }
+        }
+
+      }
+
+    }
+
+    "return empty list" when {
+      "no start date is supplied" in {
+        DateOfChangeHelperTest.startDateFormFields(None) must be(Map.empty[String, Seq[String]])
+      }
+    }
 
     "return true" when {
       "a change has been made to a model" in {
