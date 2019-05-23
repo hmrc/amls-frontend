@@ -25,8 +25,9 @@
 @header = {
     @components.back_link()
     @errorSummaryWithPlaceholder(f)
-    @heading("businessdetails.lettersaddress.title", "summary.businessdetails")
 }
+
+@supportingContent = { @registered_office_helper(model) }
 
 @main(
     title = Messages("businessdetails.lettersaddress.title") + " - " + Messages("summary.businessdetails"),
@@ -35,32 +36,26 @@
 
     @form(f, controllers.businessdetails.routes.LettersAddressController.post(edit)) {
 
-        @registered_office_helper(model)
-
-        @fieldset(
-            f = f("lettersAddress-fieldset"),
-            legend = "businessdetails.lettersaddress.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("lettersAddress"),
+            heading = "businessdetails.lettersaddress.title",
+            section = "summary.businessdetails",
+            supportingContent = supportingContent,
             panel = false,
             classes = Seq("inline")
         ) {
-
-            @errorGroupWithPlaceholder(
-                field = f("lettersAddress")
-            ) {
-                @radio(
-                    f = f("lettersAddress"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true
-                )
-                @radio(
-                    f = f("lettersAddress"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
-            }
+            @radio(
+                f = f("lettersAddress"),
+                labelText = "lbl.yes",
+                value = "true",
+                inline = true
+            )
+            @radio(
+                f = f("lettersAddress"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
         }
 
         @submit(false)

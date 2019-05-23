@@ -26,7 +26,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessdetails.registeredformlr.title", "summary.businessdetails")
 }
 
 @main(
@@ -36,44 +35,38 @@
 
     @form(f, controllers.businessdetails.routes.PreviouslyRegisteredController.post(edit)) {
 
-        @fieldset(
-            legend = "businessdetails.registeredformlr.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            heading = "businessdetails.registeredformlr.title",
+            section =  "summary.businessdetails",
             panel = false,
-            f = f("previouslyRegistered-fieldset")
+            f = f("previouslyRegistered")
         ) {
-
-            @errorGroup(
-                field = f("previouslyRegistered")
+            @radio(
+                f = f("previouslyRegistered"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = s"#$target",
+                inline = true)
+            @panel(
+                field = Some(f(s"$target")),
+                jsHidden = false,
+                id = target
             ) {
-
-                @radio(
-                    f = f("previouslyRegistered"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    target = s"#$target",
-                    inline = true)
-                @panel(
-                    field = Some(f(s"$target")),
-                    jsHidden = false,
-                    id = target
-                ) {
-                    @input(
-                        field = f("prevMLRRegNo"),
-                        labelText = "businessdetails.registeredformlr.mlrregno.lbl",
-                        hintText = "businessdetails.registeredformlr.taxReferenceHint",
-                        attrType = "number",
-                        attrMaxlength = "8",
-                        attrPattern = "[0-9]{1,8}"
-                    )
-                }
-                @radio(
-                    f = f("previouslyRegistered"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
+                @input(
+                    field = f("prevMLRRegNo"),
+                    labelText = "businessdetails.registeredformlr.mlrregno.lbl",
+                    hintText = "businessdetails.registeredformlr.taxReferenceHint",
+                    attrType = "number",
+                    attrMaxlength = "8",
+                    attrPattern = "[0-9]{1,8}"
                 )
             }
+            @radio(
+                f = f("previouslyRegistered"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
         }
 
         @submit(false)

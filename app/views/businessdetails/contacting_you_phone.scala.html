@@ -24,24 +24,28 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessdetails.contactingyou.phone.title", "summary.businessdetails")
 }
+
+@supportingContent = { <p>@Messages("businessdetails.contactingyou.phone.lbl2")</p> }
+
 
 @main(
     title = Messages("businessdetails.contactingyou.phone.title") + " - " + Messages("summary.businessdetails"),
     heading = header
 ) {
 
-    <p>@Messages("businessdetails.contactingyou.phone.lbl2")</p>
-
     @form(f, controllers.businessdetails.routes.ContactingYouPhoneController.post(edit)) {
 
-        @fieldset(
+
+        @fieldsetWithErrorGroup(
             f = f("contactingyou-fieldset"),
-            legend = "businessdetails.contactingyou.phone.title",
-            legendHidden = true,
+            heading = "businessdetails.contactingyou.phone.title",
+            section = "summary.businessdetails",
+            supportingContent = supportingContent,
             panel = false
         ) {
+
+
             @input(
                 field = f("phoneNumber"),
                 labelText = "businessdetails.contactingyou.phone.lbl",
