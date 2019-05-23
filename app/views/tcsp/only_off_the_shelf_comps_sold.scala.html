@@ -22,7 +22,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("tcsp.off-the-shelf.companies.lbl", "summary.tcsp")
 }
 
 @main(
@@ -32,29 +31,25 @@
 
     @form(f, controllers.tcsp.routes.OnlyOffTheShelfCompsSoldController.post(edit)) {
 
-        @fieldset(
-            f = f("onlyOffTheShelfCompsSold-fieldset"),
-            legend = "tcsp.onlyOffTheShelfCompsSold.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("onlyOffTheShelfCompsSold"),
+            heading = "tcsp.off-the-shelf.companies.lbl",
+            section = "summary.tcsp",
             panel = false,
             classes = Seq("inline")
         ) {
-            @errorGroup(
-                field = f("onlyOffTheShelfCompsSold")
-            ) {
-                @radio(
-                    f = f("onlyOffTheShelfCompsSold"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true
-                )
-                @radio(
-                    f = f("onlyOffTheShelfCompsSold"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
-            }
+            @radio(
+                f = f("onlyOffTheShelfCompsSold"),
+                labelText = "lbl.yes",
+                value = "true",
+                inline = true
+            )
+            @radio(
+                f = f("onlyOffTheShelfCompsSold"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
         }
 
         @submit(edit)

@@ -22,7 +22,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("tcsp.create.complex.corporate.structures.lbl", "summary.tcsp")
 }
 
 @main(
@@ -32,29 +31,25 @@
 
     @form(f, controllers.tcsp.routes.ComplexCorpStructureCreationController.post(edit)) {
 
-        @fieldset(
-            f = f("complexCorpStructureCreation-fieldset"),
-            legend = "tcsp.complexCorpStructureCreation.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("complexCorpStructureCreation"),
+            heading = "tcsp.create.complex.corporate.structures.lbl",
+            section = "summary.tcsp",
             panel = false,
             classes = Seq("inline")
         ) {
-            @errorGroup(
-                field = f("complexCorpStructureCreation")
-            ) {
-                @radio(
-                    f = f("complexCorpStructureCreation"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true
-                )
-                @radio(
-                    f = f("complexCorpStructureCreation"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
-            }
+            @radio(
+                f = f("complexCorpStructureCreation"),
+                labelText = "lbl.yes",
+                value = "true",
+                inline = true
+            )
+            @radio(
+                f = f("complexCorpStructureCreation"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
         }
 
         @submit(edit)
