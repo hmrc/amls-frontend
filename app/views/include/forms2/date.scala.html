@@ -36,7 +36,11 @@
     @if(section.nonEmpty) {
         <div class="page-header"><p class="heading-secondary"><span class="visuallyhidden">This section is: </span>@Messages(section)</p></div>
     }
-    <fieldset class="form-field form-date" id="@field.id">
+    <fieldset
+            class="form-field form-date"
+            id="@field.id"
+            @if(hintText.nonEmpty || field.hasErrors) { aria-describedby="@if(hintText.nonEmpty) {@{field.id}-hint} @if(field.hasErrors) {@{field.id}-error-notification}"}
+    >
         @legend(
             legend = labelText,
             legendHidden = legendHidden,
@@ -49,7 +53,7 @@
             <span class="form-field--hint"@if(hintId.nonEmpty) { id="@hintId-hint"}>@Messages("lbl.date.example")</span>
         }
         @if(field.hasErrors) {
-            <span class="error-notification" data-journey="error - field:user input:@field.id">
+            <span class="error-notification" data-journey="error - field:user input:@field.id" id="@{field.id}-error-notification">
                 <span class="visuallyhidden">Error: </span>@field.error
             </span>
         }
