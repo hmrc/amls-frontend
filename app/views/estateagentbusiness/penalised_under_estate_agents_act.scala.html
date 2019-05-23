@@ -26,6 +26,14 @@
     @errorSummary(f)
 }
 
+@supportingContent = {
+    <p>@Messages("estateagentbusiness.penalisedunderestateagentsact.subtitle")</p>
+    <ul class="list list-bullet">
+        <li>@Messages("estateagentbusiness.penalisedunderestateagentsact.warning")</li>
+        <li>@Messages("estateagentbusiness.penalisedunderestateagentsact.banned")</li>
+    </ul>
+}
+
 @main(
     title = Messages("estateagentbusiness.penalisedunderestateagentsact.title") + " - " + Messages("summary.estateagentbusiness"),
     heading = header
@@ -37,13 +45,9 @@
             f = f("penalisedUnderEstateAgentsAct"),
             heading = "estateagentbusiness.penalisedunderestateagentsact.title",
             section = "summary.estateagentbusiness",
-            panel = false
+            panel = false,
+            supportingContent = supportingContent
         ) {
-            <p>@Messages("estateagentbusiness.penalisedunderestateagentsact.subtitle")</p>
-            <ul class="list list-bullet">
-                <li>@Messages("estateagentbusiness.penalisedunderestateagentsact.warning")</li>
-                <li>@Messages("estateagentbusiness.penalisedunderestateagentsact.banned")</li>
-            </ul>
             @radio(
                 f = f("penalisedUnderEstateAgentsAct"),
                 labelText = "lbl.yes",
