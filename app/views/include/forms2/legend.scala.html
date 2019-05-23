@@ -20,7 +20,8 @@
     bold: Boolean = false,
     hint: String = "",
     legendHidden: Boolean = false,
-    heading: String = ""
+    heading: String = "",
+    fieldId: String = ""
 )(implicit lang:Lang,  m: Messages)
 
 <legend>
@@ -32,5 +33,5 @@
             @Messages(legend)
         }
     </span>
-    @if(hint.nonEmpty) {<span class="form-hint">@Messages(hint)</span>}
 </legend>
+@if(hint.nonEmpty) {<span id="@if(fieldId.nonEmpty){@fieldId-hint}" class="form-hint clear">@Messages(hint)</span>}

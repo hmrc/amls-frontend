@@ -44,6 +44,10 @@ a.block-link {
   margin: .15em 0 1.25em;
 }
 
+form .page-header h1 {
+  margin-top: 0;
+}
+
 .page-header .heading-secondary {
   color: #6f777b;
   display: table-header-group;
@@ -1628,4 +1632,8 @@ h2.override-heading-medium {
 .error-margin .panel-indent {
   padding: 0px;
   border: none;
+}
+
+.form-field--error input, .form-field--error textarea {
+    border-color: #b10e1e;
 }
