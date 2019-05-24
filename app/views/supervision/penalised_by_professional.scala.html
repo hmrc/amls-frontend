@@ -29,24 +29,24 @@
     @errorSummary(f)
 }
 
+@supportingContent = {
+<p>@Messages("supervision.penalisedbyprofessional.subtitle")</p>
+<ul class="list list-bullet">
+    <li>@Messages("supervision.penalisedbyprofessional.line_1")</li>
+    <li>@Messages("supervision.penalisedbyprofessional.line_2")</li>
+    <li>@Messages("supervision.penalisedbyprofessional.line_3")</li>
+    <li>@Messages("supervision.penalisedbyprofessional.line_4")</li>
+    <li>@Messages("supervision.penalisedbyprofessional.line_5")</li>
+</ul>
+<p>@Messages("supervision.penalisedbyprofessional.details")</p>
+}
+
 @main(
     title = Messages("supervision.penalisedbyprofessional.title") + " - " + Messages("summary.supervision"),
     heading = header
 ) {
 
     @form(f, controllers.supervision.routes.PenalisedByProfessionalController.post(edit)) {
-
-            @supportingContent = {
-                <p>@Messages("supervision.penalisedbyprofessional.subtitle")</p>
-                <ul class="list list-bullet">
-                    <li>@Messages("supervision.penalisedbyprofessional.line_1")</li>
-                    <li>@Messages("supervision.penalisedbyprofessional.line_2")</li>
-                    <li>@Messages("supervision.penalisedbyprofessional.line_3")</li>
-                    <li>@Messages("supervision.penalisedbyprofessional.line_4")</li>
-                    <li>@Messages("supervision.penalisedbyprofessional.line_5")</li>
-                </ul>
-                <p>@Messages("supervision.penalisedbyprofessional.details")</p>
-            }
 
             @fieldsetWithErrorGroup(
                 f = f("penalised"),
@@ -63,13 +63,9 @@
                     target = s"#$target",
                     inline = true
                 )
-                @fieldset(
-                    legend = "supervision.penalisedbyprofessional.details.lbl",
-                    f = f(target),
-                    legendHidden = true
-                ) {
-                    @textarea(f("professionalBody"), "supervision.penalisedbyprofessional.details.lbl", bold = false, largeWidth = true, cols = "30", rows = "8")
-                }
+
+                @textarea(f("professionalBody"), "supervision.penalisedbyprofessional.details.lbl", bold = false, largeWidth = true, cols = "30", rows = "8")
+
                 @radio(
                     f = f("penalised"),
                     labelText = "lbl.no",

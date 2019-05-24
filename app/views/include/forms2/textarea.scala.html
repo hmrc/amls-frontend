@@ -27,15 +27,45 @@
     rows: String = "",
     maxLength: String = "",
     charCount: Boolean = false,
-    largeWidth: Boolean = false
+    largeWidth: Boolean = false,
+    heading: String = "",
+    section: String = ""
 )(implicit lang:Lang,  m: Messages)
 
+@labelSpan = {
+    @if(labelText.nonEmpty) {
+        @if(labelHidden) {<span class="visuallyhidden">}
+            @Messages(labelText)
+        @if(labelHidden){</span>}
+    }
+}
+
+@label = {
+    @if(heading.nonEmpty) {
+        <div class="page-header">
+            <h1>
+                <label class="heading-xlarge" for="@field.id">
+                    @Messages(heading)
+                </label>
+            </h1>
+            @if(section.nonEmpty) {
+                <p class="heading-secondary">
+                    <span class="visuallyhidden">This section is: </span>@Messages(section)
+                </p>
+            }
+        </div>
+        <span class="form-label">
+            @labelSpan
+        </span>
+    } else {
+        <label class="form-label" for="@field.id">
+            @labelSpan
+        </label>
+    }
+}
+
 <div class="form-group@if(charCount){ char-counter}@if(field.hasErrors) { form-field--error}" @if(charCount) {data-char-counter}>
-    <label>
-        @if(labelText.nonEmpty) {
-            <span class="form-label@if(bold){-bold}@if(labelHidden){ visuallyhidden}">@Messages(labelText)</span>
-        }
-    </label>
+    @label
     @if(hintText.nonEmpty) {
         <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
     }
