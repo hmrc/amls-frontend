@@ -9,8 +9,8 @@ POST        /name/:index/                                          @controllers.
 GET         /legal-name-change/:index/                             @controllers.responsiblepeople.LegalNameController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /legal-name-change/:index/                             @controllers.responsiblepeople.LegalNameController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
-GET         /legal-name-change-date/:index/                        @controllers.responsiblepeople.LegalNameChangeDateController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-POST        /legal-name-change-date/:index/                        @controllers.responsiblepeople.LegalNameChangeDateController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+GET         /name-change-date/:index/                              @controllers.responsiblepeople.LegalNameChangeDateController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /name-change-date/:index/                              @controllers.responsiblepeople.LegalNameChangeDateController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
 GET         /other-names/:index/                                   @controllers.responsiblepeople.KnownByController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /other-names/:index/                                   @controllers.responsiblepeople.KnownByController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)

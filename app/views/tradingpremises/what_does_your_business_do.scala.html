@@ -45,7 +45,7 @@
             @errorGroup(
                 field = f("activities")
             ) {
-                @model.businessActivities.map { ba =>
+                @model.businessActivities.toList.sortBy(_.getMessage()).map { ba =>
                     @checkbox(
                         f = f("activities[]"),
                         labelText = "businessmatching.registerservices.servicename.lbl."+BusinessActivities.getValue(ba),

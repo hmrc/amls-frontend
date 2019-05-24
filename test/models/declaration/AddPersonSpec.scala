@@ -47,13 +47,14 @@ class AddPersonRelease7Spec extends AmlsSpec {
     }
 
     "fail validation" when {
+
       "fields are missing represented by an empty Map" in {
 
         AddPerson.formRule.validate(Map.empty) must
           be(Invalid(Seq(
             (Path \ "firstName") -> Seq(ValidationError("error.required")),
             (Path \ "lastName") -> Seq(ValidationError("error.required")),
-            (Path \ "positions") -> Seq(ValidationError("error.required"))
+            (Path \ "positions") -> Seq(ValidationError("error.invalid.position.validation"))
           )))
       }
 
@@ -99,6 +100,56 @@ class AddPersonRelease7Spec extends AmlsSpec {
           )))
       }
 
+      "firstname contain invalid character" in {
+        val formNames = Map(
+          "firstName" -> Seq("Abe>>"),
+          "lastName" -> Seq("Lincoln"),
+          "positions" -> Seq("01")
+        )
+
+        AddPerson.formRule.validate(formNames) must be(
+          Invalid(
+            Seq(
+              (Path \ "firstName") -> Seq(ValidationError("error.invalid.firstname.validation"))
+            )
+          )
+        )
+      }
+
+      "middlename contain invalid character" in {
+        val formNames = Map(
+          "firstName" -> Seq("Abe"),
+          "middleName" -> Seq(">>"),
+          "lastName" -> Seq("Lincoln"),
+          "positions" -> Seq("01")
+        )
+
+        AddPerson.formRule.validate(formNames) must be(
+          Invalid(
+            Seq(
+              (Path \ "middleName") -> Seq(ValidationError("error.invalid.middlename.validation"))
+            )
+          )
+        )
+      }
+
+      "lastname contain invalid character" in {
+        val formNames = Map(
+          "firstName" -> Seq("Abe"),
+          "middleName" -> Seq("W"),
+          "lastName" -> Seq(">>"),
+          "positions" -> Seq("01")
+        )
+
+        AddPerson.formRule.validate(formNames) must be(
+          Invalid(
+            Seq(
+              (Path \ "lastName") -> Seq(ValidationError("error.invalid.lastname.validation"))
+            )
+          )
+        )
+      }
+
       "role within business is missing" in {
 
         val urlFormEncoded = Map(
@@ -108,7 +159,7 @@ class AddPersonRelease7Spec extends AmlsSpec {
 
         AddPerson.formRule.validate(urlFormEncoded) must
           be(Invalid(Seq(
-            (Path \ "positions") -> Seq(ValidationError("error.required"))
+            (Path \ "positions") -> Seq(ValidationError("error.invalid.position.validation"))
           )))
       }
 
@@ -123,9 +174,9 @@ class AddPersonRelease7Spec extends AmlsSpec {
 
         AddPerson.formRule.validate(urlFormEncoded) must
           be(Invalid(Seq(
-            (Path \ "firstName") -> Seq(ValidationError("error.invalid.common_name.length")),
-            (Path \ "middleName") -> Seq(ValidationError("error.invalid.common_name.length")),
-            (Path \ "lastName") -> Seq(ValidationError("error.invalid.common_name.length"))
+            (Path \ "firstName") -> Seq(ValidationError("error.invalid.firstname.length")),
+            (Path \ "middleName") -> Seq(ValidationError("error.invalid.middlename.length")),
+            (Path \ "lastName") -> Seq(ValidationError("error.invalid.lastname.length"))
           )))
       }
     }
