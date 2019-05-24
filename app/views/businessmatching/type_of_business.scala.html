@@ -23,7 +23,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessmatching.typeofbusiness.title", "summary.businessmatching")
 }
 
 @main(
@@ -33,14 +32,12 @@
 
     @form(f, controllers.businessmatching.routes.TypeOfBusinessController.post(edit)) {
 
-        <div class="form-field-group">
-            @input(
-                field = f("typeOfBusiness"),
-                labelText = "businessmatching.typeofbusiness.lbl",
-                labelHidden = true,
-                hintText = Messages("businessmatching.typeofbusiness.lbl.hint")
-            )
-        </div>
+        @input(
+            field = f("typeOfBusiness"),
+            heading = "businessmatching.typeofbusiness.title",
+            section = "summary.businessmatching",
+            hintText = "businessmatching.typeofbusiness.lbl.hint"
+        )
 
         @submit(edit)
     }
