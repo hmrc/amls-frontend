@@ -40,25 +40,20 @@
         attrType = "number",
         dataAttrs = digitsOnlyAttributes,
         field = f("regNumber"),
-        hintText = "",
         labelText = "businessmatching.psr.number.lbl"
     )
 }
-@supportingContent = {
-    <p>
-    @m("businessmatching.psr.number.hint")
-    </p>
-}
+
 @main(
-    title = Messages("businessmatching.psr.number.title") + " - " + {if(isPreSubmission) Messages("summary.businessmatching") else Messages("summary.updateinformation")},
+    title = Messages("businessmatching.psr.number.title") + " - " + Messages(section),
     heading = header
 )  {
 
     @form(f, controllers.businessmatching.routes.PSRNumberController.post(edit)) {
         @fieldsetWithErrorGroup(
-            f = f("appliedfor-fieldset"),
+            f = f("appliedFor"),
             heading = "businessmatching.psr.number.title",
-            supportingContent = supportingContent,
+            hint = "businessmatching.psr.number.hint",
             section = section,
             panel = false
         ) {
@@ -67,25 +62,23 @@
                 <input type="hidden" name="appliedFor" value=true />
                 @psrInput
             } else {
-                @errorGroup(
-                    field = f("appliedFor")
+                @radio(
+                    f = f("appliedFor"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    target = s"#$target"
+                )
+                @panel(
+                    field = Some(f(s"$target")),
+                    id = target
                 ) {
-                    @radio(
-                        f = f("appliedFor"),
-                        labelText = "lbl.yes",
-                        value = "true",
-                        target = s"#$target"
-                    )
-                      @panel(
-                        field = Some(f(s"$target")),
-                        id = target
-                      ) { @psrInput }
-                    @radio(
-                        f = f("appliedFor"),
-                        labelText = "lbl.no",
-                        value = "false"
-                    )
+                    @psrInput
                 }
+                @radio(
+                    f = f("appliedFor"),
+                    labelText = "lbl.no",
+                    value = "false"
+                )
             }
         }
 
