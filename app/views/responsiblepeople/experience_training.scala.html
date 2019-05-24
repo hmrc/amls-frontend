@@ -20,7 +20,7 @@
 @import models.businessmatching._
 
 
-@(f: Form2[_], bamodel : BusinessActivities, edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], businessTypes : Option[List[String]], edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @components.back_link()
@@ -33,12 +33,19 @@
     heading = header
 ) {
 
-    <p>@Messages("responsiblepeople.experiencetraining.businessactivities")</p>
-    <ul class="list list-bullet">
-        @bamodel.businessActivities.map { ba =>
-            <li>@Messages("businessactivities.registerservices.servicename.lbl."+BusinessActivities.getValue(ba))</li>
+    @businessTypes.map { types =>
+        @if(types.size > 1) {
+            <p>@Messages("responsiblepeople.experiencetraining.businessactivities")</p>
+
+            <ul class="list list-bullet">
+                @types.map { businessType =>
+                <li>@businessType</li>
+                }
+            </ul>
+        } else {
+            <p>@Messages("businessactivities.confirm-activities.subtitle_4") @types.head </p>
         }
-    </ul>
+    }
 
     @form(f, controllers.responsiblepeople.routes.ExperienceTrainingController.post(index, edit, flow)) {
 
