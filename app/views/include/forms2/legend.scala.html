@@ -21,7 +21,8 @@
     hint: String = "",
     legendHidden: Boolean = false,
     heading: String = "",
-    fieldId: String = ""
+    fieldId: String = "",
+    supportingContent: Html = HtmlFormat.empty
 )(implicit lang:Lang,  m: Messages)
 
 <legend>
@@ -34,4 +35,5 @@
         }
     </span>
 </legend>
+@supportingContent
 @if(hint.nonEmpty) {<span id="@if(fieldId.nonEmpty){@fieldId-hint}" class="form-hint clear">@Messages(hint)</span>}
