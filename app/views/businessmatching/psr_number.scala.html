@@ -33,35 +33,33 @@
    if(isPreSubmission)  "summary.businessmatching" else "summary.updateinformation"
 }
 
-@psrInput = {
-    @input(
-        attrMaxlength = "6",
-        attrPattern = "[0-9]{1,6}",
-        attrType = "number",
-        dataAttrs = digitsOnlyAttributes,
-        field = f("regNumber"),
-        labelText = "businessmatching.psr.number.lbl"
-    )
-}
-
 @main(
     title = Messages("businessmatching.psr.number.title") + " - " + Messages(section),
     heading = header
 )  {
 
     @form(f, controllers.businessmatching.routes.PSRNumberController.post(edit)) {
-        @fieldsetWithErrorGroup(
-            f = f("appliedFor"),
-            heading = "businessmatching.psr.number.title",
-            hint = "businessmatching.psr.number.hint",
-            section = section,
-            panel = false
-        ) {
-
-            @if(edit && !isPreSubmission) {
-                <input type="hidden" name="appliedFor" value=true />
-                @psrInput
-            } else {
+        @if(edit && !isPreSubmission) {
+            <input type="hidden" name="appliedFor" value=true />
+            @input(
+                attrMaxlength = "6",
+                attrPattern = "[0-9]{1,6}",
+                attrType = "number",
+                dataAttrs = digitsOnlyAttributes,
+                field = f("regNumber"),
+                heading = "businessmatching.psr.number.title",
+                section = section,
+                hintText = "businessmatching.psr.number.hint",
+                labelText = "businessmatching.psr.number.lbl"
+            )
+        } else {
+            @fieldsetWithErrorGroup(
+                f = f("appliedFor"),
+                heading = "businessmatching.psr.number.title",
+                hint = "businessmatching.psr.number.hint",
+                section = section,
+                panel = false
+            ) {
                 @radio(
                     f = f("appliedFor"),
                     labelText = "lbl.yes",
@@ -72,7 +70,14 @@
                     field = Some(f(s"$target")),
                     id = target
                 ) {
-                    @psrInput
+                    @input(
+                        attrMaxlength = "6",
+                        attrPattern = "[0-9]{1,6}",
+                        attrType = "number",
+                        dataAttrs = digitsOnlyAttributes,
+                        field = f("regNumber"),
+                        labelText = "businessmatching.psr.number.lbl"
+                    )
                 }
                 @radio(
                     f = f("appliedFor"),
@@ -81,6 +86,7 @@
                 )
             }
         }
+
 
         @submit(edit, returnLink = showReturnLink)
    }
