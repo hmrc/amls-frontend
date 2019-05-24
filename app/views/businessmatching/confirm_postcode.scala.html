@@ -23,7 +23,6 @@
 
 @header = {
     @errorSummary(f)
-    @heading("businessmatching.confirm.postcode.title", "summary.businessmatching")
 }
 
 @main(
@@ -35,6 +34,8 @@
 
         @input(
             field = f("postCode"),
+            heading = "businessmatching.confirm.postcode.title",
+            section = "summary.businessmatching",
             labelText = "lbl.address.postcode"
         )
 
