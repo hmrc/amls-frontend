@@ -39,14 +39,14 @@
             f = f("anotherBody"),
             panel = false,
             heading="supervision.another_body.title",
-            section="summary.supervision"
+            section="summary.supervision",
+            classes = Seq("inline")
         ) {
             @radio(
                 f = f("anotherBody"),
                 labelText = "lbl.yes",
                 value = "true",
-                target = s"#$target",
-                inline = true
+                target = s"#$target"
             )
             @panel(
                 field = Some(f(s"$target"))
@@ -60,8 +60,7 @@
             @radio(
                 f = f("anotherBody"),
                 labelText = "lbl.no",
-                value = "false",
-                inline = true
+                value = "false"
             )
         }
 

@@ -53,15 +53,15 @@
                 panel = false,
                 heading="supervision.penalisedbyprofessional.title",
                 section="summary.supervision",
-                supportingContent = supportingContent
+                supportingContent = supportingContent,
+                classes = Seq("inline")
             ) {
 
                 @radio(
                     f = f("penalised"),
                     labelText = "lbl.yes",
                     value = "true",
-                    target = s"#$target",
-                    inline = true
+                    target = s"#$target"
                 )
 
                 @textarea(f("professionalBody"), "supervision.penalisedbyprofessional.details.lbl", bold = false, largeWidth = true, cols = "30", rows = "8")
@@ -69,8 +69,7 @@
                 @radio(
                     f = f("penalised"),
                     labelText = "lbl.no",
-                    value = "false",
-                    inline = true
+                    value = "false"
                 )
             }
 
