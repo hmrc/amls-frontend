@@ -168,7 +168,7 @@
             @prt.isUKResidence match {
                 case UKResidence(nino) => {
                     <p>@Messages("lbl.yes")</p>
-                    <p>@Messages("responsiblepeople.detailed_answers.uk_resident.nino"): @nino</p>
+                    <p>@Messages("responsiblepeople.detailed_answers.uk_resident.nino", personName): @nino</p>
                 }
                 case NonUKResidence => {
                     <p>@Messages("lbl.no")</p>
@@ -187,7 +187,7 @@
                 @pp match {
                     case UKPassportYes(ukPassportNumber) => {
                         <p>@Messages("lbl.yes")</p>
-                        <p>@Messages("responsiblepeople.detailed_answers.uk_resident.passport_number"): @ukPassportNumber</p>
+                        <p>@Messages("responsiblepeople.detailed_answers.uk_resident.passport_number", personName): @ukPassportNumber</p>
                     }
                     case UKPassportNo => {
                         <p>@Messages("lbl.no")</p>
@@ -207,7 +207,7 @@
                 @pp match {
                     case NonUKPassportYes(nonUKPassportNumber) => {
                         <p>@Messages("lbl.yes")</p>
-                        <p>@Messages("responsiblepeople.detailed_answers.uk_resident.passport_number"): @nonUKPassportNumber</p>
+                        <p>@Messages("responsiblepeople.detailed_answers.uk_resident.passport_number", personName): @nonUKPassportNumber</p>
                     }
                     case NoPassport => {
                         <p>@Messages("lbl.no")</p>

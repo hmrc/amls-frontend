@@ -38,31 +38,26 @@ class ExperienceTrainingController @Inject () (
 
 
 
-  private def businessActivitiesData(implicit ac: AuthContext, hc: HeaderCarrier): Future[BusinessActivities] = {
+  private def businessMatchingData(implicit ac: AuthContext, hc: HeaderCarrier): Future[BusinessMatching] = {
     dataCacheConnector.fetchAll map {
       cache =>
         Logger.debug(cache.toString)
         (for {
           c <- cache
-          businessMatching <- {
-            val a = c.getEntry[BusinessMatching](BusinessMatching.key)
-            Logger.debug(a.toString)
-            a
-          }
-          activities <- businessMatching.activities
-        } yield activities).getOrElse(BusinessActivities(Set.empty))
+          businessMatching <- c.getEntry[BusinessMatching](BusinessMatching.key)
+        } yield businessMatching).getOrElse(BusinessMatching())
     }
   }
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
       implicit authContext => implicit request =>
-        businessActivitiesData flatMap {
-          activities =>
+        businessMatchingData flatMap {
+          bm =>
             getData[ResponsiblePerson](index) map {
               case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_, Some(experienceTraining),_,_,_,_,_,_,_,_))
-              => Ok(experience_training(Form2[ExperienceTraining](experienceTraining), activities, edit, index, flow, personName.titleName))
+              => Ok(experience_training(Form2[ExperienceTraining](experienceTraining), bm.prefixedAlphabeticalBusinessTypes, edit, index, flow, personName.titleName))
               case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-              => Ok(experience_training(EmptyForm, activities, edit, index, flow, personName.titleName))
+              => Ok(experience_training(EmptyForm, bm.prefixedAlphabeticalBusinessTypes, edit, index, flow, personName.titleName))
               case _
               => NotFound(notFoundView)
             }
@@ -72,21 +67,20 @@ class ExperienceTrainingController @Inject () (
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
     Authorised.async {
       implicit authContext => implicit request => {
-        businessActivitiesData flatMap {
-          activities =>
+        businessMatchingData flatMap {
+          bm =>
             Form2[ExperienceTraining](request.body) match {
               case f: InvalidForm =>
                 getData[ResponsiblePerson](index) map { rp =>
-                  BadRequest(views.html.responsiblepeople.experience_training(f, activities, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+                  BadRequest(views.html.responsiblepeople.experience_training(f, bm.prefixedAlphabeticalBusinessTypes, edit, index, flow, ControllerHelper.rpTitleName(rp)))
                 }
               case ValidForm(_, data) => {
                 for {
-                  result <- updateDataStrict[ResponsiblePerson](index) { rp =>
-                    rp.experienceTraining(data)
-                  }
-                } yield edit match {
-                  case true => Redirect(routes.DetailedAnswersController.get(index, flow))
-                  case false => Redirect(routes.TrainingController.get(index, edit, flow))
+                  result <- updateDataStrict[ResponsiblePerson](index) { rp => rp.experienceTraining(data) }
+                } yield if (edit) {
+                  Redirect(routes.DetailedAnswersController.get(index, flow))
+                } else {
+                  Redirect(routes.TrainingController.get(index, edit, flow))
                 }
               }.recoverWith {
                 case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

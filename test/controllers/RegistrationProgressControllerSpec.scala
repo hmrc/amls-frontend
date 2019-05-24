@@ -101,7 +101,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
         }
       }
 
-      "status is ReadyForRenewal" must {
+      "status is ReadyForRenewal and renewal data exists in mongoCache" must {
         "redirect to renewal registration progress" in new Fixture {
 
             mockCacheFetch[Renewal](Some(Renewal(Some(InvolvedInOtherNo))))
@@ -113,7 +113,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
             redirectLocation(responseF) must be(Some(renewal.routes.RenewalProgressController.get().url))
           }
         }
-        "status is renewal submitted" must {
+        "status is renewal submitted and renewal data exists in mongoCache" must {
           "show the registration amendment page" in new Fixture {
             when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
               .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
@@ -138,31 +138,11 @@ class RegistrationProgressControllerSpec extends AmlsSpec
         }
 
 
-      "redirect to renewal progress" when {
+      "redirect to registration progress" when {
         "status is ready for renewal and" must {
           "redirectWithNominatedOfficer" in new Fixture {
 
             mockApplicationStatus(ReadyForRenewal(None))
-
-            when(controller.sectionsProvider.sections(mockCacheMap))
-              .thenReturn(Seq.empty[Section])
-
-            when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-              .thenReturn(Future.successful(None))
-
-            val responseF = controller.get()(request)
-
-            status(responseF) must be(SEE_OTHER)
-            redirectLocation(responseF) must be(Some(renewal.routes.RenewalProgressController.get().url))
-          }
-        }
-      }
-
-      "redirect to registration progress" when {
-        "status is NOT ready for renewal and" must {
-          "redirectWithNominatedOfficer" in new Fixture {
-
-            mockApplicationStatus(RenewalSubmitted(None))
 
             when(controller.sectionsProvider.sections(mockCacheMap))
               .thenReturn(Seq.empty[Section])
@@ -176,6 +156,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
             val pageTitle = Messages("progress.title") + " - " +
               Messages("title.amls") + " - " + Messages("title.gov")
             Jsoup.parse(contentAsString(responseF)).title mustBe pageTitle
+
           }
         }
       }

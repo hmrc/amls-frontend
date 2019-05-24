@@ -24,6 +24,10 @@
     @errorSummary(f)
 }
 
+@supportingContent = {
+    <p>@Messages("businessactivities.accountantForAMLSRegulations.subtext")</p>
+}
+
 @main(
     title = Messages("businessactivities.accountantForAMLSRegulations.title") + " - " + Messages("summary.businessactivities"),
     heading = header
@@ -36,9 +40,9 @@
             heading = "businessactivities.accountantForAMLSRegulations.title",
             section = "summary.businessactivities",
             panel = false,
-            classes = Seq("inline")
+            classes = Seq("inline"),
+            supportingContent = supportingContent
         ) {
-            <p>@Messages("businessactivities.accountantForAMLSRegulations.subtext")</p>
             @radio(
                 f = f("accountantForAMLSRegulations"),
                 labelText = "lbl.yes",
