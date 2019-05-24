@@ -39,7 +39,21 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.businessactivities")
+}
+
+@supportingContent = {
+    @businessTypes.map { types =>
+        @if(types.size > 1) {
+            <p>@Messages("businessactivities.confirm-activities.subtitle")</p>
+            <ul class="list list-bullet">
+                @types.map { businessType =>
+                    <li>@businessType</li>
+                }
+            </ul>
+        } else {
+            <p>@Messages("businessactivities.confirm-activities.subtitle_2") @types.head @Messages("businessactivities.confirm-activities.subtitle_3")</p>
+        }
+    }
 }
 
 @main(
@@ -49,62 +63,48 @@
 
     @form(f, controllers.businessactivities.routes.ExpectedAMLSTurnoverController.post(edit)) {
 
-        @fieldset(
-            f = f("expectedAMLSTurnover-fieldset"),
+        @fieldsetWithErrorGroup(
+            f = f("expectedAMLSTurnover"),
             heading = "businessactivities.turnover.title",
-            panel = false
+            section = "summary.businessactivities",
+            panel = false,
+            supportingContent = supportingContent
         ) {
-            @businessTypes.map { types =>
-                @if(types.size > 1) {
-                    <p>@Messages("businessactivities.confirm-activities.subtitle")</p>
-                    <ul class="list list-bullet">
-                        @types.map { businessType =>
-                            <li>@businessType</li>
-                        }
-                    </ul>
-                } else {
-                    <p>@Messages("businessactivities.confirm-activities.subtitle_2") @types.head @Messages("businessactivities.confirm-activities.subtitle_3")</p>
-                }
-            }
-            @errorGroup(
-                field = f("expectedAMLSTurnover")
-            ) {
-                @radio(
-                    f = f("expectedAMLSTurnover"),
-                    labelText = "businessactivities.turnover.lbl.01",
-                    value = "01"
-                )
-                @radio(
-                    f = f("expectedAMLSTurnover"),
-                    labelText = "businessactivities.turnover.lbl.02",
-                    value = "02"
-                )
-                @radio(
-                    f = f("expectedAMLSTurnover"),
-                    labelText = "businessactivities.turnover.lbl.03",
-                    value = "03"
-                )
-                @radio(
-                    f = f("expectedAMLSTurnover"),
-                    labelText = "businessactivities.turnover.lbl.04",
-                    value = "04"
-                )
-                @radio(
-                    f = f("expectedAMLSTurnover"),
-                    labelText = "businessactivities.turnover.lbl.05",
-                    value = "05"
-                )
-                @radio(
-                    f = f("expectedAMLSTurnover"),
-                    labelText = "businessactivities.turnover.lbl.06",
-                    value = "06"
-                )
-                @radio(
-                    f = f("expectedAMLSTurnover"),
-                    labelText = "businessactivities.turnover.lbl.07",
-                    value = "07"
-                )
-            }
+            @radio(
+                f = f("expectedAMLSTurnover"),
+                labelText = "businessactivities.turnover.lbl.01",
+                value = "01"
+            )
+            @radio(
+                f = f("expectedAMLSTurnover"),
+                labelText = "businessactivities.turnover.lbl.02",
+                value = "02"
+            )
+            @radio(
+                f = f("expectedAMLSTurnover"),
+                labelText = "businessactivities.turnover.lbl.03",
+                value = "03"
+            )
+            @radio(
+                f = f("expectedAMLSTurnover"),
+                labelText = "businessactivities.turnover.lbl.04",
+                value = "04"
+            )
+            @radio(
+                f = f("expectedAMLSTurnover"),
+                labelText = "businessactivities.turnover.lbl.05",
+                value = "05"
+            )
+            @radio(
+                f = f("expectedAMLSTurnover"),
+                labelText = "businessactivities.turnover.lbl.06",
+                value = "06"
+            )
+            @radio(
+                f = f("expectedAMLSTurnover"),
+                labelText = "businessactivities.turnover.lbl.07",
+                value = "07"
+            )
         }
         @submit(edit)
     }

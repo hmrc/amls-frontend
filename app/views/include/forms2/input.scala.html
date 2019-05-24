@@ -21,7 +21,6 @@
     field: Field,
     labelText: String = "",
     hintText: String = "",
-    bold: Boolean = false,
     classes: Seq[String] = Seq.empty,
     panel: Boolean = false,
     jsHidden: Boolean = false,
@@ -37,28 +36,56 @@
     attrDescribedBy: String = "",
     data: String = "",
     dataAttrs: Map[String, String] = Map.empty[String, String],
-    headingText: String = ""
+    heading: String = "",
+    section: String = ""
 )(implicit lang:Lang,  m: Messages)
+
+@labelSpan = {
+    @if(labelText.nonEmpty) {
+        @if(labelHidden) {<span class="visuallyhidden">}
+            @Messages(labelText)
+        @if(labelHidden){</span>}
+    }
+}
+
+@label = {
+    @if(heading.nonEmpty) {
+        <div class="page-header">
+            <h1>
+                <label class="heading-xlarge" for="@field.id">
+                    @Messages(heading)
+                </label>
+            </h1>
+            @if(section.nonEmpty) {
+                <p class="heading-secondary">
+                    <span class="visuallyhidden">This section is: </span>@Messages(section)
+                </p>
+            }
+        </div>
+        <span class="form-label">
+            @labelSpan
+        </span>
+    } else {
+        <label class="form-label" for="@field.id">
+            @labelSpan
+        </label>
+    }
+}
 
 
 <div class="form-group@if(field.hasErrors){ form-field--error}@if(parentDateAttr){ form-group-@parentDateAttr} @if(panel){ panel-indent}@if(jsHidden){ js-hidden}"@if(data){ data-reveal="@data"}>
-    <label class="form-label@if(bold){-bold}" for="@field.id">
-        @if(labelText.nonEmpty) {
-            @if(labelHidden) {<span class="visuallyhidden">}
-            @Messages(labelText)
-            @if(labelHidden){</span>}
-        }
-    </label>
+    @label
     @if(hintText.nonEmpty) {
         <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
     }
     @if(field.hasErrors) {
-        <span class="error-notification" data-journey="error - field:user input:@field.name">@field.error</span>
+        <span class="error-notification" id="@{field.id}-error-notification" data-journey="error - field:user input:@field.name">
+            <span class="visuallyhidden">Error: </span>@field.error
+        </span>
     }
     <input name="@field.name" class="form-control @if(attrType=="number"){ input--no-spinner} @classes.mkString(" ")"
             value="@field.value" id="@field.id"
-            @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint" }
-            @if(attrDescribedBy.nonEmpty) { aria-describedby="@attrDescribedBy-hint" }
+            @if(hintText.nonEmpty || field.hasErrors || attrDescribedBy.nonEmpty) { aria-describedby="@if(hintText.nonEmpty) {@{field.id}-hint} @if(field.hasErrors) {@{field.id}-error-notification}" @if(attrDescribedBy.nonEmpty){@attrDescribedBy-hint}}
             @if(attrType.nonEmpty) { type="@attrType" } else { type="text" }
             @if(attrMinMax.attrMin.nonEmpty) { min="@attrMinMax.attrMin" }
             @if(attrMinMax.attrMax.nonEmpty) { max="@attrMinMax.attrMax" }

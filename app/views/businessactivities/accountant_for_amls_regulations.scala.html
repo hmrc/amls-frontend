@@ -22,7 +22,10 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.businessactivities")
+}
+
+@supportingContent = {
+    <p>@Messages("businessactivities.accountantForAMLSRegulations.subtext")</p>
 }
 
 @main(
@@ -32,13 +35,14 @@
 
     @form(f, controllers.businessactivities.routes.AccountantForAMLSRegulationsController.post(edit)) {
 
-        @fieldset(
+        @fieldsetWithErrorGroup(
             f = f("accountantForAMLSRegulations"),
             heading = "businessactivities.accountantForAMLSRegulations.title",
+            section = "summary.businessactivities",
             panel = false,
-            classes = Seq("inline")
+            classes = Seq("inline"),
+            supportingContent = supportingContent
         ) {
-            <p>@Messages("businessactivities.accountantForAMLSRegulations.subtext")</p>
             @radio(
                 f = f("accountantForAMLSRegulations"),
                 labelText = "lbl.yes",

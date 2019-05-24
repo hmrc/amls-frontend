@@ -24,7 +24,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.businessactivities")
 }
 
 @main(
@@ -36,6 +35,7 @@
 
         @fieldset(
             heading = "businessactivities.whoisyouraccountant.title",
+            section = "summary.businessactivities",
             panel = false,
             f = f("whoisyouraccountant-fieldset"),
             classes = Seq("form-group")

@@ -23,7 +23,10 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.renewal")
+}
+
+@supportingContent = {
+    <p>@hint("lbl.list.upto.3.countries")</p>
 }
 
 @main(
@@ -33,24 +36,21 @@
 
     @form(f, controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.post(edit)) {
 
-        @fieldset(
+        @fieldsetWithErrorGroup(
             heading = "renewal.msb.largest.amounts.title",
-            f = f("largestAmountsOfMoney-fieldset"),
-            panel = false
+            section = "summary.renewal",
+            f = f("largestAmountsOfMoney"),
+            panel = false,
+            supportingContent = supportingContent
         ) {
-            <p>@hint("lbl.list.upto.3.countries")</p>
-            @errorGroup(
-                field = f("largestAmountsOfMoney")
-            ) {
-                @for(i <- 0 until 3) {
-                    @defining(
-                        f(s"largestAmountsOfMoney[$i]")
-                    ) { field => @country_autocomplete(
-                            field = field,
-                            labelText = s"lbl.country.line${i + 1}",
-                            data = countryData.getOrElse(Seq.empty)
-                        )
-                    }
+            @for(i <- 0 until 3) {
+                @defining(
+                    f(s"largestAmountsOfMoney[$i]")
+                ) { field => @country_autocomplete(
+                        field = field,
+                        labelText = s"lbl.country.line${i + 1}",
+                        data = countryData.getOrElse(Seq.empty)
+                    )
                 }
             }
         }

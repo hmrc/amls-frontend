@@ -24,7 +24,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.businessactivities")
 }
 
 @main(
@@ -34,25 +33,18 @@
 
     @form(f, controllers.businessactivities.routes.EmployeeCountAMLSSupervisionController.post(edit)) {
 
-        @fieldset(
-            f = f("employees"),
+        @input(
+            attrMinMax = AttrMinMax(attrMin = "1"),
+            attrPattern = "[0-9]*",
+            attrStep = "1",
+            attrType = "number",
+            classes = Seq("form-control-1-4"),
+            field = f("employeeCountAMLSSupervision"),
             heading = "businessactivities.employees.amls.supervision.title",
-            panel = false
-        ) {
-            <p class="form-label">@Messages("businessactivities.employees.line2.label")</p>
-            <p class="form-hint">@Messages("businessactivities.employees.line2.hint")</p>
-
-            @input(
-                attrMinMax = AttrMinMax(attrMin = "1"),
-                attrPattern = "[0-9]*",
-                attrStep = "1",
-                attrType = "number",
-                bold = false,
-                field = f("employeeCountAMLSSupervision"),
-                labelText = "businessactivities.employees.amls.supervision.title",
-                labelHidden = true
-            )
-        }
+            section = "summary.businessactivities",
+            labelText = "businessactivities.employees.line2.label",
+            hintText = "businessactivities.employees.line2.hint"
+        )
 
         @submit(edit)
 

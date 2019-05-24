@@ -24,7 +24,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("renewal.msb.ce.transactions.expected.title", "summary.renewal")
 }
 
 @main(
@@ -40,8 +39,8 @@
             attrType = "number",
             classes = Seq("form-control-1-4"),
             field = f("ceTransaction"),
-            labelText = "renewal.msb.ce.transactions.expected.title",
-            labelHidden = true
+            heading = "renewal.msb.ce.transactions.expected.title",
+            section = "summary.renewal"
         )
 
         @submit(edit, returnLocation = Some("renewal"))

@@ -22,7 +22,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.businessactivities")
 }
 
 @question = @{
@@ -36,9 +35,10 @@
 
     @form(f, controllers.businessactivities.routes.TaxMattersController.post(edit)) {
 
-        @fieldset(
+        @fieldsetWithErrorGroup(
             f = f("manageYourTaxAffairs"),
             heading = question,
+            section = "summary.businessactivities",
             panel = false,
             classes = Seq("inline")
         ) {

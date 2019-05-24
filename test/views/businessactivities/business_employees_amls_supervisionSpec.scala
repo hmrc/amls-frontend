@@ -47,8 +47,8 @@ class business_employees_amls_supervisionSpec extends AmlsSpec with MustMatchers
 
       def view = views.html.businessactivities.business_employees_amls_supervision(form2, true)
 
-      heading.html must be(Messages("businessactivities.employees.amls.supervision.title"))
-      subHeading.html must include(Messages("summary.businessactivities"))
+      heading.text() must be(Messages("businessactivities.employees.amls.supervision.title"))
+      subHeading.text() must include(Messages("summary.businessactivities"))
 
     }
 

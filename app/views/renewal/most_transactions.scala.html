@@ -23,7 +23,10 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.renewal")
+}
+
+@supportingContent = {
+    <p>@hint("lbl.list.upto.3.countries")</p>
 }
 
 @main(
@@ -33,24 +36,21 @@
 
     @form(f, controllers.renewal.routes.MostTransactionsController.post(edit)) {
 
-        @fieldset(
-            f = f("mostTransactionsCountries-fieldset"),
+        @fieldsetWithErrorGroup(
+            f = f("mostTransactionsCountries"),
             heading = "renewal.msb.most.transactions.title",
-            panel = false
+            section = "summary.renewal",
+            panel = false,
+            supportingContent = supportingContent
         ) {
-            @hint("lbl.list.upto.3.countries")
-            @errorGroup(
-                field = f("mostTransactionsCountries")
-            ) {
-                @for(i <- 0 until 3) {
-                    @defining(
-                        f(s"mostTransactionsCountries[$i]")
-                    ) { field => @country_autocomplete(
-                        field = field,
-                        labelText = s"lbl.country.line${i + 1}",
-                        data = countryData.getOrElse(Seq.empty)
-                    ) }
-                }
+            @for(i <- 0 until 3) {
+                @defining(
+                    f(s"mostTransactionsCountries[$i]")
+                ) { field => @country_autocomplete(
+                    field = field,
+                    labelText = s"lbl.country.line${i + 1}",
+                    data = countryData.getOrElse(Seq.empty)
+                ) }
             }
         }
         @submit(edit, returnLocation = Some("renewal"))

@@ -46,11 +46,11 @@ class transactions_in_last_12_monthsSpec extends AmlsSpec with MustMatchers {
 
   "The MSB money transfers view" must {
     "display the correct header" in new ViewFixture {
-      doc.select("header .heading-xlarge").text mustBe Messages("renewal.msb.transfers.header")
+      doc.select(".heading-xlarge").text mustBe Messages("renewal.msb.transfers.header")
     }
 
     "display the correct secondary header" in new ViewFixture {
-      doc.select("header .heading-secondary").text must include(Messages("summary.renewal"))
+      doc.select(".heading-secondary").text must include(Messages("summary.renewal"))
     }
 
     "display the correct title" in new ViewFixture {
