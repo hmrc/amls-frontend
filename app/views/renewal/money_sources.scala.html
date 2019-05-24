@@ -25,6 +25,10 @@
     @errorSummary(f)
 }
 
+@supportingContent = {
+    <p class="form-hint">@Messages("lbl.select.all")</p>
+}
+
 @main(
     title = Messages("renewal.msb.money_sources.header") + " - " + Messages("summary.renewal"),
     heading = header
@@ -36,9 +40,9 @@
             heading = "renewal.msb.money_sources.header",
             section = "summary.renewal",
             jsHidden = false,
-            panel = false
+            panel = false,
+            supportingContent = supportingContent
         ) {
-            <p class="form-hint">@Messages("lbl.select.all")</p>
             @checkbox(
                 f = f("bankMoneySource"),
                 labelText = "msb.which_currencies.source.banks",

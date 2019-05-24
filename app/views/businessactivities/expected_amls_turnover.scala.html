@@ -41,6 +41,21 @@
     @errorSummary(f)
 }
 
+@supportingContent = {
+    @businessTypes.map { types =>
+        @if(types.size > 1) {
+            <p>@Messages("businessactivities.confirm-activities.subtitle")</p>
+            <ul class="list list-bullet">
+                @types.map { businessType =>
+                    <li>@businessType</li>
+                }
+            </ul>
+        } else {
+            <p>@Messages("businessactivities.confirm-activities.subtitle_2") @types.head @Messages("businessactivities.confirm-activities.subtitle_3")</p>
+        }
+    }
+}
+
 @main(
     title = Messages("businessactivities.turnover.title") + " - " + Messages("summary.businessactivities"),
     heading = header
@@ -52,20 +67,9 @@
             f = f("expectedAMLSTurnover"),
             heading = "businessactivities.turnover.title",
             section = "summary.businessactivities",
-            panel = false
+            panel = false,
+            supportingContent = supportingContent
         ) {
-            @businessTypes.map { types =>
-                @if(types.size > 1) {
-                    <p>@Messages("businessactivities.confirm-activities.subtitle")</p>
-                    <ul class="list list-bullet">
-                        @types.map { businessType =>
-                            <li>@businessType</li>
-                        }
-                    </ul>
-                } else {
-                    <p>@Messages("businessactivities.confirm-activities.subtitle_2") @types.head @Messages("businessactivities.confirm-activities.subtitle_3")</p>
-                }
-            }
             @radio(
                 f = f("expectedAMLSTurnover"),
                 labelText = "businessactivities.turnover.lbl.01",

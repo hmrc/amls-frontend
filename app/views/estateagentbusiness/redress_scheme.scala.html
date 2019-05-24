@@ -24,6 +24,10 @@
     @errorSummary(f)
 }
 
+@supportingContent = {
+    <p>@Messages("estateagentbusiness.registered.redress.text")</p>
+}
+
 @main(
     title = Messages("estateagentbusiness.registered.redress.title") + " - " + Messages("summary.estateagentbusiness"),
     heading = header
@@ -36,9 +40,9 @@
             heading = "estateagentbusiness.registered.redress.heading",
             section = "summary.estateagentbusiness",
             classes = Seq("propertyRedress-fieldset"),
-            panel = false
+            panel = false,
+            supportingContent = supportingContent
         ) {
-            <p>@Messages("estateagentbusiness.registered.redress.text")</p>
             @radio(
                 f = f("propertyRedressScheme"),
                 labelText = "estateagentbusiness.redress.lbl.05",
