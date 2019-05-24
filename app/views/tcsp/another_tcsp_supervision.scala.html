@@ -45,8 +45,7 @@
                 f = f("servicesOfAnotherTCSP"),
                 labelText = "lbl.yes",
                 value = "true",
-                target = "[data-reveal='mlr-ref-number']",
-                inline = true
+                target = "[data-reveal='mlr-ref-number']"
             )
             @input(
                 field = f("mlrRefNumber"),
@@ -55,12 +54,11 @@
                 hintText = "hint.8.digits",
                 attrMaxlength = "15",
                 attrPattern = "[0-9a-z-A-Z]{1,15}"
-           )
+            )
             @radio(
                 f = f("servicesOfAnotherTCSP"),
                 labelText = "lbl.no",
-                value = "false",
-                inline = true
+                value = "false"
             )
         }
 
