@@ -40,7 +40,7 @@ class company_registration_numberSpec extends AmlsSpec with MustMatchers  {
       def view = views.html.businessmatching.company_registration_number(form2, edit = false, isPreSubmission = true)
 
       doc.title must startWith(Messages("businessmatching.registrationnumber.title") + " - " + Messages("summary.businessmatching"))
-      heading.html must be(Messages("businessmatching.registrationnumber.title"))
+      heading.html must include(Messages("businessmatching.registrationnumber.title"))
       subHeading.html must include(Messages("summary.businessmatching"))
 
     }
@@ -52,7 +52,7 @@ class company_registration_numberSpec extends AmlsSpec with MustMatchers  {
       def view = views.html.businessmatching.company_registration_number(form2, edit = true, isPreSubmission = false)
 
       doc.title must startWith(Messages("businessmatching.registrationnumber.title") + " - " + Messages("summary.updateinformation"))
-      heading.html must be(Messages("businessmatching.registrationnumber.title"))
+      heading.html must include(Messages("businessmatching.registrationnumber.title"))
       subHeading.html must include(Messages("summary.updateinformation"))
 
     }
