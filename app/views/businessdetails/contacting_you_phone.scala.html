@@ -28,7 +28,6 @@
 
 @supportingContent = { <p>@Messages("businessdetails.contactingyou.phone.lbl2")</p> }
 
-
 @main(
     title = Messages("businessdetails.contactingyou.phone.title") + " - " + Messages("summary.businessdetails"),
     heading = header
@@ -36,16 +35,13 @@
 
     @form(f, controllers.businessdetails.routes.ContactingYouPhoneController.post(edit)) {
 
-
         @fieldsetWithErrorGroup(
-            f = f("contactingyou-fieldset"),
+            f = f("contactingyou"),
             heading = "businessdetails.contactingyou.phone.title",
             section = "summary.businessdetails",
             supportingContent = supportingContent,
             panel = false
         ) {
-
-
             @input(
                 field = f("phoneNumber"),
                 labelText = "businessdetails.contactingyou.phone.lbl",
