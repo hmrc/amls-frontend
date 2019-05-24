@@ -26,7 +26,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessdetails.registeredforvat.title", "summary.businessdetails")
 }
 
 @main(
@@ -36,44 +35,37 @@
 
     @form(f, controllers.businessdetails.routes.VATRegisteredController.post(edit)) {
 
-        @fieldset(
-            f = f("registeredforvat-fieldset"),
-            legend = "businessdetails.registeredforvat.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("registeredForVAT"),
+            heading = "businessdetails.registeredforvat.title",
+            section = "summary.businessdetails",
             panel = false
         ) {
-
-            @errorGroup(
-                field = f("registeredForVAT")
+            @radio(
+                f = f("registeredForVAT"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = s"#$target"
+            )
+            @panel(
+                field = Some(f(s"$target")),
+                jsHidden = false,
+                id = target
             ) {
-                @radio(
-                    f = f("registeredForVAT"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    target = s"#$target",
-                    inline = true
-                )
-                @panel(
-                    field = Some(f(s"$target")),
-                    jsHidden = false,
-                    id = target
-                ) {
-                    @input(
-                        field = f("vrnNumber"),
-                        labelText = "businessdetails.registeredforvat.lbl.vatNumber",
-                        hintText = "businessdetails.registeredforvat.lbl.vatNumber.hint",
-                        attrType = "number",
-                        attrMaxlength = "9",
-                        attrPattern = "[0-9]{1,9}"
-                    )
-                }
-                @radio(
-                    f = f("registeredForVAT"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
+                @input(
+                    field = f("vrnNumber"),
+                    labelText = "businessdetails.registeredforvat.lbl.vatNumber",
+                    hintText = "businessdetails.registeredforvat.lbl.vatNumber.hint",
+                    attrType = "number",
+                    attrMaxlength = "9",
+                    attrPattern = "[0-9]{1,9}"
                 )
             }
+            @radio(
+                f = f("registeredForVAT"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
 
         @submit(false)
