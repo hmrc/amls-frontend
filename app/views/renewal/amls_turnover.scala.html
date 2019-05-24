@@ -25,6 +25,22 @@
     @errorSummary(f)
 }
 
+@supportingContent = {
+    @businessTypes.map { types =>
+        @if(types.size > 1) {
+            <p>@Messages("renewal.turnover.text")</p>
+
+            <ul class="list list-bullet">
+                @types.map { businessType =>
+                <li>@businessType</li>
+                }
+            </ul>
+        } else {
+            <p>@Messages("businessactivities.confirm-activities.subtitle_4") @types.head </p>
+        }
+    }
+}
+
 @main(
     title = Messages("renewal.turnover.title") + " - " + Messages("summary.renewal"),
     heading = header
@@ -36,21 +52,9 @@
                 f = f("turnover"),
                 heading = "renewal.turnover.title",
                 section = "summary.renewal",
-                panel = false
+                panel = false,
+                supportingContent = supportingContent
             ) {
-                @businessTypes.map { types =>
-                    @if(types.size > 1) {
-                        <p>@Messages("renewal.turnover.text")</p>
-
-                        <ul class="list list-bullet">
-                            @types.map { businessType =>
-                            <li>@businessType</li>
-                            }
-                        </ul>
-                    } else {
-                        <p>@Messages("businessactivities.confirm-activities.subtitle_4") @types.head </p>
-                    }
-                }
                 @radio(
                     f = f("turnover"),
                     labelText = "businessactivities.turnover.lbl.01",

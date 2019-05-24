@@ -17,7 +17,9 @@
 package controllers.declaration
 
 import connectors.{AmlsConnector, DataCacheConnector}
+import forms.InvalidForm
 import generators.ResponsiblePersonGenerator
+import jto.validation.{Path, ValidationError}
 import models.ReadStatusResponse
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.declaration.{AddPerson, WhoIsRegistering}
@@ -235,6 +237,52 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
           contentAsString(result) must include(Messages("declaration.who.is.registering.text"))
           contentAsString(result) must include(Messages("submit.registration"))
         }
+      }
+
+      "show who is declaring this update error when invalid data is posted for update" in new Fixture {
+        run(SubmissionReadyForReview) { _ =>
+          val newRequest = request.withFormUrlEncodedBody()
+          val result = controller.post()(newRequest)
+
+          status(result) must be(BAD_REQUEST)
+          contentAsString(result) must include("Select who is declaring this update")
+        }
+      }
+
+      "show who is declaring this update error when status is where there is no add person view shown" in new Fixture {
+        val invalidForm = InvalidForm(Map.empty, Seq.empty)
+
+        val actualForm = controller.updateFormErrors(invalidForm, NotCompleted, true)
+
+        val expectedErrors = Seq((Path("person"), Seq(ValidationError(Seq("Select who is registering this business")))))
+        actualForm.errors must be(expectedErrors)
+      }
+
+      "show who is declaring this update error when status is RenewalSubmitted" in new Fixture {
+        val invalidForm = InvalidForm(Map.empty, Seq.empty)
+
+        val actualForm = controller.updateFormErrors(invalidForm, RenewalSubmitted(Some(LocalDate.now)), true)
+
+        val expectedErrors = Seq((Path("person"), Seq(ValidationError(Seq("Select who is declaring this update")))))
+        actualForm.errors must be(expectedErrors)
+      }
+
+      "show who is declaring this renewal error when there is variation and status is SubmissionReadyForReview or SubmissionDecisionApproved or ReadyForRenewal" in new Fixture {
+        val invalidForm = InvalidForm(Map.empty, Seq.empty)
+
+        val actualForm = controller.updateFormErrors(invalidForm, SubmissionReadyForReview, true)
+
+        val expectedErrors = Seq((Path("person"), Seq(ValidationError(Seq("Select who is declaring this renewal")))))
+        actualForm.errors must be(expectedErrors)
+      }
+
+      "show who is declaring this update error when there is variation and status is SubmissionReadyForReview or SubmissionDecisionApproved or ReadyForRenewal" in new Fixture {
+        val invalidForm = InvalidForm(Map.empty, Seq.empty)
+
+        val actualForm = controller.updateFormErrors(invalidForm, SubmissionReadyForReview, false)
+
+        val expectedErrors = Seq((Path("person"), Seq(ValidationError(Seq("Select who is declaring this update")))))
+        actualForm.errors must be(expectedErrors)
       }
 
       "redirect to the declaration page" when {

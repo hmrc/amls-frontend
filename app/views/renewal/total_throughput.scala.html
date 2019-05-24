@@ -26,6 +26,10 @@
     @errorSummary(f)
 }
 
+@supportingContent = {
+    <p>@Messages("renewal.msb.throughput.info")</p>
+}
+
 @main(
     title = s"${messages("renewal.msb.throughput.header")} - ${messages("summary.renewal")}",
     heading = header
@@ -36,9 +40,9 @@
             f = f("throughput"),
             heading = "renewal.msb.throughput.header",
             section = "summary.renewal",
-            panel = false
+            panel = false,
+            supportingContent = supportingContent
         ) {
-            <p>@Messages("renewal.msb.throughput.info")</p>
             @(TotalThroughput.throughputValues.map { v =>
                 radio(
                     f = f("throughput"),

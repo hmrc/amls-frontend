@@ -23,6 +23,10 @@
     s"""${f("franchiseName").id}-panel"""
 }
 
+@supportingContent = {
+    <p>@Messages("businessactivities.businessfranchise.subtitle")</p>
+}
+
 @header = {
     @components.back_link()
     @errorSummary(f)
@@ -39,11 +43,9 @@
             f = f("businessFranchise"),
             heading = "businessactivities.businessfranchise.title",
             section = "summary.businessactivities",
-            panel = false
+            panel = false,
+            supportingContent = supportingContent
         ) {
-
-            <p>@Messages("businessactivities.businessfranchise.subtitle")</p>
-
             @radio(
                 f = f("businessFranchise"),
                 labelText = "lbl.yes",

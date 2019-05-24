@@ -24,6 +24,19 @@
     @errorSummary(f)
 }
 
+@supportingContent = {
+    <p>@Messages("renewal.percentage.info.line1")</p>
+    <p>@Messages("renewal.percentage.info.line2")</p>
+
+    <ul class="list list-bullet">
+        <li>@Messages("renewal.percentage.list.line1")</li>
+        <li>@Messages("renewal.percentage.list.line2")</li>
+        <li>@Messages("renewal.percentage.list.line3")</li>
+    </ul>
+
+    <p>@Messages("renewal.percentage.turnover.text")</p>
+}
+
 @main(
     title = Messages("renewal.hvd.percentage.title") + " - " + Messages("summary.renewal"),
     heading = header
@@ -35,18 +48,9 @@
             f = f("percentage"),
             heading = "renewal.hvd.percentage.title",
             section = "summary.renewal",
-            panel = false
+            panel = false,
+            supportingContent = supportingContent
         ) {
-            <p>@Messages("renewal.percentage.info.line1")</p>
-            <p>@Messages("renewal.percentage.info.line2")</p>
-
-            <ul class="list list-bullet">
-                <li>@Messages("renewal.percentage.list.line1")</li>
-                <li>@Messages("renewal.percentage.list.line2")</li>
-                <li>@Messages("renewal.percentage.list.line3")</li>
-            </ul>
-
-            <p>@Messages("renewal.percentage.turnover.text")</p>
             @radio(
                 f = f("percentage"),
                 labelText = "hvd.percentage.lbl.01",
