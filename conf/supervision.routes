@@ -1,7 +1,7 @@
 GET         /what-you-need                                                @controllers.supervision.WhatYouNeedController.get()
 
-GET         /another-supervising-body                                                   @controllers.supervision.AnotherBodyController.get(edit: Boolean ?= false)
-POST        /another-supervising-body                                                   @controllers.supervision.AnotherBodyController.post(edit: Boolean ?= false)
+GET         /another-supervising-body                                     @controllers.supervision.AnotherBodyController.get(edit: Boolean ?= false)
+POST        /another-supervising-body                                     @controllers.supervision.AnotherBodyController.post(edit: Boolean ?= false)
 
 GET         /supervised-start-date                                        @controllers.supervision.SupervisionStartController.get(edit: Boolean ?= false)
 POST        /supervised-start-date                                        @controllers.supervision.SupervisionStartController.post(edit: Boolean ?= false)
@@ -12,14 +12,14 @@ POST        /supervised-end-date                                          @contr
 GET         /supervised-end-reasons                                       @controllers.supervision.SupervisionEndReasonsController.get(edit: Boolean ?= false)
 POST        /supervised-end-reasons                                       @controllers.supervision.SupervisionEndReasonsController.post(edit: Boolean ?= false)
 
-GET         /member-professional-body                                            @controllers.supervision.ProfessionalBodyMemberController.get(edit: Boolean ?= false)
-POST        /member-professional-body                                            @controllers.supervision.ProfessionalBodyMemberController.post(edit: Boolean ?= false)
+GET         /member-professional-body                                     @controllers.supervision.ProfessionalBodyMemberController.get(edit: Boolean ?= false)
+POST        /member-professional-body                                     @controllers.supervision.ProfessionalBodyMemberController.post(edit: Boolean ?= false)
 
-GET         /which-professional-body                                      @controllers.supervision.WhichProfessionalBodyController.get(edit: Boolean ?= false)
-POST        /which-professional-body                                      @controllers.supervision.WhichProfessionalBodyController.post(edit: Boolean ?= false)
+GET         /which-professional-bodies                                    @controllers.supervision.WhichProfessionalBodyController.get(edit: Boolean ?= false)
+POST        /which-professional-bodies                                    @controllers.supervision.WhichProfessionalBodyController.post(edit: Boolean ?= false)
 
-GET         /penalty                                                    @controllers.supervision.PenalisedByProfessionalController.get(edit: Boolean ?= false)
-POST        /penalty                                                    @controllers.supervision.PenalisedByProfessionalController.post(edit: Boolean ?= false)
+GET         /penalty                                                      @controllers.supervision.PenalisedByProfessionalController.get(edit: Boolean ?= false)
+POST        /penalty                                                      @controllers.supervision.PenalisedByProfessionalController.post(edit: Boolean ?= false)
 
 GET         /check-your-answers                                           @controllers.supervision.SummaryController.get()
 POST        /check-your-answers                                           @controllers.supervision.SummaryController.post()

@@ -107,7 +107,6 @@ object FormTypes {
   /** Name Rules **/
 
   private val commonNameRegex = "^[a-zA-Z\\u00C0-\\u00FF '‘’\\u2014\\u2013\\u2010\\u002d]+$".r
-  val commonNameRegexRule = regexWithMsg(commonNameRegex, "error.invalid.common_name.validation")
 
   private val middleNameLength = maxWithMsg(maxNameTypeLength, "error.invalid.length.middlename")
   val middleNameType = notEmpty andThen middleNameLength
@@ -287,10 +286,12 @@ object FormTypes {
     .andThen(maxLength(maxNameTypeLength))
     .andThen(regexWithMsg(commonNameRegex, "err.text.validation"))
 
-  def genericNameRule(requiredMsg: String = "", maxLengthMsg: String = "error.invalid.common_name.length") =
+  def genericNameRule(requiredMsg: String = "",
+                      maxLengthMsg: String = "error.invalid.common_name.length",
+                      regExMessage: String="error.invalid.common_name.validation") =
     notEmptyStrip
       .andThen(notEmpty.withMessage(requiredMsg))
-      .andThen(commonNameRegexRule)
+      .andThen(regexWithMsg(commonNameRegex, regExMessage))
       .andThen(maxWithMsg(maxNameTypeLength, maxLengthMsg))
 
   val accountNameType = notEmptyStrip
