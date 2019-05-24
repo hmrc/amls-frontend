@@ -104,13 +104,8 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
       when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      val businessActivities = BusinessActivities(involvedInOther = Some(InvolvedInOtherYes("test")))
-      when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
-        .thenReturn(Some(businessActivities))
-
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
-
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName,experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
@@ -130,13 +125,8 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
       when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      val businessActivities = BusinessActivities(involvedInOther = Some(InvolvedInOtherYes("test")))
-      when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
-        .thenReturn(Some(businessActivities))
-
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
-
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, experienceTraining = Some(ExperienceTrainingNo))))))
@@ -156,15 +146,10 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
         "experienceInformation" -> "I do not remember when I did the training"
       )
 
-
       val mockCacheMap = mock[CacheMap]
 
       when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
-
-      val businessActivities = BusinessActivities(involvedInOther = Some(InvolvedInOtherYes("test")))
-      when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
-        .thenReturn(Some(businessActivities))
 
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
@@ -185,15 +170,10 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
         "experienceTraining" -> "false"
       )
 
-
       val mockCacheMap = mock[CacheMap]
 
       when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
-
-      val businessActivities = BusinessActivities(involvedInOther = Some(InvolvedInOtherYes("test")))
-      when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
-        .thenReturn(Some(businessActivities))
 
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
@@ -218,10 +198,6 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
       when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      val businessActivities = BusinessActivities(involvedInOther = Some(InvolvedInOtherYes("test")))
-      when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
-        .thenReturn(Some(businessActivities))
-
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
@@ -242,10 +218,6 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
 
       when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
-
-      val businessActivities = BusinessActivities(involvedInOther = Some(InvolvedInOtherYes("test")))
-      when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
-        .thenReturn(Some(businessActivities))
 
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))

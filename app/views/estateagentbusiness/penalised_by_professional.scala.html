@@ -29,6 +29,18 @@ s"""${f("professionalBody").id}-fieldset"""
     @errorSummary(f)
 }
 
+@supportingContent = {
+    <p>@Messages("estateagentbusiness.penalisedbyprofessional.subtitle")</p>
+
+    <ul class="list list-bullet form-group">
+        <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_1")</li>
+        <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_2")</li>
+        <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_3")</li>
+        <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_4")</li>
+        <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_5")</li>
+    </ul>
+}
+
 @main(
     title = Messages("estateagentbusiness.penalisedbyprofessional.title") + " - " + Messages("summary.estateagentbusiness"),
     heading = header
@@ -40,17 +52,9 @@ s"""${f("professionalBody").id}-fieldset"""
         f = f("penalised"),
         heading = "estateagentbusiness.penalisedbyprofessional.title",
         section = "summary.estateagentbusiness",
-        panel = false
+        panel = false,
+        supportingContent = supportingContent
     ) {
-        <p>@Messages("estateagentbusiness.penalisedbyprofessional.subtitle")</p>
-
-        <ul class="list list-bullet form-group">
-            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_1")</li>
-            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_2")</li>
-            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_3")</li>
-            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_4")</li>
-            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_5")</li>
-        </ul>
         @radio(
             f = f("penalised"),
             labelText = "lbl.yes",

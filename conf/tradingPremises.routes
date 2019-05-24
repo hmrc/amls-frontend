@@ -11,8 +11,8 @@ POST        /premises-details/:index                                 @controller
 GET         /trading-start-date/:index                               @controllers.tradingpremises.ActivityStartDateController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-start-date/:index                               @controllers.tradingpremises.ActivityStartDateController.post(index: Int, edit: Boolean ?= false)
 
-GET         /is-residential/:index                                   @controllers.tradingpremises.IsResidentialController.get(index: Int, edit: Boolean ?= false)
-POST        /is-residential/:index                                   @controllers.tradingpremises.IsResidentialController.post(index: Int, edit: Boolean ?= false)
+GET         /residential-address/:index                              @controllers.tradingpremises.IsResidentialController.get(index: Int, edit: Boolean ?= false)
+POST        /residential-address/:index                              @controllers.tradingpremises.IsResidentialController.post(index: Int, edit: Boolean ?= false)
 
 GET         /premises/date-of-change/:index                          @controllers.tradingpremises.WhereAreTradingPremisesController.dateOfChange(index: Int)
 POST        /premises/date-of-change/:index                          @controllers.tradingpremises.WhereAreTradingPremisesController.saveDateOfChange(index: Int)

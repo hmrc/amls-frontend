@@ -24,6 +24,11 @@
     @errorSummary(f)
 }
 
+@supportingContent = {
+    <p>@Messages("businessactivities.ncaRegistered.p1")</p>
+    <p>@Messages("businessactivities.ncaRegistered.p2")</p>
+}
+
 @main(
     title = Messages("businessactivities.ncaRegistered.title") + " - " + Messages("summary.businessactivities"),
     heading = header
@@ -37,10 +42,9 @@
             heading = "businessactivities.ncaRegistered.title",
             section = "summary.businessactivities",
             panel = false,
-            classes = Seq("inline")
+            classes = Seq("inline"),
+            supportingContent = supportingContent
         ) {
-            <p>@Messages("businessactivities.ncaRegistered.p1")</p>
-            <p>@Messages("businessactivities.ncaRegistered.p2")</p>
             @radio(
                 f = f("ncaRegistered"),
                 labelText = "lbl.yes",
