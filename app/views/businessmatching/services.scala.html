@@ -26,14 +26,11 @@
 }
 
 @section = @{
-    if(isPreSubmission)
-    "summary.businessmatching"
-    else
-    "summary.updateinformation"
+    if(isPreSubmission)  "summary.businessmatching" else "summary.updateinformation"
 }
 
 @main(
-    title = Messages("msb.services.title") + " - " + {if(isPreSubmission) Messages("summary.businessmatching") else Messages("summary.updateinformation")},
+    title = Messages("msb.services.title") + " - " + Messages(section),
     heading = header
 ) {
 
