@@ -30,15 +30,15 @@
 }
 
 @supportingContent = {
-<p>@Messages("supervision.penalisedbyprofessional.subtitle")</p>
-<ul class="list list-bullet">
-    <li>@Messages("supervision.penalisedbyprofessional.line_1")</li>
-    <li>@Messages("supervision.penalisedbyprofessional.line_2")</li>
-    <li>@Messages("supervision.penalisedbyprofessional.line_3")</li>
-    <li>@Messages("supervision.penalisedbyprofessional.line_4")</li>
-    <li>@Messages("supervision.penalisedbyprofessional.line_5")</li>
-</ul>
-<p>@Messages("supervision.penalisedbyprofessional.details")</p>
+    <p>@Messages("supervision.penalisedbyprofessional.subtitle")</p>
+    <ul class="list list-bullet">
+        <li>@Messages("supervision.penalisedbyprofessional.line_1")</li>
+        <li>@Messages("supervision.penalisedbyprofessional.line_2")</li>
+        <li>@Messages("supervision.penalisedbyprofessional.line_3")</li>
+        <li>@Messages("supervision.penalisedbyprofessional.line_4")</li>
+        <li>@Messages("supervision.penalisedbyprofessional.line_5")</li>
+    </ul>
+    <p>@Messages("supervision.penalisedbyprofessional.details")</p>
 }
 
 @main(
@@ -51,8 +51,8 @@
             @fieldsetWithErrorGroup(
                 f = f("penalised"),
                 panel = false,
-                heading="supervision.penalisedbyprofessional.title",
-                section="summary.supervision",
+                heading = "supervision.penalisedbyprofessional.title",
+                section = "summary.supervision",
                 supportingContent = supportingContent,
                 classes = Seq("inline")
             ) {
@@ -61,10 +61,18 @@
                     f = f("penalised"),
                     labelText = "lbl.yes",
                     value = "true",
-                    target = s"#$target"
+                    target = "[data-reveal='target']"
                 )
 
-                @textarea(f("professionalBody"), "supervision.penalisedbyprofessional.details.lbl", bold = false, largeWidth = true, cols = "30", rows = "8")
+                @textarea(
+                    f("professionalBody"),
+                    "supervision.penalisedbyprofessional.details.lbl",
+                    bold = false,
+                    largeWidth = true,
+                    cols = "30",
+                    rows = "8",
+                    data = "target"
+                )
 
                 @radio(
                     f = f("penalised"),

@@ -29,7 +29,8 @@
     charCount: Boolean = false,
     largeWidth: Boolean = false,
     heading: String = "",
-    section: String = ""
+    section: String = "",
+    data: String = ""
 )(implicit lang:Lang,  m: Messages)
 
 @labelSpan = {
@@ -54,9 +55,7 @@
                 </p>
             }
         </div>
-        <span class="form-label">
-            @labelSpan
-        </span>
+        <p>@labelSpan</p>
     } else {
         <label class="form-label" for="@field.id">
             @labelSpan
@@ -64,7 +63,7 @@
     }
 }
 
-<div class="form-group@if(charCount){ char-counter}@if(field.hasErrors) { form-field--error}" @if(charCount) {data-char-counter}>
+<div class="form-group@if(charCount){ char-counter}@if(field.hasErrors) { form-field--error}" @if(charCount) {data-char-counter} @if(data){ data-reveal="@data"}>
     @label
     @if(hintText.nonEmpty) {
         <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
