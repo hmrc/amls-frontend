@@ -16,7 +16,7 @@
 
 package models.responsiblepeople
 
-import models.Country
+import models.{Country, NonUKCountry}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{Path, From, Rule, Write}
 import play.api.libs.json.{Reads, Writes}
@@ -55,7 +55,7 @@ case class PersonAddressNonUK(
                          addressLineNonUK2: String,
                          addressLineNonUK3: Option[String],
                          addressLineNonUK4: Option[String],
-                         country: Country) extends PersonAddress
+                         country: NonUKCountry) extends PersonAddress
 
 object PersonAddress {
   implicit val formRule: Rule[UrlFormEncoded, PersonAddress] = From[UrlFormEncoded] { __ =>
@@ -76,7 +76,7 @@ object PersonAddress {
             (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
             (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
             (__ \ "addressLineNonUK4").read(optionR(validateAddress)) ~
-            (__ \ "country").read[Country]
+            (__ \ "country").read[NonUKCountry]
           )(PersonAddressNonUK.apply _)
       }
     }
@@ -119,7 +119,7 @@ object PersonAddress {
         (__ \ "personAddressLine2").read[String] and
         (__ \ "personAddressLine3").readNullable[String] and
         (__ \ "personAddressLine4").readNullable[String] and
-        (__ \ "personAddressCountry").read[Country])(PersonAddressNonUK.apply _)
+        (__ \ "personAddressCountry").read[NonUKCountry])(PersonAddressNonUK.apply _)
   }
 
   implicit val jsonWrites: Writes[PersonAddress] = {
@@ -141,7 +141,7 @@ object PersonAddress {
             (__ \ "personAddressLine2").write[String] and
             (__ \ "personAddressLine3").writeNullable[String] and
             (__ \ "personAddressLine4").writeNullable[String] and
-            (__ \ "personAddressCountry").write[Country]
+            (__ \ "personAddressCountry").write[NonUKCountry]
           )(unlift(PersonAddressNonUK.unapply)).writes(a)
     }
   }

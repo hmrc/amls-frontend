@@ -18,7 +18,7 @@ package controllers.responsiblepeople
 
 import connectors.{DataCacheConnector, KeystoreConnector}
 import models.autocomplete.{CountryDataProvider, NameValuePair}
-import models.{Country, DateOfChange}
+import models.{NonUKCountry, DateOfChange}
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ThreeYearsPlus, ZeroToFiveMonths}
 import models.responsiblepeople._
 import org.joda.time.LocalDate
@@ -215,7 +215,7 @@ class NewHomeAddressControllerSpec extends AmlsSpec with MockitoSugar {
             "addressLineNonUK2" -> "new address line2",
             "country" -> "ES"
           )
-          val NonUKAddress = PersonAddressNonUK("push current address line1", "push current address line2", None, None, Country("Spain","ES"))
+          val NonUKAddress = PersonAddressNonUK("push current address line1", "push current address line2", None, None, NonUKCountry("Spain","ES"))
           val currentAddress = ResponsiblePersonCurrentAddress(NonUKAddress, Some(ZeroToFiveMonths), Some(DateOfChange(LocalDate.now)))
           val additionalAddress = ResponsiblePersonAddress(PersonAddressUK("Line 11", "Line 22", None, None, "AB1 1BA"), Some(ZeroToFiveMonths))
           val additionalExtraAddress = ResponsiblePersonAddress(PersonAddressUK("Line 21", "Line 22", None, None, "BB1 1BB"), Some(ZeroToFiveMonths))
@@ -224,10 +224,10 @@ class NewHomeAddressControllerSpec extends AmlsSpec with MockitoSugar {
             additionalExtraAddress = Some(additionalExtraAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
 
-          val pushCurrentToAdditional = ResponsiblePersonAddress(PersonAddressNonUK("push current address line1", "push current address line2", None, None, Country("Spain","ES")), Some(ZeroToFiveMonths))
+          val pushCurrentToAdditional = ResponsiblePersonAddress(PersonAddressNonUK("push current address line1", "push current address line2", None, None, NonUKCountry("Spain","ES")), Some(ZeroToFiveMonths))
           val pushCurrentToExtraAdditional = ResponsiblePersonAddress(PersonAddressUK("Line 11", "Line 22", None, None, "AB1 1BA"), Some(ZeroToFiveMonths))
 
-          val nCurrentAddress = ResponsiblePersonCurrentAddress(PersonAddressNonUK("new address line1", "new address line2", None, None, Country("Spain","ES")),
+          val nCurrentAddress = ResponsiblePersonCurrentAddress(PersonAddressNonUK("new address line1", "new address line2", None, None, NonUKCountry("Spain","ES")),
             Some(ZeroToFiveMonths), Some(DateOfChange(LocalDate.now)))
           val upDatedHistory = ResponsiblePersonAddressHistory(currentAddress = Some(nCurrentAddress),
             additionalAddress = Some(pushCurrentToAdditional),

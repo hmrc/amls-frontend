@@ -17,7 +17,7 @@
 package models.responsiblepeople
 
 import controllers.responsiblepeople.NinoUtil
-import models.Country
+import models.{Country, NonUKCountry}
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ZeroToFiveMonths}
 import org.joda.time.LocalDate
 import play.api.libs.json.Json
@@ -71,8 +71,8 @@ trait ResponsiblePeopleValues extends NinoUtil {
     private val residence = UKResidence(Nino(nino))
     private val residenceCountry = Country("United Kingdom", "GB")
     private val residenceNationality = Country("United Kingdom", "GB")
-    private val newPersonAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))
-    private val newAdditionalPersonAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("France", "FR"))
+    private val newPersonAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, NonUKCountry("Spain", "ES"))
+    private val newAdditionalPersonAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, NonUKCountry("France", "FR"))
     private val currentAddress = ResponsiblePersonCurrentAddress(newPersonAddress, Some(ZeroToFiveMonths))
     private val additionalAddress = ResponsiblePersonAddress(newAdditionalPersonAddress, Some(ZeroToFiveMonths))
 
