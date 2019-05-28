@@ -299,9 +299,9 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
     }
 
     "convert Business Customer Address to RegisteredOfficeNonUK" in {
-      val address = Address("addr1", "addr2", Some("line3"), Some("line4"), None, Country("United Kingdom", "GB"))
+      val address = Address("addr1", "addr2", Some("line3"), Some("line4"), None, Country("Albania", "AL"))
 
-      RegisteredOffice.convert(address) must be(RegisteredOfficeNonUK("addr1", "addr2", Some("line3"), Some("line4"), NonUKCountry("United Kingdom", "GB")))
+      RegisteredOffice.convert(address) must be(RegisteredOfficeNonUK("addr1", "addr2", Some("line3"), Some("line4"), NonUKCountry("Albania", "AL")))
     }
   }
 }

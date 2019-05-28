@@ -16,7 +16,7 @@
 
 package models.responsiblepeople
 
-import models.{Country, NonUKCountry}
+import models.NonUKCountry
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
