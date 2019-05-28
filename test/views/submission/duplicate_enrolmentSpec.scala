@@ -33,7 +33,7 @@ class duplicate_enrolmentSpec extends AmlsSpec with MustMatchers {
     "display the correct title and headings" in new ViewFixture {
 
       doc.title mustBe s"${Messages("error.submission.problem.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
-      doc.select("header h1").text() mustBe Messages("error.submission.problem.title")
+      doc.select("h1").text() mustBe Messages("error.submission.problem.title")
 
       validateParagraphizedContent("error.submission.duplicate_enrolment.content")
     }

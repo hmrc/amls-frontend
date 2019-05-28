@@ -25,59 +25,76 @@
     example: Boolean = true,
     hintId: String = "",
     jsHidden: Boolean = false,
-    legendHidden: Boolean = false
+    legendHidden: Boolean = false,
+    heading: String = "",
+    section: String = ""
 )(implicit lang:Lang,  m: Messages)
 
 @field = @{ f(p) }
 
-<fieldset class="form-field form-date" id="@field.id">
-    @legend(
-        legend = labelText,
-        legendHidden = legendHidden
-    )
-    @if(hintText.nonEmpty) {
-        <span class="form-field--hint">@Messages(hintText)</span>
+@fieldsetContent = {
+    @if(section.nonEmpty) {
+        <div class="page-header"><p class="heading-secondary"><span class="visuallyhidden">This section is: </span>@Messages(section)</p></div>
     }
-    @if(example) {
-        <span class="form-field--hint"@if(hintId.nonEmpty) { id="@hintId-hint"}>@Messages("lbl.date.example")</span>
-    }
-    @if(field.hasErrors) {
-        <div class="form-field--error">
-            <span class="error-notification" data-journey="error - field:user input:@field.id">@field.error</span>
-    }
-    @input(
-        labelText = "lbl.day",
-        field = f(s"${p}.day"),
-        bold = false,
-        classes = Seq("input--no-spinner"),
-        parentDateAttr = "day",
-        attrType = "number",
-        attrMinMax = AttrMinMax(attrMin = "1", attrMax = "31"),
-        attrPattern = "[0-9]{2}",
-        attrStep = "1",
-        attrDescribedBy = s"${hintId}"
-    )
-    @input(
-        labelText = "lbl.month",
-        field = f(s"${p}.month"),
-        bold = false,
-        classes = Seq("input--no-spinner"),
-        parentDateAttr = "month",
-        attrType = "number",
-        attrMinMax = AttrMinMax(attrMin = "1", attrMax = "12"),
-        attrStep = "1",
-        attrPattern = "[0-9]{2}"
-    )
-    @input(
-        labelText = "lbl.year",
-        field = f(s"${p}.year"),
-        bold = false,
-        classes = Seq("input--no-spinner"),
-        parentDateAttr = "year",
-        attrType = "number",
-        attrMinMax = AttrMinMax(attrMin = "1800"),
-        attrStep = "1",
-        attrPattern = "[1-9][0-9]{3}"
-    )
-    @if(field.hasErrors) {</div>}
-</fieldset>
+    <fieldset
+            class="form-field form-date"
+            id="@field.id"
+            @if(hintText.nonEmpty || field.hasErrors) { aria-describedby="@if(hintText.nonEmpty) {@{field.id}-hint} @if(field.hasErrors) {@{field.id}-error-notification}"}
+    >
+        @legend(
+            legend = labelText,
+            legendHidden = legendHidden,
+            heading = heading
+        )
+        @if(hintText.nonEmpty) {
+            <span class="form-field--hint">@Messages(hintText)</span>
+        }
+        @if(example) {
+            <span class="form-field--hint"@if(hintId.nonEmpty) { id="@hintId-hint"}>@Messages("lbl.date.example")</span>
+        }
+        @if(field.hasErrors) {
+            <span class="error-notification" data-journey="error - field:user input:@field.id" id="@{field.id}-error-notification">
+                <span class="visuallyhidden">Error: </span>@field.error
+            </span>
+        }
+        @input(
+            labelText = "lbl.day",
+            field = f(s"${p}.day"),
+            classes = Seq("input--no-spinner"),
+            parentDateAttr = "day",
+            attrType = "number",
+            attrMinMax = AttrMinMax(attrMin = "1", attrMax = "31"),
+            attrPattern = "[0-9]{2}",
+            attrStep = "1",
+            attrDescribedBy = s"${hintId}"
+        )
+        @input(
+            labelText = "lbl.month",
+            field = f(s"${p}.month"),
+            classes = Seq("input--no-spinner"),
+            parentDateAttr = "month",
+            attrType = "number",
+            attrMinMax = AttrMinMax(attrMin = "1", attrMax = "12"),
+            attrStep = "1",
+            attrPattern = "[0-9]{2}"
+        )
+        @input(
+            labelText = "lbl.year",
+            field = f(s"${p}.year"),
+            classes = Seq("input--no-spinner"),
+            parentDateAttr = "year",
+            attrType = "number",
+            attrMinMax = AttrMinMax(attrMin = "1800"),
+            attrStep = "1",
+            attrPattern = "[1-9][0-9]{3}"
+        )
+    </fieldset>
+}
+
+@if(field.hasErrors) {
+    <div id="@field.id" class="clear form-field--error">
+} else {
+    <div class="clear">
+}
+    @fieldsetContent
+</div>

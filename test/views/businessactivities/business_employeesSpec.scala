@@ -48,8 +48,8 @@ class business_employeesSpec extends AmlsSpec with MustMatchers  {
 
       def view = views.html.businessactivities.business_employees(form2, true)
 
-      heading.html must be(Messages("businessactivities.employees.title"))
-      subHeading.html must include(Messages("summary.businessactivities"))
+      heading.text() must be(Messages("businessactivities.employees.title"))
+      subHeading.text() must include(Messages("summary.businessactivities"))
 
     }
 

@@ -27,7 +27,18 @@ s"""${f("professionalBody").id}-fieldset"""
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.estateagentbusiness")
+}
+
+@supportingContent = {
+    <p>@Messages("estateagentbusiness.penalisedbyprofessional.subtitle")</p>
+
+    <ul class="list list-bullet form-group">
+        <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_1")</li>
+        <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_2")</li>
+        <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_3")</li>
+        <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_4")</li>
+        <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_5")</li>
+    </ul>
 }
 
 @main(
@@ -37,51 +48,40 @@ s"""${f("professionalBody").id}-fieldset"""
 
 @form(f, controllers.estateagentbusiness.routes.PenalisedByProfessionalController.post(edit)) {
 
-    @fieldset(
-        f = f("penalised-fieldset"),
+    @fieldsetWithErrorGroup(
+        f = f("penalised"),
         heading = "estateagentbusiness.penalisedbyprofessional.title",
-        panel = false
+        section = "summary.estateagentbusiness",
+        panel = false,
+        supportingContent = supportingContent
     ) {
-        <p>@Messages("estateagentbusiness.penalisedbyprofessional.subtitle")</p>
-
-        <ul class="list list-bullet form-group">
-            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_1")</li>
-            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_2")</li>
-            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_3")</li>
-            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_4")</li>
-            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_5")</li>
-        </ul>
-        @errorGroup(
-             field = f("penalised")
+        @radio(
+            f = f("penalised"),
+            labelText = "lbl.yes",
+            value = "true",
+            target = "[data-reveal='other-professional-body']"
+        )
+        @panel(
+            jsHidden = true,
+            dataReveal = "other-professional-body",
+            wide = false,
+            gutter = true
         ) {
-            @radio(
-                f = f("penalised"),
-                labelText = "lbl.yes",
-                value = "true",
-                target = "[data-reveal='other-professional-body']"
-            )
-            @panel(
-                jsHidden = true,
-                dataReveal = "other-professional-body",
-                wide = false,
-                gutter = true
-            ) {
-                @textarea(
-                    field = f("professionalBody"),
-                    labelText = "estateagentbusiness.penalisedbyprofessional.lbl.detailslbl",
-                    hintText = "hint.255.chars",
-                    bold = false,
-                    largeWidth = true,
-                    cols = "30",
-                    rows = "8"
-                )
-            }
-            @radio(
-                f = f("penalised"),
-                labelText = "lbl.no",
-                value = "false"
+            @textarea(
+                field = f("professionalBody"),
+                labelText = "estateagentbusiness.penalisedbyprofessional.lbl.detailslbl",
+                hintText = "hint.255.chars",
+                bold = false,
+                largeWidth = true,
+                cols = "30",
+                rows = "8"
             )
         }
+        @radio(
+            f = f("penalised"),
+            labelText = "lbl.no",
+            value = "false"
+        )
     }
 
     @submit(edit)

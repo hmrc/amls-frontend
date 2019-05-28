@@ -52,7 +52,7 @@ class total_throughputSpec extends AmlsSpec with MustMatchers {
     }
 
     "display the correct secondary header" in new ViewFixture {
-      doc.select("header .heading-secondary").text must include(Messages("summary.renewal"))
+      doc.select(".heading-secondary").text must include(Messages("summary.renewal"))
     }
 
     "display the correct title" in new ViewFixture {

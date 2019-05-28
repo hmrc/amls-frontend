@@ -23,10 +23,13 @@
     s"""${f("franchiseName").id}-panel"""
 }
 
+@supportingContent = {
+    <p>@Messages("businessactivities.businessfranchise.subtitle")</p>
+}
+
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.businessactivities")
 }
 
 @main(
@@ -36,43 +39,34 @@
 
     @form(f, controllers.businessactivities.routes.BusinessFranchiseController.post(edit)) {
 
-        @fieldset(
-            f = f("businessfranchise-fieldset"),
+        @fieldsetWithErrorGroup(
+            f = f("businessFranchise"),
             heading = "businessactivities.businessfranchise.title",
-            panel = false
+            section = "summary.businessactivities",
+            panel = false,
+            supportingContent = supportingContent
         ) {
-
-            <p>@Messages("businessactivities.businessfranchise.subtitle")</p>
-
-            @errorGroup(
-                field = f("businessFranchise")
+            @radio(
+                f = f("businessFranchise"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = s"#$target"
+            )
+            @panel(
+              field = Some(f(s"$target")),
+              jsHidden = false
             ) {
-
-                @radio(
-                    f = f("businessFranchise"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    target = s"#$target",
-                    inline = true
-                )
-                @panel(
-                  field = Some(f(s"$target")),
-                  jsHidden = false
-                ) {
-                    @input(
-                        field = f("franchiseName"),
-                        labelText = "businessactivities.businessfranchise.lbl.franchisename",
-                        hintText = "businessactivities.businessfranchise.lbl.hint",
-                        bold = false
-                    )
-                }
-                @radio(
-                    f = f("businessFranchise"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
+                @input(
+                    field = f("franchiseName"),
+                    labelText = "businessactivities.businessfranchise.lbl.franchisename",
+                    hintText = "businessactivities.businessfranchise.lbl.hint"
                 )
             }
+            @radio(
+                f = f("businessFranchise"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
 
         @submit(edit)

@@ -24,7 +24,14 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.estateagentbusiness")
+}
+
+@supportingContent = {
+    <p>@Messages("estateagentbusiness.penalisedunderestateagentsact.subtitle")</p>
+    <ul class="list list-bullet">
+        <li>@Messages("estateagentbusiness.penalisedunderestateagentsact.warning")</li>
+        <li>@Messages("estateagentbusiness.penalisedunderestateagentsact.banned")</li>
+    </ul>
 }
 
 @main(
@@ -34,47 +41,40 @@
 
     @form(f, controllers.estateagentbusiness.routes.PenalisedUnderEstateAgentsActController.post(edit)) {
 
-        @fieldset(
-            f = f("penalisedUnderEstateAgentsAct-fieldset"),
+        @fieldsetWithErrorGroup(
+            f = f("penalisedUnderEstateAgentsAct"),
             heading = "estateagentbusiness.penalisedunderestateagentsact.title",
-            panel = false
+            section = "summary.estateagentbusiness",
+            panel = false,
+            supportingContent = supportingContent
         ) {
-            <p>@Messages("estateagentbusiness.penalisedunderestateagentsact.subtitle")</p>
-            <ul class="list list-bullet">
-                <li>@Messages("estateagentbusiness.penalisedunderestateagentsact.warning")</li>
-                <li>@Messages("estateagentbusiness.penalisedunderestateagentsact.banned")</li>
-            </ul>
-            @errorGroup(
-                field = f("penalisedUnderEstateAgentsAct")
+            @radio(
+                f = f("penalisedUnderEstateAgentsAct"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = "[data-reveal='penalised-estate-agents-act']"
+            )
+            @panel(
+                jsHidden = true,
+                dataReveal = "penalised-estate-agents-act",
+                wide = false,
+                gutter = true
             ) {
-                @radio(
-                    f = f("penalisedUnderEstateAgentsAct"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    target = "[data-reveal='penalised-estate-agents-act']"
-                )
-                @panel(
-                    jsHidden = true,
-                    dataReveal = "penalised-estate-agents-act",
-                    wide = false,
-                    gutter = true
-                ) {
-                    @textarea(
-                        f("penalisedUnderEstateAgentsActDetails"),
-                        labelText = "estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl",
-                        hintText = "hint.255.chars",
-                        bold = false,
-                        largeWidth = true,
-                        cols = "30",
-                        rows = "8"
-                    )
-                }
-                @radio(
-                    f = f("penalisedUnderEstateAgentsAct"),
-                    labelText = "lbl.no",
-                    value = "false"
+                @textarea(
+                    f("penalisedUnderEstateAgentsActDetails"),
+                    labelText = "estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl",
+                    hintText = "hint.255.chars",
+                    bold = false,
+                    largeWidth = true,
+                    cols = "30",
+                    rows = "8"
                 )
             }
+            @radio(
+                f = f("penalisedUnderEstateAgentsAct"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
 
         @submit(edit)
