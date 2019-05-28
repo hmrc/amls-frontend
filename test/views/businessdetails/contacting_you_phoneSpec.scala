@@ -44,7 +44,7 @@ class contacting_you_phoneSpec extends AmlsSpec with MustMatchers  {
         " - " + Messages("summary.businessdetails") +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
-      heading.html must be(Messages("businessdetails.contactingyou.phone.title"))
+      heading.html must include(Messages("businessdetails.contactingyou.phone.title"))
       subHeading.html must include(Messages("summary.businessdetails"))
 
       doc.getElementsByAttributeValue("name", "phoneNumber") must not be empty
