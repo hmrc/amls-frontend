@@ -17,11 +17,10 @@
 package controllers.responsiblepeople
 
 import javax.inject.{Inject, Singleton}
-
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.Country
+import models.{Country, NonUKCountry}
 import models.responsiblepeople.{CountryOfBirth, PersonResidenceType, ResponsiblePerson}
 import services.AutoCompleteService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -37,7 +36,7 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
 
   private def getCountryOfBirth(countryOfBirth: Country): CountryOfBirth = {
      if(countryOfBirth.code != "GB") {
-        CountryOfBirth(false, Some(countryOfBirth))
+        CountryOfBirth(false, Some(NonUKCountry(countryOfBirth.name, countryOfBirth.code)))
       } else {
         CountryOfBirth(true, None)
       }
@@ -71,7 +70,7 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
     val countryOfBirth = if (data.bornInUk) {
       Some(Country("United Kingdom", "GB"))
     } else {
-      data.country
+      data.country.map { country => Country(country.name, country.code) }
     }
     personResidenceType.fold[Option[PersonResidenceType]](None)(pType => Some(pType.copy(countryOfBirth = countryOfBirth)))
   }

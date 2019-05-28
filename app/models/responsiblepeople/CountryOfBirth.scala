@@ -18,9 +18,9 @@ package models.responsiblepeople
 
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, Write}
-import models.Country
+import models.NonUKCountry
 
-case class CountryOfBirth (bornInUk: Boolean, country: Option[Country])
+case class CountryOfBirth (bornInUk: Boolean, country: Option[NonUKCountry])
 
 object CountryOfBirth {
 
@@ -30,7 +30,7 @@ object CountryOfBirth {
     From[UrlFormEncoded] { __ =>
       import jto.validation.forms.Rules._
       (__ \ "bornInUk").read[Boolean].withMessage("error.required.rp.select.country.of.birth") flatMap {
-        case false => (__ \ "country").read[Country] map {c => CountryOfBirth(bornInUk = false, Some(c))}
+        case false => (__ \ "country").read[NonUKCountry] map {c => CountryOfBirth(bornInUk = false, Some(c))}
         case true => CountryOfBirth(bornInUk = true, None)
       }
     }

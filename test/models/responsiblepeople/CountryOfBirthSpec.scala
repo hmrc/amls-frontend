@@ -19,7 +19,7 @@ package models.responsiblepeople
 
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.{Path, ValidationError}
-import models.Country
+import models.NonUKCountry
 import org.scalatestplus.play.PlaySpec
 
 class CountryOfBirthSpec extends PlaySpec {
@@ -30,9 +30,9 @@ class CountryOfBirthSpec extends PlaySpec {
       "read successfully for valid input type 'Yes'" in {
         val urlFormEncoded = Map(
           "bornInUk" -> Seq("false"),
-          "country" -> Seq("GB")
+          "country" -> Seq("AL")
         )
-        CountryOfBirth.formRule.validate(urlFormEncoded) must be(Valid(CountryOfBirth(false, Some(Country("United Kingdom", "GB")))))
+        CountryOfBirth.formRule.validate(urlFormEncoded) must be(Valid(CountryOfBirth(false, Some(NonUKCountry("Albania", "AL")))))
       }
 
       "read successfully for valid input type 'No'" in {
@@ -50,7 +50,7 @@ class CountryOfBirthSpec extends PlaySpec {
           Seq(ValidationError("error.required.rp.select.country.of.birth")))))
       }
 
-      "throw validation error when mandatory field country od birth is selected as 'yes' and not selected country" in {
+      "throw validation error when mandatory field country of birth is selected as 'yes' and not selected country" in {
         val urlFormEncoded = Map(
           "bornInUk" -> Seq("false"),
           "country" -> Seq("")
@@ -58,6 +58,16 @@ class CountryOfBirthSpec extends PlaySpec {
 
         CountryOfBirth.formRule.validate(urlFormEncoded) must be(Invalid(Seq((Path \ "country") ->
           Seq(ValidationError("error.required.country")))))
+      }
+
+      "throw validation error when mandatory field country of birth is selected as 'yes' and country selected in United Kingdom" in {
+        val urlFormEncoded = Map(
+          "bornInUk" -> Seq("false"),
+          "country" -> Seq("GB")
+        )
+
+        CountryOfBirth.formRule.validate(urlFormEncoded) must be(Invalid(Seq((Path \ "country") ->
+          Seq(ValidationError("error.required.non.uk.country")))))
       }
     }
 
