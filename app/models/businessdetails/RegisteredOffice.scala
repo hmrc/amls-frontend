@@ -16,6 +16,7 @@
 
 package models.businessdetails
 
+import cats.data.Validated.{Invalid, Valid}
 import models.{Country, DateOfChange, NonUKCountry}
 import models.FormTypes._
 import models.businesscustomer.Address
@@ -71,6 +72,10 @@ object RegisteredOffice {
 
   implicit val formRule: Rule[UrlFormEncoded, RegisteredOffice] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
+    val validateNonUKCountry: Rule[NonUKCountry, NonUKCountry] = Rule.fromMapping[NonUKCountry, NonUKCountry] {
+      case country if country.code == "GB" => Invalid(Seq(ValidationError(List("error.required.atb.registered.office.uk.or.overseas"))))
+      case country => Valid(country)
+    }
     (__ \ "isUK").read[Boolean].withMessage("error.required.atb.registered.office.uk.or.overseas") flatMap {
       case true =>
         (
@@ -88,7 +93,7 @@ object RegisteredOffice {
             (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
             (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
             (__ \ "addressLineNonUK4").read(optionR(validateAddress)) ~
-            (__ \ "country").read[NonUKCountry].withMessage("error.required.atb.registered.office.uk.or.overseas")
+            (__ \ "country").read(validateNonUKCountry.withMessage("dsfdsdsfds"))
           ) ((addr1: String, addr2: String, addr3: Option[String], addr4: Option[String], country: NonUKCountry) =>
           RegisteredOfficeNonUK(addr1, addr2, addr3, addr4, country, None))
     }

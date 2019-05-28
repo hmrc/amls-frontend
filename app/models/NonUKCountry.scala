@@ -48,7 +48,7 @@ object NonUKCountry {
   implicit val formRule: Rule[String, NonUKCountry] =
     Rule {
       case "" => Invalid(Seq(Path -> Seq(ValidationError("error.required.country"))))
-      case "GB" => Invalid(Seq(Path -> Seq(ValidationError("error.required.non.uk.country"))))
+//      case "GB" => Invalid(Seq(Path -> Seq(ValidationError("error.required.non.uk.country"))))
       case code =>
         nonUkcountries.collectFirst {
           case e @ NonUKCountry(_, c) if c == code =>
