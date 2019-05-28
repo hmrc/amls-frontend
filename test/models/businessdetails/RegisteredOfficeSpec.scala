@@ -71,7 +71,9 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
               NonUKCountry("Albania", "AL"),
               None)))
       }
+    }
 
+    "fail validation" when {
       "given a non valid non UK address" in {
         val nonUKModel = Map(
           "isUK" -> Seq("false"),
@@ -87,9 +89,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
             (Path \ "country") -> Seq(ValidationError("error.required.non.uk.country"))
           )))
       }
-    }
 
-    "fail validation" when {
       "given missing data represented by an empty Map" in {
 
         RegisteredOffice.formRule.validate(Map.empty) must

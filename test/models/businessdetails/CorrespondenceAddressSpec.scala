@@ -16,11 +16,9 @@
 
 package models.businessdetails
 
-import cats.data.Validated.{Invalid, Valid}
-import models.Country
+import models.NonUKCountry
 import org.scalatestplus.play.PlaySpec
-import jto.validation.Path
-import jto.validation.ValidationError
+import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatest.mock.MockitoSugar
 import play.api.libs.json.{JsSuccess, Json}
 
@@ -30,29 +28,36 @@ class CorrespondenceAddressSpec extends PlaySpec with MockitoSugar {
 
     "validate toLines" when {
       "given a UK address" in {
-        DefaultUKAddress.toLines must be(Seq("Default Your Name",
-          "Default Business Name",
-          "Default Line 1",
-          "Default Line 2",
-          "Default Line 3",
-          "Default Line 4",
-          "AA1 1AA"))
-
+        CorrespondenceAddress.formRule.validate(DefaultUKModel) must
+          be(Valid(DefaultUKAddress))
       }
 
-      "given a Non UK address" in {
-        DefaultNonUKAddress.toLines must be(Seq("Default Your Name",
-          "Default Business Name",
-          "Default Line 1",
-          "Default Line 2",
-          "Default Line 3",
-          "Default Line 4",
-          "United Kingdom"))
+      "given a valid Non UK address" in {
+        CorrespondenceAddress.formRule.validate(DefaultNonUKModel) must
+          be(Valid(DefaultNonUKAddress))
       }
     }
   }
 
     "CorrespondenceAddress Form validation" must {
+      "given a non valid non UK address" in {
+        val invalidNonUKModel = Map(
+          "isUK" -> Seq("false"),
+          "yourName" -> Seq(DefaultYourName),
+          "businessName" -> Seq(DefaultBusinessName),
+          "addressLineNonUK1" -> Seq(DefaultAddressLine1),
+          "addressLineNonUK2" -> Seq(DefaultAddressLine2),
+          "addressLineNonUK3" -> Seq("Default Line 3"),
+          "addressLineNonUK4" -> Seq("Default Line 4"),
+          "country" -> Seq("GB")
+        )
+
+        CorrespondenceAddress.formRule.validate(invalidNonUKModel) must
+          be(Invalid(Seq(
+            (Path \ "country") -> Seq(ValidationError("error.required.non.uk.country"))
+          )))
+      }
+
       "throw error when mandatory fields are missing" in {
         CorrespondenceAddress.formRule.validate(Map.empty) must be
         Invalid(Seq(
@@ -221,7 +226,7 @@ class CorrespondenceAddressSpec extends PlaySpec with MockitoSugar {
   val DefaultAddressLine3 = Some("Default Line 3")
   val DefaultAddressLine4 = Some("Default Line 4")
   val DefaultPostcode = "AA1 1AA"
-  val DefaultCountry = Country("United Kingdom", "GB")
+  val DefaultCountry = NonUKCountry("Albania", "AL")
 
   val NewYourName = "New Your Name"
   val NewBusinessName = "New Business Name"

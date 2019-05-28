@@ -117,7 +117,7 @@ class AddressCreatedEventSpec extends AmlsSpec {
       }
 
       "given a correspondence address outside the UK" in {
-        val address = NonUKCorrespondenceAddress("not used", "not used", "CA Line 1", "CA Line 2", "CA Line 3".some, None, Country("Finland", "FIN"))
+        val address = NonUKCorrespondenceAddress("not used", "not used", "CA Line 1", "CA Line 2", "CA Line 3".some, None, NonUKCountry("Finland", "FIN"))
         val event = AddressCreatedEvent(address)
         val expected = headerCarrier.toAuditDetails() ++ Map(
           "addressLine1" -> "CA Line 1",

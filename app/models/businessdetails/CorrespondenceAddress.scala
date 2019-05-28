@@ -17,9 +17,9 @@
 package models.businessdetails
 
 import jto.validation.forms.Rules._
-import models.Country
+import models.NonUKCountry
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.{Path, From, Rule, Write}
+import jto.validation.{From, Path, Rule, Write}
 import jto.validation.ValidationError
 import play.api.libs.json.{Reads, Writes}
 
@@ -66,7 +66,7 @@ case class NonUKCorrespondenceAddress(
                                      addressLineNonUK2: String,
                                      addressLineNonUK3: Option[String],
                                      addressLineNonUK4: Option[String],
-                                     country: Country
+                                     country: NonUKCountry
                                      ) extends CorrespondenceAddress
 
 object CorrespondenceAddress {
@@ -106,7 +106,7 @@ object CorrespondenceAddress {
             (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
             (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
             (__ \ "addressLineNonUK4").read(optionR(validateAddress)) ~
-              (__ \ "country").read[Country]
+              (__ \ "country").read[NonUKCountry]
           )(NonUKCorrespondenceAddress.apply _)
       }
     }
@@ -155,7 +155,7 @@ object CorrespondenceAddress {
         (__ \ "correspondenceAddressLine2").read[String] and
         (__ \ "correspondenceAddressLine3").readNullable[String] and
         (__ \ "correspondenceAddressLine4").readNullable[String] and
-        (__ \ "correspondenceCountry").read[Country])(NonUKCorrespondenceAddress.apply _)
+        (__ \ "correspondenceCountry").read[NonUKCountry])(NonUKCorrespondenceAddress.apply _)
 
   }
 
@@ -182,7 +182,7 @@ object CorrespondenceAddress {
           (__ \ "correspondenceAddressLine2").write[String] and
           (__ \ "correspondenceAddressLine3").writeNullable[String] and
           (__ \ "correspondenceAddressLine4").writeNullable[String] and
-          (__ \ "correspondenceCountry").write[Country]
+          (__ \ "correspondenceCountry").write[NonUKCountry]
         )(unlift(NonUKCorrespondenceAddress.unapply)).writes(a)
     }
   }

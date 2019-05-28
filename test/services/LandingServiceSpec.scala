@@ -29,13 +29,13 @@ import models.declaration.release7.RoleWithinBusinessRelease7
 import models.estateagentbusiness.{Auction, EstateAgentBusiness, Residential, Services}
 import models.hvd._
 import models.moneyservicebusiness.{MostTransactions => MsbMostTransactions, SendTheLargestAmountsOfMoney => MsbSendTheLargestAmountsOfMoney, WhichCurrencies => MsbWhichCurrencies, _}
-import models.renewal.{PaymentMethods => RPaymentMethods, PercentageOfCashPaymentOver15000 => RPercentageOfCashPaymentOver15000, ReceiveCashPayments => RReceiveCashPayments, WhichCurrencies => RenWhichCurrencies, MoneySources => RMoneySources, _}
+import models.renewal.{MoneySources => RMoneySources, PaymentMethods => RPaymentMethods, PercentageOfCashPaymentOver15000 => RPercentageOfCashPaymentOver15000, ReceiveCashPayments => RReceiveCashPayments, WhichCurrencies => RenWhichCurrencies, _}
 import models.responsiblepeople.ResponsiblePerson
 import models.status.{RenewalSubmitted, SubmissionReadyForReview}
 import models.supervision.Supervision
 import models.tcsp._
 import models.tradingpremises.TradingPremises
-import models.{AmendVariationRenewalResponse, Country, SubscriptionResponse, ViewResponse}
+import models._
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -90,7 +90,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
     val cacheMap = CacheMap("", Map.empty)
 
     "return a cachmap with the saved alternative correspondence address - true" in {
-      val correspondenceAddress = NonUKCorrespondenceAddress("Name Test", "Test", "Test", "Test", Some("test"), None, Country("Albania", "AL"))
+      val correspondenceAddress = NonUKCorrespondenceAddress("Name Test", "Test", "Test", "Test", Some("test"), None, NonUKCountry("Albania", "AL"))
       val businessDetails = BusinessDetails(None, None, None, None, None,None, None, Some(correspondenceAddress))
 
       implicit val r = FakeRequest()
