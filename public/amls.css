@@ -1638,3 +1638,7 @@ h2.override-heading-medium {
 .form-field--error > textarea {
     border-color: #b10e1e;
 }
+
+legend .page-header {
+    margin: 0;
+}
