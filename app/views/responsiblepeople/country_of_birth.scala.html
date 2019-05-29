@@ -67,6 +67,7 @@
 
                     @country_autocomplete(
                         field = f("country"),
+                        placeholder = s"$personName ${Messages("doesnotlive")}",
                         labelText = Messages("responsiblepeople.country.of.birth.txt.lbl", personName),
                         data = countryData.getOrElse(Seq.empty)
                     )

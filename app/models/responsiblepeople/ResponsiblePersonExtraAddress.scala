@@ -21,30 +21,30 @@ import jto.validation.{From, Rule, To, ValidationError, Write}
 import jto.validation.forms._
 
 
-case class ResponsiblePersonAddress(personAddress: PersonAddress,
+case class ResponsiblePersonExtraAddress(personAddress: PersonAddress,
                                     timeAtAddress: Option[TimeAtAddress])
 
-object ResponsiblePersonAddress {
+object ResponsiblePersonExtraAddress {
 
   import play.api.libs.json._
 
   val validateCountry: Rule[PersonAddress, PersonAddress] = Rule.fromMapping[PersonAddress, PersonAddress] {
-    case address: PersonAddressNonUK if address.country.code == "GB" => Invalid(Seq(ValidationError(List("error.required.select.non.uk.previous.address"))))
+    case address: PersonAddressNonUK if address.country.code == "GB" => Invalid(Seq(ValidationError(List("error.required.select.non.uk.other.previous.address"))))
     case address => Valid(address)
   }
 
   implicit val formRule: Rule[UrlFormEncoded, ResponsiblePersonAddress] = From[UrlFormEncoded] { __ =>
 
-  import jto.validation.forms.Rules._
+    import jto.validation.forms.Rules._
     (__.read(validateCountry) ~ (__ \ "timeAtAddress").read[Option[TimeAtAddress]]) (ResponsiblePersonAddress.apply _)
-}
+  }
 
   implicit val formWrites: Write[ResponsiblePersonAddress, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
     import jto.validation.forms.Writes._
     import play.api.libs.functional.syntax.unlift
     (
-        __.write[PersonAddress] ~
-          __.write[Option[TimeAtAddress]]
+      __.write[PersonAddress] ~
+        __.write[Option[TimeAtAddress]]
       ) (unlift(ResponsiblePersonAddress.unapply))
   }
 

@@ -29,7 +29,7 @@ object CountryOfBirth {
 
   implicit val formRule: Rule[UrlFormEncoded, CountryOfBirth] = From[UrlFormEncoded] { __ =>
     val validateCountry: Rule[Country, Country] = Rule.fromMapping[Country, Country] {
-      case country if country.code == "GB" => Invalid(Seq(ValidationError(List("error.required.atb.registered.office.uk.or.overseas"))))
+      case country if country.code == "GB" => Invalid(Seq(ValidationError(List("error.required.enter.valid.non.uk"))))
       case country => Valid(country)
     }
       import jto.validation.forms.Rules._

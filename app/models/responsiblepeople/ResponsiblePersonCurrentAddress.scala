@@ -31,7 +31,7 @@ object ResponsiblePersonCurrentAddress {
   import play.api.libs.json._
 
   val validateCountry: Rule[PersonAddress, PersonAddress] = Rule.fromMapping[PersonAddress, PersonAddress] {
-    case address: PersonAddressNonUK if address.country.code == "GB" => Invalid(Seq(ValidationError(List("error.required.atb.registered.office.uk.or.overseas"))))
+    case address: PersonAddressNonUK if address.country.code == "GB" => Invalid(Seq(ValidationError(List("error.required.select.non.uk.address"))))
     case address => Valid(address)
   }
 

@@ -269,8 +269,10 @@ error.required.rp.moved.address = Select yes if {0} has moved from this home add
 error.required.rp.select.country.of.birth = Select yes if {0} was born in the UK
 error.required.select.uk.passport = Select yes if {0} has a UK passport
 error.required.select.non.uk.passport = Select yes if {0} has a passport from another country
-error.required.select.non.uk.address = Enter a country that is not the United Kingdom because {0} does not live in the UK
-error.required.enter.valid.non.uk = Enter a country that is not the United Kingdom because {0} was not born in the UK
+error.required.select.non.uk = Enter a country that is not the United Kingdom because {0} in the UK
+error.required.select.non.uk.address = does not live
+error.required.select.non.uk.previous.address = Enter a country that is not the United Kingdom because {0} previous address was not in the UK
+error.required.select.non.uk.other.previous.address = Enter a country that is not the United Kingdom because {0} other previous address was not in the UK
 error.required.enter.valid.non.uk = Enter a country that is not the United Kingdom because {0} was not born in the UK
 
 
