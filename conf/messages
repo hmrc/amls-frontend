@@ -129,6 +129,8 @@ error.max.length.bm.businesstype.type = You can’t enter more than 40 character
 error.required.atb.previously.registered = Select yes if your business is currently registered with HMRC for anti-money laundering supervision
 error.required.atb.confirm.office = Select yes if this is the address of your registered office
 error.required.atb.registered.office.uk.or.overseas = Select yes if this is a UK address
+error.required.atb.registered.office.not.uk= Enter a country that is not the United Kingdom because your registered office is not in the UK
+error.required.atb.letters.address.not.uk= Enter a country that is not the United Kingdom because your address for letters is not in the UK
 error.required.atb.registered.for.vat = Select yes if your business is registered for VAT in the UK
 error.required.atb.corporation.tax = Select yes if your business is registered for Corporation Tax
 error.required.atb.corporation.tax.number = Enter a valid Corporation Tax reference number
@@ -265,9 +267,9 @@ error.required.rp.registered.for.vat = Select yes if {0} is registered for VAT
 error.required.rp.confirm.address = Select yes if this is {0}’s home address
 error.required.rp.moved.address = Select yes if {0} has moved from this home address
 error.required.rp.select.country.of.birth = Select yes if {0} was born in the UK
-error.required.rp.select.country.of.birth = Select yes if {0} was born in the UK
 error.required.select.uk.passport = Select yes if {0} has a UK passport
 error.required.select.non.uk.passport = Select yes if {0} has a passport from another country
+error.required.select.non.uk.address = Enter a country that is not the United Kingdom because {0} does not live in the UK
 
 
 ############################### Trust and company service providers ###############################

@@ -16,6 +16,7 @@
 
 package models.businessdetails
 
+import cats.data.Validated.{Invalid, Valid}
 import jto.validation.forms.Rules._
 import models.NonUKCountry
 import jto.validation.forms.UrlFormEncoded
@@ -70,8 +71,11 @@ case class NonUKCorrespondenceAddress(
                                      ) extends CorrespondenceAddress
 
 object CorrespondenceAddress {
-  implicit val formRule: Rule[UrlFormEncoded, CorrespondenceAddress] =
-    From[UrlFormEncoded] { __ =>
+  implicit val formRule: Rule[UrlFormEncoded, CorrespondenceAddress] = From[UrlFormEncoded] { __ =>
+  val validateNonUKCountry: Rule[NonUKCountry, NonUKCountry] = Rule.fromMapping[NonUKCountry, NonUKCountry] {
+    case country if country.code == "GB" => Invalid(Seq(ValidationError(List("error.required.atb.registered.office.uk.or.overseas"))))
+    case country => Valid(country)
+  }
       import jto.validation.forms.Rules._
       import models.FormTypes._
       import utils.MappingUtils.Implicits._
@@ -106,7 +110,7 @@ object CorrespondenceAddress {
             (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
             (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
             (__ \ "addressLineNonUK4").read(optionR(validateAddress)) ~
-              (__ \ "country").read[NonUKCountry]
+            (__ \ "country").read(validateNonUKCountry.withMessage("error.required.atb.letters.address.not.uk"))
           )(NonUKCorrespondenceAddress.apply _)
       }
     }
