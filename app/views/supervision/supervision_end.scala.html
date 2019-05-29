@@ -22,7 +22,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("supervision.supervision_end.title", "summary.supervision")
 }
 
 @main(
@@ -35,8 +34,8 @@
             @date(
                 f = f,
                 p = "endDate",
-                labelText = "supervision.supervision_end.title",
-                legendHidden = true,
+                heading = "supervision.supervision_end.title",
+                section = "summary.supervision",
                 example = true
             )
 
