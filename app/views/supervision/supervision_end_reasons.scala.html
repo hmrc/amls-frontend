@@ -26,7 +26,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.supervision")
 }
 
 @main(
@@ -36,20 +35,16 @@
 
     @form(f, controllers.supervision.routes.SupervisionEndReasonsController.post(edit)) {
 
-        @fieldset(
-            f = f(s"$target"),
-            hint = "hint.255.chars",
-            heading = "supervision.supervision_end_reasons.title",
-            jsHidden = true
-        ) {
             @textarea(
                 field = f("endingReason"),
                 bold = false,
                 largeWidth = true,
                 cols = "30",
-                rows = "8"
+                rows = "8",
+                heading = "supervision.supervision_end_reasons.title",
+                section = "summary.supervision"
             )
-        }
+
         @submit(edit)
     }
 }

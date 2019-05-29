@@ -23,7 +23,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("tcsp.provided_services.title", "summary.tcsp")
 }
 
 @main(
@@ -33,34 +32,26 @@
 
     @form(f, controllers.tcsp.routes.ProvidedServicesController.post(edit)) {
 
-        @fieldset(
-            f = f("services-fieldset"),
-            legend = "tcsp.provided_services.title",
-            legendHidden = true,
-            panel = false
+        @fieldsetWithErrorGroup(
+            f = f("services"),
+            heading = "tcsp.provided_services.title",
+            section = "summary.tcsp",
+            panel = false,
+            hint = "lbl.select.all"
         ) {
-            @hint("lbl.select.all")
-            @errorGroup(
-                field = f("services")
-            ) {
-                @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.07", "07")
-                @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.02", "02")
-                @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.03", "03")
-                @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.05", "05")
-                @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.06", "06")
-                @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.04", "04")
-                @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.01", "01")
-                @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.08", "08", target = s"#${f("details").id}-fieldset")
-            }
-        }
+            @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.07", "07")
+            @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.02", "02")
+            @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.03", "03")
+            @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.05", "05")
+            @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.06", "06")
+            @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.04", "04")
+            @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.01", "01")
+            @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.08", "08", target = "[data-reveal=details-reveal]")
 
-        @fieldset(
-            legend = "tcsp.provided_services.service.lbl.08",
-            f = f(s"${f("details").id}-fieldset"),
-            legendHidden = true,
-            id = s"""${f("details").id}-fieldset"""
-        ) {
-            @input(f("details"), "tcsp.provided_services.service.lbl.details")
+            @input(
+                field = f("details"),
+                data = "details-reveal",
+                labelText = "tcsp.provided_services.service.lbl.details")
         }
 
         @submit(edit)

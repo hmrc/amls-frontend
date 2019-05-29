@@ -28,7 +28,7 @@
 <legend>
     <span class="form-label@if(bold){-bold}@if(legendHidden){ visuallyhidden}">
         @if(heading.nonEmpty) {
-            <h1 class="heading-xlarge">@Messages(heading)</h1>
+            <div class="page-header"><h1 class="heading-xlarge">@Messages(heading)</h1></div>
         }
         @if(legend.nonEmpty) {
             @Messages(legend)

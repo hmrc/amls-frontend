@@ -26,7 +26,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("supervision.whichprofessionalbody.title", "summary.supervision")
 }
 
 @main(
@@ -36,13 +35,13 @@
 
     @form(f, controllers.supervision.routes.WhichProfessionalBodyController.post(edit)) {
 
-        @fieldset(
-            legend = "supervision.memberofprofessionalbody.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
             f = f("businessType"),
-            panel = false
+            panel = false,
+            heading = "supervision.whichprofessionalbody.title",
+            section = "summary.supervision",
+            hint="lbl.select.all"
         ) {
-            @hint("lbl.select.all")
             @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.01", "01")
             @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.02", "02")
             @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.03", "03")
