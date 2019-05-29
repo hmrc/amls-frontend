@@ -22,7 +22,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("asp.services.title", "summary.asp")
 }
 
 @main(
@@ -31,42 +30,39 @@
 ) {
 
     @form(f, controllers.asp.routes.ServicesOfBusinessController.post(edit)) {
-        @fieldset(
-            f = f("services-fieldset"),
-            legend = "asp.services.title",
-            legendHidden = true,
-            panel = false
+
+        @fieldsetWithErrorGroup(
+            f = f("services"),
+            heading = "asp.services.title",
+            section = "summary.asp",
+            panel = false,
+            hint = "lbl.select.all"
         ) {
-            @hint("lbl.select.all")
-            @errorGroup(
-                 field = f("services")
-            ) {
-                @checkbox(
-                    f = f("services[]"),
-                    labelText = "asp.service.lbl.01",
-                    value = "01"
-                )
-                @checkbox(
-                    f = f("services[]"),
-                    labelText = "asp.service.lbl.04",
-                    value = "04"
-                )
-                @checkbox(
-                    f = f("services[]"),
-                    labelText = "asp.service.lbl.03",
-                    value = "03"
-                )
-                @checkbox(
-                    f = f("services[]"),
-                    labelText = "asp.service.lbl.05",
-                    value = "05"
-                )
-                @checkbox(
-                    f = f("services[]"),
-                    labelText = "asp.service.lbl.02",
-                    value = "02"
-                )
-            }
+            @checkbox(
+                f = f("services[]"),
+                labelText = "asp.service.lbl.01",
+                value = "01"
+            )
+            @checkbox(
+                f = f("services[]"),
+                labelText = "asp.service.lbl.04",
+                value = "04"
+            )
+            @checkbox(
+                f = f("services[]"),
+                labelText = "asp.service.lbl.03",
+                value = "03"
+            )
+            @checkbox(
+                f = f("services[]"),
+                labelText = "asp.service.lbl.05",
+                value = "05"
+            )
+            @checkbox(
+                f = f("services[]"),
+                labelText = "asp.service.lbl.02",
+                value = "02"
+            )
         }
         @submit(edit)
     }

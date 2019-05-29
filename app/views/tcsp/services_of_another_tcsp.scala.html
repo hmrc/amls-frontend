@@ -22,7 +22,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("tcsp.servicesOfAnotherTcsp.title", "summary.tcsp")
 }
 
 @main(
@@ -33,28 +32,23 @@
     @form(f, controllers.tcsp.routes.ServicesOfAnotherTCSPController.post(edit)) {
 
         @fieldset(
-            f = f("servicesOfAnotherTCSP-fieldset"),
-            legend = "tcsp.servicesOfAnotherTcsp.title",
-            legendHidden = true,
+            f = f("servicesOfAnotherTCSP"),
+            heading = "tcsp.servicesOfAnotherTcsp.title",
+            section = "summary.tcsp",
             panel = false,
             classes = Seq("inline")
         ) {
-            @errorGroup(
-                field = f("servicesOfAnotherTCSP")
-            ) {
-                @radio(
-                    f = f("servicesOfAnotherTCSP"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true
-                )
-                @radio(
-                    f = f("servicesOfAnotherTCSP"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
-            }
+            @radio(
+                f = f("servicesOfAnotherTCSP"),
+                labelText = "lbl.yes",
+                value = "true"
+            )
+            @radio(
+                f = f("servicesOfAnotherTCSP"),
+                labelText = "lbl.no",
+                value = "false"
+            )
+
         }
 
         @submit(edit)

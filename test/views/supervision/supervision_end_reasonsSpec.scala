@@ -37,7 +37,7 @@ class supervision_end_reasonsSpec extends AmlsSpec with MustMatchers  {
       def view = views.html.supervision.supervision_end_reasons(EmptyForm, edit = false)
 
       doc.title must startWith(Messages("supervision.supervision_end_reasons.title"))
-      heading.html must be(Messages("supervision.supervision_end_reasons.title"))
+      heading.html must include(Messages("supervision.supervision_end_reasons.title"))
       subHeading.html must include(Messages("summary.supervision"))
     }
 
