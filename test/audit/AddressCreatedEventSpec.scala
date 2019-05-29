@@ -18,7 +18,7 @@ package audit
 
 import audit.AddressConversions._
 import cats.implicits._
-import models.{Country, NonUKCountry}
+import models.Country
 import models.businessdetails.{NonUKCorrespondenceAddress, RegisteredOfficeNonUK, RegisteredOfficeUK, UKCorrespondenceAddress}
 import models.responsiblepeople.{PersonAddressNonUK, PersonAddressUK}
 import models.tradingpremises.{Address => TradingPremisesAddress}
@@ -49,7 +49,7 @@ class AddressCreatedEventSpec extends AmlsSpec {
       }
 
       "given an address of a responsible person outside the UK" in {
-        val address = PersonAddressNonUK("Line 1", "Line 2", "Line 3".some, None, NonUKCountry("Norway", "NW"))
+        val address = PersonAddressNonUK("Line 1", "Line 2", "Line 3".some, None, Country("Norway", "NW"))
         val event = AddressCreatedEvent(address)
         val expected = headerCarrier.toAuditDetails() ++ Map(
           "addressLine1" -> "Line 1",
@@ -90,7 +90,7 @@ class AddressCreatedEventSpec extends AmlsSpec {
       }
 
       "given the address of a registered office outside the UK" in {
-        val address = RegisteredOfficeNonUK("RO Line 1", "RO Line 2", "RO Line 3".some, None, NonUKCountry("Albania", "AL"))
+        val address = RegisteredOfficeNonUK("RO Line 1", "RO Line 2", "RO Line 3".some, None, Country("Albania", "AL"))
         val event = AddressCreatedEvent(address)
         val expected = headerCarrier.toAuditDetails() ++ Map(
           "addressLine1" -> "RO Line 1",
@@ -117,7 +117,7 @@ class AddressCreatedEventSpec extends AmlsSpec {
       }
 
       "given a correspondence address outside the UK" in {
-        val address = NonUKCorrespondenceAddress("not used", "not used", "CA Line 1", "CA Line 2", "CA Line 3".some, None, NonUKCountry("Finland", "FIN"))
+        val address = NonUKCorrespondenceAddress("not used", "not used", "CA Line 1", "CA Line 2", "CA Line 3".some, None, Country("Finland", "FIN"))
         val event = AddressCreatedEvent(address)
         val expected = headerCarrier.toAuditDetails() ++ Map(
           "addressLine1" -> "CA Line 1",

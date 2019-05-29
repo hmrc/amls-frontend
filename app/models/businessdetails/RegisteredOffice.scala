@@ -17,7 +17,7 @@
 package models.businessdetails
 
 import cats.data.Validated.{Invalid, Valid}
-import models.{Country, DateOfChange, NonUKCountry}
+import models.{Country, DateOfChange}
 import models.FormTypes._
 import models.businesscustomer.Address
 import jto.validation._
@@ -62,7 +62,7 @@ case class RegisteredOfficeNonUK(
                                   addressLine2: String,
                                   addressLine3: Option[String] = None,
                                   addressLine4: Option[String] = None,
-                                  country: NonUKCountry,
+                                  country: Country,
                                   dateOfChange: Option[DateOfChange] = None
                                 ) extends RegisteredOffice
 
@@ -72,9 +72,11 @@ object RegisteredOffice {
 
   implicit val formRule: Rule[UrlFormEncoded, RegisteredOffice] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    val validateNonUKCountry: Rule[NonUKCountry, NonUKCountry] = Rule.fromMapping[NonUKCountry, NonUKCountry] {
-      case country if country.code == "GB" => Invalid(Seq(ValidationError(List("error.required.atb.registered.office.uk.or.overseas"))))
-      case country => Valid(country)
+    val validateCountry: Rule[Country, Country] = Rule.fromMapping[Country, Country] { country =>
+      country.code match {
+        case "GB" => Invalid(Seq(ValidationError(List("error.required.atb.registered.office.not.uk"))))
+        case _ => Valid(country)
+      }
     }
     (__ \ "isUK").read[Boolean].withMessage("error.required.atb.registered.office.uk.or.overseas") flatMap {
       case true =>
@@ -93,8 +95,8 @@ object RegisteredOffice {
             (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
             (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
             (__ \ "addressLineNonUK4").read(optionR(validateAddress)) ~
-            (__ \ "country").read(validateNonUKCountry.withMessage("error.required.atb.registered.office.not.uk"))
-          ) ((addr1: String, addr2: String, addr3: Option[String], addr4: Option[String], country: NonUKCountry) =>
+            (__ \ "country").read(validateCountry.withMessage("error.required.atb.registered.office.not.uk"))
+          ) ((addr1: String, addr2: String, addr3: Option[String], addr4: Option[String], country: Country) =>
           RegisteredOfficeNonUK(addr1, addr2, addr3, addr4, country, None))
     }
   }
@@ -140,7 +142,7 @@ object RegisteredOffice {
           (__ \ "addressLineNonUK2").read[String] and
           (__ \ "addressLineNonUK3").readNullable[String] and
           (__ \ "addressLineNonUK4").readNullable[String] and
-          (__ \ "country").read[NonUKCountry] and
+          (__ \ "country").read[Country] and
           (__ \ "dateOfChange").readNullable[DateOfChange]
         ) (RegisteredOfficeNonUK.apply _)
   }
@@ -179,7 +181,7 @@ object RegisteredOffice {
         address.line_2,
         address.line_3,
         address.line_4,
-        new NonUKCountry(address.country.name, address.country.code))
+        new Country(address.country.name, address.country.code))
     }
   }
 }

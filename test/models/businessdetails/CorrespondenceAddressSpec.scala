@@ -16,7 +16,7 @@
 
 package models.businessdetails
 
-import models.NonUKCountry
+import models.Country
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatest.mock.MockitoSugar
@@ -226,7 +226,7 @@ class CorrespondenceAddressSpec extends PlaySpec with MockitoSugar {
   val DefaultAddressLine3 = Some("Default Line 3")
   val DefaultAddressLine4 = Some("Default Line 4")
   val DefaultPostcode = "AA1 1AA"
-  val DefaultCountry = NonUKCountry("Albania", "AL")
+  val DefaultCountry = Country("Albania", "AL")
 
   val NewYourName = "New Your Name"
   val NewBusinessName = "New Business Name"

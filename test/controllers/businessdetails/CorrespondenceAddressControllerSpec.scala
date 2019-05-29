@@ -17,7 +17,7 @@
 package controllers.businessdetails
 
 import connectors.DataCacheConnector
-import models.NonUKCountry
+import models.Country
 import models.businessdetails.{BusinessDetails, NonUKCorrespondenceAddress, UKCorrespondenceAddress}
 import models.autocomplete.NameValuePair
 import org.jsoup.Jsoup
@@ -70,7 +70,7 @@ class CorrespondenceAddressControllerSpec extends AmlsSpec with MockitoSugar wit
 
       "data exists in the keystore" in new Fixture {
 
-        val correspondenceAddress = NonUKCorrespondenceAddress("Name Test", "Test", "Test", "Test", Some("test"), None, NonUKCountry("Albania", "AL"))
+        val correspondenceAddress = NonUKCorrespondenceAddress("Name Test", "Test", "Test", "Test", Some("test"), None, Country("Albania", "AL"))
         val businessDetails = BusinessDetails(None, None, None, None, None,None, None, Some(correspondenceAddress))
 
         when(controller.dataConnector.fetch[BusinessDetails](any())(any(), any(), any()))

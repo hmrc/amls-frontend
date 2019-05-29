@@ -17,8 +17,7 @@
 package models.businessdetails
 
 import cats.data.Validated.{Invalid, Valid}
-import jto.validation.forms.Rules._
-import models.NonUKCountry
+import models.Country
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Path, Rule, Write}
 import jto.validation.ValidationError
@@ -67,12 +66,12 @@ case class NonUKCorrespondenceAddress(
                                      addressLineNonUK2: String,
                                      addressLineNonUK3: Option[String],
                                      addressLineNonUK4: Option[String],
-                                     country: NonUKCountry
+                                     country: Country
                                      ) extends CorrespondenceAddress
 
 object CorrespondenceAddress {
   implicit val formRule: Rule[UrlFormEncoded, CorrespondenceAddress] = From[UrlFormEncoded] { __ =>
-  val validateNonUKCountry: Rule[NonUKCountry, NonUKCountry] = Rule.fromMapping[NonUKCountry, NonUKCountry] {
+  val validateCountry: Rule[Country, Country] = Rule.fromMapping[Country, Country] {
     case country if country.code == "GB" => Invalid(Seq(ValidationError(List("error.required.atb.registered.office.uk.or.overseas"))))
     case country => Valid(country)
   }
@@ -110,7 +109,7 @@ object CorrespondenceAddress {
             (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
             (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
             (__ \ "addressLineNonUK4").read(optionR(validateAddress)) ~
-            (__ \ "country").read(validateNonUKCountry.withMessage("error.required.atb.letters.address.not.uk"))
+            (__ \ "country").read(validateCountry.withMessage("error.required.atb.letters.address.not.uk"))
           )(NonUKCorrespondenceAddress.apply _)
       }
     }
@@ -159,7 +158,7 @@ object CorrespondenceAddress {
         (__ \ "correspondenceAddressLine2").read[String] and
         (__ \ "correspondenceAddressLine3").readNullable[String] and
         (__ \ "correspondenceAddressLine4").readNullable[String] and
-        (__ \ "correspondenceCountry").read[NonUKCountry])(NonUKCorrespondenceAddress.apply _)
+        (__ \ "correspondenceCountry").read[Country])(NonUKCorrespondenceAddress.apply _)
 
   }
 
@@ -186,7 +185,7 @@ object CorrespondenceAddress {
           (__ \ "correspondenceAddressLine2").write[String] and
           (__ \ "correspondenceAddressLine3").writeNullable[String] and
           (__ \ "correspondenceAddressLine4").writeNullable[String] and
-          (__ \ "correspondenceCountry").write[NonUKCountry]
+          (__ \ "correspondenceCountry").write[Country]
         )(unlift(NonUKCorrespondenceAddress.unapply)).writes(a)
     }
   }

@@ -16,7 +16,7 @@
 
 package models.responsiblepeople
 
-import models.NonUKCountry
+import models.Country
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
@@ -29,7 +29,7 @@ class PersonAddressSpec extends PlaySpec {
   val DefaultAddressLine3 = Some("Default Line 3")
   val DefaultAddressLine4 = Some("Default Line 4")
   val DefaultPostcode = "AA1 1AA"
-  val DefaultCountry = NonUKCountry("Albania", "AL")
+  val DefaultCountry = Country("Albania", "AL")
 
   val NewAddressLine1 = "New Line 1"
   val NewAddressLine2 = "New Line 2"

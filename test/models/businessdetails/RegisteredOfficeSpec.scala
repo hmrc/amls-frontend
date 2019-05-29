@@ -16,7 +16,7 @@
 
 package models.businessdetails
 
-import models.{Country, NonUKCountry, DateOfChange}
+import models.{Country, DateOfChange}
 import models.businesscustomer.Address
 import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
@@ -68,7 +68,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
               "building",
               Some("street"),
               Some("Area"),
-              NonUKCountry("Albania", "AL"),
+              Country("Albania", "AL"),
               None)))
       }
     }
@@ -197,7 +197,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
     }
 
     "validate toLines for Non UK address" in {
-      RegisteredOfficeNonUK("38B", "some street", None, None, NonUKCountry("United Kingdom", "GB")).toLines must be(Seq("38B",
+      RegisteredOfficeNonUK("38B", "some street", None, None, Country("United Kingdom", "GB")).toLines must be(Seq("38B",
         "some street",
         "United Kingdom"))
 
@@ -217,7 +217,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
 
     "write correct Non UK address to the model" in {
 
-      val data = RegisteredOfficeNonUK("38B", "Some Street", None, None, NonUKCountry("United Kingdom", "GB"))
+      val data = RegisteredOfficeNonUK("38B", "Some Street", None, None, Country("United Kingdom", "GB"))
 
       RegisteredOffice.formWrites.writes(data) mustBe Map("isUK" -> Seq("false"),
         "addressLineNonUK1" -> Seq("38B"),
@@ -277,7 +277,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
       "Test Address 2",
       Some("Test Address 3"),
       Some("Test Address 4"),
-      NonUKCountry("Albania", "AL")
+      Country("Albania", "AL")
     )
 
     "Round trip a UK Address correctly through serialisation" in {
@@ -301,7 +301,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
     "convert Business Customer Address to RegisteredOfficeNonUK" in {
       val address = Address("addr1", "addr2", Some("line3"), Some("line4"), None, Country("Albania", "AL"))
 
-      RegisteredOffice.convert(address) must be(RegisteredOfficeNonUK("addr1", "addr2", Some("line3"), Some("line4"), NonUKCountry("Albania", "AL")))
+      RegisteredOffice.convert(address) must be(RegisteredOfficeNonUK("addr1", "addr2", Some("line3"), Some("line4"), Country("Albania", "AL")))
     }
   }
 }

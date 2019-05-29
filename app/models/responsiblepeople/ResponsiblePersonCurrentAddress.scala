@@ -16,9 +16,10 @@
 
 package models.responsiblepeople
 
-import models.DateOfChange
+import cats.data.Validated.{Invalid, Valid}
+import models.{DateOfChange}
 import jto.validation.forms._
-import jto.validation.{From, Rule, To, Write}
+import jto.validation.{From, Rule, To, ValidationError, Write}
 
 
 case class ResponsiblePersonCurrentAddress(personAddress: PersonAddress,
@@ -29,11 +30,15 @@ object ResponsiblePersonCurrentAddress {
 
   import play.api.libs.json._
 
-  implicit val formRule: Rule[UrlFormEncoded, ResponsiblePersonCurrentAddress] = From[UrlFormEncoded] { __ =>
+  val validateCountry: Rule[PersonAddress, PersonAddress] = Rule.fromMapping[PersonAddress, PersonAddress] {
+    case address: PersonAddressNonUK if address.country.code == "GB" => Invalid(Seq(ValidationError(List("error.required.atb.registered.office.uk.or.overseas"))))
+    case address => Valid(address)
+  }
 
+  implicit val formRule: Rule[UrlFormEncoded, ResponsiblePersonCurrentAddress] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
     (
-      __.read[PersonAddress] ~ (__ \ "timeAtAddress").read[Option[TimeAtAddress]]
+      __.read(validateCountry) ~ (__ \ "timeAtAddress").read[Option[TimeAtAddress]]
       ) ((personAddress:PersonAddress, _:Option[TimeAtAddress]) => ResponsiblePersonCurrentAddress(personAddress, None, None))
   }
 

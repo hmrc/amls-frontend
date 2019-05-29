@@ -17,7 +17,7 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import models.NonUKCountry
+import models.Country
 import models.autocomplete.NameValuePair
 import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 import models.responsiblepeople._
@@ -153,7 +153,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
       "display the previous home address with non-UK fields populated" in new Fixture {
 
-        val nonukAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, NonUKCountry("Spain", "ES"))
+        val nonukAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))
         val additionalAddress = ResponsiblePersonCurrentAddress(nonukAddress, Some(SixToElevenMonths))
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
         val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))

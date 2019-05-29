@@ -16,7 +16,7 @@
 
 package models.responsiblepeople
 
-import models.NonUKCountry
+import models.Country
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ZeroToFiveMonths}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -25,12 +25,12 @@ import play.api.libs.json.Json
 class ResponsiblePersonAddressHistorySpec extends PlaySpec with MockitoSugar {
 
   val DefaultCurrentAddress = ResponsiblePersonCurrentAddress(PersonAddressUK("Line 1", "Line 2", None, None, "AA111AA"), Some(ZeroToFiveMonths))
-  val DefaultAdditionalAddress = ResponsiblePersonAddress(PersonAddressNonUK("Line 1", "Line 2", None, None, NonUKCountry("Spain", "ES")), Some(SixToElevenMonths))
+  val DefaultAdditionalAddress = ResponsiblePersonAddress(PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES")), Some(SixToElevenMonths))
   val DefaultAdditionalExtraAddress = ResponsiblePersonAddress(PersonAddressUK("Line 1", "Line 2", None, None, "NE1234"), Some(OneToThreeYears))
 
-  val NewCurrentAddress = ResponsiblePersonCurrentAddress(PersonAddressNonUK("Line 1", "Line 2", None, None, NonUKCountry("Spain", "ES")), Some(ZeroToFiveMonths))
-  val NewAdditionalAddress = ResponsiblePersonAddress(PersonAddressNonUK("Line 1", "Line 2", None, None, NonUKCountry("France", "FR")), Some(ZeroToFiveMonths))
-  val NewAdditionalExtraAddress = ResponsiblePersonAddress(PersonAddressNonUK("Line 1", "Line 2", None, None, NonUKCountry("Albania", "AL")), Some(SixToElevenMonths))
+  val NewCurrentAddress = ResponsiblePersonCurrentAddress(PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES")), Some(ZeroToFiveMonths))
+  val NewAdditionalAddress = ResponsiblePersonAddress(PersonAddressNonUK("Line 1", "Line 2", None, None, Country("France", "FR")), Some(ZeroToFiveMonths))
+  val NewAdditionalExtraAddress = ResponsiblePersonAddress(PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Albania", "AL")), Some(SixToElevenMonths))
 
   val DefaultAddressHistory = ResponsiblePersonAddressHistory(
     currentAddress = Some(DefaultCurrentAddress),

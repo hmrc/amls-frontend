@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.{Country, NonUKCountry}
+import models.Country
 import models.responsiblepeople.{CountryOfBirth, PersonResidenceType, ResponsiblePerson}
 import services.AutoCompleteService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -36,7 +36,7 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
 
   private def getCountryOfBirth(countryOfBirth: Country): CountryOfBirth = {
      if(countryOfBirth.code != "GB") {
-        CountryOfBirth(false, Some(NonUKCountry(countryOfBirth.name, countryOfBirth.code)))
+        CountryOfBirth(false, Some(Country(countryOfBirth.name, countryOfBirth.code)))
       } else {
         CountryOfBirth(true, None)
       }

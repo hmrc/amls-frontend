@@ -17,9 +17,9 @@
 package models.responsiblepeople
 
 import cats.data.Validated.{Invalid, Valid}
-import models.{Country, NonUKCountry}
+import models.Country
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Path, Rule, ValidationError, Write}
+import jto.validation.{From, Rule, ValidationError, Write}
 import play.api.libs.json.{Reads, Writes}
 
 sealed trait PersonAddress {
@@ -56,11 +56,11 @@ case class PersonAddressNonUK(
                          addressLineNonUK2: String,
                          addressLineNonUK3: Option[String],
                          addressLineNonUK4: Option[String],
-                         country: NonUKCountry) extends PersonAddress
+                         country: Country) extends PersonAddress
 
 object PersonAddress {
   implicit val formRule: Rule[UrlFormEncoded, PersonAddress] = From[UrlFormEncoded] { __ =>
-    val validateNonUKCountry: Rule[NonUKCountry, NonUKCountry] = Rule.fromMapping[NonUKCountry, NonUKCountry] {
+    val validateCountry: Rule[Country, Country] = Rule.fromMapping[Country, Country] {
       case country if country.code == "GB" => Invalid(Seq(ValidationError(List("error.required.atb.registered.office.uk.or.overseas"))))
       case country => Valid(country)
     }
@@ -81,7 +81,7 @@ object PersonAddress {
             (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
             (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
             (__ \ "addressLineNonUK4").read(optionR(validateAddress)) ~
-            (__ \ "country").read(validateNonUKCountry.withMessage("error.required.select.non.uk.address"))
+            (__ \ "country").read(validateCountry.withMessage("error.required.select.non.uk.address"))
           )(PersonAddressNonUK.apply _)
       }
     }
@@ -124,7 +124,7 @@ object PersonAddress {
         (__ \ "personAddressLine2").read[String] and
         (__ \ "personAddressLine3").readNullable[String] and
         (__ \ "personAddressLine4").readNullable[String] and
-        (__ \ "personAddressCountry").read[NonUKCountry])(PersonAddressNonUK.apply _)
+        (__ \ "personAddressCountry").read[Country])(PersonAddressNonUK.apply _)
   }
 
   implicit val jsonWrites: Writes[PersonAddress] = {
@@ -146,7 +146,7 @@ object PersonAddress {
             (__ \ "personAddressLine2").write[String] and
             (__ \ "personAddressLine3").writeNullable[String] and
             (__ \ "personAddressLine4").writeNullable[String] and
-            (__ \ "personAddressCountry").write[NonUKCountry]
+            (__ \ "personAddressCountry").write[Country]
           )(unlift(PersonAddressNonUK.unapply)).writes(a)
     }
   }

@@ -19,7 +19,7 @@ package views.responsiblepeople
 import controllers.responsiblepeople.NinoUtil
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ZeroToFiveMonths}
 import models.responsiblepeople._
-import models.{Country, DateOfChange, NonUKCountry}
+import models.{Country, DateOfChange}
 import org.joda.time.LocalDate
 import org.jsoup.nodes.Element
 import org.scalatest.MustMatchers
@@ -108,7 +108,7 @@ class detailed_answersSpec extends AmlsSpec
             ResponsiblePersonAddressHistory(
               currentAddress = Some(ResponsiblePersonCurrentAddress(
                 personAddress = PersonAddressNonUK(
-                  "addressLine1", "addressLine2", Some("addressLine3"), Some("addressLine4"), NonUKCountry("spain", "esp")
+                  "addressLine1", "addressLine2", Some("addressLine3"), Some("addressLine4"), Country("spain", "esp")
                 ),
                 timeAtAddress = Some(ZeroToFiveMonths),
                 dateOfChange = Some(DateOfChange(new LocalDate(1990, 2, 24)))

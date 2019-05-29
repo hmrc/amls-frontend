@@ -19,7 +19,7 @@ package models.responsiblepeople
 
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.{Path, ValidationError}
-import models.NonUKCountry
+import models.Country
 import org.scalatestplus.play.PlaySpec
 
 class CountryOfBirthSpec extends PlaySpec {
@@ -32,7 +32,7 @@ class CountryOfBirthSpec extends PlaySpec {
           "bornInUk" -> Seq("false"),
           "country" -> Seq("AL")
         )
-        CountryOfBirth.formRule.validate(urlFormEncoded) must be(Valid(CountryOfBirth(false, Some(NonUKCountry("Albania", "AL")))))
+        CountryOfBirth.formRule.validate(urlFormEncoded) must be(Valid(CountryOfBirth(false, Some(Country("Albania", "AL")))))
       }
 
       "read successfully for valid input type 'No'" in {
