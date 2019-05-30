@@ -271,8 +271,8 @@ error.required.select.uk.passport = Select yes if {0} has a UK passport
 error.required.select.non.uk.passport = Select yes if {0} has a passport from another country
 error.required.select.non.uk = Enter a country that is not the United Kingdom because {0} in the UK
 error.required.select.non.uk.address = does not live
-error.required.select.non.uk.previous.address = Enter a country that is not the United Kingdom because {0} previous address was not in the UK
-error.required.select.non.uk.other.previous.address = Enter a country that is not the United Kingdom because {0} other previous address was not in the UK
+error.required.select.non.uk.previous.address = previous address was not
+error.required.select.non.uk.other.previous.address = other previous address was not
 error.required.enter.valid.non.uk = Enter a country that is not the United Kingdom because {0} was not born in the UK
 
 

@@ -61,7 +61,7 @@ case class PersonAddressNonUK(
 object PersonAddress {
   implicit val formRule: Rule[UrlFormEncoded, PersonAddress] = From[UrlFormEncoded] { __ =>
     val validateCountry: Rule[Country, Country] = Rule.fromMapping[Country, Country] {
-      case country if country.code == "GB" => Invalid(Seq(ValidationError(List("error.required.select.non.uk.previous.address"))))
+      case country if country.code == "GB" => Invalid(Seq(ValidationError(List("error.required.select.non.uk"))))
       case country => Valid(country)
     }
       import jto.validation.forms.Rules._
@@ -81,7 +81,7 @@ object PersonAddress {
             (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
             (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
             (__ \ "addressLineNonUK4").read(optionR(validateAddress)) ~
-            (__ \ "country").read(validateCountry.withMessage("error.required.select.non.uk"))
+            (__ \ "country").read(validateCountry).withMessage("error.required.select.non.uk")
           )(PersonAddressNonUK.apply _)
       }
     }
