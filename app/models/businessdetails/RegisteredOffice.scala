@@ -95,7 +95,7 @@ object RegisteredOffice {
             (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
             (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
             (__ \ "addressLineNonUK4").read(optionR(validateAddress)) ~
-            (__ \ "country").read(validateCountry.withMessage("error.required.atb.registered.office.not.uk"))
+            (__ \ "country").read(validateCountry)
           ) ((addr1: String, addr2: String, addr3: Option[String], addr4: Option[String], country: Country) =>
           RegisteredOfficeNonUK(addr1, addr2, addr3, addr4, country, None))
     }

@@ -16,14 +16,12 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.Country
 import models.autocomplete.NameValuePair
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 import models.responsiblepeople._
-import models.status.SubmissionReadyForReview
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 
@@ -35,9 +33,8 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import utils.AmlsSpec
 import play.api.i18n.Messages
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
-import services.{AutoCompleteService, StatusService}
+import services.AutoCompleteService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success

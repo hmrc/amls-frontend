@@ -28,13 +28,15 @@ object CountryOfBirth {
   import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, CountryOfBirth] = From[UrlFormEncoded] { __ =>
-    val validateCountry: Rule[Country, Country] = Rule.fromMapping[Country, Country] {
-      case country if country.code == "GB" => Invalid(Seq(ValidationError(List("error.required.enter.valid.non.uk"))))
-      case country => Valid(country)
+    val validateCountry: Rule[Country, Country] = Rule.fromMapping[Country, Country] { country =>
+      country.code match {
+        case "GB" => Invalid(Seq(ValidationError(List("error.required.enter.valid.non.uk"))))
+        case _ => Valid(country)
+      }
     }
       import jto.validation.forms.Rules._
       (__ \ "bornInUk").read[Boolean].withMessage("error.required.rp.select.country.of.birth") flatMap {
-        case false => (__ \ "country").read(validateCountry.withMessage("error.required.enter.valid.non.uk")) map {
+        case false => (__ \ "country").read(validateCountry) map {
           c => CountryOfBirth(bornInUk = false, Some(c))
         }
         case true => CountryOfBirth(bornInUk = true, None)

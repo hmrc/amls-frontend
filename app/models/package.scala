@@ -449,7 +449,4 @@ package object models {
     Country("Zambia", "ZM"),
     Country("Zimbabwe", "ZW")
   )
-
-//  val nonUkcountries: Seq[Country] = (countries diff Seq(Country("United Kingdom", "GB"))).map {country => Country(country.name, country.code)}
-  val nonUkcountries: Seq[Country] = countries.map {country => Country(country.name, country.code)}
 }

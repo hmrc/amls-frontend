@@ -36,7 +36,7 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
 
   private def getCountryOfBirth(countryOfBirth: Country): CountryOfBirth = {
      if(countryOfBirth.code != "GB") {
-        CountryOfBirth(false, Some(Country(countryOfBirth.name, countryOfBirth.code)))
+        CountryOfBirth(false, Some(countryOfBirth))
       } else {
         CountryOfBirth(true, None)
       }
@@ -70,7 +70,7 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
     val countryOfBirth = if (data.bornInUk) {
       Some(Country("United Kingdom", "GB"))
     } else {
-      data.country.map { country => Country(country.name, country.code) }
+      data.country
     }
     personResidenceType.fold[Option[PersonResidenceType]](None)(pType => Some(pType.copy(countryOfBirth = countryOfBirth)))
   }

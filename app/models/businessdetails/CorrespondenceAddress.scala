@@ -71,9 +71,11 @@ case class NonUKCorrespondenceAddress(
 
 object CorrespondenceAddress {
   implicit val formRule: Rule[UrlFormEncoded, CorrespondenceAddress] = From[UrlFormEncoded] { __ =>
-  val validateCountry: Rule[Country, Country] = Rule.fromMapping[Country, Country] {
-    case country if country.code == "GB" => Invalid(Seq(ValidationError(List("error.required.atb.letters.address.not.uk"))))
-    case country => Valid(country)
+  val validateCountry: Rule[Country, Country] = Rule.fromMapping[Country, Country] { country =>
+    country.code match {
+      case "GB" => Invalid(Seq(ValidationError(List("error.required.atb.letters.address.not.uk"))))
+      case _ => Valid(country)
+    }
   }
       import jto.validation.forms.Rules._
       import models.FormTypes._
@@ -109,7 +111,7 @@ object CorrespondenceAddress {
             (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
             (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
             (__ \ "addressLineNonUK4").read(optionR(validateAddress)) ~
-            (__ \ "country").read(validateCountry.withMessage("error.required.atb.letters.address.not.uk"))
+            (__ \ "country").read(validateCountry)
           )(NonUKCorrespondenceAddress.apply _)
       }
     }
