@@ -181,7 +181,7 @@ object RegisteredOffice {
         address.line_2,
         address.line_3,
         address.line_4,
-        new Country(address.country.name, address.country.code))
+        address.country
     }
   }
 }
