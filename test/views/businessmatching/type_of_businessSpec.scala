@@ -48,7 +48,7 @@ class type_of_businessSpec extends AmlsSpec with MustMatchers  {
 
       def view = views.html.businessmatching.type_of_business(form2, true)
 
-      heading.html must be(Messages("businessmatching.typeofbusiness.title"))
+      heading.html must include(Messages("businessmatching.typeofbusiness.title"))
       subHeading.html must include(Messages("summary.businessmatching"))
 
     }

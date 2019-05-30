@@ -37,7 +37,7 @@ class PsrNumberViewSpec extends AmlsSpec {
             def view = views.html.businessmatching.psr_number(form2, edit = false, isPreSubmission = true)
 
             doc.title must startWith(Messages("businessmatching.psr.number.title") + " - " + Messages("summary.businessmatching"))
-            heading.html must be(Messages("businessmatching.psr.number.title"))
+            heading.html must include(Messages("businessmatching.psr.number.title"))
             subHeading.html must include(Messages("summary.businessmatching"))
 
         }
@@ -49,7 +49,7 @@ class PsrNumberViewSpec extends AmlsSpec {
             def view = views.html.businessmatching.psr_number(form2, edit = true, isPreSubmission = false)
 
             doc.title must startWith(Messages("businessmatching.psr.number.title") + " - " + Messages("summary.updateinformation"))
-            heading.html must be(Messages("businessmatching.psr.number.title"))
+            heading.html must include(Messages("businessmatching.psr.number.title"))
             subHeading.html must include(Messages("summary.updateinformation"))
 
         }

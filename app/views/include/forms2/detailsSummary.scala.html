@@ -24,7 +24,7 @@
 @* http://hmrc.github.io/assets-frontend/section-details.html *@
 <div class="form-group no-print">
     <details role="group">
-        <summary class="@summaryClasses.mkString(" ")">@summary</summary>
+        <summary class="@summaryClasses.mkString(" ")" role="button">@summary</summary>
         <div@if(detailsInner) { class="details__inner"}>
             @content
         </div>

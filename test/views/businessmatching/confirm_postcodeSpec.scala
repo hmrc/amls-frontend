@@ -36,7 +36,7 @@ class confirm_postcodeSpec extends AmlsSpec with MustMatchers  {
       def view = views.html.businessmatching.confirm_postcode(EmptyForm)
 
       doc.title must startWith(Messages("businessmatching.confirm.postcode.title") + " - " + Messages("summary.businessmatching"))
-      heading.html must be(Messages("businessmatching.confirm.postcode.title"))
+      heading.html must include(Messages("businessmatching.confirm.postcode.title"))
       subHeading.html must include(Messages("summary.businessmatching"))
       doc.select(s"input[id=postCode]").size() must be(1)
     }
