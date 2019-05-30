@@ -51,11 +51,6 @@ class new_nominated_officerSpec extends AmlsSpec with MustMatchers with Responsi
       subHeading.html must include(Messages("summary.updateinformation"))
 
     }
-    "have a back link" in new ViewFixture {
-      def view = views.html.changeofficer.new_nominated_officer(EmptyForm, Nil)
-
-      doc.getElementsByAttributeValue("class", "link-back") must not be empty
-    }
 
     "have correct form fields" in new ViewFixture {
 
