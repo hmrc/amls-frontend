@@ -25,7 +25,6 @@ error.invalid.country = Enter an official country name: for example, Holland is 
 error.required.country.name = Enter an official country name: for example, Holland is Netherlands
 error.required.nationality = Select one or more options to show this person’s nationality
 error.required.uk.or.overseas = Select yes if this is a UK address
-error.required.non.uk.country = You can`t enter United Kingdom for a Non UK Address. Enter an official country name: for example, Holland is Netherlands
 
 error.required.firstname = Enter a first name.
 error.required.lastname = Enter a last name.

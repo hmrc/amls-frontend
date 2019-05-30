@@ -96,7 +96,7 @@ class AddressCreatedEventSpec extends AmlsSpec {
           "addressLine1" -> "RO Line 1",
           "addressLine2" -> "RO Line 2",
           "addressLine3" -> "RO Line 3",
-          "country" -> "Scotland"
+          "country" -> "Albania"
         )
 
         event.detail mustBe expected

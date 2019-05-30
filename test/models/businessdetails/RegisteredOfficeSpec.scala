@@ -86,7 +86,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
 
         RegisteredOffice.formRule.validate(nonUKModel) must
           be(Invalid(Seq(
-            (Path \ "country") -> Seq(ValidationError("error.required.non.uk.country"))
+            (Path \ "country") -> Seq(ValidationError("error.required.atb.registered.office.not.uk"))
           )))
       }
 

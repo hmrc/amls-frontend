@@ -54,7 +54,7 @@ class CorrespondenceAddressSpec extends PlaySpec with MockitoSugar {
 
         CorrespondenceAddress.formRule.validate(invalidNonUKModel) must
           be(Invalid(Seq(
-            (Path \ "country") -> Seq(ValidationError("error.required.non.uk.country"))
+            (Path \ "country") -> Seq(ValidationError("error.required.atb.letters.address.not.uk"))
           )))
       }
 

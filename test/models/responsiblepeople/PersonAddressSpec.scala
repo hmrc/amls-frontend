@@ -128,7 +128,7 @@ class PersonAddressSpec extends PlaySpec {
 
         PersonAddress.formRule.validate(invalidNonUKModel) must
           be(Invalid(Seq(
-            (Path \ "country") -> Seq(ValidationError("error.required.non.uk.country"))
+            (Path \ "country") -> Seq(ValidationError("error.required.select.non.uk"))
           )))
       }
 
@@ -167,7 +167,7 @@ class PersonAddressSpec extends PlaySpec {
               be(Invalid(Seq(
                 (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.required.address.line1")),
                 (Path \ "addressLineNonUK2") -> Seq(ValidationError("error.required.address.line2")),
-                (Path \ "country") -> Seq(ValidationError("error.required.country"))
+                (Path \ "country") -> Seq(ValidationError("error.required.select.non.uk"))
               )))
           }
         }
@@ -206,7 +206,7 @@ class PersonAddressSpec extends PlaySpec {
               (Path \ "addressLineNonUK2") -> Seq(ValidationError("error.max.length.address.line")),
               (Path \ "addressLineNonUK3") -> Seq(ValidationError("error.max.length.address.line")),
               (Path \ "addressLineNonUK4") -> Seq(ValidationError("error.max.length.address.line")),
-              (Path \ "country") -> Seq(ValidationError("error.invalid.country"))
+              (Path \ "country") -> Seq(ValidationError("error.required.select.non.uk"))
             )))
         }
       }

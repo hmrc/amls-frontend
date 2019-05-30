@@ -23,6 +23,7 @@ import models.autocomplete.NameValuePair
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 import models.responsiblepeople._
+import models.status.SubmissionReadyForReview
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 
@@ -36,7 +37,7 @@ import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
-import services.AutoCompleteService
+import services.{AutoCompleteService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
@@ -314,16 +315,25 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar {
             "country" -> ""
           )
 
+          val responsiblePeople = ResponsiblePerson(personName = personName)
+
+          when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
           when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = additionalAddressController.post(RecordId)(requestWithMissingParams)
           status(result) must be(BAD_REQUEST)
 
+          val rpName: String = personName.map(pName =>
+            pName.titleName
+          ).getOrElse("")
+
           val document: Document = Jsoup.parse(contentAsString(result))
           document.select("a[href=#addressLineNonUK1]").html() must include(Messages("error.required.address.line1"))
           document.select("a[href=#addressLineNonUK2]").html() must include(Messages("error.required.address.line2"))
-          document.select("a[href=#country]").html() must include(Messages("error.required.country"))
+          document.select("a[href=#country]").html() must include(Messages("error.required.select.non.uk", s"$rpName's ${Messages("error.required.select.non.uk.previous.address")}"))
         }
 
         "given an invalid uk address" in new Fixture {
