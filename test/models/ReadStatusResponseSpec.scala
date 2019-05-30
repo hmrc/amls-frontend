@@ -17,10 +17,11 @@
 package models
 
 import java.sql.Timestamp
+
 import org.joda.time.{LocalDate, LocalDateTime}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.Json
+import play.api.libs.json.{JsResult, JsSuccess, Json}
 
 class ReadStatusResponseSpec extends PlaySpec with MockitoSugar {
 
@@ -86,6 +87,70 @@ class ReadStatusResponseSpec extends PlaySpec with MockitoSugar {
       )
 
       Json toJson response mustEqual expectedJson
+    }
+
+    "create model from json with all fields" in {
+
+      val json =
+        Json.obj(
+          "processingDate" -> "2019-12-30T00:00:00Z",
+          "formBundleStatus" -> "bundle",
+          "statusReason" -> "status",
+          "deRegistrationDate" -> "2017-01-01",
+          "currentRegYearStartDate" -> "2018-02-02",
+          "currentRegYearEndDate" -> "2019-03-03",
+          "renewalConFlag" -> true,
+          "renewalSubmissionFlag" -> true,
+          "currentAMLSOutstandingBalance" -> "balance",
+          "businessContactNumber" -> "number",
+          "safeId" -> "idNumber"
+        )
+
+      val actual: JsResult[ReadStatusResponse] = Json.fromJson[ReadStatusResponse](json)
+
+      val expected = ReadStatusResponse(
+        processingDate = new LocalDateTime(Timestamp.valueOf("2019-12-30 00:00:00.000")),
+        formBundleStatus = "bundle",
+        statusReason = Some("status"),
+        deRegistrationDate = Some(new LocalDate("2017-01-01")),
+        currentRegYearStartDate = Some(new LocalDate("2018-02-02")),
+        currentRegYearEndDate = Some(new LocalDate("2019-03-03")),
+        renewalConFlag = true,
+        renewalSubmissionFlag = Some(true),
+        currentAMLSOutstandingBalance = Some("balance"),
+        businessContactNumber = Some("number"),
+        safeId = Some("idNumber")
+      )
+
+      actual mustEqual JsSuccess(expected)
+    }
+
+    "create model from json with only mandatory fields" in {
+
+      val json =
+        Json.obj(
+          "processingDate" -> "2019-12-30T00:00:00Z",
+          "formBundleStatus" -> "bundle",
+          "statusReason" -> "status",
+          "deRegistrationDate" -> "2017-01-01",
+          "currentRegYearStartDate" -> "2018-02-02",
+          "currentRegYearEndDate" -> "2019-03-03",
+          "renewalConFlag" -> true
+        )
+
+      val actual: JsResult[ReadStatusResponse] = Json.fromJson[ReadStatusResponse](json)
+
+      val expected = ReadStatusResponse(
+        processingDate = new LocalDateTime(Timestamp.valueOf("2019-12-30 00:00:00.000")),
+        formBundleStatus = "bundle",
+        statusReason = Some("status"),
+        deRegistrationDate = Some(new LocalDate("2017-01-01")),
+        currentRegYearStartDate = Some(new LocalDate("2018-02-02")),
+        currentRegYearEndDate = Some(new LocalDate("2019-03-03")),
+        renewalConFlag = true
+      )
+
+      actual mustEqual JsSuccess(expected)
     }
   }
 }
