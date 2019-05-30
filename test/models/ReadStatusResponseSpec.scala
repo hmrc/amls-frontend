@@ -21,136 +21,79 @@ import java.sql.Timestamp
 import org.joda.time.{LocalDate, LocalDateTime}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.{JsResult, JsSuccess, Json}
+import play.api.libs.json.{JsObject, JsResult, JsSuccess, Json}
 
 class ReadStatusResponseSpec extends PlaySpec with MockitoSugar {
 
+val mandatoryJson: JsObject = Json.obj (
+    "processingDate" -> "2019-12-30T00:00:00Z",
+    "formBundleStatus" -> "bundle",
+    "statusReason" -> "status",
+    "deRegistrationDate" -> "2017-01-01",
+    "currentRegYearStartDate" -> "2018-02-02",
+    "currentRegYearEndDate" -> "2019-03-03",
+    "renewalConFlag" -> true
+  )
+
+  val fullJson: JsObject = Json.obj (
+    "processingDate" -> "2019-12-30T00:00:00Z",
+    "formBundleStatus" -> "bundle",
+    "statusReason" -> "status",
+    "deRegistrationDate" -> "2017-01-01",
+    "currentRegYearStartDate" -> "2018-02-02",
+    "currentRegYearEndDate" -> "2019-03-03",
+    "renewalConFlag" -> true,
+    "renewalSubmissionFlag" -> true,
+    "currentAMLSOutstandingBalance" -> "balance",
+    "businessContactNumber" -> "number",
+    "safeId" -> "idNumber"
+  )
+
+  val mandatoryResponse = ReadStatusResponse (
+    processingDate = new LocalDateTime(Timestamp.valueOf("2019-12-30 00:00:00.000")),
+    formBundleStatus = "bundle",
+    statusReason = Some("status"),
+    deRegistrationDate = Some(new LocalDate("2017-01-01")),
+    currentRegYearStartDate = Some(new LocalDate("2018-02-02")),
+    currentRegYearEndDate = Some(new LocalDate("2019-03-03")),
+    renewalConFlag = true
+  )
+
+  val fullResponse = ReadStatusResponse(
+    processingDate = new LocalDateTime(Timestamp.valueOf("2019-12-30 00:00:00.000")),
+    formBundleStatus = "bundle",
+    statusReason = Some("status"),
+    deRegistrationDate = Some(new LocalDate("2017-01-01")),
+    currentRegYearStartDate = Some(new LocalDate("2018-02-02")),
+    currentRegYearEndDate = Some(new LocalDate("2019-03-03")),
+    renewalConFlag = true,
+    renewalSubmissionFlag = Some(true),
+    currentAMLSOutstandingBalance = Some("balance"),
+    businessContactNumber = Some("number"),
+    safeId = Some("idNumber")
+  )
+
+
+
   "ReadStatusResponse" must {
-
-    "serialise to json when optional fields are not present" in {
-
-      val expectedJson =
-        Json.obj(
-          "processingDate" -> "2019-12-30T00:00:00Z",
-          "formBundleStatus" -> "bundle",
-          "statusReason" -> "status",
-          "deRegistrationDate" -> "2017-01-01",
-          "currentRegYearStartDate" -> "2018-02-02",
-          "currentRegYearEndDate" -> "2019-03-03",
-          "renewalConFlag" -> true
-        )
-
-
-      val response = ReadStatusResponse(
-        processingDate = new LocalDateTime(Timestamp.valueOf("2019-12-30 00:00:00.000")),
-        formBundleStatus = "bundle",
-        statusReason = Some("status"),
-        deRegistrationDate = Some(new LocalDate("2017-01-01")),
-        currentRegYearStartDate = Some(new LocalDate("2018-02-02")),
-        currentRegYearEndDate = Some(new LocalDate("2019-03-03")),
-        renewalConFlag = true
-      )
-
-      Json toJson response mustEqual expectedJson
+    "serialise to json with mandatory fields" in {
+      Json toJson mandatoryResponse mustEqual mandatoryJson
     }
 
     "serialise to json with all fields" in {
-
-      val expectedJson =
-        Json.obj(
-          "processingDate" -> "2019-12-30T00:00:00Z",
-          "formBundleStatus" -> "bundle",
-          "statusReason" -> "status",
-          "deRegistrationDate" -> "2017-01-01",
-          "currentRegYearStartDate" -> "2018-02-02",
-          "currentRegYearEndDate" -> "2019-03-03",
-          "renewalConFlag" -> true,
-          "renewalSubmissionFlag" -> true,
-          "currentAMLSOutstandingBalance" -> "balance",
-          "businessContactNumber" -> "number",
-          "safeId" -> "idNumber"
-        )
-
-
-      val response = ReadStatusResponse(
-        processingDate = new LocalDateTime(Timestamp.valueOf("2019-12-30 00:00:00.000")),
-        formBundleStatus = "bundle",
-        statusReason = Some("status"),
-        deRegistrationDate = Some(new LocalDate("2017-01-01")),
-        currentRegYearStartDate = Some(new LocalDate("2018-02-02")),
-        currentRegYearEndDate = Some(new LocalDate("2019-03-03")),
-        renewalConFlag = true,
-        renewalSubmissionFlag = Some(true),
-        currentAMLSOutstandingBalance = Some("balance"),
-        businessContactNumber = Some("number"),
-        safeId = Some("idNumber")
-      )
-
-      Json toJson response mustEqual expectedJson
+      Json toJson fullResponse mustEqual fullJson
     }
 
     "create model from json with all fields" in {
+      val actual: JsResult[ReadStatusResponse] = Json.fromJson[ReadStatusResponse](fullJson)
 
-      val json =
-        Json.obj(
-          "processingDate" -> "2019-12-30T00:00:00Z",
-          "formBundleStatus" -> "bundle",
-          "statusReason" -> "status",
-          "deRegistrationDate" -> "2017-01-01",
-          "currentRegYearStartDate" -> "2018-02-02",
-          "currentRegYearEndDate" -> "2019-03-03",
-          "renewalConFlag" -> true,
-          "renewalSubmissionFlag" -> true,
-          "currentAMLSOutstandingBalance" -> "balance",
-          "businessContactNumber" -> "number",
-          "safeId" -> "idNumber"
-        )
-
-      val actual: JsResult[ReadStatusResponse] = Json.fromJson[ReadStatusResponse](json)
-
-      val expected = ReadStatusResponse(
-        processingDate = new LocalDateTime(Timestamp.valueOf("2019-12-30 00:00:00.000")),
-        formBundleStatus = "bundle",
-        statusReason = Some("status"),
-        deRegistrationDate = Some(new LocalDate("2017-01-01")),
-        currentRegYearStartDate = Some(new LocalDate("2018-02-02")),
-        currentRegYearEndDate = Some(new LocalDate("2019-03-03")),
-        renewalConFlag = true,
-        renewalSubmissionFlag = Some(true),
-        currentAMLSOutstandingBalance = Some("balance"),
-        businessContactNumber = Some("number"),
-        safeId = Some("idNumber")
-      )
-
-      actual mustEqual JsSuccess(expected)
+      actual mustEqual JsSuccess(fullResponse)
     }
 
     "create model from json with only mandatory fields" in {
+      val actual: JsResult[ReadStatusResponse] = Json.fromJson[ReadStatusResponse](mandatoryJson)
 
-      val json =
-        Json.obj(
-          "processingDate" -> "2019-12-30T00:00:00Z",
-          "formBundleStatus" -> "bundle",
-          "statusReason" -> "status",
-          "deRegistrationDate" -> "2017-01-01",
-          "currentRegYearStartDate" -> "2018-02-02",
-          "currentRegYearEndDate" -> "2019-03-03",
-          "renewalConFlag" -> true
-        )
-
-      val actual: JsResult[ReadStatusResponse] = Json.fromJson[ReadStatusResponse](json)
-
-      val expected = ReadStatusResponse(
-        processingDate = new LocalDateTime(Timestamp.valueOf("2019-12-30 00:00:00.000")),
-        formBundleStatus = "bundle",
-        statusReason = Some("status"),
-        deRegistrationDate = Some(new LocalDate("2017-01-01")),
-        currentRegYearStartDate = Some(new LocalDate("2018-02-02")),
-        currentRegYearEndDate = Some(new LocalDate("2019-03-03")),
-        renewalConFlag = true
-      )
-
-      actual mustEqual JsSuccess(expected)
+      actual mustEqual JsSuccess(mandatoryResponse)
     }
   }
 }
