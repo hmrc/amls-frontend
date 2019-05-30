@@ -16,10 +16,8 @@
 
 package views.changeofficer
 
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
-import models.businessdetails.{VATRegistered, VATRegisteredYes}
-import models.changeofficer.StillEmployed
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -70,6 +68,11 @@ class remove_responsible_personSpec extends AmlsSpec with MustMatchers  {
       doc.getElementsByAttributeValue("name", "date.day") must not be empty
       doc.getElementsByAttributeValue("name", "date.month") must not be empty
       doc.getElementsByAttributeValue("name", "date.year") must not be empty
+    }
+    "have a back link" in new ViewFixture {
+      def view = views.html.changeofficer.remove_responsible_person(EmptyForm, "first")
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
   }
