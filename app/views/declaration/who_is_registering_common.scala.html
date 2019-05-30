@@ -18,13 +18,18 @@
 @import models.responsiblepeople._
 @import forms2._
 
-@(title: String, f: forms.Form2[_], model : Seq[ResponsiblePerson])(implicit m: Messages, request: Request[_])
+@(heading: String,
+  f: forms.Form2[_],
+  model : Seq[ResponsiblePerson],
+  section: String,
+  supportingContent: Html = HtmlFormat.empty)(implicit m: Messages, request: Request[_])
 
-@fieldset(
+@fieldsetWithErrorGroup(
     f = f("person"),
-    legend = title,
-    legendHidden = true,
-    panel = false
+    heading = heading,
+    section = section,
+    panel = false,
+    supportingContent = supportingContent
 ) {
     @model.zipWithIndex.map { case (person, i) =>
         @person.personName.map { obj =>
