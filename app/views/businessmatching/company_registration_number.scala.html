@@ -36,13 +36,12 @@
 ) {
 
     @form(f, controllers.businessmatching.routes.CompanyRegistrationNumberController.post(edit)) {
-
             @input(
                 attrMaxlength = "8",
                 attrPattern = "[0-9]{1,8}",
                 attrType = "tel",
                 field = f("companyRegistrationNumber"),
-                hintText = "lbl.hint.crn",
+                labelText = "lbl.hint.crn",
                 heading = "businessmatching.registrationnumber.title",
                 section = section
             )
