@@ -22,7 +22,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("payments.typeofbank.header", "submit.registration")
 }
 
 @main(
@@ -32,33 +31,26 @@
 
     @form(f, controllers.payments.routes.TypeOfBankController.post()) {
 
-        @fieldset(
-            f = f("typeOfBank-fieldset"),
-            legend = "payments.typeofbank.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("typeOfBank"),
+            heading = "payments.typeofbank.title",
+            section = "submit.registration",
             panel = false
         ) {
-            @errorGroup(
-                field = f("typeOfBank")
-            ) {
-                @radio(
-                    f = f("typeOfBank"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true
-                )
-                @radio(
-                    f = f("typeOfBank"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
-            }
-    }
+            @radio(
+                f = f("typeOfBank"),
+                labelText = "lbl.yes",
+                value = "true"
+            )
+            @radio(
+                f = f("typeOfBank"),
+                labelText = "lbl.no",
+                value = "false"
+            )
 
-    @submit(
-        returnLink = false
-    )
+        }
+
+        @submit(returnLink = false)
 
     }
 }
