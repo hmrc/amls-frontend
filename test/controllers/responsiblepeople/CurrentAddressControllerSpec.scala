@@ -439,16 +439,12 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
           val result = currentAddressController.post(RecordId)(requestWithMissingParams)
           status(result) must be(BAD_REQUEST)
 
-          val rpName: String = personName.map(pName =>
-            pName.titleName
-          ).getOrElse("")
-
           val document: Document = Jsoup.parse(contentAsString(result))
           document.select("a[href=#addressLineNonUK1]").html() must include(Messages("error.required.address.line1"))
           document.select("a[href=#addressLineNonUK2]").html() must include(Messages("error.required.address.line2"))
           document.select("a[href=#country]").html() must include(Messages("error.required.country"))
         }
-        
+
         "the country selected is United Kingdom" in new Fixture {
 
           val requestWithMissingParams = request.withFormUrlEncodedBody(
