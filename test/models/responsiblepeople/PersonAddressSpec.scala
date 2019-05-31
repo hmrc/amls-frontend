@@ -167,7 +167,7 @@ class PersonAddressSpec extends PlaySpec {
               be(Invalid(Seq(
                 (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.required.address.line1")),
                 (Path \ "addressLineNonUK2") -> Seq(ValidationError("error.required.address.line2")),
-                (Path \ "country") -> Seq(ValidationError("error.required.select.non.uk"))
+                (Path \ "country") -> Seq(ValidationError("error.required.country"))
               )))
           }
         }
@@ -206,7 +206,7 @@ class PersonAddressSpec extends PlaySpec {
               (Path \ "addressLineNonUK2") -> Seq(ValidationError("error.max.length.address.line")),
               (Path \ "addressLineNonUK3") -> Seq(ValidationError("error.max.length.address.line")),
               (Path \ "addressLineNonUK4") -> Seq(ValidationError("error.max.length.address.line")),
-              (Path \ "country") -> Seq(ValidationError("error.required.select.non.uk"))
+              (Path \ "country") -> Seq(ValidationError("error.invalid.country"))
             )))
         }
       }

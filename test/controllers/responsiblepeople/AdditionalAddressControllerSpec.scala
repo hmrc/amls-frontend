@@ -303,13 +303,38 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar {
           document.select("a[href=#postcode]").html() must include(Messages("error.invalid.postcode"))
         }
 
-        "the default fields for overseas are not supplied" in new Fixture {
+        "there is no country supplied" in new Fixture {
 
           val requestWithMissingParams = request.withFormUrlEncodedBody(
             "isUK" -> "false",
             "addressLineNonUK1" -> "",
             "addressLineNonUK2" -> "",
             "country" -> ""
+          )
+
+          when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = additionalAddressController.post(RecordId)(requestWithMissingParams)
+          status(result) must be(BAD_REQUEST)
+
+          val rpName: String = personName.map(pName =>
+            pName.titleName
+          ).getOrElse("")
+
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.select("a[href=#addressLineNonUK1]").html() must include(Messages("error.required.address.line1"))
+          document.select("a[href=#addressLineNonUK2]").html() must include(Messages("error.required.address.line2"))
+          document.select("a[href=#country]").html() must include(Messages("error.required.country"))
+        }
+
+        "the country selected is United Kingdom" in new Fixture {
+
+          val requestWithMissingParams = request.withFormUrlEncodedBody(
+            "isUK" -> "false",
+            "addressLineNonUK1" -> "",
+            "addressLineNonUK2" -> "",
+            "country" -> "GB"
           )
 
           val responsiblePeople = ResponsiblePerson(personName = personName)
