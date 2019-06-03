@@ -67,6 +67,7 @@
 
                     @country_autocomplete(
                         field = f("country"),
+                        placeholder = personName,
                         labelText = Messages("responsiblepeople.country.of.birth.txt.lbl", personName),
                         data = countryData.getOrElse(Seq.empty)
                     )

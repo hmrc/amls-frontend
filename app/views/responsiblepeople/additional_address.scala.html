@@ -23,7 +23,7 @@
 
 @header = {
     @components.back_link()
-    @errorSummary(f)
+    @errorSummaryWithPlaceholder(f, s"$personName's ${Messages("error.required.select.non.uk.previous.address")}")
     @headingWithPlaceholder(("responsiblepeople.additional_address.heading", personName), "summary.responsiblepeople")
 }
 
@@ -93,6 +93,7 @@
                     @input(f("addressLineNonUK4"), labelText = "lbl.address.line4")
                     @country_autocomplete(
                         field = f("country"),
+                        placeholder = s"$personName ${Messages("error.required.select.non.uk.previous.address")}",
                         labelText = "responsiblepeople.additional_address.country",
                         data = countryData.getOrElse(Seq.empty)
                     )

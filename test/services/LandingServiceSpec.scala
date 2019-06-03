@@ -29,13 +29,13 @@ import models.declaration.release7.RoleWithinBusinessRelease7
 import models.estateagentbusiness.{Auction, EstateAgentBusiness, Residential, Services}
 import models.hvd._
 import models.moneyservicebusiness.{MostTransactions => MsbMostTransactions, SendTheLargestAmountsOfMoney => MsbSendTheLargestAmountsOfMoney, WhichCurrencies => MsbWhichCurrencies, _}
-import models.renewal.{PaymentMethods => RPaymentMethods, PercentageOfCashPaymentOver15000 => RPercentageOfCashPaymentOver15000, ReceiveCashPayments => RReceiveCashPayments, WhichCurrencies => RenWhichCurrencies, MoneySources => RMoneySources, _}
+import models.renewal.{MoneySources => RMoneySources, PaymentMethods => RPaymentMethods, PercentageOfCashPaymentOver15000 => RPercentageOfCashPaymentOver15000, ReceiveCashPayments => RReceiveCashPayments, WhichCurrencies => RenWhichCurrencies, _}
 import models.responsiblepeople.ResponsiblePerson
 import models.status.{RenewalSubmitted, SubmissionReadyForReview}
 import models.supervision.Supervision
 import models.tcsp._
 import models.tradingpremises.TradingPremises
-import models.{AmendVariationRenewalResponse, Country, SubscriptionResponse, ViewResponse}
+import models._
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures

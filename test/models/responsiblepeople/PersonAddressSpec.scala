@@ -29,7 +29,7 @@ class PersonAddressSpec extends PlaySpec {
   val DefaultAddressLine3 = Some("Default Line 3")
   val DefaultAddressLine4 = Some("Default Line 4")
   val DefaultPostcode = "AA1 1AA"
-  val DefaultCountry = Country("United Kingdom", "GB")
+  val DefaultCountry = Country("Albania", "AL")
 
   val NewAddressLine1 = "New Line 1"
   val NewAddressLine2 = "New Line 2"
@@ -103,7 +103,7 @@ class PersonAddressSpec extends PlaySpec {
         "Default Line 2",
         "Default Line 3",
         "Default Line 4",
-        "United Kingdom"))
+        "Albania"))
     }
 
     "pass validation" when {
@@ -116,6 +116,22 @@ class PersonAddressSpec extends PlaySpec {
     }
 
     "throw error" when {
+      "given a non valid non UK address" in {
+        val invalidNonUKModel = Map(
+          "isUK" -> Seq("false"),
+          "addressLineNonUK1" -> Seq(DefaultAddressLine1),
+          "addressLineNonUK2" -> Seq(DefaultAddressLine2),
+          "addressLineNonUK3" -> Seq("Default Line 3"),
+          "addressLineNonUK4" -> Seq("Default Line 4"),
+          "country" -> Seq("GB")
+        )
+
+        PersonAddress.formRule.validate(invalidNonUKModel) must
+          be(Invalid(Seq(
+            (Path \ "country") -> Seq(ValidationError("error.required.select.non.uk"))
+          )))
+      }
+
       "mandatory fields are missing" when {
         "isUK has not been selected" in {
           PersonAddress.formRule.validate(DefaultUKModel) must be
