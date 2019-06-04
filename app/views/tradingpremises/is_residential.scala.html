@@ -23,7 +23,12 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("tradingpremises.isResidential.title", "summary.tradingpremises")
+}
+
+@supportingContent = @{
+    model.map { address =>
+        registered_office_helper(address)
+    } getOrElse(HtmlFormat.empty)
 }
 
 @main(
@@ -33,34 +38,24 @@
 
     @form(f, controllers.tradingpremises.routes.IsResidentialController.post(index, edit)) {
 
-        @model.map { address =>
-            @registered_office_helper(address)
-        }
-
-        @fieldset(
-            f = f("isResidential-fieldset"),
-            legend = "tradingpremises.isResidential.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("isResidential"),
+            heading = "tradingpremises.isResidential.title",
+            section = "summary.tradingpremises",
+            supportingContent = supportingContent,
             panel = false,
             classes = Seq("inline")
         ) {
-
-            @errorGroup(
-                field = f("isResidential")
-            ) {
-                @radio(
-                    f = f("isResidential"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true
-                )
-                @radio(
-                    f = f("isResidential"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
-            }
+            @radio(
+                f = f("isResidential"),
+                labelText = "lbl.yes",
+                value = "true"
+            )
+            @radio(
+                f = f("isResidential"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
 
         @submit(false)

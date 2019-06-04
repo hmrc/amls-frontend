@@ -23,7 +23,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("tradingpremises.agentpartnership.title", "summary.tradingpremises")
 }
 
 @main(
@@ -35,8 +34,8 @@
 
         @input(
             field = f("agentPartnership"),
-            labelText = "tradingpremises.agentpartnership.title",
-            labelHidden = true
+            heading = "tradingpremises.agentpartnership.title",
+            section = "section.tradingpremises"
         )
 
         @submit(edit)
