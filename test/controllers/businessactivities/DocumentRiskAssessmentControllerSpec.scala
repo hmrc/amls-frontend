@@ -48,36 +48,33 @@ class DocumentRiskAssessmentControllerSpec extends AmlsSpec with MockitoSugar {
   "DocumentRiskAssessmentController" when {
 
     "get is called" must {
-//      "load the Risk assessment Page" in new Fixture {
-//
-//        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-//          .thenReturn(Future.successful(None))
-//
-//        val result = controller.get()(request)
-//        status(result) must be(OK)
-//
-//        val document = Jsoup.parse(contentAsString(result))
-//        document.getElementById("hasPolicy-true").hasAttr("checked") must be(false)
-//        document.getElementById("hasPolicy-false").hasAttr("checked") must be(false)
-//        document.getElementById("riskassessments-01").hasAttr("checked") must be(false)
-//        document.getElementById("riskassessments-02").hasAttr("checked") must be(false)
-//      }
-//
-//      "pre-populate the Risk assessment Page" in new Fixture {
-//
-//        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-//          .thenReturn(Future.successful(Some(BusinessActivities(
-//            riskAssessmentPolicy = Some(RiskAssessmentPolicyYes(Set(PaperBased, Digital)))
-//          ))))
-//
-//        val result = controller.get()(request)
-//        status(result) must be(OK)
-//
-//        val document = Jsoup.parse(contentAsString(result))
-//        document.getElementById("hasPolicy-true").hasAttr("checked") must be(true)
-//        document.getElementById("riskassessments-01").hasAttr("checked") must be(true)
-//        document.getElementById("riskassessments-02").hasAttr("checked") must be(true)
-//      }
+      "load the Document Risk assessment Page" in new Fixture {
+
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        val document = Jsoup.parse(contentAsString(result))
+        document.getElementById("riskassessments-01").hasAttr("checked") must be(false)
+        document.getElementById("riskassessments-02").hasAttr("checked") must be(false)
+      }
+
+      "pre-populate the Document Risk assessment Page" in new Fixture {
+
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(BusinessActivities(
+            riskAssessmentPolicy = Some(RiskAssessmentPolicyYes(Set(PaperBased, Digital)))
+          ))))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        val document = Jsoup.parse(contentAsString(result))
+        document.getElementById("riskassessments-01").hasAttr("checked") must be(true)
+        document.getElementById("riskassessments-02").hasAttr("checked") must be(true)
+      }
     }
 
     "post is called" must {
