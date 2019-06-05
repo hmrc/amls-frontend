@@ -30,7 +30,7 @@ import scala.concurrent.Future
 
 class DocumentRiskAssessmentController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                  override val authConnector: AuthConnector
-                                                )extends BaseController {
+                                         )extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>

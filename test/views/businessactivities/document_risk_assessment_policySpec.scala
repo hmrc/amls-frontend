@@ -17,16 +17,15 @@
 package views.businessactivities
 
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import jto.validation.{Path, ValidationError}
 import models.businessactivities.{RiskAssessmentPolicy, RiskAssessmentPolicyNo}
 import org.scalatest.MustMatchers
-import utils.AmlsSpec
-import jto.validation.Path
-import jto.validation.ValidationError
 import play.api.i18n.Messages
+import utils.AmlsSpec
 import views.Fixture
 
 
-class risk_assessment_policySpec extends AmlsSpec with MustMatchers {
+class document_risk_assessment_policySpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
@@ -37,9 +36,9 @@ class risk_assessment_policySpec extends AmlsSpec with MustMatchers {
 
       val form2: ValidForm[RiskAssessmentPolicy] = Form2(RiskAssessmentPolicyNo)
 
-      def view = views.html.businessactivities.risk_assessment_policy(form2, true)
+      def view = views.html.businessactivities.document_risk_assessment_policy(form2, true)
 
-      doc.title must startWith(Messages("businessactivities.riskassessment.policy.title"))
+      doc.title must startWith(Messages("businessactivities.document.riskassessment.policy.title"))
     }
 
     "have correct headings" in new ViewFixture {
@@ -57,19 +56,20 @@ class risk_assessment_policySpec extends AmlsSpec with MustMatchers {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "hasPolicy") -> Seq(ValidationError("not a message Key"))
+          (Path \ "riskassessments") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.businessactivities.risk_assessment_policy(form2, true)
+      def view = views.html.businessactivities.document_risk_assessment_policy(form2, true)
 
-      errorSummary.html() must include("not a message Key")
+      errorSummary.html() must include("second not a message Key")
 
-      doc.getElementById("hasPolicy")
-        .getElementsByClass("error-notification").first().html() must include("not a message Key")
+      doc.getElementById("riskassessments")
+        .getElementsByClass("error-notification").first().html() must include("second not a message Key")
+
     }
 
     "have a back link" in new ViewFixture {
-      def view = views.html.businessactivities.risk_assessment_policy(EmptyForm, true)
+      def view = views.html.businessactivities.document_risk_assessment_policy(EmptyForm, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

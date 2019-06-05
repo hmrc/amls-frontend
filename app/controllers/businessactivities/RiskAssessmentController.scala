@@ -50,7 +50,7 @@ class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConne
       Form2[RiskAssessmentPolicy](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(risk_assessment_policy(f, edit)))
-        case ValidForm(_, data) => {
+        case ValidForm(_, data: RiskAssessmentPolicy) => {
           dataCacheConnector.fetchAll flatMap { maybeCache =>
             val businessMatching = for {
               cacheMap <- maybeCache
@@ -60,8 +60,7 @@ class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConne
             for {
               businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
               _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key, businessActivities.riskAssessmentPolicy(data))
-            } yield redirectDependingOnEdit(edit, ControllerHelper.isAccountancyServicesSelected(Some(businessMatching)))
-
+            } yield redirectDependingOnEdit(edit, ControllerHelper.isAccountancyServicesSelected(Some(businessMatching)), data)
           }
         } recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
@@ -69,8 +68,9 @@ class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConne
       }
   }
 
-  private def redirectDependingOnEdit(edit: Boolean, accountancyServices: Boolean) = edit match {
-    case true => Redirect(routes.SummaryController.get())
-    case false => Redirect(routes.DocumentRiskAssessmentController.get())
-  }
+  private def redirectDependingOnEdit(edit: Boolean, accountancyServices: Boolean, data: RiskAssessmentPolicy) =
+    (edit, accountancyServices, data) match {
+      case (true, _, _) => Redirect(routes.SummaryController.get())
+      case (false, _, _) => Redirect(routes.DocumentRiskAssessmentController.get())
+    }
 }
