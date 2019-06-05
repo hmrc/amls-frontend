@@ -28,9 +28,9 @@ import views.html.businessactivities._
 
 import scala.concurrent.Future
 
-class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                          override val authConnector: AuthConnector
-                                         )extends BaseController {
+class DocumentRiskAssessmentController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                                 override val authConnector: AuthConnector
+                                                )extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -71,6 +71,9 @@ class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConne
 
   private def redirectDependingOnEdit(edit: Boolean, accountancyServices: Boolean) = edit match {
     case true => Redirect(routes.SummaryController.get())
-    case false => Redirect(routes.DocumentRiskAssessmentController.get())
+    case false => accountancyServices match {
+      case true => Redirect(routes.SummaryController.get())
+      case false => Redirect(routes.AccountantForAMLSRegulationsController.get())
+    }
   }
 }
