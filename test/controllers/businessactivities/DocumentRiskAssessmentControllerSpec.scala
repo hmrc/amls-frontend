@@ -82,7 +82,7 @@ class DocumentRiskAssessmentControllerSpec extends AmlsSpec with MockitoSugar {
 
     "post is called" must {
       "when edit is false" must {
-        "on post with valid data and load check your answers page when businessActivity is ASP" in new Fixture {
+        "on post with valid data redirect to check your answers page when businessActivity is ASP" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
             "hasPolicy" -> "true",
@@ -109,7 +109,7 @@ class DocumentRiskAssessmentControllerSpec extends AmlsSpec with MockitoSugar {
           redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get().url))
         }
 
-        "on post with valid data and load advice on MLR due to diligence page when businessActivity is not ASP" in new Fixture {
+        "on post with valid data redirect to advice on MLR due to diligence page when businessActivity is not ASP" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
             "hasPolicy" -> "true",
