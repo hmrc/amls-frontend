@@ -83,7 +83,31 @@ class RiskAssessmentControllerSpec extends AmlsSpec with MockitoSugar {
 
     "post is called" must {
       "when edit is false" must {
-        "on post with valid data and load check your answers page when businessActivity is ASP" in new Fixture {
+        "on post with valid data redirect to check your answers page when businessActivity is ASP and hasPolicy is false" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "hasPolicy" -> "false"
+          )
+
+          val mockCacheMap = mock[CacheMap]
+
+          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            .thenReturn(Some(BusinessMatching(None, Some(BMBusinessActivities(Set(AccountancyServices, MoneyServiceBusiness))))))
+
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicyNo)))))
+
+          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(mockCacheMap))
+
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get().url))
+        }
+        "on post with valid data redirect to DocumentRiskAssessment page when businessActivity is ASP and hasPolicy is true" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
             "hasPolicy" -> "true",
@@ -107,15 +131,39 @@ class RiskAssessmentControllerSpec extends AmlsSpec with MockitoSugar {
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get().url))
+          redirectLocation(result) must be(Some(controllers.businessactivities.routes.DocumentRiskAssessmentController.get().url))
         }
 
-        "on post with valid data and load advice on MLR due to diligence page when businessActivity is not ASP" in new Fixture {
+        "on post with valid data redirect to DocumentRiskAssessment page when businessActivity is not ASP and hasPolicy is true" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
             "hasPolicy" -> "true",
             "riskassessments[0]" -> "01",
             "riskassessments[1]" -> "02"
+          )
+
+          val mockCacheMap = mock[CacheMap]
+
+          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            .thenReturn(Some(BusinessMatching(None, Some(BMBusinessActivities(Set(MoneyServiceBusiness))))))
+
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicyNo)))))
+
+          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(mockCacheMap))
+
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.businessactivities.routes.DocumentRiskAssessmentController.get().url))
+        }
+        "on post with valid data redirect to advice on MLR due to diligence page when businessActivity is not ASP and hasPolicy is false" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "hasPolicy" -> "false"
           )
 
           val mockCacheMap = mock[CacheMap]
@@ -223,7 +271,31 @@ class RiskAssessmentControllerSpec extends AmlsSpec with MockitoSugar {
       }
 
       "when edit is true" must {
-        "redirect to the SummaryController" in new Fixture {
+        "redirect to the SummaryController when hasPolicy is false" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "hasPolicy" -> "false"
+          )
+
+          val mockCacheMap = mock[CacheMap]
+
+          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            .thenReturn(Some(BusinessMatching(None, Some(BMBusinessActivities(Set(MoneyServiceBusiness))))))
+
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicyNo)))))
+
+          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(mockCacheMap))
+
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          val result = controller.post(true)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+        }
+        "redirect to the DocumentRiskAssessmentController when hasPolicy is true" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
             "hasPolicy" -> "true",
@@ -247,7 +319,7 @@ class RiskAssessmentControllerSpec extends AmlsSpec with MockitoSugar {
 
           val result = controller.post(true)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+          redirectLocation(result) must be(Some(routes.DocumentRiskAssessmentController.get().url))
         }
       }
     }
