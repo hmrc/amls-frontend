@@ -29,7 +29,7 @@
     heading = header
 ) {
 
-    @form(f, controllers.businessactivities.routes.RiskAssessmentController.post(edit)) {
+    @form(f, controllers.businessactivities.routes.DocumentRiskAssessmentController.post(edit)) {
 
         @fieldsetWithErrorGroup(
             f = f("riskassessments"),
@@ -38,6 +38,7 @@
             hint = "lbl.select.all",
             panel = false
         ) {
+            <input type="hidden" name="hasPolicy" value=true />
             @checkbox(
                 f = f("riskassessments[]"),
                 labelText = "businessactivities.RiskAssessmentType.lbl.01",

@@ -76,9 +76,12 @@ object RiskAssessmentPolicy {
     ): Rule[UrlFormEncoded, RiskAssessmentPolicy] =
     From[UrlFormEncoded] { __ =>
       (__ \ "hasPolicy").read[Boolean].withMessage("error.required.ba.option.risk.assessment") flatMap {
+//          case true =>
+//             (__ \ "riskassessments").
+//               read(minLengthR[Set[RiskAssessmentType]](1).withMessage("error.required.ba.risk.assessment.format")) map RiskAssessmentPolicyYes.apply
           case true =>
              (__ \ "riskassessments").
-               read(minLengthR[Set[RiskAssessmentType]](1).withMessage("error.required.ba.risk.assessment.format")) map RiskAssessmentPolicyYes.apply
+               read[Set[RiskAssessmentType]] map RiskAssessmentPolicyYes.apply
          case false => Rule.fromMapping { _ => Valid(RiskAssessmentPolicyNo) }
       }
 
