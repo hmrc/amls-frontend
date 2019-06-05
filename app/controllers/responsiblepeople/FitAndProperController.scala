@@ -80,11 +80,7 @@ class FitAndProperController @Inject()(
 
                 for {
                   cacheMap <- fetchAllAndUpdateStrict[ResponsiblePerson](index) { (_, rp) =>
-                    if (appConfig.phase2ChangesToggle) {
                       rp.updateFitAndProperAndApproval(data, msbOrTcsp)
-                    } else {
-                      rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data)))
-                    }
                   }
                 } yield identifyRoutingTarget(index, edit, cacheMap, data, msbOrTcsp, flow)
               }
@@ -102,7 +98,7 @@ class FitAndProperController @Inject()(
                                     msbOrTscp: Boolean,
                                     flow: Option[String])
                                    (implicit authContext: AuthContext, request: Request[AnyContent]): Result = {
-    (edit, fitAndProperAnswer, appConfig.phase2ChangesToggle) match {
+    (edit, fitAndProperAnswer, true) match {
       case (true, false, true) => routeMsbOrTcsb(index, cacheMapOpt, fitAndProperAnswer, msbOrTscp, flow)
       case (false, false, true) => routeMsbOrTcsb(index, cacheMapOpt, fitAndProperAnswer, msbOrTscp, flow)
       case _ => Redirect(routes.DetailedAnswersController.get(index, flow))

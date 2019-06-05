@@ -16,13 +16,12 @@
 
 package typeclasses.confirmation
 
-import config.ApplicationConfig
 import models.businessmatching.BusinessActivities
 import models.confirmation.{BreakdownRow, Currency, RowEntity}
 import models.responsiblepeople.ResponsiblePerson
 import models.tradingpremises.TradingPremises
 import models.{AmendVariationRenewalResponse, SubmissionResponse}
-import typeclasses.confirmation.ResponsiblePeopleRowsInstances._
+import typeclasses.confirmation.ResponsiblePeopleRowsInstancesPhase2._
 
 trait ConfirmationBreakdownRows[A] extends FeeCalculations {
   def apply(
@@ -84,19 +83,11 @@ object BreakdownRowInstances {
   }
 
   def responsiblePeopleRowsProxy(subscription: SubmissionResponse, people: Option[Seq[ResponsiblePerson]], activities: BusinessActivities) = {
-    if (ApplicationConfig.phase2ChangesToggle) {
       ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
         subscription,
         activities.businessActivities,
         people
       )
-    } else {
-      ResponsiblePeopleRows[SubmissionResponse](
-        subscription,
-        activities.businessActivities,
-        people
-      )
-    }
   }
 
   implicit val breakdownRowFromVariation: ConfirmationBreakdownRows[AmendVariationRenewalResponse] = {

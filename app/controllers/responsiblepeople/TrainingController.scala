@@ -16,12 +16,12 @@
 
 package controllers.responsiblepeople
 
-import config.{AMLSAuthConnector, AppConfig, ApplicationConfig}
+import config.AppConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import javax.inject.Inject
-import models.businessmatching.{BusinessActivities, BusinessMatching, MoneyServiceBusiness, TrustAndCompanyServices}
+import models.businessmatching.BusinessMatching
 import models.responsiblepeople.{ResponsiblePerson, Training}
 import play.api.i18n.MessagesApi
 import play.api.mvc.Result
@@ -77,10 +77,7 @@ class TrainingController @Inject()(
       case Some(cacheMap) => {
         (edit, cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) match {
           case (true, _) => Redirect(routes.DetailedAnswersController.get(index, flow))
-          case (false, Some(BusinessMatching(_, Some(BusinessActivities(acts, _, _, _)),_,_,_,_, _, _, _)))
-            if  appConfig.phase2ChangesToggle || acts.exists(act => act == MoneyServiceBusiness || act == TrustAndCompanyServices)
-          => Redirect(routes.FitAndProperNoticeController.get(index, false, flow))
-          case (false, _) => Redirect(routes.DetailedAnswersController.get(index, flow))
+          case (false, _) => Redirect(routes.FitAndProperNoticeController.get(index, false, flow))
         }
       }
       case _ => Redirect(routes.DetailedAnswersController.get(index, flow))

@@ -16,12 +16,11 @@
 
 package controllers.responsiblepeople
 
-import javax.inject.Inject
-import cats.data.OptionT
 import config.AppConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.responsiblepeople.{DateOfBirth, ResponsiblePerson}
 import play.api.i18n.MessagesApi
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -63,8 +62,7 @@ class DateOfBirthController @Inject()(
               }
             } yield edit match {
               case true => Redirect(routes.DetailedAnswersController.get(index, flow))
-              case false if appConfig.phase2ChangesToggle => Redirect(routes.PersonResidentTypeController.get(index, edit, flow))
-              case false => Redirect(routes.CountryOfBirthController.get(index, edit, flow))
+              case false => Redirect(routes.PersonResidentTypeController.get(index, edit, flow))
             }
 
           }.recoverWith {

@@ -65,7 +65,7 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
       responsiblePersonGen.sample.get.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)))) ++
       responsiblePeopleGen(2).sample.get
 
-    val generateDOB = if(ApplicationConfig.phase2ChangesToggle) Some(DateOfBirth(new LocalDate(2001,12,2))) else None
+    val generateDOB = Some(DateOfBirth(new LocalDate(2001,12,2)))
 
     var peopleMixedWithInactive = Seq(
       responsiblePersonGen.sample.get.copy(Some(PersonName("Person", None, "1")), dateOfBirth = generateDOB, approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(false))),

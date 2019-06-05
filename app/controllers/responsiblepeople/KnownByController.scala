@@ -17,13 +17,12 @@
 package controllers.responsiblepeople
 
 import config.AppConfig
-import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.{KnownBy, LegalNameChangeDate, ResponsiblePerson}
+import javax.inject.{Inject, Singleton}
+import models.responsiblepeople.{KnownBy, ResponsiblePerson}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.known_by
 
@@ -68,9 +67,8 @@ class KnownByController @Inject()(val dataCacheConnector: DataCacheConnector,
                 }
               }
             } yield edit match {
-        case true => Redirect (routes.DetailedAnswersController.get (index, flow) )
-        case false if appConfig.phase2ChangesToggle => Redirect (routes.DateOfBirthController.get (index, edit, flow) )
-        case false => Redirect (routes.PersonResidentTypeController.get (index, edit, flow) )
+        case true => Redirect (routes.DetailedAnswersController.get (index, flow))
+        case false => Redirect (routes.DateOfBirthController.get (index, edit, flow))
         }
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
