@@ -19,10 +19,6 @@
 
 @(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
 
-@target = @{
-    s"""${f("riskassessments").id}-fieldset"""
-}
-
 @header = {
     @components.back_link()
     @errorSummary(f)
@@ -37,9 +33,10 @@
 
         @fieldsetWithErrorGroup(
             f = f("riskassessments"),
-            legend = "businessactivities.document.riskassessment.policy.title",
+            heading = "businessactivities.document.riskassessment.policy.title",
+            section = "summary.businessactivities",
             hint = "lbl.select.all",
-            errorClasses = Seq("error-margin")
+            panel = false
         ) {
             @checkbox(
                 f = f("riskassessments[]"),
