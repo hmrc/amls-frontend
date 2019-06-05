@@ -23,22 +23,21 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
-class RiskAssessmentControllerSpec extends AmlsSpec with MockitoSugar {
+class DocumentRiskAssessmentControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new RiskAssessmentController (
+    val controller = new DocumentRiskAssessmentController (
       dataCacheConnector = mock[DataCacheConnector],
       authConnector = self.authConnector
     )
@@ -46,7 +45,7 @@ class RiskAssessmentControllerSpec extends AmlsSpec with MockitoSugar {
 
   val emptyCache = CacheMap("", Map.empty)
 
-  "RiskAssessmentController" when {
+  "DocumentRiskAssessmentController" when {
 
     "get is called" must {
 //      "load the Risk assessment Page" in new Fixture {
@@ -63,7 +62,7 @@ class RiskAssessmentControllerSpec extends AmlsSpec with MockitoSugar {
 //        document.getElementById("riskassessments-01").hasAttr("checked") must be(false)
 //        document.getElementById("riskassessments-02").hasAttr("checked") must be(false)
 //      }
-
+//
 //      "pre-populate the Risk assessment Page" in new Fixture {
 //
 //        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
