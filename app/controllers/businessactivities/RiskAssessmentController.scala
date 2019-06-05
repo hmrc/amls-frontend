@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessactivities.{BusinessActivities, RiskAssessmentPolicy}
+import models.businessactivities.{BusinessActivities, RiskAssessmentPolicy, RiskAssessmentPolicyYes}
 import models.businessmatching.BusinessMatching
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
@@ -70,7 +70,10 @@ class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConne
 
   private def redirectDependingOnEdit(edit: Boolean, accountancyServices: Boolean, data: RiskAssessmentPolicy) =
     (edit, accountancyServices, data) match {
+      case (true, _, RiskAssessmentPolicyYes(_)) => Redirect(routes.DocumentRiskAssessmentController.get())
       case (true, _, _) => Redirect(routes.SummaryController.get())
-      case (false, _, _) => Redirect(routes.DocumentRiskAssessmentController.get())
+      case (false, _, RiskAssessmentPolicyYes(_)) => Redirect(routes.DocumentRiskAssessmentController.get())
+      case (false, true, _) => Redirect(routes.SummaryController.get())
+      case (false, false, _) => Redirect(routes.AccountantForAMLSRegulationsController.get())
     }
 }
