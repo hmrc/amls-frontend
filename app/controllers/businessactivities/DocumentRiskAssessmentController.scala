@@ -40,7 +40,7 @@ class DocumentRiskAssessmentController @Inject()(val dataCacheConnector: DataCac
             businessActivities <- response
             riskAssessmentPolicy <- businessActivities.riskAssessmentPolicy
           } yield Form2[RiskAssessmentPolicy](riskAssessmentPolicy)).getOrElse(EmptyForm)
-          Ok(risk_assessment_policy(form, edit))
+          Ok(document_risk_assessment_policy(form, edit))
       }
   }
 
@@ -49,7 +49,7 @@ class DocumentRiskAssessmentController @Inject()(val dataCacheConnector: DataCac
     implicit authContext => implicit request =>
       Form2[RiskAssessmentPolicy](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(risk_assessment_policy(f, edit)))
+          Future.successful(BadRequest(document_risk_assessment_policy(f, edit)))
         case ValidForm(_, data) => {
           dataCacheConnector.fetchAll flatMap { maybeCache =>
             val businessMatching = for {
