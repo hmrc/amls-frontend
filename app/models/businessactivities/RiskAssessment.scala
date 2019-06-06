@@ -22,6 +22,7 @@ import jto.validation.ValidationError
 import play.api.libs.json._
 import jto.validation.forms.Rules.{minLength => _, _}
 import cats.data.Validated.{Invalid, Valid}
+import models.ValidationRule
 import utils.TraversableValidators.minLengthR
 
 sealed trait RiskAssessmentPolicy
@@ -38,7 +39,15 @@ case object Digital extends RiskAssessmentType
 
 object RiskAssessmentType {
 
-  import utils.MappingUtils.Implicits._
+  import utils.MappingUtils.Implicits.
+
+//  type RiskAssessmentValidation = Option[Set[RiskAssessmentType]]
+//
+//  val validateRiskAssessmentType: ValidationRule[RiskAssessmentValidation] = Rule[RiskAssessmentValidation, RiskAssessmentValidation] {
+//    case x@None => Valid(x)
+//    case x@Some(riskassessments) if riskassessments.nonEmpty => Valid(x)
+//    case _ => Invalid(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))))
+//  }
 
   implicit val riskAssessmentFormRead = Rule[String, RiskAssessmentType] {
     case "01" => Valid(PaperBased)

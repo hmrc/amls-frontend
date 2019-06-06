@@ -23,7 +23,7 @@ import play.api.libs.json._
 
 class RiskAssessmentSpec extends PlaySpec with MockitoSugar {
 
-  val formalRiskAssessments: Set[RiskAssessmentType] = Set(PaperBased, Digital)
+  val formalRiskAssessments: Option[Set[RiskAssessmentType]] = Some(Set(PaperBased, Digital))
 
   "RiskAssessment" must {
 
@@ -36,18 +36,6 @@ class RiskAssessmentSpec extends PlaySpec with MockitoSugar {
           be(Invalid(Seq((Path \ "hasPolicy") -> Seq(ValidationError("error.required.ba.option.risk.assessment")))))
       }
 
-      "given `Yes` with no value" in {
-
-        val model = Map(
-          "hasPolicy" -> Seq("true")
-        )
-
-        RiskAssessmentPolicy.formReads.validate(model) must
-          be(Invalid(Seq(
-            (Path \ "riskassessments") -> Seq(ValidationError("error.required.ba.risk.assessment.format"))
-          )))
-      }
-
       "given invalid enum value" in {
         val model = Map(
           "hasPolicy" -> Seq("true"),
@@ -56,6 +44,16 @@ class RiskAssessmentSpec extends PlaySpec with MockitoSugar {
 
         RiskAssessmentPolicy.formReads.validate(model) must
           be(Invalid(Seq((Path \ "riskassessments" \ 1 \ "riskassessments", Seq(ValidationError("error.invalid"))))))
+      }
+
+      "given empty riskassessments data" in {
+        val model = Map(
+          "hasPolicy" -> Seq("true"),
+          "riskassessments[]" -> Seq()
+        )
+
+        RiskAssessmentPolicy.formReads.validate(model) must
+          be(Invalid(Seq((Path \ "riskassessments", Seq(ValidationError("error.required.ba.option.risk.assessment"))))))
       }
 
       "given missing hasPolicy data" in {
@@ -84,6 +82,12 @@ class RiskAssessmentSpec extends PlaySpec with MockitoSugar {
           be(Valid(RiskAssessmentPolicyNo))
       }
 
+      "given `Yes` with no value" in {
+        val model = Map("hasPolicy" -> Seq("true"))
+        RiskAssessmentPolicy.formReads.validate(model) must
+          be(Valid(RiskAssessmentPolicyYes(None)))
+      }
+
       "validate model with multiple check boxes selected" in {
 
         val model = Map(
@@ -97,13 +101,22 @@ class RiskAssessmentSpec extends PlaySpec with MockitoSugar {
     }
 
     "write form data correctly" when {
+      "yes is selected and no risk assessment value is provided" in {
+        val model = Map(
+          "hasPolicy" -> Seq("true")
+        )
+
+        RiskAssessmentPolicy.formWrites.writes(RiskAssessmentPolicyYes(None)) must
+          be(model)
+      }
+
       "yes is selected and risk assessment value is provided" in {
         val model = Map(
           "hasPolicy" -> Seq("true"),
           "riskassessments[]" -> Seq("01", "02")
         )
 
-        RiskAssessmentPolicy.formWrites.writes(RiskAssessmentPolicyYes(Set(PaperBased, Digital))) must
+        RiskAssessmentPolicy.formWrites.writes(RiskAssessmentPolicyYes(Some((Set(PaperBased, Digital)))) must
           be(model)
       }
 
@@ -145,7 +158,7 @@ class RiskAssessmentSpec extends PlaySpec with MockitoSugar {
 
     "successfully write JSON" when {
       "hasPolicy is true" in {
-        Json.toJson[RiskAssessmentPolicy](RiskAssessmentPolicyYes(Set(PaperBased, Digital))) must be(Json.obj("hasPolicy" -> true,
+        Json.toJson[RiskAssessmentPolicy](RiskAssessmentPolicyYes(Some(Set(PaperBased, Digital)))) must be(Json.obj("hasPolicy" -> true,
           "riskassessments" -> Seq("01", "02")
         ))
       }
