@@ -27,7 +27,7 @@ object RiskAssessmentHasPolicy {
 
   implicit val formRule: Rule[UrlFormEncoded, RiskAssessmentHasPolicy] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    (__ \ "hasPolicy").read[Boolean].withMessage("error.required.hvd.accepted.cash.payment") flatMap {
+    (__ \ "hasPolicy").read[Boolean].withMessage("error.required.ba.option.risk.assessment") flatMap {
       RiskAssessmentHasPolicy.apply
     }
   }

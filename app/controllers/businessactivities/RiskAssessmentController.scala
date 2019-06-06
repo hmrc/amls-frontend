@@ -72,7 +72,7 @@ class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConne
     (edit, accountancyServices, data) match {
       case (true, _, RiskAssessmentHasPolicy(true)) => Redirect(routes.DocumentRiskAssessmentController.get())
       case (true, _, _) => Redirect(routes.SummaryController.get())
-      case (false, _, RiskAssessmentHasPolicy(false)) => Redirect(routes.DocumentRiskAssessmentController.get())
+      case (false, _, RiskAssessmentHasPolicy(true)) => Redirect(routes.DocumentRiskAssessmentController.get())
       case (false, true, _) => Redirect(routes.SummaryController.get())
       case (false, false, _) => Redirect(routes.AccountantForAMLSRegulationsController.get())
     }
