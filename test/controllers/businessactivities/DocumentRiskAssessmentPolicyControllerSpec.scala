@@ -82,7 +82,6 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
         "on post with valid data redirect to check your answers page when businessActivity is ASP" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "hasPolicy" -> "true",
             "riskassessments[0]" -> "01",
             "riskassessments[1]" -> "02"
           )
@@ -109,7 +108,6 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
         "on post with valid data redirect to advice on MLR due to diligence page when businessActivity is not ASP" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "hasPolicy" -> "true",
             "riskassessments[0]" -> "01",
             "riskassessments[1]" -> "02"
           )
@@ -157,7 +155,6 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
           "hasPolicy field is missing, represented by an empty string" in new Fixture {
 
             val newRequest = request.withFormUrlEncodedBody(
-              "hasPolicy" -> "",
               "riskassessments[0]" -> "01",
               "riskassessments[1]" -> "02"
             )

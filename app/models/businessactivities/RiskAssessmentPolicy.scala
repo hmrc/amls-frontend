@@ -174,7 +174,7 @@ object RiskAssessmentPolicy {
     Writes[RiskAssessmentPolicy] {
       case RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(a)) =>
         Json.obj(
-          "hasPolicy" -> "true",
+          "hasPolicy" -> true,
           "riskassessments" -> a.toSeq.map(d => {
             if (d.toString == "PaperBased") {
               "01"
@@ -187,7 +187,7 @@ object RiskAssessmentPolicy {
         )
       case RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), _) =>
         Json.obj(
-          "hasPolicy" -> "false"
+          "hasPolicy" -> false
         )
     }
   }
