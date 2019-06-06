@@ -59,7 +59,7 @@ class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConne
 
             for {
               businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
-//              _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key, businessActivities.riskAssessmentPolicy(data))
+              _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key, businessActivities.riskAssessmentHasPolicy(data))
             } yield redirectDependingOnEdit(edit, ControllerHelper.isAccountancyServicesSelected(Some(businessMatching)), data)
           }
         } recoverWith {

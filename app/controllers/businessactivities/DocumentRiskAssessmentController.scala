@@ -59,7 +59,7 @@ class DocumentRiskAssessmentController @Inject()(val dataCacheConnector: DataCac
 
             for {
               businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
-//              _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key, businessActivities.riskAssessmentPolicy(data))
+              _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key, businessActivities.riskAssessmentTypes(data))
             } yield redirectDependingOnEdit(edit, ControllerHelper.isAccountancyServicesSelected(Some(businessMatching)))
 
           }

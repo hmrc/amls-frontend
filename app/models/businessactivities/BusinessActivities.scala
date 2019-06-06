@@ -91,6 +91,26 @@ case class BusinessActivities(
     this.copy(riskAssessmentPolicy = Some(p), hasChanged = hasChanged || !this.riskAssessmentPolicy.contains(p),
       hasAccepted = hasAccepted && this.riskAssessmentPolicy.contains(p))
 
+  def riskAssessmentHasPolicy(p: RiskAssessmentHasPolicy): BusinessActivities = {
+    val newRiskAssessmentPolicy = if (this.riskAssessmentPolicy.isDefined) {
+      this.riskAssessmentPolicy.get.copy(hasPolicy = p)
+    } else {
+      RiskAssessmentPolicy(p, RiskAssessmentTypes(Set()))
+    }
+    this.copy(riskAssessmentPolicy = Some(newRiskAssessmentPolicy), hasChanged = hasChanged || !this.riskAssessmentPolicy.contains(p),
+      hasAccepted = hasAccepted && this.riskAssessmentPolicy.contains(p))
+  }
+
+  def riskAssessmentTypes(p: RiskAssessmentTypes): BusinessActivities = {
+    val newRiskAssessmentPolicy = if (riskAssessmentPolicy.isDefined) {
+      this.riskAssessmentPolicy.get.copy(riskassessments = p)
+    } else {
+      RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), p)
+    }
+    this.copy(riskAssessmentPolicy = Some(newRiskAssessmentPolicy), hasChanged = hasChanged || !this.riskAssessmentPolicy.contains(p),
+      hasAccepted = hasAccepted && this.riskAssessmentPolicy.contains(p))
+  }
+
   def howManyEmployees(p: HowManyEmployees): BusinessActivities =
     this.copy(howManyEmployees = Some(p), hasChanged = hasChanged || !this.howManyEmployees.contains(p),
       hasAccepted = hasAccepted && this.howManyEmployees.contains(p))
