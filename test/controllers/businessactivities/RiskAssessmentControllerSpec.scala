@@ -66,7 +66,7 @@ class RiskAssessmentControllerSpec extends AmlsSpec with MockitoSugar {
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(BusinessActivities(
-            riskAssessmentPolicy = Some(RiskAssessmentPolicyYes(Set(PaperBased, Digital)))
+            riskAssessmentPolicy = Some(RiskAssessmentPolicyYes(Some(Set(PaperBased, Digital))))
           ))))
 
         val result = controller.get()(request)

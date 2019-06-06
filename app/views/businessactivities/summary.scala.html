@@ -176,7 +176,7 @@
         editUrl = controllers.businessactivities.routes.DocumentRiskAssessmentController.get(true).toString
     ) {
         @model.riskAssessmentPolicy.map {
-            case RiskAssessmentPolicyYes(v) => {
+            case RiskAssessmentPolicyYes(Some(v)) => {
                     <ul class="list list--comma">
                     @v.map { x=>
                         <li>@x match {

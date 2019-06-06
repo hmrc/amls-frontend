@@ -52,7 +52,7 @@ class RiskAssessmentSpec extends PlaySpec with MockitoSugar {
           "riskassessments[]" -> Seq()
         )
 
-        RiskAssessmentPolicy.formReads.validate(model) must
+        RiskAssessmentPolicy.formRule.validate(model) must
           be(Invalid(Seq((Path \ "riskassessments", Seq(ValidationError("error.required.ba.option.risk.assessment"))))))
       }
 
@@ -61,7 +61,7 @@ class RiskAssessmentSpec extends PlaySpec with MockitoSugar {
           "riskassessments[]" -> Seq("01", "02")
         )
 
-        RiskAssessmentPolicy.formReads.validate(model) must
+        RiskAssessmentPolicy.formRule.validate(model) must
           be(Invalid(Seq((Path \ "hasPolicy", Seq(ValidationError("error.required.ba.option.risk.assessment"))))))
       }
 
@@ -71,20 +71,20 @@ class RiskAssessmentSpec extends PlaySpec with MockitoSugar {
           "riskassessments[]" -> Seq("01", "02")
         )
 
-        RiskAssessmentPolicy.formReads.validate(model) must
+        RiskAssessmentPolicy.formRule.validate(model) must
           be(Invalid(Seq((Path \ "hasPolicy", Seq(ValidationError("error.required.ba.option.risk.assessment"))))))
       }
     }
 
     "pass validation" when {
       "successfully validate given an enum value" in {
-        RiskAssessmentPolicy.formReads.validate(Map("hasPolicy" -> Seq("false"))) must
+        RiskAssessmentPolicy.formRule.validate(Map("hasPolicy" -> Seq("false"))) must
           be(Valid(RiskAssessmentPolicyNo))
       }
 
       "given `Yes` with no value" in {
         val model = Map("hasPolicy" -> Seq("true"))
-        RiskAssessmentPolicy.formReads.validate(model) must
+        RiskAssessmentPolicy.formRule.validate(model) must
           be(Valid(RiskAssessmentPolicyYes(None)))
       }
 
@@ -95,7 +95,7 @@ class RiskAssessmentSpec extends PlaySpec with MockitoSugar {
           "riskassessments[]" -> Seq("01", "02")
         )
 
-        RiskAssessmentPolicy.formReads.validate(model) must
+        RiskAssessmentPolicy.formRule.validate(model) must
           be(Valid(RiskAssessmentPolicyYes(formalRiskAssessments)))
       }
     }
