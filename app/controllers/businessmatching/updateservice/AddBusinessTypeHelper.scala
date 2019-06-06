@@ -137,6 +137,7 @@ class AddBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
     OptionT(dataCacheConnector.update[Seq[ResponsiblePerson]](ResponsiblePerson.key) {
       case Some(people) =>
         responsiblePeopleService.updateFitAndProperFlag(people, indices, isMsbOrTcsp(model))
+      case _ => throw new RuntimeException("No responsible people found")
     })
   }
 
