@@ -106,9 +106,7 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
         "on post with valid data redirect to DocumentRiskAssessment page when businessActivity is ASP and hasPolicy is true" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "hasPolicy" -> "true",
-            "riskassessments[0]" -> "01",
-            "riskassessments[1]" -> "02"
+            "hasPolicy" -> "true"
           )
 
           val mockCacheMap = mock[CacheMap]
@@ -133,9 +131,7 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
         "on post with valid data redirect to DocumentRiskAssessment page when businessActivity is not ASP and hasPolicy is true" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "hasPolicy" -> "true",
-            "riskassessments[0]" -> "01",
-            "riskassessments[1]" -> "02"
+            "hasPolicy" -> "true"
           )
 
           val mockCacheMap = mock[CacheMap]
@@ -185,8 +181,6 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
           "hasPolicy field is missing" in new Fixture {
 
             val newRequest = request.withFormUrlEncodedBody(
-              "riskassessments[0]" -> "01",
-              "riskassessments[1]" -> "02"
             )
 
             when(controller.dataCacheConnector.fetch[BusinessActivities](any())
@@ -205,9 +199,7 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
           "hasPolicy field is missing, represented by an empty string" in new Fixture {
 
             val newRequest = request.withFormUrlEncodedBody(
-              "hasPolicy" -> "",
-              "riskassessments[0]" -> "01",
-              "riskassessments[1]" -> "02"
+              "hasPolicy" -> ""
             )
 
             when(controller.dataCacheConnector.fetch[BusinessActivities](any())
@@ -221,47 +213,6 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
 
             val document = Jsoup.parse(contentAsString(result))
             document.select("a[href=#hasPolicy]").html() must include(Messages("error.required.ba.option.risk.assessment"))
-          }
-
-          "riskassessments fields are missing" in new Fixture {
-
-            val newRequest = request.withFormUrlEncodedBody(
-              "hasPolicy" -> "true"
-            )
-
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-              (any(), any(), any())).thenReturn(Future.successful(None))
-
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-              (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-            val result = controller.post()(newRequest)
-            status(result) must be(BAD_REQUEST)
-
-            val document = Jsoup.parse(contentAsString(result))
-            document.select("a[href=#riskassessments]").html() must include(Messages("error.required.ba.risk.assessment.format"))
-          }
-
-          "riskassessments fields are missing, represented by an empty string" in new Fixture {
-
-            val newRequest = request.withFormUrlEncodedBody(
-              "hasPolicy" -> "true",
-              "riskassessments[0]" -> "",
-              "riskassessments[1]" -> ""
-            )
-
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-              (any(), any(), any())).thenReturn(Future.successful(None))
-
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-              (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-            val result = controller.post()(newRequest)
-            status(result) must be(BAD_REQUEST)
-
-            val document = Jsoup.parse(contentAsString(result))
-
-            document.select("a[href=#riskassessments[0]-riskassessments]").html() must include(Messages("error.invalid"))
           }
         }
       }
@@ -294,9 +245,7 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
         "redirect to the DocumentRiskAssessmentController when hasPolicy is true" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "hasPolicy" -> "true",
-            "riskassessments[0]" -> "01",
-            "riskassessments[1]" -> "02"
+            "hasPolicy" -> "true"
           )
 
           val mockCacheMap = mock[CacheMap]
