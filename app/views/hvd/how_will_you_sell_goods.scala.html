@@ -24,7 +24,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("hvd.how-will-you-sell-goods.title", "summary.hvd")
 }
 
 @main(
@@ -32,34 +31,29 @@
     heading = header
 ) {
 
-    <p>@hint(Messages("lbl.select.all"))</p>
-
     @form(f, controllers.hvd.routes.HowWillYouSellGoodsController.post(edit)) {
-        @fieldset(
-            f = f("salesChannels-fieldset"),
-            legend = "hvd.how-will-you-sell-goods.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("salesChannels"),
+            heading = "hvd.how-will-you-sell-goods.title",
+            section = "summary.hvd",
+            hint = "lbl.select.all",
             panel = false
         ) {
-            @errorGroup(
-                field = f("salesChannels")
-            ) {
-                @checkbox(
-                    f = f("salesChannels[]"),
-                    labelText = "hvd.how-will-you-sell-goods.channels.auction",
-                    value = "Auction"
-                )
-                @checkbox(
-                    f = f("salesChannels[]"),
-                    labelText = "hvd.how-will-you-sell-goods.channels.retail" ,
-                    value = "Retail"
-                )
-                @checkbox(
-                    f = f("salesChannels[]"),
-                    labelText = "hvd.how-will-you-sell-goods.channels.wholesale" ,
-                    value = "Wholesale"
-                )
-            }
+            @checkbox(
+                f = f("salesChannels[]"),
+                labelText = "hvd.how-will-you-sell-goods.channels.auction",
+                value = "Auction"
+            )
+            @checkbox(
+                f = f("salesChannels[]"),
+                labelText = "hvd.how-will-you-sell-goods.channels.retail" ,
+                value = "Retail"
+            )
+            @checkbox(
+                f = f("salesChannels[]"),
+                labelText = "hvd.how-will-you-sell-goods.channels.wholesale" ,
+                value = "Wholesale"
+            )
         }
 
         @submit(edit)

@@ -23,43 +23,34 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("hvd.cash.payment.title", "summary.hvd")
 }
 
 @main(
     title = Messages("hvd.cash.payment.title") + " - " + Messages("summary.hvd"),
     heading = header
 )  {
-    @cash_payment_text()
 
     @form(f, controllers.hvd.routes.CashPaymentController.post(edit)) {
 
-        <div class="form-group">
-        @fieldset(
-            f = f("acceptedAnyPayment-fieldset"),
-            legend = "hvd.cash.payment.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("acceptedAnyPayment"),
+            heading = "hvd.cash.payment.title",
+            section = "summary.hvd",
+            supportingContent = cash_payment_text(),
             panel = false,
             classes = Seq("inline")
         ) {
-            @errorGroup(
-                field = f("acceptedAnyPayment")
-            ) {
-                @radio(
-                    f = f("acceptedAnyPayment"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true
-                )
-                @radio(
-                    f = f("acceptedAnyPayment"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
-            }
+            @radio(
+                f = f("acceptedAnyPayment"),
+                labelText = "lbl.yes",
+                value = "true"
+            )
+            @radio(
+                f = f("acceptedAnyPayment"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
-        </div>
-    @submit(edit)
+        @submit(edit)
    }
 }

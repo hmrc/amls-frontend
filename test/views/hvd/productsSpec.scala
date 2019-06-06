@@ -78,8 +78,7 @@ class productsSpec extends AmlsSpec with MustMatchers  {
       doc.getElementById("products")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
-      doc.getElementById("otherDetails-fieldset")
-        .getElementsByClass("error-notification").first().html() must include("second not a message Key")
+      doc.getElementById("otherDetails-error-notification").html() must include("second not a message Key")
     }
   }
 }
