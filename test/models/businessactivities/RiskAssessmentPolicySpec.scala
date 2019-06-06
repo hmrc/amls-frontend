@@ -21,7 +21,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 
-class RiskAssessmentSpec extends PlaySpec with MockitoSugar {
+class RiskAssessmentPolicySpec extends PlaySpec with MockitoSugar {
 
   val formalRiskAssessments: Option[Set[RiskAssessmentType]] = Some(Set(PaperBased, Digital))
 
