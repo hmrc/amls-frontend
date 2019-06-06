@@ -39,16 +39,6 @@ case object Digital extends RiskAssessmentType
 
 object RiskAssessmentType {
 
-  import utils.MappingUtils.Implicits._
-
-//  type RiskAssessmentValidation = Option[Set[RiskAssessmentType]]
-//
-//  val validateRiskAssessmentType: ValidationRule[RiskAssessmentValidation] = Rule[RiskAssessmentValidation, RiskAssessmentValidation] {
-//    case x@None => Valid(x)
-//    case x@Some(riskassessments) if riskassessments.nonEmpty => Valid(x)
-//    case _ => Invalid(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))))
-//  }
-
   implicit val riskAssessmentFormRead = Rule[String, RiskAssessmentType] {
     case "01" => Valid(PaperBased)
     case "02" => Valid(Digital)
@@ -79,22 +69,53 @@ object RiskAssessmentPolicy {
 
   import utils.MappingUtils.Implicits._
 
-  implicit def formReads
-  (implicit
-   p: Path => RuleLike[UrlFormEncoded, Option[Set[RiskAssessmentType]]]
-    ): Rule[UrlFormEncoded, RiskAssessmentPolicy] =
-    From[UrlFormEncoded] { __ =>
-      (__ \ "hasPolicy").read[Boolean].withMessage("error.required.ba.option.risk.assessment") flatMap {
-//          case true =>
-//             (__ \ "riskassessments").
-//               read(minLengthR[Set[RiskAssessmentType]](1).withMessage("error.required.ba.risk.assessment.format")) map RiskAssessmentPolicyYes.apply
-          case true =>
-             (__ \ "riskassessments").
-               read[Option[Set[RiskAssessmentType]]] map RiskAssessmentPolicyYes.apply
-         case false => Rule.fromMapping { _ => Valid(RiskAssessmentPolicyNo) }
+    type RiskAssessmentValidation = (Boolean, Option[Set[RiskAssessmentType]])
+
+    val validateRiskAssessmentType: ValidationRule[RiskAssessmentValidation] = Rule[RiskAssessmentValidation, RiskAssessmentValidation] {
+      case (a, x@None) => Valid(a, x)
+      case (b, x@Some(riskassessments) )if riskassessments.nonEmpty => Valid(b, x)
+      case _ => Invalid(Seq((Path \ "riskassessment") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))))
+    }
+
+  implicit def formRule(implicit  p: Path => Rule[UrlFormEncoded, Set[RiskAssessmentType]]):
+    Rule[UrlFormEncoded, RiskAssessmentPolicy] = From[UrlFormEncoded] { __ =>
+    import jto.validation.forms._
+
+    val riskassessmentTypes: Rule[UrlFormEncoded, Option[Set[RiskAssessmentType]]] =
+      (__ \ "riskassessments").read[Option[Set[RiskAssessmentType]]] map {
+        case _ => None
       }
 
+    val hasPolicy: Rule[UrlFormEncoded, Boolean] =
+      (__ \ "hasPolicy").read[Boolean]
+
+    val validated = (hasPolicy ~ riskassessmentTypes).tupled andThen validateRiskAssessmentType
+
+    validated map { rav: RiskAssessmentValidation =>
+      (rav._1, rav._2) match {
+        case (true, b) => RiskAssessmentPolicyYes(b)
+        case (false, _) => RiskAssessmentPolicyNo
+      }
+
+    }
   }
+//
+//  implicit def formReads
+//  (implicit
+//   p: Path => Rule[UrlFormEncoded, Option[Set[RiskAssessmentType]]]
+//    ): Rule[UrlFormEncoded, RiskAssessmentPolicy] =
+//    From[UrlFormEncoded] { __ =>
+//      (__ \ "hasPolicy").read[Boolean].withMessage("error.required.ba.option.risk.assessment") flatMap {
+////          case true =>
+////             (__ \ "riskassessments").
+////               read(minLengthR[Set[RiskAssessmentType]](1).withMessage("error.required.ba.risk.assessment.format")) map RiskAssessmentPolicyYes.apply
+//          case true =>
+//             (__ \ "riskassessments").
+//               read[Option[Set[RiskAssessmentType]]] map RiskAssessmentPolicyYes.apply
+//         case false => Rule.fromMapping { _ => Valid(RiskAssessmentPolicyNo) }
+//      }
+//
+//  }
 
   implicit def formWrites
   (implicit
