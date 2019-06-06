@@ -11,7 +11,7 @@
 ->          /money-service-business                                                   msb.Routes
 ->          /accountancy-service-provider                                             asp.Routes
 ->          /trust-company-service-provider                                           tcsp.Routes
-->          /supervision                                                              supervision.Routes
+->          /supervision-details                                                      supervision.Routes
 ->          /renewal                                                                  renewal.Routes
 ->          /business-matching                                                        businessMatching.Routes
 
