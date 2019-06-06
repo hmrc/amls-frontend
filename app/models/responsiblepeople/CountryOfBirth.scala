@@ -16,8 +16,9 @@
 
 package models.responsiblepeople
 
+import cats.data.Validated.{Invalid, Valid}
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, Write}
+import jto.validation.{From, Rule, ValidationError, Write}
 import models.Country
 
 case class CountryOfBirth (bornInUk: Boolean, country: Option[Country])
@@ -26,11 +27,18 @@ object CountryOfBirth {
 
   import utils.MappingUtils.Implicits._
 
-  implicit val formRule: Rule[UrlFormEncoded, CountryOfBirth] =
-    From[UrlFormEncoded] { __ =>
+  implicit val formRule: Rule[UrlFormEncoded, CountryOfBirth] = From[UrlFormEncoded] { __ =>
+    val validateCountry: Rule[Country, Country] = Rule.fromMapping[Country, Country] { country =>
+      country.code match {
+        case "GB" => Invalid(Seq(ValidationError(List("error.required.enter.valid.non.uk"))))
+        case _ => Valid(country)
+      }
+    }
       import jto.validation.forms.Rules._
       (__ \ "bornInUk").read[Boolean].withMessage("error.required.rp.select.country.of.birth") flatMap {
-        case false => (__ \ "country").read[Country] map {c => CountryOfBirth(bornInUk = false, Some(c))}
+        case false => (__ \ "country").read(validateCountry) map {
+          c => CountryOfBirth(bornInUk = false, Some(c))
+        }
         case true => CountryOfBirth(bornInUk = true, None)
       }
     }

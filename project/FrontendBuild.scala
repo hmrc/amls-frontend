@@ -50,13 +50,11 @@ private object AppDependencies {
   private val scalatestVersion = "2.2.6"
   private val pegdownVersion = "1.6.0"
   private val jsoupVersion = "1.9.2"
-  private val hmrctestVersion = "2.4.0"
 
   object Test {
     def apply() = new ScopeDependencies {
       override val scope = "test"
       override lazy val dependencies = Seq(
-        "uk.gov.hmrc" %% "hmrctest" % hmrctestVersion % scope,
         "org.scalatest" %% "scalatest" % scalatestVersion % scope,
         "org.scalacheck" %% "scalacheck" % "1.12.5" % scope,
         "org.pegdown" % "pegdown" % pegdownVersion % scope,

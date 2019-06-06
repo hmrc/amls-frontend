@@ -16,10 +16,10 @@
 
 package models.businessdetails
 
-import jto.validation.forms.Rules._
+import cats.data.Validated.{Invalid, Valid}
 import models.Country
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.{Path, From, Rule, Write}
+import jto.validation.{From, Path, Rule, Write}
 import jto.validation.ValidationError
 import play.api.libs.json.{Reads, Writes}
 
@@ -70,8 +70,13 @@ case class NonUKCorrespondenceAddress(
                                      ) extends CorrespondenceAddress
 
 object CorrespondenceAddress {
-  implicit val formRule: Rule[UrlFormEncoded, CorrespondenceAddress] =
-    From[UrlFormEncoded] { __ =>
+  implicit val formRule: Rule[UrlFormEncoded, CorrespondenceAddress] = From[UrlFormEncoded] { __ =>
+  val validateCountry: Rule[Country, Country] = Rule.fromMapping[Country, Country] { country =>
+    country.code match {
+      case "GB" => Invalid(Seq(ValidationError(List("error.required.atb.letters.address.not.uk"))))
+      case _ => Valid(country)
+    }
+  }
       import jto.validation.forms.Rules._
       import models.FormTypes._
       import utils.MappingUtils.Implicits._
@@ -106,7 +111,7 @@ object CorrespondenceAddress {
             (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
             (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
             (__ \ "addressLineNonUK4").read(optionR(validateAddress)) ~
-              (__ \ "country").read[Country]
+            (__ \ "country").read(validateCountry)
           )(NonUKCorrespondenceAddress.apply _)
       }
     }

@@ -16,7 +16,8 @@
 
 package models.responsiblepeople
 
-import jto.validation.{To, Write, From, Rule}
+import cats.data.Validated.{Invalid, Valid}
+import jto.validation.{From, Rule, To, ValidationError, Write}
 import jto.validation.forms._
 
 
@@ -27,10 +28,15 @@ object ResponsiblePersonAddress {
 
   import play.api.libs.json._
 
+  val validateCountry: Rule[PersonAddress, PersonAddress] = Rule.fromMapping[PersonAddress, PersonAddress] {
+    case address: PersonAddressNonUK if address.country.code == "GB" => Invalid(Seq(ValidationError(List("error.required.select.non.uk.previous.address"))))
+    case address => Valid(address)
+  }
+
   implicit val formRule: Rule[UrlFormEncoded, ResponsiblePersonAddress] = From[UrlFormEncoded] { __ =>
 
   import jto.validation.forms.Rules._
-    (__.read[PersonAddress] ~ (__ \ "timeAtAddress").read[Option[TimeAtAddress]]) (ResponsiblePersonAddress.apply _)
+    (__.read(validateCountry) ~ (__ \ "timeAtAddress").read[Option[TimeAtAddress]]) (ResponsiblePersonAddress.apply _)
 }
 
   implicit val formWrites: Write[ResponsiblePersonAddress, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
