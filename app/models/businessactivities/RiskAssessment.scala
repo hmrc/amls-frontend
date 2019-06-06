@@ -27,7 +27,7 @@ import utils.TraversableValidators.minLengthR
 
 sealed trait RiskAssessmentPolicy
 
-case class RiskAssessmentPolicyYes(riskassessments: Set[RiskAssessmentType]) extends RiskAssessmentPolicy
+case class RiskAssessmentPolicyYes(riskassessments: Option[Set[RiskAssessmentType]]) extends RiskAssessmentPolicy
 
 case object RiskAssessmentPolicyNo extends RiskAssessmentPolicy
 
@@ -39,7 +39,7 @@ case object Digital extends RiskAssessmentType
 
 object RiskAssessmentType {
 
-  import utils.MappingUtils.Implicits.
+  import utils.MappingUtils.Implicits._
 
 //  type RiskAssessmentValidation = Option[Set[RiskAssessmentType]]
 //
@@ -81,7 +81,7 @@ object RiskAssessmentPolicy {
 
   implicit def formReads
   (implicit
-   p: Path => RuleLike[UrlFormEncoded, Set[RiskAssessmentType]]
+   p: Path => RuleLike[UrlFormEncoded, Option[Set[RiskAssessmentType]]]
     ): Rule[UrlFormEncoded, RiskAssessmentPolicy] =
     From[UrlFormEncoded] { __ =>
       (__ \ "hasPolicy").read[Boolean].withMessage("error.required.ba.option.risk.assessment") flatMap {
@@ -90,7 +90,7 @@ object RiskAssessmentPolicy {
 //               read(minLengthR[Set[RiskAssessmentType]](1).withMessage("error.required.ba.risk.assessment.format")) map RiskAssessmentPolicyYes.apply
           case true =>
              (__ \ "riskassessments").
-               read[Set[RiskAssessmentType]] map RiskAssessmentPolicyYes.apply
+               read[Option[Set[RiskAssessmentType]]] map RiskAssessmentPolicyYes.apply
          case false => Rule.fromMapping { _ => Valid(RiskAssessmentPolicyNo) }
       }
 
@@ -100,9 +100,11 @@ object RiskAssessmentPolicy {
   (implicit
    w: Write[RiskAssessmentType, String]
     ) = Write[RiskAssessmentPolicy, UrlFormEncoded] {
-        case RiskAssessmentPolicyYes(data) =>
+        case RiskAssessmentPolicyYes(Some(data)) =>
             Map("hasPolicy" -> Seq("true"),
             "riskassessments[]" -> data.toSeq.map(w.writes))
+        case RiskAssessmentPolicyYes(None) =>
+            Map("hasPolicy" -> Seq("true"))
         case RiskAssessmentPolicyNo =>
             Map("hasPolicy" -> Seq("false"))
 
@@ -112,7 +114,7 @@ object RiskAssessmentPolicy {
   implicit def jsonReads: Reads[RiskAssessmentPolicy] =
     (__ \ "hasPolicy").read[Boolean] flatMap {
       case true =>
-        (__ \ "riskassessments").read[Set[RiskAssessmentType]].flatMap(RiskAssessmentPolicyYes.apply _)
+        (__ \ "riskassessments").readNullable[Set[RiskAssessmentType]].flatMap(RiskAssessmentPolicyYes.apply)
       case false => Reads(_ => JsSuccess(RiskAssessmentPolicyNo))
     }
 
