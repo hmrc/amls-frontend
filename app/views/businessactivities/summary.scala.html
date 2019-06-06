@@ -172,13 +172,17 @@
     }
 
     @checkYourAnswers(
-        question = Messages("businessactivities.riskassessment.policy.title"),
+        question = Messages("businessactivities.document.riskassessment.policy.title"),
         editUrl = controllers.businessactivities.routes.DocumentRiskAssessmentController.get(true).toString
     ) {
         @model.riskAssessmentPolicy.map {
-            case _ => {
-                    <ul class="list list--comma">
-                    </ul>
+            case RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(v)) => {
+                <ul class="list list--comma">
+                @v.map {
+                        case PaperBased => { "paperBased" }
+                        case Digital => { "digital" }
+                    }
+                </ul>
                 }
             }
         }
