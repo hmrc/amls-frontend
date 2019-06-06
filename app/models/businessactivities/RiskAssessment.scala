@@ -16,12 +16,11 @@
 
 package models.businessactivities
 
-import jto.validation.forms.UrlFormEncoded
-import jto.validation._
-import jto.validation.ValidationError
-import play.api.libs.json._
-import jto.validation.forms.Rules.{minLength => _, _}
 import cats.data.Validated.{Invalid, Valid}
+import jto.validation.{ValidationError, _}
+import jto.validation.forms.Rules.{minLength => _, _}
+import jto.validation.forms.UrlFormEncoded
+import play.api.libs.json._
 import utils.TraversableValidators.minLengthR
 
 sealed trait RiskAssessmentPolicy
@@ -37,8 +36,6 @@ case object PaperBased extends RiskAssessmentType
 case object Digital extends RiskAssessmentType
 
 object RiskAssessmentType {
-
-  import utils.MappingUtils.Implicits._
 
   implicit val riskAssessmentFormRead = Rule[String, RiskAssessmentType] {
     case "01" => Valid(PaperBased)
@@ -81,7 +78,6 @@ object RiskAssessmentPolicy {
                read(minLengthR[Set[RiskAssessmentType]](1).withMessage("error.required.ba.risk.assessment.format")) map RiskAssessmentPolicyYes.apply
          case false => Rule.fromMapping { _ => Valid(RiskAssessmentPolicyNo) }
       }
-
   }
 
   implicit def formWrites
@@ -93,7 +89,6 @@ object RiskAssessmentPolicy {
             "riskassessments[]" -> data.toSeq.map(w.writes))
         case RiskAssessmentPolicyNo =>
             Map("hasPolicy" -> Seq("false"))
-
   }
 
 

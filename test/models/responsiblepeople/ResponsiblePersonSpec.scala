@@ -24,7 +24,6 @@ import play.api.inject.guice.GuiceApplicationBuilder
 class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsiblePeopleValues with OneAppPerSuite {
 
   override lazy val app: Application = new GuiceApplicationBuilder()
-    .configure("microservice.services.feature-toggle.phase-2-changes" -> true)
     .build()
 
   "ResponsiblePeople" must {
@@ -86,9 +85,6 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
     }
 
     "reset when resetBasedOnApprovalFlags is called" when {
-
-      "phase 2 feature toggle is true" when {
-
         "fitAndProper is true and approval is true" in {
           val inputRp = ResponsiblePerson(
             approvalFlags = ApprovalFlags(
@@ -98,7 +94,6 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
             hasChanged = true)
 
           inputRp.resetBasedOnApprovalFlags() mustBe(inputRp)
-
         }
 
         "fitAndProper is false and approval is true" in {
@@ -118,19 +113,16 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
 
           inputRp.resetBasedOnApprovalFlags() mustBe(expectedRp)
         }
-      }
     }
 
-    "Successfully validate if the model is complete when phase 2 feature toggle is true" when {
-
+    "Successfully validate if the model is complete" when {
       "json is complete" when {
-
         "both Fit and proper and approval are both set only" in {
-          completeJsonPresentUkResidentFitAndProperPhase2.as[ResponsiblePerson] must be(completeModelUkResident)
+          completeJsonPresentUkResidentFitAndProper.as[ResponsiblePerson] must be(completeModelUkResidentFPtrue)
         }
 
         "will fail if at least one of the approval flags is not defined" in {
-          val model = completeModelUkResidentPhase2.copy(approvalFlags = ApprovalFlags(hasAlreadyPaidApprovalCheck = None))
+          val model = completeModelUkResident.copy(approvalFlags = ApprovalFlags(hasAlreadyPaidApprovalCheck = None))
 
           model.isComplete must be(false)
         }
@@ -138,33 +130,33 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
 
       "json is complete" when {
         "Fit and proper and approval" in {
-          completeJsonPresentUkResidentFitAndProperApprovalPhase2.as[ResponsiblePerson] must be(completeModelUkResident)
+          completeJsonPresentUkResidentFitAndProperApproval.as[ResponsiblePerson] must be(completeModelUkResidentFPtrue)
         }
       }
 
       "the model is fully complete" in {
-        completeModelUkResidentPhase2.copy(hasAccepted = true).isComplete must be(true)
+        completeModelUkResident.copy(hasAccepted = true).isComplete must be(true)
       }
 
       "the model is fully complete with no previous name added" in {
-        completeModelUkResidentNoPreviousNamePhase2.copy(hasAccepted = true).isComplete must be(true)
+        completeModelUkResidentNoPreviousName.copy(hasAccepted = true).isComplete must be(true)
       }
 
       "the model partially complete with soleProprietorOfAnotherBusiness is empty" in {
-        completeModelUkResidentPhase2.copy(soleProprietorOfAnotherBusiness = None, hasAccepted = true).isComplete must be(true)
+        completeModelUkResident.copy(soleProprietorOfAnotherBusiness = None, hasAccepted = true).isComplete must be(true)
       }
 
       "the model partially complete with vat registration model is empty" in {
-        completeModelUkResidentPhase2.copy(vatRegistered = None).isComplete must be(false)
+        completeModelUkResident.copy(vatRegistered = None).isComplete must be(false)
       }
 
       "the model partially complete soleProprietorOfAnotherBusiness is selected as No vat registration is not empty" in {
-        completeModelUkResidentPhase2.copy(soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(false)),
+        completeModelUkResident.copy(soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(false)),
           vatRegistered = Some(VATRegisteredNo)).isComplete must be(false)
       }
 
       "the model is incomplete" in {
-        incompleteModelUkResidentNoDOBPhase2.copy(hasAccepted = true).isComplete must be(false)
+        incompleteModelUkResidentNoDOB.copy(hasAccepted = true).isComplete must be(false)
       }
 
       "the model is not complete" in {

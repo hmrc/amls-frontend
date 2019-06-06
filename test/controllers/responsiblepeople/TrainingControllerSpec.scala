@@ -18,7 +18,6 @@ package controllers.responsiblepeople
 
 import config.AppConfig
 import connectors.DataCacheConnector
-import models.businessmatching._
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{PersonName, ResponsiblePerson, TrainingNo, TrainingYes}
 import org.jsoup.Jsoup
@@ -50,8 +49,6 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
-      .overrides(bind[AppConfig].to(mockAppConfig))
-
 
     val builder = defaultBuilder
     lazy val app = builder.build()
@@ -154,40 +151,17 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
         }
 
         "edit is false" must {
-          "redirect to DeatiledAnswersController when training is yes" in new Fixture {
-
-            val newRequest = request.withFormUrlEncodedBody(
-              "training" -> "true",
-              "information" -> "test"
-            )
-
-            when(controller.dataCacheConnector.fetchAll(any(), any()))
-              .thenReturn(Future.successful(Some(emptyCache)))
-
-            when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(mockCacheMap))
-
-            val result = controller.post(recordId, false)(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId).url))
-          }
-
-          "redirect to FitAndProperNoticeController when businessActivities includes HighValueDealing" in new Fixture {
+          "redirect to FitAndProperNoticeController" in new Fixture {
             val newRequest = request.withFormUrlEncodedBody(
               "training" -> "true",
               "information" -> "I do not remember when I did the training"
             )
 
-            val testCacheMap = CacheMap("", Map(
-
-            ))
+            val testCacheMap = CacheMap("", Map())
 
             when(controller.dataCacheConnector.fetchAll(any(), any()))
               .thenReturn(Future.successful(Some(mockCacheMap)))
-            when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
-              .thenReturn(Some(
-                BusinessMatching(activities = Some(BusinessActivities(Set(HighValueDealing))))
-              ))
+
             when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
               .thenReturn(Some(Seq(ResponsiblePerson())))
 

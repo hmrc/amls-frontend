@@ -40,7 +40,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
   "removing Responsible People types" when {
     "there is more than one business type" when {
-      "the buisness is TCSP and they answered yes to F&P then do not remove the responsible people approval if the phase-2-changes toggle is true" in new Fixture {
+      "the buisness is TCSP and they answered yes to F&P then do not remove the responsible people approval" in new Fixture {
 
         val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
 
@@ -72,7 +72,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
         helper.removeFitAndProper(model).returnsSome(expectedResultRP)
       }
-      "the buisness is TCSP and they answered no to F&P then do remove the responsible people approval if the phase-2-changes toggle is true" in new Fixture {
+      "the buisness is TCSP and they answered no to F&P then do remove the responsible people approval" in new Fixture {
 
         val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
 

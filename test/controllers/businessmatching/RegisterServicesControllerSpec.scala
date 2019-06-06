@@ -18,7 +18,6 @@ package controllers.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._
-import config.AppConfig
 import connectors.DataCacheConnector
 import forms.{EmptyForm, Form2}
 import generators.ResponsiblePersonGenerator
@@ -66,7 +65,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
     val request = addToken(authRequest)
 
     val statusService = mockStatusService
-    val mockAppConfig = mock[AppConfig]
+    //val mockAppConfig = mock[AppConfig]
 
     val businessMatchingService = mock[BusinessMatchingService]
 
@@ -83,7 +82,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
       .overrides(bind[StatusService].to(statusService))
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
-      .overrides(bind[AppConfig].to(mockAppConfig))
+      //.overrides(bind[AppConfig].to(mockAppConfig))
       .build()
 
     val controller = app.injector.instanceOf[RegisterServicesController]
@@ -812,26 +811,6 @@ class RegisterServicesControllerSpec extends AmlsSpec
         verify(controller.businessMatchingService).updateModel(eqTo(businessMatching1.activities(
           BMBusinessActivities(Set(HighValueDealing, TelephonePaymentService))
         )))(any(),any(),any())
-
-      }
-    }
-    "remove RP FitAndProper" when {
-      "fitAndProper is not required" in new Fixture {
-
-        when {
-          controller.businessMatchingService.getModel(any(),any(),any())
-        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(None, Some(BMBusinessActivities(Set(MoneyServiceBusiness, HighValueDealing)))))
-
-        val result = controller.post()(request.withFormUrlEncodedBody(
-          "businessActivities[0]" -> BMBusinessActivities.getValue(HighValueDealing)
-        ))
-
-        status(result) must be(SEE_OTHER)
-
-        verify(mockCacheConnector).save[Seq[ResponsiblePerson]](
-          eqTo(ResponsiblePerson.key),
-          eqTo(Seq(responsiblePersonChanged, responsiblePersonChanged))
-        )(any(),any(),any())
 
       }
     }

@@ -134,8 +134,6 @@ class AddBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
   def updateResponsiblePeople(model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, Seq[ResponsiblePerson]] = {
     val indices = model.responsiblePeople.fold[Set[Int]](Set.empty)(_.index)
 
-/// refactor
-
     OptionT(dataCacheConnector.update[Seq[ResponsiblePerson]](ResponsiblePerson.key) {
       case Some(people) =>
         responsiblePeopleService.updateFitAndProperFlag(people, indices, isMsbOrTcsp(model))

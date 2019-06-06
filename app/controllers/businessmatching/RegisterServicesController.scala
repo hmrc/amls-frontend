@@ -282,13 +282,12 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
         }
     }
 
-  val shouldPromptForApproval:
-  (ResponsiblePerson, BusinessMatchingActivities, Boolean) => (ResponsiblePerson, BusinessMatchingActivities) =
+  val shouldPromptForApproval: (ResponsiblePerson, BusinessMatchingActivities, Boolean) => (ResponsiblePerson, BusinessMatchingActivities) =
   (rp, activities, isRemoving) => {
 
     def approvalIsRequired(rp: ResponsiblePerson, businessActivities: BusinessMatchingActivities, isRemoving: Boolean) = {
       rp.approvalFlags.hasAlreadyPassedFitAndProper.contains(false) &
-        !containsTcspOrMsb(businessActivities.businessActivities) &
+        !(containsTcspOrMsb(businessActivities.businessActivities)) &
         isRemoving
     }
 

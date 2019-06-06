@@ -21,7 +21,7 @@ import models.confirmation.{BreakdownRow, Currency, RowEntity}
 import models.responsiblepeople.ResponsiblePerson
 import models.tradingpremises.TradingPremises
 import models.{AmendVariationRenewalResponse, SubmissionResponse}
-import typeclasses.confirmation.ResponsiblePeopleRowsInstancesPhase2._
+import typeclasses.confirmation.ResponsiblePeopleRowsInstances._
 
 trait ConfirmationBreakdownRows[A] extends FeeCalculations {
   def apply(
@@ -83,7 +83,7 @@ object BreakdownRowInstances {
   }
 
   def responsiblePeopleRowsProxy(subscription: SubmissionResponse, people: Option[Seq[ResponsiblePerson]], activities: BusinessActivities) = {
-      ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+      ResponsiblePeopleRowsInstances.responsiblePeopleRowsFromSubscription(
         subscription,
         activities.businessActivities,
         people

@@ -111,7 +111,7 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
   }
 }
 
-object ResponsiblePeopleRowsInstancesPhase2 {
+object ResponsiblePeopleRowsInstances {
 
   implicit val responsiblePeopleRowsFromSubscription: ResponsiblePeopleRows[SubmissionResponse] =
     new ResponsiblePeopleRows[SubmissionResponse] {
