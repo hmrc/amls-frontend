@@ -50,7 +50,7 @@ class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConne
       Form2[RiskAssessmentHasPolicy](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(risk_assessment_policy(f, edit)))
-        case ValidForm(_, data: RiskAssessmentPolicy) => {
+        case ValidForm(_, data: RiskAssessmentHasPolicy) => {
           dataCacheConnector.fetchAll flatMap { maybeCache =>
             val businessMatching = for {
               cacheMap <- maybeCache
@@ -59,8 +59,8 @@ class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConne
 
             for {
               businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
-              _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key, businessActivities.riskAssessmentPolicy(data))
-            } yield redirectDependingOnEdit(edit, ControllerHelper.isAccountancyServicesSelected(Some(businessMatching)), data.hasPolicy)
+//              _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key, businessActivities.riskAssessmentPolicy(data))
+            } yield redirectDependingOnEdit(edit, ControllerHelper.isAccountancyServicesSelected(Some(businessMatching)), data)
           }
         } recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

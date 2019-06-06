@@ -65,7 +65,7 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(BusinessActivities(
-            riskAssessmentPolicy = Some(RiskAssessmentPolicyYes(Some(Set(PaperBased, Digital))))
+            riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(PaperBased, Digital))))
           ))))
 
         val result = controller.get()(request)
@@ -93,7 +93,7 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
             .thenReturn(Some(BusinessMatching(None, Some(BMBusinessActivities(Set(AccountancyServices, MoneyServiceBusiness))))))
 
           when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicyNo)))))
+            .thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), RiskAssessmentTypes(Set())))))))
 
           when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
@@ -120,7 +120,7 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
             .thenReturn(Some(BusinessMatching(None, Some(BMBusinessActivities(Set(MoneyServiceBusiness))))))
 
           when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicyNo)))))
+            .thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), RiskAssessmentTypes(Set())))))))
 
           when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
@@ -233,7 +233,7 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
             .thenReturn(Some(BusinessMatching(None, Some(BMBusinessActivities(Set(MoneyServiceBusiness))))))
 
           when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicyNo)))))
+            .thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), RiskAssessmentTypes(Set())))))))
 
           when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(mockCacheMap))

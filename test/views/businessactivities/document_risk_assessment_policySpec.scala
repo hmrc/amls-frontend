@@ -18,7 +18,7 @@ package views.businessactivities
 
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.businessactivities.{RiskAssessmentPolicy, RiskAssessmentPolicyNo}
+import models.businessactivities.{PaperBased, RiskAssessmentTypes}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -34,7 +34,7 @@ class document_risk_assessment_policySpec extends AmlsSpec with MustMatchers {
   "risk_assessment_policy view" must {
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[RiskAssessmentPolicy] = Form2(RiskAssessmentPolicyNo)
+      val form2: ValidForm[RiskAssessmentTypes] = Form2(RiskAssessmentTypes(Set(PaperBased)))
 
       def view = views.html.businessactivities.document_risk_assessment_policy(form2, true)
 
@@ -43,7 +43,7 @@ class document_risk_assessment_policySpec extends AmlsSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[RiskAssessmentPolicy] = Form2(RiskAssessmentPolicyNo)
+      val form2: ValidForm[RiskAssessmentTypes] = Form2(RiskAssessmentTypes(Set(PaperBased)))
 
       def view = views.html.businessactivities.risk_assessment_policy(form2, true)
 

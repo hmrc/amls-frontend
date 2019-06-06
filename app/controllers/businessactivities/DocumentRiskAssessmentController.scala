@@ -50,7 +50,7 @@ class DocumentRiskAssessmentController @Inject()(val dataCacheConnector: DataCac
       Form2[RiskAssessmentTypes](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(document_risk_assessment_policy(f, edit)))
-        case ValidForm(_, data) => {
+        case ValidForm(_, data: RiskAssessmentTypes) => {
           dataCacheConnector.fetchAll flatMap { maybeCache =>
             val businessMatching = for {
               cacheMap <- maybeCache
@@ -59,7 +59,7 @@ class DocumentRiskAssessmentController @Inject()(val dataCacheConnector: DataCac
 
             for {
               businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
-              _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key, businessActivities.riskAssessmentPolicy(data))
+//              _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key, businessActivities.riskAssessmentPolicy(data))
             } yield redirectDependingOnEdit(edit, ControllerHelper.isAccountancyServicesSelected(Some(businessMatching)))
 
           }

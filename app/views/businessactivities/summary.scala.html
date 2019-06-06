@@ -176,14 +176,8 @@
         editUrl = controllers.businessactivities.routes.DocumentRiskAssessmentController.get(true).toString
     ) {
         @model.riskAssessmentPolicy.map {
-            case RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(v))) => {
+            case _ => {
                     <ul class="list list--comma">
-                    @v.map { x=>
-                        <li>@x match {
-                            case Digital1 => {@Messages("businessactivities.RiskAssessmentType.lbl.01")}
-                            case PaperBased1 => {@Messages("businessactivities.RiskAssessmentType.lbl.02")}
-                        }</li>
-                    }
                     </ul>
                 }
             }

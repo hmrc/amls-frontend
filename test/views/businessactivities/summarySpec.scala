@@ -88,7 +88,7 @@ class summarySpec extends AmlsSpec
           Some(NCARegistered(true)),
           Some(AccountantForAMLSRegulations(true)),
           Some(IdentifySuspiciousActivity(true)),
-          Some(RiskAssessmentPolicyYes(Some(Set(PaperBased, Digital)))),
+          Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(PaperBased)))),
           Some(HowManyEmployees(Some("123"), Some("456"))),
           Some(WhoIsYourAccountant("AccountantName",Some("tradingName"),UkAccountantsAddress("line1","line2",Some("line3"),Some("line4"),"AB12CD"))),
           Some(TaxMatters(true)),
