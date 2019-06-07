@@ -20,6 +20,7 @@ import cats.data.Validated.{Invalid, Valid}
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
+import utils.TraversableValidators._
 
 sealed trait RiskAssessmentType
 
@@ -58,10 +59,11 @@ object RiskAssessmentType {
 case class RiskAssessmentTypes(riskassessments: Set[RiskAssessmentType])
 
 object RiskAssessmentTypes {
+  import utils.MappingUtils.Implicits._
 
   implicit def formRule(implicit p: Path => Rule[UrlFormEncoded, Set[RiskAssessmentType]]):
   Rule[UrlFormEncoded, RiskAssessmentTypes] = From[UrlFormEncoded] { __ =>
-    (__ \ "riskassessments").read[Set[RiskAssessmentType]] map RiskAssessmentTypes.apply
+    (__ \ "riskassessments").read(minLengthR[Set[RiskAssessmentType]](1)).withMessage("error.required.ba.risk.assessment.format") map RiskAssessmentTypes.apply
   }
 
   implicit def formWrites

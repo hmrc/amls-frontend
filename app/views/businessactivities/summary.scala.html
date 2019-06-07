@@ -179,8 +179,8 @@
             case RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(v)) => {
                 <ul class="list list--comma">
                 @v.map {
-                        case PaperBased => { "paperBased" }
-                        case Digital => { "digital" }
+                        case Digital => { <p>@Messages("businessactivities.RiskAssessmentType.lbl.01")</p> }
+                        case PaperBased => { <p>@Messages("businessactivities.RiskAssessmentType.lbl.02")</p> }
                     }
                 </ul>
                 }
