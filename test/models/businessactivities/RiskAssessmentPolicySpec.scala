@@ -40,8 +40,6 @@ class RiskAssessmentPolicySpec extends PlaySpec with MockitoSugar {
       "hasPolicy is false" in {
         val json = Json.obj("hasPolicy" -> false)
 
-        println(Json.fromJson[RiskAssessmentPolicy](json))
-
         Json.fromJson[RiskAssessmentPolicy](json) must
           be(JsSuccess(RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), RiskAssessmentTypes(Set())), JsPath))
       }
