@@ -65,8 +65,8 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(BusinessActivities(
-            riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(PaperBased, Digital))))
-          ))))
+            riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(PaperBased, Digital)))))
+          )))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -168,7 +168,7 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
 
             val document = Jsoup.parse(contentAsString(result))
 
-            document.select("a[href=#riskassessments[0]-riskassessments]").html() must include(Messages("error.invalid"))
+            document.select("a[href=#riskassessments[0]-riskassessments]").html() must include(Messages("error.required.ba.risk.assessment.format"))
           }
         }
       }

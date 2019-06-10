@@ -166,8 +166,8 @@ object RiskAssessmentPolicy {
   implicit val jsonReads: Reads[RiskAssessmentPolicy] = {
     import play.api.libs.functional.syntax._
     ((__ \ "hasPolicy").read[Boolean] and
-      (__ \ "riskassessments").read[Set[RiskAssessmentType]]
-      )((a, b) => RiskAssessmentPolicy(RiskAssessmentHasPolicy(a), RiskAssessmentTypes(b)) )
+      (__ \ "riskassessments").readNullable[Set[RiskAssessmentType]]
+      )((a, b: Option[Set[RiskAssessmentType]]) => RiskAssessmentPolicy(RiskAssessmentHasPolicy(a), RiskAssessmentTypes(b.getOrElse(Set[RiskAssessmentType]()))) )
   }
 
   implicit val jsonWrites:Writes[RiskAssessmentPolicy] = {

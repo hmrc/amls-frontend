@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessactivities.{BusinessActivities, RiskAssessmentTypes}
+import models.businessactivities.{BusinessActivities, RiskAssessmentPolicy, RiskAssessmentTypes}
 import models.businessmatching.BusinessMatching
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
@@ -38,7 +38,7 @@ class DocumentRiskAssessmentController @Inject()(val dataCacheConnector: DataCac
         response =>
           val form: Form2[RiskAssessmentTypes] = (for {
             businessActivities <- response
-            riskAssessmentPolicy <- businessActivities.riskAssessmentPolicy
+            riskAssessmentPolicy: RiskAssessmentPolicy <- businessActivities.riskAssessmentPolicy
           } yield Form2[RiskAssessmentTypes](riskAssessmentPolicy.riskassessments)).getOrElse(EmptyForm)
           Ok(document_risk_assessment_policy(form, edit))
       }
