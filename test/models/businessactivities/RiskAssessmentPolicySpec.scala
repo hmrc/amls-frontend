@@ -16,6 +16,7 @@
 
 package models.businessactivities
 
+import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
@@ -23,6 +24,112 @@ import play.api.libs.json._
 class RiskAssessmentPolicySpec extends PlaySpec with MockitoSugar {
 
   val formalRiskAssessments: Set[RiskAssessmentType] = Set(PaperBased, Digital)
+//
+//  "RiskAssessment" must {
+//
+//    import jto.validation.forms.Rules._
+//
+//    "fail validation" when {
+//
+//      "given invalid data represented by an empty map" in {
+//        RiskAssessmentPolicy.formReads.validate(Map.empty) must
+//          be(Invalid(Seq((Path \ "hasPolicy") -> Seq(ValidationError("error.required.ba.option.risk.assessment")))))
+//      }
+//
+//      "given invalid enum value" in {
+//        val model = Map(
+//          "hasPolicy" -> Seq("true"),
+//          "riskassessments[]" -> Seq("01", "99")
+//        )
+//
+//        RiskAssessmentPolicy.formReads.validate(model) must
+//          be(Invalid(Seq((Path \ "riskassessments" \ 1 \ "riskassessments", Seq(ValidationError("error.invalid"))))))
+//      }
+//
+//      "given empty riskassessments data" in {
+//        val model = Map(
+//          "hasPolicy" -> Seq("true"),
+//          "riskassessments[]" -> Seq()
+//        )
+//
+//        RiskAssessmentPolicy.formRule.validate(model) must
+//          be(Invalid(Seq((Path \ "riskassessments", Seq(ValidationError("error.required.ba.option.risk.assessment"))))))
+//      }
+//
+//      "given missing hasPolicy data" in {
+//        val model = Map(
+//          "riskassessments[]" -> Seq("01", "02")
+//        )
+//
+//        RiskAssessmentPolicy.formRule.validate(model) must
+//          be(Invalid(Seq((Path \ "hasPolicy", Seq(ValidationError("error.required.ba.option.risk.assessment"))))))
+//      }
+//
+//      "given missing hasPolicy data represented by an empty string" in {
+//        val model = Map(
+//          "hasPolicy" -> Seq(""),
+//          "riskassessments[]" -> Seq("01", "02")
+//        )
+//
+//        RiskAssessmentPolicy.formRule.validate(model) must
+//          be(Invalid(Seq((Path \ "hasPolicy", Seq(ValidationError("error.required.ba.option.risk.assessment"))))))
+//      }
+//    }
+//
+//    "pass validation" when {
+//      "successfully validate given an enum value" in {
+//        RiskAssessmentPolicy.formRule.validate(Map("hasPolicy" -> Seq("false"))) must
+//          be(Valid(RiskAssessmentPolicyNo))
+//      }
+//
+//      "given `Yes` with no value" in {
+//        val model = Map("hasPolicy" -> Seq("true"))
+//        RiskAssessmentPolicy.formRule.validate(model) must
+//          be(Valid(RiskAssessmentPolicyYes(None)))
+//      }
+//
+//      "validate model with multiple check boxes selected" in {
+//
+//        val model = Map(
+//          "hasPolicy" -> Seq("true"),
+//          "riskassessments[]" -> Seq("01", "02")
+//        )
+//
+//        RiskAssessmentPolicy.formRule.validate(model) must
+//          be(Valid(RiskAssessmentPolicyYes(formalRiskAssessments)))
+//      }
+//    }
+//
+//    "write form data correctly" when {
+//      "yes is selected and no risk assessment value is provided" in {
+//        val model = Map(
+//          "hasPolicy" -> Seq("true")
+//        )
+//
+//        RiskAssessmentPolicy.formWrites.writes(RiskAssessmentPolicyYes(None)) must
+//          be(model)
+//      }
+//
+//      "yes is selected and risk assessment value is provided" in {
+//        val model = Map(
+//          "hasPolicy" -> Seq("true"),
+//          "riskassessments[]" -> Seq("01", "02")
+//        )
+//
+//        RiskAssessmentPolicy.formWrites.writes(RiskAssessmentPolicyYes(Some((Set(PaperBased, Digital)))) must
+//          be(model)
+//      }
+//
+//      "no is selected" in {
+//        val model = Map(
+//          "hasPolicy" -> Seq("false")
+//        )
+//
+//        RiskAssessmentPolicy.formWrites.writes(RiskAssessmentPolicyNo) must
+//          be(model)
+//      }
+//    }
+//  }
 
   "JSON validation" must {
     "successfully validate" when {
