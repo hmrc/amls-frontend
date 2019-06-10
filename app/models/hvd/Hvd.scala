@@ -65,7 +65,7 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
       hasChanged = hasChanged || !this.linkedCashPayment.contains(p),
       hasAccepted = hasAccepted && this.linkedCashPayment.contains(p))
 
-  def howWillYouSellGoods(p: HowWillYouSellGoods)  : Hvd = {
+  def howWillYouSellGoods(p: HowWillYouSellGoods): Hvd = {
     copy(howWillYouSellGoods = Some(p),
       hasChanged = hasChanged || !this.howWillYouSellGoods.contains(p),
       hasAccepted = hasAccepted && this.howWillYouSellGoods.contains(p))
@@ -74,7 +74,7 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
   def percentageOfCashPaymentOver15000(v: PercentageOfCashPaymentOver15000): Hvd =
     this.copy(
       percentageOfCashPaymentOver15000 = Some(v),
-      hasChanged = hasChanged || this.percentageOfCashPaymentOver15000.contains(v),
+      hasChanged = hasChanged || !this.percentageOfCashPaymentOver15000.contains(v),
       hasAccepted = hasAccepted && this.percentageOfCashPaymentOver15000.contains(v))
 
   def dateOfChange(v: DateOfChange): Hvd = this.copy(dateOfChange = Some(v))
