@@ -98,9 +98,9 @@ class FitAndProperController @Inject()(
                                     msbOrTscp: Boolean,
                                     flow: Option[String])
                                    (implicit authContext: AuthContext, request: Request[AnyContent]): Result = {
-    (edit, fitAndProperAnswer, true) match {
-      case (true, false, true) => routeMsbOrTcsb(index, cacheMapOpt, fitAndProperAnswer, msbOrTscp, flow)
-      case (false, false, true) => routeMsbOrTcsb(index, cacheMapOpt, fitAndProperAnswer, msbOrTscp, flow)
+    (edit, fitAndProperAnswer) match {
+      case (true, false) => routeMsbOrTcsb(index, cacheMapOpt, fitAndProperAnswer, msbOrTscp, flow)
+      case (false, false) => routeMsbOrTcsb(index, cacheMapOpt, fitAndProperAnswer, msbOrTscp, flow)
       case _ => Redirect(routes.DetailedAnswersController.get(index, flow))
     }
   }
