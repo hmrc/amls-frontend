@@ -70,9 +70,8 @@ class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConne
 
   private def redirectDependingOnEdit(edit: Boolean, accountancyServices: Boolean, data: RiskAssessmentHasPolicy) =
     (edit, accountancyServices, data) match {
-      case (true, _, RiskAssessmentHasPolicy(true)) => Redirect(routes.DocumentRiskAssessmentController.get())
+      case (_ , _, RiskAssessmentHasPolicy(true)) => Redirect(routes.DocumentRiskAssessmentController.get())
       case (true, _, _) => Redirect(routes.SummaryController.get())
-      case (false, _, RiskAssessmentHasPolicy(true)) => Redirect(routes.DocumentRiskAssessmentController.get())
       case (false, true, _) => Redirect(routes.SummaryController.get())
       case (false, false, _) => Redirect(routes.AccountantForAMLSRegulationsController.get())
     }
