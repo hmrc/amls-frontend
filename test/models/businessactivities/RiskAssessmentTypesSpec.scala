@@ -17,6 +17,7 @@
 package models.businessactivities
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
+import models.businessactivities
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
@@ -45,6 +46,14 @@ class RiskAssessmentTypesSpec extends PlaySpec with MockitoSugar {
       "successfully validate given an enum value" in {
         RiskAssessmentType.riskAssessmentFormRead.validate("01") must
           be(Valid(PaperBased))
+      }
+    }
+    "write form data correctly" when {
+      "selecting paper based" in {
+        RiskAssessmentType.jsonRiskAssessmentWrites.writes(PaperBased) must be(JsString("01"))
+      }
+      "selecting digitally" in {
+        RiskAssessmentType.jsonRiskAssessmentWrites.writes(Digital) must be(JsString("02"))
       }
     }
   }
