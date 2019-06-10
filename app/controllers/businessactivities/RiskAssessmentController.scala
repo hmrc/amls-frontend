@@ -60,7 +60,7 @@ class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConne
             for {
               businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
               _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key, businessActivities.riskAssessmentHasPolicy(data))
-            } yield redirectDependingOnEdit(edit, ControllerHelper.isAccountancyServicesSelected(Some(businessMatching)), data)
+            } yield redirectDependingOnEdit(ControllerHelper.isAccountancyServicesSelected(Some(businessMatching)), data)
           }
         } recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
@@ -68,11 +68,10 @@ class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConne
       }
   }
 
-  private def redirectDependingOnEdit(edit: Boolean, accountancyServices: Boolean, data: RiskAssessmentHasPolicy) =
-    (edit, accountancyServices, data) match {
-      case (_ , _, RiskAssessmentHasPolicy(true)) => Redirect(routes.DocumentRiskAssessmentController.get())
-      case (true, _, _) => Redirect(routes.SummaryController.get())
-      case (false, true, _) => Redirect(routes.SummaryController.get())
-      case (false, false, _) => Redirect(routes.AccountantForAMLSRegulationsController.get())
+  private def redirectDependingOnEdit(accountancyServices: Boolean, data: RiskAssessmentHasPolicy) =
+    accountancyServices match {
+      case _ if data == RiskAssessmentHasPolicy(true) => Redirect(routes.DocumentRiskAssessmentController.get())
+      case true => Redirect(routes.SummaryController.get())
+      case false => Redirect(routes.AccountantForAMLSRegulationsController.get())
     }
 }
