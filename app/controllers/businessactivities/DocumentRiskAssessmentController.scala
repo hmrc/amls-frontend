@@ -69,11 +69,8 @@ class DocumentRiskAssessmentController @Inject()(val dataCacheConnector: DataCac
       }
   }
 
-  private def redirectDependingOnEdit(edit: Boolean, accountancyServices: Boolean) = edit match {
-    case true => Redirect(routes.SummaryController.get())
-    case false => accountancyServices match {
-      case true => Redirect(routes.SummaryController.get())
-      case false => Redirect(routes.AccountantForAMLSRegulationsController.get())
+  private def redirectDependingOnEdit(edit: Boolean, accountancyServices: Boolean) = (edit, accountancyServices) match {
+    case (false, false) => Redirect(routes.AccountantForAMLSRegulationsController.get())
+    case (_, _) => Redirect(routes.SummaryController.get())
     }
   }
-}
