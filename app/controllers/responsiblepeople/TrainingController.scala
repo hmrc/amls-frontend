@@ -61,10 +61,10 @@ class TrainingController @Inject()(
             }
           case ValidForm(_, data) => {
             for {
-              cacheMap <- fetchAllAndUpdateStrict[ResponsiblePerson](index) { (_, rp) =>
+              _ <- fetchAllAndUpdateStrict[ResponsiblePerson](index) { (_, rp) =>
                 rp.training(data)
               }
-            } yield identifyRoutingTarget(index, edit, cacheMap, flow)
+            } yield identifyRoutingTarget(index, edit, flow)
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
@@ -72,15 +72,11 @@ class TrainingController @Inject()(
       }
     }
 
-  private def identifyRoutingTarget(index: Int, edit: Boolean, cacheMapOpt: Option[CacheMap], flow: Option[String]): Result = {
-    cacheMapOpt match {
-      case Some(cacheMap) => {
-        (edit, cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) match {
-          case (true, _) => Redirect(routes.DetailedAnswersController.get(index, flow))
-          case (false, _) => Redirect(routes.FitAndProperNoticeController.get(index, false, flow))
-        }
-      }
-      case _ => Redirect(routes.DetailedAnswersController.get(index, flow))
+  private def identifyRoutingTarget(index: Int, edit: Boolean, flow: Option[String]): Result = {
+    if (edit) {
+      Redirect(routes.DetailedAnswersController.get(index, flow))
+    } else {
+      Redirect(routes.FitAndProperNoticeController.get(index, edit, flow))
     }
   }
 }

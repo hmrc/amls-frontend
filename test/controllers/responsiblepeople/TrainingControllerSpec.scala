@@ -135,21 +135,6 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
       }
 
       "given valid data" when {
-        "there is no cache data, must redirect to the PersonRegisteredController" in new Fixture {
-
-          val newRequest = request.withFormUrlEncodedBody(
-            "training" -> "true",
-            "information" -> "test"
-          )
-
-          when(controller.dataCacheConnector.fetchAll(any(), any()))
-            .thenReturn(Future.successful(None))
-
-          val result = controller.post(recordId, false)(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId).url))
-        }
-
         "edit is false" must {
           "redirect to FitAndProperNoticeController" in new Fixture {
             val newRequest = request.withFormUrlEncodedBody(
@@ -174,7 +159,7 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
           }
         }
         "edit is true" must {
-          "on post with valid data in edit mode" in new Fixture {
+          "redirect to DetailedAnswersController" in new Fixture {
 
             val newRequest = request.withFormUrlEncodedBody(
               "training" -> "true",
@@ -188,8 +173,6 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId, Some(flowFromDeclaration)).url))
           }
-
-
         }
       }
 
