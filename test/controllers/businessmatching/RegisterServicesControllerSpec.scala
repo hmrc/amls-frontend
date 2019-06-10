@@ -65,7 +65,6 @@ class RegisterServicesControllerSpec extends AmlsSpec
     val request = addToken(authRequest)
 
     val statusService = mockStatusService
-    //val mockAppConfig = mock[AppConfig]
 
     val businessMatchingService = mock[BusinessMatchingService]
 
@@ -82,7 +81,6 @@ class RegisterServicesControllerSpec extends AmlsSpec
       .overrides(bind[StatusService].to(statusService))
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
-      //.overrides(bind[AppConfig].to(mockAppConfig))
       .build()
 
     val controller = app.injector.instanceOf[RegisterServicesController]

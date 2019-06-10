@@ -60,7 +60,6 @@ class PersonNonUKPassportController @Inject()(
     } yield (rp.dateOfBirth.isDefined && edit) match {
       case true => Redirect(routes.DetailedAnswersController.get(index, flow))
       case false => Redirect(routes.CountryOfBirthController.get(index, edit, flow))
-      //case _ => Redirect(routes.DateOfBirthController.get(index, edit, flow))
     }).getOrElse(NotFound(notFoundView))
   }
 
