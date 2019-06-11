@@ -33,6 +33,6 @@ object RiskAssessmentHasPolicy {
   }
 
   implicit def formWrites: Write[RiskAssessmentHasPolicy, UrlFormEncoded] = Write {
-    case RiskAssessmentHasPolicy(hasPolicy) => Map("hasPolicy" -> Seq(hasPolicy.toString))
+    case RiskAssessmentHasPolicy(hasPolicy) => Map("hasPolicy" -> hasPolicy.toString)
   }
 }

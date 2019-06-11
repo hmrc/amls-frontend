@@ -36,12 +36,12 @@ object RiskAssessmentPolicy {
         Json.obj(
           "hasPolicy" -> true,
           "riskassessments" -> a.toSeq.map(d =>
-          d.toString match {
-            case "PaperBased" => "01"
-            case "Digital" => "02"
-            case _ => ""
-          })
-        )
+            d.toString match {
+              case "PaperBased" => "01"
+              case "Digital" => "02"
+              case _ => ""
+            })
+          )
 
       case RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), _) =>
         Json.obj(
