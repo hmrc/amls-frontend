@@ -27,16 +27,17 @@ object RiskAssessmentPolicy {
     import play.api.libs.functional.syntax._
     ((__ \ "hasPolicy").read[Boolean] and
       (__ \ "riskassessments").readNullable[Set[RiskAssessmentType]]
-      )((a, b) => RiskAssessmentPolicy(RiskAssessmentHasPolicy(a), RiskAssessmentTypes(b.getOrElse(Set[RiskAssessmentType]()))))
+      )((hasPolicy, riskAssessmentTypes) =>
+      RiskAssessmentPolicy(RiskAssessmentHasPolicy(hasPolicy), RiskAssessmentTypes(riskAssessmentTypes.getOrElse(Set[RiskAssessmentType]()))))
   }
 
   implicit val jsonWrites:Writes[RiskAssessmentPolicy] = {
     Writes[RiskAssessmentPolicy] {
-      case RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(a)) =>
+      case RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(riskAssessmentTypes)) =>
         Json.obj(
           "hasPolicy" -> true,
-          "riskassessments" -> a.toSeq.map(d =>
-            d.toString match {
+          "riskassessments" -> riskAssessmentTypes.toSeq.map(raType =>
+            raType.toString match {
               case "PaperBased" => "01"
               case "Digital" => "02"
               case _ => ""
