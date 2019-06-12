@@ -21,7 +21,7 @@
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @target = @{
-    s"""${f("professionalBody").id}-fieldset"""
+    s"""${f("professionalBody").id}-panel"""
 }
 
 @header = {
@@ -50,29 +50,32 @@
 
             @fieldsetWithErrorGroup(
                 f = f("penalised"),
-                panel = false,
                 heading = "supervision.penalisedbyprofessional.title",
                 section = "summary.supervision",
-                supportingContent = supportingContent,
-                classes = Seq("inline")
+                panel=false,
+                supportingContent = supportingContent
             ) {
 
                 @radio(
                     f = f("penalised"),
                     labelText = "lbl.yes",
                     value = "true",
-                    target = "[data-reveal='target']"
+                    target = s"#$target"
                 )
-
-                @textarea(
-                    f("professionalBody"),
-                    "supervision.penalisedbyprofessional.details.lbl",
-                    bold = false,
-                    largeWidth = true,
-                    cols = "30",
-                    rows = "8",
-                    data = "target"
-                )
+                @panel(
+                    field = Some(f(s"$target")),
+                    jsHidden = false
+                ) {
+                    @textarea(
+                        f("professionalBody"),
+                        "supervision.penalisedbyprofessional.details.lbl",
+                        bold = false,
+                        largeWidth = true,
+                        cols = "30",
+                        rows = "8",
+                        data = "target"
+                    )
+                }
 
                 @radio(
                     f = f("penalised"),
