@@ -53,6 +53,9 @@ class AuthAction @Inject() (
 
     authorised(User).retrieve(Retrievals.allEnrolments and Retrievals.internalId) {
       case enrolments ~ Some(internalId) =>
+
+        val identifiers = enrolments.getEnrolment(amlsKey).map(_.identifiers)
+
         val amlsRefNumber = enrolments.getEnrolment(amlsKey).map(_.key)
         Future.successful(Right(AuthorisedRequest(request, amlsRefNumber, internalId)))
       case _ =>
