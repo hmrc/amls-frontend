@@ -16,7 +16,6 @@
 
 package models.moneyservicebusiness
 
-import config.ApplicationConfig
 import models.businessmatching.{BusinessMatching, CurrencyExchange, ForeignExchange, TransmittingMoney}
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.api.libs.json._
@@ -30,7 +29,7 @@ case class MoneyServiceBusiness(
                                  whichCurrencies: Option[WhichCurrencies] = None,
                                  sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None,
                                  fundsTransfer: Option[FundsTransfer] = None,
-                                 branchesOrAgents: Option[BranchesOrAgents] = None,
+                                 branchesOrAgents: Option[BranchesOrAgentsGroup] = None,
                                  sendTheLargestAmountsOfMoney: Option[SendTheLargestAmountsOfMoney] = None,
                                  mostTransactions: Option[MostTransactions] = None,
                                  transactionsInNext12Months: Option[TransactionsInNext12Months] = None,
@@ -55,7 +54,7 @@ case class MoneyServiceBusiness(
   def fundsTransfer(p: FundsTransfer): MoneyServiceBusiness =
     this.copy(fundsTransfer = Some(p), hasChanged = hasChanged || !this.fundsTransfer.contains(p), hasAccepted = hasAccepted && this.fundsTransfer.contains(p))
 
-  def branchesOrAgents(p: BranchesOrAgents): MoneyServiceBusiness =
+  def branchesOrAgents(p: BranchesOrAgentsGroup): MoneyServiceBusiness =
     this.copy(branchesOrAgents = Some(p), hasChanged = hasChanged || !this.branchesOrAgents.contains(p), hasAccepted = hasAccepted && this.branchesOrAgents.contains(p))
 
   def sendMoneyToOtherCountry(p: SendMoneyToOtherCountry): MoneyServiceBusiness =
@@ -148,7 +147,7 @@ object MoneyServiceBusiness {
         (__ \ "whichCurrencies").readNullable[WhichCurrencies] and
         (__ \ "sendMoneyToOtherCountry").readNullable[SendMoneyToOtherCountry] and
         (__ \ "fundsTransfer").readNullable[FundsTransfer] and
-        (__ \ "branchesOrAgents").readNullable[BranchesOrAgents] and
+        (__ \ "branchesOrAgents").readNullable[BranchesOrAgentsGroup] and
         (__ \ "sendTheLargestAmountsOfMoney").readNullable[SendTheLargestAmountsOfMoney] and
         (__ \ "mostTransactions").readNullable[MostTransactions] and
         (__ \ "transactionsInNext12Months").readNullable[TransactionsInNext12Months] and

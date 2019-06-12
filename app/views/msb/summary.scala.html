@@ -69,21 +69,38 @@
         }
 
         @model.branchesOrAgents.map { boa =>
-            @checkYourAnswers(
-                question = Messages("msb.branchesoragents.title"),
-                editLinkTag = "msbbranchesoragents-edit",
-                editUrl = controllers.msb.routes.BranchesOrAgentsController.get(true).toString
-            ) {
-                @boa.branches.fold {
-                    <p>@Messages("lbl.no")</p>
-                } { branches =>
-                    <ul class="list list--comma">
-                        @branches.map { country =>
-                            <li>@country</li>
+                @checkYourAnswers(
+                    question = Messages("msb.branchesoragents.title"),
+                    editLinkTag = "msbbranchesoragents-edit",
+                    editUrl = controllers.msb.routes.BranchesOrAgentsController.get(true).toString
+                ) {
+                    <p>@boa.hasCountries match {
+                        case BranchesOrAgents(true) => {
+                            @Messages("lbl.yes")
                         }
-                    </ul>
+                        case _ => {
+                            @Messages("lbl.no")
+                        }
+                    }</p>
                 }
-            }
+
+                @boa.hasCountries match {
+                    case BranchesOrAgents(true) => {
+                        @checkYourAnswers(
+                            question = Messages("msb.branchesoragents.countries.title"),
+                            editLinkTag = "msbwhichcountries-edit",
+                            editUrl = controllers.msb.routes.BranchesOrAgentsWhichCountriesController.get(true).toString
+                        ) {
+                            @boa.branches.map { branches =>
+                                <ul class="list list--comma">
+                                    @branches.branches.map { country => <li>@country</li> }
+                                </ul>
+                            }
+                        }
+                    }
+                    case _ => { }
+                }
+
         }
 
         @model.identifyLinkedTransactions.map { ilt =>

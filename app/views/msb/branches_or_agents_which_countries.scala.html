@@ -19,41 +19,36 @@
 @import forms2._
 @import models.autocomplete._
 
-@(f: Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages)
+@(f: Form2[_], edit: Boolean, countryData: Option[Seq[NameValuePair]])(implicit request: Request[_],m:Messages)
 
 @header = {
     @components.back_link()
     @errorSummary(f)
 }
 
-@supportingContent = { <p>@Messages("msb.branchesoragents.intro")</p> }
-
 @main(
-    title = Messages("msb.branchesoragents.title") + " - " + Messages("summary.msb"),
+    title = Messages("msb.branchesoragents.countries.title") + " - " + Messages("summary.msb"),
     heading = header
 ) {
 
-    @form(f, controllers.msb.routes.BranchesOrAgentsController.post(edit)) {
+    @form(f, controllers.msb.routes.BranchesOrAgentsWhichCountriesController.post(edit)) {
 
         @fieldsetWithErrorGroup(
-            f = f("hasCountries"),
-            heading = "msb.branchesoragents.title",
+            f = f("countries"),
+            heading = "msb.branchesoragents.countries.title",
             section = "summary.msb",
-            panel = false
+            panel = false,
+            hint = "msb.branchesoragents.hint"
         ) {
-            @radio(
-                f = f("hasCountries"),
-                labelText = "lbl.yes",
-                value = "true",
-                target = s"#countries",
-                inline = true
-            )
-            @radio(
-                f = f("hasCountries"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true
-            )
+            @for(i <- 0 until 10) {
+                @defining(
+                    f(s"countries[$i]")
+                ) { field => @country_autocomplete(
+                    field = field,
+                    labelText = s"lbl.country.line${i + 1}",
+                    data = countryData.getOrElse(Seq.empty)
+                ) }
+            }
         }
 
         @submit(edit)
