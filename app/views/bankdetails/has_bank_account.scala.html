@@ -23,37 +23,30 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("bankdetails.hasbankaccount.title", "summary.bankdetails")
 }
 @main(
     title = s"${Messages("bankdetails.hasbankaccount.title")} - ${Messages("summary.bankdetails")}",
     heading = header
 ) {
     @form(f, controllers.bankdetails.routes.HasBankAccountController.post()) {
-        @fieldset(
-            f = f("hasBankAccount-fieldset"),
-            legend = "bankdetails.hasbankaccount.title",
+        @fieldsetWithErrorGroup(
+            f = f("hasBankAccount"),
+            heading = "bankdetails.hasbankaccount.title",
+            section = "summary.bankdetails",
             panel = false,
-            legendHidden = true,
             classes = Seq("inline")
         ) {
-            @errorGroup(
-                field = f("hasBankAccount")
-            ) {
-                @radio(
-                    f = f("hasBankAccount"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true
-                )
+            @radio(
+                f = f("hasBankAccount"),
+                labelText = "lbl.yes",
+                value = "true"
+            )
 
-                @radio(
-                    f = f("hasBankAccount"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
-            }
+            @radio(
+                f = f("hasBankAccount"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
 
         @submit()
