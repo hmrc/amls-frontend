@@ -16,9 +16,9 @@
 
 package connectors
 
-import uk.gov.hmrc.domain.{CtUtr, SaUtr, Org}
+import uk.gov.hmrc.domain.{CtUtr, Org, SaUtr}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.domain.{CtAccount, SaAccount, OrgAccount}
+import uk.gov.hmrc.play.frontend.auth.connectors.domain.{CtAccount, OrgAccount, SaAccount}
 
 object ConnectorHelper {
 
@@ -36,5 +36,15 @@ object ConnectorHelper {
       }
     }
   }
+
+  protected[connectors] def accountTypeAndIdFromEnrolments(): (String, String) = {
+
+    // Need to figure out the account type and id from new auth... Enrolments?
+    val accountType = ???
+    val accountId = ???
+    (accountType, accountId)
+
+  }
+
 }
 

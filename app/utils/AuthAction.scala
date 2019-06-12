@@ -49,11 +49,7 @@ class AuthAction @Inject() (
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
 
     // TODO - what else might we need?
-    // ac.user.oid?
-    // ac.principal
     // ac.principal.accounts
-    // ac.userDetailsUri ?? (may be not needed in new auth)
-    // ac.enrolmentsUri ?? (may be not needed in new auth)
 
     authorised(User).retrieve(Retrievals.allEnrolments and Retrievals.internalId) {
       case enrolments ~ Some(internalId) =>
