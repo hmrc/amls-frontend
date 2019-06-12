@@ -16,6 +16,7 @@
 
 package connectors.cache
 
+import connectors.AuthConnector
 import javax.inject.Inject
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Format
@@ -26,49 +27,111 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.Future
 
-class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory) extends Conversions {
+class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory, authConnector: AuthConnector) extends Conversions {
 
   lazy val mongoCache: MongoCacheClient = cacheClientFactory.createClient
 
   /**
     * Fetches the data item with the specified key from the mongo store
     */
-  def fetch[T](key: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
+  def fetchByOid[T](key: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
     mongoCache.find(authContext.user.oid, key)
+
+  def fetchByCredId[T](key: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] = {
+    authConnector.getCredId flatMap {
+      credId => mongoCache.find(credId, key)
+    }
+  }
+
+  def fetch[T](key: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] = {
+    fetchByCredId(key) flatMap {
+      case data => {
+        println("by cred")
+        Future.successful(data)
+      }
+      case _ => {
+        println("by oid")
+        fetchByOid(key)
+      }
+    }
+  }
 
   /**
     * Saves the data item in the mongo store with the specified key
     */
-  def save[T](key: String, data: T)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
-    mongoCache.createOrUpdate(authContext.user.oid, data, key).map(toCacheMap)
+  def save[T](key: String, data: T)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] = {
+    authConnector.getCredId flatMap {
+      cache => {
+        mongoCache.createOrUpdateWithCacheMiss(authContext.user.oid, cache, data, key).map(toCacheMap)
+      }
+    }
+  }
 
   /**
     * Saves the data item in the in-memory cache with the specified key
     */
-  def upsert[T](targetCache: CacheMap,
-                           key: String,
-                           data: T)
-                          (implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): CacheMap = {
+  def upsert[T](targetCache: CacheMap, key: String, data: T)
+               (implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): CacheMap =
     mongoCache.upsert(targetCache, authContext.user.oid, data, key)
-  }
 
   /**
     * Fetches the entire cache from the mongo store
     */
-  def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =
-    mongoCache.fetchAll(authContext.user.oid).map(_.map(toCacheMap))
+  def fetchAllByOid(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =
+    mongoCache.fetchAll(authContext.user.oid, true).map(_.map(toCacheMap))
+
+  def fetchAllByCredId(implicit authContext: AuthContext, hc: HeaderCarrier): Future[Option[CacheMap]] = {
+    authConnector.getCredId flatMap {
+      credId =>
+        mongoCache.fetchAll(credId, false).map(_.map(toCacheMap))
+    }
+  }
+
+  def fetchAll[T](implicit authContext: AuthContext, hc: HeaderCarrier): Future[Option[CacheMap]] = {
+    fetchAllByCredId flatMap {
+      case data => Future.successful(data)
+      case _ => fetchAllByOid
+    }
+  }
 
   /**
     * Fetches the entire cache from the mongo store and returns an empty cache where not exists
     */
-  def fetchAllWithDefault(implicit hc: HeaderCarrier, authContext: AuthContext): Future[CacheMap] =
-    mongoCache.fetchAllWithDefault(authContext.user.oid).map(toCacheMap)
+  def fetchAllWithDefault(implicit hc: HeaderCarrier, authContext: AuthContext): Future[CacheMap] = {
+  fetchAllWithDefaultByCredId flatMap {
+      case data => Future.successful(data)
+      case _ => fetchAllWithDefaultByOid
+    }
+  }
+
+  def fetchAllWithDefaultByOid(implicit hc: HeaderCarrier, authContext: AuthContext): Future[CacheMap] =
+    mongoCache.fetchAllWithDefault(authContext.user.oid, true).map(toCacheMap)
+
+  def fetchAllWithDefaultByCredId(implicit authContext: AuthContext, hc: HeaderCarrier): Future[CacheMap] = {
+    authConnector.getCredId flatMap {
+      credId =>
+        mongoCache.fetchAllWithDefault(credId, false).map(toCacheMap)
+    }
+  }
 
   /**
     * Removes the entire cache from the mongo store
     */
   def remove(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Boolean] =
-    mongoCache.removeById(authContext.user.oid)
+    removeByCredId flatMap {
+      case removed => Future.successful(removed)
+      case _ => removeByOid
+    }
+
+  def removeByOid(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Boolean] =
+    mongoCache.removeById(authContext.user.oid, true)
+
+  def removeByCredId(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Boolean] = {
+    authConnector.getCredId flatMap {
+      credId =>
+        mongoCache.removeById(credId, false)
+    }
+  }
 
   /**
     * Removes the cache entry for a given key from the mongo store
@@ -92,9 +155,12 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory)
     * @return The model after it has been transformed
     */
   def update[T](key: String)(f: Option[T] => T)(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
-    mongoCache.find[T](ac.user.oid, key) flatMap { maybeModel =>
-      val transformed = f(maybeModel)
-      mongoCache.createOrUpdate(ac.user.oid, transformed, key) map { _ => Some(transformed) }
+    authConnector.getCredId flatMap {
+      credId =>
+        mongoCache.findWithCacheMiss[T](ac.user.oid, credId, key) flatMap { maybeModel =>
+          val transformed = f(maybeModel)
+          mongoCache.createOrUpdateWithCacheMiss(ac.user.oid, credId, transformed, key) map { _ => Some(transformed) }
+        }
     }
 }
 
