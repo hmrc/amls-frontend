@@ -17,7 +17,7 @@
 package controllers.msb
 
 import models.Country
-import models.moneyservicebusiness.{BranchesOrAgents, MoneyServiceBusiness}
+import models.moneyservicebusiness.{BranchesOrAgents, BranchesOrAgentsCountries, BranchesOrAgentsGroup, MoneyServiceBusiness}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -55,9 +55,10 @@ class BranchesOrAgentsControllerSpec extends AmlsSpec with MockitoSugar {
     "show a prefilled form when store contains data" in new Fixture {
 
       val model = MoneyServiceBusiness(
-        branchesOrAgents = Some(
-          BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))
-        )
+        branchesOrAgents = Some(BranchesOrAgentsGroup(
+          BranchesOrAgents(true),
+          Some(BranchesOrAgentsCountries(Seq(Country("United Kingdom", "GB"))))
+        ))
       )
 
       when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
@@ -70,25 +71,12 @@ class BranchesOrAgentsControllerSpec extends AmlsSpec with MockitoSugar {
 
       document.select("input[name=hasCountries]").size mustEqual 2
       document.select("input[name=hasCountries][checked]").`val` mustEqual "true"
-      document.select("option[value=GB][selected]").size mustEqual 1
-    }
-
-    "return a Bad request with prefilled form on invalid submission" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "hasCountries" -> "true"
-      )
-
-      val result = controller.post()(newRequest)
-      val document = Jsoup.parse(contentAsString(result))
-
-      status(result) mustEqual BAD_REQUEST
     }
 
     "return a redirect to the 'Linked Transactions' page on valid submission" in new Fixture {
 
       val model = MoneyServiceBusiness(
-        branchesOrAgents = Some(BranchesOrAgents(None)),
+        branchesOrAgents = Some(BranchesOrAgentsGroup(BranchesOrAgents(false), None)),
         hasChanged = true
       )
 
@@ -97,9 +85,9 @@ class BranchesOrAgentsControllerSpec extends AmlsSpec with MockitoSugar {
       )
 
       when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
-        .thenReturn(Future.successful(None))
+        .thenReturn(Future.successful(Some(model)))
 
-      when(mockCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(model))(any(), any(), any()))
+      when(mockCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(edit = false)(newRequest)
@@ -108,35 +96,33 @@ class BranchesOrAgentsControllerSpec extends AmlsSpec with MockitoSugar {
       redirectLocation(result) mustEqual Some(routes.IdentifyLinkedTransactionsController.get().url)
     }
 
-    "return a redirect to the 'Linked Transactions' page when the user has selected 'yes' from options and has filled " +
-      "the mandatory auto suggested country field" in new Fixture {
+    "return a redirect to the 'Which Countries' page when the user has selected 'yes' from options" in new Fixture {
 
       val model = MoneyServiceBusiness(
-        branchesOrAgents = Some(BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))),
+        branchesOrAgents = Some(BranchesOrAgentsGroup(BranchesOrAgents(true), None)),
         hasChanged = true
       )
 
       val newRequest = request.withFormUrlEncodedBody(
-        "hasCountries" -> "true",
-        "countries" -> "GB"
+        "hasCountries" -> "true"
       )
 
       when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
         .thenReturn(Future.successful(None))
 
-      when(mockCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(model))(any(), any(), any()))
+      when(mockCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(edit = false)(newRequest)
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result) mustEqual Some(routes.IdentifyLinkedTransactionsController.get().url)
+      redirectLocation(result) mustEqual Some(routes.BranchesOrAgentsWhichCountriesController.get().url)
     }
 
-    "return a redirect to the 'Summary page' page on valid submission when edit flag is set" in new Fixture {
+    "return a redirect to the 'Summary page' page on valid submission when edit flag is set and answering no" in new Fixture {
 
       val model = MoneyServiceBusiness(
-        branchesOrAgents = Some(BranchesOrAgents(None)),
+        branchesOrAgents = Some(BranchesOrAgentsGroup(BranchesOrAgents(false), None)),
         hasChanged = true
       )
 
@@ -145,15 +131,38 @@ class BranchesOrAgentsControllerSpec extends AmlsSpec with MockitoSugar {
       )
 
       when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
-        .thenReturn(Future.successful(None))
+        .thenReturn(Future.successful(Some(model)))
 
-      when(mockCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(model))(any(), any(), any()))
+      when(mockCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key),any())(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(edit = true)(newRequest)
 
       status(result) mustEqual SEE_OTHER
       redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
+    }
+
+    "return a redirect to the 'Which Countries' page on valid submission when edit flag is set and answering yes" in new Fixture {
+
+      val model = MoneyServiceBusiness(
+        branchesOrAgents = Some(BranchesOrAgentsGroup(BranchesOrAgents(true), None)),
+        hasChanged = true
+      )
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "hasCountries" -> "true"
+      )
+
+      when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+        .thenReturn(Future.successful(Some(model)))
+
+      when(mockCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key),any())(any(), any(), any()))
+        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+      val result = controller.post(edit = true)(newRequest)
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result) mustEqual Some(routes.BranchesOrAgentsWhichCountriesController.get(true).url)
     }
   }
 }
