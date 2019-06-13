@@ -162,7 +162,7 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
   /**
     * Inserts data into the existing cache object in memory given the specified key. If the data does not exist, it will be created.
     */
-  def upsert[T](targetCache: CacheMap, id: String, data: T, key: String)(implicit writes: Writes[T]): CacheMap = {
+  def upsert[T](targetCache: CacheMap, data: T, key: String)(implicit writes: Writes[T]): CacheMap = {
     val jsonData = if (appConfig.mongoEncryptionEnabled) {
       val jsonEncryptor = new JsonEncryptor[T]()
       Json.toJson(Protected(data))(jsonEncryptor)
@@ -243,7 +243,7 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
   /**
     * Removes the item with the specified id from the cache
     */
-  def removeById(id: String, deprecatedFilter: Boolean): Future[Boolean] = {
+  def removeById(id: String, deprecatedFilter: Boolean) = {
     val key = if(deprecatedFilter) bsonIdQueryOid(id) else bsonIdQuery(id)
 
     collection.remove(key) map handleWriteResult

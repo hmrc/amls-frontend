@@ -39,20 +39,14 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
 
   def fetchByCredId[T](key: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] = {
     authConnector.getCredId flatMap {
-      credId => mongoCache.find(credId, key)
+      credId => mongoCache.findWithCacheMiss(authContext.user.oid, credId, key)
     }
   }
 
   def fetch[T](key: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] = {
     fetchByCredId(key) flatMap {
-      case data => {
-        println("by cred")
-        Future.successful(data)
-      }
-      case _ => {
-        println("by oid")
-        fetchByOid(key)
-      }
+      case Some(data) => Future.successful(Some(data))
+      case _ => fetchByOid(key)
     }
   }
 
@@ -61,8 +55,8 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
     */
   def save[T](key: String, data: T)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] = {
     authConnector.getCredId flatMap {
-      cache => {
-        mongoCache.createOrUpdateWithCacheMiss(authContext.user.oid, cache, data, key).map(toCacheMap)
+      credId => {
+        mongoCache.createOrUpdateWithCacheMiss(authContext.user.oid, credId, data, key).map(toCacheMap)
       }
     }
   }
@@ -72,7 +66,7 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
     */
   def upsert[T](targetCache: CacheMap, key: String, data: T)
                (implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): CacheMap =
-    mongoCache.upsert(targetCache, authContext.user.oid, data, key)
+    mongoCache.upsert(targetCache, data, key)
 
   /**
     * Fetches the entire cache from the mongo store
@@ -89,7 +83,7 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
 
   def fetchAll[T](implicit authContext: AuthContext, hc: HeaderCarrier): Future[Option[CacheMap]] = {
     fetchAllByCredId flatMap {
-      case data => Future.successful(data)
+      case Some(data) => Future.successful(Some(data))
       case _ => fetchAllByOid
     }
   }
@@ -119,7 +113,7 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
     */
   def remove(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Boolean] =
     removeByCredId flatMap {
-      case removed => Future.successful(removed)
+      case true => Future.successful(true)
       case _ => removeByOid
     }
 

@@ -17,7 +17,7 @@
 package connectors.cache
 
 import connectors.{AuthConnector, Authority}
-import org.mockito.Matchers.any
+import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito.{reset, when}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -75,41 +75,7 @@ class MongoCacheConnectorSpec extends FreeSpec
       mockAuthConnector.getCredId(any(), any())
     } thenReturn Future.successful("12345678")
 
-    val connector = new MongoCacheConnector(factory, mockAuthConnector) {
-      override lazy val mongoCache: MongoCacheClient = client
-    }
-  }
-
-  trait OidFixture {
-    implicit val hc = HeaderCarrier()
-    implicit val ac = mock[AuthContext]
-    implicit val user = mock[LoggedInUser]
-    implicit val ec = mock[ExecutionContext]
-
-    val factory = mock[MongoCacheClientFactory]
-    val client = mock[MongoCacheClient]
-    val cacheId = arbitrary[String].sample.get
-    val key = arbitrary[String].sample.get
-    val mockAuthConnector = mock[AuthConnector]
-
-    val authority = Authority("", Accounts(), "/user-details", "/ids", "12345678")
-    val cacheMap = CacheMap("12345678", Map("id" -> Json.toJson("12345678")))
-
-    when(ac.user) thenReturn user
-    when(user.oid) thenReturn cacheId
-    when(factory.createClient) thenReturn client
-
-    when {
-      mockAuthConnector.getCurrentAuthority(any(), any())
-    } thenReturn Future.successful(authority)
-
-    when {
-      mockAuthConnector.getCredId(any(), any())
-    } thenReturn Future.successful("12345678")
-
-    val connector = new MongoCacheConnector(factory, mockAuthConnector) {
-      override lazy val mongoCache: MongoCacheClient = client
-    }
+    val connector = new MongoCacheConnector(factory, mockAuthConnector)
   }
 
   def referenceMap(str1: String = "", str2: String = ""): Map[String, JsValue] = Map(
@@ -125,31 +91,41 @@ class MongoCacheConnectorSpec extends FreeSpec
     "should delegate the call to the underlying mongo client for credId" in new Fixture {
       val model = Model("data")
 
-      when(connector.mongoCache.find[Model](any(), any())(any())).thenReturn(Future.successful(Some(model)))
+      when(client.findWithCacheMiss[Model](any(), any(), any())(any())).thenReturn(Future.successful(Some(model)))
 
       whenReady(connector.fetch[Model](key)) { _ mustBe Some(model) }
     }
 
-//    "should delegate the call to the underlying mongo client for Oid" in new OidFixture {
-//      val model = Model("data")
-//
-////      when(connector.fetchByCredId[Model](any())).thenReturn(Future.successful(None))
-//
-//      //when(connector.mongoCache.find[Model](meq("12345678"), any())(any())).thenReturn(Future.successful(None))
-//      when(connector.fetchByCredId[Model](meq(key))(ac, hc, any())).thenReturn(Future.successful(None))
-//      when(connector.mongoCache.find[Model](meq(cacheId), meq(key))(any())).thenReturn(Future.successful(Some(model)))
-//
-//
-//      whenReady(connector.fetch[Model](key)) { _ mustBe Some(model) }
-//    }
+    "should delegate the call to the underlying mongo client for Oid" in new Fixture {
+      val model = Model("data")
+
+      when(client.findWithCacheMiss[Model](any(), any(), any())(any())).thenReturn(Future.successful(None))
+      when(client.find[Model](any(), any())(any())).thenReturn(Future.successful(Some(model)))
+
+      whenReady(connector.fetch[Model](key)) { _ mustBe Some(model) }
+    }
   }
 
   "fetchAll" - {
-    "should delegate the call to the underlying mongo client" in new Fixture with Conversions {
+    "should delegate the call to the underlying mongo client for CredId" in new Fixture with Conversions {
       val cache = Cache("12345678", referenceMap())
 
       when {
-        connector.mongoCache.fetchAll("12345678", false)
+        client.fetchAll("12345678", false)
+      } thenReturn Future.successful(Some(cache))
+
+      whenReady(connector.fetchAll) { _ mustBe Some(toCacheMap(cache)) }
+    }
+
+    "should delegate the call to the underlying mongo client for Oid" in new Fixture with Conversions {
+      val cache = Cache(cacheId, referenceMap())
+
+      when {
+        client.fetchAll("12345678", false)
+      } thenReturn Future.successful(None)
+
+      when {
+        client.fetchAll(cacheId, true)
       } thenReturn Future.successful(Some(cache))
 
       whenReady(connector.fetchAll) { _ mustBe Some(toCacheMap(cache)) }
@@ -157,21 +133,38 @@ class MongoCacheConnectorSpec extends FreeSpec
   }
 
   "save" - {
-    "should delegate the call to the underlying mongo client" in new Fixture with Conversions {
+    "should delegate the call to the underlying mongo client for CredId" in new Fixture with Conversions {
       val model = Model()
       val cache = Cache("12345678", referenceMap())
 
       when {
-        connector.mongoCache.createOrUpdateWithCacheMiss(cacheId, "12345678", model, key)
+        client.createOrUpdateWithCacheMiss(cacheId, "12345678", model, key)
       } thenReturn Future.successful(cache)
 
-      whenReady(connector.save(key, model)) { _ mustBe toCacheMap(cache) }
+      whenReady(connector.save(key, model)) { result =>
+        result mustBe toCacheMap(cache)
+        result.id mustBe "12345678"
+      }
+    }
+
+    "should delegate the call to the underlying mongo client for Oid" in new Fixture with Conversions {
+      val model = Model()
+      val cache = Cache(cacheId, referenceMap())
+
+      when {
+        client.createOrUpdateWithCacheMiss(cacheId, "12345678", model, key)
+      } thenReturn Future.successful(cache)
+
+      whenReady(connector.save(key, model)) { result =>
+        result mustBe toCacheMap(cache)
+        result.id mustBe cacheId
+      }
     }
   }
 
   "saveAll" - {
     "should convert the incoming CacheMap to a Cache before saving the data" in new Fixture {
-      when(connector.mongoCache.saveAll(any())) thenReturn Future.successful(true)
+      when(client.saveAll(any())) thenReturn Future.successful(true)
 
       forAll(arbitrary[String], arbitrary[String]) { (str1, str2) =>
         val cacheMap = CacheMap("test", referenceMap(str1, str2))
@@ -184,13 +177,27 @@ class MongoCacheConnectorSpec extends FreeSpec
   }
 
   "remove" - {
-    "should delegate the call to the underlying mongo client" in new Fixture {
-      forAll(arbitrary[Boolean]) { v =>
-        reset(connector.mongoCache)
-        when(connector.mongoCache.removeById("12345678", false)) thenReturn Future.successful(v)
+    "should delegate the call to the underlying mongo client for CredId" in new Fixture {
+      reset(client)
+      when(client.removeById("12345678", false)) thenReturn Future.successful(true)
 
-        whenReady(connector.remove) { _ mustBe v }
-      }
+      whenReady(connector.remove) { _ mustBe true }
+    }
+
+    "should delegate the call to the underlying mongo client for Oid" in new Fixture {
+      reset(client)
+      when(client.removeById(any(), any())) thenReturn Future.successful(false)
+      when(client.removeById(cacheId, true)) thenReturn Future.successful(true)
+
+      whenReady(connector.remove) { _ mustBe true }
+    }
+
+    "should delegate the call to the underlying mongo client and return false if cannot remove" ignore new Fixture {
+      reset(client)
+      when(client.removeById(any(), any())) thenReturn Future.successful(false)
+      when(client.removeById(cacheId, true)) thenReturn Future.successful(false)
+
+      whenReady(connector.remove) { _ mustBe false }
     }
   }
 
@@ -200,8 +207,8 @@ class MongoCacheConnectorSpec extends FreeSpec
       val updatedModel = model.copy(tmp = "this has been updated")
       val f: Option[Model] => Model = { _ => updatedModel }
 
-      when(connector.mongoCache.findWithCacheMiss[Model](cacheId, "12345678", key)) thenReturn Future.successful(Some(model))
-      when(connector.mongoCache.createOrUpdateWithCacheMiss(cacheId, "12345678", updatedModel, key)) thenReturn Future.successful(Cache.empty)
+      when(client.findWithCacheMiss[Model](any(), any(), meq(key))(any())) thenReturn Future.successful(Some(model))
+      when(client.createOrUpdateWithCacheMiss(any(), any(), meq(updatedModel), meq(key))(any())) thenReturn Future.successful(Cache.empty)
 
       whenReady(connector.update[Model](key)(f)) { _ mustBe Some(updatedModel) }
     }
