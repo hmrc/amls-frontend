@@ -131,7 +131,10 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
     * Removes the cache entry for a given key from the mongo store
     */
   def removeByKey[T](key: String)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
-    mongoCache.removeByKey(authContext.user.oid, key).map(toCacheMap)
+    authConnector.getCredId flatMap {
+      credId =>
+        mongoCache.removeByKeyWithCacheMiss(authContext.user.oid, credId, key).map(toCacheMap)
+    }
 
   /**
     * Saves the given cache map into the mongo store

@@ -142,20 +142,22 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
   /**
     * Removes the item with the specified key from the cache
     */
-  def removeByKey[T](id: String, key: String)(implicit writes: Writes[T]): Future[Cache] = {
+  def removeByKeyWithCacheMiss[T](id: String, newId: String, key: String)(implicit writes: Writes[T]): Future[Cache] = {
 
-    fetchAll(id) flatMap { maybeCache =>
-      val cache = maybeCache.getOrElse(Cache(id, Map.empty))
+    fetchAll(newId, false) flatMap { maybeNewCache =>
+      fetchAll(id, true) flatMap { maybeCache =>
+        val cache = maybeNewCache.getOrElse(maybeCache.getOrElse(Cache(newId, Map.empty)))
 
-      val updatedCache = cache.copy(
-        data = cache.data - (key),
-        lastUpdated = DateTime.now(DateTimeZone.UTC)
-      )
+        val updatedCache = cache.copy(
+          data = cache.data - (key),
+          lastUpdated = DateTime.now(DateTimeZone.UTC)
+        )
 
-      val document = Json.toJson(updatedCache)
-      val modifier = BSONDocument("$set" -> document)
+        val document = Json.toJson(updatedCache)
+        val modifier = BSONDocument("$set" -> document)
 
-      collection.update(bsonIdQuery(id), modifier, upsert = true) map { _ => updatedCache }
+        collection.update(bsonIdQuery(id), modifier, upsert = true) map { _ => updatedCache }
+      }
     }
   }
 
