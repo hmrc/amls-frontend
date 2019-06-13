@@ -145,19 +145,18 @@
                 }
         }
 
-        @if(ApplicationConfig.phase2ChangesToggle) {
-            @person.dateOfBirth.map { dateOfBirth =>
 
-                @detailedAnswers(
-                    question = Messages("responsiblepeople.detailed_answers.dob", personName),
-                    editUrl = controllers.responsiblepeople.routes.DateOfBirthController.get(idx, true, flow).toString(),
-                    dataItem = Some(dateOfBirth),
-                    editLinkTag = "date-of-birth"
-                ) { dob =>
-                    <p>@DateHelper.formatDate(dob.dateOfBirth)</p>
-                }
+        @person.dateOfBirth.map { dateOfBirth =>
 
+            @detailedAnswers(
+                question = Messages("responsiblepeople.detailed_answers.dob", personName),
+                editUrl = controllers.responsiblepeople.routes.DateOfBirthController.get(idx, true, flow).toString(),
+                dataItem = Some(dateOfBirth),
+                editLinkTag = "date-of-birth"
+            ) { dob =>
+                <p>@DateHelper.formatDate(dob.dateOfBirth)</p>
             }
+
         }
 
         @detailedAnswers(
@@ -215,21 +214,6 @@
                 }
             }
 
-        }
-
-        @if(!ApplicationConfig.phase2ChangesToggle) {
-            @person.dateOfBirth.map { dateOfBirth =>
-
-                @detailedAnswers(
-                    question = Messages("responsiblepeople.detailed_answers.dob", personName),
-                    editUrl = controllers.responsiblepeople.routes.DateOfBirthController.get(idx, true, flow).toString(),
-                    dataItem = Some(dateOfBirth),
-                    editLinkTag = "date-of-birth"
-                ) { dob =>
-                    <p>@DateHelper.formatDate(dob.dateOfBirth)</p>
-                }
-
-            }
         }
 
         @detailedAnswers(
