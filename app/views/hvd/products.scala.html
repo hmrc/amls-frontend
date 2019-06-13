@@ -22,7 +22,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("hvd.products.title", "summary.hvd")
 }
 
 @main(
@@ -30,42 +29,29 @@
     heading = header
 ) {
 
-    <p>@hint(Messages("lbl.select.all"))</p>
-
     @form(f, controllers.hvd.routes.ProductsController.post(edit)) {
 
-        @fieldset(
-            f = f("products-fieldset"),
-            legend = "hvd.products.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("products"),
+            heading = "hvd.products.title",
+            section = "summary.hvd",
+            hint = "lbl.select.all",
             panel = false
         ) {
-            @errorGroup(
-                field = f("products")
-            ) {
-                @checkbox(f = f("products[]"), labelText = "hvd.products.option.01", value = "01")
-                @checkbox(f = f("products[]"), labelText = "hvd.products.option.03", value = "03")
-                @checkbox(f = f("products[]"), labelText = "hvd.products.option.06", value = "06")
-                @checkbox(f = f("products[]"), labelText = "hvd.products.option.04", value = "04")
-                @checkbox(f = f("products[]"), labelText = "hvd.products.option.11", value = "11")
-                @checkbox(f = f("products[]"), labelText = "hvd.products.option.08", value = "08")
-                @checkbox(f = f("products[]"), labelText = "hvd.products.option.07", value = "07")
-                @checkbox(f = f("products[]"), labelText = "hvd.products.option.10", value = "10")
-                @checkbox(f = f("products[]"), labelText = "hvd.products.option.05", value = "05")
-                @checkbox(f = f("products[]"), labelText = "hvd.products.option.09", value = "09")
-                @checkbox(f = f("products[]"), labelText = "hvd.products.option.02", value = "02")
-                @checkbox(f = f("products[]"), labelText = "hvd.products.option.12", value = "12", target = s".otherDetails-fieldset")
-            }
-        }
-
-        @fieldset(
-            f = f("otherDetails-fieldset"),
-            legend = "lbl.give.details",
-            legendHidden = true,
-            jsHidden = true,
-            classes = Seq("otherDetails-fieldset")
-        ) {
+            @checkbox(f = f("products[]"), labelText = "hvd.products.option.01", value = "01")
+            @checkbox(f = f("products[]"), labelText = "hvd.products.option.03", value = "03")
+            @checkbox(f = f("products[]"), labelText = "hvd.products.option.06", value = "06")
+            @checkbox(f = f("products[]"), labelText = "hvd.products.option.04", value = "04")
+            @checkbox(f = f("products[]"), labelText = "hvd.products.option.11", value = "11")
+            @checkbox(f = f("products[]"), labelText = "hvd.products.option.08", value = "08")
+            @checkbox(f = f("products[]"), labelText = "hvd.products.option.07", value = "07")
+            @checkbox(f = f("products[]"), labelText = "hvd.products.option.10", value = "10")
+            @checkbox(f = f("products[]"), labelText = "hvd.products.option.05", value = "05")
+            @checkbox(f = f("products[]"), labelText = "hvd.products.option.09", value = "09")
+            @checkbox(f = f("products[]"), labelText = "hvd.products.option.02", value = "02")
+            @checkbox(f = f("products[]"), labelText = "hvd.products.option.12", value = "12", target = "[data-reveal='other-details']")
             @input(
+                data = "other-details",
                 panel = true,
                 field = f("otherDetails"),
                 labelText = "lbl.give.details"
