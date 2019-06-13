@@ -16,9 +16,11 @@
 
 package connectors
 
+import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolments}
 import uk.gov.hmrc.domain.{CtUtr, Org, SaUtr}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.{CtAccount, OrgAccount, SaAccount}
+import utils.UrlSafe
 
 object ConnectorHelper {
 
@@ -37,14 +39,38 @@ object ConnectorHelper {
     }
   }
 
-  protected[connectors] def accountTypeAndIdFromEnrolments(): (String, String) = {
+  protected[connectors] def accountTypeAndIdFromEnrolments(affinityGroup: AffinityGroup,
+                                                           enrolments: Enrolments,
+                                                           credId: String): (String, String) = {
 
-    // Need to figure out the account type and id from new auth... Enrolments?
-    val accountType = ???
-    val accountId = ???
-    (accountType, accountId)
+    /*
+     * Set the `accountType` to `"org"` if `affinityGroup = "Organisation"` (which you get through retrievals)
+     * Set the `accountId` as a hash of the CredId. Its possible to get the `credId` through retrievals
+     */
 
+    /*
+     * For an affinity group other than Org;
+     * Retrieve the enrolments through retrievals.
+     * If one of them is `"IR-SA"`, you can set `accountType` to `"sa"` and `accountId` to the `value` for `key` `"UTR"`
+     * If one of them is `"IR-CT"`, you can set `accountType` to `"ct"` and `accountId` to the `value` for `key` `"UTR"`
+     */
+
+    affinityGroup match {
+      case AffinityGroup.Organisation => ("org", UrlSafe.hash(credId))
+      case _ =>
+
+        val sa = for {
+          enrolment <- enrolments.getEnrolment("IR-SA")
+          utr       <- enrolment.getIdentifier("UTR")
+        } yield "sa" -> utr.value
+
+        val ct = for {
+          enrolment <- enrolments.getEnrolment("IR-CT")
+          utr       <- enrolment.getIdentifier("UTR")
+        } yield "ct" -> utr.value
+
+        (sa orElse ct).getOrElse(throw new IllegalArgumentException("auth does not contain any of the expected account types"))
+    }
   }
-
 }
 

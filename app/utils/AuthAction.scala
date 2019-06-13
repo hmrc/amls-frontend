@@ -23,7 +23,7 @@ import javax.inject.Inject
 import models.ReturnLocation
 import play.api.mvc._
 import play.api.mvc.Results.Redirect
-import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, User, AuthConnector => NewAuthConnector}
+import uk.gov.hmrc.auth.core.{AffinityGroup, AuthorisationException, AuthorisedFunctions, Enrolments, User, AuthConnector => NewAuthConnector}
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
@@ -31,7 +31,7 @@ import uk.gov.hmrc.play.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
 
-final case class AuthorisedRequest[A](request: Request[A], amlsRefNumber: Option[String], cacheId: String) extends WrappedRequest[A](request)
+final case class AuthorisedRequest[A](request: Request[A], amlsRefNumber: Option[String], cacheId: String, affinityGroup: AffinityGroup, enrolments: Enrolments) extends WrappedRequest[A](request)
 
 class AuthAction @Inject() (
                              val authConnector: NewAuthConnector
@@ -48,16 +48,10 @@ class AuthAction @Inject() (
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
 
-    // TODO - what else might we need?
-    // ac.principal.accounts
-
-    authorised(User).retrieve(Retrievals.allEnrolments and Retrievals.internalId) {
-      case enrolments ~ Some(internalId) =>
-
-        val identifiers = enrolments.getEnrolment(amlsKey).map(_.identifiers)
-
+    authorised(User).retrieve(Retrievals.allEnrolments and Retrievals.internalId and Retrievals.affinityGroup) {
+      case enrolments ~ Some(internalId) ~ Some(affinityGroup)=>
         val amlsRefNumber = enrolments.getEnrolment(amlsKey).map(_.key)
-        Future.successful(Right(AuthorisedRequest(request, amlsRefNumber, internalId)))
+        Future.successful(Right(AuthorisedRequest(request, amlsRefNumber, internalId, affinityGroup, enrolments)))
       case _ =>
         Future.successful(Left(Redirect(Call("GET", signoutUrl))))
     }.recover[Either[Result, AuthorisedRequest[A]]] {
