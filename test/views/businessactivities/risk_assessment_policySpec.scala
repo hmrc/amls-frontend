@@ -17,7 +17,7 @@
 package views.businessactivities
 
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessactivities.{RiskAssessmentPolicy, RiskAssessmentPolicyNo}
+import models.businessactivities.RiskAssessmentHasPolicy
 import org.scalatest.MustMatchers
 import utils.AmlsSpec
 import jto.validation.Path
@@ -35,7 +35,7 @@ class risk_assessment_policySpec extends AmlsSpec with MustMatchers {
   "risk_assessment_policy view" must {
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[RiskAssessmentPolicy] = Form2(RiskAssessmentPolicyNo)
+      val form2: ValidForm[RiskAssessmentHasPolicy] = Form2(RiskAssessmentHasPolicy(false))
 
       def view = views.html.businessactivities.risk_assessment_policy(form2, true)
 
@@ -44,7 +44,7 @@ class risk_assessment_policySpec extends AmlsSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[RiskAssessmentPolicy] = Form2(RiskAssessmentPolicyNo)
+      val form2: ValidForm[RiskAssessmentHasPolicy] = Form2(RiskAssessmentHasPolicy(false))
 
       def view = views.html.businessactivities.risk_assessment_policy(form2, true)
 
@@ -57,21 +57,15 @@ class risk_assessment_policySpec extends AmlsSpec with MustMatchers {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "hasPolicy") -> Seq(ValidationError("not a message Key")),
-          (Path \ "riskassessments") -> Seq(ValidationError("second not a message Key"))
+          (Path \ "hasPolicy") -> Seq(ValidationError("not a message Key"))
         ))
 
       def view = views.html.businessactivities.risk_assessment_policy(form2, true)
 
       errorSummary.html() must include("not a message Key")
-      errorSummary.html() must include("second not a message Key")
 
       doc.getElementById("hasPolicy")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
-
-      doc.getElementById("riskassessments")
-        .getElementsByClass("error-notification").first().html() must include("second not a message Key")
-
     }
 
     "have a back link" in new ViewFixture {

@@ -116,7 +116,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
       customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
       ncaRegistered = Some(NCARegistered(true)),
       accountantForAMLSRegulations = Some(AccountantForAMLSRegulations(true)),
-      riskAssessmentPolicy = Some(RiskAssessmentPolicyYes(Set(PaperBased))),
+      riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(PaperBased)))),
       howManyEmployees = Some(HowManyEmployees(Some("5"), Some("4"))),
       identifySuspiciousActivity = Some(IdentifySuspiciousActivity(true)),
       whoIsYourAccountant = Some(WhoIsYourAccountant("Accountant's name", Some("Accountant's trading name"),

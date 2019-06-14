@@ -16,8 +16,7 @@
 
 package typeclasses.confirmation
 
-import config.ApplicationConfig
-import models.businessmatching.{BusinessActivity, TrustAndCompanyServices, MoneyServiceBusiness => MSB}
+import models.businessmatching.BusinessActivity
 import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.ResponsiblePerson
 import models.{AmendVariationRenewalResponse, SubmissionResponse}
@@ -30,13 +29,6 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
              activities: Set[BusinessActivity],
              people: Option[Seq[ResponsiblePerson]]
            ): Seq[BreakdownRow]
-
-  val showBreakdown = (fpFee: Option[BigDecimal], activities: Set[BusinessActivity]) =>
-    if (ApplicationConfig.phase2ChangesToggle) {
-      true
-    } else {
-      fpFee.fold(activities.exists(act => act == MSB || act == TrustAndCompanyServices)) { _ => true }
-    }
 
   val splitPeopleByFitAndProperTest = (people: Seq[ResponsiblePerson]) =>
     ResponsiblePerson.filter(people).partition(_.approvalFlags.hasAlreadyPassedFitAndProper.getOrElse(false))
@@ -119,7 +111,7 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
   }
 }
 
-object ResponsiblePeopleRowsInstancesPhase2 {
+object ResponsiblePeopleRowsInstances {
 
   implicit val responsiblePeopleRowsFromSubscription: ResponsiblePeopleRows[SubmissionResponse] =
     new ResponsiblePeopleRows[SubmissionResponse] {
@@ -141,78 +133,6 @@ object ResponsiblePeopleRowsInstancesPhase2 {
                  people: Option[Seq[ResponsiblePerson]]): Seq[BreakdownRow] = {
 
         createBreakdownRowForAmendVariationRenewalResponse(value, people, activities)
-      }
-    }
-  }
-}
-
-object ResponsiblePeopleRowsInstances {
-
-  implicit val responsiblePeopleRowsFromSubscription: ResponsiblePeopleRows[SubmissionResponse] =
-    new ResponsiblePeopleRows[SubmissionResponse] {
-      def apply(
-                 value: SubmissionResponse,
-                 activities: Set[BusinessActivity],
-                 people: Option[Seq[ResponsiblePerson]]
-               ): Seq[BreakdownRow] = {
-
-        if (!ApplicationConfig.phase2ChangesToggle) {
-
-          val firstSeq = people.fold(Seq.empty[BreakdownRow]) { responsiblePeople =>
-            if (showBreakdown(value.getFpFee, activities)) {
-              splitPeopleByFitAndProperTest(responsiblePeople) match {
-                case (_, notFP) if notFP.nonEmpty =>
-                  Seq(
-                    BreakdownRow(
-                      peopleRow(value).message,
-                      notFP.size,
-                      peopleRow(value).feePer,
-                      Currency.fromBD(value.getFpFee.getOrElse(0))
-                    ))
-
-                case (_, _) => Seq.empty
-              }
-            } else {
-              Seq.empty
-            }
-          }
-          firstSeq
-        } else {
-          createBreakdownRowForSubmissionResponse(value, people, activities)
-        }
-      }
-    }
-
-  implicit val responsiblePeopleRowsFromVariation: ResponsiblePeopleRows[AmendVariationRenewalResponse] = {
-    new ResponsiblePeopleRows[AmendVariationRenewalResponse] {
-      override def apply(
-                          value: AmendVariationRenewalResponse,
-                          activities: Set[BusinessActivity],
-                          people: Option[Seq[ResponsiblePerson]]): Seq[BreakdownRow] = {
-
-        if (!ApplicationConfig.phase2ChangesToggle) {
-
-          val firstSeq = if (showBreakdown(value.getFpFee, activities)) {
-
-            val notFP = value.addedResponsiblePeople
-
-            if (notFP > 0) {
-              Seq(BreakdownRow(
-                peopleVariationRow(value).message,
-                notFP,
-                peopleVariationRow(value).feePer,
-                Currency.fromBD(value.getFpFee.getOrElse(0))
-              ))
-            } else {
-              Seq.empty
-            }
-          } else {
-            Seq.empty
-          }
-          firstSeq
-        } else {
-          createBreakdownRowForAmendVariationRenewalResponse(value, people, activities)
-        }
       }
     }
   }

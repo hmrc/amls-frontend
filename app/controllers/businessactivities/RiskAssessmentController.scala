@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessactivities.{BusinessActivities, RiskAssessmentPolicy}
+import models.businessactivities.{BusinessActivities, RiskAssessmentHasPolicy, RiskAssessmentPolicy}
 import models.businessmatching.BusinessMatching
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
@@ -36,10 +36,10 @@ class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConne
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
         response =>
-          val form: Form2[RiskAssessmentPolicy] = (for {
+          val form: Form2[RiskAssessmentHasPolicy] = (for {
             businessActivities <- response
             riskAssessmentPolicy <- businessActivities.riskAssessmentPolicy
-          } yield Form2[RiskAssessmentPolicy](riskAssessmentPolicy)).getOrElse(EmptyForm)
+          } yield Form2[RiskAssessmentHasPolicy](riskAssessmentPolicy.hasPolicy)).getOrElse(EmptyForm)
           Ok(risk_assessment_policy(form, edit))
       }
   }
@@ -47,10 +47,10 @@ class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConne
   def post(edit: Boolean = false) = Authorised.async {
     import jto.validation.forms.Rules._
     implicit authContext => implicit request =>
-      Form2[RiskAssessmentPolicy](request.body) match {
+      Form2[RiskAssessmentHasPolicy](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(risk_assessment_policy(f, edit)))
-        case ValidForm(_, data) => {
+        case ValidForm(_, data: RiskAssessmentHasPolicy) => {
           dataCacheConnector.fetchAll flatMap { maybeCache =>
             val businessMatching = for {
               cacheMap <- maybeCache
@@ -59,9 +59,8 @@ class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConne
 
             for {
               businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
-              _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key, businessActivities.riskAssessmentPolicy(data))
-            } yield redirectDependingOnEdit(edit, ControllerHelper.isAccountancyServicesSelected(Some(businessMatching)))
-
+              _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key, businessActivities.riskAssessmentHasPolicy(data))
+            } yield redirectDependingOnAccountancyServices(ControllerHelper.isAccountancyServicesSelected(Some(businessMatching)), data)
           }
         } recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
@@ -69,11 +68,10 @@ class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConne
       }
   }
 
-  private def redirectDependingOnEdit(edit: Boolean, accountancyServices: Boolean) = edit match {
-    case true => Redirect(routes.SummaryController.get())
-    case false => accountancyServices match {
+  private def redirectDependingOnAccountancyServices(accountancyServices: Boolean, data: RiskAssessmentHasPolicy) =
+    accountancyServices match {
+      case _ if data == RiskAssessmentHasPolicy(true) => Redirect(routes.DocumentRiskAssessmentController.get())
       case true => Redirect(routes.SummaryController.get())
       case false => Redirect(routes.AccountantForAMLSRegulationsController.get())
     }
-  }
 }

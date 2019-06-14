@@ -80,8 +80,6 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   lazy val peopleFeeRate = getConfigInt("amounts.people")
   lazy val approvalCheckPeopleFeeRate = getConfigInt("amounts.approval-check-rate")
 
-  def phase2ChangesToggle: Boolean = getConfBool("feature-toggle.phase-2-changes", false)
-
   override def refreshProfileToggle = getConfBool("feature-toggle.refresh-profile", false)
 
   override def frontendBaseUrl = {
@@ -105,8 +103,6 @@ class AppConfig @Inject()(environment: Environment, val runModeConfiguration: Co
   def enrolmentStoreToggle = getConfBool("feature-toggle.enrolment-store", defBool = false)
 
   def fxEnabledToggle = getConfBool("feature-toggle.fx-enabled", defBool = false)
-
-  def phase2ChangesToggle = getConfBool("feature-toggle.phase-2-changes", defBool = false)
 
   def authUrl = baseUrl("auth")
 

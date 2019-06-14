@@ -18,7 +18,7 @@ package models.responsiblepeople
 
 import controllers.responsiblepeople.NinoUtil
 import models.Country
-import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ZeroToFiveMonths}
+import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ZeroToFiveMonths}
 import org.joda.time.LocalDate
 import play.api.libs.json.Json
 import uk.gov.hmrc.domain.Nino
@@ -88,31 +88,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     val training = TrainingNo
   }
 
-  val completeModelUkResident = ResponsiblePerson(
-    personName = Some(DefaultValues.personName),
-    legalName = Some(DefaultValues.legalName),
-    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
-    knownBy = None,
-    personResidenceType = Some(DefaultValues.personResidenceTypeUk),
-    ukPassport = None,
-    nonUKPassport = None,
-    dateOfBirth = None,
-    contactDetails = Some(DefaultValues.contactDetails),
-    addressHistory = Some(DefaultValues.addressHistory),
-    positions = Some(DefaultValues.positions),
-    saRegistered = Some(DefaultValues.saRegistered),
-    vatRegistered = Some(DefaultValues.vatRegistered),
-    experienceTraining = Some(DefaultValues.experienceTraining),
-    training = Some(DefaultValues.training),
-    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
-    hasChanged = false,
-    hasAccepted = false,
-    lineId = Some(1),
-    status = Some(StatusConstants.Unchanged),
-    endDate = None,
-    soleProprietorOfAnotherBusiness = Some(DefaultValues.soleProprietorOfAnotherBusiness)
-  )
-  val incompleteModelUkResidentNoDOBPhase2 = ResponsiblePerson(
+  val completeModelUkResidentFPtrue = ResponsiblePerson(
     personName = Some(DefaultValues.personName),
     legalName = Some(DefaultValues.legalName),
     legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
@@ -137,7 +113,32 @@ trait ResponsiblePeopleValues extends NinoUtil {
     soleProprietorOfAnotherBusiness = Some(DefaultValues.soleProprietorOfAnotherBusiness)
   )
 
-  val completeModelUkResidentPhase2 = ResponsiblePerson(
+  val incompleteModelUkResidentNoDOB = ResponsiblePerson(
+    personName = Some(DefaultValues.personName),
+    legalName = Some(DefaultValues.legalName),
+    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
+    knownBy = None,
+    personResidenceType = Some(DefaultValues.personResidenceTypeUk),
+    ukPassport = None,
+    nonUKPassport = None,
+    dateOfBirth = None,
+    contactDetails = Some(DefaultValues.contactDetails),
+    addressHistory = Some(DefaultValues.addressHistory),
+    positions = Some(DefaultValues.positions),
+    saRegistered = Some(DefaultValues.saRegistered),
+    vatRegistered = Some(DefaultValues.vatRegistered),
+    experienceTraining = Some(DefaultValues.experienceTraining),
+    training = Some(DefaultValues.training),
+    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
+    hasChanged = false,
+    hasAccepted = false,
+    lineId = Some(1),
+    status = Some(StatusConstants.Unchanged),
+    endDate = None,
+    soleProprietorOfAnotherBusiness = Some(DefaultValues.soleProprietorOfAnotherBusiness)
+  )
+
+  val completeModelUkResident = ResponsiblePerson(
     personName = Some(DefaultValues.personName),
     legalName = Some(DefaultValues.legalName),
     legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
@@ -170,31 +171,6 @@ trait ResponsiblePeopleValues extends NinoUtil {
     personResidenceType = Some(DefaultValues.personResidenceTypeUk),
     ukPassport = None,
     nonUKPassport = None,
-    dateOfBirth = None,
-    contactDetails = Some(DefaultValues.contactDetails),
-    addressHistory = Some(DefaultValues.addressHistory),
-    positions = Some(DefaultValues.positions),
-    saRegistered = Some(DefaultValues.saRegistered),
-    vatRegistered = Some(DefaultValues.vatRegistered),
-    experienceTraining = Some(DefaultValues.experienceTraining),
-    training = Some(DefaultValues.training),
-    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
-    hasChanged = false,
-    hasAccepted = false,
-    lineId = Some(1),
-    status = Some(StatusConstants.Unchanged),
-    endDate = None,
-    soleProprietorOfAnotherBusiness = Some(DefaultValues.soleProprietorOfAnotherBusiness)
-  )
-
-  val completeModelUkResidentForOldDataPhase2 = ResponsiblePerson(
-    personName = Some(DefaultValues.personName),
-    legalName = Some(DefaultValues.legalName),
-    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
-    knownBy = None,
-    personResidenceType = Some(DefaultValues.personResidenceTypeUk),
-    ukPassport = None,
-    nonUKPassport = None,
     dateOfBirth = Some(DefaultValues.dateOfBirth),
     contactDetails = Some(DefaultValues.contactDetails),
     addressHistory = Some(DefaultValues.addressHistory),
@@ -220,31 +196,6 @@ trait ResponsiblePeopleValues extends NinoUtil {
     personResidenceType = Some(DefaultValues.personResidenceTypeUk),
     ukPassport = None,
     nonUKPassport = None,
-    dateOfBirth = None,
-    contactDetails = Some(DefaultValues.contactDetails),
-    addressHistory = Some(DefaultValues.addressHistory),
-    positions = Some(DefaultValues.positions),
-    saRegistered = Some(DefaultValues.saRegistered),
-    vatRegistered = Some(DefaultValues.vatRegistered),
-    experienceTraining = Some(DefaultValues.experienceTraining),
-    training = Some(DefaultValues.training),
-    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
-    hasChanged = false,
-    hasAccepted = false,
-    lineId = Some(1),
-    status = Some(StatusConstants.Unchanged),
-    endDate = None,
-    soleProprietorOfAnotherBusiness = Some(DefaultValues.soleProprietorOfAnotherBusiness)
-  )
-
-  val completeModelUkResidentForOldDataNoPreviousPhase2 = ResponsiblePerson(
-    personName = Some(DefaultValues.personName),
-    legalName = None,
-    legalNameChangeDate = None,
-    knownBy = None,
-    personResidenceType = Some(DefaultValues.personResidenceTypeUk),
-    ukPassport = None,
-    nonUKPassport = None,
     dateOfBirth = Some(DefaultValues.dateOfBirth),
     contactDetails = Some(DefaultValues.contactDetails),
     addressHistory = Some(DefaultValues.addressHistory),
@@ -262,57 +213,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     soleProprietorOfAnotherBusiness = Some(DefaultValues.soleProprietorOfAnotherBusiness)
   )
 
-  val completeModelNonUkResidentNonUkPassport = ResponsiblePerson(
-    personName = Some(DefaultValues.personName),
-    legalName = Some(DefaultValues.legalName),
-    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
-    knownBy = Some(DefaultValues.knownBy),
-    personResidenceType = Some(DefaultValues.personResidenceTypeNonUk),
-    ukPassport = Some(DefaultValues.ukPassportNo),
-    nonUKPassport = Some(DefaultValues.nonUKPassportYes),
-    dateOfBirth = Some(DefaultValues.dateOfBirth),
-    contactDetails = Some(DefaultValues.contactDetails),
-    addressHistory = Some(DefaultValues.addressHistory),
-    positions = Some(DefaultValues.positions),
-    saRegistered = Some(DefaultValues.saRegistered),
-    vatRegistered = Some(DefaultValues.vatRegistered),
-    experienceTraining = Some(DefaultValues.experienceTraining),
-    training = Some(DefaultValues.training),
-    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
-    hasChanged = false,
-    hasAccepted = false,
-    lineId = Some(1),
-    status = Some(StatusConstants.Unchanged),
-    endDate = None,
-    soleProprietorOfAnotherBusiness = Some(DefaultValues.soleProprietorOfAnotherBusiness)
-  )
-
-  val completeModelNonUkResidentNonUkPassportNoPreviousName = ResponsiblePerson(
-    personName = Some(DefaultValues.personName),
-    legalName = Some(DefaultValues.legalName),
-    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
-    knownBy = Some(DefaultValues.knownBy),
-    personResidenceType = Some(DefaultValues.personResidenceTypeNonUk),
-    ukPassport = Some(DefaultValues.ukPassportNo),
-    nonUKPassport = Some(DefaultValues.nonUKPassportYes),
-    dateOfBirth = Some(DefaultValues.dateOfBirth),
-    contactDetails = Some(DefaultValues.contactDetails),
-    addressHistory = Some(DefaultValues.addressHistory),
-    positions = Some(DefaultValues.positions),
-    saRegistered = Some(DefaultValues.saRegistered),
-    vatRegistered = Some(DefaultValues.vatRegistered),
-    experienceTraining = Some(DefaultValues.experienceTraining),
-    training = Some(DefaultValues.training),
-    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
-    hasChanged = false,
-    hasAccepted = false,
-    lineId = Some(1),
-    status = Some(StatusConstants.Unchanged),
-    endDate = None,
-    soleProprietorOfAnotherBusiness = Some(DefaultValues.soleProprietorOfAnotherBusiness)
-  )
-
-  val completeModelUkResidentNoPreviousNamePhase2 = ResponsiblePerson(
+  val completeModelUkResidentNoPreviousName = ResponsiblePerson(
     personName = Some(DefaultValues.personName),
     legalName = Some(DefaultValues.legalName),
     legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
@@ -337,63 +238,6 @@ trait ResponsiblePeopleValues extends NinoUtil {
     soleProprietorOfAnotherBusiness = Some(DefaultValues.soleProprietorOfAnotherBusiness)
   )
 
-
-  val completeModelNonUkResidentNoPassport = ResponsiblePerson(
-    personName = Some(DefaultValues.personName),
-    legalName = Some(DefaultValues.legalName),
-    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
-    knownBy = None,
-    personResidenceType = Some(DefaultValues.personResidenceTypeNonUk),
-    ukPassport = Some(DefaultValues.ukPassportNo),
-    nonUKPassport = Some(DefaultValues.nonUKPassportNo),
-    dateOfBirth = Some(DefaultValues.dateOfBirth),
-    contactDetails = Some(DefaultValues.contactDetails),
-    addressHistory = Some(DefaultValues.addressHistory),
-    positions = Some(DefaultValues.positions),
-    saRegistered = Some(DefaultValues.saRegistered),
-    vatRegistered = Some(DefaultValues.vatRegistered),
-    experienceTraining = Some(DefaultValues.experienceTraining),
-    training = Some(DefaultValues.training),
-    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
-    hasChanged = false,
-    hasAccepted = false,
-    lineId = Some(1),
-    status = Some(StatusConstants.Unchanged),
-    endDate = None,
-    soleProprietorOfAnotherBusiness = Some(DefaultValues.soleProprietorOfAnotherBusiness)
-  )
-
-  val completeModelNonUkResidentUkPassport = ResponsiblePerson(
-    Some(DefaultValues.personName),
-    Some(DefaultValues.legalName),
-    Some(new LocalDate(1990, 2, 24)),
-    None,
-    Some(DefaultValues.personResidenceTypeNonUk),
-    Some(DefaultValues.ukPassportYes),
-    None,
-    Some(DefaultValues.dateOfBirth),
-    Some(DefaultValues.contactDetails),
-    Some(DefaultValues.addressHistory),
-    Some(DefaultValues.positions),
-    Some(DefaultValues.saRegistered),
-    Some(DefaultValues.vatRegistered),
-    Some(DefaultValues.experienceTraining),
-    Some(DefaultValues.training),
-    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
-    false,
-    false,
-    Some(1),
-    Some(StatusConstants.Unchanged),
-    None,
-    Some(DefaultValues.soleProprietorOfAnotherBusiness)
-  )
-
-  val incompleteAddressHistoryPerson = completeModelUkResident.copy(
-    addressHistory = Some(DefaultValues.addressHistory.copy(
-      currentAddress = Some(DefaultValues.currentAddress.copy(timeAtAddress = Some(ZeroToFiveMonths))),
-      additionalAddress = Some(DefaultValues.additionalAddress.copy(timeAtAddress = Some(SixToElevenMonths)))
-    )))
-
   val incompleteResponsiblePeople = ResponsiblePerson(
     personName = Some(DefaultValues.personName),
     legalName = Some(DefaultValues.legalName),
@@ -405,44 +249,6 @@ trait ResponsiblePeopleValues extends NinoUtil {
     dateOfBirth = None,
     contactDetails = Some(DefaultValues.contactDetails),
     addressHistory = Some(DefaultValues.addressHistory)
-  )
-
-  val incompleteResponsiblePeopleUpToUkResident = ResponsiblePerson(
-    personName = Some(DefaultValues.personName),
-    legalName = Some(DefaultValues.legalName),
-    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
-    knownBy = None,
-    personResidenceType = Some(DefaultValues.personResidenceTypeNonUk)
-  )
-
-  val incompleteResponsiblePeopleUpToUkPassportNumber = ResponsiblePerson(
-    personName = Some(DefaultValues.personName),
-    legalName = Some(DefaultValues.legalName),
-    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
-    knownBy = None,
-    personResidenceType = Some(DefaultValues.personResidenceTypeNonUk),
-    ukPassport = Some(DefaultValues.ukPassportYes)
-  )
-
-  val incompleteResponsiblePeopleUpToNonUkPassportNumber = ResponsiblePerson(
-    personName = Some(DefaultValues.personName),
-    legalName = Some(DefaultValues.legalName),
-    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
-    knownBy = None,
-    personResidenceType = Some(DefaultValues.personResidenceTypeNonUk),
-    ukPassport = None,
-    nonUKPassport = Some(DefaultValues.nonUKPassportYes)
-  )
-
-  val incompleteResponsiblePeopleUpToNoNonUkPassportDateOfBirth = ResponsiblePerson(
-    personName = Some(DefaultValues.personName),
-    legalName = Some(DefaultValues.legalName),
-    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
-    knownBy = None,
-    personResidenceType = Some(DefaultValues.personResidenceTypeNonUk),
-    ukPassport = None,
-    nonUKPassport = Some(DefaultValues.nonUKPassportNo),
-    dateOfBirth = Some(DefaultValues.dateOfBirth)
   )
 
   val incompleteJsonCurrent = Json.obj(
@@ -1045,7 +851,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     "status" -> "Unchanged"
   )
 
-  val completeJsonPresentUkResidentFitAndProperPhase2 = Json.obj(
+  val completeJsonPresentUkResidentFitAndProper = Json.obj(
     "personName" -> Json.obj(
       "firstName" -> "first",
       "middleName" -> "middle",
@@ -1122,7 +928,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     "status" -> "Unchanged"
   )
 
-  val completeJsonPresentUkResidentFitAndProperApprovalPhase2 = Json.obj(
+  val completeJsonPresentUkResidentFitAndProperApproval = Json.obj(
     "personName" -> Json.obj(
       "firstName" -> "first",
       "middleName" -> "middle",

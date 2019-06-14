@@ -27,7 +27,8 @@
     jsHidden: Boolean = false,
     legendHidden: Boolean = false,
     heading: String = "",
-    section: String = ""
+    section: String = "",
+    supportingContent: Html = HtmlFormat.empty
 )(implicit lang:Lang,  m: Messages)
 
 @field = @{ f(p) }
@@ -44,7 +45,8 @@
         @legend(
             legend = labelText,
             legendHidden = legendHidden,
-            heading = heading
+            heading = heading,
+            supportingContent = supportingContent
         )
         @if(hintText.nonEmpty) {
             <span class="form-field--hint">@Messages(hintText)</span>

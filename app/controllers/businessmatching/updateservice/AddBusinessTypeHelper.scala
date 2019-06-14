@@ -135,14 +135,10 @@ class AddBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
     val indices = model.responsiblePeople.fold[Set[Int]](Set.empty)(_.index)
 
     OptionT(dataCacheConnector.update[Seq[ResponsiblePerson]](ResponsiblePerson.key) {
-      case Some(people) if (appConfig.phase2ChangesToggle || isMsbOrTcsp(model)) =>
-        responsiblePeopleService.updateFitAndProperFlag(people, indices, updateApprovalMsbOrTcsp(model))
-      case Some(people) => people
+      case Some(people) =>
+        responsiblePeopleService.updateFitAndProperFlag(people, indices, isMsbOrTcsp(model))
+      case _ => throw new RuntimeException("No responsible people found")
     })
-  }
-
-  def updateApprovalMsbOrTcsp(model: AddBusinessTypeFlowModel) = {
-    appConfig.phase2ChangesToggle && isMsbOrTcsp(model)
   }
 
   def isMsbOrTcsp(model: AddBusinessTypeFlowModel) = {

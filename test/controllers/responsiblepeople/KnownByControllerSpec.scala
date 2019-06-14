@@ -20,8 +20,6 @@ import config.AppConfig
 import connectors.DataCacheConnector
 import models.responsiblepeople.{KnownBy, PersonName, ResponsiblePerson}
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo}
-import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
@@ -100,34 +98,13 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
 
     "post is called" must {
       "form is valid" must {
-        "go to PersonResidentTypeController" when {
-          "edit is false and phase-2-change feature toggle is false" in new TestFixture {
-
-            val requestWithParams = request.withFormUrlEncodedBody(
-              "hasOtherNames" -> "true",
-              "otherNames" -> "otherName"
-            )
-
-            when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
-
-            mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
-            mockCacheSave[KnownBy]
-
-            val result = controller.post(RecordId)(requestWithParams)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.PersonResidentTypeController.get(RecordId).url))
-          }
-        }
-
         "go to DateOfBirthController" when {
-          "edit is false and phase-2-change feature toggle is true" in new TestFixture {
+          "edit is false" in new TestFixture {
 
             val requestWithParams = request.withFormUrlEncodedBody(
               "hasOtherNames" -> "true",
               "otherNames" -> "otherName"
             )
-
-            when(mockAppConfig.phase2ChangesToggle).thenReturn(true)
 
             mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
             mockCacheSave[KnownBy]

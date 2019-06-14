@@ -23,7 +23,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("bankdetails.bankaccount.accountname.title", "summary.bankdetails")
 }
 
 @main(
@@ -36,7 +35,9 @@
         controllers.bankdetails.routes.BankAccountNameController.postNoIndex()
     }) {
         @input(
-            field = f("accountName")
+            field = f("accountName"),
+            heading = "bankdetails.bankaccount.accountname.title",
+            section = "summary.bankdetails"
         )
 
         @submit(edit)

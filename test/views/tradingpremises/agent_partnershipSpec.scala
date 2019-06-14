@@ -38,7 +38,7 @@ class agent_partnershipSpec extends AmlsSpec with MustMatchers {
       def view = views.html.tradingpremises.agent_partnership(form2, 1, false)
 
       doc.title() must startWith(Messages("tradingpremises.agentpartnership.title") + " - " + Messages("summary.tradingpremises"))
-      heading.html() must be(Messages("tradingpremises.agentpartnership.title"))
+      heading.html() must include(Messages("tradingpremises.agentpartnership.title"))
       subHeading.html() must include(Messages("summary.tradingpremises"))
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty

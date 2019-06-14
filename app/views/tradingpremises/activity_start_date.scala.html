@@ -23,7 +23,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("tradingpremises.startDate.title", "summary.tradingpremises")
 }
 
 @main(
@@ -33,16 +32,15 @@
 
     @form(f, controllers.tradingpremises.routes.ActivityStartDateController.post(index, edit)) {
 
-        @registered_office_helper(address.toBCAddress)
-
         @date(
             f = f,
             p = "startDate",
             example = false,
             hintId = "dob",
             hintText = Messages("lbl.date.example"),
-            labelText = "tradingpremises.startDate.title",
-            legendHidden = true
+            heading = "tradingpremises.startDate.title",
+            section = "summary.tradingpremises",
+            supportingContent = registered_office_helper(address.toBCAddress)
         )
 
         @submit(false)
