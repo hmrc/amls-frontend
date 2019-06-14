@@ -28,8 +28,8 @@ object BranchesOrAgents {
     ((__ \ "hasCountries").read[Boolean] map BranchesOrAgentsHasCountries.apply and
       (__ \ "countries").read[Seq[Country]].map {
         case countries if countries.isEmpty => None
-        case countries => Some(BranchesOrAgentsWhichCountries.apply(countries))
-      })((hasCountries, countries) => BranchesOrAgents apply(hasCountries, countries))
+        case countries => Some(BranchesOrAgentsWhichCountries apply countries)
+      })((hasCountries, countries) => BranchesOrAgents apply (hasCountries, countries))
   }
 
   implicit val jsonWrites:Writes[BranchesOrAgents] = {
@@ -57,7 +57,7 @@ object BranchesOrAgents {
   def update(branchesOrAgents: BranchesOrAgents, countries: BranchesOrAgentsWhichCountries): BranchesOrAgents = {
     countries match {
       case BranchesOrAgentsWhichCountries(list) if list.isEmpty => BranchesOrAgents(BranchesOrAgentsHasCountries(false), None)
-      case BranchesOrAgentsWhichCountries(_) =>BranchesOrAgents(BranchesOrAgentsHasCountries(true), Some(countries))
+      case BranchesOrAgentsWhichCountries(_) => BranchesOrAgents(BranchesOrAgentsHasCountries(true), Some(countries))
     }
   }
 }

@@ -52,27 +52,10 @@ object BranchesOrAgentsWhichCountries {
       val countrySeqR = {
         (seqToOptionSeq[String] andThen flattenR[String] andThen cR)
           .andThen(minLengthR[Seq[Country]](minLength) withMessage "error.invalid.countries.msb.branchesOrAgents")
-          .andThen(maxLengthR[Seq[Country]](maxLength))
       }
 
-      (__ \ "countries").read(countrySeqR).map(countries => {
-        BranchesOrAgentsWhichCountries.apply(countries)
-      })
+      (__ \ "countries").read(countrySeqR) map BranchesOrAgentsWhichCountries.apply
     }
-
-
-//  private implicit def write
-//  (implicit
-//   mon: cats.Monoid[UrlFormEncoded],
-//  // a: Path => WriteLike[Boolean, UrlFormEncoded],
-//   b: Path => WriteLike[Seq[Country], UrlFormEncoded]
-//  ): Write[BranchesOrAgentsCountries, UrlFormEncoded] =
-//    To[UrlFormEncoded] { __ =>
-//      (
-//
-//          (__ \ "countries").write[Option[Seq[Country]]]
-//        )(a => (Some(a.branches), Some(a.branches)))
-//    }
 
   private  def write: Write[BranchesOrAgentsWhichCountries, UrlFormEncoded] = Write {
     case BranchesOrAgentsWhichCountries(countries) => countries.zipWithIndex.map(i => s"countries[${i._2}]" -> Seq(i._1.code)).toMap

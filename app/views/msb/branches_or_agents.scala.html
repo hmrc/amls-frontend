@@ -39,20 +39,18 @@
             f = f("hasCountries"),
             heading = "msb.branchesoragents.title",
             section = "summary.msb",
+            supportingContent = supportingContent,
             panel = false
         ) {
             @radio(
                 f = f("hasCountries"),
                 labelText = "lbl.yes",
-                value = "true",
-                target = s"#countries",
-                inline = true
+                value = "true"
             )
             @radio(
                 f = f("hasCountries"),
                 labelText = "lbl.no",
-                value = "false",
-                inline = true
+                value = "false"
             )
         }
 
