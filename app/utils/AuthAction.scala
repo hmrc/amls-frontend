@@ -60,7 +60,7 @@ class DefaultAuthAction @Inject() (
 
     Logger.debug("DefaultAuthAction calling authorised(User) - User: " + User)
 
-    authorised(User).retrieve(
+    authorised(Admin).retrieve(
       Retrievals.allEnrolments and
       Retrievals.credentials and
       Retrievals.affinityGroup
