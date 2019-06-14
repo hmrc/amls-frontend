@@ -20,16 +20,16 @@ import config.AppConfig
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.ViewResponse
-import models.businessdetails.BusinessDetails
 import models.asp.Asp
 import models.businessactivities.BusinessActivities
+import models.businessdetails.BusinessDetails
 import models.businessmatching.{BusinessActivities => BMActivities, _}
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.estateagentbusiness.{EstateAgentBusiness => Eab}
 import models.hvd.Hvd
 import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
-import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReadyForReview}
+import models.status.SubmissionDecisionApproved
 import models.tcsp.Tcsp
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -272,207 +272,9 @@ class BusinessMatchingServiceSpec extends PlaySpec
       }
     }
   }
-  "fitAndProperRequired" must {
-    "return true" when {
-      "When phase 2 toggle is true" in new Fixture {
-        when(mockAppConfig.phase2ChangesToggle).thenReturn(true)
-        val existing = BusinessMatching(
-          activities = Some(BMActivities(
-            Set(BillPaymentServices)
-          ))
-        )
-
-        val current = BusinessMatching(
-          activities = Some(BMActivities(
-            Set(HighValueDealing)
-          ))
-        )
-
-        val viewResponse = ViewResponse(
-          "",
-          businessMatchingSection = existing,
-          businessDetailsSection = BusinessDetails(),
-          bankDetailsSection = Seq.empty,
-          businessActivitiesSection = BusinessActivities(),
-          eabSection = None,
-          aspSection = None,
-          tcspSection = None,
-          responsiblePeopleSection = None,
-          tradingPremisesSection = None,
-          msbSection = None,
-          hvdSection = None,
-          supervisionSection = None,
-          aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
-        )
-
-        mockCacheFetch(Some(current), Some(BusinessMatching.key))
-        mockCacheFetch[ViewResponse](Some(viewResponse), Some(ViewResponse.key))
-
-        whenReady(service.fitAndProperRequired.value) { result =>
-          result must be(Some(true))
-        }
-      }
-      "existing activities does not contain msb and tcsp and phase 2 toggle is false" when {
-        "current activities contains msb" in new Fixture {
-          when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
-          val existing = BusinessMatching(
-            activities = Some(BMActivities(
-              Set(BillPaymentServices)
-            ))
-          )
-
-          val current = BusinessMatching(
-            activities = Some(BMActivities(
-              Set(MoneyServiceBusiness)
-            ))
-          )
-
-          val viewResponse = ViewResponse(
-            "",
-            businessMatchingSection = existing,
-            businessDetailsSection = BusinessDetails(),
-            bankDetailsSection = Seq.empty,
-            businessActivitiesSection = BusinessActivities(),
-            eabSection = None,
-            aspSection = None,
-            tcspSection = None,
-            responsiblePeopleSection = None,
-            tradingPremisesSection = None,
-            msbSection = None,
-            hvdSection = None,
-            supervisionSection = None,
-            aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
-          )
-
-          mockCacheFetch(Some(current), Some(BusinessMatching.key))
-          mockCacheFetch[ViewResponse](Some(viewResponse), Some(ViewResponse.key))
-
-          whenReady(service.fitAndProperRequired.value) { result =>
-            result must be(Some(true))
-          }
-        }
-        "current activities contains tcsp" in new Fixture {
-          when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
-          val existing = BusinessMatching(
-            activities = Some(BMActivities(
-              Set(BillPaymentServices)
-            ))
-          )
-          val current = BusinessMatching(
-            activities = Some(BMActivities(
-              Set(TrustAndCompanyServices)
-            ))
-          )
-
-          val viewResponse = ViewResponse(
-            "",
-            businessMatchingSection = existing,
-            businessDetailsSection = BusinessDetails(),
-            bankDetailsSection = Seq.empty,
-            businessActivitiesSection = BusinessActivities(),
-            eabSection = None,
-            aspSection = None,
-            tcspSection = None,
-            responsiblePeopleSection = None,
-            tradingPremisesSection = None,
-            msbSection = None,
-            hvdSection = None,
-            supervisionSection = None,
-            aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
-          )
-
-          mockCacheFetch(Some(current), Some(BusinessMatching.key))
-          mockCacheFetch[ViewResponse](Some(viewResponse), Some(ViewResponse.key))
-
-          whenReady(service.fitAndProperRequired.value) { result =>
-            result must be(Some(true))
-          }
-        }
-      }
-    }
-
-    "return false" when {
-      "existing activities contains msb" in new Fixture {
-        when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
-        val existing = BusinessMatching(
-          activities = Some(BMActivities(
-            Set(MoneyServiceBusiness)
-          ))
-        )
-        val current = BusinessMatching(
-          activities = Some(BMActivities(
-            Set(TrustAndCompanyServices)
-          ))
-        )
-
-        val viewResponse = ViewResponse(
-          "",
-          businessMatchingSection = existing,
-          businessDetailsSection = BusinessDetails(),
-          bankDetailsSection = Seq.empty,
-          businessActivitiesSection = BusinessActivities(),
-          eabSection = None,
-          aspSection = None,
-          tcspSection = None,
-          responsiblePeopleSection = None,
-          tradingPremisesSection = None,
-          msbSection = None,
-          hvdSection = None,
-          supervisionSection = None,
-          aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
-        )
-
-        mockCacheFetch(Some(current), Some(BusinessMatching.key))
-        mockCacheFetch[ViewResponse](Some(viewResponse), Some(ViewResponse.key))
-
-        whenReady(service.fitAndProperRequired.value) { result =>
-          result must be(Some(false))
-        }
-      }
-      "existing activities contains tcsp" in new Fixture {
-        when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
-        val existing = BusinessMatching(
-          activities = Some(BMActivities(
-            Set(TrustAndCompanyServices)
-          ))
-        )
-        val current = BusinessMatching(
-          activities = Some(BMActivities(
-            Set(BillPaymentServices)
-          ))
-        )
-
-        val viewResponse = ViewResponse(
-          "",
-          businessMatchingSection = existing,
-          businessDetailsSection = BusinessDetails(),
-          bankDetailsSection = Seq.empty,
-          businessActivitiesSection = BusinessActivities(),
-          eabSection = None,
-          aspSection = None,
-          tcspSection = None,
-          responsiblePeopleSection = None,
-          tradingPremisesSection = None,
-          msbSection = None,
-          hvdSection = None,
-          supervisionSection = None,
-          aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
-        )
-
-        mockCacheFetch(Some(current), Some(BusinessMatching.key))
-        mockCacheFetch[ViewResponse](Some(viewResponse), Some(ViewResponse.key))
-
-        whenReady(service.fitAndProperRequired.value) { result =>
-          result must be(Some(false))
-        }
-      }
-    }
-  }
 
   "clear section" must {
-
     "clear data of Asp given AccountancyServices" in new Fixture {
-
       val result = service.clearSection(AccountancyServices)
 
       await(result)

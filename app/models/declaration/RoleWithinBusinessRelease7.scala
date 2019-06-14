@@ -84,12 +84,12 @@ object RoleWithinBusinessRelease7 {
 
   val otherDetailsType = notEmptyStrip andThen
     notEmpty.withMessage("error.required.declaration.specify.role") andThen
-    maxLength(maxDetailsLength).withMessage("error.invalid.maxlength.255") andThen
-    basicPunctuationPattern()
+    maxLength(maxDetailsLength).withMessage("error.invalid.role.in.business.maxlength.255") andThen
+    basicPunctuationPattern("err.text.role.in.business.text.validation")
 
   implicit val formRule: Rule[UrlFormEncoded, RoleWithinBusinessRelease7] =
     From[UrlFormEncoded] { readerURLFormEncoded =>
-      (readerURLFormEncoded \ "positions").read(minLengthR[Set[String]](1).withMessage("error.required")) flatMap { z =>
+      (readerURLFormEncoded \ "positions").read(minLengthR[Set[String]](1).withMessage("error.invalid.position.validation")) flatMap { z =>
         z.map {
           case "01" => Rule[UrlFormEncoded, RoleType](_ => Valid(BeneficialShareholder))
           case "02" => Rule[UrlFormEncoded, RoleType](_ => Valid(Director))

@@ -90,13 +90,13 @@ class AddressCreatedEventSpec extends AmlsSpec {
       }
 
       "given the address of a registered office outside the UK" in {
-        val address = RegisteredOfficeNonUK("RO Line 1", "RO Line 2", "RO Line 3".some, None, Country("Scotland", "SCO"))
+        val address = RegisteredOfficeNonUK("RO Line 1", "RO Line 2", "RO Line 3".some, None, Country("Albania", "AL"))
         val event = AddressCreatedEvent(address)
         val expected = headerCarrier.toAuditDetails() ++ Map(
           "addressLine1" -> "RO Line 1",
           "addressLine2" -> "RO Line 2",
           "addressLine3" -> "RO Line 3",
-          "country" -> "Scotland"
+          "country" -> "Albania"
         )
 
         event.detail mustBe expected

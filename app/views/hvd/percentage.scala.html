@@ -16,13 +16,13 @@
 
 @import include._
 @import forms2._
+@import views.html.hvd.cash_payment_text
 
 @(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
 
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("hvd.percentage.title", "summary.hvd")
 }
 
 @main(
@@ -30,45 +30,40 @@
     heading = header
 ) {
 
-    <p>@Messages("hvd.percentage.text")</p>
-
     @form(f, controllers.hvd.routes.PercentageOfCashPaymentOver15000Controller.post(edit)) {
 
-        @fieldset(
-            f = f("percentage-fieldset"),
-            legend = "hvd.percentage.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("percentage"),
+            heading = "hvd.percentage.title",
+            section = "summary.hvd",
+            supportingContent = cash_payment_text(),
             panel = false
         ) {
-            @errorGroup(
-                field = f("percentage")
-            ) {
-                @radio(
-                    f = f("percentage"),
-                    labelText = "hvd.percentage.lbl.01",
-                    value = "01"
-                )
-                @radio(
-                    f = f("percentage"),
-                    labelText = "hvd.percentage.lbl.02",
-                    value = "02"
-                )
-                @radio(
-                    f = f("percentage"),
-                    labelText = "hvd.percentage.lbl.03",
-                    value = "03"
-                )
-                @radio(
-                    f = f("percentage"),
-                    labelText = "hvd.percentage.lbl.04",
-                    value = "04"
-                )
-                @radio(
-                    f = f("percentage"),
-                    labelText = "hvd.percentage.lbl.05",
-                    value = "05"
-                )
-            }
+            @radio(
+                f = f("percentage"),
+                labelText = "hvd.percentage.lbl.01",
+                value = "01"
+            )
+            @radio(
+                f = f("percentage"),
+                labelText = "hvd.percentage.lbl.02",
+                value = "02"
+            )
+            @radio(
+                f = f("percentage"),
+                labelText = "hvd.percentage.lbl.03",
+                value = "03"
+            )
+            @radio(
+                f = f("percentage"),
+                labelText = "hvd.percentage.lbl.04",
+                value = "04"
+            )
+            @radio(
+                f = f("percentage"),
+                labelText = "hvd.percentage.lbl.05",
+                value = "05"
+            )
         }
 
         @submit(edit)

@@ -51,7 +51,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
     )
 
     val businessMatching = BusinessMatching(
-      activities = Some(Activities(Set.empty))
+      activities = Some(Activities(Set(models.businessmatching.AccountancyServices)))
     )
 
     def testRenewal: Option[Renewal] = None
@@ -107,7 +107,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.01"))
+        contentAsString(result) must include(Messages("businessactivities.registerservices.servicename.lbl.01"))
 
       }
 
@@ -128,7 +128,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.02"))
+        contentAsString(result) must include(Messages("businessactivities.registerservices.servicename.lbl.02"))
 
       }
 
@@ -149,7 +149,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.03"))
+        contentAsString(result) must include(Messages("businessactivities.registerservices.servicename.lbl.03"))
 
       }
 
@@ -170,7 +170,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.04"))
+        contentAsString(result) must include(Messages("businessactivities.registerservices.servicename.lbl.04"))
 
       }
 
@@ -191,7 +191,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.05"))
+        contentAsString(result) must include(Messages("businessactivities.registerservices.servicename.lbl.05"))
 
       }
 
@@ -212,7 +212,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.06"))
+        contentAsString(result) must include(Messages("businessactivities.registerservices.servicename.lbl.06"))
 
       }
 
@@ -233,7 +233,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.07"))
+        contentAsString(result) must include(Messages("businessactivities.registerservices.servicename.lbl.07"))
 
       }
 

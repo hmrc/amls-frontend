@@ -24,7 +24,10 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.renewal")
+}
+
+@supportingContent = {
+    <p>@Messages("renewal.msb.throughput.info")</p>
 }
 
 @main(
@@ -33,23 +36,20 @@
 ) {
 
     @form(f, controllers.renewal.routes.TotalThroughputController.post(edit)) {
-        @fieldset(
-            f = f("throughput-fieldset"),
+        @fieldsetWithErrorGroup(
+            f = f("throughput"),
             heading = "renewal.msb.throughput.header",
-            panel = false
+            section = "summary.renewal",
+            panel = false,
+            supportingContent = supportingContent
         ) {
-            <p>@Messages("renewal.msb.throughput.info")</p>
-            @errorGroup(
-                field = f("throughput")
-            ) {
-                @(TotalThroughput.throughputValues.map { v =>
-                    radio(
-                        f = f("throughput"),
-                        labelText = v.label,
-                        value = v.value
-                    )
-                })
-            }
+            @(TotalThroughput.throughputValues.map { v =>
+                radio(
+                    f = f("throughput"),
+                    labelText = v.label,
+                    value = v.value
+                )
+            })
         }
 
         @submit(returnLocation = Some("renewal"))

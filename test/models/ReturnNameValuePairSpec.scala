@@ -34,7 +34,7 @@ class ReturnNameValuePairSpec extends AmlsSpec with OneAppPerSuite {
     "correctly determine the absolute url based on the current request" when {
       "request is running on localhost" in {
 
-        val call = controllers.routes.ConfirmationController.paymentConfirmation("reference")
+        val call = controllers.routes.PaymentConfirmationController.paymentConfirmation("reference")
         val model = ReturnLocation(call)
 
         model.absoluteUrl mustBe s"https://somehost:9000${call.url}"

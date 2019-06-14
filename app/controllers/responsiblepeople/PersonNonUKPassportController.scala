@@ -17,11 +17,11 @@
 package controllers.responsiblepeople
 
 import config.AppConfig
-import javax.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.{NoPassport, NonUKPassport, NonUKPassportYes, ResponsiblePerson}
+import javax.inject.Inject
+import models.responsiblepeople.{NonUKPassport, ResponsiblePerson}
 import play.api.i18n.MessagesApi
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -57,10 +57,10 @@ class PersonNonUKPassportController @Inject()(
     (for {
       cache <- result
       rp <- getData[ResponsiblePerson](cache, index)
-    } yield (rp.dateOfBirth.isDefined && edit) match {
-      case true => Redirect(routes.DetailedAnswersController.get(index, flow))
-      case false if appConfig.phase2ChangesToggle => Redirect(routes.CountryOfBirthController.get(index, edit, flow))
-      case _ => Redirect(routes.DateOfBirthController.get(index, edit, flow))
+    } yield (rp.dateOfBirth.isDefined, edit) match {
+      case (true, true) => Redirect(routes.DetailedAnswersController.get(index, flow))
+      case (true, false) => Redirect(routes.CountryOfBirthController.get(index, edit, flow))
+      case(false, _) => Redirect(routes.DateOfBirthController.get(index, edit, flow))
     }).getOrElse(NotFound(notFoundView))
   }
 

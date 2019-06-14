@@ -17,7 +17,6 @@
 package controllers.responsiblepeople
 
 import javax.inject.{Inject, Singleton}
-
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import connectors.DataCacheConnector
 import controllers.BaseController

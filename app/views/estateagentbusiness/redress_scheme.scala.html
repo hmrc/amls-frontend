@@ -22,7 +22,10 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.estateagentbusiness")
+}
+
+@supportingContent = {
+    <p>@Messages("estateagentbusiness.registered.redress.text")</p>
 }
 
 @main(
@@ -32,51 +35,47 @@
 
     @form(f, controllers.estateagentbusiness.routes.ResidentialRedressSchemeController.post(edit)) {
 
-        @fieldset(
-            f = f("propertyRedressScheme-fieldset"),
+        @fieldsetWithErrorGroup(
+            f = f("propertyRedressScheme"),
             heading = "estateagentbusiness.registered.redress.heading",
+            section = "summary.estateagentbusiness",
             classes = Seq("propertyRedress-fieldset"),
-            panel = false
+            panel = false,
+            supportingContent = supportingContent
         ) {
-            <p>@Messages("estateagentbusiness.registered.redress.text")</p>
-
-            @errorGroup(
-                field = f("propertyRedressScheme")
-            ) {
-                @radio(
-                    f = f("propertyRedressScheme"),
-                    labelText = "estateagentbusiness.redress.lbl.05",
-                    value = "05"
-                )
-                @radio(
-                    f = f("propertyRedressScheme"),
-                    labelText = "estateagentbusiness.redress.lbl.01",
-                    value = "01"
-                )
-                @radio(
-                    f = f("propertyRedressScheme"),
-                    labelText = "estateagentbusiness.redress.lbl.02",
-                    value = "02"
-                )
-                @radio(
-                    f = f("propertyRedressScheme"),
-                    labelText = "estateagentbusiness.redress.lbl.03",
-                    value = "03"
-                )
-                @radio(
-                    f = f("propertyRedressScheme"),
-                    labelText = "estateagentbusiness.redress.lbl.04",
-                    value = "04",
-                    target = "[data-reveal='other-redress-scheme']"
-                )
-                @input(
-                    field = f("other"),
-                    data = "other-redress-scheme",
-                    panel = true,
-                    jsHidden = true,
-                    labelText = "estateagentbusiness.redress.lbl.other"
-                )
-            }
+            @radio(
+                f = f("propertyRedressScheme"),
+                labelText = "estateagentbusiness.redress.lbl.05",
+                value = "05"
+            )
+            @radio(
+                f = f("propertyRedressScheme"),
+                labelText = "estateagentbusiness.redress.lbl.02",
+                value = "02"
+            )
+            @radio(
+                f = f("propertyRedressScheme"),
+                labelText = "estateagentbusiness.redress.lbl.03",
+                value = "03"
+            )
+            @radio(
+                f = f("propertyRedressScheme"),
+                labelText = "estateagentbusiness.redress.lbl.01",
+                value = "01"
+            )
+            @radio(
+                f = f("propertyRedressScheme"),
+                labelText = "estateagentbusiness.redress.lbl.04",
+                value = "04",
+                target = "[data-reveal='other-redress-scheme']"
+            )
+            @input(
+                field = f("other"),
+                data = "other-redress-scheme",
+                panel = true,
+                jsHidden = true,
+                labelText = "estateagentbusiness.redress.lbl.other"
+            )
         }
 
         @submit(edit)

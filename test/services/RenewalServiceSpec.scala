@@ -100,7 +100,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           Some(TotalThroughput("01")),
           Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
           Some(TransactionsInLast12Months("1500")),
-          Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
+          Some(SendTheLargestAmountsOfMoney(Seq(Country("us", "US")))),
           Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
           Some(CETransactionsInLast12Months("123")),
           Some(FXTransactionsInLast12Months("456")),
@@ -243,7 +243,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             totalThroughput = Some(TotalThroughput("01")),
             sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
             transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
-            sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
+            sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(Country("us", "US")))),
             mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB"))))
           )
           await(service.isRenewalComplete(model)) mustBe true
@@ -293,7 +293,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             totalThroughput = Some(TotalThroughput("01")),
             sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
             transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
-            sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
+            sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(Country("us", "US")))),
             mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
             whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
             ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("123")),
@@ -328,7 +328,6 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           await(service.isRenewalComplete(model)) mustBe true
         }
       }
-
     }
 
     "be false" when {
@@ -667,7 +666,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
             transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
             mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-            sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
+            sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(Country("us", "US")))),
             whichCurrencies = None,
             ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("123"))
           )
@@ -680,7 +679,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
             transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
             mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-            sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
+            sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(Country("us", "US")))),
             whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
             ceTransactionsInLast12Months = None
           )
@@ -693,7 +692,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
             transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
             mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-            sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
+            sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(Country("us", "US")))),
             whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
             ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("123")),
             fxTransactionsInLast12Months = None

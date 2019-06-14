@@ -55,10 +55,9 @@
                         classes = Seq("ukResident-fieldset")
                     ) {
                         @input(
-                            bold = false,
                             field = f("nino"),
                             hintText = "lbl.nino.hint",
-                            labelText = "lbl.nino"
+                            labelText = Messages("responsiblepeople.detailed_answers.uk_resident.nino", personName)
                         )
                     }
                     @radio(

@@ -16,20 +16,18 @@
 
 package utils
 
-import uk.gov.hmrc.play.test.UnitSpec
-
-class FeeRateHelperSpec extends UnitSpec {
+class FeeRateHelperSpec extends AmlsSpec {
   "fetch" must {
     "translate a specified value" in {
-      FeeRateHelper.fetch(Some(115.00)) shouldBe 115.00
+      FeeRateHelper.fetch(Some(115.00)) mustBe 115.00
     }
 
     "return a zero value where 0" in {
-      FeeRateHelper.fetch(Some(0)) shouldBe 0
+      FeeRateHelper.fetch(Some(0)) mustBe 0
     }
 
     "return a zero value where not specified" in {
-      FeeRateHelper.fetch(None) shouldBe 0
+      FeeRateHelper.fetch(None) mustBe 0
     }
   }
 }

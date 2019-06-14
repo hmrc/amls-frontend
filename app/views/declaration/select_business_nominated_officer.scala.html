@@ -23,7 +23,10 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("declaration.who.is.business.nominated.officer", subtitle)
+}
+
+@supportingContent = {
+    <p>@Messages("declaration.who.is.business.nominated.officer.text")</p>
 }
 
 @main(
@@ -33,13 +36,12 @@
     @form(f, controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.post()) {
 
 
-        <p>@Messages("declaration.who.is.business.nominated.officer.text")</p>
-
-        @fieldset(
+        @fieldsetWithErrorGroup(
             f = f("value"),
-            legend = "declaration.who.is.business.nominated.officer",
-            legendHidden = true,
-            panel = false
+            heading = "declaration.who.is.business.nominated.officer",
+            section = subtitle,
+            panel = false,
+            supportingContent = supportingContent
         ) {
             @model.zipWithIndex.map { people =>
                 @people._1.personName.map { obj =>

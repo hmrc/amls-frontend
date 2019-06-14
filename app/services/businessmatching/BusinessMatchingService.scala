@@ -81,12 +81,6 @@ class BusinessMatchingService @Inject()(
       activities <- OptionT.fromOption[Future](model.activities)
     } yield BusinessActivities.all diff activities.businessActivities
 
-  def fitAndProperRequired(implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext): OptionT[Future, Boolean] =
-    fetchActivitySet map { case (current, existing) =>
-      (!((existing contains TrustAndCompanyServices) | (existing contains MoneyServiceBusiness)) &
-        (current contains TrustAndCompanyServices) | (current contains MoneyServiceBusiness)) || appConfig.phase2ChangesToggle
-    }
-
   def clearSection(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier) = activity match {
     case AccountancyServices =>
       dataCacheConnector.removeByKey[Asp](Asp.key)

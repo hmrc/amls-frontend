@@ -20,10 +20,12 @@ import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.BusinessMatching
+import jto.validation.{Path, ValidationError}
+import models.businessmatching.{BusinessMatching, BusinessType}
 import models.declaration.AddPerson
 import models.declaration.release7._
 import models.status._
+import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, Request, Result}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -51,7 +53,13 @@ class AddPersonController @Inject () (
     implicit authContext => implicit request => {
       Form2[AddPerson](request.body) match {
         case f: InvalidForm =>
-          addPersonView(BadRequest,f)
+
+          dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) flatMap { bm =>
+            val businessType = ControllerHelper.getBusinessType(bm)
+            val updatedForm = updateFormErrors(f, businessType)
+            addPersonView(BadRequest, updatedForm)
+          }
+
         case ValidForm(_, data) =>
           dataCacheConnector.save[AddPerson](AddPerson.key, data) flatMap { _ =>
             statusService.getStatus map {
@@ -66,10 +74,22 @@ class AddPersonController @Inject () (
     }
   }
 
+  def updateFormErrors(f: InvalidForm, businessType: Option[BusinessType]): InvalidForm = {
+    val message = businessType match {
+      case Some(bt) => BusinessType.errorMessageFor(bt)
+      case _ => throw new IllegalArgumentException("[Controllers][AddPersonController] business type is not known")
+    }
+
+    val newErrors: Seq[(Path, Seq[ValidationError])] = f.errors.map {
+      case (p, _) if p == Path("positions") => (p, Seq(ValidationError(Seq(message))))
+      case (p, s) => (p, s)
+    }
+
+    f.copy(errors = newErrors)
+  }
+
   private def isResponsiblePerson(data: AddPerson): Boolean = {
-
     val roleList = data.roleWithinBusiness.items
-
     roleList.contains(BeneficialShareholder) ||
     roleList.contains(Director) ||
     roleList.contains(Partner) ||
@@ -83,6 +103,7 @@ class AddPersonController @Inject () (
 
     dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) flatMap { bm =>
       val businessType = ControllerHelper.getBusinessType(bm)
+
         statusService.getStatus map {
           case SubmissionReady =>
             status(views.html.declaration.add_person("declaration.addperson.title", "submit.registration", businessType, form))

@@ -22,7 +22,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("hvd.cash.payment.date.title", "summary.hvd")
 }
 
 @main(
@@ -35,9 +34,9 @@
         @date(
             f = f,
             p = "paymentDate",
-            labelText = "hvd.cash.payment.date.title",
+            heading = "hvd.cash.payment.date.title",
             hintText = "hvd.cash.payment.date.example",
-            legendHidden = true,
+            section = "summary.hvd",
             example = false
         )
 

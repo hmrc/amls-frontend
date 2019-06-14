@@ -41,7 +41,7 @@
             <span class="heading-large payment-ref">@reference</span></p>
     </div>
 
-    @form(EmptyForm, controllers.routes.ConfirmationController.retryPayment()) {
+    @form(EmptyForm, controllers.routes.RetryPaymentController.retryPayment()) {
         <input type="hidden" name="paymentRef" value="@reference">
         <input type="submit" name="submit" class="button" value="@messages("confirmation.payment.button.retry")">
     }

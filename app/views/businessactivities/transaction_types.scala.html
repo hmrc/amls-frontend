@@ -26,7 +26,10 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.businessactivities")
+}
+
+@supportingContent = {
+    <p>@hint("businessactivities.do.keep.records.hint")</p>
 }
 
 @main(
@@ -34,42 +37,39 @@
     heading = header
 ) {
     @form(f, controllers.businessactivities.routes.TransactionTypesController.post(edit)) {
-        @fieldset(
-            f = f("transactions-fieldset"),
+        @fieldsetWithErrorGroup(
+            f = f("types"),
             heading = "businessactivities.do.keep.records",
-            hint = "businessactivities.do.keep.records.hint",
+            section = "summary.businessactivities",
             classes = Seq(s"$target"),
-            panel = false
+            panel = false,
+            supportingContent = supportingContent
         ) {
-            @errorGroup(
-                field = f("types")
+            @checkbox(
+                f = f("types[]"),
+                labelText = "businessactivities.transactiontype.lbl.01",
+                value = "01"
+            )
+            @checkbox(
+                f = f("types[]"),
+                labelText = "businessactivities.transactiontype.lbl.02",
+                value = "02"
+            )
+            @checkbox(
+                f = f("types[]"),
+                labelText = "businessactivities.transactiontype.lbl.03",
+                value = "03",
+                target = s"#$target"
+            )
+            @panel(
+                field = Some(f(s"$target")),
+                panel = true
             ) {
-                @checkbox(
-                    f = f("types[]"),
-                    labelText = "businessactivities.transactiontype.lbl.01",
-                    value = "01"
+                @input(
+                    classes = Seq("form-control-3-4 form-control-3-4"),
+                    field = f("name"),
+                    labelText = "businessactivities.name.software.pkg.lbl"
                 )
-                @checkbox(
-                    f = f("types[]"),
-                    labelText = "businessactivities.transactiontype.lbl.02",
-                    value = "02"
-                )
-                @checkbox(
-                    f = f("types[]"),
-                    labelText = "businessactivities.transactiontype.lbl.03",
-                    value = "03",
-                    target = s"#$target"
-                )
-                @panel(
-                    field = Some(f(s"$target")),
-                    panel = true
-                ) {
-                    @input(
-                        classes = Seq("form-control-3-4 form-control-3-4"),
-                        field = f("name"),
-                        labelText = "businessactivities.name.software.pkg.lbl"
-                    )
-                }
             }
         }
 

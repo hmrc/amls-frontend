@@ -34,6 +34,7 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "json-encryption" % jsonEncryptionVersion,
     "uk.gov.hmrc" %% "play-reactivemongo" % playReactivemongoVersion,
     "uk.gov.hmrc" %% "auth-client" % authVersion,
+    "uk.gov.hmrc" %% "play-ui" % "7.40.0-play-25",
 
     "io.github.jto" %% "validation-core"      % validationVersion excludeAll playJars,
     "io.github.jto" %% "validation-playjson"  % validationVersion excludeAll playJars,
@@ -52,13 +53,11 @@ private object AppDependencies {
   private val scalatestVersion = "2.2.6"
   private val pegdownVersion = "1.6.0"
   private val jsoupVersion = "1.9.2"
-  private val hmrctestVersion = "2.4.0"
 
   object Test {
     def apply() = new ScopeDependencies {
       override val scope = "test"
       override lazy val dependencies = Seq(
-        "uk.gov.hmrc" %% "hmrctest" % hmrctestVersion % scope,
         "org.scalatest" %% "scalatest" % scalatestVersion % scope,
         "org.scalacheck" %% "scalacheck" % "1.12.5" % scope,
         "org.pegdown" % "pegdown" % pegdownVersion % scope,

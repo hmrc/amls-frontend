@@ -21,20 +21,15 @@
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @target = @{
-    s"""${f("professionalBody").id}-fieldset"""
+    s"""${f("professionalBody").id}-panel"""
 }
 
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("supervision.penalisedbyprofessional.title", "summary.supervision")
 }
 
-@main(
-    title = Messages("supervision.penalisedbyprofessional.title") + " - " + Messages("summary.supervision"),
-    heading = header
-) {
-
+@supportingContent = {
     <p>@Messages("supervision.penalisedbyprofessional.subtitle")</p>
     <ul class="list list-bullet">
         <li>@Messages("supervision.penalisedbyprofessional.line_1")</li>
@@ -44,34 +39,47 @@
         <li>@Messages("supervision.penalisedbyprofessional.line_5")</li>
     </ul>
     <p>@Messages("supervision.penalisedbyprofessional.details")</p>
+}
+
+@main(
+    title = Messages("supervision.penalisedbyprofessional.title") + " - " + Messages("summary.supervision"),
+    heading = header
+) {
 
     @form(f, controllers.supervision.routes.PenalisedByProfessionalController.post(edit)) {
 
-            @fieldset(
-                legend = "supervision.penalisedbyprofessional.title",
-                legendHidden = true,
+            @fieldsetWithErrorGroup(
                 f = f("penalised"),
-                panel = false
+                heading = "supervision.penalisedbyprofessional.title",
+                section = "summary.supervision",
+                panel=false,
+                supportingContent = supportingContent
             ) {
+
                 @radio(
                     f = f("penalised"),
                     labelText = "lbl.yes",
                     value = "true",
-                    target = s"#$target",
-                    inline = true
+                    target = s"#$target"
                 )
-                @fieldset(
-                    legend = "supervision.penalisedbyprofessional.details.lbl",
-                    f = f(target),
-                    legendHidden = true
+                @panel(
+                    field = Some(f(s"$target")),
+                    jsHidden = false
                 ) {
-                    @textarea(f("professionalBody"), "supervision.penalisedbyprofessional.details.lbl", bold = false, largeWidth = true, cols = "30", rows = "8")
+                    @textarea(
+                        f("professionalBody"),
+                        "supervision.penalisedbyprofessional.details.lbl",
+                        bold = false,
+                        largeWidth = true,
+                        cols = "30",
+                        rows = "8"
+                    )
                 }
+
                 @radio(
                     f = f("penalised"),
                     labelText = "lbl.no",
-                    value = "false",
-                    inline = true
+                    value = "false"
                 )
             }
 

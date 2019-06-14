@@ -18,7 +18,7 @@
 @import forms2._
 @import models.businessmatching._
 
-@(f: forms.Form2[_], edit: Boolean, bmModel: BusinessMatching, businessTypes: Option[String])(implicit request: Request[_],m:Messages)
+@(f: forms.Form2[_], edit: Boolean, businessTypes: Option[List[String]])(implicit request: Request[_],m:Messages)
 
 @target = @{
     s"""${f("details").id}-fieldset"""
@@ -27,7 +27,29 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.businessactivities")
+}
+
+@supportingContent = {
+    @businessTypes.map { types =>
+        @if(types.size > 1) {
+            <p>@Messages("businessactivities.confirm-activities.subtitle_4"):</p>
+
+            <ul class="list list-bullet">
+                @types.map { businessType =>
+                    <li>@businessType</li>
+                }
+            </ul>
+        } else {
+            <p>@Messages("businessactivities.confirm-activities.subtitle_4") @(types.head).</p>
+        }
+    }
+
+    <p>@Messages("businessactivities.involved.other.hint")</p>
+    <ul class="list list-bullet">
+        <li>@Messages("businessactivities.involved.listline1")</li>
+        <li>@Messages("businessactivities.involved.listline2")</li>
+        <li>@Messages("businessactivities.involved.listline3")</li>
+    </ul>
 }
 
 @main(
@@ -37,58 +59,40 @@
 
     @form(f, controllers.businessactivities.routes.InvolvedInOtherController.post(edit)) {
 
-        @fieldset(
-            f = f("involvedInOther-fieldset"),
-            heading = "businessactivities.involved.other.title",
-            panel = false
-        ) {
-             <p>@Messages("businessactivities.confirm-activities.subtitle")</p>
-             <ul class="list list-bullet">
-               @businessTypes.map {activity =>
-                 @activity.split('|').map {a =>
-                   <li>@if(a.charAt(0) == 'a' || a.charAt(0) == 'e') { an @a } else { a @a }</li>
-                 }
-               }
-             </ul>
 
-            <p>@Messages("businessactivities.involved.other.hint")</p>
-            <ul class="list list-bullet">
-                <li>@Messages("businessactivities.involved.listline1")</li>
-                <li>@Messages("businessactivities.involved.listline2")</li>
-                <li>@Messages("businessactivities.involved.listline3")</li>
-            </ul>
-            @errorGroup(
-                field = f("involvedInOther")
+        @fieldsetWithErrorGroup(
+            f = f("involvedInOther"),
+            heading = "businessactivities.involved.other.title",
+            section = "summary.businessactivities",
+            panel = false,
+            supportingContent = supportingContent
+        ) {
+            @radio(
+                f = f("involvedInOther"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = s"#$target"
+            )
+            @panel(
+              field = Some(f(s"$target")),
+              jsHidden = false,
+              id = target
             ) {
-                @radio(
-                    f = f("involvedInOther"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    target = s"#$target",
-                    inline = true
-                )
-                @panel(
-                  field = Some(f(s"$target")),
-                  jsHidden = false,
-                  id = target
-                ) {
-                    @textarea(
-                      field = f("details"),
-                      labelText = "businessactivities.confirm-activities.lbl.details",
-                      hintText = "businessactivities.involved.hint",
-                      bold = false,
-                      largeWidth = true,
-                      rows = "6",
-                      cols = "30"
-                    )
-                }
-                @radio(
-                    f = f("involvedInOther"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
+                @textarea(
+                  field = f("details"),
+                  labelText = "businessactivities.confirm-activities.lbl.details",
+                  hintText = "businessactivities.involved.hint",
+                  bold = false,
+                  largeWidth = true,
+                  rows = "6",
+                  cols = "30"
                 )
             }
+            @radio(
+                f = f("involvedInOther"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
 
         @submit(false)

@@ -56,9 +56,9 @@ object AddPerson {
     }
 
     (
-      (__ \ "firstName").read(genericNameRule("error.required.declaration.first_name")) ~
-        (__ \ "middleName").read(optionR(genericNameRule())) ~
-        (__ \ "lastName").read(genericNameRule("error.required.declaration.last_name")) ~
+      (__ \ "firstName").read(genericNameRule("error.required.declaration.first_name", maxLengthMsg = "error.invalid.firstname.length", regExMessage="error.invalid.firstname.validation")) ~
+        (__ \ "middleName").read(optionR(genericNameRule(maxLengthMsg="error.invalid.middlename.length", regExMessage="error.invalid.middlename.validation"))) ~
+        (__ \ "lastName").read(genericNameRule("error.required.declaration.last_name", maxLengthMsg="error.invalid.lastname.length", regExMessage="error.invalid.lastname.validation")) ~
         roleReader
       ) (AddPerson.apply)
   }

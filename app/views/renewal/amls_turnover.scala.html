@@ -20,77 +20,76 @@
 
 @(f: forms.Form2[_], edit: Boolean, businessTypes:Option[List[String]])(implicit lang:Lang,  m: Messages, request: Request[_])
 
-@headingText = @{
-    businessTypes match {
-        case Some(types) if types.length == 1 => "renewal.turnover.title.single.service"
-        case _ => "renewal.turnover.title"
-    }
-}
-
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.renewal")
+}
+
+@supportingContent = {
+    @businessTypes.map { types =>
+        @if(types.size > 1) {
+            <p>@Messages("renewal.turnover.text")</p>
+
+            <ul class="list list-bullet">
+                @types.map { businessType =>
+                <li>@businessType</li>
+                }
+            </ul>
+        } else {
+            <p>@Messages("businessactivities.confirm-activities.subtitle_4") @types.head </p>
+        }
+    }
 }
 
 @main(
-    title = Messages(headingText) + " - " + Messages("summary.renewal"),
+    title = Messages("renewal.turnover.title") + " - " + Messages("summary.renewal"),
     heading = header
 ) {
 
         @form(f, controllers.renewal.routes.AMLSTurnoverController.post(edit)) {
 
-            @fieldset(
-                f = f("turnover-fieldset"),
-                heading = headingText,
-                panel = false
+            @fieldsetWithErrorGroup(
+                f = f("turnover"),
+                heading = "renewal.turnover.title",
+                section = "summary.renewal",
+                panel = false,
+                supportingContent = supportingContent
             ) {
-                <ul class="list list-bullet">
-                    @businessTypes.map { types =>
-                        @types.map {activity =>
-                            <li>@activity</li>
-                        }
-                    }
-                </ul>
-                @errorGroup(
-                    field = f("turnover")
-                ) {
-                    @radio(
-                        f = f("turnover"),
-                        labelText = "businessactivities.turnover.lbl.01",
-                        value = "01"
-                    )
-                    @radio(
-                        f = f("turnover"),
-                        labelText = "businessactivities.turnover.lbl.02",
-                        value = "02"
-                    )
-                    @radio(
-                        f = f("turnover"),
-                        labelText = "businessactivities.turnover.lbl.03",
-                        value = "03"
-                    )
-                    @radio(
-                        f = f("turnover"),
-                        labelText = "businessactivities.turnover.lbl.04",
-                        value = "04"
-                    )
-                    @radio(
-                        f = f("turnover"),
-                        labelText = "businessactivities.turnover.lbl.05",
-                        value = "05"
-                    )
-                    @radio(
-                        f = f("turnover"),
-                        labelText = "businessactivities.turnover.lbl.06",
-                        value = "06"
-                    )
-                    @radio(
-                        f = f("turnover"),
-                        labelText = "businessactivities.turnover.lbl.07",
-                        value = "07"
-                    )
-                }
+                @radio(
+                    f = f("turnover"),
+                    labelText = "businessactivities.turnover.lbl.01",
+                    value = "01"
+                )
+                @radio(
+                    f = f("turnover"),
+                    labelText = "businessactivities.turnover.lbl.02",
+                    value = "02"
+                )
+                @radio(
+                    f = f("turnover"),
+                    labelText = "businessactivities.turnover.lbl.03",
+                    value = "03"
+                )
+                @radio(
+                    f = f("turnover"),
+                    labelText = "businessactivities.turnover.lbl.04",
+                    value = "04"
+                )
+                @radio(
+                    f = f("turnover"),
+                    labelText = "businessactivities.turnover.lbl.05",
+                    value = "05"
+                )
+                @radio(
+                    f = f("turnover"),
+                    labelText = "businessactivities.turnover.lbl.06",
+                    value = "06"
+                )
+                @radio(
+                    f = f("turnover"),
+                    labelText = "businessactivities.turnover.lbl.07",
+                    value = "07"
+                )
             }
 
         @submit(edit, returnLocation = Some("renewal"))

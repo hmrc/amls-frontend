@@ -16,13 +16,13 @@
 
 package models.businessdetails
 
+import cats.data.Validated.{Invalid, Valid}
 import models.{Country, DateOfChange}
 import models.FormTypes._
 import models.businesscustomer.Address
-import org.joda.time.LocalDate
 import jto.validation._
 import jto.validation.forms._
-import play.api.libs.json.{JsNull, Json, Reads, Writes}
+import play.api.libs.json.{Json, Reads, Writes}
 
 sealed trait RegisteredOffice {
 
@@ -72,6 +72,12 @@ object RegisteredOffice {
 
   implicit val formRule: Rule[UrlFormEncoded, RegisteredOffice] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
+    val validateCountry: Rule[Country, Country] = Rule.fromMapping[Country, Country] { country =>
+      country.code match {
+        case "GB" => Invalid(Seq(ValidationError(List("error.required.atb.registered.office.not.uk"))))
+        case _ => Valid(country)
+      }
+    }
     (__ \ "isUK").read[Boolean].withMessage("error.required.atb.registered.office.uk.or.overseas") flatMap {
       case true =>
         (
@@ -89,7 +95,7 @@ object RegisteredOffice {
             (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
             (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
             (__ \ "addressLineNonUK4").read(optionR(validateAddress)) ~
-            (__ \ "country").read[Country]
+            (__ \ "country").read(validateCountry)
           ) ((addr1: String, addr2: String, addr3: Option[String], addr4: Option[String], country: Country) =>
           RegisteredOfficeNonUK(addr1, addr2, addr3, addr4, country, None))
     }

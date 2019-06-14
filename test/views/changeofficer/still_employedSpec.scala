@@ -16,9 +16,8 @@
 
 package views.changeofficer
 
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm}
 import jto.validation.{Path, ValidationError}
-import models.businessdetails.{VATRegistered, VATRegisteredYes}
 import models.changeofficer.StillEmployed
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
@@ -66,6 +65,12 @@ class still_employedSpec extends AmlsSpec with MustMatchers  {
 
       doc.getElementById("stillEmployed")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
+    }
+
+    "have a back link" in new ViewFixture {
+      def view = views.html.changeofficer.still_employed(EmptyForm, "test")
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
   }

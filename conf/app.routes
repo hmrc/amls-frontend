@@ -11,7 +11,7 @@
 ->          /money-service-business                                                   msb.Routes
 ->          /accountancy-service-provider                                             asp.Routes
 ->          /trust-company-service-provider                                           tcsp.Routes
-->          /supervision                                                              supervision.Routes
+->          /supervision-details                                                      supervision.Routes
 ->          /renewal                                                                  renewal.Routes
 ->          /business-matching                                                        businessMatching.Routes
 
@@ -75,7 +75,12 @@ POST        /submit-application/type-of-bank                                    
 GET         /submit-application/bank-details/                                         @controllers.payments.BankDetailsController.get(isUK: Boolean = true)
 GET         /submit-application/bank-details-non-uk/                                  @controllers.payments.BankDetailsController.get(isUK: Boolean = false)
 
-GET         /submit-application/confirm-bacs/                                         @controllers.ConfirmationController.bacsConfirmation()
+GET         /submit-application/confirm-bacs/                                         @controllers.BacsConfirmationController.bacsConfirmation()
+
+GET         /confirmation/payment-complete                                            @controllers.PaymentConfirmationController.paymentConfirmation(reference: String)
+POST        /confirmation/payment/retry                                               @controllers.RetryPaymentController.retryPayment()
+
+GET         /confirmation                                                             @controllers.ConfirmationController.get()
 
 GET         /declaration/add-person                                                   @controllers.declaration.AddPersonController.get()
 POST        /declaration/add-person                                                   @controllers.declaration.AddPersonController.post()
@@ -101,10 +106,5 @@ POST        /update-information/new-nominated-officer                           
 
 GET         /update-information/remove-responsible-person                             @controllers.changeofficer.RemoveResponsiblePersonController.get()
 POST        /update-information/remove-responsible-person                             @controllers.changeofficer.RemoveResponsiblePersonController.post()
-
-GET         /confirmation                                                             @controllers.ConfirmationController.get()
-
-GET         /confirmation/payment-complete                                            @controllers.ConfirmationController.paymentConfirmation(reference: String)
-POST        /confirmation/payment/retry                                               @controllers.ConfirmationController.retryPayment()
 
 GET         /login-event/update-responsible-people                                    @controllers.LoginEventController.get()

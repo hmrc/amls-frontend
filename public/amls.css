@@ -44,6 +44,10 @@ a.block-link {
   margin: .15em 0 1.25em;
 }
 
+form .page-header h1 {
+  margin-top: 0;
+}
+
 .page-header .heading-secondary {
   color: #6f777b;
   display: table-header-group;
@@ -1607,4 +1611,34 @@ h2.override-heading-medium {
 
 .sidebar-top-spacing {
   margin-top: -0.75em;
+}
+
+.page-header + fieldset h1 {
+  margin-top: .15em;
+}
+
+.form-field--error .page-header {
+  margin-top: 0;
+}
+
+.error-notification {
+  clear: both;
+}
+
+.error-margin {
+  margin-bottom: 20px;
+}
+
+.error-margin .panel-indent {
+  padding: 0px;
+  border: none;
+}
+
+.form-field--error > input,
+.form-field--error > textarea {
+    border-color: #b10e1e;
+}
+
+legend .page-header {
+    margin: 0;
 }

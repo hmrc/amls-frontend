@@ -20,6 +20,7 @@
 @(f: forms.Form2[_], personName: String)(implicit request: Request[_],m:Messages)
 
 @header = {
+    @components.back_link()
     @errorSummary(f)
     @headingWithPlaceholder(("changeofficer.removeresponsibleperson.lbl", personName), "summary.updateinformation")
 }

@@ -20,6 +20,7 @@ import jto.validation.forms.UrlFormEncoded
 import jto.validation._
 import play.api.libs.json._
 import cats.data.Validated.{Invalid, Valid}
+import play.api.i18n.Messages
 
 sealed trait BusinessType
 
@@ -34,6 +35,19 @@ object BusinessType {
   case object LPrLLP extends BusinessType
   case object UnincorporatedBody extends BusinessType
 
+  def errorMessageFor(businessType: BusinessType)(implicit messages: Messages): String = {
+
+    val common = "error.required.declaration.add.position.for"
+
+    businessType match {
+      case BusinessType.LimitedCompany => Messages(s"$common.limitedcompany")
+      case BusinessType.SoleProprietor => Messages(s"$common.sole.proprietor")
+      case BusinessType.Partnership => Messages(s"$common.partner.ship")
+      case BusinessType.LPrLLP => Messages(s"$common.lprlpp")
+      case BusinessType.UnincorporatedBody => Messages(s"$common.unicorporated.body")
+    }
+
+  }
   implicit val formR: Rule[UrlFormEncoded, BusinessType] =
     From[UrlFormEncoded] { __ =>
       (__ \ "businessType").read[String] flatMap {

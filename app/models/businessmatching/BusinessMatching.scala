@@ -109,7 +109,6 @@ case class BusinessMatching(
   }
 
   def alphabeticalBusinessTypes()(implicit message: Messages): Option[List[String]] = {
-
     activities map { a =>
       a.businessActivities.map {
         case AccountancyServices => Messages("businessmatching.registerservices.servicename.lbl.01")
@@ -120,6 +119,18 @@ case class BusinessMatching(
         case TrustAndCompanyServices => Messages("businessmatching.registerservices.servicename.lbl.06")
         case TelephonePaymentService => Messages("businessmatching.registerservices.servicename.lbl.07")
       }.toList.sorted
+    }
+  }
+
+  def prefixedAlphabeticalBusinessTypes()(implicit message: Messages): Option[List[String]] = {
+    val vowels = List("a", "e", "i", "o", "u")
+
+    alphabeticalBusinessTypes.map {
+      businessType =>
+        businessType.map(item => {
+          val prefix = if (vowels.exists(item.toLowerCase.startsWith(_))) "an" else "a"
+          s"$prefix ${item(0).toLower + item.substring(1)}"
+        })
     }
   }
 

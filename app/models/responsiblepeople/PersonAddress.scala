@@ -16,9 +16,10 @@
 
 package models.responsiblepeople
 
+import cats.data.Validated.{Invalid, Valid}
 import models.Country
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.{Path, From, Rule, Write}
+import jto.validation.{From, Rule, ValidationError, Write}
 import play.api.libs.json.{Reads, Writes}
 
 sealed trait PersonAddress {
@@ -59,6 +60,12 @@ case class PersonAddressNonUK(
 
 object PersonAddress {
   implicit val formRule: Rule[UrlFormEncoded, PersonAddress] = From[UrlFormEncoded] { __ =>
+    val validateCountry: Rule[Country, Country] = Rule.fromMapping[Country, Country] { country =>
+      country.code match {
+        case "GB" => Invalid(Seq(ValidationError(List("error.required.select.non.uk"))))
+        case _ => Valid(country)
+      }
+    }
       import jto.validation.forms.Rules._
       import models.FormTypes._
       import utils.MappingUtils.Implicits._
@@ -76,7 +83,7 @@ object PersonAddress {
             (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
             (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
             (__ \ "addressLineNonUK4").read(optionR(validateAddress)) ~
-            (__ \ "country").read[Country]
+            (__ \ "country").read(validateCountry)
           )(PersonAddressNonUK.apply _)
       }
     }

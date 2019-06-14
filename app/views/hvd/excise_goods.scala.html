@@ -22,7 +22,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("hvd.excise.goods.title", "summary.hvd")
 }
 
 @main(
@@ -32,29 +31,23 @@
 
     @form(f, controllers.hvd.routes.ExciseGoodsController.post(edit)) {
 
-        @fieldset(
-            f = f("exciseGoods-fieldset"),
-            legend = "hvd.excise.goods.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("exciseGoods"),
+            heading = "hvd.excise.goods.title",
+            section = "summary.hvd",
             panel = false,
             classes = Seq("inline")
         ) {
-            @errorGroup(
-                field = f("exciseGoods")
-            ) {
-                @radio(
-                    f = f("exciseGoods"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true
-                )
-                @radio(
-                    f = f("exciseGoods"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
-            }
+            @radio(
+                f = f("exciseGoods"),
+                labelText = "lbl.yes",
+                value = "true"
+            )
+            @radio(
+                f = f("exciseGoods"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
 
         @submit(edit)

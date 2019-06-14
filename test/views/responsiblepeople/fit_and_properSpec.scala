@@ -48,7 +48,7 @@ class fit_and_properSpec extends AmlsSpec with MustMatchers {
       )
     }
 
-    "have correct headings when phase2 changes is true" in new ViewFixture {
+    "have correct headings" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
       def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName")
       heading.html must be(Messages("responsiblepeople.fit_and_proper.heading", "PersonName"))
@@ -56,17 +56,14 @@ class fit_and_properSpec extends AmlsSpec with MustMatchers {
       doc.title must include(Messages("responsiblepeople.fit_and_proper.title"))
     }
 
-    "have the correct content" when {
-      "phase 2 content is being shown" in new ViewFixture {
+    "have the correct content" in new ViewFixture {
         val form2: Form2[_] = EmptyForm
         def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName")
         doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.details"))
         doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.details2", "PersonName"))
-      }
     }
 
     "show errors in the correct locations" in new ViewFixture {
-
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
           (Path \ "hasAlreadyPassedFitAndProper") -> Seq(ValidationError("not a message Key"))

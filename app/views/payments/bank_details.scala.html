@@ -30,14 +30,7 @@
     title = Messages("payments.bankdetails.title") + " - " + Messages("submit.registration"),
     heading = header
 ) {
-
-    @panel(
-        wide = true,
-        jsHidden = false,
-        gutter = true
-    ) {
-        <p>@Messages("payments.bankdetails.hint")</p>
-    }
+    <p>@Messages("payments.bankdetails.hint")</p>
 
     <div class="form-group">
         <div class="grid-layout grid-border">
@@ -103,6 +96,6 @@
         gaTag=Some("bank-details:click:print")
     )
 
-    <p><a class="button" id="banks-details-submit" href="@controllers.routes.ConfirmationController.bacsConfirmation()">@Messages("button.continue")</a></p>
+    <p><a class="button" id="banks-details-submit" href="@controllers.routes.BacsConfirmationController.bacsConfirmation()">@Messages("button.continue")</a></p>
 
 }

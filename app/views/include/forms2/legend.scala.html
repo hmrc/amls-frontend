@@ -20,17 +20,20 @@
     bold: Boolean = false,
     hint: String = "",
     legendHidden: Boolean = false,
-    heading: String = ""
+    heading: String = "",
+    fieldId: String = "",
+    supportingContent: Html = HtmlFormat.empty
 )(implicit lang:Lang,  m: Messages)
 
 <legend>
     <span class="form-label@if(bold){-bold}@if(legendHidden){ visuallyhidden}">
         @if(heading.nonEmpty) {
-            <h1 class="heading-xlarge">@Messages(heading)</h1>
+            <div class="page-header"><h1 class="heading-xlarge">@Messages(heading)</h1></div>
         }
         @if(legend.nonEmpty) {
             @Messages(legend)
         }
     </span>
-    @if(hint.nonEmpty) {<span class="form-hint">@Messages(hint)</span>}
 </legend>
+@supportingContent
+@if(hint.nonEmpty) {<span id="@if(fieldId.nonEmpty){@fieldId-hint}" class="form-hint clear">@Messages(hint)</span>}

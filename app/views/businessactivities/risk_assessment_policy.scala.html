@@ -26,7 +26,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.businessactivities")
 }
 
 @main(
@@ -36,48 +35,41 @@
 
     @form(f, controllers.businessactivities.routes.RiskAssessmentController.post(edit)) {
 
-        @fieldset(
-            f = f("hasPolicy-fieldset"),
+        @fieldsetWithErrorGroup(
+            f = f("hasPolicy"),
             heading = "businessactivities.riskassessment.policy.title",
+            section = "summary.businessactivities",
             panel = false
         ) {
-            @errorGroup(
-                field = f("hasPolicy")
+            @radio(
+                f = f("hasPolicy"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = "#riskassessments"
+            )
+            @fieldsetWithErrorGroup(
+                f = f("riskassessments"),
+                legend = "businessactivities.paper.or.digital",
+                hint = "lbl.select.all",
+                panel = true,
+                errorClasses = Seq("error-margin")
             ) {
-                @radio(
-                    f = f("hasPolicy"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    target = s"#$target"
+                @checkbox(
+                    f = f("riskassessments[]"),
+                    labelText = "businessactivities.RiskAssessmentType.lbl.01",
+                    value = "01"
                 )
-                @fieldset(
-                    f = f(s"$target"),
-                    legend = "businessactivities.paper.or.digital",
-                    jsHidden = true,
-                    classes = Seq("panel-indent")
-                ) {
-                    <span class="form-hint" style="clear:both;">@Messages("lbl.select.all")</span>
-                    @errorGroup(
-                        field = f("riskassessments")
-                    ) {
-                        @checkbox(
-                            f = f("riskassessments[]"),
-                            labelText = "businessactivities.RiskAssessmentType.lbl.01",
-                            value = "01"
-                        )
-                        @checkbox(
-                            f = f("riskassessments[]"),
-                            labelText = "businessactivities.RiskAssessmentType.lbl.02",
-                            value = "02"
-                        )
-                    }
-                }
-                @radio(
-                    f = f("hasPolicy"),
-                    labelText = "lbl.no",
-                    value = "false"
+                @checkbox(
+                    f = f("riskassessments[]"),
+                    labelText = "businessactivities.RiskAssessmentType.lbl.02",
+                    value = "02"
                 )
             }
+            @radio(
+                f = f("hasPolicy"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
 
         @submit(edit)

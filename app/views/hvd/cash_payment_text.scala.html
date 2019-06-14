@@ -14,10 +14,12 @@
  * limitations under the License.
  *@
 
-@(
-    dataAddBtnText: String = ""
-)(content: Html)(implicit lang:Lang,  m: Messages)
+@()(implicit messages: Messages, request: Request[_])
 
-<div data-add-one="@Messages(dataAddBtnText)">
-  @content
-</div>
+<p>@Messages("hvd.cash.data.payment.summary.details")</p>
+<ul class="list list-bullet">
+    <li>@Messages("hvd.cash.payment.data.summary.details.01")</li>
+    <li>@Messages("hvd.cash.payment.data.summary.details.02")</li>
+    <li>@Messages("hvd.cash.payment.data.summary.details.03")</li>
+</ul>
+<p>@Messages("hvd.cash.payment.convert.currency.summary")</p>

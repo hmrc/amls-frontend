@@ -22,7 +22,19 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.renewal")
+}
+
+@supportingContent = {
+    <p>@Messages("renewal.percentage.info.line1")</p>
+    <p>@Messages("renewal.percentage.info.line2")</p>
+
+    <ul class="list list-bullet">
+        <li>@Messages("renewal.percentage.list.line1")</li>
+        <li>@Messages("renewal.percentage.list.line2")</li>
+        <li>@Messages("renewal.percentage.list.line3")</li>
+    </ul>
+
+    <p>@Messages("renewal.percentage.turnover.text")</p>
 }
 
 @main(
@@ -32,49 +44,38 @@
 
     @form(f, controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.post(edit)) {
 
-        @fieldset(
-            f = f("percentage-fieldset"),
+        @fieldsetWithErrorGroup(
+            f = f("percentage"),
             heading = "renewal.hvd.percentage.title",
-            panel = false
+            section = "summary.renewal",
+            panel = false,
+            supportingContent = supportingContent
         ) {
-            <p>@Messages("renewal.percentage.info.line1")</p>
-            <p>@Messages("renewal.percentage.info.line2")</p>
-
-            <ul class="list list-bullet">
-                <li>@Messages("renewal.percentage.info.line3")</li>
-                <li>@Messages("renewal.percentage.info.line4")</li>
-            </ul>
-
-            <p>@Messages("renewal.percentage.turnover.text")</p>
-            @errorGroup(
-                field = f("percentage")
-            ) {
-                @radio(
-                    f = f("percentage"),
-                    labelText = "hvd.percentage.lbl.01",
-                    value = "01"
-                )
-                @radio(
-                    f = f("percentage"),
-                    labelText = "hvd.percentage.lbl.02",
-                    value = "02"
-                )
-                @radio(
-                    f = f("percentage"),
-                    labelText = "hvd.percentage.lbl.03",
-                    value = "03"
-                )
-                @radio(
-                    f = f("percentage"),
-                    labelText = "hvd.percentage.lbl.04",
-                    value = "04"
-                )
-                @radio(
-                    f = f("percentage"),
-                    labelText = "hvd.percentage.lbl.05",
-                    value = "05"
-                )
-            }
+            @radio(
+                f = f("percentage"),
+                labelText = "hvd.percentage.lbl.01",
+                value = "01"
+            )
+            @radio(
+                f = f("percentage"),
+                labelText = "hvd.percentage.lbl.02",
+                value = "02"
+            )
+            @radio(
+                f = f("percentage"),
+                labelText = "hvd.percentage.lbl.03",
+                value = "03"
+            )
+            @radio(
+                f = f("percentage"),
+                labelText = "hvd.percentage.lbl.04",
+                value = "04"
+            )
+            @radio(
+                f = f("percentage"),
+                labelText = "hvd.percentage.lbl.05",
+                value = "05"
+            )
         }
 
         @submit(edit, returnLocation = Some("renewal"))

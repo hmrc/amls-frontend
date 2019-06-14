@@ -27,61 +27,63 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessmatching.psr.number.title", if(isPreSubmission)  "summary.businessmatching" else "summary.updateinformation")
 }
 
-@psrInput = {
-    @input(
-        attrMaxlength = "6",
-        attrPattern = "[0-9]{1,6}",
-        attrType = "number",
-        bold = false,
-        dataAttrs = digitsOnlyAttributes,
-        field = f("regNumber"),
-        hintText = "",
-        labelText = "businessmatching.psr.number.lbl"
-    )
+@section = @{
+   if(isPreSubmission)  "summary.businessmatching" else "summary.updateinformation"
 }
 
 @main(
-    title = Messages("businessmatching.psr.number.title") + " - " + {if(isPreSubmission) Messages("summary.businessmatching") else Messages("summary.updateinformation")},
+    title = Messages("businessmatching.psr.number.title") + " - " + Messages(section),
     heading = header
 )  {
 
     @form(f, controllers.businessmatching.routes.PSRNumberController.post(edit)) {
-        <p>
-            @m("businessmatching.psr.number.hint")
-        </p>
-        @fieldset(
-            f = f("appliedfor-fieldset"),
-            legend = "businessmatching.psr.number.title",
-            legendHidden = true,
-            panel = false
-        ) {
-
-            @if(edit && !isPreSubmission) {
-                <input type="hidden" name="appliedFor" value=true />
-                @psrInput
-            } else {
-                @errorGroup(
-                    field = f("appliedFor")
+        @if(edit && !isPreSubmission) {
+            <input type="hidden" name="appliedFor" value=true />
+            @input(
+                attrMaxlength = "6",
+                attrPattern = "[0-9]{1,6}",
+                attrType = "number",
+                dataAttrs = digitsOnlyAttributes,
+                field = f("regNumber"),
+                heading = "businessmatching.psr.number.title",
+                section = section,
+                hintText = "businessmatching.psr.number.hint",
+                labelText = "businessmatching.psr.number.lbl"
+            )
+        } else {
+            @fieldsetWithErrorGroup(
+                f = f("appliedFor"),
+                heading = "businessmatching.psr.number.title",
+                hint = "businessmatching.psr.number.hint",
+                section = section,
+                panel = false
+            ) {
+                @radio(
+                    f = f("appliedFor"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    target = s"#$target"
+                )
+                @panel(
+                    field = Some(f(s"$target")),
+                    id = target
                 ) {
-                    @radio(
-                        f = f("appliedFor"),
-                        labelText = "lbl.yes",
-                        value = "true",
-                        target = s"#$target"
-                    )
-                      @panel(
-                        field = Some(f(s"$target")),
-                        id = target
-                      ) { @psrInput }
-                    @radio(
-                        f = f("appliedFor"),
-                        labelText = "lbl.no",
-                        value = "false"
+                    @input(
+                        attrMaxlength = "6",
+                        attrPattern = "[0-9]{1,6}",
+                        attrType = "number",
+                        dataAttrs = digitsOnlyAttributes,
+                        field = f("regNumber"),
+                        labelText = "businessmatching.psr.number.lbl"
                     )
                 }
+                @radio(
+                    f = f("appliedFor"),
+                    labelText = "lbl.no",
+                    value = "false"
+                )
             }
         }
 

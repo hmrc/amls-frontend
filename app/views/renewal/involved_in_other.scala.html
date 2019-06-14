@@ -27,7 +27,29 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(section = "summary.renewal")
+}
+
+@supportingContent = {
+    @businessTypes.map { types =>
+        @if(types.size > 1) {
+            <p>@Messages("businessactivities.confirm-activities.subtitle_4"):</p>
+
+            <ul class="list list-bullet">
+                @types.map { businessType =>
+                <li>@businessType</li>
+                }
+            </ul>
+        } else {
+            <p>@Messages("businessactivities.confirm-activities.subtitle_4") @types.head </p>
+        }
+    }
+
+    <p>@Messages("renewal.involvedinother.example")</p>
+    <ul class="list list-bullet">
+        <li>@Messages("renewal.involvedinother.listline1")</li>
+        <li>@Messages("renewal.involvedinother.listline2")</li>
+        <li>@Messages("renewal.involvedinother.listline3")</li>
+    </ul>
 }
 
 @main(
@@ -37,61 +59,39 @@
 
     @form(f, controllers.renewal.routes.InvolvedInOtherController.post(edit)) {
 
-        @fieldset(
-            f = f("involvedInOther-fieldset"),
+        @fieldsetWithErrorGroup(
+            f = f("involvedInOther"),
             heading = "renewal.involvedinother.title",
-            panel = false
+            section = "summary.renewal",
+            panel = false,
+            supportingContent = supportingContent
         ) {
-            <p>@Messages("businessactivities.confirm-activities.subtitle")</p>
-
-            <ul class="list list-bullet">
-                @businessTypes.map {
-                    case types => {
-                        @types.map{ x =>
-                            <li>@x</li>
-                        }
-                    }
-                }
-            </ul>
-
-            <p>@Messages("renewal.involvedinother.example")</p>
-            <ul class="list list-bullet">
-                <li>@Messages("renewal.involvedinother.listline1")</li>
-                <li>@Messages("renewal.involvedinother.listline2")</li>
-                <li>@Messages("renewal.involvedinother.listline3")</li>
-            </ul>
-            @errorGroup(
-                field = f("involvedInOther")
+            @radio(
+                f = f("involvedInOther"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = "[data-reveal='involved-in-other']"
+            )
+            @panel(
+                jsHidden = true,
+                dataReveal = "involved-in-other",
+                id = target
             ) {
-                @radio(
-                    f = f("involvedInOther"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    target = "[data-reveal='involved-in-other']",
-                    inline = true
-                )
-                @panel(
-                    jsHidden = true,
-                    dataReveal = "involved-in-other",
-                    id = target
-                ) {
-                    @textarea(
-                        field = f("details"),
-                        labelText = "businessactivities.confirm-activities.lbl.details",
-                        hintText = "renewal.hint.255.chars",
-                        bold = false,
-                        largeWidth = true,
-                        rows = "6",
-                        cols = "30"
-                    )
-                }
-                @radio(
-                    f = f("involvedInOther"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
+                @textarea(
+                    field = f("details"),
+                    labelText = "businessactivities.renewal.confirm-activities.lbl.details",
+                    hintText = "hint.255.chars",
+                    bold = false,
+                    largeWidth = true,
+                    rows = "6",
+                    cols = "30"
                 )
             }
+            @radio(
+                f = f("involvedInOther"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
 
         @submit(returnLocation = Some("renewal"))

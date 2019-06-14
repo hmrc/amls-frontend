@@ -26,7 +26,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("supervision.another_body.title", "summary.supervision")
 }
 
 @main(
@@ -36,40 +35,30 @@
 
     @form(f, controllers.supervision.routes.AnotherBodyController.post(edit)) {
 
-        @fieldset(
-            legend = "supervision.another_body.title",
+        @fieldsetWithErrorGroup(
             f = f("anotherBody"),
-            legendHidden = true,
-            panel = false
+            panel = false,
+            heading = "supervision.another_body.title",
+            section = "summary.supervision"
         ) {
             @radio(
                 f = f("anotherBody"),
                 labelText = "lbl.yes",
                 value = "true",
-                target = s"#$target",
-                inline = true
+                target = s"#$target"
             )
             @panel(
                 field = Some(f(s"$target"))
             ) {
-
-                @errorGroup(
-                    field = f("supervisor-panel"),
-                    classes = Seq("form-field")
-                ) {
-                    @input(
-                        field = f("supervisorName"),
-                        labelText = "supervision.another_body.lbl.supervisor",
-                        bold = false,
-                        panel = false
-                    )
-                }
+                @input(
+                   field = f("supervisorName"),
+                   labelText = "supervision.another_body.lbl.supervisor"
+                )
             }
             @radio(
                 f = f("anotherBody"),
                 labelText = "lbl.no",
-                value = "false",
-                inline = true
+                value = "false"
             )
         }
 

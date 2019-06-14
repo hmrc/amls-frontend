@@ -24,25 +24,26 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessmatching.registrationnumber.title", if(isPreSubmission)  "summary.businessmatching" else "summary.updateinformation")
+}
+
+@section = @{
+    if(isPreSubmission)  "summary.businessmatching" else "summary.updateinformation"
 }
 
 @main(
-    title = Messages("businessmatching.registrationnumber.title") + " - " + {if(isPreSubmission) Messages("summary.businessmatching") else Messages("summary.updateinformation")},
+    title = Messages("businessmatching.registrationnumber.title") + " - " + Messages(section),
     heading = header
 ) {
 
     @form(f, controllers.businessmatching.routes.CompanyRegistrationNumberController.post(edit)) {
-
             @input(
                 attrMaxlength = "8",
                 attrPattern = "[0-9]{1,8}",
                 attrType = "tel",
-                bold = false,
                 field = f("companyRegistrationNumber"),
-                hintText = "lbl.hint.crn",
-                labelHidden = true,
-                labelText = "businessmatching.registrationnumber.lbl"
+                labelText = "lbl.hint.crn",
+                heading = "businessmatching.registrationnumber.title",
+                section = section
             )
 
         @submit(edit, returnLink = showReturnLink)

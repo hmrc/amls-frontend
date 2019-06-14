@@ -22,7 +22,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessdetails.activity.start.date.title", "summary.businessdetails")
 }
 
 @main(
@@ -30,13 +29,13 @@
     heading = header
 ) {
 
-
-
     @form(f, controllers.businessdetails.routes.ActivityStartDateController.post(edit)) {
 
         @date(
             f = f,
             p = "startDate",
+            heading = "businessdetails.activity.start.date.title",
+            section = "summary.businessdetails",
             example = true,
             legendHidden = false
         )

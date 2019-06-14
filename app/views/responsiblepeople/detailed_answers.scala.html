@@ -145,19 +145,18 @@
                 }
         }
 
-        @if(ApplicationConfig.phase2ChangesToggle) {
-            @person.dateOfBirth.map { dateOfBirth =>
 
-                @detailedAnswers(
-                    question = Messages("responsiblepeople.detailed_answers.dob", personName),
-                    editUrl = controllers.responsiblepeople.routes.DateOfBirthController.get(idx, true, flow).toString(),
-                    dataItem = Some(dateOfBirth),
-                    editLinkTag = "date-of-birth"
-                ) { dob =>
-                    <p>@DateHelper.formatDate(dob.dateOfBirth)</p>
-                }
+        @person.dateOfBirth.map { dateOfBirth =>
 
+            @detailedAnswers(
+                question = Messages("responsiblepeople.detailed_answers.dob", personName),
+                editUrl = controllers.responsiblepeople.routes.DateOfBirthController.get(idx, true, flow).toString(),
+                dataItem = Some(dateOfBirth),
+                editLinkTag = "date-of-birth"
+            ) { dob =>
+                <p>@DateHelper.formatDate(dob.dateOfBirth)</p>
             }
+
         }
 
         @detailedAnswers(
@@ -168,7 +167,7 @@
             @prt.isUKResidence match {
                 case UKResidence(nino) => {
                     <p>@Messages("lbl.yes")</p>
-                    <p>@Messages("responsiblepeople.detailed_answers.uk_resident.nino"): @nino</p>
+                    <p>@Messages("responsiblepeople.detailed_answers.uk_resident.nino", personName): @nino</p>
                 }
                 case NonUKResidence => {
                     <p>@Messages("lbl.no")</p>
@@ -187,7 +186,7 @@
                 @pp match {
                     case UKPassportYes(ukPassportNumber) => {
                         <p>@Messages("lbl.yes")</p>
-                        <p>@Messages("responsiblepeople.detailed_answers.uk_resident.passport_number"): @ukPassportNumber</p>
+                        <p>@Messages("responsiblepeople.detailed_answers.uk_resident.passport_number", personName): @ukPassportNumber</p>
                     }
                     case UKPassportNo => {
                         <p>@Messages("lbl.no")</p>
@@ -207,7 +206,7 @@
                 @pp match {
                     case NonUKPassportYes(nonUKPassportNumber) => {
                         <p>@Messages("lbl.yes")</p>
-                        <p>@Messages("responsiblepeople.detailed_answers.uk_resident.passport_number"): @nonUKPassportNumber</p>
+                        <p>@Messages("responsiblepeople.detailed_answers.uk_resident.passport_number", personName): @nonUKPassportNumber</p>
                     }
                     case NoPassport => {
                         <p>@Messages("lbl.no")</p>
@@ -215,21 +214,6 @@
                 }
             }
 
-        }
-
-        @if(!ApplicationConfig.phase2ChangesToggle) {
-            @person.dateOfBirth.map { dateOfBirth =>
-
-                @detailedAnswers(
-                    question = Messages("responsiblepeople.detailed_answers.dob", personName),
-                    editUrl = controllers.responsiblepeople.routes.DateOfBirthController.get(idx, true, flow).toString(),
-                    dataItem = Some(dateOfBirth),
-                    editLinkTag = "date-of-birth"
-                ) { dob =>
-                    <p>@DateHelper.formatDate(dob.dateOfBirth)</p>
-                }
-
-            }
         }
 
         @detailedAnswers(

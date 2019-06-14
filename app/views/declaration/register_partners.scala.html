@@ -23,7 +23,22 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("declaration.register.partners.title", subtitle)
+}
+
+@supportingContent = {
+    @panel(
+        wide = true,
+        jsHidden = false,
+        gutter = true
+    ) {
+        <p>@if(currentPartners.size == 0) {
+            @Messages("declaration.register.partners.none.text")
+        } else {
+            @Messages("declaration.register.partners.one.text", currentPartners.head)
+        }</p>
+    }
+
+    <p>@Messages("declaration.register.partners.desc")</p>
 }
 
 @main(
@@ -32,25 +47,12 @@
 ) {
     @form(f, controllers.declaration.routes.RegisterPartnersController.post()) {
 
-        @panel(
-            wide = true,
-            jsHidden = false,
-            gutter = true
-        ) {
-            <p>@if(currentPartners.size == 0) {
-                @Messages("declaration.register.partners.none.text")
-            } else {
-                @Messages("declaration.register.partners.one.text", currentPartners.head)
-            }</p>
-        }
-
-        <p>@Messages("declaration.register.partners.desc")</p>
-
-        @fieldset(
+        @fieldsetWithErrorGroup(
             f = f("value"),
-            legend = "declaration.who.is.registering.title",
-            legendHidden = true,
-            panel = false
+            heading = "declaration.register.partners.title",
+            section = subtitle,
+            panel = false,
+            supportingContent = supportingContent
         ) {
             @model.zipWithIndex.map { case (people, i) =>
                 @people.personName.map { obj =>

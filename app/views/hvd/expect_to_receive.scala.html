@@ -16,13 +16,13 @@
 
 @import include._
 @import forms2._
+@import views.html.hvd.cash_payment_text
 
 @(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
 
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("hvd.expect.to.receive.title", "summary.hvd")
 }
 
 @main(
@@ -32,36 +32,31 @@
 
     @form(f, controllers.hvd.routes.ExpectToReceiveCashPaymentsController.post(edit)) {
 
-        <p>@hint(Messages("lbl.select.all"))</p>
-
-        @fieldset(
-            f = f("paymentMethods-fieldset"),
-            legend = "hvd.receiving.expect.to.receive",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("paymentMethods"),
+            heading = "hvd.expect.to.receive.title",
+            section = "summary.hvd",
+            supportingContent = cash_payment_text(),
+            hint = "lbl.select.all",
             panel = false,
             classes = Seq("paymentMethods-fieldset")
         ) {
-            @errorGroup(
-                classes = Seq("form-group"),
-                field = f("paymentMethods")
-            ) {
-                @checkbox(
-                    f = f("courier"),
-                    labelText = "hvd.receiving.option.01",
-                    value = "true"
-                )
-                @checkbox(
-                    f = f("direct"),
-                    labelText = "hvd.receiving.option.02",
-                    value = "true"
-                )
-                @checkbox(
-                    f = f("other"),
-                    labelText = "hvd.receiving.option.03",
-                    value = "true",
-                    target = s"#paymentMethods-details-fieldset"
-                )
-            }
+            @checkbox(
+                f = f("courier"),
+                labelText = "hvd.receiving.option.01",
+                value = "true"
+            )
+            @checkbox(
+                f = f("direct"),
+                labelText = "hvd.receiving.option.02",
+                value = "true"
+            )
+            @checkbox(
+                f = f("other"),
+                labelText = "hvd.receiving.option.03",
+                value = "true",
+                target = s"#paymentMethods-details-fieldset"
+            )
             @panel(
                 field = Some(f("paymentMethods-details-fieldset"))
             ){
