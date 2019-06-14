@@ -17,17 +17,10 @@
 package models.businessactivities
 
 import cats.data.Validated.{Invalid, Valid}
-import jto.validation.{ValidationError, _}
-import jto.validation.forms.Rules.{minLength => _, _}
+import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
-import utils.TraversableValidators.minLengthR
-
-sealed trait RiskAssessmentPolicy
-
-case class RiskAssessmentPolicyYes(riskassessments: Set[RiskAssessmentType]) extends RiskAssessmentPolicy
-
-case object RiskAssessmentPolicyNo extends RiskAssessmentPolicy
+import utils.TraversableValidators._
 
 sealed trait RiskAssessmentType
 
@@ -63,48 +56,20 @@ object RiskAssessmentType {
     }
 }
 
-object RiskAssessmentPolicy {
+case class RiskAssessmentTypes(riskassessments: Set[RiskAssessmentType])
 
+object RiskAssessmentTypes {
   import utils.MappingUtils.Implicits._
 
-  implicit def formReads
-  (implicit
-   p: Path => RuleLike[UrlFormEncoded, Set[RiskAssessmentType]]
-    ): Rule[UrlFormEncoded, RiskAssessmentPolicy] =
-    From[UrlFormEncoded] { __ =>
-      (__ \ "hasPolicy").read[Boolean].withMessage("error.required.ba.option.risk.assessment") flatMap {
-          case true =>
-             (__ \ "riskassessments").
-               read(minLengthR[Set[RiskAssessmentType]](1).withMessage("error.required.ba.risk.assessment.format")) map RiskAssessmentPolicyYes.apply
-         case false => Rule.fromMapping { _ => Valid(RiskAssessmentPolicyNo) }
-      }
+  implicit def formRule(implicit p: Path => Rule[UrlFormEncoded, Set[RiskAssessmentType]]):
+  Rule[UrlFormEncoded, RiskAssessmentTypes] = From[UrlFormEncoded] { __ =>
+    (__ \ "riskassessments").read(minLengthR[Set[RiskAssessmentType]](1)).withMessage("error.required.ba.risk.assessment.format") map RiskAssessmentTypes.apply
   }
 
   implicit def formWrites
   (implicit
    w: Write[RiskAssessmentType, String]
-    ) = Write[RiskAssessmentPolicy, UrlFormEncoded] {
-        case RiskAssessmentPolicyYes(data) =>
-            Map("hasPolicy" -> Seq("true"),
-            "riskassessments[]" -> data.toSeq.map(w.writes))
-        case RiskAssessmentPolicyNo =>
-            Map("hasPolicy" -> Seq("false"))
+  ) = Write[RiskAssessmentTypes, UrlFormEncoded] { data =>
+    Map("riskassessments[]" -> data.riskassessments.toSeq.map(w.writes))
   }
-
-
-  implicit def jsonReads: Reads[RiskAssessmentPolicy] =
-    (__ \ "hasPolicy").read[Boolean] flatMap {
-      case true =>
-        (__ \ "riskassessments").read[Set[RiskAssessmentType]].flatMap(RiskAssessmentPolicyYes.apply _)
-      case false => Reads(_ => JsSuccess(RiskAssessmentPolicyNo))
-    }
-
-  implicit def jsonWrites = Writes[RiskAssessmentPolicy] {
-       case RiskAssessmentPolicyYes(data) =>
-            Json.obj("hasPolicy" -> true,
-            "riskassessments" -> data)
-        case RiskAssessmentPolicyNo =>
-            Json.obj("hasPolicy" -> false)
-  }
-
 }

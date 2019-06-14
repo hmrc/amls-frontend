@@ -35,7 +35,7 @@ class BusinessActivitiesSpec extends AmlsSpec {
   val DefaultCustomersOutsideUK = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))
   val DefaultNCARegistered = NCARegistered(true)
   val DefaultAccountantForAMLSRegulations = AccountantForAMLSRegulations(true)
-  val DefaultRiskAssessments = RiskAssessmentPolicyYes(Set(PaperBased))
+  val DefaultRiskAssessments = RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(PaperBased)))
   val DefaultHowManyEmployees = HowManyEmployees(Some("5"),Some("4"))
   val DefaultWhoIsYourAccountant = WhoIsYourAccountant(
     "Accountant's name",
@@ -55,7 +55,7 @@ class BusinessActivitiesSpec extends AmlsSpec {
   val NewCustomersOutsideUK = CustomersOutsideUK(None)
   val NewNCARegistered = NCARegistered(false)
   val NewAccountantForAMLSRegulations = AccountantForAMLSRegulations(false)
-  val NewRiskAssessment = RiskAssessmentPolicyNo
+  val NewRiskAssessment = RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), RiskAssessmentTypes(Set()))
   val NewHowManyEmployees = HowManyEmployees(Some("2"),Some("3"))
   val NewIdentifySuspiciousActivity = IdentifySuspiciousActivity(true)
   val NewWhoIsYourAccountant = WhoIsYourAccountant(
