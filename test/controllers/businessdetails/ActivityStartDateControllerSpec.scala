@@ -17,6 +17,7 @@
 package controllers.businessdetails
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businessdetails._
 import models.businesscustomer.{Address, ReviewDetails}
@@ -25,13 +26,11 @@ import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.AmlsSpec
+import utils.{AmlsSpec, AuthorisedFixture}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
 import org.mockito.Matchers._
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
@@ -43,7 +42,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
     val controller = new ActivityStartDateController (
       dataCache = mock[DataCacheConnector],
-      authConnector = self.authConnector
+      authAction = SuccessfulAuthAction
     )
   }
 
@@ -59,7 +58,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
       "load ActivityStartDate page" in new Fixture {
 
-        when(controller.dataCache.fetch[BusinessDetails](any())(any(), any(), any()))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(businessDetails)))
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -68,7 +67,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
       "load ActivityStartDate with pre-populated data" in new Fixture {
 
-        when(controller.dataCache.fetch[BusinessDetails](any())(any(), any(), any()))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(businessDetails)))
         val result = controller.get()(request)
         val document = Jsoup.parse(contentAsString(result))
@@ -97,9 +96,9 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
         when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
           .thenReturn(Some(BusinessDetails(Some(PreviouslyRegisteredNo))))
 
-        when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        when(controller.dataCache.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
-        when(controller.dataCache.save(any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataCache.save(any(), any(), any())(any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -117,7 +116,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
           Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
 
-        when(controller.dataCache.save(any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataCache.save(any(), any(), any())(any(), any())).thenReturn(Future.successful(emptyCache))
 
         val mockCacheMap = mock[CacheMap]
 
@@ -126,7 +125,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
         when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
           .thenReturn(Some(BusinessDetails(Some(PreviouslyRegisteredNo))))
 
-        when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        when(controller.dataCache.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.post()(newRequest)
