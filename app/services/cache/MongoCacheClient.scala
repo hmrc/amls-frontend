@@ -126,7 +126,8 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
       fetchAll(id, true) flatMap { maybeCache =>
         val cache = maybeNewCache.getOrElse(maybeCache.getOrElse(Cache(newId, Map.empty)))
 
-        val updatedCache = cache.copy(
+        val updatedCache: Cache = cache.copy(
+          id = newId,
           data = cache.data + (key -> jsonData),
           lastUpdated = DateTime.now(DateTimeZone.UTC)
         )
