@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package utils
+package controllers
 
-import org.apache.commons.codec.digest.DigestUtils
-import org.apache.commons.codec.binary.Base64._
+import play.api.i18n.{I18nSupport, Messages}
+import play.api.mvc.Request
+import uk.gov.hmrc.play.frontend.controller.FrontendController
+import utils.ControllerHelper
 
-object UrlSafe {
+trait DefaultBaseController extends FrontendController with I18nSupport {
+  def notFoundView(implicit request: Request[_]) = ControllerHelper.notFoundView(request)
 
-  def hash(value: String): String = {
-    val sha1: Array[Byte] = DigestUtils.sha1(value)
-    val encoded = encodeBase64String(sha1)
-
-    urlSafe(encoded)
-  }
-
-  private def urlSafe(encoded: String): String = {
-    encoded.replace("=", "")
-      .replace("/", "_")
-      .replace("+", "-")
-  }
+  import play.api.Play.current
+  implicit def messagesApi = Messages.Implicits.applicationMessages.messages
 }
-

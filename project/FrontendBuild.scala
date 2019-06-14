@@ -35,6 +35,7 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "play-reactivemongo" % playReactivemongoVersion,
     "uk.gov.hmrc" %% "auth-client" % authVersion,
     "uk.gov.hmrc" %% "play-ui" % "7.40.0-play-25",
+    "uk.gov.hmrc" %% "bootstrap-play-25" % "4.13.0",
 
     "io.github.jto" %% "validation-core"      % validationVersion excludeAll playJars,
     "io.github.jto" %% "validation-playjson"  % validationVersion excludeAll playJars,
