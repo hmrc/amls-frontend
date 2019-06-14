@@ -190,7 +190,6 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
     }
 
   def find[T](credId: String, oId: String, key: String)(implicit reads: Reads[T]): Future[Option[T]] = {
-
     val cacheWithCredId: Future[Option[T]] = fetchAll(credId, deprecatedFilter = false) map {
       case Some(cache) => decryptOrGetValue(cache, key)(reads)
       case _ => None
@@ -214,9 +213,7 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
   }
 
   def fetchAll(id: String, deprecatedFilter: Boolean): Future[Option[Cache]] = {
-    val key = if(deprecatedFilter) bsonIdQueryOid(id) else bsonIdQuery(id)
-
-    collection.find(key).one[Cache] map {
+    collection.find(key(id, deprecatedFilter)).one[Cache] map {
       case Some(c) if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c, compositeSymmetricCrypto))
       case c => c
     }
@@ -233,11 +230,8 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
   /**
     * Removes the item with the specified id from the cache
     */
-  def removeById(id: String, deprecatedFilter: Boolean) = {
-    val key = if(deprecatedFilter) bsonIdQueryOid(id) else bsonIdQuery(id)
-
-    collection.remove(key) map handleWriteResult
-  }
+  def removeById(id: String, deprecatedFilter: Boolean) =
+    collection.remove(key(id, deprecatedFilter)) map handleWriteResult
 
   /**
     * Saves the cache data into the database
@@ -278,6 +272,7 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
     */
   private def bsonIdQuery(id: String) = BSONDocument("_id" -> id)
   private def bsonIdQueryOid(id: String) = BSONDocument("_id" -> BSONObjectID(id))
+  private def key(id: String, deprecatedFilter: Boolean) = if(deprecatedFilter) bsonIdQueryOid(id) else bsonIdQuery(id)
 
   /**
     * Handles logging for write results
