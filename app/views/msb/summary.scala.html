@@ -75,7 +75,7 @@
                     editUrl = controllers.msb.routes.BranchesOrAgentsController.get(true).toString
                 ) {
                     <p>@boa.hasCountries match {
-                        case BranchesOrAgents(true) => {
+                        case BranchesOrAgentsHasCountries(true) => {
                             @Messages("lbl.yes")
                         }
                         case _ => {
@@ -85,7 +85,7 @@
                 }
 
                 @boa.hasCountries match {
-                    case BranchesOrAgents(true) => {
+                    case BranchesOrAgentsHasCountries(true) => {
                         @checkYourAnswers(
                             question = Messages("msb.branchesoragents.countries.title"),
                             editLinkTag = "msbwhichcountries-edit",
