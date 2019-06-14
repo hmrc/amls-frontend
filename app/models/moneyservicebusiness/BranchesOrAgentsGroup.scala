@@ -56,8 +56,8 @@ object BranchesOrAgentsGroup {
 
   def update(branchesOrAgents: BranchesOrAgentsGroup, countries: BranchesOrAgentsCountries): BranchesOrAgentsGroup = {
     countries match {
-      case BranchesOrAgentsCountries(Seq()) =>BranchesOrAgentsGroup(BranchesOrAgents(false), None)
-      case BranchesOrAgentsCountries(Seq(_)) =>BranchesOrAgentsGroup(BranchesOrAgents(true), Some(countries))
+      case BranchesOrAgentsCountries(list) if list.isEmpty => BranchesOrAgentsGroup(BranchesOrAgents(false), None)
+      case BranchesOrAgentsCountries(_) =>BranchesOrAgentsGroup(BranchesOrAgents(true), Some(countries))
     }
   }
 }
