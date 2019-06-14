@@ -297,9 +297,9 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
   private def decryptOrGetValue[T](cache: Cache, key: String)(implicit reads: Reads[T] ) =
     if (appConfig.mongoEncryptionEnabled) {
       decryptValue[T](cache, key)(new JsonDecryptor[T](), reads)
-  } else {
+    } else {
       getValue[T](cache, key)
-  }
+    }
 }
 
 // $COVERAGE-ON$
