@@ -16,7 +16,6 @@
 
 package typeclasses.confirmation
 
-import config.ApplicationConfig
 import models.businessmatching.BusinessActivities
 import models.confirmation.{BreakdownRow, Currency, RowEntity}
 import models.responsiblepeople.ResponsiblePerson
@@ -84,19 +83,11 @@ object BreakdownRowInstances {
   }
 
   def responsiblePeopleRowsProxy(subscription: SubmissionResponse, people: Option[Seq[ResponsiblePerson]], activities: BusinessActivities) = {
-    if (ApplicationConfig.phase2ChangesToggle) {
-      ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+      ResponsiblePeopleRowsInstances.responsiblePeopleRowsFromSubscription(
         subscription,
         activities.businessActivities,
         people
       )
-    } else {
-      ResponsiblePeopleRows[SubmissionResponse](
-        subscription,
-        activities.businessActivities,
-        people
-      )
-    }
   }
 
   implicit val breakdownRowFromVariation: ConfirmationBreakdownRows[AmendVariationRenewalResponse] = {

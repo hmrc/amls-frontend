@@ -30,7 +30,7 @@ import models.responsiblepeople.ResponsiblePerson
 import models.status._
 import models.tradingpremises.TradingPremises
 import typeclasses.confirmation.BreakdownRowInstances._
-import typeclasses.confirmation.{BreakdownRows, ResponsiblePeopleRowsInstancesPhase2}
+import typeclasses.confirmation.{BreakdownRows, ResponsiblePeopleRowsInstances}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 

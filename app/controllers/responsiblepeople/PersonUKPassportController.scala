@@ -62,8 +62,7 @@ class PersonUKPassportController @Inject()(
             (for {
               cache <- OptionT(fetchAllAndUpdateStrict[ResponsiblePerson](index) { (_, rp) =>
                 data match {
-                  case UKPassportYes(_) if appConfig.phase2ChangesToggle => rp.ukPassport(data).copy(nonUKPassport = None)
-                  case UKPassportYes(_) => rp.ukPassport(data).copy(nonUKPassport = None, dateOfBirth = None)
+                  case UKPassportYes(_) => rp.ukPassport(data).copy(nonUKPassport = None)
                   case _ => rp.ukPassport(data)
                 }
               })

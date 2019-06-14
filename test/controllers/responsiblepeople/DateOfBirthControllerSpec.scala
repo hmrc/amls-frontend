@@ -111,34 +111,7 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar {
     }
 
     "post is called" must {
-
-      "edit is false and phase-2-change feature toggle is false" must {
-        "go to CountryOfBirthController" in new Fixture {
-
-          val newRequest = request.withFormUrlEncodedBody(
-            "dateOfBirth.day" -> "1",
-            "dateOfBirth.month" -> "12",
-            "dateOfBirth.year" -> "1990"
-          )
-
-          when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
-
-          val responsiblePeople = ResponsiblePerson()
-
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = Some(personName))))))
-
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          val result = controller.post(1)(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CountryOfBirthController.get(1).url))
-
-        }
-      }
-
-      "edit is false and phase-2-change feature toggle is true" must {
+      "edit is false" must {
         "go to PersonResidencyTypeController" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
@@ -146,8 +119,6 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar {
             "dateOfBirth.month" -> "12",
             "dateOfBirth.year" -> "1990"
           )
-
-          when(mockAppConfig.phase2ChangesToggle).thenReturn(true)
 
           val responsiblePeople = ResponsiblePerson()
 

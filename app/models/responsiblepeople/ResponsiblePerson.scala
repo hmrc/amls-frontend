@@ -16,7 +16,6 @@
 
 package models.responsiblepeople
 
-import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 import org.joda.time.LocalDate
@@ -72,9 +71,8 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
   }
 
   def resetBasedOnApprovalFlags(): ResponsiblePerson = {
-    (ApplicationConfig.phase2ChangesToggle, approvalFlags) match {
-      case (false, _) => this.copy(hasAccepted = true, approvalFlags = ApprovalFlags())
-      case (_, ApprovalFlags(Some(true), _)) => this
+    approvalFlags match {
+      case ApprovalFlags(Some(true), _) => this
       case _ =>
         this.approvalFlags(
           this.approvalFlags.copy(hasAlreadyPaidApprovalCheck = None,
@@ -184,50 +182,26 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
       !pName.hasPreviousName.get
     }
 
-    def phase2IsOffAndWithCommonFields(pos: Positions,
-                                       otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]
-                                      ): Boolean = {
-      !ApplicationConfig.phase2ChangesToggle &&
-      hasValidCommonFields(pos, otherBusinessSP)
-    }
-
-    def phase2IsOnAndValidCommonField(pos: Positions,
+    def validCommonField(pos: Positions,
                                       otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]
                                      ): Boolean = {
-      ApplicationConfig.phase2ChangesToggle &&
       approvalFlags.isComplete() &
       hasValidCommonFields(pos, otherBusinessSP)
     }
 
-    def phase2IsOnAndNoPrevousName(pName: PreviousName,
+    def noPreviousName(pName: PreviousName,
                                    pos: Positions, otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]
                                   ): Boolean = {
-      ApplicationConfig.phase2ChangesToggle &&
       approvalFlags.isComplete() &
-      hasNoPreviousName(pName, pos, otherBusinessSP)
-    }
-
-    def phase2IsOffAndNoPreviousName(pName: PreviousName,
-                                     pos: Positions,
-                                     otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]
-                                    ): Boolean = {
-      !ApplicationConfig.phase2ChangesToggle &&
       hasNoPreviousName(pName, pos, otherBusinessSP)
     }
 
     this match {
-
       case ResponsiblePerson(Some(_),Some(_),Some(_),Some(_),Some(_), _, _, Some(_),Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
-        if phase2IsOnAndValidCommonField(pos, otherBusinessSP) => true
+        if validCommonField(pos, otherBusinessSP) => true
 
       case ResponsiblePerson(Some(_),Some(pName),None,Some(_),Some(_), _, _, Some(_),Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
-        if phase2IsOnAndNoPrevousName(pName, pos, otherBusinessSP) => true
-
-      case ResponsiblePerson(Some(_),Some(_),Some(_),Some(_),Some(_), _, _, _,Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
-        if phase2IsOffAndWithCommonFields(pos, otherBusinessSP) => true
-
-      case ResponsiblePerson(Some(_),Some(pName),None,Some(_),Some(_), _, _, _,Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
-        if phase2IsOffAndNoPreviousName(pName, pos, otherBusinessSP) => true
+        if noPreviousName(pName, pos, otherBusinessSP) => true
 
       case _ => false
     }
@@ -379,11 +353,7 @@ object ResponsiblePerson {
         (__ \ "training").readNullable[Training] and
         (__ \ "hasAlreadyPassedFitAndProper").read[Boolean].map {
           fitAndProper =>
-            if(ApplicationConfig.phase2ChangesToggle) {
               ApprovalFlags(hasAlreadyPassedFitAndProper = Some(fitAndProper), hasAlreadyPaidApprovalCheck = Some(true))
-            } else {
-              ApprovalFlags(hasAlreadyPassedFitAndProper = Some(fitAndProper), hasAlreadyPaidApprovalCheck = None)
-            }
         }
           .orElse((__ \ "approvalFlags").read[ApprovalFlags])
           .orElse(Reads.pure(ApprovalFlags(None, None))) and

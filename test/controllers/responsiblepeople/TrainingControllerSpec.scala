@@ -16,25 +16,23 @@
 
 package controllers.responsiblepeople
 
-import config.{AMLSAuthConnector, AppConfig}
-import connectors.{DataCacheConnector, KeystoreConnector}
-import models.businessmatching._
+import config.AppConfig
+import connectors.DataCacheConnector
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{PersonName, ResponsiblePerson, TrainingNo, TrainingYes}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import play.api.i18n.Messages
-import play.api.test.Helpers._
-import uk.gov.hmrc.http.cache.client.CacheMap
-import org.mockito.Matchers.{eq => meq, _}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
@@ -51,8 +49,6 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
-      .overrides(bind[AppConfig].to(mockAppConfig))
-
 
     val builder = defaultBuilder
     lazy val app = builder.build()
@@ -139,113 +135,18 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
       }
 
       "given valid data" when {
-        "there is no cache data, must redirect to the PersonRegisteredController" in new Fixture {
-
-          val newRequest = request.withFormUrlEncodedBody(
-            "training" -> "true",
-            "information" -> "test"
-          )
-
-          when(controller.dataCacheConnector.fetchAll(any(), any()))
-            .thenReturn(Future.successful(None))
-
-          val result = controller.post(recordId, false)(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId).url))
-        }
-
         "edit is false" must {
-          "redirect to DeatiledAnswersController when training is yes" in new Fixture {
-
-            val newRequest = request.withFormUrlEncodedBody(
-              "training" -> "true",
-              "information" -> "test"
-            )
-
-            when(controller.dataCacheConnector.fetchAll(any(), any()))
-              .thenReturn(Future.successful(Some(emptyCache)))
-
-            when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(mockCacheMap))
-
-            val result = controller.post(recordId, false)(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId).url))
-          }
-
-          "redirect to FitAndProperNoticeController when businessActivities includes TrustAndCompanyServices and phase 2 changes toggle is false" in new Fixture {
-            when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
+          "redirect to FitAndProperNoticeController" in new Fixture {
             val newRequest = request.withFormUrlEncodedBody(
               "training" -> "true",
               "information" -> "I do not remember when I did the training"
             )
 
-            val testCacheMap = CacheMap("", Map(
-
-            ))
-
-            when(controller.dataCacheConnector.fetchAll(any(), any()))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
-            when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
-              .thenReturn(Some(
-                BusinessMatching(activities = Some(BusinessActivities(Set(TrustAndCompanyServices,HighValueDealing))))
-              ))
-            when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
-              .thenReturn(Some(Seq(ResponsiblePerson())))
-
-            when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(mockCacheMap))
-
-            val result = controller.post(recordId, false)(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.FitAndProperNoticeController.get(recordId).url))
-          }
-          "redirect to FitAndProperNoticeController when businessActivities includes MoneyServiceBusiness and phase 2 changes toggle is false" in new Fixture {
-            when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
-            val newRequest = request.withFormUrlEncodedBody(
-              "training" -> "true",
-              "information" -> "I do not remember when I did the training"
-            )
-
-            val testCacheMap = CacheMap("", Map(
-
-            ))
+            val testCacheMap = CacheMap("", Map())
 
             when(controller.dataCacheConnector.fetchAll(any(), any()))
               .thenReturn(Future.successful(Some(mockCacheMap)))
 
-            when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
-              .thenReturn(Some(
-                BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness,HighValueDealing))))
-              ))
-
-            when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
-              .thenReturn(Some(Seq(ResponsiblePerson())))
-
-            when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(mockCacheMap))
-
-            val result = controller.post(recordId, false)(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.FitAndProperNoticeController.get(recordId).url))
-          }
-          "redirect to FitAndProperNoticeController when businessActivities includes HighValueDealing and phase 2 changes toggle is true" in new Fixture {
-            when(mockAppConfig.phase2ChangesToggle).thenReturn(true)
-            val newRequest = request.withFormUrlEncodedBody(
-              "training" -> "true",
-              "information" -> "I do not remember when I did the training"
-            )
-
-            val testCacheMap = CacheMap("", Map(
-
-            ))
-
-            when(controller.dataCacheConnector.fetchAll(any(), any()))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
-            when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
-              .thenReturn(Some(
-                BusinessMatching(activities = Some(BusinessActivities(Set(HighValueDealing))))
-              ))
             when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
               .thenReturn(Some(Seq(ResponsiblePerson())))
 
@@ -258,7 +159,7 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
           }
         }
         "edit is true" must {
-          "on post with valid data in edit mode" in new Fixture {
+          "redirect to DetailedAnswersController" in new Fixture {
 
             val newRequest = request.withFormUrlEncodedBody(
               "training" -> "true",
@@ -272,8 +173,6 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId, Some(flowFromDeclaration)).url))
           }
-
-
         }
       }
 
@@ -287,9 +186,6 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
         val result = controller.post(recordId)(newRequest)
         status(result) must be(BAD_REQUEST)
       }
-
-
-
     }
   }
 }

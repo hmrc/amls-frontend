@@ -18,7 +18,6 @@ package controllers.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._
-import config.AppConfig
 import connectors.DataCacheConnector
 import forms.{EmptyForm, Form2}
 import generators.ResponsiblePersonGenerator
@@ -66,7 +65,6 @@ class RegisterServicesControllerSpec extends AmlsSpec
     val request = addToken(authRequest)
 
     val statusService = mockStatusService
-    val mockAppConfig = mock[AppConfig]
 
     val businessMatchingService = mock[BusinessMatchingService]
 
@@ -83,7 +81,6 @@ class RegisterServicesControllerSpec extends AmlsSpec
       .overrides(bind[StatusService].to(statusService))
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
-      .overrides(bind[AppConfig].to(mockAppConfig))
       .build()
 
     val controller = app.injector.instanceOf[RegisterServicesController]
@@ -740,88 +737,6 @@ class RegisterServicesControllerSpec extends AmlsSpec
       }
     }
 
-    "fitAndProperRequired" must {
-      "return true" when {
-        "tcsp is defined in businessActivities and phase-2-changes toggle is false" in new Fixture {
-
-            when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
-            val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
-
-            val result = controller invokePrivate fitAndProperRequired(BMBusinessActivities(Set(TrustAndCompanyServices), None))
-
-            result must be(true)
-
-          }
-        "msb is defined in businessActivities and phase-2-changes toggle is false" in new Fixture {
-
-          when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
-            val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
-
-            val result = controller invokePrivate fitAndProperRequired(BMBusinessActivities(Set(MoneyServiceBusiness), None))
-
-            result must be(true)
-
-          }
-        "additional activities is defined" when {
-          "tcsp is defined in additional activities and phase-2-changes toggle is false" in new Fixture {
-
-            when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
-            val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
-
-            val result = controller invokePrivate fitAndProperRequired(BMBusinessActivities(Set(HighValueDealing), Some(Set(TrustAndCompanyServices))))
-
-            result must be(true)
-
-          }
-          "msb is defined in additional activities and phase-2-changes toggle is false" in new Fixture {
-
-            when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
-            val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
-
-            val result = controller invokePrivate fitAndProperRequired(BMBusinessActivities(Set(HighValueDealing), Some(Set(MoneyServiceBusiness))))
-
-            result must be(true)
-
-          }
-        }
-      }
-      "return true" when {
-        "phase-2-changes toggle is true" in new Fixture {
-            when(mockAppConfig.phase2ChangesToggle).thenReturn(true)
-            val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
-
-            val result = controller invokePrivate fitAndProperRequired(BMBusinessActivities(Set(BillPaymentServices), None))
-
-            result must be(true)
-
-          }
-      }
-      "return false" when {
-        "additional activities is not defined" when {
-          "neither msb or tcsp appear businessActivities and phase-2-changes toggle is false" in new Fixture {
-            when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
-            val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
-
-            val result = controller invokePrivate fitAndProperRequired(BMBusinessActivities(Set(HighValueDealing), None))
-
-            result must be(false)
-
-          }
-        }
-        "additional activities is defined" when {
-          "neither msb or tcsp appear businessActivities or additional activities and phase-2-changes is false" in new Fixture {
-            when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
-            val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
-
-            val result = controller invokePrivate fitAndProperRequired(BMBusinessActivities(Set(HighValueDealing), Some(Set(EstateAgentBusinessService))))
-
-            result must be(false)
-
-          }
-        }
-      }
-    }
-
     "promptFitAndProper" must {
       "return true" when {
         "a responsible person has fitAndProper not defined" in new Fixture {
@@ -894,26 +809,6 @@ class RegisterServicesControllerSpec extends AmlsSpec
         verify(controller.businessMatchingService).updateModel(eqTo(businessMatching1.activities(
           BMBusinessActivities(Set(HighValueDealing, TelephonePaymentService))
         )))(any(),any(),any())
-
-      }
-    }
-    "remove RP FitAndProper" when {
-      "fitAndProper is not required" in new Fixture {
-
-        when {
-          controller.businessMatchingService.getModel(any(),any(),any())
-        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(None, Some(BMBusinessActivities(Set(MoneyServiceBusiness, HighValueDealing)))))
-
-        val result = controller.post()(request.withFormUrlEncodedBody(
-          "businessActivities[0]" -> BMBusinessActivities.getValue(HighValueDealing)
-        ))
-
-        status(result) must be(SEE_OTHER)
-
-        verify(mockCacheConnector).save[Seq[ResponsiblePerson]](
-          eqTo(ResponsiblePerson.key),
-          eqTo(Seq(responsiblePersonChanged, responsiblePersonChanged))
-        )(any(),any(),any())
 
       }
     }
@@ -998,28 +893,6 @@ class RegisterServicesControllerSpec extends AmlsSpec
           )
           val bm = BMBusinessActivities(businessActivities=Set(HighValueDealing))
           val isRemoving = false
-
-          val result = controller.shouldPromptForApproval(rp, bm, isRemoving)
-
-          val expectedRp = rp
-          val expectedBm = bm
-
-          result mustEqual((expectedRp, expectedBm))
-        }
-      }
-
-      "not handle any approvalFlags" when {
-        "the toggle is off" in new Fixture {
-
-          when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
-
-          val rp = responsiblePerson.copy(
-            approvalFlags = ApprovalFlags(
-              hasAlreadyPassedFitAndProper = Some(false)
-            )
-          )
-          val bm = BMBusinessActivities(businessActivities=Set(HighValueDealing))
-          val isRemoving = true
 
           val result = controller.shouldPromptForApproval(rp, bm, isRemoving)
 
