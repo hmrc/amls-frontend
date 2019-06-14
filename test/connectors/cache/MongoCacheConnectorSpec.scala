@@ -57,6 +57,7 @@ class MongoCacheConnectorSpec extends FreeSpec
     val factory = mock[MongoCacheClientFactory]
     val client = mock[MongoCacheClient]
     val cacheId = arbitrary[String].sample.get
+    val newCacheId = "12345678"
     val key = arbitrary[String].sample.get
     val mockAuthConnector = mock[AuthConnector]
 
@@ -73,7 +74,7 @@ class MongoCacheConnectorSpec extends FreeSpec
 
     when {
       mockAuthConnector.getCredId(any(), any())
-    } thenReturn Future.successful("12345678")
+    } thenReturn Future.successful(newCacheId)
 
     val connector = new MongoCacheConnector(factory, mockAuthConnector)
   }
@@ -108,10 +109,10 @@ class MongoCacheConnectorSpec extends FreeSpec
 
   "fetchAll" - {
     "should delegate the call to the underlying mongo client for CredId" in new Fixture with Conversions {
-      val cache = Cache("12345678", referenceMap())
+      val cache = Cache(newCacheId, referenceMap())
 
       when {
-        client.fetchAll("12345678", false)
+        client.fetchAll(newCacheId, false)
       } thenReturn Future.successful(Some(cache))
 
       whenReady(connector.fetchAll) { _ mustBe Some(toCacheMap(cache)) }
@@ -121,7 +122,7 @@ class MongoCacheConnectorSpec extends FreeSpec
       val cache = Cache(cacheId, referenceMap())
 
       when {
-        client.fetchAll("12345678", false)
+        client.fetchAll(newCacheId, false)
       } thenReturn Future.successful(None)
 
       when {
@@ -135,15 +136,15 @@ class MongoCacheConnectorSpec extends FreeSpec
   "save" - {
     "should delegate the call to the underlying mongo client for CredId" in new Fixture with Conversions {
       val model = Model()
-      val cache = Cache("12345678", referenceMap())
+      val cache = Cache(newCacheId, referenceMap())
 
       when {
-        client.createOrUpdateWithCacheMiss(cacheId, "12345678", model, key)
+        client.createOrUpdateWithCacheMiss(cacheId, newCacheId, model, key)
       } thenReturn Future.successful(cache)
 
       whenReady(connector.save(key, model)) { result =>
         result mustBe toCacheMap(cache)
-        result.id mustBe "12345678"
+        result.id mustBe newCacheId
       }
     }
 
@@ -152,7 +153,7 @@ class MongoCacheConnectorSpec extends FreeSpec
       val cache = Cache(cacheId, referenceMap())
 
       when {
-        client.createOrUpdateWithCacheMiss(cacheId, "12345678", model, key)
+        client.createOrUpdateWithCacheMiss(cacheId, newCacheId, model, key)
       } thenReturn Future.successful(cache)
 
       whenReady(connector.save(key, model)) { result =>
@@ -179,7 +180,7 @@ class MongoCacheConnectorSpec extends FreeSpec
   "remove" - {
     "should delegate the call to the underlying mongo client for CredId" in new Fixture {
       reset(client)
-      when(client.removeById("12345678", false)) thenReturn Future.successful(true)
+      when(client.removeById(newCacheId, false)) thenReturn Future.successful(true)
 
       whenReady(connector.remove) { _ mustBe true }
     }
