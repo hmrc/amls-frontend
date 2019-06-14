@@ -55,7 +55,7 @@ object BranchesOrAgentsCountries {
           .andThen(maxLengthR[Seq[Country]](maxLength))
       }
 
-      (__ \ "countries").read[Seq[String]].andThen(countrySeqR).map(countries => {
+      (__ \ "countries").read(countrySeqR).map(countries => {
         BranchesOrAgentsCountries.apply(countries)
       })
     }
