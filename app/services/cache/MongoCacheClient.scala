@@ -289,16 +289,16 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
   private def tryDecrypt(value: Crypted): PlainText = Try {
     compositeSymmetricCrypto.decrypt(value).value
   } match {
-    case Success(v) => PlainText(v)
-    case Failure(e) if e.isInstanceOf[SecurityException] => PlainText(value.value)
-    case Failure(e) => throw e
+      case Success(v) => PlainText(v)
+      case Failure(e) if e.isInstanceOf[SecurityException] => PlainText(value.value)
+      case Failure(e) => throw e
   }
 
   private def decryptOrGetValue[T](cache: Cache, key: String)(implicit reads: Reads[T] ) =
     if (appConfig.mongoEncryptionEnabled) {
-    decryptValue[T](cache, key)(new JsonDecryptor[T](), reads)
+      decryptValue[T](cache, key)(new JsonDecryptor[T](), reads)
   } else {
-    getValue[T](cache, key)
+      getValue[T](cache, key)
   }
 }
 
