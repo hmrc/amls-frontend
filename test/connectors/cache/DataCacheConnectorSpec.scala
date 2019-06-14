@@ -46,20 +46,20 @@ class DataCacheConnectorSpec
 
     implicit val user = mock[LoggedInUser]
     val key = "key"
-    val cacheId = "oldId"
-    val newCacheId = "12345678"
-    val cache = Cache(cacheId, referenceMap())
-    val newCache = cache.copy(id = newCacheId)
+    val oId = "oldId"
+    val credId = "12345678"
+    val cache = Cache(oId, referenceMap())
+    val newCache = cache.copy(id = credId)
     implicit val ec = mock[ExecutionContext]
 
     when(authContext.user) thenReturn user
-    when(user.oid) thenReturn cacheId
+    when(user.oid) thenReturn oId
 
     val mockAuthConnector = mock[AuthConnector]
 
     val factory = mock[MongoCacheClientFactory]
     val client = mock[MongoCacheClient]
-    val authority = Authority("", Accounts(), "/user-details", "/ids", newCacheId)
+    val authority = Authority("", Accounts(), "/user-details", "/ids", credId)
 
     when(factory.createClient) thenReturn client
 
@@ -69,7 +69,7 @@ class DataCacheConnectorSpec
 
     when {
       mockAuthConnector.getCredId(any(), any())
-    } thenReturn Future.successful(newCacheId)
+    } thenReturn Future.successful(credId)
 
     val appConfig = mock[AppConfig]
 
@@ -92,12 +92,12 @@ class DataCacheConnectorSpec
       val model = Model("data")
 
       when {
-        dataCacheConnector.mongoCache.createOrUpdateWithCacheMiss(cacheId, newCacheId, model, key)
+        dataCacheConnector.mongoCache.createOrUpdate(credId, oId, model, key)
       } thenReturn Future.successful(newCache)
 
       whenReady(dataCacheConnector.save(key, model)) { result =>
         result mustBe toCacheMap(newCache)
-        result.id mustBe newCacheId
+        result.id mustBe credId
       }
     }
 
@@ -105,7 +105,7 @@ class DataCacheConnectorSpec
       val model = Model("data")
 
       when {
-        dataCacheConnector.mongoCache.findWithCacheMiss[Model](cacheId, newCacheId, key)
+        dataCacheConnector.mongoCache.find[Model](credId, oId, key)
       } thenReturn Future.successful(Some(model))
 
       whenReady(dataCacheConnector.fetch[Model](key)) { _ mustBe Some(model) }
@@ -115,7 +115,7 @@ class DataCacheConnectorSpec
       val model = Model("data")
 
       when {
-        dataCacheConnector.mongoCache.fetchAll(newCacheId, false)
+        dataCacheConnector.mongoCache.fetchAll(credId, deprecatedFilter = false)
       } thenReturn Future.successful(Some(newCache))
 
       whenReady(dataCacheConnector.fetchAll) { _ mustBe Some(toCacheMap(newCache)) }
@@ -123,7 +123,7 @@ class DataCacheConnectorSpec
 
     "remove data from Mongo" in new Fixture {
       when {
-        dataCacheConnector.mongoCache.removeById(newCacheId, false)
+        dataCacheConnector.mongoCache.removeById(credId, deprecatedFilter = false)
       } thenReturn Future.successful(true)
 
       whenReady(dataCacheConnector.remove) {
@@ -137,7 +137,7 @@ class DataCacheConnectorSpec
       } thenReturn Future.successful(false)
 
       when {
-        dataCacheConnector.mongoCache.removeById(cacheId, true)
+        dataCacheConnector.mongoCache.removeById(oId, deprecatedFilter = true)
       } thenReturn Future.successful(true)
 
       whenReady(dataCacheConnector.remove) {

@@ -114,7 +114,7 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
   /**
     * Inserts data into the cache with the specified key. If the data does not exist, it will be created.
     */
-  def createOrUpdateWithCacheMiss[T](id: String, newId: String, data: T, key: String)(implicit writes: Writes[T]): Future[Cache] = {
+  def createOrUpdate[T](credId: String, oId: String, data: T, key: String)(implicit writes: Writes[T]): Future[Cache] = {
     val jsonData = if (appConfig.mongoEncryptionEnabled) {
       val jsonEncryptor = new JsonEncryptor[T]()
       Json.toJson(Protected(data))(jsonEncryptor)
@@ -122,12 +122,12 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
       Json.toJson(data)
     }
 
-    fetchAll(newId, false) flatMap { maybeNewCache =>
-      fetchAll(id, true) flatMap { maybeCache =>
-        val cache = maybeNewCache.getOrElse(maybeCache.getOrElse(Cache(newId, Map.empty)))
+    fetchAll(credId, deprecatedFilter = false) flatMap { maybeNewCache =>
+      fetchAll(oId, deprecatedFilter = true) flatMap { maybeCache =>
+        val cache: Cache = maybeNewCache.getOrElse(maybeCache.getOrElse(Cache(credId, Map.empty)))
 
         val updatedCache: Cache = cache.copy(
-          id = newId,
+          id = credId,
           data = cache.data + (key -> jsonData),
           lastUpdated = DateTime.now(DateTimeZone.UTC)
         )
@@ -135,7 +135,7 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
         val document = Json.toJson(updatedCache)
         val modifier = BSONDocument("$set" -> document)
 
-        collection.update(bsonIdQuery(newId), modifier, upsert = true) map { _ => updatedCache }
+        collection.update(bsonIdQuery(credId), modifier, upsert = true) map { _ => updatedCache }
       }
     }
   }
@@ -143,11 +143,11 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
   /**
     * Removes the item with the specified key from the cache
     */
-  def removeByKeyWithCacheMiss[T](id: String, newId: String, key: String)(implicit writes: Writes[T]): Future[Cache] = {
+  def removeByKey[T](credId: String, oId: String, key: String)(implicit writes: Writes[T]): Future[Cache] = {
 
-    fetchAll(newId, false) flatMap { maybeNewCache =>
-      fetchAll(id, true) flatMap { maybeCache =>
-        val cache = maybeNewCache.getOrElse(maybeCache.getOrElse(Cache(newId, Map.empty)))
+    fetchAll(credId, deprecatedFilter = false) flatMap { maybeNewCache =>
+      fetchAll(oId, deprecatedFilter = true) flatMap { maybeCache =>
+        val cache = maybeNewCache.getOrElse(maybeCache.getOrElse(Cache(credId, Map.empty)))
 
         val updatedCache = cache.copy(
           data = cache.data - (key),
@@ -157,7 +157,7 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
         val document = Json.toJson(updatedCache)
         val modifier = BSONDocument("$set" -> document)
 
-        collection.update(bsonIdQuery(newId), modifier, upsert = true) map { _ => updatedCache }
+        collection.update(bsonIdQuery(credId), modifier, upsert = true) map { _ => updatedCache }
       }
     }
   }
@@ -189,33 +189,20 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
       case _ => None
     }
 
-  def findWithCacheMiss[T](id: String, newId: String, key: String)(implicit reads: Reads[T]): Future[Option[T]] = {
-    val newCache: Future[Option[T]] = fetchAll(newId, false) map {
-      case Some(cache) => if (appConfig.mongoEncryptionEnabled) {
-        decryptValue[T](cache, key)(new JsonDecryptor[T](), reads)
-      } else {
-        getValue[T](cache, key)
-      }
+  def find[T](credId: String, oId: String, key: String)(implicit reads: Reads[T]): Future[Option[T]] = {
+
+    val cacheWithCredId: Future[Option[T]] = fetchAll(credId, deprecatedFilter = false) map {
+      case Some(cache) => decryptOrGetValue(cache, key)(reads)
       case _ => None
     }
 
-    val oldCache: Future[Option[T]] = fetchAll(id, true) map {
-      case Some(cache) => if (appConfig.mongoEncryptionEnabled) {
-        decryptValue[T](cache, key)(new JsonDecryptor[T](), reads)
-      } else {
-        getValue[T](cache, key)
-      }
+    val cacheWithOid: Future[Option[T]] = fetchAll(oId, deprecatedFilter = true) map {
+      case Some(cache) => decryptOrGetValue(cache, key)(reads)
       case _ => None
     }
 
-    for {
-      n <- newCache
-      o <- oldCache
-    } yield (n, o) match {
-      case (newC@Some(_), _) => newC
-      case (_, oldC@Some(_)) => oldC
-      case (_, _) => None
-    }
+    Future.sequence(List(cacheWithCredId, cacheWithOid))
+      .map(_.flatten).map(r => r.headOption)
   }
 
   /**
@@ -310,6 +297,13 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
     case Success(v) => PlainText(v)
     case Failure(e) if e.isInstanceOf[SecurityException] => PlainText(value.value)
     case Failure(e) => throw e
+  }
+
+  private def decryptOrGetValue[T](cache: Cache, key: String)(implicit reads: Reads[T] ) =
+    if (appConfig.mongoEncryptionEnabled) {
+    decryptValue[T](cache, key)(new JsonDecryptor[T](), reads)
+  } else {
+    getValue[T](cache, key)
   }
 }
 

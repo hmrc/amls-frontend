@@ -34,12 +34,12 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
   /**
     * Fetches the data item with the specified key from the mongo store
     */
-  def fetchByOid[T](key: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
+  private def fetchByOid[T](key: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
     mongoCache.find(authContext.user.oid, key)
 
-  def fetchByCredId[T](key: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] = {
+  private def fetchByCredId[T](key: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] = {
     authConnector.getCredId flatMap {
-      credId => mongoCache.findWithCacheMiss(authContext.user.oid, credId, key)
+      credId => mongoCache.find(credId, authContext.user.oid, key)
     }
   }
 
@@ -56,7 +56,7 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
   def save[T](key: String, data: T)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] = {
     authConnector.getCredId flatMap {
       credId => {
-        mongoCache.createOrUpdateWithCacheMiss(authContext.user.oid, credId, data, key).map(toCacheMap)
+        mongoCache.createOrUpdate(credId, authContext.user.oid, data, key).map(toCacheMap)
       }
     }
   }
@@ -71,13 +71,13 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
   /**
     * Fetches the entire cache from the mongo store
     */
-  def fetchAllByOid(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =
-    mongoCache.fetchAll(authContext.user.oid, true).map(_.map(toCacheMap))
+  private def fetchAllByOid(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =
+    mongoCache.fetchAll(authContext.user.oid, deprecatedFilter = true).map(_.map(toCacheMap))
 
-  def fetchAllByCredId(implicit authContext: AuthContext, hc: HeaderCarrier): Future[Option[CacheMap]] = {
+  private def fetchAllByCredId(implicit authContext: AuthContext, hc: HeaderCarrier): Future[Option[CacheMap]] = {
     authConnector.getCredId flatMap {
       credId =>
-        mongoCache.fetchAll(credId, false).map(_.map(toCacheMap))
+        mongoCache.fetchAll(credId, deprecatedFilter = false).map(_.map(toCacheMap))
     }
   }
 
@@ -98,13 +98,13 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
     }
   }
 
-  def fetchAllWithDefaultByOid(implicit hc: HeaderCarrier, authContext: AuthContext): Future[CacheMap] =
-    mongoCache.fetchAllWithDefault(authContext.user.oid, true).map(toCacheMap)
+  private def fetchAllWithDefaultByOid(implicit hc: HeaderCarrier, authContext: AuthContext): Future[CacheMap] =
+    mongoCache.fetchAllWithDefault(authContext.user.oid, deprecatedFilter = true).map(toCacheMap)
 
-  def fetchAllWithDefaultByCredId(implicit authContext: AuthContext, hc: HeaderCarrier): Future[CacheMap] = {
+  private def fetchAllWithDefaultByCredId(implicit authContext: AuthContext, hc: HeaderCarrier): Future[CacheMap] = {
     authConnector.getCredId flatMap {
       credId =>
-        mongoCache.fetchAllWithDefault(credId, false).map(toCacheMap)
+        mongoCache.fetchAllWithDefault(credId, deprecatedFilter = false).map(toCacheMap)
     }
   }
 
@@ -117,13 +117,13 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
       case _ => removeByOid
     }
 
-  def removeByOid(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Boolean] =
-    mongoCache.removeById(authContext.user.oid, true)
+  private def removeByOid(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Boolean] =
+    mongoCache.removeById(authContext.user.oid, deprecatedFilter = true)
 
-  def removeByCredId(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Boolean] = {
+  private def removeByCredId(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Boolean] = {
     authConnector.getCredId flatMap {
       credId =>
-        mongoCache.removeById(credId, false)
+        mongoCache.removeById(credId, deprecatedFilter = false)
     }
   }
 
@@ -133,7 +133,7 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
   def removeByKey[T](key: String)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
     authConnector.getCredId flatMap {
       credId =>
-        mongoCache.removeByKeyWithCacheMiss(authContext.user.oid, credId, key).map(toCacheMap)
+        mongoCache.removeByKey(credId, authContext.user.oid, key).map(toCacheMap)
     }
 
   /**
@@ -154,9 +154,9 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
   def update[T](key: String)(f: Option[T] => T)(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
     authConnector.getCredId flatMap {
       credId =>
-        mongoCache.findWithCacheMiss[T](ac.user.oid, credId, key) flatMap { maybeModel =>
+        mongoCache.find[T](credId, ac.user.oid, key) flatMap { maybeModel =>
           val transformed = f(maybeModel)
-          mongoCache.createOrUpdateWithCacheMiss(ac.user.oid, credId, transformed, key) map { _ => Some(transformed) }
+          mongoCache.createOrUpdate(credId, ac.user.oid, transformed, key) map { _ => Some(transformed) }
         }
     }
 }
