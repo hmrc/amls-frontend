@@ -193,7 +193,7 @@ class MongoCacheConnectorSpec extends FreeSpec
       whenReady(connector.remove) { _ mustBe true }
     }
 
-    "should delegate the call to the underlying mongo client and return false if cannot remove" ignore new Fixture {
+    "should delegate the call to the underlying mongo client and return false if cannot remove" in new Fixture {
       reset(client)
       when(client.removeById(any(), any())) thenReturn Future.successful(false)
       when(client.removeById(cacheId, true)) thenReturn Future.successful(false)
