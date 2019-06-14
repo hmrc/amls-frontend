@@ -20,14 +20,9 @@
 
 @(f: forms.Form2[_],index: Int, complete: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
-@target = @{
-    s"""${f("other").id}-fieldset"""
-}
-
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("tradingpremises.remove_reasons.agent.premises.title", "summary.tradingpremises")
 }
 
 @main(
@@ -37,10 +32,10 @@
 
     @form(f, controllers.tradingpremises.routes.RemoveAgentPremisesReasonsController.post(index, complete)) {
 
-        @fieldset(
+        @fieldsetWithErrorGroup(
             f = f("removalReason"),
-            legend = "tradingpremises.remove_reasons.agent.premises.title",
-            legendHidden = true,
+            heading = "tradingpremises.remove_reasons.agent.premises.title",
+            section = "summary.tradingpremises",
             bold = false,
             panel = false
         ) {
@@ -49,15 +44,8 @@
             @radio(f("removalReason"), "tradingpremises.remove_reasons.agent.premises.lbl.03", "03")
             @radio(f("removalReason"), "tradingpremises.remove_reasons.agent.premises.lbl.04", "04")
             @radio(f("removalReason"), "tradingpremises.remove_reasons.agent.premises.lbl.05", "05")
-            @radio(f("removalReason"), "tradingpremises.remove_reasons.agent.premises.lbl.06", "06", target = s"#$target")
-        }
-
-        @fieldset(
-            legend = "tradingpremises.remove_reasons.agent.premises.lbl.06",
-            legendHidden = true,
-            f = f(target)
-        ) {
-            @input(f("removalReasonOther"), "lbl.pleasespecify")
+            @radio(f("removalReason"), "tradingpremises.remove_reasons.agent.premises.lbl.06", "06", target = "[data-reveal='removalReasonOther']")
+            @input(f("removalReasonOther"), "lbl.pleasespecify", data = "removalReasonOther")
         }
 
         @submit()

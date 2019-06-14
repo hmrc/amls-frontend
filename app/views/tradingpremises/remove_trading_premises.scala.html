@@ -23,11 +23,15 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @if(showDateField) {
-        @heading("tradingpremises.remove.trading.premises.enddate.lbl", "summary.tradingpremises")
-    } else {
+    @if(!showDateField) {
         @heading("tradingpremises.remove.trading.premises.title", "summary.tradingpremises")
     }
+}
+
+@content = {
+    <div class="panel-border-wide">
+        <p>@Messages("tradingpremises.remove.trading.premises.text", tradingAddress)</p>
+    </div>
 }
 
 @main(
@@ -36,27 +40,17 @@
 ) {
 
     @form(f, controllers.tradingpremises.routes.RemoveTradingPremisesController.remove(index, complete)) {
-        <div class="panel-border-wide">
-            <p>@Messages("tradingpremises.remove.trading.premises.text", tradingAddress)</p>
-        </div>
 
         @if(showDateField) {
-          @fieldset(
-            f = f("endDate-fieldset"),
-            legend = "tradingpremises.remove.trading.premises.enddate.lbl",
-            legendHidden = true,
-            panel = false,
-            classes = Seq("inline")
-          ) {
-
             @date(
-              f = f,
-              p = "endDate",
-              labelText = "",
-              hintText = "",
-              true
+                f = f,
+                p = "endDate",
+                heading = "tradingpremises.remove.trading.premises.enddate.lbl",
+                section = "summary.tradingpremises",
+                supportingContent = content
             )
-          }
+        } else {
+            @content
         }
 
         @submit(false, Some(Messages("tradingpremises.remove.trading.premises.btn")))
