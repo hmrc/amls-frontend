@@ -25,7 +25,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("tradingpremises.confirmaddress.title", "summary.tradingpremises")
 }
 
 @main(
@@ -35,32 +34,24 @@
 
     @form(f, controllers.tradingpremises.routes.ConfirmAddressController.post(index)) {
 
-        @registered_office_helper(model)
-
-        @fieldset(
-            f = f("confirmAddress-fieldset"),
-            legend = "tradingpremises.confirmaddress.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("confirmAddress"),
+            heading = "tradingpremises.confirmaddress.title",
+            section = "summary.tradingpremises",
+            supportingContent = registered_office_helper(model),
             panel = false,
             classes = Seq("inline")
         ) {
-
-            @errorGroup(
-                field = f("confirmAddress")
-            ) {
-                @radio(
-                    f = f("confirmAddress"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true
-                )
-                @radio(
-                    f = f("confirmAddress"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
-            }
+            @radio(
+                f = f("confirmAddress"),
+                labelText = "lbl.yes",
+                value = "true"
+            )
+            @radio(
+                f = f("confirmAddress"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
 
         @submit(false)

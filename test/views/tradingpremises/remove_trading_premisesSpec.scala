@@ -43,7 +43,7 @@ class remove_trading_premisesSpec extends AmlsSpec with MustMatchers {
 
       doc.title must be(pageTitle)
 
-      heading.html must be(Messages("tradingpremises.remove.trading.premises.enddate.lbl"))
+      heading.html must include(Messages("tradingpremises.remove.trading.premises.enddate.lbl"))
       subHeading.html must include(Messages("summary.tradingpremises"))
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
@@ -65,7 +65,7 @@ class remove_trading_premisesSpec extends AmlsSpec with MustMatchers {
     "check date field existence when input param showDateField is set to true" in new ViewFixture {
       def view = views.html.tradingpremises.remove_trading_premises(EmptyForm, 1, false, "trading Address", true)
 
-      doc.getElementsByAttributeValue("id", "endDate-fieldset") must not be empty
+      doc.getElementsByAttributeValue("id", "endDate") must not be empty
       doc.getElementsMatchingOwnText(Messages("lbl.day")).hasText must be(true)
       doc.getElementsMatchingOwnText(Messages("lbl.month")).hasText must be(true)
       doc.getElementsMatchingOwnText(Messages("lbl.year")).hasText must be(true)

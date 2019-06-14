@@ -24,7 +24,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("tradingpremises.yourtradingpremises.title", "summary.tradingpremises")
 }
 
 @main(
@@ -34,22 +33,20 @@
 
     @form(f, controllers.tradingpremises.routes.WhereAreTradingPremisesController.post(index, edit)) {
 
-        @input(
-            field = f("tradingName"),
-            labelText = "tradingpremises.yourtradingpremises.tradingname"
-        )
-
         @fieldset(
-            legend = "legend.address",
-            legendHidden = true,
+            heading = "tradingpremises.yourtradingpremises.title",
+            section = "summary.tradingpremises",
             panel = false,
-            f = f("address-fieldset")
+            f = f("address")
         ) {
+            @input(
+                field = f("tradingName"),
+                labelText = "tradingpremises.yourtradingpremises.tradingname"
+            )
             @input(field = f("addressLine1"), labelText = "lbl.address.line1", labelHidden = false)
             @input(field = f("addressLine2"), labelText = "lbl.address.line2", labelHidden = false)
             @input(field = f("addressLine3"), labelText = "lbl.address.line3", labelHidden = false)
             @input(field = f("addressLine4"), labelText = "lbl.address.line4", labelHidden = false)
-
             @input(
                 field = f("postcode"),
                 labelText = "lbl.address.postcode",

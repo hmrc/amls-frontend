@@ -25,28 +25,28 @@
 }
 
 @main(
-    title = Messages("businessactivities.riskassessment.policy.title") + " - " + Messages("summary.businessactivities"),
+    title = Messages("businessactivities.document.riskassessment.policy.title") + " - " + Messages("summary.businessactivities"),
     heading = header
 ) {
 
-    @form(f, controllers.businessactivities.routes.RiskAssessmentController.post(edit)) {
+    @form(f, controllers.businessactivities.routes.DocumentRiskAssessmentController.post(edit)) {
 
         @fieldsetWithErrorGroup(
-            f = f("hasPolicy"),
-            heading = "businessactivities.riskassessment.policy.title",
+            f = f("riskassessments"),
+            heading = "businessactivities.document.riskassessment.policy.title",
             section = "summary.businessactivities",
-            classes = Seq("inline"),
+            hint = "lbl.select.all",
             panel = false
         ) {
-            @radio(
-                f = f("hasPolicy"),
-                labelText = "lbl.yes",
-                value = "true"
+            @checkbox(
+                f = f("riskassessments[]"),
+                labelText = "businessactivities.RiskAssessmentType.lbl.02",
+                value = "02"
             )
-            @radio(
-                f = f("hasPolicy"),
-                labelText = "lbl.no",
-                value = "false"
+            @checkbox(
+                f = f("riskassessments[]"),
+                labelText = "businessactivities.RiskAssessmentType.lbl.01",
+                value = "01"
             )
         }
 
