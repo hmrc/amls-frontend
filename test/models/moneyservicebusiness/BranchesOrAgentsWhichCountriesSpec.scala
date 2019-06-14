@@ -26,18 +26,18 @@ class BranchesOrAgentsWhichCountriesSpec extends PlaySpec with MustMatchers{
 
   "MsbServices" must {
 
-    val rule = implicitly[Rule[UrlFormEncoded, BranchesOrAgentsCountries]]
-    val write = implicitly[Write[BranchesOrAgentsCountries, UrlFormEncoded]]
+    val rule = implicitly[Rule[UrlFormEncoded, BranchesOrAgentsWhichCountries]]
+    val write = implicitly[Write[BranchesOrAgentsWhichCountries, UrlFormEncoded]]
 
 
     "round trip through forms correctly" in {
-      val model: BranchesOrAgentsCountries = BranchesOrAgentsCountries(Seq(Country("United Kingdom", "GB")))
+      val model: BranchesOrAgentsWhichCountries = BranchesOrAgentsWhichCountries(Seq(Country("United Kingdom", "GB")))
       rule.validate(write.writes(model)) mustBe Valid(model)
     }
 
     "successfully validate when  there is at least 1 country selected" in {
       val form: UrlFormEncoded = Map( "countries" -> Seq("GB") )
-      val model: BranchesOrAgentsCountries = BranchesOrAgentsCountries( Seq(Country("United Kingdom", "GB")))
+      val model: BranchesOrAgentsWhichCountries = BranchesOrAgentsWhichCountries( Seq(Country("United Kingdom", "GB")))
       rule.validate(form) mustBe Valid(model)
     }
 
@@ -70,7 +70,7 @@ class BranchesOrAgentsWhichCountriesSpec extends PlaySpec with MustMatchers{
         "countries[]" -> Seq("GB", "", "US", "")
       )
 
-      rule.validate(form) mustBe Valid(BranchesOrAgentsCountries(Seq(
+      rule.validate(form) mustBe Valid(BranchesOrAgentsWhichCountries(Seq(
         Country("United Kingdom", "GB"),
         Country("United States of America", "US")
       )))
@@ -83,7 +83,7 @@ class BranchesOrAgentsWhichCountriesSpec extends PlaySpec with MustMatchers{
         "countries[1]" -> Seq("")
       )
 
-      rule.validate(form) mustBe Valid(BranchesOrAgentsCountries(Seq(
+      rule.validate(form) mustBe Valid(BranchesOrAgentsWhichCountries(Seq(
         Country("United Kingdom", "GB")
       )))
     }
@@ -94,7 +94,7 @@ class BranchesOrAgentsWhichCountriesSpec extends PlaySpec with MustMatchers{
 
     "the list of countries has entries" must {
       "populate the countries list" in {
-        BranchesOrAgentsCountries.formWrite.writes(BranchesOrAgentsCountries(Seq(Country("TESTCOUNTRY1", "TC1"), Country("TESTCOUNTRY2", "TC2")))) must be (Map(
+        BranchesOrAgentsWhichCountries.formWrite.writes(BranchesOrAgentsWhichCountries(Seq(Country("TESTCOUNTRY1", "TC1"), Country("TESTCOUNTRY2", "TC2")))) must be (Map(
         "countries[0]" -> Seq("TC1"),
         "countries[1]" -> Seq("TC2")
       ))}

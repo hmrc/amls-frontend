@@ -18,13 +18,13 @@ package views.msb
 
 import forms.{Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.moneyservicebusiness.BranchesOrAgents
+import models.moneyservicebusiness.BranchesOrAgentsHasCountries
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.{AmlsSpec, AutoCompleteServiceMocks}
 import views.Fixture
 
-class branches_or_agentsSpec extends AmlsSpec with MustMatchers {
+class branches_or_agents_has_countriesSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks {
     implicit val requestWithToken = addToken(request)
@@ -33,14 +33,14 @@ class branches_or_agentsSpec extends AmlsSpec with MustMatchers {
   "branches_or_agents view" must {
 
     "have the back link button" in new ViewFixture {
-      val form2: ValidForm[BranchesOrAgents] = Form2(BranchesOrAgents(true))
+      val form2: ValidForm[BranchesOrAgentsHasCountries] = Form2(BranchesOrAgentsHasCountries(true))
       def view = views.html.msb.branches_or_agents(form2, edit = true)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[BranchesOrAgents] = Form2(BranchesOrAgents(true))
+      val form2: ValidForm[BranchesOrAgentsHasCountries] = Form2(BranchesOrAgentsHasCountries(true))
 
       def view = views.html.msb.branches_or_agents(form2, edit = true)
 
@@ -52,7 +52,7 @@ class branches_or_agentsSpec extends AmlsSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[BranchesOrAgents] = Form2(BranchesOrAgents(true))
+      val form2: ValidForm[BranchesOrAgentsHasCountries] = Form2(BranchesOrAgentsHasCountries(true))
 
       def view = views.html.msb.branches_or_agents(form2, edit = true)
 

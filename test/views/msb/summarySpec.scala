@@ -83,7 +83,7 @@ class summarySpec extends AmlsSpec
       Some(WhichCurrencies(Seq("USD", "GBP", "EUR"), Some(UsesForeignCurrenciesYes), Some(MoneySources(None, None, Some(true))))),
       Some(SendMoneyToOtherCountry(true)),
       Some(FundsTransfer(false)),
-      Some(BranchesOrAgentsGroup(BranchesOrAgents(true), Some(BranchesOrAgentsCountries(Seq(Country("United Kingdom", "GB")))))),
+      Some(BranchesOrAgents(BranchesOrAgentsHasCountries(true), Some(BranchesOrAgentsWhichCountries(Seq(Country("United Kingdom", "GB")))))),
       Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))),
       Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
       Some(TransactionsInNext12Months("10")),

@@ -17,7 +17,7 @@
 package controllers.msb
 
 import models.Country
-import models.moneyservicebusiness.{BranchesOrAgents, BranchesOrAgentsCountries, BranchesOrAgentsGroup, MoneyServiceBusiness}
+import models.moneyservicebusiness.{BranchesOrAgentsHasCountries, BranchesOrAgentsWhichCountries, BranchesOrAgents, MoneyServiceBusiness}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -28,7 +28,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
-class BranchesOrAgentsControllerSpec extends AmlsSpec with MockitoSugar {
+class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
@@ -36,7 +36,7 @@ class BranchesOrAgentsControllerSpec extends AmlsSpec with MockitoSugar {
     val controller = new BranchesOrAgentsController(mockCacheConnector, authConnector = self.authConnector, mockAutoComplete)
   }
 
-  "BranchesOrAgentsController" must {
+  "BranchesOrAgentsHasCountriesController" must {
 
     "show an empty form on get with no data in store" in new Fixture {
 
@@ -55,9 +55,9 @@ class BranchesOrAgentsControllerSpec extends AmlsSpec with MockitoSugar {
     "show a prefilled form when store contains data" in new Fixture {
 
       val model = MoneyServiceBusiness(
-        branchesOrAgents = Some(BranchesOrAgentsGroup(
-          BranchesOrAgents(true),
-          Some(BranchesOrAgentsCountries(Seq(Country("United Kingdom", "GB"))))
+        branchesOrAgents = Some(BranchesOrAgents(
+          BranchesOrAgentsHasCountries(true),
+          Some(BranchesOrAgentsWhichCountries(Seq(Country("United Kingdom", "GB"))))
         ))
       )
 
@@ -76,7 +76,7 @@ class BranchesOrAgentsControllerSpec extends AmlsSpec with MockitoSugar {
     "return a redirect to the 'Linked Transactions' page on valid submission" in new Fixture {
 
       val model = MoneyServiceBusiness(
-        branchesOrAgents = Some(BranchesOrAgentsGroup(BranchesOrAgents(false), None)),
+        branchesOrAgents = Some(BranchesOrAgents(BranchesOrAgentsHasCountries(false), None)),
         hasChanged = true
       )
 
@@ -99,7 +99,7 @@ class BranchesOrAgentsControllerSpec extends AmlsSpec with MockitoSugar {
     "return a redirect to the 'Which Countries' page when the user has selected 'yes' from options" in new Fixture {
 
       val model = MoneyServiceBusiness(
-        branchesOrAgents = Some(BranchesOrAgentsGroup(BranchesOrAgents(true), None)),
+        branchesOrAgents = Some(BranchesOrAgents(BranchesOrAgentsHasCountries(true), None)),
         hasChanged = true
       )
 
@@ -122,7 +122,7 @@ class BranchesOrAgentsControllerSpec extends AmlsSpec with MockitoSugar {
     "return a redirect to the 'Summary page' page on valid submission when edit flag is set and answering no" in new Fixture {
 
       val model = MoneyServiceBusiness(
-        branchesOrAgents = Some(BranchesOrAgentsGroup(BranchesOrAgents(false), None)),
+        branchesOrAgents = Some(BranchesOrAgents(BranchesOrAgentsHasCountries(false), None)),
         hasChanged = true
       )
 
@@ -145,7 +145,7 @@ class BranchesOrAgentsControllerSpec extends AmlsSpec with MockitoSugar {
     "return a redirect to the 'Which Countries' page on valid submission when edit flag is set and answering yes" in new Fixture {
 
       val model = MoneyServiceBusiness(
-        branchesOrAgents = Some(BranchesOrAgentsGroup(BranchesOrAgents(true), None)),
+        branchesOrAgents = Some(BranchesOrAgents(BranchesOrAgentsHasCountries(true), None)),
         hasChanged = true
       )
 

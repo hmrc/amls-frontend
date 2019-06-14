@@ -19,7 +19,7 @@ package views.msb
 import forms.{Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.Country
-import models.moneyservicebusiness.BranchesOrAgentsCountries
+import models.moneyservicebusiness.BranchesOrAgentsWhichCountries
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.{AmlsSpec, AutoCompleteServiceMocks}
@@ -34,14 +34,14 @@ class branches_or_agents_with_countriesSpec extends AmlsSpec with MustMatchers {
   "branches_or_agents view" must {
 
     "have the back link button" in new ViewFixture {
-      val form2: ValidForm[BranchesOrAgentsCountries] = Form2(BranchesOrAgentsCountries(Seq.empty[Country]))
+      val form2: ValidForm[BranchesOrAgentsWhichCountries] = Form2(BranchesOrAgentsWhichCountries(Seq.empty[Country]))
       def view = views.html.msb.branches_or_agents_which_countries(form2, edit = true, mockAutoComplete.getCountries)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[BranchesOrAgentsCountries] = Form2(BranchesOrAgentsCountries(Seq.empty[Country]))
+      val form2: ValidForm[BranchesOrAgentsWhichCountries] = Form2(BranchesOrAgentsWhichCountries(Seq.empty[Country]))
 
       def view = views.html.msb.branches_or_agents_which_countries(form2, edit = true, mockAutoComplete.getCountries)
 
@@ -53,7 +53,7 @@ class branches_or_agents_with_countriesSpec extends AmlsSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[BranchesOrAgentsCountries] = Form2(BranchesOrAgentsCountries(Seq.empty[Country]))
+      val form2: ValidForm[BranchesOrAgentsWhichCountries] = Form2(BranchesOrAgentsWhichCountries(Seq.empty[Country]))
 
       def view = views.html.msb.branches_or_agents_which_countries(form2, edit = true, mockAutoComplete.getCountries)
 

@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
-import models.moneyservicebusiness.{BranchesOrAgents, BranchesOrAgentsGroup, MoneyServiceBusiness}
+import models.moneyservicebusiness.{BranchesOrAgentsHasCountries, BranchesOrAgents, MoneyServiceBusiness}
 import play.api.mvc.Call
 import services.AutoCompleteService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -39,32 +39,32 @@ class BranchesOrAgentsController @Inject() (val dataCacheConnector: DataCacheCon
           val form = (for {
             msb <- response
             branches <- msb.branchesOrAgents
-          } yield Form2[BranchesOrAgents](branches.hasCountries)).getOrElse(EmptyForm)
+          } yield Form2[BranchesOrAgentsHasCountries](branches.hasCountries)).getOrElse(EmptyForm)
           Ok(views.html.msb.branches_or_agents(form, edit))
       }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      Form2[BranchesOrAgents](request.body) match {
+      Form2[BranchesOrAgentsHasCountries](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.msb.branches_or_agents(f, edit)))
         case ValidForm(_, data) =>
           for {
             msb <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
             _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
-              msb.branchesOrAgents map (boa => msb.branchesOrAgents(BranchesOrAgentsGroup.update(boa, data))))
+              msb.branchesOrAgents map (boa => msb.branchesOrAgents(BranchesOrAgents.update(boa, data))))
           } yield Redirect(getNextPage(data, edit))
       }
   }
 
-  private def getNextPage(data: BranchesOrAgents, edit: Boolean): Call =
+  private def getNextPage(data: BranchesOrAgentsHasCountries, edit: Boolean): Call =
      (data, edit) match {
-      case (BranchesOrAgents(false), false) =>
+      case (BranchesOrAgentsHasCountries(false), false) =>
         routes.IdentifyLinkedTransactionsController.get()
-      case (BranchesOrAgents(false), true) =>
+      case (BranchesOrAgentsHasCountries(false), true) =>
         routes.SummaryController.get()
-      case (BranchesOrAgents(true), _) =>
+      case (BranchesOrAgentsHasCountries(true), _) =>
         routes.BranchesOrAgentsWhichCountriesController.get(edit)
     }
 }

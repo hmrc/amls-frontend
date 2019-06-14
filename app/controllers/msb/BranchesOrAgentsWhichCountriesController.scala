@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
-import models.moneyservicebusiness.{BranchesOrAgents, BranchesOrAgentsCountries, BranchesOrAgentsGroup, MoneyServiceBusiness}
+import models.moneyservicebusiness.{BranchesOrAgentsHasCountries, BranchesOrAgentsWhichCountries, BranchesOrAgents, MoneyServiceBusiness}
 import services.AutoCompleteService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
@@ -39,7 +39,7 @@ class BranchesOrAgentsWhichCountriesController @Inject()(val dataCacheConnector:
             msb <- response
             boa <- msb.branchesOrAgents
             branches <- boa.branches
-          } yield Form2[BranchesOrAgentsCountries](branches)).getOrElse(EmptyForm)
+          } yield Form2[BranchesOrAgentsWhichCountries](branches)).getOrElse(EmptyForm)
 
           Ok(views.html.msb.branches_or_agents_which_countries(form, edit, autoCompleteService.getCountries))
       }
@@ -47,14 +47,14 @@ class BranchesOrAgentsWhichCountriesController @Inject()(val dataCacheConnector:
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      Form2[BranchesOrAgentsCountries](request.body) match {
+      Form2[BranchesOrAgentsWhichCountries](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.msb.branches_or_agents_which_countries(f, edit, autoCompleteService.getCountries)))
         case ValidForm(_, data) =>
           for {
             msb <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
             _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
-              msb.branchesOrAgents(BranchesOrAgentsGroup.update(msb.branchesOrAgents.getOrElse(BranchesOrAgentsGroup(BranchesOrAgents(false), None)), data)))
+              msb.branchesOrAgents(BranchesOrAgents.update(msb.branchesOrAgents.getOrElse(BranchesOrAgents(BranchesOrAgentsHasCountries(false), None)), data)))
           } yield edit match {
             case false =>
               Redirect(routes.IdentifyLinkedTransactionsController.get())

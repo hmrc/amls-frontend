@@ -21,24 +21,24 @@ import jto.validation.forms.UrlFormEncoded
 import models.Country
 import utils.TraversableValidators
 
-case class BranchesOrAgentsCountries(branches: Seq[Country])
+case class BranchesOrAgentsWhichCountries(branches: Seq[Country])
 
-object BranchesOrAgentsCountries {
+object BranchesOrAgentsWhichCountries {
 
   val minLength = 1
   val maxLength = 10
 
   import jto.validation.forms.Rules._
 
-  implicit val formWrite: Write[BranchesOrAgentsCountries, UrlFormEncoded] = write
+  implicit val formWrite: Write[BranchesOrAgentsWhichCountries, UrlFormEncoded] = write
 
-  implicit val formRule: Rule[UrlFormEncoded, BranchesOrAgentsCountries] = rule
+  implicit val formRule: Rule[UrlFormEncoded, BranchesOrAgentsWhichCountries] = rule
 
   private implicit def rule
   (implicit
    a: Path => RuleLike[UrlFormEncoded, Seq[String]],
    cR: Rule[Seq[String], Seq[Country]]
-  ): Rule[UrlFormEncoded, BranchesOrAgentsCountries] =
+  ): Rule[UrlFormEncoded, BranchesOrAgentsWhichCountries] =
     From[UrlFormEncoded] { __ =>
 
       import TraversableValidators._
@@ -56,7 +56,7 @@ object BranchesOrAgentsCountries {
       }
 
       (__ \ "countries").read(countrySeqR).map(countries => {
-        BranchesOrAgentsCountries.apply(countries)
+        BranchesOrAgentsWhichCountries.apply(countries)
       })
     }
 
@@ -74,8 +74,8 @@ object BranchesOrAgentsCountries {
 //        )(a => (Some(a.branches), Some(a.branches)))
 //    }
 
-  private  def write: Write[BranchesOrAgentsCountries, UrlFormEncoded] = Write {
-    case BranchesOrAgentsCountries(countries) => countries.zipWithIndex.map(i => s"countries[${i._2}]" -> Seq(i._1.code)).toMap
+  private  def write: Write[BranchesOrAgentsWhichCountries, UrlFormEncoded] = Write {
+    case BranchesOrAgentsWhichCountries(countries) => countries.zipWithIndex.map(i => s"countries[${i._2}]" -> Seq(i._1.code)).toMap
     case _ => throw new IllegalArgumentException("Eep")
   }
 }

@@ -45,7 +45,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       whichCurrencies = Some(WhichCurrencies(Seq("USD", "GBP", "EUR"), Some(UsesForeignCurrenciesYes), Some(MoneySources(None, None, Some(true))))),
       sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
       fundsTransfer = Some(FundsTransfer(true)),
-      branchesOrAgents = Some(BranchesOrAgentsGroup(BranchesOrAgents(true), Some(BranchesOrAgentsCountries(Seq(Country("United Kingdom", "GB")))))),
+      branchesOrAgents = Some(BranchesOrAgents(BranchesOrAgentsHasCountries(true), Some(BranchesOrAgentsWhichCountries(Seq(Country("United Kingdom", "GB")))))),
       sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))),
       mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
       transactionsInNext12Months = Some(TransactionsInNext12Months("12345678963")),

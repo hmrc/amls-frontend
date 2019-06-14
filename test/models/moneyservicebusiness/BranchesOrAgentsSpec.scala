@@ -18,53 +18,45 @@ package models.moneyservicebusiness
 
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
+import models.Country
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
+import play.api.libs.json._
 
 class BranchesOrAgentsSpec extends PlaySpec with MustMatchers{
 
   "MsbServices" must {
 
-    val rule = implicitly[Rule[UrlFormEncoded, BranchesOrAgents]]
-    val write = implicitly[Write[BranchesOrAgents, UrlFormEncoded]]
+    val rule = implicitly[Rule[UrlFormEncoded, BranchesOrAgentsHasCountries]]
+    val write = implicitly[Write[BranchesOrAgentsHasCountries, UrlFormEncoded]]
 
-    "round trip through forms correctly" in {
-
-      val model: BranchesOrAgents = BranchesOrAgents(true)
-      rule.validate(write.writes(model)) mustBe Valid(model)
-    }
-
-    "successfully validate when hasCountries is false" in {
-
-      val form: UrlFormEncoded = Map(
-        "hasCountries" -> Seq("false")
-      )
-
-      val model: BranchesOrAgents = BranchesOrAgents(false)
-
-      rule.validate(form) mustBe Valid(model)
-    }
-
-
-    "fail to validate when hasCountries isn't selected" in {
-
-      val form: UrlFormEncoded = Map.empty
-
-      rule.validate(form) mustBe Invalid(
-        Seq((Path \ "hasCountries") -> Seq(ValidationError("error.required.hasCountries.msb.branchesOrAgents")))
-      )
-    }
-
-    "test" in {
-      val form: UrlFormEncoded = Map("hasCountries" -> Seq("true"))
-      rule.validate(form) mustBe Valid(BranchesOrAgents(true))
+    "round trip through Json correctly" in {
+      val model: BranchesOrAgents = BranchesOrAgents(
+        BranchesOrAgentsHasCountries(true),
+        Some(BranchesOrAgentsWhichCountries(Seq(Country("United Kingdom", "GB")))))
+      Json.fromJson[BranchesOrAgents](Json.toJson(model)) mustBe JsSuccess(model)
     }
   }
 
-  "BranchesOrAgents form writes" when {
-    "there is no list of countries" must {
+  "BranchesOrAgents" when {
+
+    "the list of countries is empty" must {
       "set hasCountries to false" in {
-        BranchesOrAgents.formWrites.writes(BranchesOrAgents(false)) must be (Map("hasCountries" -> Seq("false")))
+
+        BranchesOrAgents.update(
+          BranchesOrAgents(BranchesOrAgentsHasCountries(true), None),
+          BranchesOrAgentsWhichCountries(Seq.empty)) mustBe BranchesOrAgents(BranchesOrAgentsHasCountries(false), None)
+      }
+    }
+
+    "the list of countries has entries" must {
+      "set hasCountries to true and populate the countries list" in {
+
+        BranchesOrAgents.update(
+          BranchesOrAgents(BranchesOrAgentsHasCountries(false), None),
+          BranchesOrAgentsWhichCountries(Seq(Country(name = "sadasd", code = "asdasd")))) mustBe BranchesOrAgents(
+          BranchesOrAgentsHasCountries(true),
+          Some(BranchesOrAgentsWhichCountries(Seq(Country(name = "sadasd", code = "asdasd")))))
       }
     }
   }

@@ -17,7 +17,7 @@
 package controllers.msb
 
 import models.Country
-import models.moneyservicebusiness.{BranchesOrAgents, BranchesOrAgentsCountries, BranchesOrAgentsGroup, MoneyServiceBusiness}
+import models.moneyservicebusiness.{BranchesOrAgentsHasCountries, BranchesOrAgentsWhichCountries, BranchesOrAgents, MoneyServiceBusiness}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -37,16 +37,16 @@ class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec with Mockito
   }
 
   val modelBefore = MoneyServiceBusiness(
-    branchesOrAgents = Some(BranchesOrAgentsGroup(
-      BranchesOrAgents(true),
+    branchesOrAgents = Some(BranchesOrAgents(
+      BranchesOrAgentsHasCountries(true),
       None
     ))
   )
 
   val modelAfter = MoneyServiceBusiness(
-    branchesOrAgents = Some(BranchesOrAgentsGroup(
-      BranchesOrAgents(true),
-      Some(BranchesOrAgentsCountries(Seq(Country("United Kingdom", "GB"))))
+    branchesOrAgents = Some(BranchesOrAgents(
+      BranchesOrAgentsHasCountries(true),
+      Some(BranchesOrAgentsWhichCountries(Seq(Country("United Kingdom", "GB"))))
     ))
   )
 

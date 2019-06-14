@@ -16,23 +16,48 @@
 
 package models.moneyservicebusiness
 
-import jto.validation._
-import jto.validation.forms.UrlFormEncoded
+import models.Country
+import play.api.libs.json.{Json, Reads, Writes, __}
 
-case class BranchesOrAgents(hasCountries: Boolean)
+case class BranchesOrAgents(hasCountries: BranchesOrAgentsHasCountries, branches: Option[BranchesOrAgentsWhichCountries])
 
 object BranchesOrAgents {
 
-  import utils.MappingUtils.Implicits._
-
-  implicit val formRule : Rule[UrlFormEncoded, BranchesOrAgents] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "hasCountries")
-      .read[Boolean]
-      .withMessage("error.required.hasCountries.msb.branchesOrAgents") flatMap { BranchesOrAgents.apply }
+  implicit val jsonReads: Reads[BranchesOrAgents] = {
+    import play.api.libs.functional.syntax._
+    ((__ \ "hasCountries").read[Boolean] map BranchesOrAgentsHasCountries.apply and
+      (__ \ "countries").read[Seq[Country]].map {
+        case countries if countries.isEmpty => None
+        case countries => Some(BranchesOrAgentsWhichCountries.apply(countries))
+      })((hasCountries, countries) => BranchesOrAgents apply(hasCountries, countries))
   }
 
-  implicit def formWrites: Write[BranchesOrAgents, UrlFormEncoded] = Write {
-    case BranchesOrAgents(accepted) => Map("hasCountries" -> accepted.toString)
+  implicit val jsonWrites:Writes[BranchesOrAgents] = {
+    Writes[BranchesOrAgents] {
+      case BranchesOrAgents(BranchesOrAgentsHasCountries(hasCountries), None) =>
+        Json.obj(
+          "hasCountries" -> hasCountries,
+          "countries" -> Seq[String]()
+        )
+      case BranchesOrAgents(BranchesOrAgentsHasCountries(hasCountries), Some(BranchesOrAgentsWhichCountries(countries))) =>
+        Json.obj(
+          "hasCountries" -> hasCountries,
+          "countries" -> countries
+        )
+    }
+  }
+
+  def update(branchesOrAgents: BranchesOrAgents, hasCountries: BranchesOrAgentsHasCountries): BranchesOrAgents = {
+    hasCountries match {
+      case BranchesOrAgentsHasCountries(false) => BranchesOrAgents(hasCountries, None)
+      case BranchesOrAgentsHasCountries(true) => BranchesOrAgents(hasCountries, branchesOrAgents.branches)
+    }
+  }
+
+  def update(branchesOrAgents: BranchesOrAgents, countries: BranchesOrAgentsWhichCountries): BranchesOrAgents = {
+    countries match {
+      case BranchesOrAgentsWhichCountries(list) if list.isEmpty => BranchesOrAgents(BranchesOrAgentsHasCountries(false), None)
+      case BranchesOrAgentsWhichCountries(_) =>BranchesOrAgents(BranchesOrAgentsHasCountries(true), Some(countries))
+    }
   }
 }
