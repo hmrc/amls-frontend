@@ -49,7 +49,7 @@ class bank_account_nameSpec extends AmlsSpec with MustMatchers {
 
     override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_name(form2, false, Some(0))
 
-    heading.html() must be(Messages("bankdetails.bankaccount.accountname.title"))
+    heading.html() must include(Messages("bankdetails.bankaccount.accountname.title"))
   }
 
   "have a back link" in new ViewFixture {
