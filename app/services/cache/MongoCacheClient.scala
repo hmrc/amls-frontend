@@ -156,7 +156,7 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
         val document = Json.toJson(updatedCache)
         val modifier = BSONDocument("$set" -> document)
 
-        collection.update(bsonIdQuery(id), modifier, upsert = true) map { _ => updatedCache }
+        collection.update(bsonIdQuery(newId), modifier, upsert = true) map { _ => updatedCache }
       }
     }
   }
