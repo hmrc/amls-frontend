@@ -44,18 +44,25 @@ class BranchesOrAgentsController @Inject() (val dataCacheConnector: DataCacheCon
       }
   }
 
+
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
+
       Form2[BranchesOrAgentsHasCountries](request.body) match {
+
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.msb.branches_or_agents(f, edit)))
-        case ValidForm(_, data) =>
+
+        case ValidForm(_, data) => {
           for {
-            msb <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
-            _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
-              msb.branchesOrAgents map (boa => msb.branchesOrAgents(BranchesOrAgents.update(boa, data))))
+            msb <-  dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
+            boa: BranchesOrAgents <- Future(msb.flatMap((m:MoneyServiceBusiness) => m.branchesOrAgents)
+              .map((boa:BranchesOrAgents) => BranchesOrAgents.update(boa, data))
+              .getOrElse(BranchesOrAgents(data, None)))
+            _ <- dataCacheConnector.save(MoneyServiceBusiness.key, msb.branchesOrAgents(boa))
           } yield Redirect(getNextPage(data, edit))
-      }
+        }
+    }
   }
 
   private def getNextPage(data: BranchesOrAgentsHasCountries, edit: Boolean): Call =
