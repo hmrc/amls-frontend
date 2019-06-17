@@ -25,43 +25,33 @@
 @header = {
     @components.back_link()
     @errorSummaryWithPlaceholder(f, personName)
-    @headingWithPlaceholder(("responsiblepeople.movedaddress.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
     title = Messages("responsiblepeople.movedaddress.title") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
-
     @form(f, controllers.responsiblepeople.routes.MovedAddressController.post(index)) {
 
-        @person_address_helper(model)
-
-        @fieldset(
-            f = f("movedAddress-fieldset"),
-            legend = "responsiblepeople.movedaddress.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("movedAddress"),
+            heading = Messages("responsiblepeople.movedaddress.heading", personName),
+            section = "summary.responsiblepeople",
             panel = false,
-            classes = Seq("inline")
+            supportingContent = person_address_helper(model),
+            classes = Seq("inline"),
+            errorGroupPlaceholder = personName
         ) {
-
-            @errorGroupWithPlaceholder(
-                field = f("movedAddress"),
-                placeholder = personName
-            ) {
-                @radio(
-                    f = f("movedAddress"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true
-                )
-                @radio(
-                    f = f("movedAddress"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
-            }
+            @radio(
+                f = f("movedAddress"),
+                labelText = "lbl.yes",
+                value = "true"
+            )
+            @radio(
+                f = f("movedAddress"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
 
         @submit(false)
