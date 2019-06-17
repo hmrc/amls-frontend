@@ -22,8 +22,13 @@ import org.scalatest.mock.MockitoSugar
 import org.mockito.Mockito._
 import org.mockito.Matchers.{eq => eqTo, _}
 import play.api.i18n.Messages
+import play.api.mvc.Result
 import play.api.test.Helpers._
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+
+import scala.concurrent.{Await, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 
 class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
 
@@ -40,6 +45,42 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
   }
 
   "ProfessionalBodyMemberController" must {
+
+    "update the the answer field in supervision when the answer is yes" in new Fixture {
+
+      val supervision = Some(
+        Supervision (
+          anotherBody = Some(AnotherBodyNo),
+          professionalBodyMember = Some(ProfessionalBodyMemberNo),
+          professionalBodies = None,
+          professionalBody = Some(ProfessionalBodyNo),
+          hasChanged = true,
+          hasAccepted = true
+        )
+      )
+
+      val newSupervision = controller.updateSupervisionFromIncomingData(ProfessionalBodyMemberYes, supervision)
+
+      Await.result(newSupervision, 1 seconds).professionalBodyMember.get mustEqual(ProfessionalBodyMemberYes)
+    }
+
+    "reset professionalBodies to null if the answer to the question is No" in new Fixture {
+
+      val supervision = Some(
+        Supervision (
+          anotherBody = Some(AnotherBodyNo),
+          professionalBodyMember = Some(ProfessionalBodyMemberYes),
+          professionalBodies = Some(ProfessionalBodies(Set(AccountingTechnicians))),
+          professionalBody = Some(ProfessionalBodyNo),
+          hasChanged = true,
+          hasAccepted = true
+        )
+      )
+
+      val newSupervision = controller.updateSupervisionFromIncomingData(ProfessionalBodyMemberNo, supervision)
+
+      Await.result(newSupervision, 1 seconds).professionalBodies mustEqual(None)
+    }
 
     "load the page Is your business a member of a professional body?" in new Fixture  {
 
@@ -66,8 +107,24 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
     }
 
     "on post with valid data" must {
+
       "redirect to WhichProfessionalBodyController" when {
-        "isMember is true" when {
+
+        "the answer is yes to the question and no previous professional bodies has been registered in the cache" in new Fixture {
+          val supervision = Some (
+            Supervision (
+              professionalBodyMember = Some(ProfessionalBodyMemberYes),
+              professionalBodies = None
+            )
+          )
+
+          val result: Future[Result] = Future(controller.redirectTo(supervision, any()))
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.WhichProfessionalBodyController.get().url))
+        }
+
+        "isAMember field is true" when {
           "edit is false" in new Fixture {
 
             val newRequest = request.withFormUrlEncodedBody(
@@ -96,7 +153,22 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
           }
         }
       }
+
       "redirect to PenalisedByProfessionalController" when {
+
+        "the answer is no to the question and no previous professional bodies has been registered in the cache" in new Fixture {
+          val supervision = Some (
+            Supervision (
+              professionalBodyMember = Some(ProfessionalBodyMemberNo)
+            )
+          )
+
+          val result: Future[Result] = Future(controller.redirectTo(supervision, edit = false))
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.PenalisedByProfessionalController.get().url))
+        }
+
         "isMember is false" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
@@ -110,7 +182,28 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
           redirectLocation(result) must be(Some(routes.PenalisedByProfessionalController.get().url))
         }
       }
+
       "redirect to SummaryController" when {
+
+        "the answer is yes and professional bodies is already known" in new Fixture {
+          val supervision = Some (
+            Supervision (
+              anotherBody = Some(AnotherBodyNo),
+              professionalBodyMember = Some(ProfessionalBodyMemberYes),
+              professionalBodies = Some(ProfessionalBodies(Set(AccountingTechnicians))),
+              professionalBody = Some(ProfessionalBodyNo),
+              hasChanged = true,
+              hasAccepted = true
+            )
+          )
+
+          val result: Future[Result] = Future(controller.redirectTo(supervision, any()))
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+
+        }
+
         "edit is true" when {
           "isMember is true" when {
             "ProfessionalBodyMemberYes is already defined and professional bodies provided" in new Fixture {
