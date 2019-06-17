@@ -23,7 +23,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @headingWithPlaceholder(("responsiblepeople.timeataddress.address_history.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
@@ -33,38 +32,33 @@
 
     @form(f, controllers.responsiblepeople.routes.TimeAtCurrentAddressController.post(index,edit,flow)) {
 
-        @fieldset(
-            f = f("timeAtAddress-fieldset"),
-            legend = "responsiblepeople.timeataddress.address_history.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("timeAtAddress"),
+            heading = Messages("responsiblepeople.timeataddress.address_history.heading", personName),
+            section = "summary.responsiblepeople",
             jsHidden = false,
-            panel = false,
-            id = s"""${f("address-history").id}-fieldset"""
+            panel = false
         ) {
-            @errorGroup(
-                field = f("timeAtAddress")
-            ) {
-                @radio(
-                    f = f("timeAtAddress"),
-                    labelText = "responsiblepeople.timeataddress.5_months_history",
-                    value = "01"
-                )
-                @radio(
-                    f = f("timeAtAddress"),
-                    labelText = "responsiblepeople.timeataddress.11_months_history",
-                    value = "02"
-                )
-                @radio(
-                    f = f("timeAtAddress"),
-                    labelText = "responsiblepeople.timeataddress.3_years_history",
-                    value = "03"
-                )
-                @radio(
-                    f = f("timeAtAddress"),
-                    labelText = "responsiblepeople.timeataddress.more_years_history",
-                    value = "04"
-                )
-            }
+            @radio(
+                f = f("timeAtAddress"),
+                labelText = "responsiblepeople.timeataddress.5_months_history",
+                value = "01"
+            )
+            @radio(
+                f = f("timeAtAddress"),
+                labelText = "responsiblepeople.timeataddress.11_months_history",
+                value = "02"
+            )
+            @radio(
+                f = f("timeAtAddress"),
+                labelText = "responsiblepeople.timeataddress.3_years_history",
+                value = "03"
+            )
+            @radio(
+                f = f("timeAtAddress"),
+                labelText = "responsiblepeople.timeataddress.more_years_history",
+                value = "04"
+            )
         }
         @submit(edit, Some("button.saveandcontinue"))
     }
