@@ -21,10 +21,11 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.supervision.{ProfessionalBodyMember, ProfessionalBodyMemberNo, ProfessionalBodyMemberYes, Supervision}
+import play.api.mvc.Result
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.supervision.member_of_professional_body
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class ProfessionalBodyMemberController @Inject()(
                                                   val dataCacheConnector: DataCacheConnector,
@@ -51,23 +52,25 @@ class ProfessionalBodyMemberController @Inject()(
         case ValidForm(_, data) => {
           for {
             supervision <- dataCacheConnector.fetch[Supervision](Supervision.key)
-            _ <- dataCacheConnector.save[Supervision](Supervision.key, {
-              data match {
-                case ProfessionalBodyMemberNo
-                  if supervision.professionalBodyMember.contains(ProfessionalBodyMemberYes) | supervision.professionalBodies.isDefined =>
-                  supervision.professionalBodyMember(data).copy(professionalBodies = None)
-                case _ => supervision.professionalBodyMember(data)
-              }}
-            )
-          } yield redirectTo(data, supervision, edit)
+            updatedSupervision <- updateSupervisionFromIncomingData(data, supervision)
+            _ <- dataCacheConnector.save[Supervision](Supervision.key, updatedSupervision)
+          } yield redirectTo(updatedSupervision, edit)
         }
       }
   }
 
-  def redirectTo(data: ProfessionalBodyMember, supervision: Supervision, edit: Boolean) =
-    (data, edit) match {
-      case (ProfessionalBodyMemberYes, _) if !supervision.isComplete => Redirect(routes.WhichProfessionalBodyController.get(edit))
-      case (ProfessionalBodyMemberNo, false) => Redirect(routes.PenalisedByProfessionalController.get())
+  def updateSupervisionFromIncomingData(data: ProfessionalBodyMember, supervision: Option[Supervision])(implicit ec: ExecutionContext) = {
+    Future[Supervision](data match {
+      case ProfessionalBodyMemberNo => supervision.professionalBodyMember(data).copy(professionalBodies = None)
+      case _ => supervision.professionalBodyMember(data)
+    })
+  }
+
+  def redirectTo(supervision: Supervision, edit: Boolean): Result = {
+    (supervision.professionalBodyMember, edit) match {
+      case (Some(ProfessionalBodyMemberYes), _) if !supervision.isComplete => Redirect(routes.WhichProfessionalBodyController.get(edit))
+      case (Some(ProfessionalBodyMemberNo), false) => Redirect(routes.PenalisedByProfessionalController.get())
       case _ => Redirect(routes.SummaryController.get())
     }
+  }
 }
