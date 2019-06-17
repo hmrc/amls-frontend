@@ -53,17 +53,6 @@ class BranchesOrAgentsWhichCountriesSpec extends PlaySpec with MustMatchers{
       )
     }
 
-    "fail to validate when hasCountries is true and there are more than 10 countries" in {
-
-      val form: UrlFormEncoded = Map(
-        "countries[]" -> Seq.fill(11)("GB")
-      )
-
-      rule.validate(form) mustBe Invalid(
-        Seq((Path \ "countries") -> Seq(ValidationError("error.maxLength", 10)))
-      )
-    }
-
     "successfully validate when there are empty values in the seq" in {
 
       val form: UrlFormEncoded = Map(
