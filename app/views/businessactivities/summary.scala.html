@@ -161,29 +161,36 @@
         }</p>
     }
 
-    @checkYourAnswers(
-        question = Messages("businessactivities.riskassessment.policy.title"),
-        editUrl = controllers.businessactivities.routes.RiskAssessmentController.get(true).toString
-    ) {
-        @model.riskAssessmentPolicy.map {
-            case RiskAssessmentPolicyNo => { <p>@Messages("lbl.no")</p> }
-            case RiskAssessmentPolicyYes(v) => {
-                    <p>@Messages("lbl.yes")</p>
-                    @checkYourAnswersExtra(
-                        question = Messages("businessactivities.paper.or.digital")
-                    ) {
-                        <ul class="list list--comma">
-                            @v.map { x=>
-                                <li>@x match {
-                                    case PaperBased => {@Messages("businessactivities.RiskAssessmentType.lbl.01")}
-                                    case Digital => {@Messages("businessactivities.RiskAssessmentType.lbl.02")}
-                                }</li>
-                            }
-                        </ul>
+    @model.riskAssessmentPolicy.map {
+        case RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), _) => {
+            @checkYourAnswers(
+                question = Messages("businessactivities.riskassessment.policy.title"),
+                editUrl = controllers.businessactivities.routes.RiskAssessmentController.get(true).toString
+            ) {
+                <p>@Messages("lbl.no")</p>
+            }
+        }
+        case RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(v)) => {
+            @checkYourAnswers(
+                question = Messages("businessactivities.riskassessment.policy.title"),
+                editUrl = controllers.businessactivities.routes.RiskAssessmentController.get(true).toString
+            ) {
+                <p>@Messages("lbl.yes")</p>
+            }
+            @checkYourAnswers(
+                question = Messages("businessactivities.document.riskassessment.policy.title"),
+                editUrl = controllers.businessactivities.routes.DocumentRiskAssessmentController.get(true).toString
+            ) {
+                <ul class="list list-bullet">
+                    @v.map {
+                        case Digital => { <li>@Messages("businessactivities.RiskAssessmentType.lbl.02")</li> }
+                        case PaperBased => { <li>@Messages("businessactivities.RiskAssessmentType.lbl.01")</li> }
                     }
+                </ul>
             }
         }
     }
+
 
     @if(!hideReceiveAdvice) {
         @model.accountantForAMLSRegulations.map { x =>
@@ -242,5 +249,4 @@
     @form(f, controllers.businessactivities.routes.SummaryController.post()) {
             @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
     }
-
 }

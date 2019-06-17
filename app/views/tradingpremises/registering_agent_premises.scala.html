@@ -22,7 +22,10 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading(Messages("tradingpremises.agent.premises.title"), "summary.tradingpremises")
+}
+
+@supportingContent = {
+    <p>@Messages("tradingpremises.agent.premises.text")</p>
 }
 
 @main(
@@ -32,31 +35,24 @@
 
     @form(f, controllers.tradingpremises.routes.RegisteringAgentPremisesController.post(index, edit)) {
 
-        <p>@Messages("tradingpremises.agent.premises.text")</p>
-
-        @fieldset(
-            f = f("agentPremises-fieldset"),
-            legend = "tradingpremises.agent.premises.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("agentPremises"),
+            heading = "tradingpremises.agent.premises.title",
+            section = "summary.tradingpremises",
+            supportingContent = supportingContent,
             panel = false,
             classes = Seq("inline")
         ) {
-            @errorGroup(
-                field = f("agentPremises")
-            ) {
-                @radio(
-                    f = f("agentPremises"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true
-                )
-                @radio(
-                    f = f("agentPremises"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
-            }
+            @radio(
+                f = f("agentPremises"),
+                labelText = "lbl.yes",
+                value = "true"
+            )
+            @radio(
+                f = f("agentPremises"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
         @submit(false)
 

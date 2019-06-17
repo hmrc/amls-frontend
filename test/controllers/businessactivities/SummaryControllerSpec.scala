@@ -217,7 +217,7 @@ object BusinessActivitiesValues {
   val DefaultCustomersOutsideUK = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))
   val DefaultNCARegistered = NCARegistered(true)
   val DefaultAccountantForAMLSRegulations = AccountantForAMLSRegulations(true)
-  val DefaultRiskAssessments = RiskAssessmentPolicyYes(Set(PaperBased))
+  val DefaultRiskAssessments = RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(PaperBased)))
   val DefaultHowManyEmployees = HowManyEmployees(Some("5"),Some("4"))
   val DefaultWhoIsYourAccountant = WhoIsYourAccountant(
     "Accountant's name",

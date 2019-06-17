@@ -30,6 +30,9 @@ POST        /accountant                                           @controllers.b
 GET         /risk-assessment                                      @controllers.businessactivities.RiskAssessmentController.get(edit: Boolean ?= false)
 POST        /risk-assessment                                      @controllers.businessactivities.RiskAssessmentController.post(edit: Boolean ?= false)
 
+GET         /how-document-risk-assessment                         @controllers.businessactivities.DocumentRiskAssessmentController.get(edit: Boolean ?= false)
+POST        /how-document-risk-assessment                         @controllers.businessactivities.DocumentRiskAssessmentController.post(edit: Boolean ?= false)
+
 GET         /employees                                            @controllers.businessactivities.HowManyEmployeesController.get(edit: Boolean ?= false)
 POST        /employees                                            @controllers.businessactivities.HowManyEmployeesController.post(edit: Boolean ?= false)
 

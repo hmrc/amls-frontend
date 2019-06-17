@@ -22,7 +22,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("bankdetails.accounttype.title", "summary.bankdetails")
 }
 
 @main(
@@ -32,31 +31,27 @@
 
     @form(f, controllers.bankdetails.routes.BankAccountTypeController.post(index, edit)) {
 
-        @fieldset(
-            f = f("bankAccountType-fieldset"),
-            legend = "bankdetails.accounttype.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("bankAccountType"),
+            heading = "bankdetails.accounttype.title",
+            section = "summary.bankdetails",
             panel = false
         ) {
-            @errorGroup(
-                field = f("bankAccountType")
-            ) {
-                @radio(
-                    f = f("bankAccountType"),
-                    labelText = "bankdetails.accounttype.lbl.03",
-                    value = "03"
-                )
-                @radio(
-                    f = f("bankAccountType"),
-                    labelText = "bankdetails.accounttype.lbl.02",
-                    value = "02"
-                )
-                @radio(
-                    f = f("bankAccountType"),
-                    labelText = "bankdetails.accounttype.lbl.01",
-                    value = "01"
-                )
-            }
+            @radio(
+                f = f("bankAccountType"),
+                labelText = "bankdetails.accounttype.lbl.03",
+                value = "03"
+            )
+            @radio(
+                f = f("bankAccountType"),
+                labelText = "bankdetails.accounttype.lbl.02",
+                value = "02"
+            )
+            @radio(
+                f = f("bankAccountType"),
+                labelText = "bankdetails.accounttype.lbl.01",
+                value = "01"
+            )
         }
 
         @submit(false)

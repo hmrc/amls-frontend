@@ -27,7 +27,6 @@ import play.api.inject.guice.GuiceApplicationBuilder
 class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with DependencyMocks {
 
   override lazy val app: Application = new GuiceApplicationBuilder()
-    .configure("microservice.services.feature-toggle.phase-2-changes" -> true)
     .build()
 
   def createCompleteResponsiblePersonSeq: Option[Seq[ResponsiblePerson]] = Some(Seq(completeResponsiblePerson))

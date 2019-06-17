@@ -24,7 +24,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("tradingpremises.msb.services.title", "summary.tradingpremises")
 }
 
 @main(
@@ -34,26 +33,21 @@
 
     @form(f, controllers.tradingpremises.routes.MSBServicesController.post(index, edit, changed)) {
 
-        @fieldset(
-            f = f("msbServices-fieldset"),
-            legend = "tradingpremises.msb.services.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("msbServices"),
+            heading = "tradingpremises.msb.services.title",
+            section = "summary.tradingpremises",
+            hint = "lbl.select.all",
             panel = false
         ) {
-            @hint("lbl.select.all")
-            @errorGroup(
-                field = f("msbServices")
-            ) {
-
-                @model.msbServices.map { services =>
-                    @services.msbServices.toList.sortBy(_.toString).map { svc =>
-                        @svc match {
-                            case ChequeCashingNotScrapMetal => {@checkbox(f("msbServices[]"), "msb.services.list.lbl.03", "03")}
-                            case ChequeCashingScrapMetal => {@checkbox(f("msbServices[]"), "msb.services.list.lbl.04", "04")}
-                            case CurrencyExchange => {@checkbox(f("msbServices[]"), "msb.services.list.lbl.02", "02")}
-                            case ForeignExchange => {@checkbox(f("msbServices[]"), "msb.services.list.lbl.05", "05")}
-                            case TransmittingMoney => {@checkbox(f("msbServices[]"), "msb.services.list.lbl.01", "01")}
-                        }
+            @model.msbServices.map { services =>
+                @services.msbServices.toList.sortBy(_.toString).map { svc =>
+                    @svc match {
+                        case ChequeCashingNotScrapMetal => {@checkbox(f("msbServices[]"), "msb.services.list.lbl.03", "03")}
+                        case ChequeCashingScrapMetal => {@checkbox(f("msbServices[]"), "msb.services.list.lbl.04", "04")}
+                        case CurrencyExchange => {@checkbox(f("msbServices[]"), "msb.services.list.lbl.02", "02")}
+                        case ForeignExchange => {@checkbox(f("msbServices[]"), "msb.services.list.lbl.05", "05")}
+                        case TransmittingMoney => {@checkbox(f("msbServices[]"), "msb.services.list.lbl.01", "01")}
                     }
                 }
             }

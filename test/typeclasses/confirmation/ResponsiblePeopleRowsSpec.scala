@@ -16,7 +16,7 @@
 
 package typeclasses.confirmation
 
-import connectors.{DataCacheConnector, KeystoreConnector}
+import connectors.DataCacheConnector
 import generators.{AmlsReferenceNumberGenerator, ResponsiblePersonGenerator}
 import models.businessmatching.{BusinessActivity, EstateAgentBusinessService, TrustAndCompanyServices}
 import models.confirmation.{BreakdownRow, Currency}
@@ -31,9 +31,8 @@ import services.ConfirmationService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.StatusConstants
-import play.api.inject.bind
 
-class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
+class ResponsiblePeopleRowsSpec extends PlaySpec
   with MockitoSugar
   with ScalaFutures
   with IntegrationPatience
@@ -43,7 +42,6 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
   with AmlsReferenceNumberGenerator {
 
   override lazy val app: Application = new GuiceApplicationBuilder()
-    .configure("microservice.services.feature-toggle.phase-2-changes" -> true)
     .build()
 
   trait Fixture {
@@ -84,7 +82,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
       difference = Some(0)
     )
 
-    "responsible people rows with phase2 toggle" should {
+    "responsible people rows" should {
 
       "return an approval check row" when {
         "The business is HVD, EAB or ASP and has answered no to both the approvals question and F&P question" in new Fixture {
@@ -101,7 +99,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
             )
           )
 
-          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+          val result = ResponsiblePeopleRowsInstances.responsiblePeopleRowsFromSubscription(
             subscriptionResponse,
             activities = businessActivity,
             people)
@@ -137,7 +135,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
             )
           )
 
-          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+          val result = ResponsiblePeopleRowsInstances.responsiblePeopleRowsFromSubscription(
             subscriptionResponse,
             activities = businessActivity,
             people)
@@ -179,7 +177,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
             )
           )
 
-          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+          val result = ResponsiblePeopleRowsInstances.responsiblePeopleRowsFromSubscription(
             subscriptionResponse,
             activities = businessActivity,
             people)
@@ -212,7 +210,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
             )
           )
 
-          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+          val result = ResponsiblePeopleRowsInstances.responsiblePeopleRowsFromSubscription(
             subscriptionResponse,
             activities = businessActivity,
             people)
@@ -241,7 +239,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
             )
           )
 
-          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromVariation(
+          val result = ResponsiblePeopleRowsInstances.responsiblePeopleRowsFromVariation(
             amendVariationRenewalResponse,
             activities = businessActivity,
             people)
@@ -263,7 +261,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
             )
           )
 
-          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+          val result = ResponsiblePeopleRowsInstances.responsiblePeopleRowsFromSubscription(
             subscriptionResponse,
             activities = businessActivity,
             people)
@@ -286,7 +284,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
             )
           )
 
-          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+          val result = ResponsiblePeopleRowsInstances.responsiblePeopleRowsFromSubscription(
             subscriptionResponse,
             activities = businessActivity,
             people)
@@ -310,7 +308,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
           )
         )
 
-        val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+        val result = ResponsiblePeopleRowsInstances.responsiblePeopleRowsFromSubscription(
           subscriptionResponse,
           activities = businessActivity,
           people)
@@ -334,7 +332,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
           )
         )
 
-        val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+        val result = ResponsiblePeopleRowsInstances.responsiblePeopleRowsFromSubscription(
           subscriptionResponse,
           activities = businessActivity,
           people)
@@ -359,7 +357,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
             )
           )
 
-          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+          val result = ResponsiblePeopleRowsInstances.responsiblePeopleRowsFromSubscription(
             subscriptionResponse,
             activities = businessActivity,
             people)
@@ -388,7 +386,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
             )
           )
 
-          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+          val result = ResponsiblePeopleRowsInstances.responsiblePeopleRowsFromSubscription(
             subscriptionResponse,
             activities = businessActivity,
             people)
@@ -418,7 +416,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
             )
           )
 
-          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+          val result = ResponsiblePeopleRowsInstances.responsiblePeopleRowsFromSubscription(
             subscriptionResponse,
             activities = businessActivity,
             people)
@@ -448,7 +446,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
             )
           )
 
-          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+          val result = ResponsiblePeopleRowsInstances.responsiblePeopleRowsFromSubscription(
             subscriptionResponse,
             activities = businessActivity,
             people)
@@ -477,7 +475,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
           )
         )
 
-        val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+        val result = ResponsiblePeopleRowsInstances.responsiblePeopleRowsFromSubscription(
           subscriptionResponse,
           activities = businessActivity,
           people)
@@ -506,7 +504,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
             )
           )
 
-          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+          val result = ResponsiblePeopleRowsInstances.responsiblePeopleRowsFromSubscription(
             subscriptionResponse,
             activities = businessActivity,
             people)
@@ -545,7 +543,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
             )
           )
 
-          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+          val result = ResponsiblePeopleRowsInstances.responsiblePeopleRowsFromSubscription(
             subscriptionResponse,
             activities = businessActivity,
             people)
@@ -574,7 +572,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
             )
           )
 
-          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+          val result = ResponsiblePeopleRowsInstances.responsiblePeopleRowsFromSubscription(
             subscriptionResponse,
             activities = businessActivity,
             people)
@@ -604,7 +602,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
             )
           )
 
-          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+          val result = ResponsiblePeopleRowsInstances.responsiblePeopleRowsFromSubscription(
             subscriptionResponse,
             activities = businessActivity,
             people)

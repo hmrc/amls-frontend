@@ -380,71 +380,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
 
         }
 
-        "removes data from uk passport and no uk passport including date of birth" when {
-          "phase-2-changes feature toggle is false, data is changed from not uk resident to uk resident and edit is true" in new Fixture {
-
-            val nino = nextNino
-
-            val countryCode = "GB"
-
-            val dateOfBirth = DateOfBirth(LocalDate.parse("2000-01-01"))
-
-            val responsiblePeople = ResponsiblePerson(
-              personResidenceType = Some(
-                PersonResidenceType(
-                  NonUKResidence,
-                  Some(Country(countryCode, countryCode)),
-                  Some(Country(countryCode, countryCode))
-                )
-              ),
-              ukPassport = Some(UKPassportNo),
-              nonUKPassport = Some(NonUKPassportYes("22654321")),
-              dateOfBirth = Some(dateOfBirth)
-            )
-
-            val newRequest = request.withFormUrlEncodedBody(
-              "isUKResidence" -> "true",
-              "nino" -> nino,
-              "countryOfBirth" -> countryCode,
-              "nationality" -> countryCode
-            )
-
-            when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
-
-            val personName = PersonName("firstname", None, "lastname")
-
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = Some(personName), dateOfBirth = Some(dateOfBirth))))))
-
-            when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
-              .thenReturn(Some(Seq(responsiblePeople)))
-
-            when(controller.dataCacheConnector.fetchAll(any(), any()))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
-
-            when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(mockCacheMap))
-
-            val result = controller.post(1, true)(newRequest)
-            status(result) must be(SEE_OTHER)
-
-            verify(controller.dataCacheConnector)
-              .save[Seq[ResponsiblePerson]](any(), meq(Seq(responsiblePeople.copy(
-              personResidenceType = Some(PersonResidenceType(
-                UKResidence(Nino(nino)),
-                Some(Country(countryCode, countryCode)),
-                Some(Country(countryCode, countryCode))
-              )),
-              ukPassport = None,
-              nonUKPassport = None,
-              dateOfBirth = None,
-              hasChanged = true
-            ))))(any(), any(), any())
-          }
-        }
-
         "removes data from uk passport and no uk passport excluding date of birth" when {
-          "phase-2-changes feature toggle is true, data is changed from not uk resident to uk resident and edit is true" in new Fixture {
+          "data is changed from not uk resident to uk resident and edit is true" in new Fixture {
 
             val nino = nextNino
 
@@ -471,8 +408,6 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
               "countryOfBirth" -> countryCode,
               "nationality" -> countryCode
             )
-
-            when(mockAppConfig.phase2ChangesToggle).thenReturn(true)
 
             val personName = PersonName("firstname", None, "lastname")
 

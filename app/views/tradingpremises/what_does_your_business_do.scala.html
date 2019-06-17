@@ -25,7 +25,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("tradingpremises.whatdoesyourbusinessdo.title", "summary.tradingpremises")
 }
 
 @main(
@@ -35,22 +34,18 @@
 
     @form(f, controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.post(index, edit)) {
 
-        @fieldset(
-            f = f("activities-fieldset"),
-            legend = "tradingpremises.whatdoesyourbusinessdo.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("activities"),
+            heading = "tradingpremises.whatdoesyourbusinessdo.title",
+            section = "summary.tradingpremises",
+            hint = "lbl.select.all",
             panel = false
         ) {
-            @hint("lbl.select.all")
-            @errorGroup(
-                field = f("activities")
-            ) {
-                @model.businessActivities.toList.sortBy(_.getMessage()).map { ba =>
-                    @checkbox(
-                        f = f("activities[]"),
-                        labelText = "businessmatching.registerservices.servicename.lbl."+BusinessActivities.getValue(ba),
-                        value = BusinessActivities.getValue(ba))
-                }
+            @model.businessActivities.toList.sortBy(_.getMessage()).map { ba =>
+                @checkbox(
+                    f = f("activities[]"),
+                    labelText = "businessmatching.registerservices.servicename.lbl."+BusinessActivities.getValue(ba),
+                    value = BusinessActivities.getValue(ba))
             }
         }
         @submit(false)

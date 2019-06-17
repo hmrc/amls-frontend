@@ -18,7 +18,7 @@ package controllers.responsiblepeople
 
 import cats.data.OptionT
 import cats.implicits._
-import config.{AMLSAuthConnector, AppConfig}
+import config.AppConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -65,8 +65,7 @@ class PersonResidentTypeController @Inject()(override val messagesApi: MessagesA
                 val countryOfBirth = rp.personResidenceType.fold[Option[Country]](None)(x => x.countryOfBirth)
                 val updatedData = data.copy(countryOfBirth = countryOfBirth, nationality = nationality)
                 residency match {
-                  case UKResidence(_) if appConfig.phase2ChangesToggle => rp.personResidenceType(updatedData).copy(ukPassport = None, nonUKPassport = None)
-                  case UKResidence(_) => rp.personResidenceType(updatedData).copy(ukPassport = None, nonUKPassport = None, dateOfBirth = None)
+                  case UKResidence(_) => rp.personResidenceType(updatedData).copy(ukPassport = None, nonUKPassport = None)
                   case NonUKResidence => rp.personResidenceType(updatedData)
                 }
               })

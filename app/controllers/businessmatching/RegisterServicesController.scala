@@ -258,18 +258,6 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
 
   private def containsTcspOrMsb(activities: Set[BusinessActivity]) = (activities contains MoneyServiceBusiness) | (activities contains TrustAndCompanyServices)
 
-  private def fitAndProperRequired(businessActivities: BusinessMatchingActivities): Boolean = {
-    if (!appConfig.phase2ChangesToggle) {
-
-      (businessActivities.businessActivities, businessActivities.additionalActivities) match {
-        case (a, Some(e)) => containsTcspOrMsb(a) | containsTcspOrMsb(e)
-        case (a, _) => containsTcspOrMsb(a)
-      }
-    } else {
-      true
-    }
-  }
-
   private def promptFitAndProper(rp: ResponsiblePerson) =
     rp.approvalFlags.hasAlreadyPassedFitAndProper.isEmpty
 
@@ -285,23 +273,16 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
   private def updateResponsiblePeople(responsiblePeople: Seq[ResponsiblePerson])(implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
     dataCacheConnector.save[Seq[ResponsiblePerson]](ResponsiblePerson.key, responsiblePeople)
 
-  val shouldPromptForFitAndProper:
-    (ResponsiblePerson, BusinessMatchingActivities) => ResponsiblePerson =
+  val shouldPromptForFitAndProper: (ResponsiblePerson, BusinessMatchingActivities) => ResponsiblePerson =
     (rp, activities) => {
-
-      if(fitAndProperRequired(activities)) {
         if(promptFitAndProper(rp)) {
           resetHasAccepted(rp)
         } else {
           rp
         }
-      } else {
-        removeFitAndProper(rp)
-      }
     }
 
-  val shouldPromptForApproval:
-  (ResponsiblePerson, BusinessMatchingActivities, Boolean) => (ResponsiblePerson, BusinessMatchingActivities) =
+  val shouldPromptForApproval: (ResponsiblePerson, BusinessMatchingActivities, Boolean) => (ResponsiblePerson, BusinessMatchingActivities) =
   (rp, activities, isRemoving) => {
 
     def approvalIsRequired(rp: ResponsiblePerson, businessActivities: BusinessMatchingActivities, isRemoving: Boolean) = {
