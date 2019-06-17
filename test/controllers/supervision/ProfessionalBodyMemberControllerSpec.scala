@@ -110,7 +110,7 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
 
       "redirect to WhichProfessionalBodyController" when {
 
-        "the answer is yes to the question and no previous professional bodies has been registered in the cache" in new Fixture {
+        "the answer to the question is yes and no previous professional bodies exist in the cache" in new Fixture {
           val supervision = Some (
             Supervision (
               professionalBodyMember = Some(ProfessionalBodyMemberYes),
@@ -156,7 +156,7 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
 
       "redirect to PenalisedByProfessionalController" when {
 
-        "the answer is no to the question and no previous professional bodies has been registered in the cache" in new Fixture {
+        "the answer to the question is no and no previous professional bodies exist in the cache" in new Fixture {
           val supervision = Some (
             Supervision (
               professionalBodyMember = Some(ProfessionalBodyMemberNo)
