@@ -26,7 +26,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @headingWithPlaceholder(("responsiblepeople.nationality.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
@@ -36,37 +35,25 @@
 
     @form(f, controllers.responsiblepeople.routes.NationalityController.post(index, edit, flow)) {
 
-        @fieldset(
-            f = f("nationality-fieldset"),
-            legend = "responsiblepeople.nationality.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("nationality"),
+            heading = Messages("responsiblepeople.nationality.heading", personName),
+            section = "summary.responsiblepeople",
             panel = false
         ) {
-            @errorGroup(
-                field = f("nationality")
-            ) {
-                @radio(
-                    f = f("nationality"),
-                    labelText = "responsiblepeople.nationality.selection.british",
-                    value = "01"
-                )
-                @radio(
-                    f = f("nationality"),
-                    labelText = "responsiblepeople.nationality.selection.other",
-                    value = "02",
-                    target = s"#$target"
-                )
-            }
-        }
-
-        @fieldset(
-            f = f(s"$target"),
-            legend = "responsiblepeople.nationality.selection.other.name",
-            legendHidden = true,
-            jsHidden = true,
-            id = target
-        ) {
+            @radio(
+                f = f("nationality"),
+                labelText = "responsiblepeople.nationality.selection.british",
+                value = "01"
+            )
+            @radio(
+                f = f("nationality"),
+                labelText = "responsiblepeople.nationality.selection.other",
+                value = "02",
+                target = s"#$target"
+            )
             @panel(
+                field = Some(f(s"$target")),
                 jsHidden = false,
                 wide = false,
                 gutter = true
