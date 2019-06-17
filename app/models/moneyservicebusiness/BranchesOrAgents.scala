@@ -26,9 +26,10 @@ object BranchesOrAgents {
   implicit val jsonReads: Reads[BranchesOrAgents] = {
     import play.api.libs.functional.syntax._
     ((__ \ "hasCountries").read[Boolean] map BranchesOrAgentsHasCountries.apply and
-      (__ \ "countries").read[Seq[Country]].map {
-        case countries if countries.isEmpty => None
-        case countries => Some(BranchesOrAgentsWhichCountries apply countries)
+      (__ \ "countries").readNullable[Seq[Country]].map {
+        case Some(countries) if countries.isEmpty => None
+        case Some(countries) => Some(BranchesOrAgentsWhichCountries apply countries)
+        case None => None
       })((hasCountries, countries) => BranchesOrAgents apply (hasCountries, countries))
   }
 
