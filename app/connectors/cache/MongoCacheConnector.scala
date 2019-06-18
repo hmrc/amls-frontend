@@ -111,11 +111,16 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
   /**
     * Removes the entire cache from the mongo store
     */
-  def remove(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Boolean] =
-    removeByCredId flatMap {
-      case true => Future.successful(true)
-      case _ => removeByOid
-    }
+  def remove(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Boolean] =  {
+    // If we are completly removing the cache we may aswell tidy up and remove any 'oid' entries also!
+    removeByCredId
+    removeByOid
+  }
+//    removeByCredId flatMap {
+//      case true => Future.successful(true)
+//      case _ => removeByOid
+//    }
+
 
   private def removeByOid(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Boolean] =
     mongoCache.removeById(authContext.user.oid, deprecatedFilter = true)
@@ -146,6 +151,7 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
   //  }
   //}
 
+  // I believe the save all method should also migrate users to the new 'Cred ID' and away from 'oid'
   def saveAll(cacheMap: Future[CacheMap])(implicit hc: HeaderCarrier, ac: AuthContext): Future[CacheMap] = {
     authConnector.getCredId flatMap {
       credId =>
