@@ -262,7 +262,7 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
       }
     })
 
-    collection.update(bsonIdQuery(cache.id), BSONDocument("$set" -> Json.toJson(rebuiltCache)), upsert = true) map handleWriteResult
+    collection.update(bsonIdQuery(rebuiltCache.id), BSONDocument("$set" -> Json.toJson(rebuiltCache)), upsert = true) map handleWriteResult
   }
 
   /**
