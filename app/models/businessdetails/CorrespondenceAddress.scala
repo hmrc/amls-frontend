@@ -20,7 +20,16 @@ import models.Country
 import play.api.libs.json.{Reads, Writes}
 
 case class CorrespondenceAddress( ukAddress: Option[CorrespondenceAddressUk],
-                                  nonUkAddress: Option[CorrespondenceAddressNonUk])
+                                  nonUkAddress: Option[CorrespondenceAddressNonUk]) {
+
+  def isUk: Option[Boolean] = {
+    this match {
+      case CorrespondenceAddress(Some(_), None) => Some(true)
+      case CorrespondenceAddress(None, Some(_)) => Some(false)
+      case _ => None
+    }
+  }
+}
 
 object CorrespondenceAddress {
 

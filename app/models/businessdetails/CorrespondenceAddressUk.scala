@@ -61,13 +61,13 @@ object CorrespondenceAddressUk {
 
     ((__ \ "yourName").read(alternativeAddressNameType) ~
       (__ \ "businessName").read(alternativeAddressTradingNameType) ~
-      (__ \ "addressLine1").readsnotEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
+      (__ \ "addressLine1").read(notEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
       (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
       (__ \ "addressLine3").read(optionR(validateAddress)) ~
       (__ \ "addressLine4").read(optionR(validateAddress)) ~
       (__ \ "postCode").read(notEmptyStrip andThen postcodeType)
     )(CorrespondenceAddressUk.apply _)
-    }
+  }
 
   implicit val formWrites = Write[CorrespondenceAddressUk, UrlFormEncoded] {
     a => Map(

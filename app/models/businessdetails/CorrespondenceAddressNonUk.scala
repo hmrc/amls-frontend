@@ -56,7 +56,6 @@ object CorrespondenceAddressNonUk {
         required("error.required.name.of.business") andThen
         maxLength(businessNameMaxLength).withMessage("error.invalid.name.of.business") andThen
         basicPunctuationPattern()
-
      (
             (__ \ "yourName").read(alternativeAddressNameType) ~
             (__ \ "businessName").read(alternativeAddressTradingNameType) ~

@@ -19,18 +19,24 @@ package models.businessdetails
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, Write}
 
-case class CorrespondenceAddressIsUk(isUk: Boolean)
+case class CorrespondenceAddressIsUk(isUk: Option[Boolean])
 
 object CorrespondenceAddressIsUk {
 
-  implicit val formRule: Rule[UrlFormEncoded, Boolean] = From[UrlFormEncoded] { __ =>
+  import utils.MappingUtils.Implicits._
 
-    import jto.validation.forms.Rules._
-    import utils.MappingUtils.Implicits._
+  implicit val formRule: Rule[UrlFormEncoded, CorrespondenceAddressIsUk] =
+    From[UrlFormEncoded] { __ =>
+      import jto.validation.forms.Rules._
+      (__ \ "isUK").read[Boolean].withMessage("error.required.address.line1")
+        .map(x => CorrespondenceAddressIsUk.apply(Option(x)))
+    }
 
-
-    ((__ \ "isUK").read[Boolean].withMessage("error.required.address.line1") )
+  implicit val formWrites = Write[CorrespondenceAddressIsUk, UrlFormEncoded] { a =>
+    a.isUk match {
+      case Some(true) => Map("isUK" -> Seq("true"))
+      case Some(false) => Map("isUK" -> Seq("true"))
+      case _ => Map()
+    }
   }
-
-  implicit val formWrites = Write[CorrespondenceAddress, UrlFormEncoded] { a => Map("isUK" -> Seq("true"))  }
 }

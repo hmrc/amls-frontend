@@ -40,12 +40,12 @@ import utils.{AmlsSpec, AuthorisedFixture}
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
 
-class CorrespondenceAddressControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new CorrespondenceAddressController (
+    val controller = new CorrespondenceAddressUkController (
       dataConnector = mock[DataCacheConnector],
       authConnector = self.authConnector,
       auditConnector = mock[AuditConnector],

@@ -35,7 +35,7 @@ import views.html.businessdetails._
 
 import scala.concurrent.Future
 
-class CorrespondenceAddressController @Inject () (
+class CorrespondenceAddressUkController @Inject ()(
                                                  val dataConnector: DataCacheConnector,
                                                  val authConnector: AuthConnector,
                                                  val auditConnector: AuditConnector,
