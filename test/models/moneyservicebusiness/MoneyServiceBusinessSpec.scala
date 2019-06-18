@@ -128,7 +128,7 @@ trait MoneyServiceBusinessTestData {
     )),
     sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
     fundsTransfer = Some(FundsTransfer(true)),
-    branchesOrAgents = Some(BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))),
+    branchesOrAgents = Some(BranchesOrAgents(BranchesOrAgentsHasCountries(true), Some(BranchesOrAgentsWhichCountries(Seq(Country("United Kingdom", "GB")))))),
     sendTheLargestAmountsOfMoney = Some(sendTheLargestAmountsOfMoney),
     mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
     transactionsInNext12Months = Some(TransactionsInNext12Months("12345678963")),
