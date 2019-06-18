@@ -27,7 +27,6 @@
 @header = {
     @components.back_link()
     @errorSummaryWithPlaceholder(f, personName)
-    @headingWithPlaceholder(("responsiblepeople.country.of.birth.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
@@ -37,42 +36,33 @@
 
     @form(f, controllers.responsiblepeople.routes.CountryOfBirthController.post(index, edit, flow)) {
 
-        @fieldset(
-            f = f("countryOfBirth-fieldset"),
-            legend = "responsiblepeople.country.of.birth.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("bornInUk"),
+            heading = Messages("responsiblepeople.country.of.birth.heading", personName),
+            section = "summary.responsiblepeople",
+            errorGroupPlaceholder = personName
             panel = false
         ) {
-            @errorGroupWithPlaceholder(
-                field = f("bornInUk"),
-                placeholder = personName
+            @radio(
+                f = f("bornInUk"),
+                labelText = "lbl.yes",
+                value = "true"
+            )
+            @radio(
+                f = f("bornInUk"),
+                labelText = "lbl.no",
+                value = "false",
+                target = s"#$target"
+            )
+            @panel(
+                field = Some(f(s"$target"))
             ) {
-                @radio(
-                    f = f("bornInUk"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true
-
+                @country_autocomplete(
+                    field = f("country"),
+                    placeholder = personName,
+                    labelText = Messages("responsiblepeople.country.of.birth.txt.lbl", personName),
+                    data = countryData.getOrElse(Seq.empty)
                 )
-                @radio(
-                    f = f("bornInUk"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true,
-                    target = s"#$target"
-                )
-                @panel(
-                    field = Some(f(s"$target"))
-                ) {
-
-                    @country_autocomplete(
-                        field = f("country"),
-                        placeholder = personName,
-                        labelText = Messages("responsiblepeople.country.of.birth.txt.lbl", personName),
-                        data = countryData.getOrElse(Seq.empty)
-                    )
-
-                }
             }
         }
 
