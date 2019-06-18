@@ -22,7 +22,6 @@
 @header = {
     @components.back_link()
     @errorSummaryWithPlaceholder(f, personName)
-    @headingWithPlaceholder(("responsiblepeople.sole.proprietor.another.business.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
@@ -32,30 +31,24 @@
 
     @form(f, controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.post(index, edit, flow)) {
 
-        @fieldset(
-            f = f("soleProprietorOfAnotherBusiness-fieldset"),
-            legend = "responsiblepeople.sole.proprietor.another.business.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("soleProprietorOfAnotherBusiness"),
+            legend = Messages("responsiblepeople.sole.proprietor.another.business.heading", personName),
+            section = "summary.responsiblepeople",
             panel = false,
+            errorGroupPlaceholder = personName,
             classes = Seq("inline")
         ) {
-            @errorGroupWithPlaceholder(
-                field = f("soleProprietorOfAnotherBusiness"),
-                placeholder = personName
-            ) {
-                @radio(
-                    f = f("soleProprietorOfAnotherBusiness"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true
-                )
-                @radio(
-                    f = f("soleProprietorOfAnotherBusiness"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
-            }
+            @radio(
+                f = f("soleProprietorOfAnotherBusiness"),
+                labelText = "lbl.yes",
+                value = "true"
+            )
+            @radio(
+                f = f("soleProprietorOfAnotherBusiness"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
 
         @submit()
