@@ -139,10 +139,20 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
   /**
     * Saves the given cache map into the mongo store
     */
-  def saveAll(cacheMap: Future[CacheMap]): Future[CacheMap] = {
-    cacheMap.flatMap { updateCache =>
-      val cache = Cache(updateCache)
-      mongoCache.saveAll(cache) map { _ => toCacheMap(cache) }
+  //def saveAll(cacheMap: Future[CacheMap]): Future[CacheMap] = {
+  //  cacheMap.flatMap { updateCache =>
+  //    val cache = Cache(updateCache)
+  //    mongoCache.saveAll(cache) map { _ => toCacheMap(cache) }
+  //  }
+  //}
+
+  def saveAll(cacheMap: Future[CacheMap])(implicit hc: HeaderCarrier, ac: AuthContext): Future[CacheMap] = {
+    authConnector.getCredId flatMap {
+      credId =>
+        cacheMap.flatMap { updateCache =>
+          val cache = Cache(updateCache)
+          mongoCache.saveAll(cache, credId) map { _ => toCacheMap(cache) }
+        }
     }
   }
 

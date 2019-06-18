@@ -250,6 +250,20 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
 
     collection.update(bsonIdQuery(cache.id), BSONDocument("$set" -> Json.toJson(rebuiltCache)), upsert = true) map handleWriteResult
   }
+  def saveAll(cache: Cache, id :String): Future[Boolean] = {
+    // Rebuild the cache and decrypt each key if necessary
+    val rebuiltCache = Cache(id, cache.data.foldLeft(Map.empty[String, JsValue]) { (acc, value) =>
+      val plainText = tryDecrypt(Crypted(value._2.toString))
+
+      if (appConfig.mongoEncryptionEnabled) {
+        acc + (value._1 -> JsString(compositeSymmetricCrypto.encrypt(plainText).value))
+      } else {
+        acc + (value._1 -> Json.parse(plainText.value))
+      }
+    })
+
+    collection.update(bsonIdQuery(cache.id), BSONDocument("$set" -> Json.toJson(rebuiltCache)), upsert = true) map handleWriteResult
+  }
 
   /**
     * Creates a new index on the specified field, using the specified name and the ttl
