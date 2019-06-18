@@ -23,7 +23,11 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @headingWithPlaceholder(("responsiblepeople.fit_and_proper.heading", personName), "summary.responsiblepeople")
+}
+
+@supportingContent = {
+    <p>@Messages("responsiblepeople.fit_and_proper.details")</p>
+    <p>@Messages("responsiblepeople.fit_and_proper.details2", personName)</p>
 }
 
 @main(
@@ -31,37 +35,26 @@
     heading = header
 ) {
 
-    <p>@Messages("responsiblepeople.fit_and_proper.details")</p>
-    <p>@Messages("responsiblepeople.fit_and_proper.details2", personName)</p>
-
     @form(f, controllers.responsiblepeople.routes.FitAndProperController.post(index, edit, flow)) {
 
-        <div class="form-group">
-        @fieldset(
-            f = f("hasAlreadyPassedFitAndProper-fieldset"),
-            legend = "responsiblepeople.fit_and_proper.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("hasAlreadyPassedFitAndProper"),
+            heading = Messages("responsiblepeople.fit_and_proper.heading", personName),
+            section = "summary.responsiblepeople",
             panel = false,
             classes = Seq("inline")
         ) {
-            @errorGroup(
-                field = f("hasAlreadyPassedFitAndProper")
-            ) {
-                @radio(
-                    f = f("hasAlreadyPassedFitAndProper"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true
-                )
-                @radio(
-                    f = f("hasAlreadyPassedFitAndProper"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
-            }
+            @radio(
+                f = f("hasAlreadyPassedFitAndProper"),
+                labelText = "lbl.yes",
+                value = "true"
+            )
+            @radio(
+                f = f("hasAlreadyPassedFitAndProper"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
-        </div>
 
         @submit(edit)
 
