@@ -993,11 +993,12 @@ businessdetails.contactingyou.website.lbl = Website address (optional)
 businessdetails.contactingyou.businessaddress = Business address:
 businessdetails.contactingyou.invalid.phone = Invalid Phone Number
 businessdetails.contactingyou.invalid.mobile = Invalid Mobile Number
-businessdetails.correspondenceaddress.title = What is the right address to send you letters?
-businessdetails.correspondenceaddress.lbl = Is this a UK address?
+
+businessdetails.correspondenceaddress.isuk.title = Is the address to send you letters about your supervision in the UK?
+businessdetails.correspondenceaddress.title = What is the right address to send you letters about your supervision?
 businessdetails.correspondenceaddress.p = We’ll send letters about your supervision to this address.
 businessdetails.correspondenceaddress.contact.info = Contact person or business
-businessdetails.correspondenceaddress.yourName = Name of the person
+businessdetails.correspondenceaddress.yourName = Your name
 businessdetails.correspondenceaddress.businessName = Name of the business
 businessdetails.correspondenceaddress.ukAddress = Yes
 businessdetails.correspondenceaddress.nonUkAddress = No
