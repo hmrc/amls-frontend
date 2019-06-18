@@ -112,7 +112,7 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
     * Removes the entire cache from the mongo store
     */
   def remove(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Boolean] =  {
-    // If we are completly removing the cache we may aswell tidy up and remove any 'oid' entries also!
+    // If we are completely removing the cache we should also tidy up and remove any 'oid' entries.
     removeByCredId
     removeByOid
   }
