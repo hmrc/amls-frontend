@@ -35,7 +35,7 @@
 
     @form(f, controllers.responsiblepeople.routes.VATRegisteredController.post(index, edit, flow)) {
 
-        @fieldset(
+        @fieldsetWithErrorGroup(
             f = f("registeredForVAT"),
             heading = Messages("responsiblepeople.registeredforvat.heading", personName),
             section = "summary.responsiblepeople",
