@@ -51,16 +51,18 @@
                 f = f("training"),
                 labelText = "lbl.yes",
                 value = "true",
-                target = s"#$target"
+                target = "[data-reveal='information']"
             )
-            @fieldset(
-                f = f(s"$target"),
-                legend = Messages("responsiblepeople.training.information.lbl", personName),
-                hint = "responsiblepeople.training.information.hint",
-                jsHidden = false
+            @panel(
+                jsHidden = true,
+                dataReveal = "information",
+                wide = false,
+                gutter = true
             ) {
                 @textarea(
                     field = f("information"),
+                    legend = Messages("responsiblepeople.training.information.lbl", personName),
+                    hint = "responsiblepeople.training.information.hint",
                     hintText = "hint.255.chars",
                     bold = false,
                     largeWidth = true,

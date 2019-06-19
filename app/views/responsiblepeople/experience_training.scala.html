@@ -61,18 +61,18 @@
                 f = f("experienceTraining"),
                 labelText = "lbl.yes",
                 value = "true",
-                target = ".more-information"
+                target = "[data-reveal='experience-information']"
             )
-            @fieldset(
-                legend = Messages("responsiblepeople.experiencetraining.information.lbl", personName),
-                jsHidden = false,
-                panel = true,
-                classes = Seq("more-information"),
-                hint = "responsiblepeople.experiencetraining.information.hint",
-                f = f("experienceInformation-fieldset")
+            @panel(
+                jsHidden = true,
+                dataReveal = "experience-information",
+                wide = false,
+                gutter = true
             ) {
                 @textarea(
                     field = f("experienceInformation"),
+                    legend = Messages("responsiblepeople.experiencetraining.information.lbl", personName),
+                    hint = "responsiblepeople.experiencetraining.information.hint",
                     hintText = "hint.255.chars",
                     bold = false,
                     largeWidth = true,
