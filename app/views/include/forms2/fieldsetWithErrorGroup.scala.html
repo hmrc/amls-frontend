@@ -30,7 +30,8 @@
     hint: String = "",
     heading: String = "",
     section: String = "",
-    supportingContent: Html = HtmlFormat.empty
+    supportingContent: Html = HtmlFormat.empty,
+    errorGroupPlaceholder: String = ""
 )(content: Html)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @fieldsetContent = {
@@ -47,7 +48,12 @@
         @include.forms2.legend(legend, jsHidden, bold, hint, legendHidden, heading, f.id, supportingContent)
         @if(f.hasErrors) {
             <span class="error-notification" id="@f.id-error-notification" data-journey="error - field:user input:@f.id">
-                <span class="visuallyhidden">Error: </span>@f.error
+                <span class="visuallyhidden">Error: </span>@
+                @if(errorGroupPlaceholder.nonEmpty) {
+                    @Messages(f.rpError, errorGroupPlaceholder)
+                } else {
+                    @f.error
+                }
             </span>
         }
         @content
