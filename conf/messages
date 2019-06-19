@@ -134,7 +134,7 @@ error.required.atb.registered.for.vat = Select yes if your business is registere
 error.required.atb.corporation.tax = Select yes if your business is registered for Corporation Tax
 error.required.atb.corporation.tax.number = Enter a valid Corporation Tax reference number
 error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax reference number
-error.required.atb.lettersaddress = Select yes if this is the right address to send you letters
+error.required.atb.lettersaddress = Select yes if this is the right address to send you letters about your supervision
 error.mismatch.atb.email = The email addresses you’ve entered do not match
 
 error.businessmatching.updateservice.responsiblepeople = Select at least one option to show which responsible people have passed the HMRC Money Laundering Regulations fit and proper test
@@ -988,7 +988,6 @@ businessdetails.contactingyou.confirm.email.lbl = Confirm email address
 businessdetails.contactingyou.email.hint = For example, myname@example.com.
 businessdetails.contactingyou.phone.lbl = Phone number
 businessdetails.contactingyou.phone.hint = For international numbers include the country code.
-businessdetails.contactingyou.sendletter.lbl = Is this the right address to send you letters?
 businessdetails.contactingyou.website.lbl = Website address (optional)
 businessdetails.contactingyou.businessaddress = Business address:
 businessdetails.contactingyou.invalid.phone = Invalid Phone Number
@@ -1016,7 +1015,7 @@ businessdetails.registeredoffice.postcode.lbl = Postcode
 businessdetails.registeredoffice.country.lbl = Country
 businessdetails.activity.start.date.title = When did or will your business start activities that need to be registered for anti-money laundering supervision?
 businessdetails.activity.start.date.text = If your business is already involved in these activities, give the date it started.
-businessdetails.lettersaddress.title = Is this the right address to send you letters?
+businessdetails.lettersaddress.title = Is this the right address to send you letters about your supervision?
 
 tradingpremises.whatyouneed.paragraph1.text = We need to know where you trade from, and where your agents trade from. An agent is an individual or business that works on behalf of your business, to offer your services.
 tradingpremises.whatyouneed.requiredinfo.heading = For each of your trading premises you’ll be asked things like:
