@@ -57,7 +57,7 @@ class ce_transaction_in_next_12_monthsSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.msb.ce_transaction_in_next_12_months(form2, true)
 
-      heading.html must be(Messages("msb.ce.transactions.expected.in.12.months.title"))
+      heading.html must include(Messages("msb.ce.transactions.expected.in.12.months.title"))
       subHeading.html must include(Messages("summary.msb"))
 
     }
