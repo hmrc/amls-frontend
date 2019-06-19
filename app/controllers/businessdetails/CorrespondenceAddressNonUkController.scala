@@ -51,7 +51,7 @@ class CorrespondenceAddressNonUkController @Inject ()(
             correspondenceAddress <- businessDetails.correspondenceAddress
             ukAddress <- correspondenceAddress.nonUkAddress
           } yield Form2[CorrespondenceAddressNonUk](ukAddress)).getOrElse(EmptyForm)
-          Ok(correspondence_address_uk(form, edit))
+          Ok(correspondence_address_non_uk(form, edit, autoCompleteService.getCountries))
       }
   }
 
@@ -59,7 +59,7 @@ class CorrespondenceAddressNonUkController @Inject ()(
     implicit authContext => implicit request => {
       Form2[CorrespondenceAddressNonUk](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(correspondence_address_uk(f, edit)))
+          Future.successful(BadRequest(correspondence_address_non_uk(f, edit, autoCompleteService.getCountries)))
         case ValidForm(_, data) =>
           val doUpdate = for {
             businessDetails:BusinessDetails <- OptionT(dataConnector.fetch[BusinessDetails](BusinessDetails.key))

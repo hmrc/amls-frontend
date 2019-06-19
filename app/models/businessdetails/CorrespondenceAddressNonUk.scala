@@ -29,7 +29,19 @@ case class CorrespondenceAddressNonUk(
                                      addressLineNonUK3: Option[String],
                                      addressLineNonUK4: Option[String],
                                      country: Country
-                                     )
+                                     ) {
+
+  def toLines: Seq[String] =
+    Seq(
+      Some(yourName),
+      Some(businessName),
+      Some(addressLineNonUK1),
+      Some(addressLineNonUK2),
+      addressLineNonUK3,
+      addressLineNonUK4,
+      Some(country.toString)
+    ).flatten
+}
 
 object CorrespondenceAddressNonUk {
   implicit val formRule: Rule[UrlFormEncoded, CorrespondenceAddressNonUk] = From[UrlFormEncoded] { __ =>

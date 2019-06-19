@@ -25,11 +25,13 @@
     @errorSummary(f)
 }
 
+@supportingContent = { <p>@Messages("businessdetails.correspondenceaddress.p")</p> }
+
 @main(
     title = Messages("businessdetails.correspondenceaddress.isuk.title") + " - " + Messages("summary.businessdetails"),
     heading = header
 ) {
-    <p>@Messages("businessdetails.correspondenceaddress.p")</p>
+
 
     @form(f, controllers.businessdetails.routes.CorrespondenceAddressIsUkController.post(edit)) {
 
@@ -37,19 +39,19 @@
             f = f("isUK"),
             heading = "businessdetails.correspondenceaddress.isuk.title",
             section = "summary.businessdetails",
-            classes = Seq("inline form-group")
+            supportingContent = supportingContent,
+            panel = false,
+            classes = Seq("inline")
         ) {
             @radio(
                 f = f("isUK"),
                 labelText = "businessdetails.correspondenceaddress.ukAddress",
-                value = "true",
-                inline = true
+                value = "true"
             )
             @radio(
                 f = f("isUK"),
                 labelText = "businessdetails.correspondenceaddress.nonUkAddress",
-                value = "false",
-                inline = true
+                value = "false"
             )
         }
 

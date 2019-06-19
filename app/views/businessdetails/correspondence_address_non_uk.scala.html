@@ -26,6 +26,8 @@
     @errorSummary(f)
 }
 
+@formname = @{ s"""${f("country").id}-fieldset"""}
+
 @main(
     title = Messages("businessdetails.correspondenceaddress.title") + " - " + Messages("summary.businessdetails"),
     heading = header
@@ -33,11 +35,18 @@
     @form(f, controllers.businessdetails.routes.CorrespondenceAddressNonUkController.post(edit)) {
 
         @fieldsetWithErrorGroup(
-            f = f(s"$target"),
+            f = f("form"),
             heading = "businessdetails.correspondenceaddress.title",
             section = "summary.businessdetails"
-            panel = false)
-        {
+        ) {
+            @input(
+                field = f("yourName"),
+                labelText = "businessdetails.correspondenceaddress.yourName"
+            )
+            @input(
+                field = f("businessName"),
+                labelText = "businessdetails.correspondenceaddress.businessName"
+            )
             @input(
                 field = f("addressLineNonUK1"),
                 labelText = "lbl.address.line1"
