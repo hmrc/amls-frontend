@@ -25,7 +25,7 @@
     isDeclaration: Boolean,
     heading: String = "",
     section: String = "",
-    supportingContent: Html = HtmlFormat.empty
+    hint: String = ""
 )(implicit request: Request[_],m:Messages, lang: Lang)
 
 @content = {
@@ -81,20 +81,20 @@
 }
 
 @if(heading.nonEmpty) {
-    @fieldset(
+    @fieldsetWithErrorGroup(
         f = f("positions"),
-        legend = "responsiblepeople.position_within_business.title",
-        legendHidden = true,
+        heading = heading,
+        section = section,
+        hint = hint,
         panel = false
     ) {
         @content
     }
 } else {
-    @fieldsetWithErrorGroup(
+    @fieldset(
         f = f("positions"),
-        heading = heading,
-        section = section,
-        supportingContent = supportingContent,
+        legend = "responsiblepeople.position_within_business.title",
+        legendHidden = true,
         panel = false
     ) {
         @content
