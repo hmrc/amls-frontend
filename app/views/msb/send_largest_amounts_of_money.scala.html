@@ -23,7 +23,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("msb.send.the.largest.amounts.of.money.title", "summary.msb")
 }
 
 @main(
@@ -33,25 +32,21 @@
 
     @form(f, controllers.msb.routes.SendTheLargestAmountsOfMoneyController.post(edit)) {
 
-        @fieldset(
-            legend = "msb.send.the.largest.amounts.of.money.title",
-            f = f("largestAmountsOfMoney-fieldset"),
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            heading = "msb.send.the.largest.amounts.of.money.title",
+            f = f("largestAmountsOfMoney"),
+            section = "summary.msb",
+            hint = "lbl.list.upto.3.countries",
             panel = false
         ) {
-            @hint("lbl.list.upto.3.countries")
-            @errorGroup(
-                field = f("largestAmountsOfMoney")
-            ) {
-                @for(i <- 0 until 3) {
-                    @defining(
-                        f(s"largestAmountsOfMoney[$i]")
-                    ) { field => @country_autocomplete(
-                            field = field,
-                            labelText = s"lbl.country.line${i + 1}",
-                            data = countryData.getOrElse(Seq.empty)
-                        )
-                    }
+            @for(i <- 0 until 3) {
+                @defining(
+                    f(s"largestAmountsOfMoney[$i]")
+                ) { field => @country_autocomplete(
+                        field = field,
+                        labelText = s"lbl.country.line${i + 1}",
+                        data = countryData.getOrElse(Seq.empty)
+                    )
                 }
             }
         }

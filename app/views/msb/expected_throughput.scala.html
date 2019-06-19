@@ -25,32 +25,30 @@
     @heading("msb.throughput.title", "summary.msb")
 }
 
+@supportingContent = {
+    <p>@Messages("msb.throughput.sub")</p>
+}
+
 @main(
     title = Messages("msb.throughput.title") + " - " + Messages("summary.msb"),
     heading = header
 ) {
 
-    <p>@Messages("msb.throughput.sub")</p>
-
     @form(f, controllers.msb.routes.ExpectedThroughputController.post(edit)) {
 
-        @fieldset(
-            f = f("throughput-series"),
-            legend = "msb.throughput.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("throughput"),
+            heading = "msb.throughput.title",
+            section = "summary.msb",
             panel = false
         ) {
-            @errorGroup(
-                field = f("throughput")
-            ) {
-                @radio(f("throughput"), "msb.throughput.lbl.01", "01")
-                @radio(f("throughput"), "msb.throughput.lbl.02", "02")
-                @radio(f("throughput"), "msb.throughput.lbl.03", "03")
-                @radio(f("throughput"), "msb.throughput.lbl.04", "04")
-                @radio(f("throughput"), "msb.throughput.lbl.05", "05")
-                @radio(f("throughput"), "msb.throughput.lbl.06", "06")
-                @radio(f("throughput"), "msb.throughput.lbl.07", "07")
-            }
+            @radio(f("throughput"), "msb.throughput.lbl.01", "01")
+            @radio(f("throughput"), "msb.throughput.lbl.02", "02")
+            @radio(f("throughput"), "msb.throughput.lbl.03", "03")
+            @radio(f("throughput"), "msb.throughput.lbl.04", "04")
+            @radio(f("throughput"), "msb.throughput.lbl.05", "05")
+            @radio(f("throughput"), "msb.throughput.lbl.06", "06")
+            @radio(f("throughput"), "msb.throughput.lbl.07", "07")
         }
 
         @submit(edit)
