@@ -27,7 +27,10 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @headingWithPlaceholder(("responsiblepeople.training.heading", personName), "summary.responsiblepeople")
+}
+
+@supportingContent = {
+    <p>@Messages("responsiblepeople.training.hinttext")</p>
 }
 
 @main(
@@ -35,48 +38,41 @@
     heading = header
 ) {
 
-    <p>@Messages("responsiblepeople.training.hinttext")</p>
-
     @form(f, controllers.responsiblepeople.routes.TrainingController.post(index, edit, flow)) {
 
-        @fieldset(
-            f = f("training-fieldset"),
-            legend = "responsiblepeople.training.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("training"),
+            heading = Messages("responsiblepeople.training.heading", personName),
+            section = "summary.responsiblepeople",
+            supportingContent = supportingContent,
             panel = false
         ) {
-            @errorGroup(
-                field = f("training")
+            @radio(
+                f = f("training"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = s"#$target"
+            )
+            @fieldset(
+                f = f(s"$target"),
+                legend = Messages("responsiblepeople.training.information.lbl", personName),
+                hint = "responsiblepeople.training.information.hint",
+                jsHidden = false
             ) {
-                @radio(
-                    f = f("training"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true,
-                    target = s"#$target"
-                )
-                @fieldset(
-                    f = f(s"$target"),
-                    legend = Messages("responsiblepeople.training.information.lbl", personName),
-                    hint = "responsiblepeople.training.information.hint",
-                    jsHidden = false
-                ) {
-                    @textarea(
-                        field = f("information"),
-                        hintText = "hint.255.chars",
-                        bold = false,
-                        largeWidth = true,
-                        cols = "30",
-                        rows ="8"
-                    )
-                }
-                @radio(
-                    f = f("training"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
+                @textarea(
+                    field = f("information"),
+                    hintText = "hint.255.chars",
+                    bold = false,
+                    largeWidth = true,
+                    cols = "30",
+                    rows ="8"
                 )
             }
+            @radio(
+                f = f("training"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
 
         @submit(edit)

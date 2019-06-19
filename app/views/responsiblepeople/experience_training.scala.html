@@ -25,14 +25,9 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @headingWithPlaceholder(("responsiblepeople.experiencetraining.heading", personName), "summary.responsiblepeople")
 }
 
-@main(
-    title = Messages("responsiblepeople.experiencetraining.title", personName) + " - " + Messages("summary.responsiblepeople"),
-    heading = header
-) {
-
+@supportingContent = {
     @businessTypes.map { types =>
         @if(types.size > 1) {
             <p>@Messages("responsiblepeople.experiencetraining.businessactivities")</p>
@@ -46,49 +41,50 @@
             <p>@Messages("businessactivities.confirm-activities.subtitle_4") @types.head </p>
         }
     }
+}
+
+@main(
+    title = Messages("responsiblepeople.experiencetraining.title", personName) + " - " + Messages("summary.responsiblepeople"),
+    heading = header
+) {
 
     @form(f, controllers.responsiblepeople.routes.ExperienceTrainingController.post(index, edit, flow)) {
 
-        @fieldset(
-            f = f("experienceTraining-fieldset"),
-            legend = "responsiblepeople.experiencetraining.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("experienceTraining"),
+            heading = Messages("responsiblepeople.experiencetraining.heading", personName),
+            section = "summary.responsiblepeople",
+            supportingContent = supportingContent,
             panel = false
         ) {
-            @errorGroup(
-                field = f("experienceTraining")
+            @radio(
+                f = f("experienceTraining"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = ".more-information"
+            )
+            @fieldset(
+                legend = Messages("responsiblepeople.experiencetraining.information.lbl", personName),
+                jsHidden = false,
+                panel = true,
+                classes = Seq("more-information"),
+                hint = "responsiblepeople.experiencetraining.information.hint",
+                f = f("experienceInformation-fieldset")
             ) {
-                @radio(
-                    f = f("experienceTraining"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true,
-                    target = ".more-information"
-                )
-                @fieldset(
-                    legend = Messages("responsiblepeople.experiencetraining.information.lbl", personName),
-                    jsHidden = false,
-                    panel = true,
-                    classes = Seq("more-information"),
-                    hint = "responsiblepeople.experiencetraining.information.hint",
-                    f = f("experienceInformation-fieldset")
-                ) {
-                    @textarea(
-                        field = f("experienceInformation"),
-                        hintText = "hint.255.chars",
-                        bold = false,
-                        largeWidth = true,
-                        cols = "30",
-                        rows ="8"
-                    )
-                }
-                @radio(
-                    f = f("experienceTraining"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
+                @textarea(
+                    field = f("experienceInformation"),
+                    hintText = "hint.255.chars",
+                    bold = false,
+                    largeWidth = true,
+                    cols = "30",
+                    rows ="8"
                 )
             }
+            @radio(
+                f = f("experienceTraining"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
 
         @submit(edit)
