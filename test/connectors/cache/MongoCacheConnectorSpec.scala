@@ -165,7 +165,7 @@ class MongoCacheConnectorSpec extends FreeSpec
 
   "saveAll" - {
     "should convert the incoming CacheMap to a Cache before saving the data" in new Fixture {
-      when(client.saveAll(any())) thenReturn Future.successful(true)
+      when(client.saveAll(any(), any())) thenReturn Future.successful(true)
 
       forAll(arbitrary[String], arbitrary[String]) { (str1, str2) =>
         val cacheMap = CacheMap("test", referenceMap(str1, str2))
@@ -178,24 +178,33 @@ class MongoCacheConnectorSpec extends FreeSpec
   }
 
   "remove" - {
-    "should delegate the call to the underlying mongo client for CredId" in new Fixture {
+    "should delegate the call to the underlying mongo client" in new Fixture {
       reset(client)
+      when(client.removeById(oId, deprecatedFilter = true)) thenReturn Future.successful(true)
       when(client.removeById(credId, deprecatedFilter = false)) thenReturn Future.successful(true)
 
       whenReady(connector.remove) { _ mustBe true }
     }
 
-    "should delegate the call to the underlying mongo client for Oid" in new Fixture {
+    "should delegate the call to the underlying mongo client and return true if removed for Cred ID" in new Fixture {
       reset(client)
-      when(client.removeById(any(), any())) thenReturn Future.successful(false)
+      when(client.removeById(credId, deprecatedFilter = false)) thenReturn Future.successful(true)
+      when(client.removeById(oId, deprecatedFilter = true)) thenReturn Future.successful(false)
+
+      whenReady(connector.remove) { _ mustBe true }
+    }
+
+    "should delegate the call to the underlying mongo client and return true if removed for OID" in new Fixture {
+      reset(client)
+      when(client.removeById(credId, deprecatedFilter = false)) thenReturn Future.successful(false)
       when(client.removeById(oId, deprecatedFilter = true)) thenReturn Future.successful(true)
 
       whenReady(connector.remove) { _ mustBe true }
     }
 
-    "should delegate the call to the underlying mongo client and return false if cannot remove" in new Fixture {
+    "should delegate the call to the underlying mongo client and return false if neither removed" in new Fixture {
       reset(client)
-      when(client.removeById(any(), any())) thenReturn Future.successful(false)
+      when(client.removeById(credId, deprecatedFilter = false)) thenReturn Future.successful(false)
       when(client.removeById(oId, deprecatedFilter = true)) thenReturn Future.successful(false)
 
       whenReady(connector.remove) { _ mustBe false }

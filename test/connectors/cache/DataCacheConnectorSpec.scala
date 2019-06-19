@@ -121,7 +121,11 @@ class DataCacheConnectorSpec
       whenReady(dataCacheConnector.fetchAll) { _ mustBe Some(toCacheMap(newCache)) }
     }
 
-    "remove data from Mongo" in new Fixture {
+    "remove data from Mongo for CredId" in new Fixture {
+      when {
+        dataCacheConnector.mongoCache.removeById(oId, deprecatedFilter = true)
+      } thenReturn Future.successful(true)
+
       when {
         dataCacheConnector.mongoCache.removeById(credId, deprecatedFilter = false)
       } thenReturn Future.successful(true)
