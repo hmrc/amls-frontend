@@ -104,15 +104,10 @@ object AddressConversions {
   implicit def convert(address: RegisteredOfficeNonUK): AuditAddress =
     AuditAddress(address.addressLine1, address.addressLine2, address.addressLine3, address.country.name, None)
 
-  implicit def convert(address: CorrespondenceAddress): AuditAddress = address match {
-    case a: UKCorrespondenceAddress => convert(a)
-    case a: NonUKCorrespondenceAddress => convert(a)
-  }
-
-  implicit def convert(address: UKCorrespondenceAddress): AuditAddress =
+  implicit def convert(address: CorrespondenceAddressUk): AuditAddress =
     AuditAddress(address.addressLine1, address.addressLine2, address.addressLine3, "GB", address.postCode.some)
 
-  implicit def convert(address: NonUKCorrespondenceAddress): AuditAddress =
+  implicit def convert(address: CorrespondenceAddressNonUk): AuditAddress =
     AuditAddress(address.addressLineNonUK1, address.addressLineNonUK2, address.addressLineNonUK3, address.country.name, None)
 
   implicit def convertOptionalAddress[A](address: Option[A])(implicit f: A => AuditAddress): Option[AuditAddress] = Functor[Option].lift(f)(address)
