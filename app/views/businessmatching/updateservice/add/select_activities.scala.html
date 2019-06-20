@@ -24,7 +24,11 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessmatching.updateservice.selectactivities.heading", "summary.updateservice")
+}
+
+@supportingContent = {
+    @current_business_types(existing.toSet)
+    <p>@Messages("businessmatching.updateservice.selectactivities.hint")</p>
 }
 
 @main(
@@ -32,30 +36,22 @@
     heading = header
 ) {
 
-    @current_business_types(existing.toSet)
-
-    <p>@Messages("businessmatching.updateservice.selectactivities.hint")</p>
-
     @form(f, controllers.businessmatching.updateservice.add.routes.SelectBusinessTypeController.post(edit)) {
 
-        <div class="form-group">
-            @fieldset(
-                f = f("businessActivities-fieldset"),
-                legend = "businessmatching.updateservice.selectactivities.title",
-                legendHidden = true,
-                panel = false
+        @fieldsetWithErrorGroup(
+            f = f("businessActivities"),
+            heading = "businessmatching.updateservice.selectactivities.title",
+            section = "summary.updateservice",
+            panel = false,
+            supportingContent = supportingContent
             ) {
-                @errorGroup(
-                    field = f("businessActivities")
-                ) {
-                    @{activityValues map (value => radio(
-                        f = f("businessActivities[]"),
-                        labelText = s"businessmatching.registerservices.servicename.lbl.$value",
-                        value = value
-                    ))}
-                }
+                @{activityValues map (value => radio(
+                f = f("businessActivities[]"),
+                labelText = s"businessmatching.registerservices.servicename.lbl.$value",
+                value = value
+             ))}
             }
-        </div>
+        }
 
         @detailsSummary(
             summary = Messages("businessmatching.registerservices.details")
@@ -77,4 +73,3 @@
 
         @submit(returnLink = false, buttonId = Some("selectactivities-submit"))
     }
-}

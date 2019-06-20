@@ -30,43 +30,52 @@
     @heading("businessmatching.psr.number.title", "summary.updateservice")
 }
 
+@supportingContent = {
+    <p>@m("businessmatching.updateservice.psr.number.hint")</p>
+}
+
 @main(
     title = Messages("businessmatching.psr.number.title") + " - " + Messages("summary.updateservice"),
     heading = header
 )  {
 
     @form(f, controllers.businessmatching.updateservice.add.routes.BusinessAppliedForPSRNumberController.post(edit)) {
-        <p>
-            @m("businessmatching.updateservice.psr.number.hint")
-        </p>
+
         @fieldsetWithErrorGroup(
             f = f("appliedFor"),
             legend = "businessmatching.updateservice.psr.number.title",
-            legendHidden = true,
+            section = "summary.updateservice",
             panel = false,
             classes = Seq("inline")
         ) {
-
-            @errorGroup(
-                field = f("appliedFor")
+            @radio(
+                f = f("appliedFor"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = s"#$target",
+                inline = true
+            )
+            @panel(
+                field = Some(f(s"$target")),
+                id = target
             ) {
-
-                @radio(
-                    f = f("appliedFor"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    target = s"#$target",
-                    inline = true
-                )
-                @radio(
-                    f = f("appliedFor"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
+                @textarea(
+                    f("regNumber"),
+                    "businessmatching.updateservice.psr.number.lbl",
+                    bold = false,
+                    largeWidth = true,
+                    cols = "30",
+                    rows = "8"
                 )
             }
+            @radio(
+                f = f("appliedFor"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
+            }
         }
-
         @panel(
             field = Some(f(s"$target")),
             id = target
@@ -84,4 +93,4 @@
 
         @submit(edit, returnLink = false, buttonId = Some("appliedspsr-submit"))
    }
-}
+

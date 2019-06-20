@@ -23,7 +23,10 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessmatching.updateservice.msb.services.heading", "summary.updateservice")
+}
+
+@supportingContent = {
+    <p>@Messages("businessmatching.updateservice.msb.services.list.heading")</p>
 }
 
 @main(
@@ -31,54 +34,45 @@
     heading = header
 ) {
 
-    <p>@Messages("businessmatching.updateservice.msb.services.list.heading")</p>
-
     @form(f, controllers.businessmatching.updateservice.add.routes.SubSectorsController.post(edit)) {
 
-      @fieldset(
-        f = f("msbServices-fieldset"),
-        legend = "businessmatching.updateservice.msb.services.title",
-        legendHidden = true,
-        panel = false
+      @fieldsetWithErrorGroup(
+        f = f("msbServices"),
+        heading = "businessmatching.updateservice.msb.services.title",
+        section = "summary.updateservice",
+        panel = false,
+        supportingContent = supportingContent
       ) {
+          @checkbox(
+            f = f("msbServices[]"),
+            labelText = "businessmatching.updateservice.msb.services.list.lbl.01",
+            value = "01"
+          )
+          @checkbox(
+            f = f("msbServices[]"),
+            labelText = "businessmatching.updateservice.msb.services.list.lbl.02",
+            value = "02"
+          )
 
-          @errorGroup(
-                field = f("msbServices")
-            ) {
-
+          @if(isFxEnabled) {
               @checkbox(
-                f = f("msbServices[]"),
-                labelText = "businessmatching.updateservice.msb.services.list.lbl.01",
-                value = "01"
+                  f = f("msbServices[]"),
+                  labelText = "businessmatching.updateservice.msb.services.list.lbl.05",
+                  value = "05"
               )
-              @checkbox(
-                f = f("msbServices[]"),
-                labelText = "businessmatching.updateservice.msb.services.list.lbl.02",
-                value = "02"
-              )
-
-              @if(isFxEnabled) {
-                  @checkbox(
-                      f = f("msbServices[]"),
-                      labelText = "businessmatching.updateservice.msb.services.list.lbl.05",
-                      value = "05"
-                  )
-              }
-
-              @checkbox(
-                f = f("msbServices[]"),
-                labelText = "businessmatching.updateservice.msb.services.list.lbl.03",
-                value = "03"
-              )
-              @checkbox(
-                f = f("msbServices[]"),
-                labelText = "businessmatching.updateservice.msb.services.list.lbl.04",
-                value = "04"
-              )
-            }
+          }
+          @checkbox(
+            f = f("msbServices[]"),
+            labelText = "businessmatching.updateservice.msb.services.list.lbl.03",
+            value = "03"
+          )
+          @checkbox(
+            f = f("msbServices[]"),
+            labelText = "businessmatching.updateservice.msb.services.list.lbl.04",
+            value = "04"
+          )
+        }
       }
 
       @submit(edit, returnLink = false, buttonId = Some("msbsubservice-submit"))
-
     }
-}
