@@ -17,16 +17,14 @@
 package views.msb
 
 import forms.{Form2, InvalidForm, ValidForm}
-import models.moneyservicebusiness.BranchesOrAgents
+import jto.validation.{Path, ValidationError}
+import models.moneyservicebusiness.BranchesOrAgentsHasCountries
 import org.scalatest.MustMatchers
-import utils.{AmlsSpec, AutoCompleteServiceMocks}
-import jto.validation.Path
-import jto.validation.ValidationError
-import models.Country
 import play.api.i18n.Messages
+import utils.{AmlsSpec, AutoCompleteServiceMocks}
 import views.Fixture
 
-class branches_or_agentsSpec extends AmlsSpec with MustMatchers {
+class branches_or_agents_has_countriesSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks {
     implicit val requestWithToken = addToken(request)
@@ -35,16 +33,16 @@ class branches_or_agentsSpec extends AmlsSpec with MustMatchers {
   "branches_or_agents view" must {
 
     "have the back link button" in new ViewFixture {
-      val form2: ValidForm[BranchesOrAgents] = Form2(BranchesOrAgents(Some(Seq.empty[Country])))
-      def view = views.html.msb.branches_or_agents(form2, edit = true, mockAutoComplete.getCountries)
+      val form2: ValidForm[BranchesOrAgentsHasCountries] = Form2(BranchesOrAgentsHasCountries(true))
+      def view = views.html.msb.branches_or_agents(form2, edit = true)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[BranchesOrAgents] = Form2(BranchesOrAgents(Some(Seq.empty[Country])))
+      val form2: ValidForm[BranchesOrAgentsHasCountries] = Form2(BranchesOrAgentsHasCountries(true))
 
-      def view = views.html.msb.branches_or_agents(form2, true, mockAutoComplete.getCountries)
+      def view = views.html.msb.branches_or_agents(form2, edit = true)
 
       doc.title must be(Messages("msb.branchesoragents.title") +
         " - " + Messages("summary.msb") +
@@ -54,34 +52,27 @@ class branches_or_agentsSpec extends AmlsSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[BranchesOrAgents] = Form2(BranchesOrAgents(Some(Seq.empty[Country])))
+      val form2: ValidForm[BranchesOrAgentsHasCountries] = Form2(BranchesOrAgentsHasCountries(true))
 
-      def view = views.html.msb.branches_or_agents(form2, true, mockAutoComplete.getCountries)
+      def view = views.html.msb.branches_or_agents(form2, edit = true)
 
       heading.html must be(Messages("msb.branchesoragents.title"))
       subHeading.html must include(Messages("summary.msb"))
-
     }
 
     "show errors in the correct locations" in new ViewFixture {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "hasCountries") -> Seq(ValidationError("not a message Key")),
-          (Path \ "countries") -> Seq(ValidationError("second not a message Key"))
+          (Path \ "hasCountries") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.msb.branches_or_agents(form2, true, mockAutoComplete.getCountries)
+      def view = views.html.msb.branches_or_agents(form2, edit = true)
 
       errorSummary.html() must include("not a message Key")
-      errorSummary.html() must include("second not a message Key")
 
       doc.getElementById("hasCountries")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
-
-      doc.getElementById("countries")
-        .getElementsByClass("error-notification").first().html() must include("second not a message Key")
-
     }
   }
 }

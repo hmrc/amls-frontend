@@ -159,8 +159,11 @@ class RetryPaymentControllerSpec extends AmlsSpec
 
       val result = controller.retryPayment()(request.withFormUrlEncodedBody(postData))
 
+      val expectedUrl: Option[String] = Some(paymentResponse.nextUrl.value)
+      val actualUrl: Option[String] = redirectLocation(result)
+
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(paymentResponse.nextUrl.value)
+      actualUrl mustEqual expectedUrl
     }
 
     "fail if a payment cannot be retried" in new Fixture {
