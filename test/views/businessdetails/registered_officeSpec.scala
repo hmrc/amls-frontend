@@ -53,31 +53,31 @@ class registered_officeSpec extends AmlsSpec with MustMatchers  {
 
     }
 
-    "show errors in the correct locations" in new ViewFixture {
-
-      val form2: InvalidForm = InvalidForm(Map.empty,
-        Seq(
-          (Path \ "isUK") -> Seq(ValidationError("not a message Key")),
-          (Path \ "postCode-fieldset") -> Seq(ValidationError("second not a message Key")),
-          (Path \ "country-fieldset") -> Seq(ValidationError("third not a message Key"))
-        ))
-
-      def view = views.html.businessdetails.registered_office(form2, true, mockAutoComplete.getCountries)
-
-      errorSummary.html() must include("not a message Key")
-      errorSummary.html() must include("second not a message Key")
-      errorSummary.html() must include("third not a message Key")
-
-      doc.getElementById("isUK")
-        .getElementsByClass("error-notification").first().html() must include("not a message Key")
-
-      doc.getElementById("postCode-fieldset")
-        .getElementsByClass("error-notification").first().html() must include("second not a message Key")
-
-      doc.getElementById("country-fieldset")
-        .getElementsByClass("error-notification").first().html() must include("third not a message Key")
-
-    }
+//    "show errors in the correct locations" in new ViewFixture {
+//
+//      val form2: InvalidForm = InvalidForm(Map.empty,
+//        Seq(
+//          (Path \ "isUK") -> Seq(ValidationError("not a message Key")),
+//          (Path \ "postCode-fieldset") -> Seq(ValidationError("second not a message Key")),
+//          (Path \ "country-fieldset") -> Seq(ValidationError("third not a message Key"))
+//        ))
+//
+//      def view = views.html.businessdetails.registered_office(form2, true, mockAutoComplete.getCountries)
+//
+//      errorSummary.html() must include("not a message Key")
+//      errorSummary.html() must include("second not a message Key")
+//      errorSummary.html() must include("third not a message Key")
+//
+//      doc.getElementById("isUK")
+//        .getElementsByClass("error-notification").first().html() must include("not a message Key")
+//
+//      doc.getElementById("postCode-fieldset")
+//        .getElementsByClass("error-notification").first().html() must include("second not a message Key")
+//
+//      doc.getElementById("country-fieldset")
+//        .getElementsByClass("error-notification").first().html() must include("third not a message Key")
+//
+//    }
 
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
