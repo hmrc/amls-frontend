@@ -23,10 +23,6 @@
 @header = {
     @components.back_link()
     @errorSummaryWithPlaceholder(f, Messages(s"businessmatching.registerservices.servicename.lbl.$activity.phrased"))
-    @headingWithPlaceholder((
-        "businessmatching.updateservice.tradingpremises.heading",
-        Messages(s"businessmatching.registerservices.servicename.lbl.$activity.phrased")
-    ), "summary.updateservice")
 }
 
 @main(
@@ -36,31 +32,23 @@
 
     @form(f, controllers.businessmatching.updateservice.add.routes.TradingPremisesController.post(edit)) {
 
-        @fieldset(
-            f = f("tradingPremisesNewActivities-fieldset"),
-            legend = Messages("businessmatching.updateservice.tradingpremises.heading", Messages(s"businessmatching.registerservices.servicename.lbl.$activity.phrased")),
-            legendHidden = true,
-            panel = false
+        @fieldsetWithErrorGroup(
+            f = f("tradingPremisesNewActivities"),
+            heading = Messages("businessmatching.updateservice.tradingpremises.heading", Messages(s"businessmatching.registerservices.servicename.lbl.$activity.phrased")),
+            section = "summary.updateservice",
+            panel = false,
+            errorGroupPlaceholder = Messages(s"businessmatching.registerservices.servicename.lbl.$activity.phrased")
         ) {
-
-            @errorGroupWithPlaceholder(
-                field = f("tradingPremisesNewActivities"),
-                placeholder = Messages(s"businessmatching.registerservices.servicename.lbl.$activity.phrased")
-            ) {
-                @radio(
-                    f = f("tradingPremisesNewActivities"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true
-                )
-                @radio(
-                    f = f("tradingPremisesNewActivities"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
-            }
-
+            @radio(
+                f = f("tradingPremisesNewActivities"),
+                labelText = "lbl.yes",
+                value = "true"
+            )
+            @radio(
+                f = f("tradingPremisesNewActivities"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
 
         <input type="hidden" name="businessActivities" id="businessActivities" value="@activity" />
