@@ -81,7 +81,7 @@ class registered_office_non_ukSpec extends AmlsSpec with MustMatchers  {
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.businessdetails.registered_office(form2, true, mockAutoComplete.getCountries)
+      def view = views.html.businessdetails.registered_office_non_uk(form2, true, mockAutoComplete.getCountries)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

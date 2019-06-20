@@ -19,6 +19,12 @@ POST        /registered-office-address                             @controllers.
 GET         /business-address                                      @controllers.businessdetails.RegisteredOfficeController.get(edit: Boolean ?= false)
 POST        /business-address                                      @controllers.businessdetails.RegisteredOfficeController.post(edit: Boolean ?= false)
 
+GET         /registered-office-address-uk                          @controllers.businessdetails.RegisteredOfficeUKController.get(edit: Boolean ?= false)
+POST        /registered-office-address-uk                          @controllers.businessdetails.RegisteredOfficeUKController.post(edit: Boolean ?= false)
+
+GET         /registered-office-address-non-uk                      @controllers.businessdetails.RegisteredOfficeNonUKController.get(edit: Boolean ?= false)
+POST        /registered-office-address-non-uk                      @controllers.businessdetails.RegisteredOfficeNonUKController.post(edit: Boolean ?= false)
+
 GET         /new-registered-office/date-change                     @controllers.businessdetails.RegisteredOfficeDateOfChangeController.get()
 POST        /new-registered-office/date-change                     @controllers.businessdetails.RegisteredOfficeDateOfChangeController.post()
 
