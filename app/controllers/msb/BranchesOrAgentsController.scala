@@ -20,7 +20,8 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
-import models.moneyservicebusiness.{BranchesOrAgents, MoneyServiceBusiness}
+import models.moneyservicebusiness.{BranchesOrAgentsHasCountries, BranchesOrAgents, MoneyServiceBusiness}
+import play.api.mvc.Call
 import services.AutoCompleteService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
@@ -35,33 +36,42 @@ class BranchesOrAgentsController @Inject() (val dataCacheConnector: DataCacheCon
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
         response =>
-
           val form = (for {
             msb <- response
             branches <- msb.branchesOrAgents
-          } yield Form2[BranchesOrAgents](branches)).getOrElse(EmptyForm)
-
-          Ok(views.html.msb.branches_or_agents(form, edit, autoCompleteService.getCountries))
+          } yield Form2[BranchesOrAgentsHasCountries](branches.hasCountries)).getOrElse(EmptyForm)
+          Ok(views.html.msb.branches_or_agents(form, edit))
       }
   }
+
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      Form2[BranchesOrAgents](request.body) match {
+
+      Form2[BranchesOrAgentsHasCountries](request.body) match {
+
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.msb.branches_or_agents(f, edit, autoCompleteService.getCountries)))
-        case ValidForm(_, data) =>
+          Future.successful(BadRequest(views.html.msb.branches_or_agents(f, edit)))
+
+        case ValidForm(_, data) => {
           for {
-            msb <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
-            _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
-              msb.branchesOrAgents(data)
-            )
-          } yield edit match {
-            case false =>
-              Redirect(routes.IdentifyLinkedTransactionsController.get())
-            case true =>
-              Redirect(routes.SummaryController.get())
-          }
-      }
+            msb <-  dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
+            boa: BranchesOrAgents <- Future(msb.flatMap((m:MoneyServiceBusiness) => m.branchesOrAgents)
+              .map((boa:BranchesOrAgents) => BranchesOrAgents.update(boa, data))
+              .getOrElse(BranchesOrAgents(data, None)))
+            _ <- dataCacheConnector.save(MoneyServiceBusiness.key, msb.branchesOrAgents(boa))
+          } yield Redirect(getNextPage(data, edit))
+        }
+    }
   }
+
+  private def getNextPage(data: BranchesOrAgentsHasCountries, edit: Boolean): Call =
+     (data, edit) match {
+      case (BranchesOrAgentsHasCountries(false), false) =>
+        routes.IdentifyLinkedTransactionsController.get()
+      case (BranchesOrAgentsHasCountries(false), true) =>
+        routes.SummaryController.get()
+      case (BranchesOrAgentsHasCountries(true), _) =>
+        routes.BranchesOrAgentsWhichCountriesController.get(edit)
+    }
 }
