@@ -43,7 +43,7 @@ class RegisteredOfficeControllerNonUKSpec extends AmlsSpec with  MockitoSugar{
   trait Fixture extends AuthorisedFixture with AutoCompleteServiceMocks {
     self => val request = addToken(authRequest)
 
-    val controller = new RegisteredOfficeController(
+    val controller = new RegisteredOfficeNonUKController(
       dataCacheConnector = mock[DataCacheConnector],
       authConnector = self.authConnector,
       statusService = mock[StatusService],

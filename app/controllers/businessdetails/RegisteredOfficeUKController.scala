@@ -40,8 +40,7 @@ class RegisteredOfficeUKController @Inject ()(
                                             val dataCacheConnector: DataCacheConnector,
                                             val statusService: StatusService,
                                             val auditConnector: AuditConnector,
-                                            val authConnector: AuthConnector,
-                                            val autoCompleteService: AutoCompleteService
+                                            val authConnector: AuthConnector
                                             ) extends BaseController with DateOfChangeHelper {
 
   private val preSelectUK = RegisteredOfficeUK("", "", None, None, "")

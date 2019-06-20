@@ -47,9 +47,8 @@ class RegisteredOfficeControllerSpec extends AmlsSpec with  MockitoSugar{
       dataCacheConnector = mock[DataCacheConnector],
       authConnector = self.authConnector,
       statusService = mock[StatusService],
-      auditConnector = mock[AuditConnector],
-      autoCompleteService = mockAutoComplete
-      )
+      auditConnector = mock[AuditConnector]
+    )
 
     when {
       controller.auditConnector.sendEvent(any())(any(), any())
