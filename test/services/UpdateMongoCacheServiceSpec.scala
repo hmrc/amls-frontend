@@ -94,13 +94,13 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
       contactingYou = Some(ContactingYou(Some("1234567890"), Some("test@test.com"))),
       registeredOffice = Some(RegisteredOfficeUK("38B", "line2", None, None, "AA1 1AA")),
       altCorrespondenceAddress = Some(true),
-      correspondenceAddress = Some(UKCorrespondenceAddress("Name",
+      correspondenceAddress = Some(CorrespondenceAddress(Some(CorrespondenceAddressUk("Name",
         "Business Name",
         "address 1",
         "address 2",
         Some("address 3"),
         Some("address 4"),
-        "AA11 1AA")),
+        "AA11 1AA")), None)),
       hasAccepted = true
     )
 

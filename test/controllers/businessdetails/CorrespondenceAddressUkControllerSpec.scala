@@ -18,7 +18,7 @@ package controllers.businessdetails
 
 import connectors.DataCacheConnector
 import models.Country
-import models.businessdetails.{BusinessDetails, NonUKCorrespondenceAddress, UKCorrespondenceAddress}
+import models.businessdetails.{BusinessDetails, CorrespondenceAddress, CorrespondenceAddressNonUk, CorrespondenceAddressUk}
 import models.autocomplete.NameValuePair
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
@@ -70,7 +70,8 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
 
       "data exists in the keystore" in new Fixture {
 
-        val correspondenceAddress = NonUKCorrespondenceAddress("Name Test", "Test", "Test", "Test", Some("test"), None, Country("Albania", "AL"))
+        val correspondenceAddress = CorrespondenceAddress(
+          None, Some(CorrespondenceAddressNonUk("Name Test", "Test", "Test", "Test", Some("test"), None, Country("Albania", "AL"))))
         val businessDetails = BusinessDetails(None, None, None, None, None,None, None, Some(correspondenceAddress))
 
         when(controller.dataConnector.fetch[BusinessDetails](any())(any(), any(), any()))
@@ -112,9 +113,9 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
 
       "a valid form request is sent in the body" in new Fixture {
 
-        val address = UKCorrespondenceAddress("Test", "Test", "old line 1", "old line 2", Some("old line 3"), None, "AA1 1AA")
+        val address = CorrespondenceAddressUk("Test", "Test", "old line 1", "old line 2", Some("old line 3"), None, "AA1 1AA")
 
-        val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, Some(address))))
+        val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, Some(CorrespondenceAddress(Some(address), None)))))
 
         val newRequest = request.withFormUrlEncodedBody(
           "yourName" -> "Name",
@@ -150,9 +151,9 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
 
       "a valid form request is sent in the body when editing" in new Fixture {
 
-        val address = UKCorrespondenceAddress("Test", "Test", "old line 1", "old line 2", Some("old line 3"), None, "AA1 1AA")
+        val address = CorrespondenceAddressUk("Test", "Test", "old line 1", "old line 2", Some("old line 3"), None, "AA1 1AA")
 
-        val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, Some(address))))
+        val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, Some(CorrespondenceAddress(Some(address), None)))))
 
         val newRequest = request.withFormUrlEncodedBody(
           "yourName" -> "Name",

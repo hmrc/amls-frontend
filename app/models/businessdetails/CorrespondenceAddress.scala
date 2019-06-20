@@ -37,7 +37,7 @@ object CorrespondenceAddress {
     import play.api.libs.functional.syntax._
     import play.api.libs.json.Reads._
     import play.api.libs.json._
-    (__ \ "correspondencePostCode").read[String] andKeep
+    (__ \ "correspondencePostCode").readNullable[String] andKeep
       (
         (
           (__ \ "yourName").read[String] and

@@ -40,7 +40,8 @@ class CorrespondenceAddressIsUkController @Inject ()(
           val form: Form2[CorrespondenceAddressIsUk] = (for {
             businessDetails <- response
             correspondenceAddress <- businessDetails.correspondenceAddress
-          } yield Form2[CorrespondenceAddressIsUk](CorrespondenceAddressIsUk(correspondenceAddress.isUk))).getOrElse(Form2[CorrespondenceAddressIsUk](CorrespondenceAddressIsUk(None)))
+          } yield Form2[CorrespondenceAddressIsUk](CorrespondenceAddressIsUk(correspondenceAddress.isUk)))
+            .getOrElse(Form2[CorrespondenceAddressIsUk](CorrespondenceAddressIsUk(None)))
           Ok(correspondence_address_is_uk(form, edit))
       }
   }

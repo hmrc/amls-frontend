@@ -40,7 +40,8 @@ s"""${f("postCode").id}-fieldset"""
         @fieldsetWithErrorGroup(
             f = f(s"$formname"),
             heading = "businessdetails.correspondenceaddress.title",
-            section = "summary.businessdetails"
+            section = "summary.businessdetails",
+            panel = false
         ) {
             @input(
                 field = f("yourName"),

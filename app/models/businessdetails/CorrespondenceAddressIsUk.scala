@@ -35,7 +35,7 @@ object CorrespondenceAddressIsUk {
   implicit val formWrites = Write[CorrespondenceAddressIsUk, UrlFormEncoded] { a =>
     a.isUk match {
       case Some(true) => Map("isUK" -> Seq("true"))
-      case Some(false) => Map("isUK" -> Seq("true"))
+      case Some(false) => Map("isUK" -> Seq("false"))
       case _ => Map()
     }
   }

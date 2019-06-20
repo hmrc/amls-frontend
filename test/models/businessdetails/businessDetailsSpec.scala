@@ -43,7 +43,7 @@ class businessDetailsSpec extends AmlsSpec {
 
   val regOfficeOrMainPlaceUK =  RegisteredOfficeUK("38B", "line2", None, None, "AA1 1AA")
 
-  val uKCorrespondenceAddress = UKCorrespondenceAddress("Name",
+  val correspondenceAddressUk = CorrespondenceAddressUk("Name",
     "Business Name",
     "address 1",
     "address 2",
@@ -59,7 +59,7 @@ class businessDetailsSpec extends AmlsSpec {
     contactingYou = Some(contactingYou),
     registeredOffice = Some(regOfficeOrMainPlaceUK),
     altCorrespondenceAddress = Some(true),
-    correspondenceAddress = Some(uKCorrespondenceAddress),
+    correspondenceAddress = Some(CorrespondenceAddress(Some(correspondenceAddressUk), None)),
     hasAccepted = true
   )
 
@@ -191,10 +191,10 @@ class businessDetailsSpec extends AmlsSpec {
       }
     }
 
-    "Merged with UKCorrespondenceAddress" must {
-      "return BusinessDetails with correct UKCorrespondenceAddress" in {
-        val result = initial.correspondenceAddress(uKCorrespondenceAddress)
-        result must be (BusinessDetails(None, None, None, None, None, None, None, Some(uKCorrespondenceAddress), true))
+    "Merged with CorrespondenceAddressUk" must {
+      "return BusinessDetails with correct CorrespondenceAddressUk" in {
+        val result = initial.correspondenceAddress(CorrespondenceAddress(correspondenceAddressUk))
+        result must be (BusinessDetails(None, None, None, None, None, None, None, Some(CorrespondenceAddress(correspondenceAddressUk)), true))
       }
     }
   }
@@ -311,7 +311,7 @@ class businessDetailsSpec extends AmlsSpec {
     "correspondenceAddress value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val res = completeModel.correspondenceAddress(uKCorrespondenceAddress)
+          val res = completeModel.correspondenceAddress(CorrespondenceAddress(correspondenceAddressUk))
           res must be (completeModel)
           res.hasChanged must be (false)
         }
@@ -319,9 +319,9 @@ class businessDetailsSpec extends AmlsSpec {
 
       "is different" must {
         "set the hasChanged & correspondenceAddress Properties" in {
-          val res = completeModel.correspondenceAddress(UKCorrespondenceAddress("name new", "Business name new", "Line 1 New", "Line 2 New", None, None, "NEW CODE"))
+          val res = completeModel.correspondenceAddress(CorrespondenceAddress(CorrespondenceAddressUk("name new", "Business name new", "Line 1 New", "Line 2 New", None, None, "NEW CODE")))
           res.hasChanged must be (true)
-          res.correspondenceAddress must be (Some(UKCorrespondenceAddress("name new", "Business name new", "Line 1 New", "Line 2 New", None, None, "NEW CODE")))
+          res.correspondenceAddress must be (Some(CorrespondenceAddress(CorrespondenceAddressUk("name new", "Business name new", "Line 1 New", "Line 2 New", None, None, "NEW CODE"))))
         }
       }
     }
