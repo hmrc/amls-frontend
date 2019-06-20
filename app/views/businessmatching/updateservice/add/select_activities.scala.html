@@ -44,13 +44,12 @@
             section = "summary.updateservice",
             panel = false,
             supportingContent = supportingContent
-            ) {
-                @{activityValues map (value => radio(
+        ) {
+            @{activityValues map (value => radio(
                 f = f("businessActivities[]"),
                 labelText = s"businessmatching.registerservices.servicename.lbl.$value",
                 value = value
              ))}
-            }
         }
 
         @detailsSummary(
@@ -73,3 +72,4 @@
 
         @submit(returnLink = false, buttonId = Some("selectactivities-submit"))
     }
+}
