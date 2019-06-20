@@ -37,15 +37,14 @@
 
         @fieldset(
             f = f("responsiblePeople-fieldset"),
-            legend = legend,
+            legend = "businessmatching.updateservice.whichfitandproper.heading",
             legendHidden = true,
             panel = false
         ) {
-            @errorGroupWithPlaceholder(
-                field = f("responsiblePeople"),
-                placeholder = placeholder.fold("")(s => s)
+            @errorGroup(
+                field = f("responsiblePeople")
             ) {
-                @responsiblepeople.map{ case (rp, index) =>
+                @responsiblePeople.map{ case (rp, index) =>
                     @checkbox(f = f("responsiblePeople[]"), labelText = rp.personName.fold("")(_.fullName), value = index.toString)
                 }
             }

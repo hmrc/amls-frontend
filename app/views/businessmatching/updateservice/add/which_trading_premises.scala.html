@@ -38,12 +38,27 @@
     heading = header
 ) {
 
-    @trading_premises(
-        f,
-        tradingPremises,
-        pageHeading,
-        controllers.businessmatching.updateservice.add.routes.WhichTradingPremisesController.post(),
-        Some(Messages(s"businessmatching.registerservices.servicename.lbl.$activity.phrased")),
-        id = Some("whichtradingpremises")
-    )
+    <p>@Messages("lbl.select.all")</p>
+
+    @form(f, controllers.businessmatching.updateservice.add.routes.WhichTradingPremisesController.post()) {
+
+        @fieldset(
+            f = f("tradingPremises-fieldset"),
+            legend = pageHeading,
+            legendHidden = true,
+            panel = false
+        ) {
+            @errorGroupWithPlaceholder(
+                field = f("tradingPremises"),
+                placeholder = Messages(s"businessmatching.registerservices.servicename.lbl.$activity.phrased")
+            ) {
+                @tradingPremises.map{ case (tp, index) =>
+                    @checkbox(f = f("tradingPremises[]"), labelText = tp.label.getOrElse(index.toString), value = index.toString)
+                }
+            }
+        }
+
+        @submit(returnLink = false, buttonId = Some("whichtradingpremises-submit"))
+
+    }
 }
