@@ -24,7 +24,10 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessmatching.updateservice.whichfitandproper.heading", "summary.updateservice")
+}
+
+@supportingContent = {
+    <p>@Messages("businessmatching.updateservice.whichfitandproper.hint")</p>
 }
 
 @main(
@@ -33,20 +36,16 @@
 )  {
 
     @form(f, controllers.businessmatching.updateservice.add.routes.WhichFitAndProperController.post(edit)) {
-        <p>@Messages("businessmatching.updateservice.whichfitandproper.hint")</p>
 
-        @fieldset(
-            f = f("responsiblePeople-fieldset"),
-            legend = "businessmatching.updateservice.whichfitandproper.heading",
-            legendHidden = true,
-            panel = false
+        @fieldsetWithErrorGroup(
+            f = f("responsiblePeople"),
+            heading = "businessmatching.updateservice.whichfitandproper.heading",
+            section = "summary.updateservice",
+            panel = false,
+            supportingContent = supportingContent
         ) {
-            @errorGroup(
-                field = f("responsiblePeople")
-            ) {
-                @responsiblePeople.map{ case (rp, index) =>
-                    @checkbox(f = f("responsiblePeople[]"), labelText = rp.personName.fold("")(_.fullName), value = index.toString)
-                }
+            @responsiblePeople.map{ case (rp, index) =>
+                @checkbox(f = f("responsiblePeople[]"), labelText = rp.personName.fold("")(_.fullName), value = index.toString)
             }
         }
 
@@ -63,8 +62,6 @@
                 <p>@Messages("businessmatching.updateservice.whichfitandproper.text.info.line2")</p>
             }
         }
-
         @submit(returnLink = false, buttonId = Some("whichfitandproper-submit"))
-
     }
 }
