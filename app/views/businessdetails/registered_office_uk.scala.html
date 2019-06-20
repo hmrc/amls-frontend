@@ -19,7 +19,7 @@
 @import include.forms2._
 @import models.autocomplete._
 
-@(f: Form2[_], edit: Boolean, countryData: Option[Seq[NameValuePair]])(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @components.back_link()
@@ -32,8 +32,7 @@
     heading = header
 ) {
 
-    @form(f, controllers.businessdetails.routes.RegisteredOfficeController.post(edit)) {
-
+    @form(f, controllers.businessdetails.routes.RegisteredOfficeUKController.post(edit)) {
 
         @fieldset(
             f = f("postCode-fieldset"),

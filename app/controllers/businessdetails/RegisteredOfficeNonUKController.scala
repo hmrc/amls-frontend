@@ -55,7 +55,7 @@ class RegisteredOfficeNonUKController @Inject ()(
               businessDetails <- response
               registeredOffice <- businessDetails.registeredOffice
             } yield Form2[RegisteredOffice](registeredOffice)).getOrElse(Form2[RegisteredOffice](preSelectUK))
-            Ok(registered_office(form, edit, autoCompleteService.getCountries))
+            Ok(registered_office_non_uk(form, edit, autoCompleteService.getCountries))
 
         }
   }
@@ -64,7 +64,7 @@ class RegisteredOfficeNonUKController @Inject ()(
     implicit authContext => implicit request =>
         Form2[RegisteredOffice](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(registered_office(f, edit, autoCompleteService.getCountries)))
+            Future.successful(BadRequest(registered_office_non_uk(f, edit, autoCompleteService.getCountries)))
           case ValidForm(_, data) =>
 
             val doUpdate = for {
