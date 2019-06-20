@@ -24,11 +24,11 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessdetails.registeredoffice.title", "summary.businessdetails")
+    @heading("businessdetails.registeredoffice.where.title", "summary.businessdetails")
 }
 
 @main(
-    title = Messages("businessdetails.registeredoffice.title") + " - " + Messages("summary.businessdetails"),
+    title = Messages("businessdetails.registeredoffice.where.title") + " - " + Messages("summary.businessdetails"),
     heading = header
 ) {
 
@@ -36,35 +36,11 @@
 
 
         @fieldset(
-            f = f("isUK"),
-            legend = "businessdetails.registeredoffice.lbl",
-            legendHidden = false,
-            panel = false,
-            classes = Seq("form-group", "inline")
-        ) {
-            @radio(
-                f = f("isUK"),
-                labelText = "lbl.yes",
-                value = "true",
-                target = s"#${f("postCode").id}-fieldset",
-                inline = true
-            )
-            @radio(
-                f = f("isUK"),
-                labelText = "lbl.no",
-                value = "false",
-                target = s"#${f("country").id}-fieldset",
-                inline = true
-            )
-        }
-
-        @fieldset(
             f = f("postCode-fieldset"),
             legendHidden = true,
             legend = "businessdetails.correspondenceaddress.address",
             jsHidden = false,
-            panel = false,
-            id = s"""${f("postCode").id}-fieldset"""
+            panel = false
         ) {
             @input(
                 field = f("addressLine1"),
@@ -90,41 +66,6 @@
                 field = f("postCode"),
                 labelText = "businessdetails.correspondenceaddress.postCode",
                 classes = Seq("postcode")
-            )
-        }
-
-        @fieldset(
-            f = f("country-fieldset"),
-            legendHidden = true,
-            legend = "businessdetails.correspondenceaddress.address",
-            jsHidden = true,
-            panel = false,
-            id = s"""${f("country").id}-fieldset"""
-        ) {
-            @input(
-                field = f("addressLineNonUK1"),
-                labelText = "lbl.address.line1",
-                labelHidden = false
-            )
-            @input(
-                field = f("addressLineNonUK2"),
-                labelText = "lbl.address.line2",
-                labelHidden = false
-            )
-            @input(
-                field = f("addressLineNonUK3"),
-                labelText = "lbl.address.line3",
-                labelHidden = false
-            )
-            @input(
-                field = f("addressLineNonUK4"),
-                labelText = "lbl.address.line4",
-                labelHidden = false
-            )
-            @country_autocomplete(
-                field = f("country"),
-                labelText = "businessdetails.correspondenceaddress.country",
-                data = countryData.getOrElse(Seq.empty)
             )
         }
 
