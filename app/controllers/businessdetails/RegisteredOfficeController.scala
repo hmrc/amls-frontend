@@ -16,8 +16,6 @@
 
 package controllers.businessdetails
 
-import audit.AddressConversions._
-import audit.{AddressCreatedEvent, AddressModifiedEvent}
 import cats.data.OptionT
 import cats.implicits._
 import com.google.inject.Inject
@@ -25,11 +23,8 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.businessdetails._
-import play.api.mvc.Request
-import services.{AutoCompleteService, StatusService}
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
-import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
+import services.StatusService
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.DateOfChangeHelper
 import views.html.businessdetails._
@@ -70,8 +65,8 @@ class RegisteredOfficeController @Inject () (
               businessDetails <- OptionT(dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key))
             } yield {
               data match {
-                case RegisteredOfficeIsUK(true) => Redirect(routes.RegisteredOfficeUKController.get())
-                case RegisteredOfficeIsUK(false) => Redirect(routes.RegisteredOfficeNonUKController.get())
+                case RegisteredOfficeIsUK(true) => Redirect(routes.RegisteredOfficeUKController.get(edit))
+                case RegisteredOfficeIsUK(false) => Redirect(routes.RegisteredOfficeNonUKController.get(edit))
               }
             }
             doUpdate getOrElse InternalServerError("Unable to update registered office")

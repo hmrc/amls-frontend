@@ -67,15 +67,40 @@
         }
     }
 
-    @model.registeredOffice.map { a =>
-        @checkYourAnswers(
-            question = Messages("businessdetails.registeredoffice.title"),
-            editLinkTag = "businessdetailsregoffice-edit",
+    @model.registeredOffice.map {
+        case regOffUK: RegisteredOfficeUK => {
+            @checkYourAnswers(
+            question = Messages("businessdetails.registeredoffice.where.title"),
             editUrl = controllers.businessdetails.routes.RegisteredOfficeController.get(true).toString
-        ) {
-            <p>@a.toLines.map { line =>
-                @line<br />
-            }</p>
+            ) {
+                <p>@Messages("lbl.yes")</p>
+            }
+            @checkYourAnswers(
+                question = Messages("businessdetails.registeredoffice.title"),
+                editLinkTag = "businessdetailsregoffice-edit",
+                editUrl = controllers.businessdetails.routes.RegisteredOfficeUKController.get(true).toString
+            ) {
+                <p>@regOffUK.toLines.map { line =>
+                    @line<br />
+                }</p>
+            }
+        }
+        case regOffNonUK: RegisteredOfficeNonUK => {
+            @checkYourAnswers(
+                question = Messages("businessdetails.registeredoffice.where.title"),
+                editUrl = controllers.businessdetails.routes.RegisteredOfficeController.get(true).toString
+            ) {
+                <p>@Messages("lbl.no")</p>
+            }
+            @checkYourAnswers(
+                question = Messages("businessdetails.registeredoffice.title"),
+                editLinkTag = "businessdetailsregoffice-edit",
+                editUrl = controllers.businessdetails.routes.RegisteredOfficeNonUKController.get(true).toString
+            ) {
+                <p>@regOffNonUK.toLines.map { line =>
+                    @line<br />
+                }</p>
+            }
         }
 
     }
