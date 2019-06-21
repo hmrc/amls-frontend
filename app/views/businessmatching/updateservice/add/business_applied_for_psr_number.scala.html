@@ -52,37 +52,30 @@
                 f = f("appliedFor"),
                 labelText = "lbl.yes",
                 value = "true",
-                target = s"#$target",
-                inline = true
+                target = s"#$target"
             )
             @panel(
                 field = Some(f(s"$target")),
                 id = target
             ) {
                 @input(
-                attrMaxlength = "6",
-                attrPattern = "[0-9]{1,6}",
-                attrType = "number",
-                dataAttrs = digitsOnlyAttributes,
-                field = f("regNumber"),
-                hintText = "",
-                labelText = "businessmatching.updateservice.psr.number.lbl"
-            )
+                    attrMaxlength = "6",
+                    attrPattern = "[0-9]{1,6}",
+                    attrType = "number",
+                    dataAttrs = digitsOnlyAttributes,
+                    field = f("regNumber"),
+                    hintText = "",
+                    labelText = "businessmatching.updateservice.psr.number.lbl"
+                )
             }
             @radio(
                 f = f("appliedFor"),
                 labelText = "lbl.no",
-                value = "false",
-                inline = true
+                value = "false"
             )
-            }
         }
-        @panel(
-            field = Some(f(s"$target")),
-            id = target
-        ) {
-        }
-
         @submit(edit, returnLink = false, buttonId = Some("appliedspsr-submit"))
-   }
+    }
+
+}
 
