@@ -68,7 +68,7 @@ class RegisteredOfficeControllerUKSpec extends AmlsSpec with  MockitoSugar{
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include (Messages("businessdetails.registeredoffice.title"))
+      contentAsString(result) must include (Messages("businessdetails.registeredoffice.where.title"))
 
       val document = Jsoup.parse(contentAsString(result))
       document.select("input[name=isUK]").`val` must be("true")

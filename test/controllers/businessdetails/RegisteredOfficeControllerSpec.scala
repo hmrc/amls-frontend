@@ -71,19 +71,8 @@ class RegisteredOfficeControllerSpec extends AmlsSpec with  MockitoSugar{
       contentAsString(result) must include (Messages("businessdetails.registeredoffice.title"))
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("input[name=isUK]").`val` must be("true")
+      document.select("input[name=isUK]").`val` must be("")
 
-    }
-
-    "pre select uk when not in edit mode" in new Fixture {
-
-      when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any())).
-        thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(ukAddress), None))))
-
-      val result = controller.get()(request)
-      status(result) must be(OK)
-      val document = Jsoup.parse(contentAsString(result))
-      document.select("input[name=isUK]").`val` must be("true")
     }
 
     "successfully submit form and navigate to target page" in new Fixture {
