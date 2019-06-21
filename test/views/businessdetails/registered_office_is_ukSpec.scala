@@ -37,7 +37,7 @@ class registered_office_is_ukSpec extends AmlsSpec with MustMatchers  {
 
       val form2: ValidForm[RegisteredOffice] = Form2(RegisteredOfficeUK("line1","line2",None,None,"AB12CD"))
 
-      def view = views.html.businessdetails.registered_office(form2, true)
+      def view = views.html.businessdetails.registered_office_is_uk(form2, true)
 
       doc.title must startWith(Messages("businessdetails.registeredoffice.title") + " - " + Messages("summary.businessdetails"))
     }
@@ -46,7 +46,7 @@ class registered_office_is_ukSpec extends AmlsSpec with MustMatchers  {
 
       val form2: ValidForm[RegisteredOffice] = Form2(RegisteredOfficeUK("line1","line2",None,None,"AB12CD"))
 
-      def view = views.html.businessdetails.registered_office(form2, true)
+      def view = views.html.businessdetails.registered_office_is_uk(form2, true)
 
       heading.html must be(Messages("businessdetails.registeredoffice.title"))
       subHeading.html must include(Messages("summary.businessdetails"))
@@ -60,7 +60,7 @@ class registered_office_is_ukSpec extends AmlsSpec with MustMatchers  {
           (Path \ "isUK") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.businessdetails.registered_office(form2, true)
+      def view = views.html.businessdetails.registered_office_is_uk(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
@@ -71,7 +71,7 @@ class registered_office_is_ukSpec extends AmlsSpec with MustMatchers  {
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.businessdetails.registered_office(form2, true)
+      def view = views.html.businessdetails.registered_office_is_uk(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
