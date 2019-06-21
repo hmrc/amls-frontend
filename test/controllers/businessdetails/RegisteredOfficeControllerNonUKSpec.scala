@@ -17,7 +17,6 @@
 package controllers.businessdetails
 
 import connectors.DataCacheConnector
-import models.Country
 import models.businessdetails._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
@@ -50,7 +49,7 @@ class RegisteredOfficeControllerNonUKSpec extends AmlsSpec with  MockitoSugar{
       statusService = mock[StatusService],
       auditConnector = mock[AuditConnector],
       autoCompleteService = mockAutoComplete
-      )
+    )
 
     when {
       controller.auditConnector.sendEvent(any())(any(), any())
@@ -61,28 +60,41 @@ class RegisteredOfficeControllerNonUKSpec extends AmlsSpec with  MockitoSugar{
 
   "RegisteredOfficeController" must {
 
-    val ukAddress = RegisteredOfficeNonUK("305", "address line", Some("address line2"), Some("address line3"), Country("Andorra", "AN"))
+    val ukAddress = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "AA1 1AA")
 
     "load the where is your registered office or main place of business place page" in new Fixture {
 
-       when(controller.dataCacheConnector.fetch[BusinessDetails](any())
+      when(controller.dataCacheConnector.fetch[BusinessDetails](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include (Messages("businessdetails.registeredoffice.where.title"))
+      contentAsString(result) must include (Messages("businessdetails.registeredoffice.title"))
 
       val document = Jsoup.parse(contentAsString(result))
+      document.select("input[name=isUK]").`val` must be("true")
       document.select("input[name=addressLine2]").`val` must be("")
 
+    }
+
+    "pre select uk when not in edit mode" in new Fixture {
+
+      when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any())).
+        thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(ukAddress), None))))
+
+      val result = controller.get()(request)
+      status(result) must be(OK)
+      val document = Jsoup.parse(contentAsString(result))
+      document.select("input[name=isUK]").`val` must be("true")
+      document.select("input[name=addressLine2]").`val` must be("address line")
     }
 
     "pre populate where is your registered office or main place of business page with saved data" in new Fixture {
 
       when(controller.statusService.getStatus(any(),any(),any()))
-          .thenReturn(Future.successful(SubmissionDecisionRejected))
+        .thenReturn(Future.successful(SubmissionDecisionRejected))
       when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(BusinessDetails(None, None, None, None, None, Some(ukAddress), None))))
+        .thenReturn(Future.successful(Some(BusinessDetails(None, None, None, None, None, Some(ukAddress), None))))
 
       val result = controller.get(true)(request)
       status(result) must be(OK)
@@ -98,12 +110,12 @@ class RegisteredOfficeControllerNonUKSpec extends AmlsSpec with  MockitoSugar{
         .thenReturn(Future.successful(emptyCache))
 
       val newRequest = request.withFormUrlEncodedBody(
+        "isUK"-> "true",
         "addressLine1"->"line1",
         "addressLine2"->"line2",
         "addressLine3"->"",
         "addressLine4"->"",
-        "country"->"AF"
-      )
+        "postCode"->"AA1 1AA")
 
       val result = controller.post()(newRequest)
 
@@ -117,7 +129,7 @@ class RegisteredOfficeControllerNonUKSpec extends AmlsSpec with  MockitoSugar{
         case d: DataEvent =>
           d.detail("addressLine1") mustBe "line1"
           d.detail("addressLine2") mustBe "line2"
-          d.detail("country") mustBe "AF"
+          d.detail("postCode") mustBe "AA1 1AA"
       }
     }
 
@@ -131,12 +143,12 @@ class RegisteredOfficeControllerNonUKSpec extends AmlsSpec with  MockitoSugar{
         .thenReturn(Future.successful(emptyCache))
 
       val newRequest = request.withFormUrlEncodedBody(
+        "isUK"-> "true",
         "addressLine1"->"line1",
         "addressLine2"->"line2",
         "addressLine3"->"",
         "addressLine4"->"",
-        "country"->"AF"
-      )
+        "postCode"->"AA1 1AA")
 
       val result = controller.post(edit = true)(newRequest)
 
@@ -150,7 +162,7 @@ class RegisteredOfficeControllerNonUKSpec extends AmlsSpec with  MockitoSugar{
         case d: DataEvent =>
           d.detail("addressLine1") mustBe "line1"
           d.detail("addressLine2") mustBe "line2"
-          d.detail("country") mustBe "AF"
+          d.detail("postCode") mustBe "AA1 1AA"
           d.detail("originalLine1") mustBe "305"
           d.detail("originalLine2") mustBe "address line"
           d.detail("originalLine3") mustBe "address line2"
@@ -168,12 +180,12 @@ class RegisteredOfficeControllerNonUKSpec extends AmlsSpec with  MockitoSugar{
         .thenReturn(Future.successful(emptyCache))
 
       val newRequest = request.withFormUrlEncodedBody(
+        "isUK"-> "true",
         "addressLine1"->"line1 &",
         "addressLine2"->"line2 *",
         "addressLine3"->"",
         "addressLine4"->"",
-        "country"->"AF"
-      )
+        "postCode"->"AA1 1AA")
 
       val result = controller.post()(newRequest)
       val document: Document  = Jsoup.parse(contentAsString(result))
@@ -193,11 +205,11 @@ class RegisteredOfficeControllerNonUKSpec extends AmlsSpec with  MockitoSugar{
         when(controller.dataCacheConnector.save(any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
         val newRequest = request.withFormUrlEncodedBody(
+          "isUK" -> "true",
           "addressLine2" -> "line2",
           "addressLine3" -> "",
           "addressLine4" -> "",
-          "country"->"AF"
-        )
+          "postCode" -> "AA1 1AA")
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
         contentAsString(result) must include(Messages("err.summary"))
@@ -217,12 +229,12 @@ class RegisteredOfficeControllerNonUKSpec extends AmlsSpec with  MockitoSugar{
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
         val newRequest = request.withFormUrlEncodedBody(
+          "isUK" -> "true",
           "addressLine1" -> "line1",
           "addressLine2" -> "line2",
           "addressLine3" -> "",
           "addressLine4" -> "",
-          "country"->"AF"
-        )
+          "postCode" -> "AA1 1AA")
 
         val result = controller.post()(newRequest)
 
@@ -240,12 +252,12 @@ class RegisteredOfficeControllerNonUKSpec extends AmlsSpec with  MockitoSugar{
           .thenReturn(Future.successful(ReadyForRenewal(None)))
 
         val newRequest = request.withFormUrlEncodedBody(
+          "isUK" -> "true",
           "addressLine1" -> "line1",
           "addressLine2" -> "line2",
           "addressLine3" -> "",
           "addressLine4" -> "",
-          "country"->"AF"
-        )
+          "postCode" -> "AA1 1AA")
 
         val result = controller.post()(newRequest)
 
