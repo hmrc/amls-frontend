@@ -24,7 +24,7 @@ import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.businessdetails.{BusinessDetails, RegisteredOffice, RegisteredOfficeUK}
+import models.businessdetails._
 import play.api.mvc.Request
 import services.{AutoCompleteService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -43,17 +43,18 @@ class RegisteredOfficeController @Inject () (
                                             val authConnector: AuthConnector
                                             ) extends BaseController with DateOfChangeHelper {
 
-  private val preSelectUK = RegisteredOfficeUK("", "", None, None, "")
-
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
         dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key) map {
           response =>
-            val form: Form2[RegisteredOffice] = (for {
+            val form: Form2[RegisteredOfficeIsUK] = (for {
               businessDetails <- response
               registeredOffice <- businessDetails.registeredOffice
-            } yield Form2[RegisteredOffice](registeredOffice)).getOrElse(Form2[RegisteredOffice](preSelectUK))
+            } yield registeredOffice match {
+              case _: RegisteredOfficeUK => Form2[RegisteredOfficeIsUK](RegisteredOfficeIsUK(true))
+              case _: RegisteredOfficeNonUK => Form2[RegisteredOfficeIsUK](RegisteredOfficeIsUK(false))
+            }) getOrElse EmptyForm
             Ok(registered_office_is_uk(form, edit))
 
         }
@@ -61,37 +62,19 @@ class RegisteredOfficeController @Inject () (
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-        Form2[RegisteredOffice](request.body) match {
+        Form2[RegisteredOfficeIsUK](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(registered_office_is_uk(f, edit)))
           case ValidForm(_, data) =>
-
             val doUpdate = for {
               businessDetails <- OptionT(dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key))
-              _ <- OptionT.liftF(dataCacheConnector.save[BusinessDetails](BusinessDetails.key, businessDetails.registeredOffice(data)))
-              status <- OptionT.liftF(statusService.getStatus)
-              _ <- OptionT.liftF(auditAddressChange(data, businessDetails.registeredOffice, edit)) orElse OptionT.some(Success)
             } yield {
-              if (redirectToDateOfChange[RegisteredOffice](status, businessDetails.registeredOffice, data)) {
-                Redirect(routes.RegisteredOfficeDateOfChangeController.get())
-              } else {
-                edit match {
-                  case true => Redirect(routes.SummaryController.get())
-                  case _ => Redirect(routes.ContactingYouController.get(edit))
-                }
+              data match {
+                case RegisteredOfficeIsUK(true) => Redirect(routes.RegisteredOfficeUKController.get())
+                case RegisteredOfficeIsUK(false) => Redirect(routes.RegisteredOfficeNonUKController.get())
               }
             }
-
             doUpdate getOrElse InternalServerError("Unable to update registered office")
         }
-  }
-
-  def auditAddressChange(currentAddress: RegisteredOffice, oldAddress: Option[RegisteredOffice], edit: Boolean)
-                        (implicit hc: HeaderCarrier, request: Request[_]): Future[AuditResult] = {
-    if (edit) {
-      auditConnector.sendEvent(AddressModifiedEvent(currentAddress, oldAddress))
-    } else {
-      auditConnector.sendEvent(AddressCreatedEvent(currentAddress))
-    }
   }
 }

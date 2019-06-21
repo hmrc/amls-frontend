@@ -43,8 +43,6 @@ class RegisteredOfficeUKController @Inject ()(
                                             val authConnector: AuthConnector
                                             ) extends BaseController with DateOfChangeHelper {
 
-  private val preSelectUK = RegisteredOfficeUK("", "", None, None, "")
-
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
@@ -53,7 +51,7 @@ class RegisteredOfficeUKController @Inject ()(
             val form: Form2[RegisteredOffice] = (for {
               businessDetails <- response
               registeredOffice <- businessDetails.registeredOffice
-            } yield Form2[RegisteredOffice](registeredOffice)).getOrElse(Form2[RegisteredOffice](preSelectUK))
+            } yield Form2[RegisteredOffice](registeredOffice)) getOrElse EmptyForm
             Ok(registered_office_uk(form, edit))
 
         }
