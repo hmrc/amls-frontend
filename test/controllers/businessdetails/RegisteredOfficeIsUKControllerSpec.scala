@@ -38,12 +38,12 @@ import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks}
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
 
-class RegisteredOfficeControllerSpec extends AmlsSpec with  MockitoSugar{
+class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
 
   trait Fixture extends AuthorisedFixture with AutoCompleteServiceMocks {
     self => val request = addToken(authRequest)
 
-    val controller = new RegisteredOfficeController(
+    val controller = new RegisteredOfficeIsUKController(
       dataCacheConnector = mock[DataCacheConnector],
       authConnector = self.authConnector,
       statusService = mock[StatusService],
@@ -57,7 +57,7 @@ class RegisteredOfficeControllerSpec extends AmlsSpec with  MockitoSugar{
 
   val emptyCache = CacheMap("", Map.empty)
 
-  "RegisteredOfficeController" must {
+  "RegisteredOfficeIsUKController" must {
 
     val ukAddress = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "AA1 1AA")
 

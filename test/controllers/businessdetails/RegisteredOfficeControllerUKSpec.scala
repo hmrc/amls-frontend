@@ -57,7 +57,7 @@ class RegisteredOfficeControllerUKSpec extends AmlsSpec with  MockitoSugar{
 
   val emptyCache = CacheMap("", Map.empty)
 
-  "RegisteredOfficeController" must {
+  "RegisteredOfficeUKController" must {
 
     val ukAddress = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "AA1 1AA")
 

@@ -71,7 +71,7 @@
         case regOffUK: RegisteredOfficeUK => {
             @checkYourAnswers(
             question = Messages("businessdetails.registeredoffice.where.title"),
-            editUrl = controllers.businessdetails.routes.RegisteredOfficeController.get(true).toString
+            editUrl = controllers.businessdetails.routes.RegisteredOfficeIsUKController.get(true).toString
             ) {
                 <p>@Messages("lbl.yes")</p>
             }
@@ -88,7 +88,7 @@
         case regOffNonUK: RegisteredOfficeNonUK => {
             @checkYourAnswers(
                 question = Messages("businessdetails.registeredoffice.where.title"),
-                editUrl = controllers.businessdetails.routes.RegisteredOfficeController.get(true).toString
+                editUrl = controllers.businessdetails.routes.RegisteredOfficeIsUKController.get(true).toString
             ) {
                 <p>@Messages("lbl.no")</p>
             }

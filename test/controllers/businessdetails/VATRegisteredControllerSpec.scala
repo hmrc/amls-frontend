@@ -82,7 +82,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
       "with valid data" must {
 
-        "redirect to RegisteredOfficeController" when {
+        "redirect to ConfirmRegisteredOfficeController" when {
           "customer is a Partnership" in new Fixture {
 
             val partnership = ReviewDetails("BusinessName", Some(Partnership),

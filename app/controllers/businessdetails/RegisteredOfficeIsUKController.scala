@@ -31,7 +31,7 @@ import views.html.businessdetails._
 
 import scala.concurrent.Future
 
-class RegisteredOfficeController @Inject () (
+class RegisteredOfficeIsUKController @Inject ()(
                                             val dataCacheConnector: DataCacheConnector,
                                             val statusService: StatusService,
                                             val auditConnector: AuditConnector,

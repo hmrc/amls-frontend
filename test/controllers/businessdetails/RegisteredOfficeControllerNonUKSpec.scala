@@ -59,7 +59,7 @@ class RegisteredOfficeControllerNonUKSpec extends AmlsSpec with  MockitoSugar{
 
   val emptyCache = CacheMap("", Map.empty)
 
-  "RegisteredOfficeController" must {
+  "RegisteredOfficeNonUKController" must {
 
     val nonukAddress = RegisteredOfficeNonUK("305", "address line", Some("address line2"), Some("address line3"), Country("Albania", "AL"))
 
