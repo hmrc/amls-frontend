@@ -26,7 +26,7 @@ import play.api.i18n.Messages
 import views.Fixture
 
 
-class registered_officeSpec extends AmlsSpec with MustMatchers  {
+class registered_office_is_ukSpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks {
     implicit val requestWithToken = addToken(request)
