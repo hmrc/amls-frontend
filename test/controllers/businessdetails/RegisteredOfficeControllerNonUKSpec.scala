@@ -78,18 +78,6 @@ class RegisteredOfficeControllerNonUKSpec extends AmlsSpec with  MockitoSugar{
 
     }
 
-    "pre select uk when not in edit mode" in new Fixture {
-
-      when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any())).
-        thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(nonukAddress), None))))
-
-      val result = controller.get()(request)
-      status(result) must be(OK)
-      val document = Jsoup.parse(contentAsString(result))
-      document.select("input[name=isUK]").`val` must be("false")
-      document.select("input[name=addressLine2]").`val` must be("address line")
-    }
-
     "pre populate where is your registered office or main place of business page with saved data" in new Fixture {
 
       when(controller.statusService.getStatus(any(),any(),any()))
