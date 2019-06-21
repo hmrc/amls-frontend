@@ -59,14 +59,15 @@
                 field = Some(f(s"$target")),
                 id = target
             ) {
-                @textarea(
-                    f("regNumber"),
-                    "businessmatching.updateservice.psr.number.lbl",
-                    bold = false,
-                    largeWidth = true,
-                    cols = "30",
-                    rows = "8"
-                )
+                @input(
+                attrMaxlength = "6",
+                attrPattern = "[0-9]{1,6}",
+                attrType = "number",
+                dataAttrs = digitsOnlyAttributes,
+                field = f("regNumber"),
+                hintText = "",
+                labelText = "businessmatching.updateservice.psr.number.lbl"
+            )
             }
             @radio(
                 f = f("appliedFor"),
@@ -80,15 +81,6 @@
             field = Some(f(s"$target")),
             id = target
         ) {
-            @input(
-                attrMaxlength = "6",
-                attrPattern = "[0-9]{1,6}",
-                attrType = "number",
-                dataAttrs = digitsOnlyAttributes,
-                field = f("regNumber"),
-                hintText = "",
-                labelText = "businessmatching.updateservice.psr.number.lbl"
-            )
         }
 
         @submit(edit, returnLink = false, buttonId = Some("appliedspsr-submit"))
