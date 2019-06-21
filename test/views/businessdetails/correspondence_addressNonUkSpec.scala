@@ -77,17 +77,12 @@ class correspondence_addressNonUkSpec extends AmlsSpec with MustMatchers  {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "correspondenceaddress-fieldset") -> Seq(ValidationError("not a message Key")),
           (Path \ "country-fieldset") -> Seq(ValidationError("fourth not a message Key"))
         ))
 
       def view = views.html.businessdetails.correspondence_address_non_uk(form2, true, countries)
 
-      errorSummary.html() must include("second not a message Key")
-      errorSummary.html() must include("third not a message Key")
-
-      doc.getElementById("isUK")
-        .getElementsByClass("error-notification").first().html() must include("second not a message Key")
+      errorSummary.html() must include("fourth not a message Key")
 
       val test = doc.getElementById("country-fieldset")
         .getElementsByClass("error-notification").first().html() must include("fourth not a message Key")

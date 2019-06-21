@@ -19,7 +19,7 @@ package views.businessdetails
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.autocomplete.NameValuePair
-import models.businessdetails.{CorrespondenceAddress, CorrespondenceAddressUk}
+import models.businessdetails.CorrespondenceAddressUk
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -83,8 +83,10 @@ class correspondence_addressUkSpec extends AmlsSpec with MustMatchers  {
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("third not a message Key")
 
-      doc.getElementById("correspondenceaddress-fieldset")
-        .getElementsByClass("error-notification").first().html() must include("not a message Key")
+      doc.getElementById("postCode-fieldset")
+        .getElementsByClass("error-notification")
+        .first()
+        .html() must include("not a message Key")
 
       doc.getElementById("postCode-fieldset")
         .getElementsByClass("error-notification").first().html() must include("third not a message Key")

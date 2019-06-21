@@ -17,9 +17,8 @@
 package controllers.businessdetails
 
 import connectors.DataCacheConnector
-import models.Country
-import models.businessdetails.{BusinessDetails, CorrespondenceAddress, CorrespondenceAddressNonUk, CorrespondenceAddressUk}
 import models.autocomplete.NameValuePair
+import models.businessdetails.{BusinessDetails, CorrespondenceAddress, CorrespondenceAddressUk}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import org.jsoup.select.Elements
@@ -71,7 +70,7 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
       "data exists in the keystore" in new Fixture {
 
         val correspondenceAddress = CorrespondenceAddress(
-          None, Some(CorrespondenceAddressNonUk("Name Test", "Test", "Test", "Test", Some("test"), None, Country("Albania", "AL"))))
+          Some(CorrespondenceAddressUk("Name Test", "Test", "Test", "Test", Some("test"), None, "POSTCODE")), None)
         val businessDetails = BusinessDetails(None, None, None, None, None,None, None, Some(correspondenceAddress))
 
         when(controller.dataConnector.fetch[BusinessDetails](any())(any(), any(), any()))
@@ -84,14 +83,11 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
 
         page.getElementById("yourName").`val` must be("Name Test")
         page.getElementById("businessName").`val` must be("Test")
-        page.getElementById("isUK-true").hasAttr("checked") must be(false)
-        page.getElementById("isUK-false").hasAttr("checked") must be(true)
-        page.getElementById("addressLineNonUK1").`val` must be("Test")
-        page.getElementById("addressLineNonUK2").`val` must be("Test")
-        page.getElementById("addressLineNonUK3").`val` must be("test")
-        page.getElementById("addressLineNonUK4").`val` must be("")
-        page.getElementById("postCode").`val` must be("")
-        page.select("#country option[selected]").attr("value") must be("AL")
+        page.getElementById("addressLine1").`val` must be("Test")
+        page.getElementById("addressLine2").`val` must be("Test")
+        page.getElementById("addressLine3").`val` must be("test")
+        page.getElementById("addressLine4").`val` must be("")
+        page.getElementById("postCode").`val` must be("POSTCODE")
       }
 
       "no data exists in the keystore" in new Fixture {
@@ -102,7 +98,6 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
         val result = controller.get(false)(request)
         status(result) must be(OK)
         Jsoup.parse(contentAsString(result)).title must include(Messages("businessdetails.correspondenceaddress.title"))
-        Jsoup.parse(contentAsString(result)).select("#isUK-true").attr("checked") mustBe "checked"
 
       }
     }

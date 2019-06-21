@@ -46,7 +46,8 @@ object CorrespondenceAddress {
           (__ \ "correspondenceAddressLine2").read[String] and
           (__ \ "correspondenceAddressLine3").readNullable[String] and
           (__ \ "correspondenceAddressLine4").readNullable[String] and
-          (__ \ "correspondencePostCode").read[String])(CorrespondenceAddressUk.apply _).map(x => CorrespondenceAddress(Some(x), None))
+          (__ \ "correspondencePostCode").read[String])(CorrespondenceAddressUk.apply _)
+            .map(x => CorrespondenceAddress(Some(x), None))
         orElse
         (
           (__ \ "yourName").read[String] and
@@ -55,7 +56,8 @@ object CorrespondenceAddress {
           (__ \ "correspondenceAddressLine2").read[String] and
           (__ \ "correspondenceAddressLine3").readNullable[String] and
           (__ \ "correspondenceAddressLine4").readNullable[String] and
-          (__ \ "correspondenceCountry").read[Country])(CorrespondenceAddressNonUk.apply _).map(x => CorrespondenceAddress(None, Some(x)))
+          (__ \ "correspondenceCountry").read[Country])(CorrespondenceAddressNonUk.apply _)
+            .map(x => CorrespondenceAddress(None, Some(x)))
         )
   }
 
@@ -87,6 +89,6 @@ object CorrespondenceAddress {
     }
   }
 
-  def apply(ukAddress: CorrespondenceAddressUk): CorrespondenceAddress = new CorrespondenceAddress(Some(ukAddress), None)
-  def apply(nonUkAddress: CorrespondenceAddressNonUk): CorrespondenceAddress = new CorrespondenceAddress(None, Some(nonUkAddress))
+//  def apply(ukAddress: CorrespondenceAddressUk): CorrespondenceAddress = new CorrespondenceAddress(Some(ukAddress), None)
+//  def apply(nonUkAddress: CorrespondenceAddressNonUk): CorrespondenceAddress = new CorrespondenceAddress(None, Some(nonUkAddress))
 }

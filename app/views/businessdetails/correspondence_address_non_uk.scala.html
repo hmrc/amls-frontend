@@ -35,7 +35,7 @@
     @form(f, controllers.businessdetails.routes.CorrespondenceAddressNonUkController.post(edit)) {
 
         @fieldsetWithErrorGroup(
-            f = f("form"),
+            f = f(s"$formname"),
             heading = "businessdetails.correspondenceaddress.title",
             section = "summary.businessdetails"
         ) {

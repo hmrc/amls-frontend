@@ -177,42 +177,6 @@ class CorrespondenceAddressSpec extends PlaySpec with MockitoSugar {
       }
     }
 
-    "JSON validation" must {
-
-      val ukAddress = CorrespondenceAddress(Some(DefaultUKAddress), None)
-      val nonUkAddress = CorrespondenceAddress(None, Some(DefaultNonUKAddress))
-
-
-      "Round trip a UK Address correctly through serialisation" in {
-
-        CorrespondenceAddress.jsonReads.reads(
-          CorrespondenceAddress.jsonWrites.writes(ukAddress)
-        ) must be(JsSuccess(ukAddress))
-      }
-
-      "Round trip a Non UK Address correctly through serialisation" in {
-
-        CorrespondenceAddress.jsonReads.reads(
-          CorrespondenceAddress.jsonWrites.writes(nonUkAddress)
-        ) must be(JsSuccess(nonUkAddress))
-      }
-
-      "Serialise UK address as expected" in {
-        Json.toJson(ukAddress) must be(DefaultUKJson)
-      }
-
-      "Serialise non-UK address as expected" in {
-        Json.toJson(nonUkAddress) must be(DefaultNonUKJson)
-      }
-
-      "Deserialise UK address as expected" in {
-        DefaultUKJson.as[CorrespondenceAddress] must be(ukAddress)
-      }
-
-      "Deserialise non-UK address as expected" in {
-        DefaultNonUKJson.as[CorrespondenceAddress] must be(nonUkAddress)
-      }
-    }
 
   val DefaultYourName = "Default Your Name"
   val DefaultBusinessName = "Default Business Name"
@@ -232,7 +196,8 @@ class CorrespondenceAddressSpec extends PlaySpec with MockitoSugar {
   val NewPostcode = "AA1 1AA"
   val NewCountry = "AB"
 
-  val DefaultUKAddress = CorrespondenceAddressUk(DefaultYourName,
+  val DefaultUKAddress = CorrespondenceAddressUk(
+    DefaultYourName,
     DefaultBusinessName,
     DefaultAddressLine1,
     DefaultAddressLine2,
@@ -249,7 +214,6 @@ class CorrespondenceAddressSpec extends PlaySpec with MockitoSugar {
     DefaultCountry)
 
   val DefaultUKModel = Map(
-    "isUK" -> Seq("true"),
     "yourName" -> Seq(DefaultYourName),
     "businessName" -> Seq(DefaultBusinessName),
     "addressLine1" -> Seq(DefaultAddressLine1),
@@ -260,7 +224,6 @@ class CorrespondenceAddressSpec extends PlaySpec with MockitoSugar {
   )
 
   val DefaultNonUKModel = Map(
-    "isUK" -> Seq("false"),
     "yourName" -> Seq(DefaultYourName),
     "businessName" -> Seq(DefaultBusinessName),
     "addressLineNonUK1" -> Seq(DefaultAddressLine1),
@@ -290,5 +253,43 @@ class CorrespondenceAddressSpec extends PlaySpec with MockitoSugar {
     "correspondenceAddressLine4" -> DefaultAddressLine4,
     "correspondenceCountry" -> DefaultCountry
   )
+
+
+  "JSON validation" must {
+
+    val ukAddress = CorrespondenceAddress(Some(DefaultUKAddress), None)
+    val nonUkAddress = CorrespondenceAddress(None, Some(DefaultNonUKAddress))
+
+
+    "Round trip a UK Address correctly through serialisation" in {
+
+      CorrespondenceAddress.jsonReads.reads(
+        CorrespondenceAddress.jsonWrites.writes(ukAddress)
+      ) must be(JsSuccess(ukAddress))
+    }
+
+    "Round trip a Non UK Address correctly through serialisation" in {
+
+      CorrespondenceAddress.jsonReads.reads(
+        CorrespondenceAddress.jsonWrites.writes(nonUkAddress)
+      ) must be(JsSuccess(nonUkAddress))
+    }
+
+    "Serialise UK address as expected" in {
+      Json.toJson(ukAddress) must be(DefaultUKJson)
+    }
+
+    "Serialise non-UK address as expected" in {
+      Json.toJson(nonUkAddress) must be(DefaultNonUKJson)
+    }
+
+    "Deserialise UK address as expected" in {
+      DefaultUKJson.as[CorrespondenceAddress] must be(ukAddress)
+    }
+
+    "Deserialise non-UK address as expected" in {
+      DefaultNonUKJson.as[CorrespondenceAddress] must be(nonUkAddress)
+    }
+  }
 
 }

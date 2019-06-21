@@ -42,7 +42,7 @@ class correspondence_addressIsUkSpec extends AmlsSpec with MustMatchers  {
 
       def view = views.html.businessdetails.correspondence_address_is_uk(form2, true)
 
-      doc.title must startWith(Messages("businessdetails.correspondenceaddress.title") + " - " + Messages("summary.businessdetails"))
+      doc.title must startWith(Messages("businessdetails.correspondenceaddress.isuk.title") + " - " + Messages("summary.businessdetails"))
     }
 
     "have correct headings" in new ViewFixture {
@@ -51,7 +51,7 @@ class correspondence_addressIsUkSpec extends AmlsSpec with MustMatchers  {
 
       def view = views.html.businessdetails.correspondence_address_is_uk(form2, true)
 
-      heading.html must be(Messages("businessdetails.correspondenceaddress.title"))
+      heading.html must be(Messages("businessdetails.correspondenceaddress.isuk.title"))
       subHeading.html must include(Messages("summary.businessdetails"))
 
     }

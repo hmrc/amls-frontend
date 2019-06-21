@@ -84,7 +84,6 @@ object CorrespondenceAddressUk {
 
   implicit val formWrites = Write[CorrespondenceAddressUk, UrlFormEncoded] {
     a => Map(
-        "isUK" -> Seq("true"),
         "yourName" -> Seq(a.yourName),
         "businessName" -> Seq(a.businessName),
         "addressLine1" -> Seq(a.addressLine1),

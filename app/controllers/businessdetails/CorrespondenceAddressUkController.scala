@@ -63,7 +63,7 @@ class CorrespondenceAddressUkController @Inject ()(
         case ValidForm(_, data) =>
           val doUpdate = for {
             businessDetails:BusinessDetails <- OptionT(dataConnector.fetch[BusinessDetails](BusinessDetails.key))
-            _ <- OptionT.liftF(dataConnector.save[BusinessDetails](BusinessDetails.key, businessDetails.correspondenceAddress(CorrespondenceAddress(data))))
+            _ <- OptionT.liftF(dataConnector.save[BusinessDetails](BusinessDetails.key, businessDetails.correspondenceAddress(CorrespondenceAddress(Some(data), None))))
             _ <- OptionT.liftF(auditAddressChange(data, businessDetails.correspondenceAddress.flatMap(a => a.ukAddress), edit)) orElse OptionT.some(Success)
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())
