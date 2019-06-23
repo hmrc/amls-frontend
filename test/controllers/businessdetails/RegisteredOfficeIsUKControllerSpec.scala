@@ -69,10 +69,6 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
       val result = controller.get()(request)
       status(result) must be(OK)
       contentAsString(result) must include (Messages("businessdetails.registeredoffice.title"))
-
-      val document = Jsoup.parse(contentAsString(result))
-      document.select("input[name=isUK]").`val` must be("")
-
     }
 
     "successfully submit form and navigate to target page" in new Fixture {
@@ -143,11 +139,10 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
 
       val result = controller.post()(newRequest)
       val document: Document  = Jsoup.parse(contentAsString(result))
-      val errorCount = 2
       val elementsWithError : Elements = document.getElementsByClass("error-notification")
-      elementsWithError.size() must be(errorCount)
+      elementsWithError.size() must be(1)
       for (ele: Element <- elementsWithError) {
-        ele.html() must include(Messages("err.text.validation"))
+        ele.html() must include(Messages("error.required.atb.registered.office.uk.or.overseas"))
       }
     }
 
