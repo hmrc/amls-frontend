@@ -70,13 +70,13 @@
     @model.registeredOffice.map {
         case regOffUK: RegisteredOfficeUK => {
             @checkYourAnswers(
-            question = Messages("businessdetails.registeredoffice.where.title"),
-            editUrl = controllers.businessdetails.routes.RegisteredOfficeIsUKController.get(true).toString
+                question = Messages("businessdetails.registeredoffice.title"),
+                editUrl = controllers.businessdetails.routes.RegisteredOfficeIsUKController.get(true).toString
             ) {
                 <p>@Messages("lbl.yes")</p>
             }
             @checkYourAnswers(
-                question = Messages("businessdetails.registeredoffice.title"),
+                question = Messages("businessdetails.registeredoffice.where.title"),
                 editLinkTag = "businessdetailsregoffice-edit",
                 editUrl = controllers.businessdetails.routes.RegisteredOfficeUKController.get(true).toString
             ) {
@@ -87,13 +87,13 @@
         }
         case regOffNonUK: RegisteredOfficeNonUK => {
             @checkYourAnswers(
-                question = Messages("businessdetails.registeredoffice.where.title"),
+                question = Messages("businessdetails.registeredoffice.title"),
                 editUrl = controllers.businessdetails.routes.RegisteredOfficeIsUKController.get(true).toString
             ) {
                 <p>@Messages("lbl.no")</p>
             }
             @checkYourAnswers(
-                question = Messages("businessdetails.registeredoffice.title"),
+                question = Messages("businessdetails.registeredoffice.where.title"),
                 editLinkTag = "businessdetailsregoffice-edit",
                 editUrl = controllers.businessdetails.routes.RegisteredOfficeNonUKController.get(true).toString
             ) {
