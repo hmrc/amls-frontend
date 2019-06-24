@@ -17,8 +17,9 @@
 package controllers.businessdetails
 
 import connectors.DataCacheConnector
+import models.Country
 import models.autocomplete.NameValuePair
-import models.businessdetails.{BusinessDetails, CorrespondenceAddress, CorrespondenceAddressUk}
+import models.businessdetails.{BusinessDetails, CorrespondenceAddress, CorrespondenceAddressNonUk}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import org.jsoup.select.Elements
@@ -39,12 +40,12 @@ import utils.{AmlsSpec, AuthorisedFixture}
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
 
-class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new CorrespondenceAddressUkController (
+    val controller = new CorrespondenceAddressNonUkController (
       dataConnector = mock[DataCacheConnector],
       authConnector = self.authConnector,
       auditConnector = mock[AuditConnector],
@@ -63,13 +64,14 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
     } thenReturn Future.successful(Success)
   }
 
-  "CorrespondenceAddressUkontroller" should {
+  "CorrespondenceAddressNonUkController" should {
 
     "respond to a get request correctly with different form values" when {
 
       "data exists in the keystore" in new Fixture {
 
-        val correspondenceAddress = CorrespondenceAddress(Some(CorrespondenceAddressUk("Name Test", "Test", "Test", "Test", Some("test"), None, "POSTCODE")), None)
+        val correspondenceAddress = CorrespondenceAddress(None,
+          Some(CorrespondenceAddressNonUk("Name Test", "Test", "Test", "Test", Some("test"), None, Country("Albania", "AL"))))
         val businessDetails = BusinessDetails(None, None, None, None, None,None, None, Some(correspondenceAddress))
 
         when(controller.dataConnector.fetch[BusinessDetails](any())(any(), any(), any()))
@@ -82,11 +84,11 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
 
         page.getElementById("yourName").`val` must be("Name Test")
         page.getElementById("businessName").`val` must be("Test")
-        page.getElementById("addressLine1").`val` must be("Test")
-        page.getElementById("addressLine2").`val` must be("Test")
-        page.getElementById("addressLine3").`val` must be("test")
-        page.getElementById("addressLine4").`val` must be("")
-        page.getElementById("postCode").`val` must be("POSTCODE")
+        page.getElementById("addressLineNonUK1").`val` must be("Test")
+        page.getElementById("addressLineNonUK2").`val` must be("Test")
+        page.getElementById("addressLineNonUK3").`val` must be("test")
+        page.getElementById("addressLineNonUK4").`val` must be("")
+        page.getElementById("country").getElementsByAttribute("selected").`val` must be("AL")
       }
 
       "no data exists in the keystore" in new Fixture {
@@ -107,19 +109,18 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
 
       "a valid form request is sent in the body" in new Fixture {
 
-        val address = CorrespondenceAddressUk("Test", "Test", "old line 1", "old line 2", Some("old line 3"), None, "AA1 1AA")
+        val address = CorrespondenceAddressNonUk("Test", "Test", "old line 1", "old line 2", Some("old line 3"), None, Country("Albania", "AL"))
 
-        val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, Some(CorrespondenceAddress(Some(address), None)))))
+        val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, Some(CorrespondenceAddress(None, Some(address))))))
 
         val newRequest = request.withFormUrlEncodedBody(
           "yourName" -> "Name",
           "businessName" -> "Business Name",
-          "isUK"         -> "true",
-          "addressLine1" -> "Add Line 1",
-          "addressLine2" -> "Add Line 2",
-          "addressLine3" -> "",
-          "addressLine4" -> "",
-          "postCode" -> "AA1 1AA"
+          "addressLineNonUK1" -> "Add Line 1",
+          "addressLineNonUK2" -> "Add Line 2",
+          "addressLineNonUK3" -> "",
+          "addressLineNonUK4" -> "",
+          "country" -> "AL"
         )
 
         when(controller.dataConnector.fetch[BusinessDetails](any())
@@ -139,25 +140,24 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
           case d: DataEvent =>
             d.detail("addressLine1") mustBe "Add Line 1"
             d.detail("addressLine2") mustBe "Add Line 2"
-            d.detail("postCode") mustBe "AA1 1AA"
+            d.detail("country") mustBe "Albania"
         }
       }
 
       "a valid form request is sent in the body when editing" in new Fixture {
 
-        val address = CorrespondenceAddressUk("Test", "Test", "old line 1", "old line 2", Some("old line 3"), None, "AA1 1AA")
+        val address = CorrespondenceAddressNonUk("Test", "Test", "old line 1", "old line 2", Some("old line 3"), None, Country("Albania", "AL"))
 
-        val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, Some(CorrespondenceAddress(Some(address), None)))))
+        val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, Some(CorrespondenceAddress(None, Some(address))))))
 
         val newRequest = request.withFormUrlEncodedBody(
           "yourName" -> "Name",
           "businessName" -> "Business Name",
-          "isUK"         -> "true",
-          "addressLine1" -> "Add Line 1",
-          "addressLine2" -> "Add Line 2",
-          "addressLine3" -> "",
-          "addressLine4" -> "",
-          "postCode" -> "AA1 1AA"
+          "addressLineNonUK1" -> "Add Line 1",
+          "addressLineNonUK2" -> "Add Line 2",
+          "addressLineNonUK3" -> "",
+          "addressLineNonUK4" -> "",
+          "country" -> "AL"
         )
 
         when(controller.dataConnector.fetch[BusinessDetails](any())
@@ -177,11 +177,10 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
           case d: DataEvent =>
             d.detail("addressLine1") mustBe "Add Line 1"
             d.detail("addressLine2") mustBe "Add Line 2"
-            d.detail("postCode") mustBe "AA1 1AA"
             d.detail("originalLine1") mustBe "old line 1"
             d.detail("originalLine2") mustBe "old line 2"
             d.detail("originalLine3") mustBe "old line 3"
-            d.detail("originalPostCode") mustBe "AA1 1AA"
+            d.detail("originalCountry") mustBe "Albania"
         }
       }
 
@@ -192,12 +191,11 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
         val newRequest = request.withFormUrlEncodedBody(
           "yourName" -> "Name",
           "businessName" -> "Business Name",
-          "isUK"         -> "true",
-          "addressLine1" -> "Add Line 1 & 3",
-          "addressLine2" -> "Add Line 2 *",
-          "addressLine3" -> "$$$",
-          "addressLine4" -> "##",
-          "postCode" -> "AA1 1AA"
+          "addressLineNonUK1" -> "Add Line 1 & 3",
+          "addressLineNonUK2" -> "Add Line 2 *",
+          "addressLineNonUK3" -> "$$$",
+          "addressLineNonUK4" -> "##",
+          "country" -> "AL"
         )
 
         when(controller.dataConnector.fetch[BusinessDetails](any())
@@ -223,7 +221,7 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
         val newRequest = request.withFormUrlEncodedBody(
           "yourName" -> "Name",
           "businessName" -> "Business Name",
-          "invalid" -> "AA1 1AA"
+          "invalid" -> "AL"
         )
 
         val result = controller.post(false)(newRequest)

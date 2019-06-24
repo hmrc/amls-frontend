@@ -63,13 +63,10 @@ class CorrespondenceAddressNonUkController @Inject ()(
         case ValidForm(_, data) =>
           val doUpdate = for {
             businessDetails:BusinessDetails <- OptionT(dataConnector.fetch[BusinessDetails](BusinessDetails.key))
-            _ <- OptionT.liftF(dataConnector.save[BusinessDetails](BusinessDetails.key, businessDetails.correspondenceAddress(CorrespondenceAddress(None, Some(data)))))
+            _ <- OptionT.liftF(dataConnector.save[BusinessDetails]
+              (BusinessDetails.key, businessDetails.correspondenceAddress(CorrespondenceAddress(None, Some(data)))))
             _ <- OptionT.liftF(auditAddressChange(data, businessDetails.correspondenceAddress.flatMap(a => a.nonUkAddress), edit)) orElse OptionT.some(Success)
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
-            case _ => Redirect(routes.SummaryController.get())
-          }
-
+          } yield Redirect(routes.SummaryController.get())
           doUpdate getOrElse InternalServerError("Could not update correspondence address")
       }
     }

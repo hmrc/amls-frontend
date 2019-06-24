@@ -995,7 +995,9 @@ businessdetails.contactingyou.invalid.phone = Invalid Phone Number
 businessdetails.contactingyou.invalid.mobile = Invalid Mobile Number
 
 businessdetails.correspondenceaddress.isuk.title = Is the address to send you letters about your supervision in the UK?
+businessdetails.correspondenceaddress.isuk.error = Select yes if the address to send you letters about your supervision is in the UK
 businessdetails.correspondenceaddress.title = What is the right address to send you letters about your supervision?
+
 businessdetails.correspondenceaddress.p = We’ll send letters about your supervision to this address.
 businessdetails.correspondenceaddress.contact.info = Contact person or business
 businessdetails.correspondenceaddress.yourName = Your name

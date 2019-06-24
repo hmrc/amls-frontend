@@ -88,7 +88,4 @@ object CorrespondenceAddress {
         )(unlift(CorrespondenceAddressNonUk.unapply)).writes(a)
     }
   }
-
-//  def apply(ukAddress: CorrespondenceAddressUk): CorrespondenceAddress = new CorrespondenceAddress(Some(ukAddress), None)
-//  def apply(nonUkAddress: CorrespondenceAddressNonUk): CorrespondenceAddress = new CorrespondenceAddress(None, Some(nonUkAddress))
 }

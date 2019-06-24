@@ -49,12 +49,11 @@ class CorrespondenceAddressIsUkController @Inject ()(
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
       Form2[CorrespondenceAddressIsUk](request.body) match {
-        case f: InvalidForm => {
-          System.out.println("Invalid!" + f)
-          Future.successful(BadRequest(correspondence_address_is_uk(f, edit)))
-        }
-        case ValidForm(_, CorrespondenceAddressIsUk(Some(true))) => Future.successful(Redirect(routes.CorrespondenceAddressUkController.get(edit)))
-        case ValidForm(_, CorrespondenceAddressIsUk(Some(false))) => Future.successful(Redirect(routes.CorrespondenceAddressNonUkController.get(edit)))
+        case f: InvalidForm => Future.successful(BadRequest(correspondence_address_is_uk(f, edit)))
+        case ValidForm(_, CorrespondenceAddressIsUk(Some(true))) =>
+          Future.successful(Redirect(routes.CorrespondenceAddressUkController.get(edit)))
+        case ValidForm(_, CorrespondenceAddressIsUk(Some(false))) =>
+          Future.successful(Redirect(routes.CorrespondenceAddressNonUkController.get(edit)))
       }
     }
   }

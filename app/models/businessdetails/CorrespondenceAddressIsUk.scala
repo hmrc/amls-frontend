@@ -28,7 +28,7 @@ object CorrespondenceAddressIsUk {
   implicit val formRule: Rule[UrlFormEncoded, CorrespondenceAddressIsUk] =
     From[UrlFormEncoded] { __ =>
       import jto.validation.forms.Rules._
-      (__ \ "isUK").read[Boolean].withMessage("error.required.address.line1")
+      (__ \ "isUK").read[Boolean].withMessage("businessdetails.correspondenceaddress.isuk.error")
         .map(x => CorrespondenceAddressIsUk.apply(Option(x)))
     }
 
