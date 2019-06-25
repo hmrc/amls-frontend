@@ -18,17 +18,14 @@ package controllers.businessdetails
 
 import audit.AddressConversions._
 import audit.{AddressCreatedEvent, AddressModifiedEvent}
-import cats.data.OptionT
-import cats.implicits._
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.businessdetails.{BusinessDetails, RegisteredOffice, RegisteredOfficeUK}
+import models.businessdetails.{BusinessDetails, RegisteredOffice}
 import play.api.mvc.Request
-import services.{AutoCompleteService, StatusService}
+import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.DateOfChangeHelper
@@ -62,21 +59,21 @@ class RegisteredOfficeUKController @Inject ()(
           case f: InvalidForm =>
             Future.successful(BadRequest(registered_office_uk(f, edit)))
           case ValidForm(_, data) =>
-            (for {
-              businessDetails <- OptionT(dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key))
-              _ <- OptionT.liftF(dataCacheConnector.save[BusinessDetails](BusinessDetails.key, businessDetails.registeredOffice(data)))
-              status <- OptionT.liftF(statusService.getStatus)
-              _ <- OptionT.liftF(auditAddressChange(data, businessDetails.registeredOffice, edit)) orElse OptionT.some(Success)
+            for {
+              businessDetails <- dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key)
+              _ <- dataCacheConnector.save[BusinessDetails](BusinessDetails.key, businessDetails.registeredOffice(data))
+              status <- statusService.getStatus
+              _ <- auditAddressChange(data, businessDetails flatMap { _.registeredOffice } , edit)
             } yield {
               if (redirectToDateOfChange[RegisteredOffice](status, businessDetails.registeredOffice, data)) {
                 Redirect(routes.RegisteredOfficeDateOfChangeController.get())
               } else {
                 edit match {
                   case true => Redirect(routes.SummaryController.get())
-                  case _ => Redirect(routes.ContactingYouController.get(edit))
+                  case _ => Redirect(routes.ContactingYouController.get())
                 }
               }
-            }) getOrElse InternalServerError("Unable to update registered office")
+            }
         }
   }
 
