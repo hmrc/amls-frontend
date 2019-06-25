@@ -100,17 +100,6 @@ class CETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
       contentAsString(result) must include(Messages("msb.ce.transactions.expected.in.12.months.title"))
     }
 
-    "redirect to Page not found" when {
-      "application is in variation mode" in new Fixture {
-
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved))
-
-        val result = controller.get()(request)
-        status(result) must be(NOT_FOUND)
-      }
-    }
-
     "Show error message when user has not filled the mandatory fields" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(

@@ -94,18 +94,6 @@ class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSuga
       }
     }
 
-    "redirect to the next page in the flow" when {
-      "application is in variation mode and this page can't be edited" in new Fixture {
-
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved))
-
-        val result = controller.get()(request)
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) must be(Some(controllers.msb.routes.SendMoneyToOtherCountryController.get().url))
-      }
-    }
-
     "Show error message when user has not filled the mandatory fields" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(

@@ -42,18 +42,15 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request => {
-        ControllerHelper.allowedToEdit(MsbActivity, Some(CurrencyExchange)) flatMap {
-          case true => dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
-            response =>
-              val form: Form2[UsesForeignCurrencies] = (for {
-                msb <- response
-                currencies <- msb.whichCurrencies
-                usesForeign <- currencies.usesForeignCurrencies
-              } yield Form2[UsesForeignCurrencies](usesForeign)).getOrElse(EmptyForm)
+        dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+          response =>
+            val form: Form2[UsesForeignCurrencies] = (for {
+              msb <- response
+              currencies <- msb.whichCurrencies
+              usesForeign <- currencies.usesForeignCurrencies
+            } yield Form2[UsesForeignCurrencies](usesForeign)).getOrElse(EmptyForm)
 
-              Ok(views.html.msb.uses_foreign_currencies(form, edit))
-          }
-          case false => Future.successful(NotFound(notFoundView))
+            Ok(views.html.msb.uses_foreign_currencies(form, edit))
         }
       }
   }

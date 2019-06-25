@@ -42,7 +42,7 @@ class SummaryController @Inject()
 
   def get = Authorised.async {
     implicit authContext => implicit request =>
-      dataCache.fetchAll flatMap {
+      dataCache.fetchAll map {
         optionalCache =>
           (for {
             cache <- optionalCache
@@ -50,8 +50,8 @@ class SummaryController @Inject()
             msb <- cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
             register <- cache.getEntry[ServiceChangeRegister](ServiceChangeRegister.key) orElse Some(ServiceChangeRegister())
           } yield {
-            ControllerHelper.allowedToEdit(MsbActivity) map(x => Ok(summary(msb, businessMatching.msbServices, register)))
-          }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+            Ok(summary(msb, businessMatching.msbServices, register))
+          }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
 
