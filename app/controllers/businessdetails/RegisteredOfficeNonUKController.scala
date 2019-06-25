@@ -63,8 +63,7 @@ class RegisteredOfficeNonUKController @Inject ()(
           case f: InvalidForm =>
             Future.successful(BadRequest(registered_office_non_uk(f, edit, autoCompleteService.getCountries)))
           case ValidForm(_, data) =>
-
-            val doUpdate = for {
+            (for {
               businessDetails <- OptionT(dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key))
               _ <- OptionT.liftF(dataCacheConnector.save[BusinessDetails](BusinessDetails.key, businessDetails.registeredOffice(data)))
               status <- OptionT.liftF(statusService.getStatus)
@@ -78,9 +77,7 @@ class RegisteredOfficeNonUKController @Inject ()(
                   case _ => Redirect(routes.ContactingYouController.get(edit))
                 }
               }
-            }
-
-            doUpdate getOrElse InternalServerError("Unable to update registered office")
+            }) getOrElse InternalServerError("Unable to update registered office")
         }
   }
 
