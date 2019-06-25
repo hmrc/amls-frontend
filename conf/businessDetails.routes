@@ -16,8 +16,8 @@ POST        /corporation-tax                                       @controllers.
 GET         /registered-office-address                             @controllers.businessdetails.ConfirmRegisteredOfficeController.get(edit: Boolean ?= false)
 POST        /registered-office-address                             @controllers.businessdetails.ConfirmRegisteredOfficeController.post(edit: Boolean ?= false)
 
-GET         /business-address                                      @controllers.businessdetails.RegisteredOfficeIsUKController.get(edit: Boolean ?= false)
-POST        /business-address                                      @controllers.businessdetails.RegisteredOfficeIsUKController.post(edit: Boolean ?= false)
+GET         /registered-office-country                             @controllers.businessdetails.RegisteredOfficeIsUKController.get(edit: Boolean ?= false)
+POST        /registered-office-country                             @controllers.businessdetails.RegisteredOfficeIsUKController.post(edit: Boolean ?= false)
 
 GET         /registered-office-address-uk                          @controllers.businessdetails.RegisteredOfficeUKController.get(edit: Boolean ?= false)
 POST        /registered-office-address-uk                          @controllers.businessdetails.RegisteredOfficeUKController.post(edit: Boolean ?= false)
