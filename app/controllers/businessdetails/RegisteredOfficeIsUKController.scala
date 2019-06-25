@@ -16,15 +16,11 @@
 
 package controllers.businessdetails
 
-import cats.data.OptionT
-import cats.implicits._
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.businessdetails._
-import services.StatusService
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.DateOfChangeHelper
 import views.html.businessdetails._
@@ -33,8 +29,6 @@ import scala.concurrent.Future
 
 class RegisteredOfficeIsUKController @Inject ()(
                                             val dataCacheConnector: DataCacheConnector,
-                                            val statusService: StatusService,
-                                            val auditConnector: AuditConnector,
                                             val authConnector: AuthConnector
                                             ) extends BaseController with DateOfChangeHelper {
 

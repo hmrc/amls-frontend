@@ -17,22 +17,16 @@
 package controllers.businessdetails
 
 import connectors.DataCacheConnector
+import models.Country
 import models.businessdetails._
-import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import org.jsoup.select.Elements
-import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.StatusService
-import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
-import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks}
 
 import scala.collection.JavaConversions._
@@ -45,40 +39,24 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
 
     val controller = new RegisteredOfficeIsUKController(
       dataCacheConnector = mock[DataCacheConnector],
-      authConnector = self.authConnector,
-      statusService = mock[StatusService],
-      auditConnector = mock[AuditConnector]
+      authConnector = self.authConnector
     )
 
-    when {
-      controller.auditConnector.sendEvent(any())(any(), any())
-    } thenReturn Future.successful(Success)
+    when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
+      .thenReturn(Future.successful(None))
+    val ukAddress = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "AA1 1AA")
+    val nonUKAddress = RegisteredOfficeNonUK("305", "address line", Some("address line2"), Some("address line3"), Country("Albania", "AL"))
   }
-
-  val emptyCache = CacheMap("", Map.empty)
 
   "RegisteredOfficeIsUKController" must {
 
-    val ukAddress = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "AA1 1AA")
-
     "load the where is your registered office or main place of business place page" in new Fixture {
-
-       when(controller.dataCacheConnector.fetch[BusinessDetails](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
       val result = controller.get()(request)
       status(result) must be(OK)
       contentAsString(result) must include (Messages("businessdetails.registeredoffice.title"))
     }
 
-    "successfully submit form and navigate to target page" in new Fixture {
-      when(controller.statusService.getStatus(any(),any(),any()))
-        .thenReturn(Future.successful(SubmissionDecisionRejected))
-      when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(ukAddress), None))))
-      when (controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(emptyCache))
-
+    "successfully submit form and navigate to RegisteredOfficeUK when true and edit false" in new Fixture {
       val newRequest = request.withFormUrlEncodedBody(
         "isUK"-> "true"
       )
@@ -86,25 +64,23 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
       val result = controller.post()(newRequest)
 
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.ContactingYouController.get().url))
-
-      val captor = ArgumentCaptor.forClass(classOf[DataEvent])
-      verify(controller.auditConnector).sendEvent(captor.capture())(any(), any())
-
-      captor.getValue match {
-        case d: DataEvent =>
-          d.detail("isUk") mustBe "true"
-      }
+      redirectLocation(result) must be(Some(routes.RegisteredOfficeUKController.get().url))
     }
 
-    "successfully submit form and navigate to summary page after edit" in new Fixture {
+    "successfully submit form and navigate to RegisteredOfficeNonUK when false and edit false" in new Fixture {
+      val newRequest = request.withFormUrlEncodedBody(
+        "isUK"-> "false"
+      )
 
-      when(controller.statusService.getStatus(any(),any(),any()))
-        .thenReturn(Future.successful(SubmissionDecisionRejected))
+      val result = controller.post()(newRequest)
+
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.RegisteredOfficeNonUKController.get().url))
+    }
+
+    "successfully submit form and navigate to RegisteredOfficeUK when true and edit true and UKAddressSaved" in new Fixture {
       when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(ukAddress), None))))
-      when (controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(emptyCache))
 
       val newRequest = request.withFormUrlEncodedBody(
         "isUK"-> "true"
@@ -113,26 +89,52 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
       val result = controller.post(edit = true)(newRequest)
 
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(routes.RegisteredOfficeUKController.get(edit = true).url))
+    }
 
-      val captor = ArgumentCaptor.forClass(classOf[DataEvent])
-      verify(controller.auditConnector).sendEvent(captor.capture())(any(), any())
+    "successfully submit form and navigate to RegisteredOfficeNonUK when false and edit true and UKAddressSaved" in new Fixture {
+      when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(ukAddress), None))))
 
-      captor.getValue match {
-        case d: DataEvent =>
-          d.detail("isUk") mustBe "true"
-      }
+      val newRequest = request.withFormUrlEncodedBody(
+        "isUK"-> "false"
+      )
+
+      val result = controller.post(edit = true)(newRequest)
+
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.RegisteredOfficeNonUKController.get(edit = true).url))
+    }
+
+    "successfully submit form and navigate to RegisteredOfficeUK when true and edit true and NonUKAddressSaved" in new Fixture {
+      when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(nonUKAddress), None))))
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "isUK"-> "true"
+      )
+
+      val result = controller.post(edit = true)(newRequest)
+
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.RegisteredOfficeUKController.get(edit = true).url))
+    }
+
+    "successfully submit form and navigate to RegisteredOfficeNonUK when false and edit true and NonUKAddressSaved" in new Fixture {
+      when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(nonUKAddress), None))))
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "isUK"-> "false"
+      )
+
+      val result = controller.post(edit = true)(newRequest)
+
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.RegisteredOfficeNonUKController.get(edit = true).url))
     }
 
     "fail submission on invalid isUK" in new Fixture {
-      when(controller.statusService.getStatus(any(),any(),any()))
-        .thenReturn(Future.successful(SubmissionDecisionRejected))
-
-      when(controller.dataCacheConnector.fetch(any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
-      when (controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(emptyCache))
-
       val newRequest = request.withFormUrlEncodedBody(
         "isUK"-> ""
       )
@@ -151,7 +153,6 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
       "form validation fails" in new Fixture {
 
         when(controller.dataCacheConnector.fetch(any())(any(), any(), any())).thenReturn(Future.successful(None))
-        when(controller.dataCacheConnector.save(any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
         val newRequest = request.withFormUrlEncodedBody(
           "isUK" -> "*"
@@ -162,45 +163,6 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
 
       }
 
-    }
-
-    "go to the date of change page" when {
-      "the submission has been approved and isUk has submitted" in new Fixture {
-
-        when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(ukAddress), None))))
-        when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(emptyCache))
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved))
-
-        val newRequest = request.withFormUrlEncodedBody(
-          "isUK" -> "true"
-        )
-
-        val result = controller.post()(newRequest)
-
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.RegisteredOfficeDateOfChangeController.get().url))
-      }
-
-      "status is ready for renewal and isUk has submitted" in new Fixture {
-
-        when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(ukAddress), None))))
-        when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(emptyCache))
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(ReadyForRenewal(None)))
-
-        val newRequest = request.withFormUrlEncodedBody(
-          "isUK" -> "true")
-
-        val result = controller.post()(newRequest)
-
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.RegisteredOfficeDateOfChangeController.get().url))
-      }
     }
 
   }
