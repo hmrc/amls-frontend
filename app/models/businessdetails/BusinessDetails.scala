@@ -16,7 +16,6 @@
 
 package models.businessdetails
 
-import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.api.libs.json.{Json, Reads}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -58,7 +57,11 @@ case class BusinessDetails(
     this.copy(altCorrespondenceAddress = Some(v), hasChanged = hasChanged || !this.altCorrespondenceAddress.contains(v))
 
   def correspondenceAddress(v: CorrespondenceAddress): BusinessDetails =
-    this.copy(correspondenceAddress = Some(v), hasChanged = hasChanged || !this.correspondenceAddress.contains(v), hasAccepted = hasAccepted && this.correspondenceAddress.contains(v))
+    v match {
+      case CorrespondenceAddress(None, None) => this.copy(correspondenceAddress = None, hasChanged = hasChanged || !this.correspondenceAddress.contains(v), hasAccepted = hasAccepted && this.correspondenceAddress.contains(v))
+      case _ => this.copy(correspondenceAddress = Some(v), hasChanged = hasChanged || !this.correspondenceAddress.contains(v), hasAccepted = hasAccepted && this.correspondenceAddress.contains(v))
+    }
+
 
   def isComplete: Boolean =
     this match {
