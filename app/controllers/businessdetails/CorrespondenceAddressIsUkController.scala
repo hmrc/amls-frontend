@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
-import models.businessdetails.{BusinessDetails, CorrespondenceAddressIsUk}
+import models.businessdetails.{BusinessDetails, CorrespondenceAddress, CorrespondenceAddressIsUk}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessdetails._
@@ -50,11 +50,25 @@ class CorrespondenceAddressIsUkController @Inject ()(
     implicit authContext => implicit request => {
       Form2[CorrespondenceAddressIsUk](request.body) match {
         case f: InvalidForm => Future.successful(BadRequest(correspondence_address_is_uk(f, edit)))
-        case ValidForm(_, CorrespondenceAddressIsUk(Some(true))) =>
-          Future.successful(Redirect(routes.CorrespondenceAddressUkController.get(edit)))
-        case ValidForm(_, CorrespondenceAddressIsUk(Some(false))) =>
-          Future.successful(Redirect(routes.CorrespondenceAddressNonUkController.get(edit)))
+        case ValidForm(_, CorrespondenceAddressIsUk(Some(isUk))) =>
+          for {
+            businessDetails <- dataConnector.fetch[BusinessDetails](BusinessDetails.key)
+            _ <- if (isUkHasChanged(businessDetails.correspondenceAddress, isUk = isUk)) { dataConnector.save[BusinessDetails](BusinessDetails.key,
+              businessDetails.correspondenceAddress(CorrespondenceAddress(None, None))) } else { Future.successful(None) }
+          } yield if(isUk) {
+            Redirect(routes.CorrespondenceAddressUkController.get(edit))
+          } else {
+            Redirect(routes.CorrespondenceAddressNonUkController.get(edit))
+          }
       }
+    }
+  }
+
+  def isUkHasChanged(address: Option[CorrespondenceAddress], isUk: Boolean):Boolean = {
+    (address, isUk) match {
+      case (Some(CorrespondenceAddress(Some(_), None)), false) => true
+      case (Some(CorrespondenceAddress(None, Some(_))), true) => true
+      case _ => false
     }
   }
 }
