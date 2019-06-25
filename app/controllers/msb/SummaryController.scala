@@ -50,7 +50,7 @@ class SummaryController @Inject()
             msb <- cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
             register <- cache.getEntry[ServiceChangeRegister](ServiceChangeRegister.key) orElse Some(ServiceChangeRegister())
           } yield {
-            ControllerHelper.allowedToEdit(MsbActivity) map(x => Ok(summary(msb, businessMatching.msbServices, x, register)))
+            ControllerHelper.allowedToEdit(MsbActivity) map(x => Ok(summary(msb, businessMatching.msbServices, register)))
           }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
       }
   }
