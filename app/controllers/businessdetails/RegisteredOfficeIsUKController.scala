@@ -45,7 +45,6 @@ class RegisteredOfficeIsUKController @Inject ()(
               case _: RegisteredOfficeNonUK => Form2[RegisteredOfficeIsUK](RegisteredOfficeIsUK(false))
             }) getOrElse EmptyForm
             Ok(registered_office_is_uk(form, edit))
-
         }
   }
 

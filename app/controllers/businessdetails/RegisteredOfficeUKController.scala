@@ -53,7 +53,6 @@ class RegisteredOfficeUKController @Inject ()(
               registeredOffice <- businessDetails.registeredOffice
             } yield Form2[RegisteredOffice](registeredOffice)) getOrElse EmptyForm
             Ok(registered_office_uk(form, edit))
-
         }
   }
 
