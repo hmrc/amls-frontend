@@ -134,7 +134,7 @@
                         editLinkTag = "businessdetailscorraddress-edit",
                         editUrl = controllers.businessdetails.routes.CorrespondenceAddressIsUkController.get(true).toString
                     ) {
-                        <p>Yes</p>
+                        <p>@Messages("businessdetails.correspondenceaddress.ukAddress")</p>
                     }
 
                     @checkYourAnswers(
@@ -152,7 +152,7 @@
                         editLinkTag = "businessdetailscorraddress-edit",
                         editUrl = controllers.businessdetails.routes.CorrespondenceAddressIsUkController.get(true).toString
                     ) {
-                        <p>No</p>
+                        <p>@Messages("businessdetails.correspondenceaddress.nonUkAddress")</p>
                     }
                     @checkYourAnswers(
                         question = Messages("businessdetails.correspondenceaddress.title"),
@@ -164,12 +164,7 @@
                     }
                 }
             }
-
         }
-
-
-
-
     }
 
     @form(f, controllers.businessdetails.routes.SummaryController.post()) {
