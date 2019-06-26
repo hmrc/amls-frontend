@@ -23,7 +23,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("msb.supply_foreign_currencies.title", "summary.msb")
 }
 
 @main(
@@ -33,57 +32,49 @@
 
     @form(f, controllers.msb.routes.MoneySourcesController.post(edit)) {
 
-
-            @fieldset(
-                f = f("usesForeignCurrencies-fieldset"),
-                legend = "msb.supply_foreign_currencies.title",
-                hint = "lbl.select.all",
-                jsHidden = false,
-                panel = false,
-                legendHidden = true
-            ) {
-                @errorGroup(
-                    field = f("WhoWillSupply")
-                ) {
-                    @checkbox(
-                        f = f("bankMoneySource"),
-                        labelText = "msb.which_currencies.source.banks",
-                        value = "Yes",
-                        target = "[data-reveal='banks']"
-                    )
-                    @input(
-                        field = f("bankNames"),
-                        labelText = "msb.bank.names",
-                        panel = true,
-                        jsHidden = true,
-                        data = "banks"
-                    )
-                    <p></p>
-                    @checkbox(
-                        f = f("wholesalerMoneySource"),
-                        labelText = "msb.which_currencies.source.wholesalers",
-                        value = "Yes",
-                        target = "[data-reveal='wholesalers']"
-                    )
-                    @input(
-                        field = f("wholesalerNames"),
-                        labelText = "msb.wholesaler.names",
-                        panel = true,
-                        jsHidden = true,
-                        data = "wholesalers"
-                    )
-                    <p></p>
-                    @checkbox(
-                        f = f("customerMoneySource"),
-                        labelText = "msb.which_currencies.source.customers",
-                        value = "Yes"
-                    )
-                }
+        @fieldsetWithErrorGroup(
+            f = f("WhoWillSupply"),
+            heading = "msb.supply_foreign_currencies.title",
+            hint = "lbl.select.all",
+            jsHidden = false,
+            panel = false,
+            section = "summary.msb"
+        ) {
+            @checkbox(
+                f = f("bankMoneySource"),
+                labelText = "msb.which_currencies.source.banks",
+                value = "Yes",
+                target = "[data-reveal='banks']"
+            )
+            @input(
+                field = f("bankNames"),
+                labelText = "msb.bank.names",
+                panel = true,
+                jsHidden = true,
+                data = "banks"
+            )
+            <p></p>
+            @checkbox(
+                f = f("wholesalerMoneySource"),
+                labelText = "msb.which_currencies.source.wholesalers",
+                value = "Yes",
+                target = "[data-reveal='wholesalers']"
+            )
+            @input(
+                field = f("wholesalerNames"),
+                labelText = "msb.wholesaler.names",
+                panel = true,
+                jsHidden = true,
+                data = "wholesalers"
+            )
+            <p></p>
+            @checkbox(
+                f = f("customerMoneySource"),
+                labelText = "msb.which_currencies.source.customers",
+                value = "Yes"
+            )
         }
-
-    <div class="clear">
         @submit()
-    </div>
 
     }
 }

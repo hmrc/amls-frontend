@@ -22,7 +22,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("msb.linked.txn.title", "summary.msb")
 }
 
 @main(
@@ -32,29 +31,23 @@
 
     @form(f, controllers.msb.routes.IdentifyLinkedTransactionsController.post(edit)) {
 
-        @fieldset(
-            f = f("linkedTxn-fieldsets"),
-            legend = "msb.linked.txn.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("linkedTxn"),
+            heading = "msb.linked.txn.title",
+            section = "summary.msb",
             panel = false,
             classes = Seq("inline")
         ) {
-            @errorGroup(
-                field = f("linkedTxn")
-            ) {
-                @radio(
-                    f = f("linkedTxn"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true
-                )
-                @radio(
-                    f = f("linkedTxn"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
-            }
+            @radio(
+                f = f("linkedTxn"),
+                labelText = "lbl.yes",
+                value = "true"
+            )
+            @radio(
+                f = f("linkedTxn"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
 
         @submit(edit)

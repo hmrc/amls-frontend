@@ -23,7 +23,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("msb.deal_foreign_currencies.title", "summary.msb")
 }
 
 @main(
@@ -33,32 +32,24 @@
 
     @form(f, controllers.msb.routes.UsesForeignCurrenciesController.post(edit)) {
 
-        @fieldset(
-            f = f("usesForeignCurrencies-fieldset"),
-            legend = Messages("msb.deal_foreign_currencies.title"),
+        @fieldsetWithErrorGroup(
+            f = f("usesForeignCurrencies"),
+            heading = "msb.deal_foreign_currencies.title",
             panel = false,
             classes = Seq("inline form-group"),
-            legendHidden = true
+            section = "summary.msb"
         ) {
-
-            @errorGroup(f("usesForeignCurrencies")) {
-                @radio(
-                    f = f("usesForeignCurrencies"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true
-                )
-
-                @radio(
-                    f = f("usesForeignCurrencies"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
-            }
-            <div class="clear">
-            @submit()
-            </div>
+            @radio(
+                f = f("usesForeignCurrencies"),
+                labelText = "lbl.yes",
+                value = "true"
+            )
+            @radio(
+                f = f("usesForeignCurrencies"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
+        @submit()
     }
 }
