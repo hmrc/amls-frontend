@@ -23,7 +23,10 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessmatching.updateservice.whatdoyoudohere.heading", "summary.updateservice")
+}
+
+@supportingContent = {
+    <p>@Messages("businessmatching.updateservice.whatdoyoudohere.list.heading")</p>
 }
 
 @main(
@@ -31,60 +34,51 @@
     heading = header
 ) {
 
-    <p>@Messages("businessmatching.updateservice.whatdoyoudohere.list.heading")</p>
-
     @form(f, controllers.businessmatching.updateservice.add.routes.WhatDoYouDoHereController.post(edit)) {
 
-        @fieldset(
-            f = f("msbServices-fieldset"),
-            legend = "businessmatching.updateservice.whatdoyoudohere.title",
-            legendHidden = true,
-            panel = false
+        @fieldsetWithErrorGroup(
+            f = f("msbServices"),
+            heading = "businessmatching.updateservice.whatdoyoudohere.title",
+            section = "summary.updateservice",
+            panel = false,
+            supportingContent = supportingContent
         ) {
-
-            @errorGroup(
-                field = f("msbServices")
-            ) {
-
-                @if(msbServiceValues.contains("01")) {
-                    @checkbox(
-                        f = f("msbServices[]"),
-                        labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.01",
-                        value = "01"
-                    )
-                }
-                @if(msbServiceValues.contains("02")) {
-                    @checkbox(
-                        f = f("msbServices[]"),
-                        labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.02",
-                        value = "02"
-                    )
-                }
-                @if(msbServiceValues.contains("05")) {
-                    @checkbox(
-                        f = f("msbServices[]"),
-                        labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.05",
-                        value = "05"
-                    )
-                }
-                @if(msbServiceValues.contains("03")) {
-                    @checkbox(
-                        f = f("msbServices[]"),
-                        labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.03",
-                        value = "03"
-                    )
-                }
-                @if(msbServiceValues.contains("04")) {
-                    @checkbox(
-                        f = f("msbServices[]"),
-                        labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.04",
-                        value = "04"
-                    )
-                }
+            @if(msbServiceValues.contains("01")) {
+                @checkbox(
+                    f = f("msbServices[]"),
+                    labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.01",
+                    value = "01"
+                )
+            }
+            @if(msbServiceValues.contains("02")) {
+                @checkbox(
+                    f = f("msbServices[]"),
+                    labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.02",
+                    value = "02"
+                )
+            }
+            @if(msbServiceValues.contains("05")) {
+                @checkbox(
+                    f = f("msbServices[]"),
+                    labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.05",
+                    value = "05"
+                )
+            }
+            @if(msbServiceValues.contains("03")) {
+                @checkbox(
+                    f = f("msbServices[]"),
+                    labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.03",
+                    value = "03"
+                )
+            }
+            @if(msbServiceValues.contains("04")) {
+                @checkbox(
+                    f = f("msbServices[]"),
+                    labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.04",
+                    value = "04"
+                )
             }
         }
-
         @submit(edit, buttonId = Some("msbServices-submit"), returnLink = false)
-
     }
 }

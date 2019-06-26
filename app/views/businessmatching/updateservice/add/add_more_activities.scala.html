@@ -24,7 +24,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessmatching.updateservice.addmoreactivities.heading", "summary.updateservice")
 }
 
 @main(
@@ -32,33 +31,26 @@
     heading = header
 )  {
 
-    @current_business_types(existing)
 
     @form(f, controllers.businessmatching.updateservice.add.routes.AddMoreBusinessTypesController.post()) {
 
-        @fieldset(
-            f = f("addmoreactivities-fieldset"),
-            legend = Messages("businessmatching.updateservice.addmoreactivities.heading"),
-            legendHidden = true,
-            panel = false
+        @fieldsetWithErrorGroup(
+            f = f("addmoreactivities"),
+            heading = "businessmatching.updateservice.addmoreactivities.heading",
+            section = "summary.updateservice",
+            panel = false,
+            supportingContent = current_business_types(existing)
         ) {
-
-            @errorGroup(
-                field = f("addmoreactivities")
-            ) {
-                @radio(
-                    f = f("addmoreactivities"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true
-                )
-                @radio(
-                    f = f("addmoreactivities"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
-            }
+            @radio(
+                f = f("addmoreactivities"),
+                labelText = "lbl.yes",
+                value = "true"
+            )
+            @radio(
+                f = f("addmoreactivities"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
         @submit(buttonMessageKey = Some("button.continue"), returnLink = false, buttonId = Some("addmoreactivities-submit"))
     }

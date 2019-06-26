@@ -23,7 +23,10 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessmatching.updateservice.fitandproper.heading", "summary.updateservice")
+}
+
+@supportingContent = {
+    <p>@Messages("businessmatching.updateservice.fitandproper.info.no.fees")</p>
 }
 
 @main(
@@ -31,34 +34,26 @@
     heading = header
 )  {
 
-    <p>@Messages("businessmatching.updateservice.fitandproper.info.no.fees")</p>
-
     @form(f, controllers.businessmatching.updateservice.add.routes.FitAndProperController.post(edit)) {
 
-        @fieldset(
-            f = f("passedFitAndProper-fieldset"),
-            legend = Messages("businessmatching.updateservice.fitandproper.heading"),
-            legendHidden = true,
-            panel = false
+        @fieldsetWithErrorGroup(
+            f = f("passedFitAndProper"),
+            heading = "businessmatching.updateservice.fitandproper.heading",
+            section = "summary.updateservice",
+            panel = false,
+            supportingContent = supportingContent
+
         ) {
-
-            @errorGroup(
-                field = f("passedFitAndProper")
-            ) {
-                @radio(
-                    f = f("passedFitAndProper"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true
-                )
-                @radio(
-                    f = f("passedFitAndProper"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
-            }
-
+            @radio(
+                f = f("passedFitAndProper"),
+                labelText = "lbl.yes",
+                value = "true"
+            )
+            @radio(
+                f = f("passedFitAndProper"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
 
         <p></p>
@@ -78,5 +73,4 @@
         @submit(returnLink = false, buttonId = Some("fitandproper-submit"))
 
     }
-
 }
