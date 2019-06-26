@@ -925,6 +925,7 @@ button.checkyouranswers.acceptandaddbankaccount = Accept and add this bank accou
 button.checkyouranswers.acceptandcontinue = Accept and continue
 button.summary.acceptandcomplete = Accept and complete section
 summary.linetext = Please check all the information you have provided.
+button.checkyouranswers.tradingpremises = Accept and add this trading premises
 
 changeservices.title = What do you want to do?
 changeservices.choice.add = Register another service
