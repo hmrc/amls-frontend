@@ -20,12 +20,11 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
-import models.businessmatching.{BusinessMatching, CurrencyExchange, ForeignExchange, MoneyServiceBusiness => MsbActivity}
+import models.businessmatching.{BusinessMatching, ForeignExchange}
 import models.moneyservicebusiness._
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
 
 import scala.concurrent.Future
 

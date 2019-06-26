@@ -19,7 +19,7 @@ package controllers.msb
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import models.moneyservicebusiness._
-import models.status.{NotCompleted, SubmissionDecisionApproved}
+import models.status.NotCompleted
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
