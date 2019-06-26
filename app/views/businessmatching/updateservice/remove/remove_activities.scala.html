@@ -21,40 +21,36 @@
 
 @(f: Form2[_], edit: Boolean, activityValues: Seq[String])(implicit request: Request[_],m:Messages, lang: Lang)
 
-    @header = {
+@header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessmatching.updateservice.removeactivities.heading", "summary.updateservice")
-    }
+}
 
-    @main(
-        title = Messages("businessmatching.updateservice.removeactivities.title") + " - " + Messages("summary.updateservice"),
-        heading = header
-    ) {
-        <p>@Messages("businessmatching.updateservice.removeactivities.summary")</p>
-        <p>@Messages("businessmatching.updateservice.removeactivities.list.heading")</p>
+@supportingContent = {
+    <p>@Messages("businessmatching.updateservice.removeactivities.summary")</p>
+    <p>@Messages("businessmatching.updateservice.removeactivities.list.heading")</p>
+}
+
+@main(
+    title = Messages("businessmatching.updateservice.removeactivities.title") + " - " + Messages("summary.updateservice"),
+    heading = header
+) {
 
     @form(f, controllers.businessmatching.updateservice.remove.routes.RemoveBusinessTypesController.post(edit)) {
 
-            <div class="form-group">
-            @fieldset(
-                f = f("businessActivities-fieldset"),
-                legend = "businessmatching.updateservice.removeactivities.title",
-                legendHidden = true,
-                panel = false
-            ) {
-                @errorGroup(
-                    field = f("businessActivities")
-                ) {
-                    @{activityValues map (value => checkbox(
-                        f = f("businessActivities[]"),
-                        labelText = s"businessmatching.registerservices.servicename.lbl.$value",
-                        value = value
-                    ))}
-                }
-            }
-            </div>
-
-            @submit(returnLink = false, buttonMessageKey = Some("businessmatching.updateservice.removeactivities.button"), buttonId = Some("removeactivities-submit"))
+        @fieldsetWithErrorGroup(
+            f = f("businessActivities"),
+            heading = "businessmatching.updateservice.removeactivities.title",
+            section = "summary.updateservice",
+            panel = false,
+            supportingContent = supportingContent
+        ) {
+            @{activityValues map (value => checkbox(
+                f = f("businessActivities[]"),
+                labelText = s"businessmatching.registerservices.servicename.lbl.$value",
+                value = value
+            ))}
         }
+        @submit(returnLink = false, buttonMessageKey = Some("businessmatching.updateservice.removeactivities.button"), buttonId = Some("removeactivities-submit"))
     }
+}

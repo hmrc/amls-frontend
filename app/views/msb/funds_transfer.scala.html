@@ -22,7 +22,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("msb.fundstransfer.title", "summary.msb")
 }
 
 @main(
@@ -32,29 +31,23 @@
 
     @form(f, controllers.msb.routes.FundsTransferController.post(edit)) {
 
-        @fieldset(
-            f = f("transferWithoutFormalSystems-fieldset"),
-            legend = "msb.fundstransfer.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("transferWithoutFormalSystems"),
+            heading = "msb.fundstransfer.title",
+            section = "summary.msb",
             panel = false,
             classes = Seq("inline")
         ) {
-            @errorGroup(
-                field = f("transferWithoutFormalSystems")
-            ) {
-                @radio(
-                    f = f("transferWithoutFormalSystems"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true
-                )
-                @radio(
-                    f = f("transferWithoutFormalSystems"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
-            }
+            @radio(
+                f = f("transferWithoutFormalSystems"),
+                labelText = "lbl.yes",
+                value = "true"
+            )
+            @radio(
+                f = f("transferWithoutFormalSystems"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
 
         @submit()

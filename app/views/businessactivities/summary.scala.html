@@ -181,10 +181,10 @@
                 question = Messages("businessactivities.document.riskassessment.policy.title"),
                 editUrl = controllers.businessactivities.routes.DocumentRiskAssessmentController.get(true).toString
             ) {
-                <ul class="list list--comma">
-                @v.map {
-                        case Digital => { <p>@Messages("businessactivities.RiskAssessmentType.lbl.02")</p> }
-                        case PaperBased => { <p>@Messages("businessactivities.RiskAssessmentType.lbl.01")</p> }
+                <ul class="list list-bullet">
+                    @v.map {
+                        case Digital => { <li>@Messages("businessactivities.RiskAssessmentType.lbl.02")</li> }
+                        case PaperBased => { <li>@Messages("businessactivities.RiskAssessmentType.lbl.01")</li> }
                     }
                 </ul>
             }

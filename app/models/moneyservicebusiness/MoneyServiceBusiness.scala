@@ -16,7 +16,6 @@
 
 package models.moneyservicebusiness
 
-import config.ApplicationConfig
 import models.businessmatching.{BusinessMatching, CurrencyExchange, ForeignExchange, TransmittingMoney}
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.api.libs.json._

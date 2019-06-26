@@ -21,23 +21,47 @@
 
 @(f: forms.Form2[_], edit: Boolean, responsiblePeople: Seq[(ResponsiblePerson, Int)])(implicit request: Request[_], m:Messages)
 
-    @header = {
-        @components.back_link()
-        @errorSummary(f)
-        @heading("businessmatching.updateservice.whichfitandproper.heading", "summary.updateservice")
+@header = {
+    @components.back_link()
+    @errorSummary(f)
+}
+
+@supportingContent = {
+    <p>@Messages("businessmatching.updateservice.whichfitandproper.hint")</p>
+}
+
+@main(
+    title = Messages("businessmatching.updateservice.whichfitandproper.title") + " - " + Messages("summary.updateservice"),
+    heading = header
+)  {
+
+    @form(f, controllers.businessmatching.updateservice.add.routes.WhichFitAndProperController.post(edit)) {
+
+        @fieldsetWithErrorGroup(
+            f = f("responsiblePeople"),
+            heading = "businessmatching.updateservice.whichfitandproper.heading",
+            section = "summary.updateservice",
+            panel = false,
+            supportingContent = supportingContent
+        ) {
+            @responsiblePeople.map{ case (rp, index) =>
+                @checkbox(f = f("responsiblePeople[]"), labelText = rp.personName.fold("")(_.fullName), value = index.toString)
+            }
+        }
+
+        <p></p>
+
+        @detailsSummary(
+            summary = Messages("businessmatching.updateservice.whichfitandproper.text.info")
+        ) {
+            @panel(
+                jsHidden = false,
+                wide = false
+            ) {
+                <p>@Messages("businessmatching.updateservice.whichfitandproper.text.info.line1")</p>
+                <p>@Messages("businessmatching.updateservice.whichfitandproper.text.info.line2")</p>
+            }
+        }
+        @submit(returnLink = false, buttonId = Some("whichfitandproper-submit"))
     }
-
-    @main(
-        title = Messages("businessmatching.updateservice.whichfitandproper.title") + " - " + Messages("summary.updateservice"),
-        heading = header
-    )  {
-
-        @responsible_people(
-            f,
-            responsiblePeople,
-            "heading",
-            controllers.businessmatching.updateservice.add.routes.WhichFitAndProperController.post(edit),
-            id = Some("whichfitandproper")
-        )
-
 }

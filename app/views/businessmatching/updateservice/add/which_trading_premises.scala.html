@@ -30,7 +30,10 @@
 @header = {
     @components.back_link()
     @errorSummaryWithPlaceholder(f, Messages(s"businessmatching.registerservices.servicename.lbl.$activity.phrased"))
-    @heading(pageHeading, "summary.updateservice")
+}
+
+@supportingContent = {
+    <p>@Messages("lbl.select.all")</p>
 }
 
 @main(
@@ -38,12 +41,21 @@
     heading = header
 ) {
 
-    @trading_premises(
-        f,
-        tradingPremises,
-        pageHeading,
-        controllers.businessmatching.updateservice.add.routes.WhichTradingPremisesController.post(),
-        Some(Messages(s"businessmatching.registerservices.servicename.lbl.$activity.phrased")),
-        id = Some("whichtradingpremises")
-    )
+    @form(f, controllers.businessmatching.updateservice.add.routes.WhichTradingPremisesController.post()) {
+
+        @fieldsetWithErrorGroup(
+            f = f("tradingPremises"),
+            heading = pageHeading,
+            section = "summary.updateservice",
+            panel = false,
+            supportingContent = supportingContent,
+            errorGroupPlaceholder = Messages(s"businessmatching.registerservices.servicename.lbl.$activity.phrased")
+        ) {
+            @tradingPremises.map{ case (tp, index) =>
+                @checkbox(f = f("tradingPremises[]"), labelText = tp.label.getOrElse(index.toString), value = index.toString)
+            }
+        }
+
+        @submit(returnLink = false, buttonId = Some("whichtradingpremises-submit"))
+    }
 }
