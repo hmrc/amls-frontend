@@ -25,7 +25,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessdetails.confirmingyouraddress.title", "summary.businessdetails")
 }
 
 @main(
@@ -35,33 +34,24 @@
 
     @form(f, controllers.businessdetails.routes.ConfirmRegisteredOfficeController.post(edit)) {
 
-        @registered_office_helper(model)
-
-        @fieldset(
-            f = f("confirmingyouraddress-fieldset"),
-            legend = "businessdetails.confirmingyouraddress.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("isRegOfficeOrMainPlaceOfBusiness"),
+            heading = "businessdetails.confirmingyouraddress.title",
+            section = "summary.businessdetails",
+            supportingContent = registered_office_helper(model),
             panel = false,
             classes = Seq("inline")
         ) {
-
-            @errorGroup(
-                field = f("isRegOfficeOrMainPlaceOfBusiness")
-            ) {
-
-                @radio(
-                    f = f("isRegOfficeOrMainPlaceOfBusiness"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true
-                )
-                @radio(
-                    f = f("isRegOfficeOrMainPlaceOfBusiness"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
-            }
+            @radio(
+                f = f("isRegOfficeOrMainPlaceOfBusiness"),
+                labelText = "lbl.yes",
+                value = "true"
+            )
+            @radio(
+                f = f("isRegOfficeOrMainPlaceOfBusiness"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
 
         @submit(edit)

@@ -18,65 +18,86 @@
 @import forms2._
 @import models.businessmatching.{BusinessType, BusinessMatching}
 
-@(f: forms.Form2[_], businessType: BusinessType, displayNominatedOfficer: Boolean, isDeclaration: Boolean)(implicit lang:Lang, m:Messages)
+@(
+    f: forms.Form2[_],
+    businessType: BusinessType,
+    displayNominatedOfficer: Boolean,
+    isDeclaration: Boolean,
+    heading: String = "",
+    section: String = "",
+    hint: String = ""
+)(implicit request: Request[_],m:Messages, lang: Lang)
 
-<div class="form-group">
+@content = {
+    @businessType match {
+        case BusinessType.SoleProprietor => {
+            @if(isDeclaration) {  @roles_within_business_checkbox(f, "08") }
+            @if(displayNominatedOfficer) { @roles_within_business_checkbox(f, "04") }
+            @roles_within_business_checkbox(f, "06")
+        }
+        case BusinessType.Partnership => {
+            @if(isDeclaration) {  @roles_within_business_checkbox(f, "08") }
+            @if(displayNominatedOfficer) { @roles_within_business_checkbox(f, "04") }
+            @roles_within_business_checkbox(f, "05")
+        }
+        case (BusinessType.LimitedCompany) => {
+            @if(isDeclaration){
+                @checkbox(
+                    f = f("positions[]"),
+                    labelText = "declaration.addperson.lbl.01",
+                    value = "01"
+                )
+            } else {  @roles_within_business_checkbox(f, "01") }
+            @if(businessType == BusinessType.LPrLLP) { @roles_within_business_checkbox(f, "07")  }
+            @roles_within_business_checkbox(f, "02")
+            @if(isDeclaration) {  @roles_within_business_checkbox(f, "08") }
+            @if(displayNominatedOfficer) { @roles_within_business_checkbox(f, "04") }
+        }
+        case BusinessType.LPrLLP => {
+            @roles_within_business_checkbox(f, "07")
+            @if(isDeclaration) {  @roles_within_business_checkbox(f, "08") }
+            @if(displayNominatedOfficer) { @roles_within_business_checkbox(f, "04") }
+        }
+        case BusinessType.UnincorporatedBody => {
+            @if(isDeclaration) {  @roles_within_business_checkbox(f, "08") }
+            @if(displayNominatedOfficer) { @roles_within_business_checkbox(f, "04") }
+        }
+    }
+
+    @checkbox(
+        f = f("positions[]"),
+        labelText = "responsiblepeople.position_within_business.lbl.09",
+        value = "other",
+        target = "[data-reveal='other-position']"
+    )
+
+    @input(
+        field = f("otherPosition"),
+        labelText = "responsiblepeople.position_within_business.other_position.lbl",
+        data = "other-position",
+        panel = true,
+        jsHidden = true
+    )
+}
+
+@if(heading.nonEmpty) {
+    @fieldsetWithErrorGroup(
+        f = f("positions"),
+        heading = heading,
+        section = section,
+        hint = hint,
+        panel = false
+    ) {
+        @content
+    }
+} else {
     @fieldset(
         f = f("positions"),
         legend = "responsiblepeople.position_within_business.title",
         legendHidden = true,
         panel = false
     ) {
-        @businessType match {
-            case BusinessType.SoleProprietor => {
-                @if(isDeclaration) {  @roles_within_business_checkbox(f, "08") }
-                @if(displayNominatedOfficer) { @roles_within_business_checkbox(f, "04") }
-                @roles_within_business_checkbox(f, "06")
-            }
-            case BusinessType.Partnership => {
-                @if(isDeclaration) {  @roles_within_business_checkbox(f, "08") }
-                @if(displayNominatedOfficer) { @roles_within_business_checkbox(f, "04") }
-                @roles_within_business_checkbox(f, "05")
-            }
-            case (BusinessType.LimitedCompany) => {
-                @if(isDeclaration){
-                    @checkbox(
-                        f = f("positions[]"),
-                        labelText = "declaration.addperson.lbl.01",
-                        value = "01"
-                    )
-                } else {  @roles_within_business_checkbox(f, "01") }
-                @if(businessType == BusinessType.LPrLLP) { @roles_within_business_checkbox(f, "07")  }
-                @roles_within_business_checkbox(f, "02")
-                @if(isDeclaration) {  @roles_within_business_checkbox(f, "08") }
-                @if(displayNominatedOfficer) { @roles_within_business_checkbox(f, "04") }
-            }
-            case BusinessType.LPrLLP => {
-                @roles_within_business_checkbox(f, "07")
-                @if(isDeclaration) {  @roles_within_business_checkbox(f, "08") }
-                @if(displayNominatedOfficer) { @roles_within_business_checkbox(f, "04") }
-            }
-            case BusinessType.UnincorporatedBody => {
-                @if(isDeclaration) {  @roles_within_business_checkbox(f, "08") }
-                @if(displayNominatedOfficer) { @roles_within_business_checkbox(f, "04") }
-            }
-        }
-
-        @checkbox(
-            f = f("positions[]"),
-            labelText = "responsiblepeople.position_within_business.lbl.09",
-            value = "other",
-            target = "#otherPosition-fieldset"
-        )
-
-        @fieldset(
-            f = f("otherPosition-fieldset"),
-            legend = "responsiblepeople.position_within_business.other_position.lbl",
-            jsHidden = false
-        ) {
-            @input(
-                field = f("otherPosition")
-            )
-        }
+        @content
     }
-</div>
+}
+
