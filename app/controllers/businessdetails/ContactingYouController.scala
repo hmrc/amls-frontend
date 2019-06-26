@@ -41,7 +41,7 @@ class ContactingYouController @Inject () (
         businessDetails <-
         dataCache.fetch[BusinessDetails](BusinessDetails.key)
       } yield businessDetails match {
-        case Some(BusinessDetails(_,_, _, _, Some(details), _, _, _, _, _)) if details.email.isDefined =>
+        case Some(BusinessDetails(_,_, _, _, Some(details), _,  _, _, _, _, _)) if details.email.isDefined =>
           Ok(contacting_you(Form2[ContactingYouEmail](ContactingYouEmail(
             Some(details.email.getOrElse("")),
             Some(details.email.getOrElse("")))),
