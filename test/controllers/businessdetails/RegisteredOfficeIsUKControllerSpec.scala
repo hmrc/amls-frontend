@@ -80,7 +80,7 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
 
     "successfully submit form and navigate to RegisteredOfficeUK when true and edit true and UKAddressSaved" in new Fixture {
       when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(ukAddress), None))))
+        .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, None, Some(ukAddress), None))))
 
       val newRequest = request.withFormUrlEncodedBody(
         "isUK"-> "true"
@@ -94,7 +94,7 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
 
     "successfully submit form and navigate to RegisteredOfficeNonUK when false and edit true and UKAddressSaved" in new Fixture {
       when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(ukAddress), None))))
+        .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, None, Some(ukAddress), None))))
 
       val newRequest = request.withFormUrlEncodedBody(
         "isUK"-> "false"
@@ -108,7 +108,7 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
 
     "successfully submit form and navigate to RegisteredOfficeUK when true and edit true and NonUKAddressSaved" in new Fixture {
       when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(nonUKAddress), None))))
+        .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, None, Some(nonUKAddress), None))))
 
       val newRequest = request.withFormUrlEncodedBody(
         "isUK"-> "true"
@@ -122,7 +122,7 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
 
     "successfully submit form and navigate to RegisteredOfficeNonUK when false and edit true and NonUKAddressSaved" in new Fixture {
       when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(nonUKAddress), None))))
+        .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, None, Some(nonUKAddress), None))))
 
       val newRequest = request.withFormUrlEncodedBody(
         "isUK"-> "false"

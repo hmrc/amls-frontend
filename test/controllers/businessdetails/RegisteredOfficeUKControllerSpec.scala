@@ -79,7 +79,7 @@ class RegisteredOfficeUKControllerSpec extends AmlsSpec with  MockitoSugar{
     "pre select uk when not in edit mode" in new Fixture {
 
       when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any())).
-        thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(ukAddress), None))))
+        thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, None, Some(ukAddress), None))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -93,7 +93,7 @@ class RegisteredOfficeUKControllerSpec extends AmlsSpec with  MockitoSugar{
       when(controller.statusService.getStatus(any(),any(),any()))
         .thenReturn(Future.successful(SubmissionDecisionRejected))
       when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(BusinessDetails(None, None, None, None, None, Some(ukAddress), None))))
+        .thenReturn(Future.successful(Some(BusinessDetails(None, None, None, None, None, None, Some(ukAddress), None))))
 
       val result = controller.get(true)(request)
       status(result) must be(OK)
@@ -104,7 +104,7 @@ class RegisteredOfficeUKControllerSpec extends AmlsSpec with  MockitoSugar{
       when(controller.statusService.getStatus(any(),any(),any()))
         .thenReturn(Future.successful(SubmissionDecisionRejected))
       when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(ukAddress), None))))
+        .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, None, Some(ukAddress), None))))
       when (controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
@@ -137,7 +137,7 @@ class RegisteredOfficeUKControllerSpec extends AmlsSpec with  MockitoSugar{
       when(controller.statusService.getStatus(any(),any(),any()))
         .thenReturn(Future.successful(SubmissionDecisionRejected))
       when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(ukAddress), None))))
+        .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, None, Some(ukAddress), None))))
       when (controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
@@ -221,7 +221,7 @@ class RegisteredOfficeUKControllerSpec extends AmlsSpec with  MockitoSugar{
       "the submission has been approved and registeredOffice has changed" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(ukAddress), None))))
+          .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, None, Some(ukAddress), None))))
         when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
         when(controller.statusService.getStatus(any(), any(), any()))
@@ -244,7 +244,7 @@ class RegisteredOfficeUKControllerSpec extends AmlsSpec with  MockitoSugar{
       "status is ready for renewal and registeredOffice has changed" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(ukAddress), None))))
+          .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, None, Some(ukAddress), None))))
         when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
         when(controller.statusService.getStatus(any(), any(), any()))

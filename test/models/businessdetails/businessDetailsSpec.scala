@@ -166,35 +166,35 @@ class businessDetailsSpec extends AmlsSpec {
     "Merged with previously registered with MLR" must {
       "return BusinessDetails with correct previously registered for MLR option" in {
         val result = initial.previouslyRegistered(previouslyRegistered)
-        result must be (BusinessDetails(Some(previouslyRegistered), None, None, None, None, None, None, None, true))
+        result must be (BusinessDetails(Some(previouslyRegistered), None, None, None, None, None, None, None, None, true))
       }
     }
 
     "Merged with RegisteredForVAT" must {
       "return BusinessDetails with correct VAT Registered option" in {
         val result = initial.vatRegistered(regForVAT)
-        result must be (BusinessDetails(None, None, Some(regForVAT), None, None, None, None, None, true))
+        result must be (BusinessDetails(None, None, Some(regForVAT), None, None, None, None, None, None, true))
       }
     }
 
     "Merged with CorporationTaxRegistered" must {
       "return BusinessDetails with correct corporation tax registered option" in {
         val result = initial.corporationTaxRegistered(regForCorpTax)
-        result must be (BusinessDetails(None, None, None, Some(regForCorpTax), None, None, None, None, true))
+        result must be (BusinessDetails(None, None, None, Some(regForCorpTax), None, None, None, None, None, true))
       }
     }
 
     "Merged with RegisteredOfficeOrMainPlaceOfBusiness" must {
       "return BusinessDetails with correct registeredOfficeOrMainPlaceOfBusiness" in {
         val result = initial.registeredOffice(regOfficeOrMainPlaceUK)
-        result must be (BusinessDetails(None, None, None, None, None, Some(regOfficeOrMainPlaceUK), None, None, true))
+        result must be (BusinessDetails(None, None, None, None, None, None, Some(regOfficeOrMainPlaceUK), None, None, true))
       }
     }
 
     "Merged with UKCorrespondenceAddress" must {
       "return BusinessDetails with correct UKCorrespondenceAddress" in {
         val result = initial.correspondenceAddress(uKCorrespondenceAddress)
-        result must be (BusinessDetails(None, None, None, None, None, None, None, Some(uKCorrespondenceAddress), true))
+        result must be (BusinessDetails(None, None, None, None, None, None, None, None, Some(uKCorrespondenceAddress), true))
       }
     }
   }

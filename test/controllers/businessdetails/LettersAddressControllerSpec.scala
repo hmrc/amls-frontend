@@ -46,7 +46,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar {
   }
 
   private val ukAddress = RegisteredOfficeUK("line_1", "line_2", Some(""), Some(""), "AA1 1AA")
-  private val businessDetails = BusinessDetails(None, None, None, None, None, Some(ukAddress), None)
+  private val businessDetails = BusinessDetails(None, None, None, None, None, None, Some(ukAddress), None)
 
   "ConfirmRegisteredOfficeController" must {
 

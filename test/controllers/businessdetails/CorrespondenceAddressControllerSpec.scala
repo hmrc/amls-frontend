@@ -71,7 +71,7 @@ class CorrespondenceAddressControllerSpec extends AmlsSpec with MockitoSugar wit
       "data exists in the keystore" in new Fixture {
 
         val correspondenceAddress = NonUKCorrespondenceAddress("Name Test", "Test", "Test", "Test", Some("test"), None, Country("Albania", "AL"))
-        val businessDetails = BusinessDetails(None, None, None, None, None,None, None, Some(correspondenceAddress))
+        val businessDetails = BusinessDetails(None, None, None, None, None, None, None, None, Some(correspondenceAddress))
 
         when(controller.dataConnector.fetch[BusinessDetails](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(businessDetails)))
@@ -114,7 +114,7 @@ class CorrespondenceAddressControllerSpec extends AmlsSpec with MockitoSugar wit
 
         val address = UKCorrespondenceAddress("Test", "Test", "old line 1", "old line 2", Some("old line 3"), None, "AA1 1AA")
 
-        val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, Some(address))))
+        val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, Some(address))))
 
         val newRequest = request.withFormUrlEncodedBody(
           "yourName" -> "Name",
@@ -152,7 +152,7 @@ class CorrespondenceAddressControllerSpec extends AmlsSpec with MockitoSugar wit
 
         val address = UKCorrespondenceAddress("Test", "Test", "old line 1", "old line 2", Some("old line 3"), None, "AA1 1AA")
 
-        val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, Some(address))))
+        val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, Some(address))))
 
         val newRequest = request.withFormUrlEncodedBody(
           "yourName" -> "Name",

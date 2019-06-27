@@ -81,6 +81,7 @@ class summarySpec extends AmlsSpec
           Some(VATRegisteredYes("2345")),
           Some(CorporationTaxRegisteredYes("3456")),
           Some(ContactingYou(Some("01234567890"), Some("test@test.com"))),
+          Some(RegisteredOfficeIsUK(true)),
           Some(RegisteredOfficeUK("line1","line2",Some("line3"),Some("line4"),"AB12CD")),
           Some(true),
           Some(UKCorrespondenceAddress("your name", "business name","line1","line2",Some("line3"),Some("line4"),"AB12CD")),
