@@ -38,7 +38,7 @@ class correspondence_addressIsUkSpec extends AmlsSpec with MustMatchers  {
   "correspondence_address view" must {
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[CorrespondenceAddressIsUk] = Form2(CorrespondenceAddressIsUk(None))
+      val form2: ValidForm[CorrespondenceAddressIsUk] = Form2(CorrespondenceAddressIsUk(true))
 
       def view = views.html.businessdetails.correspondence_address_is_uk(form2, true)
 
@@ -47,7 +47,7 @@ class correspondence_addressIsUkSpec extends AmlsSpec with MustMatchers  {
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[CorrespondenceAddressIsUk] = Form2(CorrespondenceAddressIsUk(None))
+      val form2: ValidForm[CorrespondenceAddressIsUk] = Form2(CorrespondenceAddressIsUk(true))
 
       def view = views.html.businessdetails.correspondence_address_is_uk(form2, true)
 

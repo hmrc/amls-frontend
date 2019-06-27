@@ -91,7 +91,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
     "return a cachmap with the saved alternative correspondence address - true" in {
       val correspondenceAddress = CorrespondenceAddressNonUk("Name Test", "Test", "Test", "Test", Some("test"), None, Country("Albania", "AL"))
-      val businessDetails = BusinessDetails(None, None, None, None, None,None, None, Some(CorrespondenceAddressIsUk(Some(false))), Some(CorrespondenceAddress(None, Some(correspondenceAddress))))
+      val businessDetails = BusinessDetails(None, None, None, None, None,None, None, Some(CorrespondenceAddressIsUk(false)), Some(CorrespondenceAddress(None, Some(correspondenceAddress))))
 
       implicit val r = FakeRequest()
 

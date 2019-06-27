@@ -19,7 +19,7 @@ package controllers.businessdetails
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessdetails.{BusinessDetails, CorrespondenceAddress, CorrespondenceAddressIsUk}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -37,10 +37,11 @@ class CorrespondenceAddressIsUkController @Inject ()(
     implicit authContext => implicit request =>
       dataConnector.fetch[BusinessDetails](BusinessDetails.key) map {
         response => {
-          val isUk: Option[Boolean] = response.flatMap(businessDetails =>
-            businessDetails.correspondenceAddressIsUk.flatMap(isUk => isUk.isUk)
+          response.flatMap(businessDetails =>
+            businessDetails.correspondenceAddressIsUk.map(isUk => isUk.isUk)
               .orElse(businessDetails.correspondenceAddress.flatMap(ca => ca.isUk)))
-          Ok(correspondence_address_is_uk(Form2[CorrespondenceAddressIsUk](CorrespondenceAddressIsUk(isUk)), edit))
+            .map(isUk => Ok(correspondence_address_is_uk(Form2[CorrespondenceAddressIsUk](CorrespondenceAddressIsUk(isUk)), edit)) )
+            .getOrElse(Ok(correspondence_address_is_uk(EmptyForm, edit)))
         }
       }
   }
@@ -56,8 +57,8 @@ class CorrespondenceAddressIsUkController @Inject ()(
             _ <- if (isUkHasChanged(businessDetails.correspondenceAddress, isUk = isUk)) { dataConnector.save[BusinessDetails](BusinessDetails.key,
               businessDetails.correspondenceAddress(CorrespondenceAddress(None, None))) } else { Future.successful(None) }
           } yield isUk match {
-            case CorrespondenceAddressIsUk(Some(true)) => Redirect(routes.CorrespondenceAddressUkController.get(edit))
-            case CorrespondenceAddressIsUk(Some(false)) => Redirect(routes.CorrespondenceAddressNonUkController.get(edit))
+            case CorrespondenceAddressIsUk(true) => Redirect(routes.CorrespondenceAddressUkController.get(edit))
+            case CorrespondenceAddressIsUk(false) => Redirect(routes.CorrespondenceAddressNonUkController.get(edit))
           }
       }
     }
@@ -65,8 +66,8 @@ class CorrespondenceAddressIsUkController @Inject ()(
 
   def isUkHasChanged(address: Option[CorrespondenceAddress], isUk: CorrespondenceAddressIsUk):Boolean = {
     (address, isUk) match {
-      case (Some(CorrespondenceAddress(Some(_), None)), CorrespondenceAddressIsUk(Some(false))) => true
-      case (Some(CorrespondenceAddress(None, Some(_))), CorrespondenceAddressIsUk(Some(true))) => true
+      case (Some(CorrespondenceAddress(Some(_), None)), CorrespondenceAddressIsUk(false)) => true
+      case (Some(CorrespondenceAddress(None, Some(_))), CorrespondenceAddressIsUk(true)) => true
       case _ => false
     }
   }

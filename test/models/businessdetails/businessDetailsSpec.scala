@@ -43,6 +43,8 @@ class businessDetailsSpec extends AmlsSpec {
 
   val regOfficeOrMainPlaceUK =  RegisteredOfficeUK("38B", "line2", None, None, "AA1 1AA")
 
+  val correspondenceAddressIsUk = CorrespondenceAddressIsUk(true)
+
   val correspondenceAddressUk = CorrespondenceAddressUk("Name",
     "Business Name",
     "address 1",
@@ -50,6 +52,8 @@ class businessDetailsSpec extends AmlsSpec {
     Some("address 3"),
     Some("address 4"),
     "AA11 1AA")
+
+  val correspondenceAddress = CorrespondenceAddress(Some(correspondenceAddressUk), None)
 
   val completeModel = BusinessDetails(
     previouslyRegistered = Some(previouslyRegistered),
@@ -59,7 +63,7 @@ class businessDetailsSpec extends AmlsSpec {
     contactingYou = Some(contactingYou),
     registeredOffice = Some(regOfficeOrMainPlaceUK),
     altCorrespondenceAddress = Some(true),
-    correspondenceAddress = Some(CorrespondenceAddress(Some(correspondenceAddressUk), None)),
+    correspondenceAddress = Some(correspondenceAddress),
     hasAccepted = true
   )
 
@@ -307,6 +311,41 @@ class businessDetailsSpec extends AmlsSpec {
         }
       }
     }
+
+    "correspondenceAddressIsUk value is not set" when {
+
+      "correspondenceIsUk value is then set" must {
+        "set the hasChanged & correspondenceAddressIsUk properties" in {
+          val res = completeModel.correspondenceAddressIsUk(CorrespondenceAddressIsUk(true))
+          res.correspondenceAddressIsUk must be (Some(CorrespondenceAddressIsUk(true)))
+          res.hasChanged must be (true)
+        }
+      }
+
+    }
+
+    "correspondenceAddressIsUk value is set" when {
+      "is the same" must {
+        "not set the hasChanged & correspondenceAddressIsUk properties" in {
+          val model = completeModel.copy(correspondenceAddressIsUk = Some(CorrespondenceAddressIsUk(true)))
+          val res = model.correspondenceAddressIsUk(CorrespondenceAddressIsUk(true))
+          res.hasChanged must be (false)
+          res.correspondenceAddressIsUk must be (Some(CorrespondenceAddressIsUk(true)))
+        }
+      }
+
+      "is different" must {
+        "set the hasChanged & correspondenceAddressIsUk properties" in {
+          val model = completeModel.copy(correspondenceAddressIsUk = Some(CorrespondenceAddressIsUk(true)))
+          val res = model.correspondenceAddressIsUk(CorrespondenceAddressIsUk(false))
+          res.hasChanged must be (true)
+          res.correspondenceAddressIsUk must be (Some(CorrespondenceAddressIsUk(false)))
+        }
+      }
+    }
+
+
+
 
     "correspondenceAddress value is set" which {
       "is the same as before" must {
