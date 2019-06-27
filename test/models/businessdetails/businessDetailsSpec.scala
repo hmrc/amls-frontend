@@ -41,6 +41,8 @@ class businessDetailsSpec extends AmlsSpec {
 
   val contactingYou = ContactingYou(Some("1234567890"), Some("test@test.com"))
 
+  val regOfficeIsUK = RegisteredOfficeIsUK(true)
+
   val regOfficeOrMainPlaceUK =  RegisteredOfficeUK("38B", "line2", None, None, "AA1 1AA")
 
   val uKCorrespondenceAddress = UKCorrespondenceAddress("Name",
@@ -57,6 +59,7 @@ class businessDetailsSpec extends AmlsSpec {
     vatRegistered = Some(regForVAT),
     corporationTaxRegistered = Some(regForCorpTax),
     contactingYou = Some(contactingYou),
+    registeredOfficeIsUK = Some(regOfficeIsUK),
     registeredOffice = Some(regOfficeOrMainPlaceUK),
     altCorrespondenceAddress = Some(true),
     correspondenceAddress = Some(uKCorrespondenceAddress),
@@ -75,6 +78,8 @@ class businessDetailsSpec extends AmlsSpec {
     "contactingYou" -> Json.obj(
       "phoneNumber" -> "1234567890",
       "email" -> "test@test.com"),
+    "registeredOfficeIsUK" -> Json.obj(
+      "isUK" -> true),
     "registeredOffice" -> Json.obj(
       "addressLine1" -> "38B",
       "addressLine2" -> "line2",
