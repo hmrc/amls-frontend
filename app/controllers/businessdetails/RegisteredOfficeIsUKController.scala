@@ -39,8 +39,11 @@ class RegisteredOfficeIsUKController @Inject ()(
           response =>
             val form: Form2[RegisteredOfficeIsUK] = (for {
               businessDetails <- response
-              registeredOfficeIsUK <- businessDetails.registeredOfficeIsUK
-            } yield Form2[RegisteredOfficeIsUK](registeredOfficeIsUK)) getOrElse EmptyForm
+              registeredOffice <- businessDetails.registeredOffice
+            } yield registeredOffice match {
+              case _: RegisteredOfficeUK => Form2[RegisteredOfficeIsUK](RegisteredOfficeIsUK(true))
+              case _: RegisteredOfficeNonUK => Form2[RegisteredOfficeIsUK](RegisteredOfficeIsUK(false))
+            }) getOrElse EmptyForm
             Ok(registered_office_is_uk(form, edit))
         }
   }
@@ -55,6 +58,7 @@ class RegisteredOfficeIsUKController @Inject ()(
               businessDetails <- dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key)
               _ <- dataCacheConnector.save[BusinessDetails](BusinessDetails.key, businessDetails.registeredOfficeIsUK(data))
             } yield {
+              println(data + "xxxxxxxxxxxxxxxxxxx")
               data match {
                 case RegisteredOfficeIsUK(true) => Redirect(routes.RegisteredOfficeUKController.get(edit))
                 case RegisteredOfficeIsUK(false) => Redirect(routes.RegisteredOfficeNonUKController.get(edit))
