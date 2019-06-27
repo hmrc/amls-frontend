@@ -36,13 +36,12 @@ class CorrespondenceAddressIsUkController @Inject ()(
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataConnector.fetch[BusinessDetails](BusinessDetails.key) map {
-        response =>
-          val form: Form2[CorrespondenceAddressIsUk] = (for {
-            businessDetails <- response
-            correspondenceAddress <- businessDetails.correspondenceAddress
-          } yield Form2[CorrespondenceAddressIsUk](CorrespondenceAddressIsUk(correspondenceAddress.isUk)))
-            .getOrElse(Form2[CorrespondenceAddressIsUk](CorrespondenceAddressIsUk(None)))
-          Ok(correspondence_address_is_uk(form, edit))
+        response => {
+          val isUk: Option[Boolean] = response.flatMap(businessDetails =>
+            businessDetails.correspondenceAddressIsUk.flatMap(isUk => isUk.isUk)
+              .orElse(businessDetails.correspondenceAddress.flatMap(ca => ca.isUk)))
+          Ok(correspondence_address_is_uk(Form2[CorrespondenceAddressIsUk](CorrespondenceAddressIsUk(isUk)), edit))
+        }
       }
   }
 
@@ -50,24 +49,24 @@ class CorrespondenceAddressIsUkController @Inject ()(
     implicit authContext => implicit request => {
       Form2[CorrespondenceAddressIsUk](request.body) match {
         case f: InvalidForm => Future.successful(BadRequest(correspondence_address_is_uk(f, edit)))
-        case ValidForm(_, CorrespondenceAddressIsUk(Some(isUk))) =>
+        case ValidForm(_, isUk) =>
           for {
             businessDetails <- dataConnector.fetch[BusinessDetails](BusinessDetails.key)
+            _ <- dataConnector.save[BusinessDetails](BusinessDetails.key, businessDetails.correspondenceAddressIsUk(isUk))
             _ <- if (isUkHasChanged(businessDetails.correspondenceAddress, isUk = isUk)) { dataConnector.save[BusinessDetails](BusinessDetails.key,
               businessDetails.correspondenceAddress(CorrespondenceAddress(None, None))) } else { Future.successful(None) }
-          } yield if(isUk) {
-            Redirect(routes.CorrespondenceAddressUkController.get(edit))
-          } else {
-            Redirect(routes.CorrespondenceAddressNonUkController.get(edit))
+          } yield isUk match {
+            case CorrespondenceAddressIsUk(Some(true)) => Redirect(routes.CorrespondenceAddressUkController.get(edit))
+            case CorrespondenceAddressIsUk(Some(false)) => Redirect(routes.CorrespondenceAddressNonUkController.get(edit))
           }
       }
     }
   }
 
-  def isUkHasChanged(address: Option[CorrespondenceAddress], isUk: Boolean):Boolean = {
+  def isUkHasChanged(address: Option[CorrespondenceAddress], isUk: CorrespondenceAddressIsUk):Boolean = {
     (address, isUk) match {
-      case (Some(CorrespondenceAddress(Some(_), None)), false) => true
-      case (Some(CorrespondenceAddress(None, Some(_))), true) => true
+      case (Some(CorrespondenceAddress(Some(_), None)), CorrespondenceAddressIsUk(Some(false))) => true
+      case (Some(CorrespondenceAddress(None, Some(_))), CorrespondenceAddressIsUk(Some(true))) => true
       case _ => false
     }
   }

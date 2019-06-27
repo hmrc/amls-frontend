@@ -18,12 +18,16 @@ package models.businessdetails
 
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, Write}
+import play.api.libs.json.Json
 
 case class CorrespondenceAddressIsUk(isUk: Option[Boolean])
 
 object CorrespondenceAddressIsUk {
 
+  implicit val formats = Json.format[CorrespondenceAddressIsUk]
+
   import utils.MappingUtils.Implicits._
+
 
   implicit val formRule: Rule[UrlFormEncoded, CorrespondenceAddressIsUk] =
     From[UrlFormEncoded] { __ =>
