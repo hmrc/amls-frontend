@@ -69,7 +69,7 @@ case class BusinessDetails(
 
   def isComplete: Boolean =
     this match {
-      case BusinessDetails(Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), Some(_), Some(true), _, _, _, true) =>
+      case BusinessDetails(Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), Some(_), Some(true), _, None, _, true) =>
         false
       case BusinessDetails(Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), Some(_), Some(true), Some(_), None, _, true) =>
         false
