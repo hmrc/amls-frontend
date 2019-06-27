@@ -18,7 +18,7 @@ package controllers.businessdetails
 
 import connectors.DataCacheConnector
 import models.autocomplete.NameValuePair
-import models.businessdetails.{BusinessDetails, CorrespondenceAddress, CorrespondenceAddressUk}
+import models.businessdetails.{BusinessDetails, CorrespondenceAddress, CorrespondenceAddressIsUk, CorrespondenceAddressUk}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import org.jsoup.select.Elements
@@ -63,14 +63,14 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
     } thenReturn Future.successful(Success)
   }
 
-  "CorrespondenceAddressUkontroller" should {
+  "CorrespondenceAddressUkController" should {
 
     "respond to a get request correctly with different form values" when {
 
       "data exists in the keystore" in new Fixture {
 
         val correspondenceAddress = CorrespondenceAddress(Some(CorrespondenceAddressUk("Name Test", "Test", "Test", "Test", Some("test"), None, "POSTCODE")), None)
-        val businessDetails = BusinessDetails(None, None, None, None, None,None, None, Some(correspondenceAddress))
+        val businessDetails = BusinessDetails(None, None, None, None, None,None, None, Some(CorrespondenceAddressIsUk(Some(true))), Some(correspondenceAddress))
 
         when(controller.dataConnector.fetch[BusinessDetails](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(businessDetails)))
@@ -109,7 +109,7 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
 
         val address = CorrespondenceAddressUk("Test", "Test", "old line 1", "old line 2", Some("old line 3"), None, "AA1 1AA")
 
-        val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, Some(CorrespondenceAddress(Some(address), None)))))
+        val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, Some(CorrespondenceAddressIsUk(Some(true))), Some(CorrespondenceAddress(Some(address), None)))))
 
         val newRequest = request.withFormUrlEncodedBody(
           "yourName" -> "Name",
@@ -147,7 +147,7 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
 
         val address = CorrespondenceAddressUk("Test", "Test", "old line 1", "old line 2", Some("old line 3"), None, "AA1 1AA")
 
-        val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, Some(CorrespondenceAddress(Some(address), None)))))
+        val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, Some(CorrespondenceAddressIsUk(Some(true))), Some(CorrespondenceAddress(Some(address), None)))))
 
         val newRequest = request.withFormUrlEncodedBody(
           "yourName" -> "Name",

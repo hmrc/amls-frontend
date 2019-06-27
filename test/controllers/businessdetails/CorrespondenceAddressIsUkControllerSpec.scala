@@ -59,7 +59,7 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
 
       "when isUk is true" in new Fixture {
 
-        val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, false, false)))
+        val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, None, false, false)))
 
         val newRequest = request.withFormUrlEncodedBody("isUK" -> "true")
 
@@ -76,7 +76,7 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
 
       "when isUk is false" in new Fixture {
 
-        val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, false, false)))
+        val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, None, false, false)))
 
         val newRequest = request.withFormUrlEncodedBody("isUK" -> "false")
 
