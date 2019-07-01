@@ -127,7 +127,7 @@ error.max.length.bm.businesstype.type = You can’t enter more than 40 character
 ###############################  Business Details ###############################
 error.required.atb.previously.registered = Select yes if your business is currently registered with HMRC for anti-money laundering supervision
 error.required.atb.confirm.office = Select yes if this is the address of your registered office
-error.required.atb.registered.office.uk.or.overseas = Select yes if this is a UK address
+error.required.atb.registered.office.uk.or.overseas = Select yes if your registered office is in the UK
 error.required.atb.registered.office.not.uk= Enter a country that is not the United Kingdom because your registered office is not in the UK
 error.required.atb.letters.address.not.uk= Enter a country that is not the United Kingdom because your address for letters is not in the UK
 error.required.atb.registered.for.vat = Select yes if your business is registered for VAT in the UK
@@ -136,6 +136,7 @@ error.required.atb.corporation.tax.number = Enter a valid Corporation Tax refere
 error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax reference number
 error.required.atb.lettersaddress = Select yes if this is the right address to send you letters
 error.mismatch.atb.email = The email addresses you’ve entered do not match
+
 
 error.businessmatching.updateservice.responsiblepeople = Select at least one option to show which responsible people have passed the HMRC Money Laundering Regulations fit and proper test
 error.businessmatching.updateservice.addmoreactivities = Select yes if you want to add another type of business
