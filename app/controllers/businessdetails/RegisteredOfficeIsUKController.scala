@@ -54,6 +54,8 @@ class RegisteredOfficeIsUKController @Inject ()(
             for {
               businessDetails <- dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key)
               _ <- dataCacheConnector.save[BusinessDetails](BusinessDetails.key, businessDetails.registeredOfficeIsUK(data))
+              _ <- if (isUkHasChanged(businessDetails.registeredOffice, isUk = data)) { dataCacheConnector.save[BusinessDetails](BusinessDetails.key,
+                businessDetails.registeredOffice(RegisteredOffice)) } else { Future.successful(None) }
             } yield {
               data match {
                 case RegisteredOfficeIsUK(true) => Redirect(routes.RegisteredOfficeUKController.get(edit))
@@ -61,5 +63,12 @@ class RegisteredOfficeIsUKController @Inject ()(
               }
             }
         }
+  }
+  def isUkHasChanged(address: Option[RegisteredOffice], isUk: RegisteredOfficeIsUK):Boolean = {
+    (address, isUk) match {
+      case (Some(RegisteredOfficeUK(_, _, _, _, _, _)), RegisteredOfficeIsUK(false)) => true
+      case (Some(RegisteredOfficeNonUK(_, _, _, _, _, _)), RegisteredOfficeIsUK(true)) => true
+      case _ => false
+    }
   }
 }
