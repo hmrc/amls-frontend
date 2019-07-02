@@ -24,7 +24,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @headingWithPlaceholder(("responsiblepeople.position_within_business.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
@@ -32,15 +31,16 @@
     heading = header
 ) {
 
-    <p class="form-hint">@Messages("lbl.select.all")</p>
-
     @form(f, controllers.responsiblepeople.routes.PositionWithinBusinessController.post(index, edit, flow)) {
 
         @roles_within_business(
             f,
             businessType,
             displayNominatedOfficer,
-            isDeclaration = false
+            isDeclaration = false,
+            heading = Messages("responsiblepeople.position_within_business.heading", personName),
+            section = "summary.responsiblepeople",
+            hint = "lbl.select.all"
         )
 
         @submit()

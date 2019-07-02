@@ -25,7 +25,18 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @headingWithPlaceholder(("responsiblepeople.position_within_business.startDate.heading", personName), "summary.responsiblepeople")
+}
+
+@supportingContent = {
+    @if(positions.size == 1) {
+        <p>@Messages("responsiblepeople.position_within_business.startDate.toldus.single", personName, PositionWithinBusiness.getPrettyName(positions.head).toLowerCase)</p>
+    } else {
+        <p>@Messages("responsiblepeople.position_within_business.startDate.toldus.multiple", personName)</p>
+        <ul class="list list-bullet business-roles">
+            @positions.map(p => PositionWithinBusiness.getPrettyName(p).toLowerCase).toList.sorted.map(p => <li class="business-role">{p}</li>)
+        </ul>
+        <p>@Messages("responsiblepeople.position_within_business.startDate.toldus.selectfirst", personName)</p>
+    }
 }
 
 @main(
@@ -35,22 +46,13 @@
 
     @form(f, controllers.responsiblepeople.routes.PositionWithinBusinessStartDateController.post(index, edit, flow)) {
 
-        @if(positions.size == 1) {
-            <p>@Messages("responsiblepeople.position_within_business.startDate.toldus.single", personName, PositionWithinBusiness.getPrettyName(positions.head).toLowerCase)</p>
-        } else {
-            <p>@Messages("responsiblepeople.position_within_business.startDate.toldus.multiple", personName)</p>
-            <ul class="list list-bullet business-roles">
-                @positions.map(p => PositionWithinBusiness.getPrettyName(p).toLowerCase).toList.sorted.map(p => <li class="business-role">{p}</li>)
-            </ul>
-            <p>@Messages("responsiblepeople.position_within_business.startDate.toldus.selectfirst", personName)</p>
-        }
-
         @date(
             f = f,
             p = "startDate",
-            labelText = "responsiblepeople.position_within_business.startDate.title",
-            legendHidden = true,
+            heading = Messages("responsiblepeople.position_within_business.startDate.heading", personName),
+            section = "summary.responsiblepeople",
             hintText = "responsiblepeople.position_within_business.startDate.hint",
+            supportingContent = supportingContent,
             example = false
         )
 

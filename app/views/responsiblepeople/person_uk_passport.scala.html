@@ -26,7 +26,6 @@
 @header = {
     @components.back_link()
     @errorSummaryWithPlaceholder(f, personName)
-    @headingWithPlaceholder(("responsiblepeople.uk.passport.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
@@ -36,39 +35,33 @@
 
 @form(f, controllers.responsiblepeople.routes.PersonUKPassportController.post(index, edit, flow)) {
 
-    @fieldset(
-        f = f("ukPassport-fieldset"),
-        legend = "",
-        legendHidden = true,
-        panel = false
+    @fieldsetWithErrorGroup(
+        f = f("ukPassport"),
+        heading = Messages("responsiblepeople.uk.passport.heading", personName),
+        section = "summary.responsiblepeople",
+        panel = false,
+        errorGroupPlaceholder = personName
     ) {
-        @errorGroupWithPlaceholder(
-            field = f("ukPassport"),
-            placeholder = personName
+        @radio(
+            f = f("ukPassport"),
+            labelText = "lbl.yes",
+            value = "true",
+            target = s"#$target"
+        )
+        @panel(
+            field = Some(f(s"$target"))
         ) {
-            @radio(
-                f = f("ukPassport"),
-                labelText = "lbl.yes",
-                value = "true",
-                inline = true,
-                target = s"#$target"
-            )
-            @panel(
-                field = Some(f(s"$target"))
-            ) {
-                @input(
-                    field = f("ukPassportNumber"),
-                    labelText = Messages("lbl.passport.number", personName),
-                    hintText = "hint.9.digits"
-                )
-            }
-            @radio(
-                f = f("ukPassport"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true
+            @input(
+                field = f("ukPassportNumber"),
+                labelText = Messages("lbl.passport.number", personName),
+                hintText = "hint.9.digits"
             )
         }
+        @radio(
+            f = f("ukPassport"),
+            labelText = "lbl.no",
+            value = "false"
+        )
     }
 
     @submit()

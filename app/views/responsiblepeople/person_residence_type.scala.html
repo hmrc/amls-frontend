@@ -22,7 +22,6 @@
 @header = {
     @components.back_link()
     @errorSummaryWithPlaceholder(f, personName)
-    @headingWithPlaceholder(("responsiblepeople.person.a.resident.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
@@ -32,44 +31,35 @@
 
     @form(f, controllers.responsiblepeople.routes.PersonResidentTypeController.post(index, edit, flow)) {
 
-        <div class="form-group">
-            @fieldset(
-                f = f("isUKResidence-fieldset"),
-                legend = "responsiblepeople.person.a.resident.title",
-                legendHidden = true,
-                panel = false
+        @fieldsetWithErrorGroup(
+            f = f("isUKResidence"),
+            heading = Messages("responsiblepeople.person.a.resident.heading", personName),
+            section = "summary.responsiblepeople",
+            panel = false,
+            errorGroupPlaceholder = personName
+        ) {
+            @radio(
+                f = f("isUKResidence"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = ".ukResident-fieldset"
+            )
+            @panel(
+                jsHidden = true,
+                classes = Seq("ukResident-fieldset")
             ) {
-                @errorGroupWithPlaceholder(
-                    field = f("isUKResidence"),
-                    placeholder = personName
-                ) {
-                    @radio(
-                        f = f("isUKResidence"),
-                        labelText = "lbl.yes",
-                        value = "true",
-                        target = ".ukResident-fieldset",
-                        inline = true
-                    )
-                    @panel(
-                        jsHidden = true,
-                        classes = Seq("ukResident-fieldset")
-                    ) {
-                        @input(
-                            field = f("nino"),
-                            hintText = "lbl.nino.hint",
-                            labelText = Messages("responsiblepeople.detailed_answers.uk_resident.nino", personName)
-                        )
-                    }
-                    @radio(
-                        f = f("isUKResidence"),
-                        labelText = "lbl.no",
-                        value = "false",
-                        inline = true
-                    )
-                }
+                @input(
+                    field = f("nino"),
+                    hintText = "lbl.nino.hint",
+                    labelText = Messages("responsiblepeople.detailed_answers.uk_resident.nino", personName)
+                )
             }
-
-        </div>
+            @radio(
+                f = f("isUKResidence"),
+                labelText = "lbl.no",
+                value = "false"
+            )
+        }
 
         @submit(false)
     }

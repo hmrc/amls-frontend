@@ -26,7 +26,6 @@ s"""${f("utrNumber").id}-fieldset"""
 @header = {
     @components.back_link()
     @errorSummaryWithPlaceholder(f, personName)
-    @headingWithPlaceholder(("responsiblepeople.registeredforselfassessment.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
@@ -35,41 +34,34 @@ s"""${f("utrNumber").id}-fieldset"""
 )  {
 
     @form(f, controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.post(index, edit, flow)) {
-        @fieldset(
-            f = f("saRegistered-fieldset"),
-            legend = "responsiblepeople.registeredforselfassessment.title",
-            panel=false,
-            legendHidden = true
+        @fieldsetWithErrorGroup(
+            f = f("saRegistered"),
+            heading = Messages("responsiblepeople.registeredforselfassessment.heading", personName),
+            section = "summary.responsiblepeople",
+            panel = false
         ) {
-            @errorGroupWithPlaceholder(
-                field = f("saRegistered"),
-                placeholder = personName
+            @radio(
+                f = f("saRegistered"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = s"#utrNumber-panel"
+            )
+            @panel(
+                field = Some(f("utrNumber-panel"))
             ) {
-                @radio(
-                    f = f("saRegistered"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true,
-                    target = s"#utrNumber-panel"
-                )
-                @panel(
-                    field = Some(f("utrNumber-panel"))
-                ) {
-                    @input(
-                        attrMaxlength = "10",
-                        attrPattern = "[0-9]{1,10}",
-                        field = f("utrNumber"),
-                        hintText = "responsiblepeople.registeredforselfassessment.lbl.utrnumber.hint",
-                        labelText = "responsiblepeople.registeredforselfassessment.lbl.utrnumber"
-                    )
-                }
-                @radio(
-                    f = f("saRegistered"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
+                @input(
+                    attrMaxlength = "10",
+                    attrPattern = "[0-9]{1,10}",
+                    field = f("utrNumber"),
+                    hintText = "responsiblepeople.registeredforselfassessment.lbl.utrnumber.hint",
+                    labelText = "responsiblepeople.registeredforselfassessment.lbl.utrnumber"
                 )
             }
+            @radio(
+                f = f("saRegistered"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
 
         @submit(edit)

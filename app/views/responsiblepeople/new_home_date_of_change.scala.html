@@ -22,7 +22,6 @@
 @header = {
   @components.back_link()
   @errorSummary(f)
-  @headingWithPlaceholder(("responsiblepeople.new.home.date.of.change.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
@@ -35,9 +34,9 @@
     @date(
       f = f,
       p = "dateOfChange",
-      labelText = "responsiblepeople.new.home.date.of.change.title",
+      heading = Messages("responsiblepeople.new.home.date.of.change.heading", personName),
       example = true,
-      legendHidden = true
+      section = "summary.responsiblepeople"
     )
 
     @submit(false, Some(Messages("button.saveandcontinue")))
