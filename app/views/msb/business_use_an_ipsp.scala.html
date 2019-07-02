@@ -22,7 +22,10 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("msb.ipsp.title", "summary.msb")
+}
+
+@supportingContent = {
+    <p>@Messages("msb.throughput.ipsp.hint")</p>
 }
 
 @main(
@@ -30,50 +33,43 @@
     heading = header
 ) {
 
-    <p>@Messages("msb.throughput.ipsp.hint")</p>
-
     @form(f, controllers.msb.routes.BusinessUseAnIPSPController.post(edit)) {
 
-        @fieldset(
-            f = f("useAnIPSP-fieldset"),
-            legend = "msb.ipsp.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("useAnIPSP"),
+            heading = "msb.ipsp.title",
+            section = "summary.msb",
+            supportingContent = supportingContent,
             panel = false
         ) {
-            @errorGroup(
-                field = f("useAnIPSP")
+            @radio(
+                f = f("useAnIPSP"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = s"#${f("name").id}-panel"
+            )
+            @panel(
+                field = Some(f(s"${f("name").id}-panel")),
+                jsHidden = true
             ) {
-                @radio(
-                    f = f("useAnIPSP"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    target = s"#${f("name").id}-panel",
-                    inline = true
+                @input(
+                    f("name"),
+                    labelText = "msb.ipsp.name.lbl"
                 )
-                @panel(
-                    field = Some(f(s"${f("name").id}-panel")),
-                    jsHidden = true
-                ) {
-                    @input(
-                        f("name"),
-                        labelText = "msb.ipsp.name.lbl"
-                    )
 
-                    @input(
-                        attrMaxlength = "15",
-                        attrPattern = "[0-9a-z-A-Z]{1,15}",
-                        field = f("referenceNumber"),
-                        hintText = "msb.ipsp.referenceNumber.hint",
-                        labelText = "msb.ipsp.referenceNumber.lbl"
-                    )
-                }
-                @radio(
-                    f = f("useAnIPSP"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
+                @input(
+                    attrMaxlength = "15",
+                    attrPattern = "[0-9a-z-A-Z]{1,15}",
+                    field = f("referenceNumber"),
+                    hintText = "msb.ipsp.referenceNumber.hint",
+                    labelText = "msb.ipsp.referenceNumber.lbl"
                 )
             }
+            @radio(
+                f = f("useAnIPSP"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
 
         @submit(edit)

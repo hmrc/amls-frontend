@@ -26,7 +26,6 @@
 @header = {
     @components.back_link()
     @errorSummaryWithPlaceholder(f, personName)
-    @headingWithPlaceholder(("responsiblepeople.non.uk.passport.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
@@ -36,39 +35,33 @@
 
     @form(f, controllers.responsiblepeople.routes.PersonNonUKPassportController.post(index, edit, flow)) {
 
-        @fieldset(
-            f = f("nonUKPassport-fieldset"),
-            legend = "",
-            legendHidden = true,
-            panel = false
+        @fieldsetWithErrorGroup(
+            f = f("nonUKPassport"),
+            heading = Messages("responsiblepeople.non.uk.passport.heading", personName),
+            section = "summary.responsiblepeople",
+            panel = false,
+            errorGroupPlaceholder = personName
         ) {
-            @errorGroupWithPlaceholder(
-                field = f("nonUKPassport"),
-                placeholder = personName
+            @radio(
+                f = f("nonUKPassport"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = s"#$target"
+            )
+           @panel(
+                field = Some(f(s"$target"))
             ) {
-                @radio(
-                    f = f("nonUKPassport"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    inline = true,
-                    target = s"#$target"
-                )
-               @panel(
-                    field = Some(f(s"$target"))
-                ) {
-                    @input(
-                        field = f("nonUKPassportNumber"),
-                        labelText = Messages("lbl.passport.number", personName),
-                        hintText = "hint.9.digits"
-                    )
-                }
-                @radio(
-                    f = f("nonUKPassport"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
+                @input(
+                    field = f("nonUKPassportNumber"),
+                    labelText = Messages("lbl.passport.number", personName),
+                    hintText = "hint.9.digits"
                 )
             }
+            @radio(
+                f = f("nonUKPassport"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
 
         @submit()

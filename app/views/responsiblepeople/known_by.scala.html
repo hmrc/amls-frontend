@@ -23,7 +23,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @headingWithPlaceholder(("responsiblepeople.knownby.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
@@ -32,37 +31,30 @@
 ) {
     @form(f, controllers.responsiblepeople.routes.KnownByController.post(index, edit, flow)) {
 
-
-        @fieldset(
-            f = f("hasOtherNames-fieldset"),
-            legend = "responsiblepeople.knownby.title",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("hasOtherNames"),
+            heading = Messages("responsiblepeople.knownby.heading", personName),
+            section = "summary.responsiblepeople",
             panel = false
 
         ) {
-            @errorGroup(
-                field = f("hasOtherNames")
+            @radio(
+                f = f("hasOtherNames"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = ".otherNames-panel"
+            )
+            @panel(
+                jsHidden = true,
+                classes = Seq("otherNames-panel")
             ) {
-                @radio(
-                    f = f("hasOtherNames"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    target = ".otherNames-panel",
-                    inline = true
-                )
-                @panel(
-                    jsHidden = true,
-                    classes = Seq("otherNames-panel")
-                ) {
-                    @input(f("otherNames"), Messages("responsiblepeople.personName.alternativeName", personName))
-                }
-                @radio(
-                    f = f("hasOtherNames"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
+                @input(f("otherNames"), Messages("responsiblepeople.personName.alternativeName", personName))
             }
+            @radio(
+                f = f("hasOtherNames"),
+                labelText = "lbl.no",
+                value = "false"
+            )
         }
 
         @submit(edit)

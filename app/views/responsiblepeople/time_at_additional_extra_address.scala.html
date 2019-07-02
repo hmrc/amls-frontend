@@ -23,7 +23,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @headingWithPlaceholder(("responsiblepeople.timeataddress.address_history.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
@@ -33,22 +32,17 @@
 
     @form(f, controllers.responsiblepeople.routes.TimeAtAdditionalExtraAddressController.post(index,edit,flow)) {
 
-        @fieldset(
-            f = f("timeAtAddress-fieldset"),
-            legend = "responsiblepeople.additional_extra_address.how_long",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("timeAtAddress"),
+            heading = Messages("responsiblepeople.timeataddress.address_history.heading", personName),
+            section = "summary.responsiblepeople",
             jsHidden = false,
-            panel = false,
-            id = s"""${f("address-history").id}-fieldset"""
+            panel = false
         ) {
-            @errorGroup(
-                field = f("timeAtAddress")
-            ) {
-                @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.0_5_months", value = "01")
-                @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.6_11_months", value = "02")
-                @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.1_3_years", value = "03")
-                @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.more_3_years", value = "04")
-            }
+            @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.0_5_months", value = "01")
+            @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.6_11_months", value = "02")
+            @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.1_3_years", value = "03")
+            @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.more_3_years", value = "04")
         }
         @submit(edit, Some("button.saveandcontinue"))
     }
