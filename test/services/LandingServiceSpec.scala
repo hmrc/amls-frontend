@@ -18,7 +18,7 @@ package services
 
 import connectors._
 import models.asp.{Accountancy, BookKeeping, ServicesOfBusiness}
-import models.businessdetails.{BusinessDetails, NonUKCorrespondenceAddress}
+import models.businessdetails.{BusinessDetails, CorrespondenceAddress, CorrespondenceAddressIsUk, CorrespondenceAddressNonUk}
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.{CustomersOutsideUK => BACustomersOutsideUK, InvolvedInOtherYes => BAInvolvedInOtherYes, _}
@@ -90,8 +90,8 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
     val cacheMap = CacheMap("", Map.empty)
 
     "return a cachmap with the saved alternative correspondence address - true" in {
-      val correspondenceAddress = NonUKCorrespondenceAddress("Name Test", "Test", "Test", "Test", Some("test"), None, Country("Albania", "AL"))
-      val businessDetails = BusinessDetails(None, None, None, None, None,None, None, None, Some(correspondenceAddress))
+      val correspondenceAddress = CorrespondenceAddressNonUk("Name Test", "Test", "Test", "Test", Some("test"), None, Country("Albania", "AL"))
+      val businessDetails = BusinessDetails(None, None, None, None, None, None, None, None, Some(CorrespondenceAddressIsUk(false)), Some(CorrespondenceAddress(None, Some(correspondenceAddress))))
 
       implicit val r = FakeRequest()
 

@@ -17,9 +17,8 @@
 package controllers.businessdetails
 
 import connectors.DataCacheConnector
-import models.Country
-import models.businessdetails.{BusinessDetails, NonUKCorrespondenceAddress, UKCorrespondenceAddress}
 import models.autocomplete.NameValuePair
+import models.businessdetails.{BusinessDetails, CorrespondenceAddress, CorrespondenceAddressIsUk, CorrespondenceAddressUk}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import org.jsoup.select.Elements
@@ -40,12 +39,12 @@ import utils.{AmlsSpec, AuthorisedFixture}
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
 
-class CorrespondenceAddressControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new CorrespondenceAddressController (
+    val controller = new CorrespondenceAddressUkController (
       dataConnector = mock[DataCacheConnector],
       authConnector = self.authConnector,
       auditConnector = mock[AuditConnector],
@@ -70,8 +69,8 @@ class CorrespondenceAddressControllerSpec extends AmlsSpec with MockitoSugar wit
 
       "data exists in the keystore" in new Fixture {
 
-        val correspondenceAddress = NonUKCorrespondenceAddress("Name Test", "Test", "Test", "Test", Some("test"), None, Country("Albania", "AL"))
-        val businessDetails = BusinessDetails(None, None, None, None, None, None, None, None, Some(correspondenceAddress))
+        val correspondenceAddress = CorrespondenceAddress(Some(CorrespondenceAddressUk("Name Test", "Test", "Test", "Test", Some("test"), None, "POSTCODE")), None)
+        val businessDetails = BusinessDetails(None, None, None, None, None, None,None, None, Some(CorrespondenceAddressIsUk(true)), Some(correspondenceAddress))
 
         when(controller.dataConnector.fetch[BusinessDetails](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(businessDetails)))
@@ -83,14 +82,11 @@ class CorrespondenceAddressControllerSpec extends AmlsSpec with MockitoSugar wit
 
         page.getElementById("yourName").`val` must be("Name Test")
         page.getElementById("businessName").`val` must be("Test")
-        page.getElementById("isUK-true").hasAttr("checked") must be(false)
-        page.getElementById("isUK-false").hasAttr("checked") must be(true)
-        page.getElementById("addressLineNonUK1").`val` must be("Test")
-        page.getElementById("addressLineNonUK2").`val` must be("Test")
-        page.getElementById("addressLineNonUK3").`val` must be("test")
-        page.getElementById("addressLineNonUK4").`val` must be("")
-        page.getElementById("postCode").`val` must be("")
-        page.select("#country option[selected]").attr("value") must be("AL")
+        page.getElementById("addressLine1").`val` must be("Test")
+        page.getElementById("addressLine2").`val` must be("Test")
+        page.getElementById("addressLine3").`val` must be("test")
+        page.getElementById("addressLine4").`val` must be("")
+        page.getElementById("postCode").`val` must be("POSTCODE")
       }
 
       "no data exists in the keystore" in new Fixture {
@@ -101,7 +97,6 @@ class CorrespondenceAddressControllerSpec extends AmlsSpec with MockitoSugar wit
         val result = controller.get(false)(request)
         status(result) must be(OK)
         Jsoup.parse(contentAsString(result)).title must include(Messages("businessdetails.correspondenceaddress.title"))
-        Jsoup.parse(contentAsString(result)).select("#isUK-true").attr("checked") mustBe "checked"
 
       }
     }
@@ -112,9 +107,9 @@ class CorrespondenceAddressControllerSpec extends AmlsSpec with MockitoSugar wit
 
       "a valid form request is sent in the body" in new Fixture {
 
-        val address = UKCorrespondenceAddress("Test", "Test", "old line 1", "old line 2", Some("old line 3"), None, "AA1 1AA")
+        val address = CorrespondenceAddressUk("Test", "Test", "old line 1", "old line 2", Some("old line 3"), None, "AA1 1AA")
 
-        val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, Some(address))))
+        val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, Some(CorrespondenceAddressIsUk(true)), Some(CorrespondenceAddress(Some(address), None)))))
 
         val newRequest = request.withFormUrlEncodedBody(
           "yourName" -> "Name",
@@ -150,9 +145,9 @@ class CorrespondenceAddressControllerSpec extends AmlsSpec with MockitoSugar wit
 
       "a valid form request is sent in the body when editing" in new Fixture {
 
-        val address = UKCorrespondenceAddress("Test", "Test", "old line 1", "old line 2", Some("old line 3"), None, "AA1 1AA")
+        val address = CorrespondenceAddressUk("Test", "Test", "old line 1", "old line 2", Some("old line 3"), None, "AA1 1AA")
 
-        val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, Some(address))))
+        val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, Some(CorrespondenceAddressIsUk(true)), Some(CorrespondenceAddress(Some(address), None)))))
 
         val newRequest = request.withFormUrlEncodedBody(
           "yourName" -> "Name",

@@ -43,7 +43,7 @@ class LettersAddressController @Inject () (
               altCorrespondenceAddress <- atb.altCorrespondenceAddress
             } yield Ok(letters_address(Form2[LettersAddress](LettersAddress(!altCorrespondenceAddress)), registeredOffice, edit)))
               .getOrElse (Ok(letters_address(EmptyForm, registeredOffice, edit)))
-          }) getOrElse Redirect(routes.CorrespondenceAddressController.get(edit))
+          }) getOrElse Redirect(routes.CorrespondenceAddressIsUkController.get(edit))
       }
 
   }
@@ -60,7 +60,7 @@ class LettersAddressController @Inject () (
               } yield Option[RegisteredOffice](registeredOffice)).getOrElse(None)
               regOffice match {
                 case Some(data) => BadRequest(letters_address(f, data))
-                case _ => Redirect(routes.CorrespondenceAddressController.get(edit))
+                case _ => Redirect(routes.CorrespondenceAddressIsUkController.get(edit))
               }
           }
         case ValidForm(_, data) =>
@@ -86,7 +86,7 @@ class LettersAddressController @Inject () (
   private def getRouting(altCorrespondenceAddress: Boolean, edit: Boolean): Result = {
     altCorrespondenceAddress match {
       case true => Redirect(routes.SummaryController.get())
-      case false => Redirect(routes.CorrespondenceAddressController.get(edit))
+      case false => Redirect(routes.CorrespondenceAddressIsUkController.get(edit))
     }
   }
 }

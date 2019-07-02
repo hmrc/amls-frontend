@@ -31,6 +31,7 @@ case class BusinessDetails(
                              registeredOfficeIsUK: Option[RegisteredOfficeIsUK] = None,
                              registeredOffice: Option[RegisteredOffice] = None,
                              altCorrespondenceAddress: Option[Boolean] = None,
+                             correspondenceAddressIsUk: Option[CorrespondenceAddressIsUk] = None,
                              correspondenceAddress: Option[CorrespondenceAddress] = None,
                              hasChanged: Boolean = false,
                              hasAccepted: Boolean = false
@@ -62,13 +63,22 @@ case class BusinessDetails(
     this.copy(altCorrespondenceAddress = Some(v), hasChanged = hasChanged || !this.altCorrespondenceAddress.contains(v))
 
   def correspondenceAddress(v: CorrespondenceAddress): BusinessDetails =
-    this.copy(correspondenceAddress = Some(v), hasChanged = hasChanged || !this.correspondenceAddress.contains(v), hasAccepted = hasAccepted && this.correspondenceAddress.contains(v))
+    v match {
+      case CorrespondenceAddress(None, None) => this.copy(correspondenceAddress = None, hasChanged = hasChanged || !this.correspondenceAddress.contains(v), hasAccepted = hasAccepted && this.correspondenceAddress.contains(v))
+      case _ => this.copy(correspondenceAddress = Some(v), hasChanged = hasChanged || !this.correspondenceAddress.contains(v), hasAccepted = hasAccepted && this.correspondenceAddress.contains(v))
+    }
+
+  def correspondenceAddressIsUk(v: CorrespondenceAddressIsUk): BusinessDetails =
+    this.copy(correspondenceAddressIsUk = Some(v), hasChanged = hasChanged || !this.correspondenceAddressIsUk.contains(v), hasAccepted = hasAccepted && this.correspondenceAddressIsUk.contains(v))
+
 
   def isComplete: Boolean =
     this match {
-      case BusinessDetails(Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), _, Some(_), Some(true), None, _, true) =>
+      case BusinessDetails(Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), _, Some(_), Some(true), _, None, _, true) =>
         false
-      case BusinessDetails(Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), _, Some(_), Some(_),_, _, true) =>
+      case BusinessDetails(Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), Some(_), _, Some(true), Some(_), _, _, true) =>
+        false
+      case BusinessDetails(Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), _, Some(_), Some(_),_, _, _, true) =>
         true
       case _ =>
         false
@@ -83,7 +93,7 @@ object BusinessDetails {
     cache.getEntry[BusinessDetails](key).fold(notStarted) {
       case model if model.isComplete =>
         Section(messageKey, Completed, model.hasChanged, controllers.businessdetails.routes.SummaryController.get())
-      case BusinessDetails(None, None, None, None, None, _, None, None, None, _, _) =>
+      case BusinessDetails(None, None, None, None, None, _, None, None, None, None, _, _) =>
         notStarted
       case model =>
         Section(messageKey, Started, model.hasChanged, controllers.businessdetails.routes.WhatYouNeedController.get())
@@ -108,6 +118,7 @@ object BusinessDetails {
         (__ \ "registeredOfficeIsUK").readNullable[RegisteredOfficeIsUK] and
         (__ \ "registeredOffice").readNullable[RegisteredOffice] and
         (__ \ "altCorrespondenceAddress").readNullable[Boolean] and
+        (__ \ "correspondenceAddressIsUk").readNullable[CorrespondenceAddressIsUk] and
         (__ \ "correspondenceAddress").readNullable[CorrespondenceAddress] and
         (__ \ "hasChanged").readNullable[Boolean].map {
           _.getOrElse(false)

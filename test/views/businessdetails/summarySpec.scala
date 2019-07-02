@@ -84,7 +84,8 @@ class summarySpec extends AmlsSpec
           Some(RegisteredOfficeIsUK(true)),
           Some(RegisteredOfficeUK("line1","line2",Some("line3"),Some("line4"),"AB12CD")),
           Some(true),
-          Some(UKCorrespondenceAddress("your name", "business name","line1","line2",Some("line3"),Some("line4"),"AB12CD")),
+          Some(CorrespondenceAddressIsUk(true)),
+          Some(CorrespondenceAddress(Some(CorrespondenceAddressUk("your name", "business name","line1","line2",Some("line3"),Some("line4"),"AB12CD")), None)),
           false
         ),true
       )

@@ -148,18 +148,52 @@
     }
 
     @model.correspondenceAddress.map { ca =>
-        @checkYourAnswers(
-            question = Messages("businessdetails.correspondenceaddress.title"),
-            editLinkTag = "businessdetailscorraddress-edit",
-            classes = Seq("check-your-answers__last"),
-            editUrl = controllers.businessdetails.routes.CorrespondenceAddressController.get(true).toString
-        ) {
-            <p>@ca.toLines.map { line =>
-                    @line<br />
+
+        @ca.isUk.map { isUk =>
+
+            @isUk match {
+
+                case true => {
+
+                    @checkYourAnswers(
+                        question = Messages("businessdetails.correspondenceaddress.isuk.title"),
+                        editLinkTag = "businessdetailscorraddress-edit",
+                        editUrl = controllers.businessdetails.routes.CorrespondenceAddressIsUkController.get(true).toString
+                    ) {
+                        <p>@Messages("businessdetails.correspondenceaddress.ukAddress")</p>
+                    }
+
+                    @checkYourAnswers(
+                        question = Messages("businessdetails.correspondenceaddress.title"),
+                        editLinkTag = "businessdetailscorraddress-edit",
+                        classes = Seq("check-your-answers__last"),
+                        editUrl = controllers.businessdetails.routes.CorrespondenceAddressUkController.get(true).toString
+                    ) {
+                        <p>@ca.ukAddress.map { d => @d.toLines.map { line => @line<br /> } }
+                    }
                 }
-            }</p>
-    }
-        @form(f, controllers.businessdetails.routes.SummaryController.post()) {
-            @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
+                case false => {
+                    @checkYourAnswers(
+                        question = Messages("businessdetails.correspondenceaddress.isuk.title"),
+                        editLinkTag = "businessdetailscorraddress-edit",
+                        editUrl = controllers.businessdetails.routes.CorrespondenceAddressIsUkController.get(true).toString
+                    ) {
+                        <p>@Messages("businessdetails.correspondenceaddress.nonUkAddress")</p>
+                    }
+                    @checkYourAnswers(
+                        question = Messages("businessdetails.correspondenceaddress.title"),
+                        editLinkTag = "businessdetailscorraddress-edit",
+                        classes = Seq("check-your-answers__last"),
+                        editUrl = controllers.businessdetails.routes.CorrespondenceAddressNonUkController.get(true).toString
+                    ) {
+                        <p>@ca.nonUkAddress.map { d => @d.toLines.map { line => @line<br /> } }</p>
+                    }
+                }
+            }
         }
+    }
+
+    @form(f, controllers.businessdetails.routes.SummaryController.post()) {
+        @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
+    }
 }

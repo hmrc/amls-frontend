@@ -45,13 +45,17 @@ class businessDetailsSpec extends AmlsSpec {
 
   val regOfficeOrMainPlaceUK =  RegisteredOfficeUK("38B", "line2", None, None, "AA1 1AA")
 
-  val uKCorrespondenceAddress = UKCorrespondenceAddress("Name",
+  val correspondenceAddressIsUk = CorrespondenceAddressIsUk(true)
+
+  val correspondenceAddressUk = CorrespondenceAddressUk("Name",
     "Business Name",
     "address 1",
     "address 2",
     Some("address 3"),
     Some("address 4"),
     "AA11 1AA")
+
+  val correspondenceAddress = CorrespondenceAddress(Some(correspondenceAddressUk), None)
 
   val completeModel = BusinessDetails(
     previouslyRegistered = Some(previouslyRegistered),
@@ -62,7 +66,7 @@ class businessDetailsSpec extends AmlsSpec {
     registeredOfficeIsUK = Some(regOfficeIsUK),
     registeredOffice = Some(regOfficeOrMainPlaceUK),
     altCorrespondenceAddress = Some(true),
-    correspondenceAddress = Some(uKCorrespondenceAddress),
+    correspondenceAddress = Some(correspondenceAddress),
     hasAccepted = true
   )
 
@@ -171,35 +175,35 @@ class businessDetailsSpec extends AmlsSpec {
     "Merged with previously registered with MLR" must {
       "return BusinessDetails with correct previously registered for MLR option" in {
         val result = initial.previouslyRegistered(previouslyRegistered)
-        result must be (BusinessDetails(Some(previouslyRegistered), None, None, None, None, None, None, None, None, true))
+        result must be (BusinessDetails(Some(previouslyRegistered), None, None, None, None, None, None, None, None, None, true))
       }
     }
 
     "Merged with RegisteredForVAT" must {
       "return BusinessDetails with correct VAT Registered option" in {
         val result = initial.vatRegistered(regForVAT)
-        result must be (BusinessDetails(None, None, Some(regForVAT), None, None, None, None, None, None, true))
+        result must be (BusinessDetails(None, None, Some(regForVAT), None, None, None, None, None, None, None, true))
       }
     }
 
     "Merged with CorporationTaxRegistered" must {
       "return BusinessDetails with correct corporation tax registered option" in {
         val result = initial.corporationTaxRegistered(regForCorpTax)
-        result must be (BusinessDetails(None, None, None, Some(regForCorpTax), None, None, None, None, None, true))
+        result must be (BusinessDetails(None, None, None, Some(regForCorpTax), None, None, None, None, None, None, true))
       }
     }
 
     "Merged with RegisteredOfficeOrMainPlaceOfBusiness" must {
       "return BusinessDetails with correct registeredOfficeOrMainPlaceOfBusiness" in {
         val result = initial.registeredOffice(regOfficeOrMainPlaceUK)
-        result must be (BusinessDetails(None, None, None, None, None, None, Some(regOfficeOrMainPlaceUK), None, None, true))
+        result must be (BusinessDetails(None, None, None, None, None, None, Some(regOfficeOrMainPlaceUK), None, None, None, true))
       }
     }
 
-    "Merged with UKCorrespondenceAddress" must {
-      "return BusinessDetails with correct UKCorrespondenceAddress" in {
-        val result = initial.correspondenceAddress(uKCorrespondenceAddress)
-        result must be (BusinessDetails(None, None, None, None, None, None, None, None, Some(uKCorrespondenceAddress), true))
+    "Merged with CorrespondenceAddressUk" must {
+      "return BusinessDetails with correct CorrespondenceAddressUk" in {
+        val result = initial.correspondenceAddress(CorrespondenceAddress(Some(correspondenceAddressUk), None))
+        result must be (BusinessDetails(None, None, None, None, None, None, None, None, None, Some(CorrespondenceAddress(Some(correspondenceAddressUk), None)), true))
       }
     }
   }
@@ -313,10 +317,45 @@ class businessDetailsSpec extends AmlsSpec {
       }
     }
 
+    "correspondenceAddressIsUk value is not set" when {
+
+      "correspondenceIsUk value is then set" must {
+        "set the hasChanged & correspondenceAddressIsUk properties" in {
+          val res = completeModel.correspondenceAddressIsUk(CorrespondenceAddressIsUk(true))
+          res.correspondenceAddressIsUk must be (Some(CorrespondenceAddressIsUk(true)))
+          res.hasChanged must be (true)
+        }
+      }
+
+    }
+
+    "correspondenceAddressIsUk value is set" when {
+      "is the same" must {
+        "not set the hasChanged & correspondenceAddressIsUk properties" in {
+          val model = completeModel.copy(correspondenceAddressIsUk = Some(CorrespondenceAddressIsUk(true)))
+          val res = model.correspondenceAddressIsUk(CorrespondenceAddressIsUk(true))
+          res.hasChanged must be (false)
+          res.correspondenceAddressIsUk must be (Some(CorrespondenceAddressIsUk(true)))
+        }
+      }
+
+      "is different" must {
+        "set the hasChanged & correspondenceAddressIsUk properties" in {
+          val model = completeModel.copy(correspondenceAddressIsUk = Some(CorrespondenceAddressIsUk(true)))
+          val res = model.correspondenceAddressIsUk(CorrespondenceAddressIsUk(false))
+          res.hasChanged must be (true)
+          res.correspondenceAddressIsUk must be (Some(CorrespondenceAddressIsUk(false)))
+        }
+      }
+    }
+
+
+
+
     "correspondenceAddress value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val res = completeModel.correspondenceAddress(uKCorrespondenceAddress)
+          val res = completeModel.correspondenceAddress(CorrespondenceAddress(Some(correspondenceAddressUk), None))
           res must be (completeModel)
           res.hasChanged must be (false)
         }
@@ -324,9 +363,9 @@ class businessDetailsSpec extends AmlsSpec {
 
       "is different" must {
         "set the hasChanged & correspondenceAddress Properties" in {
-          val res = completeModel.correspondenceAddress(UKCorrespondenceAddress("name new", "Business name new", "Line 1 New", "Line 2 New", None, None, "NEW CODE"))
+          val res = completeModel.correspondenceAddress(CorrespondenceAddress(Some(CorrespondenceAddressUk("name new", "Business name new", "Line 1 New", "Line 2 New", None, None, "NEW CODE")), None))
           res.hasChanged must be (true)
-          res.correspondenceAddress must be (Some(UKCorrespondenceAddress("name new", "Business name new", "Line 1 New", "Line 2 New", None, None, "NEW CODE")))
+          res.correspondenceAddress must be (Some(CorrespondenceAddress(Some(CorrespondenceAddressUk("name new", "Business name new", "Line 1 New", "Line 2 New", None, None, "NEW CODE")), None)))
         }
       }
     }

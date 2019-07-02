@@ -28,8 +28,14 @@ POST        /registered-office-address-non-uk                      @controllers.
 GET         /new-registered-office/date-change                     @controllers.businessdetails.RegisteredOfficeDateOfChangeController.get()
 POST        /new-registered-office/date-change                     @controllers.businessdetails.RegisteredOfficeDateOfChangeController.post()
 
-GET         /address-for-letters                                   @controllers.businessdetails.CorrespondenceAddressController.get(edit: Boolean ?= false)
-POST        /address-for-letters                                   @controllers.businessdetails.CorrespondenceAddressController.post(edit: Boolean ?= false)
+GET         /letters-address-country                               @controllers.businessdetails.CorrespondenceAddressIsUkController.get(edit: Boolean ?= false)
+POST        /letters-address-country                               @controllers.businessdetails.CorrespondenceAddressIsUkController.post(edit: Boolean ?= false)
+
+GET         /letters-address-uk                                    @controllers.businessdetails.CorrespondenceAddressUkController.get(edit: Boolean ?= false)
+POST        /letters-address-uk                                    @controllers.businessdetails.CorrespondenceAddressUkController.post(edit: Boolean ?= false)
+
+GET         /letters-address-non-uk                                @controllers.businessdetails.CorrespondenceAddressNonUkController.get(edit: Boolean ?= false)
+POST        /letters-address-non-uk                                @controllers.businessdetails.CorrespondenceAddressNonUkController.post(edit: Boolean ?= false)
 
 GET         /when-start-activities                                 @controllers.businessdetails.ActivityStartDateController.get(edit: Boolean ?= false)
 POST        /when-start-activities                                 @controllers.businessdetails.ActivityStartDateController.post(edit: Boolean ?= false)
