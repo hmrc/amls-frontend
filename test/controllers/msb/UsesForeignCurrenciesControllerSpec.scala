@@ -178,6 +178,22 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
               case result: MoneyServiceBusiness => result must be(outgoingModel)
             }
           }
+
+        "keep the foreign currency data when using foreign currencies" in new Fixture2 {
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "usesForeignCurrencies" -> "true"
+            )
+
+            val result = controller.post()(newRequest)
+            status(result) must be(SEE_OTHER)
+
+            val captor = ArgumentCaptor.forClass(classOf[MoneyServiceBusiness])
+            verify(controller.dataCacheConnector).save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), captor.capture())(any(), any(), any())
+            captor.getValue match {
+              case result: MoneyServiceBusiness => result must be(completeMsb)
+            }
+          }
         }
       }
     }

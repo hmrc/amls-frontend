@@ -80,20 +80,12 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
       }
   }
 
-  def updateCurrencies(oldMsb: MoneyServiceBusiness, usesForeignCurrencies: UsesForeignCurrencies): Option[MoneyServiceBusiness] = {
-    oldMsb match {
-      case msb: MoneyServiceBusiness => {
-        msb.whichCurrencies match {
-          case Some(w) => {
-            Some(msb.whichCurrencies(w.usesForeignCurrencies(usesForeignCurrencies).moneySources(MoneySources())))
-          }
-          case _ => None
-        }
-      }
-      case _ => None
+  def updateCurrencies(oldMsb: MoneyServiceBusiness, usesForeignCurrencies: UsesForeignCurrencies): Option[MoneyServiceBusiness] =
+    (oldMsb.whichCurrencies, usesForeignCurrencies) match {
+      case (Some(w), UsesForeignCurrenciesYes) => Some(oldMsb.whichCurrencies(w.usesForeignCurrencies(usesForeignCurrencies)))
+      case (Some(w), UsesForeignCurrenciesNo) => Some(oldMsb.whichCurrencies(w.usesForeignCurrencies(usesForeignCurrencies).moneySources(MoneySources())))
+      case (_, _) => None
     }
-  }
-
 
   private def shouldAnswerForeignExchangeQuestions( msbServices: Set[BusinessMatchingMsbService],
                                                     register: ServiceChangeRegister,
