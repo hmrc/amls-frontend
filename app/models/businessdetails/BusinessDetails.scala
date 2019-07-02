@@ -76,7 +76,7 @@ case class BusinessDetails(
     this match {
       case BusinessDetails(Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), _, Some(_), Some(true), _, None, _, true) =>
         false
-      case BusinessDetails(Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), Some(_), _, Some(true), Some(_), _, _, true) =>
+      case BusinessDetails(Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), _, Some(_), Some(true), Some(_), _, _, true) =>
         false
       case BusinessDetails(Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), _, Some(_), Some(_),_, _, _, true) =>
         true
