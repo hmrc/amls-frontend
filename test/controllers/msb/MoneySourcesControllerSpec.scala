@@ -185,15 +185,4 @@ class MoneySourcesControllerSpec extends AmlsSpec
     }
 
   }
-
-  "redirect to Page not found" when {
-    "application is in variation mode" in new Fixture {
-
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(SubmissionDecisionApproved))
-
-      val result = controller.get()(request)
-      status(result) must be(NOT_FOUND)
-    }
-  }
 }

@@ -21,16 +21,13 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import javax.inject.Inject
+import models.businessmatching.BusinessMatching
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{BusinessMatching, MoneyServiceBusiness => MsbActivity}
 import models.moneyservicebusiness.MoneyServiceBusiness
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
 import views.html.msb.summary
-
-import scala.concurrent.Future
 
 class SummaryController @Inject()
 (
@@ -42,7 +39,7 @@ class SummaryController @Inject()
 
   def get = Authorised.async {
     implicit authContext => implicit request =>
-      dataCache.fetchAll flatMap {
+      dataCache.fetchAll map {
         optionalCache =>
           (for {
             cache <- optionalCache
@@ -50,8 +47,8 @@ class SummaryController @Inject()
             msb <- cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
             register <- cache.getEntry[ServiceChangeRegister](ServiceChangeRegister.key) orElse Some(ServiceChangeRegister())
           } yield {
-            ControllerHelper.allowedToEdit(MsbActivity) map(x => Ok(summary(msb, businessMatching.msbServices, x, register)))
-          }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+            Ok(summary(msb, businessMatching.msbServices, register))
+          }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
 

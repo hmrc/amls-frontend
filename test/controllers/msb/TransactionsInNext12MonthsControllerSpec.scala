@@ -19,7 +19,7 @@ package controllers.msb
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import models.moneyservicebusiness.{MoneyServiceBusiness, SendMoneyToOtherCountry, TransactionsInNext12Months}
-import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionDecisionRejected}
+import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -91,18 +91,6 @@ class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSuga
         val result = controller.get()(request)
         status(result) must be(OK)
         contentAsString(result) must include(Messages("msb.transactions.expected.title"))
-      }
-    }
-
-    "redirect to the next page in the flow" when {
-      "application is in variation mode and this page can't be edited" in new Fixture {
-
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved))
-
-        val result = controller.get()(request)
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) must be(Some(controllers.msb.routes.SendMoneyToOtherCountryController.get().url))
       }
     }
 
