@@ -52,10 +52,10 @@ class RegisteredOfficeIsUKController @Inject ()(
             Future.successful(BadRequest(registered_office_is_uk(f, edit)))
           case ValidForm(_, data) =>
             for {
-              businessDetails <- dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key)
+              businessDetails: Option[BusinessDetails] <- dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key)
               _ <- dataCacheConnector.save[BusinessDetails](BusinessDetails.key, businessDetails.registeredOfficeIsUK(data))
               _ <- if (isUkHasChanged(businessDetails.registeredOffice, isUk = data)) { dataCacheConnector.save[BusinessDetails](BusinessDetails.key,
-                businessDetails.registeredOffice(RegisteredOffice)) } else { Future.successful(None) }
+                businessDetails.copy(registeredOffice = None)) } else { Future.successful(None) }
             } yield {
               data match {
                 case RegisteredOfficeIsUK(true) => Redirect(routes.RegisteredOfficeUKController.get(edit))
