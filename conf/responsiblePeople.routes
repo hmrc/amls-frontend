@@ -60,11 +60,11 @@ POST        /date-change-moved/:index/                             @controllers.
 GET         /other-previous-address-country/:index/                @controllers.responsiblepeople.AdditionalAddressIsUKController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /other-previous-address-country/:index/                @controllers.responsiblepeople.AdditionalAddressIsUKController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
-GET         /other-previous-address-uk/:index/                     @controllers.responsiblepeople.AdditonalAddressUKController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-POST        /other-previous-address-uk/:index/                     @controllers.responsiblepeople.AdditonalAddressUKController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+GET         /other-previous-address-uk/:index/                     @controllers.responsiblepeople.AdditionalAddressUKController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /other-previous-address-uk/:index/                     @controllers.responsiblepeople.AdditionalAddressUKController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
-GET         /other-previous-address-non-uk/:index/                 @controllers.responsiblepeople.AdditonalAddressNonUKController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-POST        /other-previous-address-non-uk/:index/                 @controllers.responsiblepeople.AdditonalAddressNonUKController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+GET         /other-previous-address-non-uk/:index/                 @controllers.responsiblepeople.AdditionalAddressNonUKController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /other-previous-address-non-uk/:index/                 @controllers.responsiblepeople.AdditionalAddressNonUKController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
 GET         /time-at-previous-address/:index/                      @controllers.responsiblepeople.TimeAtAdditionalAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /time-at-previous-address/:index/                      @controllers.responsiblepeople.TimeAtAdditionalAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)

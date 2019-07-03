@@ -105,7 +105,7 @@ class TimeAtCurrentAddressController @Inject () (
     timeAtAddress match {
       case ThreeYearsPlus | OneToThreeYears if !edit => Redirect(routes.PositionWithinBusinessController.get(index, edit, flow))
       case ThreeYearsPlus | OneToThreeYears if edit => Redirect(routes.DetailedAnswersController.get(index, flow))
-      case _ => Redirect(routes.AdditionalAddressController.get(index, edit, flow))
+      case _ => Redirect(routes.AdditionalAddressIsUKController.get(index, edit, flow))
     }
   }
 }

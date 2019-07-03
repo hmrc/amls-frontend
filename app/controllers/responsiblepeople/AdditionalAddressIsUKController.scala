@@ -34,7 +34,7 @@ import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.additional_address
+import views.html.responsiblepeople.additional_address_isUK
 
 import scala.concurrent.Future
 
@@ -53,9 +53,9 @@ class AdditionalAddressIsUKController @Inject()(
       implicit request =>
         getData[ResponsiblePerson](index) map {
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_, Some(ResponsiblePersonAddressHistory(_, Some(additionalAddress), _)),_,_,_,_,_,_,_,_,_,_,_, _)) =>
-            Ok(additional_address(Form2[ResponsiblePersonAddress](additionalAddress), edit, index, flow, personName.titleName, autoCompleteService.getCountries))
+            Ok(additional_address_isUK(Form2[ResponsiblePersonAddress](additionalAddress), edit, index, flow, personName.titleName, autoCompleteService.getCountries))
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
-            Ok(additional_address(Form2(DefaultAddressHistory), edit, index, flow, personName.titleName, autoCompleteService.getCountries))
+            Ok(additional_address_isUK(Form2(DefaultAddressHistory), edit, index, flow, personName.titleName, autoCompleteService.getCountries))
           case _ => NotFound(notFoundView)
         }
   }
@@ -66,7 +66,7 @@ class AdditionalAddressIsUKController @Inject()(
         (Form2[ResponsiblePersonAddress](request.body) match {
           case f: InvalidForm =>
             getData[ResponsiblePerson](index) map { rp =>
-              BadRequest(additional_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
+              BadRequest(additional_address_isUK(f, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
             }
           case ValidForm(_, data) => {
             getData[ResponsiblePerson](index) flatMap { responsiblePerson =>

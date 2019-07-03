@@ -279,7 +279,7 @@
         @person.addressHistory.flatMap(_.additionalAddress).map { pa =>
             @detailedAnswers(
                 question = Messages("responsiblepeople.detailed_answers.previous_address"),
-                editUrl = controllers.responsiblepeople.routes.AdditionalAddressController.get(idx, true, flow).toString(),
+                editUrl = controllers.responsiblepeople.routes.AdditionalAddressIsUKController.get(idx, true, flow).toString(),
                 dataItem = Some(pa)
             ) { a =>
                 <ul class="list">
