@@ -44,7 +44,7 @@ class TimeAtCurrentAddressController @Inject () (
     implicit authContext =>
       implicit request =>
         getData[ResponsiblePerson](index) map {
-          case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(_, Some(timeAtAddress), _)), _, _)), _, _, _, _, _, _, _, _, _, _, _, _)) =>
+          case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(_, Some(timeAtAddress), _)), _, _, _)), _, _, _, _, _, _, _, _, _, _, _, _)) =>
             Ok(time_at_address(Form2[TimeAtAddress](timeAtAddress), edit, index, flow, personName.titleName))
           case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _)) =>
             Ok(time_at_address(Form2(DefaultAddressHistory), edit, index, flow, personName.titleName))

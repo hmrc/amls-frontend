@@ -108,6 +108,7 @@ class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
     ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(addr.personAddress,
       currentTimeAtAddress,
       dateOfMove.fold[Option[DateOfChange]](None)(x => x.dateOfChange.map(DateOfChange(_))))),
+      None,
       additionalAddress,
       extraAdditionalAddress)
   }

@@ -24,7 +24,7 @@ case class ResponsiblePersonAddressIsUK(isUK: Boolean)
 
 object ResponsiblePersonAddressIsUK {
 
-  implicit val formats = Json.format[ResponsiblePerson]
+  implicit val format = Json.format[ResponsiblePersonAddressIsUK]
   import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, ResponsiblePersonAddressIsUK] =

@@ -49,7 +49,7 @@ class CurrentAddressController @Inject () (
 
         getData[ResponsiblePerson](index) map {
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,
-          Some(ResponsiblePersonAddressHistory(Some(currentAddress),_,_)),_,_,_,_,_,_,_,_,_,_,_, _))
+          Some(ResponsiblePersonAddressHistory(Some(currentAddress), _,_,_)),_,_,_,_,_,_,_,_,_,_,_, _))
           => Ok(current_address(Form2[ResponsiblePersonCurrentAddress](currentAddress), edit, index, flow, personName.titleName, autoCompleteService.getCountries))
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(current_address(Form2(DefaultAddressHistory), edit, index, flow, personName.titleName, autoCompleteService.getCountries))

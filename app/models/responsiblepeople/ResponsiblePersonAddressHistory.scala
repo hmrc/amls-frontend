@@ -19,11 +19,15 @@ package models.responsiblepeople
 import play.api.libs.json.Json
 
 case class ResponsiblePersonAddressHistory(currentAddress: Option[ResponsiblePersonCurrentAddress] = None,
+                                           additionalAddressIsUK: Option[ResponsiblePersonAddressIsUK] = None,
                                            additionalAddress: Option[ResponsiblePersonAddress] = None,
                                            additionalExtraAddress: Option[ResponsiblePersonAddress] = None) {
 
   def currentAddress(add: ResponsiblePersonCurrentAddress): ResponsiblePersonAddressHistory =
     this.copy(currentAddress = Some(add))
+
+  def additionalAddressIsUK(add: ResponsiblePersonAddressIsUK): ResponsiblePersonAddressHistory =
+    this.copy(additionalAddressIsUK = Some(add))
 
   def additionalAddress(add: ResponsiblePersonAddress): ResponsiblePersonAddressHistory =
     this.copy(additionalAddress = Some(add))
