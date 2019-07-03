@@ -39,7 +39,7 @@ import views.html.responsiblepeople.additional_address
 import scala.concurrent.Future
 
 @Singleton
-class AdditionalAddressController @Inject() (
+class AdditionalAddressIsUKController @Inject()(
                                               override val dataCacheConnector: DataCacheConnector,
                                               override val authConnector: AuthConnector,
                                               auditConnector: AuditConnector,

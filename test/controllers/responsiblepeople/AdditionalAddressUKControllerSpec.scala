@@ -52,7 +52,7 @@ class AdditionalAddressUKControllerSpec extends AmlsSpec with MockitoSugar {
     val auditConnector = mock[AuditConnector]
     val autoCompleteService = mock[AutoCompleteService]
 
-    val additionalAddressController = new AdditionalAddressController(
+    val additionalAddressController = new AdditionalAddressIsUKController(
       dataCacheConnector = mockDataCacheConnector,
       authConnector = self.authConnector,
       auditConnector = auditConnector,
