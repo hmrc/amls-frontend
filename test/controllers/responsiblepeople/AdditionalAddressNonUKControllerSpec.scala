@@ -24,14 +24,11 @@ import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMont
 import models.responsiblepeople._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
-
-import scala.collection.JavaConversions._
 import org.jsoup.select.Elements
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.AutoCompleteService
@@ -39,11 +36,12 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture}
 
+import scala.collection.JavaConversions._
 import scala.concurrent.Future
 
-class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar {
+class AdditionalAddressNonUKControllerSpec extends AmlsSpec with MockitoSugar {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
   val RecordId = 1
