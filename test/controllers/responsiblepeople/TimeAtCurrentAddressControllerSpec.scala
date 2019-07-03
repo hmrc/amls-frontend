@@ -187,7 +187,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         "edit mode is on" when {
           "time at address is less than 1 year" must {
-            "redirect to the AdditionalAddressController" when {
+            "redirect to the AdditionalAddressIsUKController" when {
               "there is no additional address already saved" in new Fixture {
 
                 val requestWithParams = request.withFormUrlEncodedBody(
@@ -208,7 +208,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
                 val result = timeAtAddressController.post(RecordId, true)(requestWithParams)
 
                 status(result) must be(SEE_OTHER)
-                redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(RecordId, true).url))
+                redirectLocation(result) must be(Some(routes.AdditionalAddressIsUKController.get(RecordId, true).url))
               }
             }
             "redirect to the DetailedAnswersController" when {
@@ -236,7 +236,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
                 val result = timeAtAddressController.post(RecordId, true)(requestWithParams)
 
                 status(result) must be(SEE_OTHER)
-                redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(RecordId, true).url))
+                redirectLocation(result) must be(Some(routes.AdditionalAddressIsUKController.get(RecordId, true).url))
 
               }
             }
@@ -316,7 +316,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
               val result = timeAtAddressController.post(RecordId)(requestWithParams)
 
               status(result) must be(SEE_OTHER)
-              redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(RecordId).url))
+              redirectLocation(result) must be(Some(routes.AdditionalAddressIsUKController.get(RecordId).url))
             }
           }
           "time at address is OneToThreeYears" must {
@@ -366,7 +366,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
         "the responsible person has previously been submitted and therefore has a lineID" when {
           "editing an existing address and the address has not changed" when {
             "time at address is less than 1 year" must {
-              "redirect to the additional address controller" in new Fixture {
+              "redirect to the additional address isUK controller" in new Fixture {
                 val requestWithParams = request.withFormUrlEncodedBody(
                   "timeAtAddress" -> "01"
                 )
@@ -390,7 +390,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
                 val result = timeAtAddressController.post(RecordId, true)(requestWithParams)
 
                 status(result) must be(SEE_OTHER)
-                redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(1, true).url))
+                redirectLocation(result) must be(Some(routes.AdditionalAddressIsUKController.get(1, true).url))
               }
             }
 
@@ -447,7 +447,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
                 val result = timeAtAddressController.post(RecordId, false)(requestWithParams)
 
                 status(result) must be(SEE_OTHER)
-                redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(1, false).url))
+                redirectLocation(result) must be(Some(routes.AdditionalAddressIsUKController.get(1, false).url))
               }
             }
             "time at address is more than 1 year" must {
@@ -497,7 +497,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
                 val result = timeAtAddressController.post(RecordId, true)(requestWithParams)
 
                 status(result) must be(SEE_OTHER)
-                redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(1, true).url))
+                redirectLocation(result) must be(Some(routes.AdditionalAddressIsUKController.get(1, true).url))
               }
             }
             "time at address is more than 1 year" must {

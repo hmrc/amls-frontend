@@ -67,7 +67,7 @@ class additional_address_UKSpec extends AmlsSpec with MustMatchers {
           (Path \ "addressLine2") -> Seq(ValidationError("not a message Key 3")),
           (Path \ "addressLine3") -> Seq(ValidationError("not a message Key 4")),
           (Path \ "addressLine4") -> Seq(ValidationError("not a message Key 5")),
-          (Path \ "postCode") -> Seq(ValidationError("not a message Key 6")),
+          (Path \ "postCode") -> Seq(ValidationError("not a message Key 6"))
         ))
 
       def view = views.html.responsiblepeople.additional_address_UK(form2, true, 1, None, name, countries)

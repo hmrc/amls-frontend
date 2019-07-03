@@ -58,7 +58,7 @@ class additional_address_IsUKSpec extends AmlsSpec with MustMatchers {
     "show errors in the correct locations" in new ViewFixture {
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "isUK") -> Seq(ValidationError("not a message Key 1")),
+          (Path \ "isUK") -> Seq(ValidationError("not a message Key 1"))
         ))
 
       def view = views.html.responsiblepeople.additional_address_isUK(form2, true, 1, None, name, countries)

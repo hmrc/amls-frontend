@@ -50,7 +50,7 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with Mockito
   "CurrentAddressController" must {
     "when the service status is Approved and the address is changed" when {
       "time at address is less than 1 year" must {
-        "redirect to the AdditionalAddressController" in new Fixture {
+        "redirect to the AdditionalAddressIsUKController" in new Fixture {
 
           val requestWithParams = request.withFormUrlEncodedBody(
             "timeAtAddress" -> "01"
@@ -71,7 +71,7 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with Mockito
           val result = timeAtAddressController.post(recordId, true)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(recordId, true).url))
+          redirectLocation(result) must be(Some(routes.AdditionalAddressIsUKController.get(recordId, true).url))
         }
       }
       "time at address is more than 1 year" must {
