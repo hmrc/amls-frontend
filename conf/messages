@@ -270,7 +270,7 @@ error.required.select.uk.passport = Select yes if {0} has a UK passport
 error.required.select.non.uk.passport = Select yes if {0} has a passport from another country
 error.required.select.non.uk = Enter a country that is not the United Kingdom because {0} in the UK
 error.required.select.non.uk.address = does not live
-error.required.select.non.uk.previous.address = previous address was not
+error.required.select.non.uk.previous.address = Select yes if {0}'s other previous home address was in the UK
 error.required.select.non.uk.other.previous.address = other previous address was not
 error.required.enter.valid.non.uk = Enter a country that is not the United Kingdom because {0} was not born in the UK
 
@@ -1637,6 +1637,9 @@ responsiblepeople.timeataddress.11_months_history = 6 to 11 months
 responsiblepeople.timeataddress.3_years_history = 1 to 3 years
 responsiblepeople.timeataddress.more_years_history = More than 3 years
 
+responsiblepeople.additional_address_IsUK.heading = Was {0}’s previous home address in the UK?
+responsiblepeople.additional_address_IsUK.title = Was this person’s previous home address in the UK?
+
 responsiblepeople.additional_address.heading = What was {0}’s previous home address?
 responsiblepeople.additional_address.title = What was this person’s previous home address?
 responsiblepeople.additional_address.ukAddress = UK
@@ -1649,6 +1652,7 @@ responsiblepeople.additional_address.0_5_months = 0 to 5 months
 responsiblepeople.additional_address.6_11_months = 6 to 11 months
 responsiblepeople.additional_address.1_3_years = 1 to 3 years
 responsiblepeople.additional_address.more_3_years = More than 3 years
+
 responsiblepeople.additional_extra_address.heading = What was {0}’s other previous home address?
 responsiblepeople.additional_extra_address.title = What was this person’s other previous home address?
 responsiblepeople.additional_extra_address.ukAddress = UK
