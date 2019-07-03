@@ -21,7 +21,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
-import models.renewal.ReceiveCashPayments
+import models.renewal.{CashPayments, CashPaymentsCustomerNotMet, HowCashPaymentsReceived}
 import services.RenewalService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.renewal.how_cash_payments_received
@@ -39,10 +39,10 @@ class HowCashPaymentsReceivedController @Inject()(
     implicit authContext => implicit request =>
       renewalService.getRenewal map {
         response =>
-          val form: Form2[ReceiveCashPayments] = (for {
+          val form: Form2[HowCashPaymentsReceived] = (for {
             renewal <- response
-            receivePayments <- renewal.receiveCashPayments
-          } yield Form2[ReceiveCashPayments](receivePayments)).getOrElse(EmptyForm)
+            payments <- renewal.receiveCashPayments flatMap {c => c.howCashPaymentsReceived}
+          } yield Form2[HowCashPaymentsReceived](payments)).getOrElse(EmptyForm)
           Ok(how_cash_payments_received(form, edit))
       } recoverWith {
         case _ => Future.successful(Ok(how_cash_payments_received(EmptyForm, edit)))
@@ -51,13 +51,17 @@ class HowCashPaymentsReceivedController @Inject()(
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-      Form2[ReceiveCashPayments](request.body) match {
+      Form2[HowCashPaymentsReceived](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(how_cash_payments_received(f, edit)))
         case ValidForm(_, data) =>
           for {
             renewal <- renewalService.getRenewal
-            _ <- renewalService.updateRenewal(renewal.receiveCashPayments(data))
+            _ <- renewalService.updateRenewal(renewal.receiveCashPayments(renewal.receiveCashPayments match {
+              case Some(cp) if cp.cashPaymentsCustomerNotMet.receiveCashPayments == true => CashPayments(CashPaymentsCustomerNotMet(true), Some(data))
+              case Some(cp) if cp.cashPaymentsCustomerNotMet.receiveCashPayments == false => CashPayments(CashPaymentsCustomerNotMet(false), None)
+              case _ => CashPayments(CashPaymentsCustomerNotMet(false), None)
+            }))
           } yield Redirect(routes.SummaryController.get())
       }
     }

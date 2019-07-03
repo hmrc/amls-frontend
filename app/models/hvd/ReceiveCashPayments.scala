@@ -16,11 +16,11 @@
 
 package models.hvd
 
+import cats.data.Validated.Valid
 import jto.validation._
 import jto.validation.forms._
+import models.renewal.{CashPaymentsCustomerNotMet, HowCashPaymentsReceived, CashPayments => RCashPayments, PaymentMethods => RPaymentMethods}
 import play.api.libs.json.{Writes, _}
-import cats.data.Validated.{Invalid, Valid}
-import models.renewal.{ReceiveCashPayments => RReceiveCashPayments, PaymentMethods => RPaymentMethods}
 
 case class ReceiveCashPayments(paymentMethods: Option[PaymentMethods])
 
@@ -28,9 +28,8 @@ sealed trait ReceiveCashPayments0 {
 
 
   implicit val formRule: Rule[UrlFormEncoded, ReceiveCashPayments] = From[UrlFormEncoded] { __ =>
-    import utils.MappingUtils.Implicits.RichRule
-
     import jto.validation.forms.Rules._
+    import utils.MappingUtils.Implicits.RichRule
 
     (__ \ "receivePayments").read[Boolean].withMessage("error.required.hvd.receive.cash.payments") flatMap{
       case true =>
@@ -62,14 +61,10 @@ sealed trait ReceiveCashPayments0 {
     }
 
   val formR: Rule[UrlFormEncoded, ReceiveCashPayments] = {
-    import jto.validation.forms.Rules._
     implicitly[Rule[UrlFormEncoded, ReceiveCashPayments]]
   }
 
  val formW: Write[ReceiveCashPayments, UrlFormEncoded] = {
-    import cats.implicits._
-    import utils.MappingUtils.MonoidImplicits.urlMonoid
-    import jto.validation.forms.Writes._
     implicitly
   }
   val jsonR: Reads[ReceiveCashPayments] = {
@@ -97,18 +92,17 @@ object ReceiveCashPayments {
   implicit val formW: Write[ReceiveCashPayments, UrlFormEncoded] = Cache.formW
   implicit val jsonW: Writes[ReceiveCashPayments] = Cache.jsonW
 
-
-  def convert(model: Hvd) : RReceiveCashPayments = {
+//todo: Slawek
+  def convert(model: Hvd) : RCashPayments = {
     if(model.receiveCashPayments.contains(false)){
-      RReceiveCashPayments(None)
+      RCashPayments(CashPaymentsCustomerNotMet(false), None)
     } else {
-      model.cashPaymentMethods.fold(RReceiveCashPayments(None)){ methods =>
-        RReceiveCashPayments(Some(
-          RPaymentMethods(
-            methods.courier,
-            methods.direct,
-            methods.other
-          )
+      model.cashPaymentMethods.fold(RCashPayments(CashPaymentsCustomerNotMet(false), None)){ methods =>
+        RCashPayments(CashPaymentsCustomerNotMet(true),
+          Some(HowCashPaymentsReceived(
+            RPaymentMethods(methods.courier,
+              methods.direct,
+              methods.other))
         ))
       }
     }

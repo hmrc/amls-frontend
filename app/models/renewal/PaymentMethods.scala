@@ -24,11 +24,9 @@ import utils.JsonMapping
 import cats.data.Validated.{Invalid, Valid}
 
 
-case class PaymentMethods(
-                         courier: Boolean,
+case class PaymentMethods(courier: Boolean,
                          direct: Boolean,
-                         other: Option[String]
-                         )
+                         other: Option[String])
 
 sealed trait PaymentMethods0 {
 

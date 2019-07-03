@@ -27,7 +27,7 @@ case class Renewal(
                     turnover: Option[AMLSTurnover] = None,
                     customersOutsideUK: Option[CustomersOutsideUK] = None,
                     percentageOfCashPaymentOver15000: Option[PercentageOfCashPaymentOver15000] = None,
-                    receiveCashPayments: Option[ReceiveCashPayments] = None,
+                    receiveCashPayments: Option[CashPayments] = None,
                     totalThroughput: Option[TotalThroughput] = None,
                     whichCurrencies: Option[WhichCurrencies] = None,
                     transactionsInLast12Months: Option[TransactionsInLast12Months] = None,
@@ -61,7 +61,7 @@ case class Renewal(
   def percentageOfCashPaymentOver15000(v: PercentageOfCashPaymentOver15000): Renewal =
     this.copy(percentageOfCashPaymentOver15000 = Some(v))
 
-  def receiveCashPayments(p: ReceiveCashPayments): Renewal =
+  def receiveCashPayments(p: CashPayments): Renewal =
     this.copy(receiveCashPayments = Some(p), hasChanged = hasChanged || !this.receiveCashPayments.contains(p),
       hasAccepted = hasAccepted && this.receiveCashPayments.contains(p))
 

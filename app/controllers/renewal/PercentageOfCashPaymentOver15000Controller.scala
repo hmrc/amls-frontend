@@ -16,16 +16,15 @@
 
 package controllers.renewal
 
-import javax.inject.{Inject, Singleton}
-
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.renewal.PercentageOfCashPaymentOver15000
-import models.renewal.Renewal
-import services.{RenewalService, StatusService}
+import javax.inject.{Inject, Singleton}
+import models.renewal.{PercentageOfCashPaymentOver15000, Renewal}
+import services.RenewalService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.renewal.percentage
+
 import scala.concurrent.Future
 
 
@@ -64,7 +63,7 @@ class PercentageOfCashPaymentOver15000Controller @Inject()(
 
   private def redirectDependingOnEdit(edit: Boolean) = edit match {
     case true => Redirect(routes.SummaryController.get())
-    case false => Redirect(routes.ReceiveCashPaymentsController.get(edit))
+    case false => Redirect(routes.CashPaymentsCustomersNotMetController.get(edit))
   }
 
 }

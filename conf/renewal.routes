@@ -42,9 +42,6 @@ POST        /currencies-supply-most                                           @c
 GET         /percentage-turnover-from-cash-payments                           @controllers.renewal.PercentageOfCashPaymentOver15000Controller.get(edit: Boolean ?= false)
 POST        /percentage-turnover-from-cash-payments                           @controllers.renewal.PercentageOfCashPaymentOver15000Controller.post(edit: Boolean ?= false)
 
-GET         /cash-payments-customers-not-met-old                                  @controllers.renewal.ReceiveCashPaymentsController.get(edit: Boolean ?= false)
-POST        /cash-payments-customers-not-met-old                                  @controllers.renewal.ReceiveCashPaymentsController.post(edit: Boolean ?= false)
-
 GET         /cash-payments-customers-not-met                                      @controllers.renewal.CashPaymentsCustomersNotMetController.get(edit: Boolean ?= false)
 POST        /cash-payments-customers-not-met                                      @controllers.renewal.CashPaymentsCustomersNotMetController.post(edit: Boolean ?= false)
 
