@@ -41,7 +41,7 @@ class summarySpec extends AmlsSpec
   "summary view" must {
     "have correct title" in new ViewFixture {
 
-      def view = views.html.msb.summary(MoneyServiceBusiness(), None, true, ServiceChangeRegister())
+      def view = views.html.msb.summary(MoneyServiceBusiness(), None, ServiceChangeRegister())
 
       doc.title must be(Messages("title.cya") +
         " - " + Messages("summary.msb") +
@@ -51,7 +51,7 @@ class summarySpec extends AmlsSpec
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.msb.summary(MoneyServiceBusiness(), None, true, ServiceChangeRegister())
+      def view = views.html.msb.summary(MoneyServiceBusiness(), None, ServiceChangeRegister())
 
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.msb"))
@@ -98,7 +98,6 @@ class summarySpec extends AmlsSpec
       def view = views.html.msb.summary(
         fullMSB,
         Some(msbServices),
-        true,
         ServiceChangeRegister()
       )
 
@@ -115,26 +114,26 @@ class summarySpec extends AmlsSpec
     }
 
     trait NoSubsectorsViewFixture extends ViewFixture {
-      def view = views.html.msb.summary(fullMSB, Some(BusinessMatchingMsbServices(Set())), true, ServiceChangeRegister())
+      def view = views.html.msb.summary(fullMSB, Some(BusinessMatchingMsbServices(Set())), ServiceChangeRegister())
     }
 
     trait TMViewFixture extends ViewFixture {
-      def view = views.html.msb.summary(fullMSB, Some(BusinessMatchingMsbServices(Set(TransmittingMoney))), true, ServiceChangeRegister())
+      def view = views.html.msb.summary(fullMSB, Some(BusinessMatchingMsbServices(Set(TransmittingMoney))), ServiceChangeRegister())
     }
 
     trait TMNotSendViewFixture extends ViewFixture {
       def view = views.html.msb.summary(
         fullMSB.copy(sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false))),
-        Some(BusinessMatchingMsbServices(Set(TransmittingMoney))), true, ServiceChangeRegister()
+        Some(BusinessMatchingMsbServices(Set(TransmittingMoney))), ServiceChangeRegister()
       )
     }
 
     trait CEViewFixture extends ViewFixture {
-      def view = views.html.msb.summary(fullMSB, Some(BusinessMatchingMsbServices(Set(CurrencyExchange))), true, ServiceChangeRegister())
+      def view = views.html.msb.summary(fullMSB, Some(BusinessMatchingMsbServices(Set(CurrencyExchange))), ServiceChangeRegister())
     }
 
     trait FXViewFixture extends ViewFixture {
-      def view = views.html.msb.summary(fullMSB, Some(BusinessMatchingMsbServices(Set(ForeignExchange))), true, ServiceChangeRegister())
+      def view = views.html.msb.summary(fullMSB, Some(BusinessMatchingMsbServices(Set(ForeignExchange))), ServiceChangeRegister())
     }
 
     "business use an IPSP" when {
