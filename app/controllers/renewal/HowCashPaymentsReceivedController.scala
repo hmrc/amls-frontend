@@ -16,23 +16,24 @@
 
 package controllers.renewal
 
+import com.google.inject.Singleton
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
 import models.renewal.ReceiveCashPayments
 import services.RenewalService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import views.html.renewal.receiving
+import views.html.renewal.how_cash_payments_received
 
 import scala.concurrent.Future
 
 @Singleton
-class ReceiveCashPaymentsController @Inject()(
-                                               val dataCacheConnector: DataCacheConnector,
-                                               val authConnector: AuthConnector,
-                                               val renewalService: RenewalService
-                                             ) extends BaseController {
+class HowCashPaymentsReceivedController @Inject()(
+                                         val dataCacheConnector: DataCacheConnector,
+                                         val authConnector: AuthConnector,
+                                         val renewalService: RenewalService
+                                       ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -42,9 +43,9 @@ class ReceiveCashPaymentsController @Inject()(
             renewal <- response
             receivePayments <- renewal.receiveCashPayments
           } yield Form2[ReceiveCashPayments](receivePayments)).getOrElse(EmptyForm)
-          Ok(receiving(form, edit))
+          Ok(how_cash_payments_received(form, edit))
       } recoverWith {
-        case _ => Future.successful(Ok(receiving(EmptyForm, edit)))
+        case _ => Future.successful(Ok(how_cash_payments_received(EmptyForm, edit)))
       }
   }
 
@@ -52,12 +53,12 @@ class ReceiveCashPaymentsController @Inject()(
     implicit authContext => implicit request => {
       Form2[ReceiveCashPayments](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(receiving(f, edit)))
+          Future.successful(BadRequest(how_cash_payments_received(f, edit)))
         case ValidForm(_, data) =>
           for {
             renewal <- renewalService.getRenewal
             _ <- renewalService.updateRenewal(renewal.receiveCashPayments(data))
-          } yield Redirect(routes.CashPaymentsCustomersNotMetController.get())
+          } yield Redirect(routes.SummaryController.get())
       }
     }
   }
