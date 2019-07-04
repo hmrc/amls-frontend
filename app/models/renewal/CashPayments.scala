@@ -52,7 +52,7 @@ object CashPayments {
       }
   }
 
-//  implicit def convert(model: ReceiveCashPayments): Option[models.hvd.PaymentMethods] = model.paymentMethods map { paymentMethods =>
-//    models.hvd.PaymentMethods(paymentMethods.courier, paymentMethods.direct, paymentMethods.other)
-//  }
+  implicit def convert(model: CashPayments): Option[models.hvd.PaymentMethods] = model.howCashPaymentsReceived map { pm =>
+    models.hvd.PaymentMethods(pm.paymentMethods.courier, pm.paymentMethods.direct, pm.paymentMethods.other)
+  }
 }

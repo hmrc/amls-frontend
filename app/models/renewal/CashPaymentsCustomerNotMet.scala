@@ -27,7 +27,7 @@ object CashPaymentsCustomerNotMet {
 
   implicit val formRule: Rule[UrlFormEncoded, CashPaymentsCustomerNotMet] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    (__ \ "receiveCashPayments").read[Boolean].withMessage("error.required.hvd.accepted.cash.payment") flatMap {
+    (__ \ "receiveCashPayments").read[Boolean].withMessage("error.required.renewal.hvd.receive.cash.payments") flatMap {
       CashPaymentsCustomerNotMet.apply
     }
   }

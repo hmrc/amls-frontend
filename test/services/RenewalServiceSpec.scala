@@ -19,7 +19,6 @@ package services
 import connectors.DataCacheConnector
 import models.Country
 import models.businessmatching._
-import models.moneyservicebusiness.{MoneyServiceBusiness => moneyServiceBusiness}
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.renewal._
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -96,7 +95,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           Some(AMLSTurnover.First),
           Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
           Some(PercentageOfCashPaymentOver15000.First),
-          Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
+          Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other")))))),
           Some(TotalThroughput("01")),
           Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
           Some(TransactionsInLast12Months("1500")),
@@ -216,7 +215,8 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
         val model = preFilledModel.copy(
           customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
           percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
-          receiveCashPayments = Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other")))))
+          receiveCashPayments = Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other"))))))
+
         )
         await(service.isRenewalComplete(model)) mustBe true
       }
@@ -225,7 +225,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
         val model = preFilledModel.copy(
           customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
           percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
-          receiveCashPayments = Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other")))))
+          receiveCashPayments = Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other"))))))
         )
         await(service.isRenewalComplete(model)) mustBe true
       }

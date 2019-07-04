@@ -1,7 +1,25 @@
+/*
+ * Copyright 2019 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package views.renewal
 
-import forms.{EmptyForm, InvalidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
+import models.renewal.{HowCashPaymentsReceived, PaymentMethods}
+import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
 
@@ -9,31 +27,32 @@ class how_cash_payments_receivedSpec extends AmlsSpec {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
+
+    val paymentMethods = PaymentMethods(courier = true, direct = true, other = Some("foo"))
+    val howReceived = HowCashPaymentsReceived(paymentMethods)
   }
 
   "how_cash_payments_received view" must {
-    //
-    //    val ce = CashPaymentsCustomersNotMet("123")
-    //
-    //    "have correct title" in new ViewFixture {
-    //
-    //      val form2: ValidForm[CETransactionsInLast12Months] = Form2(ce)
-    //
-    //      def view = views.html.renewal.ce_transactions_in_last_12_months(form2, true)
-    //
-    //      doc.title must startWith(Messages("renewal.msb.ce.transactions.expected.title") + " - " + Messages("summary.renewal"))
-    //    }
-    //
-    //    "have correct headings" in new ViewFixture {
-    //
-    //      val form2: ValidForm[CETransactionsInLast12Months] = Form2(ce)
-    //
-    //      def view = views.html.renewal.ce_transactions_in_last_12_months(form2, true)
-    //
-    //      heading.text() must be(Messages("renewal.msb.ce.transactions.expected.title"))
-    //      subHeading.text() must include(Messages("summary.renewal"))
-    //
-    //    }
+
+    "have correct title" in new ViewFixture {
+
+      val form2: ValidForm[HowCashPaymentsReceived] = Form2(howReceived)
+
+      def view = views.html.renewal.how_cash_payments_received(form2, true)
+
+      doc.title must startWith("How did you receive cash payments from customers you have not met in person?" + " - " + "Renewal")
+    }
+
+    "have correct headings" in new ViewFixture {
+
+      val form2: ValidForm[HowCashPaymentsReceived] = Form2(howReceived)
+
+      def view = views.html.renewal.how_cash_payments_received(form2, true)
+
+      heading.text() must be("How did you receive cash payments from customers you have not met in person?")
+      subHeading.text() must include("Renewal")
+
+    }
 
     "show errors in the correct locations" in new ViewFixture {
 

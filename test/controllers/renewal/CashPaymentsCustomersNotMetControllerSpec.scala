@@ -1,9 +1,27 @@
+/*
+ * Copyright 2019 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package controllers.renewal
 
 import connectors.DataCacheConnector
-import models.renewal.{PaymentMethods, ReceiveCashPayments}
+import models.renewal.{CashPayments, CashPaymentsCustomerNotMet, HowCashPaymentsReceived, PaymentMethods, Renewal}
+import org.jsoup.Jsoup
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
+import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
@@ -15,14 +33,14 @@ class CashPaymentsCustomersNotMetControllerSpec extends AmlsSpec {
   lazy val mockDataCacheConnector = mock[DataCacheConnector]
   lazy val mockRenewalService = mock[RenewalService]
 
-  val receiveCashPayments = ReceiveCashPayments(
-    Some(PaymentMethods(true, true,Some("other"))
-    ))
+  val receiveCashPayments = CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other")))))
+  val doNotreceiveCashPayments = CashPayments(CashPaymentsCustomerNotMet(false), None)
+
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new ReceiveCashPaymentsController (
+    val controller = new CashPaymentsCustomersNotMetController (
       dataCacheConnector = mockDataCacheConnector,
       authConnector = self.authConnector,
       renewalService = mockRenewalService
@@ -39,13 +57,70 @@ class CashPaymentsCustomersNotMetControllerSpec extends AmlsSpec {
     "get is called" must {
       "load the page" when {
         "renewal data is found for receiving payments and pre-populate the data" in new Fixture {
+          when(mockRenewalService.getRenewal(any(),any(),any()))
+            .thenReturn(Future.successful(Some(Renewal(receiveCashPayments = Some(receiveCashPayments)))))
 
+          val result = controller.get()(request)
+          status(result) mustEqual OK
+
+          val page = Jsoup.parse(contentAsString(result))
+          page.select("input[type=radio][name=receiveCashPayments][value=true]").hasAttr("checked") must be(true)
+          page.select("input[type=radio][name=receiveCashPayments][value=false]").hasAttr("checked") must be(false)
+        }
+
+        "renewal data is found for not receiving payments and pre-populate the data" in new Fixture {
+          when(mockRenewalService.getRenewal(any(),any(),any()))
+            .thenReturn(Future.successful(Some(Renewal(receiveCashPayments = Some(doNotreceiveCashPayments)))))
+
+          val result = controller.get()(request)
+          status(result) mustEqual OK
+
+          val page = Jsoup.parse(contentAsString(result))
+          page.select("input[type=radio][name=receiveCashPayments][value=true]").hasAttr("checked") must be(false)
+          page.select("input[type=radio][name=receiveCashPayments][value=false]").hasAttr("checked") must be(true)
+        }
+
+        "no renewal data is found and show an empty form" in new Fixture {
+          val result = controller.get()(request)
+          status(result) mustEqual OK
+
+          val page = Jsoup.parse(contentAsString(result))
+          page.select("input[type=radio][name=receiveCashPayments][value=true]").hasAttr("checked") must be(false)
+          page.select("input[type=radio][name=receiveCashPayments][value=false]").hasAttr("checked") must be(false)
         }
       }
     }
 
     "post is called" must {
+      "show a bad request with an invalid request" in new Fixture {
 
+        val result = controller.post()(request)
+        status(result) mustEqual BAD_REQUEST
+      }
+
+      "redirect to summary if false" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "receiveCashPayments" -> "false"
+        )
+
+        val result = controller.post()(newRequest)
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
+      }
+
+      "redirect to HowPaymentsReceived if true" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "receiveCashPayments" -> "true"
+        )
+
+        val result = controller.post()(newRequest)
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustEqual Some(routes.HowCashPaymentsReceivedController.get().url)
+      }
     }
   }
 }

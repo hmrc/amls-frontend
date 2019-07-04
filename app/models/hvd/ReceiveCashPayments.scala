@@ -19,7 +19,7 @@ package models.hvd
 import cats.data.Validated.Valid
 import jto.validation._
 import jto.validation.forms._
-import models.renewal.{CashPaymentsCustomerNotMet, HowCashPaymentsReceived, CashPayments => RCashPayments, PaymentMethods => RPaymentMethods}
+import models.renewal.{CashPaymentsCustomerNotMet, HowCashPaymentsReceived, CashPayments => RReceiveCashPayments, PaymentMethods => RPaymentMethods}
 import play.api.libs.json.{Writes, _}
 
 case class ReceiveCashPayments(paymentMethods: Option[PaymentMethods])
@@ -64,22 +64,25 @@ sealed trait ReceiveCashPayments0 {
     implicitly[Rule[UrlFormEncoded, ReceiveCashPayments]]
   }
 
- val formW: Write[ReceiveCashPayments, UrlFormEncoded] = {
+  val formW: Write[ReceiveCashPayments, UrlFormEncoded] = {
+    import cats.implicits._
+    import utils.MappingUtils.MonoidImplicits.urlMonoid
+    import jto.validation.forms.Writes._
     implicitly
   }
   val jsonR: Reads[ReceiveCashPayments] = {
     implicitly[Reads[ReceiveCashPayments]]
   }
   val jsonW = Writes[ReceiveCashPayments] {x =>
-   x.paymentMethods match {
-     case Some(paymentMtds) => Json.obj("receivePayments" -> true,
-       "paymentMethods" -> Json.obj("courier" -> paymentMtds.courier,
-       "direct" -> paymentMtds.direct,
-       "other" -> paymentMtds.other.isDefined,
-       "details" -> paymentMtds.other
-     ))
-     case None =>  Json.obj("receivePayments" -> false, "paymentMethods" -> Json.obj())
-   }
+    x.paymentMethods match {
+      case Some(paymentMtds) => Json.obj("receivePayments" -> true,
+        "paymentMethods" -> Json.obj("courier" -> paymentMtds.courier,
+          "direct" -> paymentMtds.direct,
+          "other" -> paymentMtds.other.isDefined,
+          "details" -> paymentMtds.other
+        ))
+      case None =>  Json.obj("receivePayments" -> false, "paymentMethods" -> Json.obj())
+    }
   }
 }
 
@@ -92,17 +95,18 @@ object ReceiveCashPayments {
   implicit val formW: Write[ReceiveCashPayments, UrlFormEncoded] = Cache.formW
   implicit val jsonW: Writes[ReceiveCashPayments] = Cache.jsonW
 
-//todo: Slawek
-  def convert(model: Hvd) : RCashPayments = {
+
+  def convert(model: Hvd): RReceiveCashPayments = {
     if(model.receiveCashPayments.contains(false)){
-      RCashPayments(CashPaymentsCustomerNotMet(false), None)
+      RReceiveCashPayments(CashPaymentsCustomerNotMet(false), None)
     } else {
-      model.cashPaymentMethods.fold(RCashPayments(CashPaymentsCustomerNotMet(false), None)){ methods =>
-        RCashPayments(CashPaymentsCustomerNotMet(true),
-          Some(HowCashPaymentsReceived(
-            RPaymentMethods(methods.courier,
-              methods.direct,
-              methods.other))
+      model.cashPaymentMethods.fold(RReceiveCashPayments(CashPaymentsCustomerNotMet(false), None)){ methods =>
+        RReceiveCashPayments(CashPaymentsCustomerNotMet(false), Some(HowCashPaymentsReceived(
+          RPaymentMethods(
+            methods.courier,
+            methods.direct,
+            methods.other
+          ))
         ))
       }
     }

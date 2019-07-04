@@ -32,7 +32,8 @@ object HowCashPaymentsReceived {
     case HowCashPaymentsReceived(paymentMethods) => Map(
       "cashPaymentMethods.courier" -> Seq(paymentMethods.courier.toString),
       "cashPaymentMethods.direct" -> Seq(paymentMethods.direct.toString),
-      "cashPaymentMethods.other" -> Seq(paymentMethods.other match {
+      "cashPaymentMethods.other" -> Seq(paymentMethods.other.isDefined.toString),
+      "cashPaymentMethods.details" -> Seq(paymentMethods.other match {
         case Some(other) => other
         case _ => ""
       })

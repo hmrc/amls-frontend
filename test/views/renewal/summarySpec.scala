@@ -68,6 +68,7 @@ class summarySpec extends AmlsSpec
       "businessmatching.registerservices.servicename.lbl.07"
     )
 
+    //todo Slawek
     val sectionChecks = Table[String, Element=>Boolean, String](
       ("title key", "check", "edit link"),
       ("renewal.involvedinother.title",checkElementTextIncludes(_, "test text"), controllers.renewal.routes.InvolvedInOtherController.get(true).toString),
@@ -93,7 +94,7 @@ class summarySpec extends AmlsSpec
           Some(AMLSTurnover.First),
           Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
           Some(PercentageOfCashPaymentOver15000.First),
-          Some(ReceiveCashPayments(Some(PaymentMethods(true,true,Some("other"))))),
+          Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other")))))),
           Some(TotalThroughput("01")),
           Some(WhichCurrencies(Seq("EUR"),None,Some(MoneySources(None,None,None)))),
           Some(TransactionsInLast12Months("1500")),
