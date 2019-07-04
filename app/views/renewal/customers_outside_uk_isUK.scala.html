@@ -31,7 +31,7 @@
 }
 
 @main(
-    title = Messages("renewal.customer.outside.uk.title") + " - " + Messages("summary.renewal"),
+    title = Messages("renewal.customer.outside.uk.countries.title") + " - " + Messages("summary.renewal"),
     heading = header
 ) {
     @form(f, controllers.renewal.routes.CustomersOutsideUKController.post(edit)) {
@@ -58,7 +58,6 @@
                     }
                 }
             }
-        }
 
         @submit(edit, returnLocation = Some("renewal"))
     }
