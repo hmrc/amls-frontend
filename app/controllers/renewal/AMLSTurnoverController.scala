@@ -75,8 +75,8 @@ class AMLSTurnoverController @Inject()(
               case (true, _) => Redirect(routes.SummaryController.get())
               case (false, Some(bm)) if bm.activities.isDefined => bm.activities.get.businessActivities match {
                 case x if x.contains(MoneyServiceBusiness) => Redirect(routes.TotalThroughputController.get())
-                case x if x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideUKController.get())
-                case x if x.contains(HighValueDealing) => Redirect(routes.CustomersOutsideUKController.get())
+                case x if x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideIsUKController.get())
+                case x if x.contains(HighValueDealing) => Redirect(routes.CustomersOutsideIsUKController.get())
                 case _ => Redirect(routes.SummaryController.get())
               }
               case _ => InternalServerError("Unable to redirect from Turnover page")

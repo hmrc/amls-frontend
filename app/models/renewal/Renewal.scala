@@ -55,7 +55,7 @@ case class Renewal(
     this.copy(turnover = Some(model), hasChanged = hasChanged || !this.turnover.contains(model),
       hasAccepted = hasAccepted && this.turnover.contains(model))
 
-  def customerOutsideIsUK(model: CustomersOutsideIsUK): Renewal =
+  def customersOutsideIsUK(model: CustomersOutsideIsUK): Renewal =
     this.copy(customersOutsideIsUK = Some(model), hasChanged = hasChanged || !this.customersOutsideIsUK.contains(model),
       hasAccepted = hasAccepted && this.customersOutsideIsUK.contains(model))
 

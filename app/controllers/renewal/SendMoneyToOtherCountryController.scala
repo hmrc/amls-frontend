@@ -85,7 +85,7 @@ class SendMoneyToOtherCountryController @Inject()(
       case (true, _, _, _) => Redirect(routes.SendTheLargestAmountsOfMoneyController.get(edit))
       case (_, false, x, _) if x.contains(CurrencyExchange) =>  Redirect(routes.CETransactionsInLast12MonthsController.get())
       case (_, false, x, _) if x.contains(ForeignExchange) =>  Redirect(routes.FXTransactionsInLast12MonthsController.get())
-      case (_, false, _, x) if x.contains(HighValueDealing) || x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideUKController.get())
+      case (_, false, _, x) if x.contains(HighValueDealing) || x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideIsUKController.get())
       case _ => Redirect(routes.SummaryController.get())
     }
   }

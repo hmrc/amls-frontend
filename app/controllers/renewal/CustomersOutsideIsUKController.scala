@@ -20,8 +20,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
-import models.businessmatching._
-import models.renewal.{CustomersOutsideUK, Renewal}
+import models.renewal.{CustomersOutsideIsUK, Renewal}
 import services.{AutoCompleteService, RenewalService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.renewal._
@@ -40,40 +39,31 @@ class CustomersOutsideIsUKController @Inject()(val dataCacheConnector: DataCache
       implicit request =>
         renewalService.getRenewal map {
           response =>
-            val form: Form2[CustomersOutsideUK] = (for {
+            val form: Form2[CustomersOutsideIsUK] = (for {
               renewal <- response
-              customers <- renewal.customersOutsideUK
-            } yield Form2[CustomersOutsideUK](customers)).getOrElse(EmptyForm)
-            Ok(customers_outside_uk(form, edit, autoCompleteService.getCountries))
+              customers <- renewal.customersOutsideIsUK
+            } yield Form2[CustomersOutsideIsUK](customers)).getOrElse(EmptyForm)
+            Ok(customers_outside_uk_isUK(form, edit, autoCompleteService.getCountries))
         }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        Form2[CustomersOutsideUK](request.body) match {
+        Form2[CustomersOutsideIsUK](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(customers_outside_uk(f, edit, autoCompleteService.getCountries)))
-          case ValidForm(_, data) => {
+            Future.successful(BadRequest(customers_outside_uk_isUK(f, edit, autoCompleteService.getCountries)))
+          case ValidForm(_, data) =>
             dataCacheConnector.fetchAll flatMap { optionalCache =>
               (for {
                 cache <- optionalCache
-                businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
                 renewal <- cache.getEntry[Renewal](Renewal.key)
               } yield {
-                renewalService.updateRenewal(renewal.customersOutsideUK(data)) map {
-                  _ =>
-                    (edit, businessMatching) match {
-                      case (true, _) => Redirect(routes.SummaryController.get())
-                      case (false, bm) if bm.activities.isDefined => bm.activities.get.businessActivities match {
-                        case x if x.contains(HighValueDealing) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
-                        case _ => Redirect(routes.SummaryController.get())
-                      }
-                    }
+                renewalService.updateRenewal(renewal.customersOutsideIsUK(data)) map {
+                  _ => Redirect(routes.CustomersOutsideIsUKController.get())
                 }
               }) getOrElse Future.successful(InternalServerError("Unable to get data from the cache"))
             }
-          }
         }
   }
 
