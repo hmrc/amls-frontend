@@ -94,6 +94,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           Some(InvolvedInOtherYes("test")),
           Some(BusinessTurnover.First),
           Some(AMLSTurnover.First),
+          Some(CustomersOutsideIsUK(true)),
           Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
           Some(PercentageOfCashPaymentOver15000.First),
           Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
