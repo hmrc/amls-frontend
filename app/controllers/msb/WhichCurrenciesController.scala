@@ -20,12 +20,10 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
-import models.businessmatching.{CurrencyExchange, MoneyServiceBusiness => MsbActivity}
 import models.moneyservicebusiness._
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
 
 import scala.concurrent.Future
 
@@ -37,8 +35,7 @@ class WhichCurrenciesController @Inject() (val authConnector: AuthConnector,
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-      ControllerHelper.allowedToEdit(MsbActivity, Some(CurrencyExchange)) flatMap {
-        case true => dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+      dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
         response =>
           val form = (for {
             msb <- response
@@ -46,8 +43,6 @@ class WhichCurrenciesController @Inject() (val authConnector: AuthConnector,
           } yield Form2[WhichCurrencies](currencies)).getOrElse(EmptyForm)
 
           Ok(views.html.msb.which_currencies(form, edit))
-      }
-        case false => Future.successful(NotFound(notFoundView))
       }
     }
   }
