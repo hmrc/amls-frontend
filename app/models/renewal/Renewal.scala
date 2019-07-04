@@ -25,6 +25,7 @@ case class Renewal(
                     involvedInOtherActivities: Option[InvolvedInOther] = None,
                     businessTurnover: Option[BusinessTurnover] = None,
                     turnover: Option[AMLSTurnover] = None,
+                    customersOutsideIsUK: Option[CustomersOutsideIsUK] = None,
                     customersOutsideUK: Option[CustomersOutsideUK] = None,
                     percentageOfCashPaymentOver15000: Option[PercentageOfCashPaymentOver15000] = None,
                     receiveCashPayments: Option[ReceiveCashPayments] = None,
@@ -53,6 +54,10 @@ case class Renewal(
   def turnover(model: AMLSTurnover): Renewal =
     this.copy(turnover = Some(model), hasChanged = hasChanged || !this.turnover.contains(model),
       hasAccepted = hasAccepted && this.turnover.contains(model))
+
+  def customerOutsideIsUK(model: CustomersOutsideIsUK): Renewal =
+    this.copy(customersOutsideIsUK = Some(model), hasChanged = hasChanged || !this.customersOutsideIsUK.contains(model),
+      hasAccepted = hasAccepted && this.customersOutsideIsUK.contains(model))
 
   def customersOutsideUK(model: CustomersOutsideUK): Renewal =
     this.copy(customersOutsideUK = Some(model), hasChanged = hasChanged || !this.customersOutsideUK.contains(model),
@@ -151,13 +156,14 @@ object Renewal {
     }
 
     val aspRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
-      case r if r.customersOutsideUK.isDefined => Valid(r)
+      case r if r.customersOutsideUK.isDefined &&
+        r.customersOutsideIsUK.isDefined => Valid(r)
       case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for accountancy service provider"))))
     }
 
     val hvdRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
       case r if r.percentageOfCashPaymentOver15000.isDefined && r.receiveCashPayments.isDefined &&
-        r.customersOutsideUK.isDefined => Valid(r)
+        r.customersOutsideUK.isDefined && r.customersOutsideIsUK.isDefined => Valid(r)
       case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for high value dealing"))))
     }
 

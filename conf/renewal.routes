@@ -12,8 +12,11 @@ POST        /net-profit-last-12-months                                        @c
 GET         /net-profit-registered-services                                   @controllers.renewal.AMLSTurnoverController.get(edit: Boolean ?= false)
 POST        /net-profit-registered-services                                   @controllers.renewal.AMLSTurnoverController.post(edit: Boolean ?= false)
 
-GET         /customers-outside-uk                                             @controllers.renewal.CustomersOutsideUKController.get(edit: Boolean ?= false)
-POST        /customers-outside-uk                                             @controllers.renewal.CustomersOutsideUKController.post(edit: Boolean ?= false)
+GET         /customers-outside-uk                                             @controllers.renewal.CustomersOutsideIsUKController.get(edit: Boolean ?= false)
+POST        /customers-outside-uk                                             @controllers.renewal.CustomersOutsideIsUKController.post(edit: Boolean ?= false)
+
+GET         /countries                                                        @controllers.renewal.CustomersOutsideUKController.get(edit: Boolean ?= false)
+POST        /countries                                                        @controllers.renewal.CustomersOutsideUKController.post(edit: Boolean ?= false)
 
 GET         /throughput-last-12-months                                        @controllers.renewal.TotalThroughputController.get(edit: Boolean ?= false)
 POST        /throughput-last-12-months                                        @controllers.renewal.TotalThroughputController.post(edit: Boolean ?= false)

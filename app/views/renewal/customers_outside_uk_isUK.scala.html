@@ -34,7 +34,7 @@
     title = Messages("renewal.customer.outside.uk.countries.title") + " - " + Messages("summary.renewal"),
     heading = header
 ) {
-    @form(f, controllers.renewal.routes.CustomersOutsideUKController.post(edit)) {
+    @form(f, controllers.renewal.routes.CustomersOutsideIsUKController.post(edit)) {
 
             @panel(
                 field = Some(f(s"$target")),
