@@ -959,7 +959,7 @@ main.sidebar.information = Information is saved automatically. If you sign out, 
 
 aboutyou.yourdetails.title = What’s your name?
 aboutyou.rolewithinbusiness.title = What’s your role in the business?
-aboutyou.rolewithinbusiness.lbl.01 = Beneficial shareholder
+aboutyou.rolewithinbusiness.lbl.01 = Beneficial owner (holding more than 25% of shares in the business)
 aboutyou.rolewithinbusiness.lbl.02 = Director
 aboutyou.rolewithinbusiness.lbl.03 = External accountant
 aboutyou.rolewithinbusiness.lbl.04 = Internal accountant
@@ -1525,7 +1525,7 @@ declaration.addperson.lastname = Last name
 declaration.addperson.whatsyourrole = What’s your role in the business?
 declaration.addperson.amendment.title = What is your name?
 declaration.declaration.header = Declaration
-declaration.addperson.lbl.01 = Beneficial shareholder
+declaration.addperson.lbl.01 = Beneficial owner (holding more than 25% of shares in the business)
 declaration.addperson.lbl.02 = Director
 declaration.addperson.lbl.03 = External accountant
 declaration.addperson.lbl.04 = Internal accountant

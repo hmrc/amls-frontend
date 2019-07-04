@@ -51,7 +51,7 @@ class detailed_answersSpec extends AmlsSpec
       (Messages("responsiblepeople.timeataddress.address_history.heading", "firstName middleName lastName"), checkElementTextIncludes(_, "0 to 5 months")),
       (Messages("responsiblepeople.detailed_answers.previous_address"), checkElementTextIncludes(_, "addressLine5 addressLine6 addressLine7 addressLine8 postCode2")),
       (Messages("responsiblepeople.detailed_answers.other_previous_address"), checkElementTextIncludes(_, "addressLine9 addressLine10 addressLine11 addressLine12 postCode3")),
-      (Messages("responsiblepeople.position_within_business.heading", "firstName middleName lastName"), checkElementTextIncludes(_, "Beneficial shareholder")),
+      (Messages("responsiblepeople.position_within_business.heading", "firstName middleName lastName"), checkElementTextIncludes(_, "Beneficial owner (holding more than 25% of shares in the business)")),
       (Messages("responsiblepeople.position_within_business.heading", "firstName middleName lastName"), checkElementTextIncludes(_, "Nominated officer")),
       (Messages("responsiblepeople.position_within_business.startDate.heading", "firstName middleName lastName"), checkElementTextIncludes(_, "24 February 1990")),
       (Messages("responsiblepeople.detailed_answers.soleproprietor_for_other_business"), checkElementTextIncludes(_, "Yes")),
