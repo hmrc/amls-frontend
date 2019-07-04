@@ -290,7 +290,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
           }
         }
 
-        "go to renewal CustomerOutsideUK" when {
+        "go to renewal CustomerOutsideIsUK" when {
           "it has business type of HVD and not (ASP or MSB)" in new Fixture {
             val newRequest = request.withFormUrlEncodedBody(
               "turnover" -> "01"
@@ -309,7 +309,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.renewal.routes.CustomersOutsideUKController.get().url))
+            redirectLocation(result) must be(Some(controllers.renewal.routes.CustomersOutsideIsUKController.get().url))
           }
         }
 

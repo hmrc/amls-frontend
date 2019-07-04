@@ -43,7 +43,7 @@ class CustomersOutsideIsUKController @Inject()(val dataCacheConnector: DataCache
               renewal <- response
               customers <- renewal.customersOutsideIsUK
             } yield Form2[CustomersOutsideIsUK](customers)).getOrElse(EmptyForm)
-            Ok(customers_outside_uk_isUK(form, edit, autoCompleteService.getCountries))
+            Ok(customers_outside_uk_isUK(form, edit))
         }
   }
 
@@ -52,7 +52,7 @@ class CustomersOutsideIsUKController @Inject()(val dataCacheConnector: DataCache
       implicit request =>
         Form2[CustomersOutsideIsUK](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(customers_outside_uk_isUK(f, edit, autoCompleteService.getCountries)))
+            Future.successful(BadRequest(customers_outside_uk_isUK(f, edit)))
           case ValidForm(_, data) =>
             dataCacheConnector.fetchAll flatMap { optionalCache =>
               (for {

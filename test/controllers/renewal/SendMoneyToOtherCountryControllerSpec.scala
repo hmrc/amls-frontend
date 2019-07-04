@@ -181,7 +181,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
       }
     }
 
-    "redirect to the PercentageOfCashPaymentOver15000Controller" when {
+    "redirect to the CustomersOutsideIsUKController" when {
       "post no and has HVD and ASP and NOT CE" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody(
           "money" -> "false"
@@ -191,11 +191,11 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.renewal.routes.CustomersOutsideUKController.get().url))
+        redirectLocation(result) must be(Some(controllers.renewal.routes.CustomersOutsideIsUKController.get().url))
       }
     }
 
-    "redirect to the CustomersOutsideTheUKController" when {
+    "redirect to the CustomersOutsideIsUKController" when {
       "post no and has HVD" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody(
           "money" -> "false"
@@ -205,7 +205,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.renewal.routes.CustomersOutsideUKController.get().url))
+        redirectLocation(result) must be(Some(controllers.renewal.routes.CustomersOutsideIsUKController.get().url))
       }
       "not CE, not FX, and not HVD" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody(
@@ -216,7 +216,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.renewal.routes.CustomersOutsideUKController.get().url))
+        redirectLocation(result) must be(Some(controllers.renewal.routes.CustomersOutsideIsUKController.get().url))
       }
     }
 
