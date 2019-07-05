@@ -101,7 +101,7 @@ object ReceiveCashPayments {
       RReceiveCashPayments(CashPaymentsCustomerNotMet(false), None)
     } else {
       model.cashPaymentMethods.fold(RReceiveCashPayments(CashPaymentsCustomerNotMet(false), None)){ methods =>
-        RReceiveCashPayments(CashPaymentsCustomerNotMet(false), Some(HowCashPaymentsReceived(
+        RReceiveCashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(
           RPaymentMethods(
             methods.courier,
             methods.direct,

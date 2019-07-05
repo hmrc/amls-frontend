@@ -68,7 +68,6 @@ class summarySpec extends AmlsSpec
       "businessmatching.registerservices.servicename.lbl.07"
     )
 
-    //todo Slawek
     val sectionChecks = Table[String, Element=>Boolean, String](
       ("title key", "check", "edit link"),
       ("renewal.involvedinother.title",checkElementTextIncludes(_, "test text"), controllers.renewal.routes.InvolvedInOtherController.get(true).toString),
@@ -77,6 +76,8 @@ class summarySpec extends AmlsSpec
       ("renewal.turnover.title", checkListContainsItems(_, fullActivitiesSet), controllers.renewal.routes.AMLSTurnoverController.get(true).toString),
       ("renewal.customer.outside.uk.title", checkElementTextIncludes(_, "United Kingdom"), controllers.renewal.routes.CustomersOutsideUKController.get(true).toString),
       ("renewal.hvd.percentage.title", checkElementTextIncludes(_, "hvd.percentage.lbl.01"), controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.get(true).toString),
+      ("renewal.receiving.title", checkElementTextIncludes(_, "Yes"), controllers.renewal.routes.CashPaymentsCustomersNotMetController.get(true).toString),
+      ("renewal.cash.payments.received.title", checkElementTextIncludes(_, "Directly into a bank account"), controllers.renewal.routes.HowCashPaymentsReceivedController.get(true).toString),
       ("renewal.msb.throughput.header", checkElementTextIncludes(_, "renewal.msb.throughput.selection.1"), controllers.renewal.routes.TotalThroughputController.get(true).toString),
       ("renewal.msb.transfers.header", checkElementTextIncludes(_, "1500"), controllers.renewal.routes.TransactionsInLast12MonthsController.get(true).toString),
       ("renewal.msb.largest.amounts.title", checkElementTextIncludes(_, "France"), controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get(true).toString),

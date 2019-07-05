@@ -350,9 +350,11 @@ error.required.hvd.percentage = Select one option to show how much of your turno
 error.required.renewal.transactions.in.12months = Enter the number of currency exchange transactions you made in the last 12 months
 error.required.renewal.percentage = Select one option to show the proportion of your turnover that came from cash payments over €10,000 in the last 12 months
 
-error.required.renewal.hvd.receive.cash.payments = Select yes if you received any cash payments over €10,000 in the last 12 months from customers you’ve not met in person
-error.required.renewal.hvd.choose.option = Select one or more options to show how you received these payments
-error.required.renewal.hvd.describe = Enter details of how you received these payments
+error.required.renewal.hvd.receive.cash.payments = Select yes if you received cash payments of €10,000 or more from customers you have not met in person
+error.required.renewal.hvd.choose.option = Select how you received cash payments from customers you’ve not met in person
+error.required.renewal.hvd.describe = Enter how you received cash payments from customers you’ve not met in person
+error.required.renewal.hvd.describe.invalid.length = Description of how you received cash payments must be 255 characters or less
+error.required.renewal.hvd.describe.invalid.characters = Description of how you received cash payments can include letters a to z, numbers, spaces, and most punctuation and special characters
 
 error.required.renewal.ba.turnover.from.mlr = Select the total net profit your business made from services registered for anti-money laundering supervision
 
@@ -2185,9 +2187,6 @@ renewal.cash.payments.received.lbl1 = By courier
 renewal.cash.payments.received.lbl2 = Directly into a bank account
 renewal.cash.payments.received.lbl3 = Other
 renewal.cash.payments.received.lbl3.hint = Describe how you received cash payments from customers you’ve not met in person
-
-renewal.receiving.expect.to.receive = How did you receive these payments?
-renewal.receiving.give.details.lbl = Describe how you received cash payments over €10,000 from customers you have not met
 
 renewal.msb.throughput.header = What was your total throughput in the last 12 months?
 renewal.msb.throughput.info = Throughput is the total value of money you transfer, currency you exchange, and cheques you cash.

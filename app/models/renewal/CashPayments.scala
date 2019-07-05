@@ -48,7 +48,7 @@ object CashPayments {
 
          Json.obj("receivePayments" -> true,
           "paymentMethods" -> payMet)
-        case CashPayments(CashPaymentsCustomerNotMet(receivePayments), None) => Json.obj("receivePayments" -> receivePayments)
+        case CashPayments(CashPaymentsCustomerNotMet(receivePayments), _) => Json.obj("receivePayments" -> receivePayments)
       }
   }
 

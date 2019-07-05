@@ -29,7 +29,7 @@ import models.businessdetails.BusinessDetails
 import models.businessmatching.{BusinessMatching, BusinessActivities => BMActivities}
 import models.declaration.AddPerson
 import models.estateagentbusiness.EstateAgentBusiness
-import models.hvd.Hvd
+import models.hvd.{Hvd, ReceiveCashPayments}
 import models.moneyservicebusiness.{MostTransactions => _, SendTheLargestAmountsOfMoney => _, WhichCurrencies => _, _}
 import models.renewal._
 import models.responsiblepeople.ResponsiblePerson
@@ -271,9 +271,9 @@ class LandingService @Inject() (
           percentageOfCashPaymentOver15000 = viewResponse.hvdSection.fold[Option[PercentageOfCashPaymentOver15000]](None)
             (_.percentageOfCashPaymentOver15000.map(p => HvdRPercentageOfCashPaymentOver15000.convert(p))),
 
-//          receiveCashPayments = viewResponse.hvdSection.fold[Option[ReceiveCashPayments]](None) { hvd =>
-//            hvd.receiveCashPayments.map(r => HvdReceiveCashPayments.convert(hvd))
-//          },
+          receiveCashPayments = viewResponse.hvdSection.fold[Option[CashPayments]](None) { hvd =>
+            hvd.receiveCashPayments.map(r => ReceiveCashPayments.convert(hvd))
+          },
 
           totalThroughput = viewResponse.msbSection.fold[Option[TotalThroughput]](None)(_.throughput.map(t => ExpectedThroughput.convert(t))),
 

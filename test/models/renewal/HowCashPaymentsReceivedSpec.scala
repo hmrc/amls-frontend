@@ -47,7 +47,7 @@ class HowCashPaymentsReceivedSpec extends AmlsSpec {
         "cashPaymentMethods.details" -> Seq("a" * 260))
 
       HowCashPaymentsReceived.formRule.validate(data)
-        .mustEqual(Invalid(Seq((Path \ "cashPaymentMethods" \ "details") -> Seq(ValidationError("error.invalid.maxlength.255")))))
+        .mustEqual(Invalid(Seq((Path \ "cashPaymentMethods" \ "details") -> Seq(ValidationError("error.required.renewal.hvd.describe.invalid.length")))))
     }
   }
 }
