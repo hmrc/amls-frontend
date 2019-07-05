@@ -96,6 +96,10 @@ class MoneyServiceBusinessSpec extends AmlsSpec with MoneyServiceBusinessTestDat
       "correctly show if the model is incomplete" in {
         emptyMsb.isComplete(false, false, true) must be(false)
       }
+
+      "show as incomplete where agents or contries and no countries" in {
+        incompleteMsbNoBranchesOrAgentsCountries.isComplete(true, true, true) must be(false)
+      }
     }
 
     "Serialise to expected Json" when {
@@ -129,6 +133,27 @@ trait MoneyServiceBusinessTestData {
     sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
     fundsTransfer = Some(FundsTransfer(true)),
     branchesOrAgents = Some(BranchesOrAgents(BranchesOrAgentsHasCountries(true), Some(BranchesOrAgentsWhichCountries(Seq(Country("United Kingdom", "GB")))))),
+    sendTheLargestAmountsOfMoney = Some(sendTheLargestAmountsOfMoney),
+    mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+    transactionsInNext12Months = Some(TransactionsInNext12Months("12345678963")),
+    ceTransactionsInNext12Months = Some(CETransactionsInNext12Months("12345678963")),
+    fxTransactionsInNext12Months = Some(FXTransactionsInNext12Months("12345678963")),
+    false,
+    true
+  )
+
+  val incompleteMsbNoBranchesOrAgentsCountries = MoneyServiceBusiness(
+    throughput = Some(ExpectedThroughput.Second),
+    businessUseAnIPSP = Some(businessUseAnIPSP),
+    identifyLinkedTransactions = Some(IdentifyLinkedTransactions(true)),
+    Some(WhichCurrencies(
+      Seq("USD", "GBP", "EUR"),
+      Some(UsesForeignCurrenciesYes),
+      Some(MoneySources(Some(BankMoneySource("Bank Name")), Some(WholesalerMoneySource("Wholesaler Name")), Some(true)))
+    )),
+    sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
+    fundsTransfer = Some(FundsTransfer(true)),
+    branchesOrAgents = Some(BranchesOrAgents(BranchesOrAgentsHasCountries(true), None)),
     sendTheLargestAmountsOfMoney = Some(sendTheLargestAmountsOfMoney),
     mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
     transactionsInNext12Months = Some(TransactionsInNext12Months("12345678963")),
