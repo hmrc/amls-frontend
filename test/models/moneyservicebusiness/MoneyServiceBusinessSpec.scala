@@ -97,7 +97,7 @@ class MoneyServiceBusinessSpec extends AmlsSpec with MoneyServiceBusinessTestDat
         emptyMsb.isComplete(false, false, true) must be(false)
       }
 
-      "show as incomplete where agents or contries and no countries" in {
+      "show as incomplete where agents or countries and no countries" in {
         incompleteMsbNoBranchesOrAgentsCountries.isComplete(true, true, true) must be(false)
       }
     }
