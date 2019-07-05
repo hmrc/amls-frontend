@@ -72,9 +72,9 @@ class LettersAddressController @Inject () (
               } yield {
                 dataCache.save[BusinessDetails](BusinessDetails.key, data.lettersAddress match {
                   case true =>
-                    businessDetails.altCorrespondenceAddress(false).copy(correspondenceAddress = None)
+                    businessDetails.altCorrespondenceAddress(false).copy(correspondenceAddress = None, correspondenceAddressIsUk = None)
                   case false =>
-                    businessDetails.altCorrespondenceAddress(true)
+                    businessDetails.altCorrespondenceAddress(true).copy(correspondenceAddress = None, correspondenceAddressIsUk = None)
                 })
 
                 getRouting(data.lettersAddress, edit)
