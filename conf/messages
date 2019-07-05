@@ -374,7 +374,7 @@ error.required.renewal.ba.select.country = Select yes if you had customers in th
 
 error.required.renewal.ba.involved.in.other = Select yes if your business was involved in any other activities in the last 12 months
 error.required.renewal.ba.involved.in.other.text = Enter the other activities your business was involved in
-error.text.validation.renewal.ba.involved.in.other = Activities must only include letters a to z, numbers 0 to 9, and basic punctuation
+error.text.validation.renewal.ba.involved.in.other = Activities can include letters a to z, numbers, spaces, and most punctuation and special characters
 error.invalid.maxlength.255.renewal.ba.involved.in.other = Activities must be 255 characters or less
 
 error.required.withdrawal.reason = You must select a reason for withdrawing your application
