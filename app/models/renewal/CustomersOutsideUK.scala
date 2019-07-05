@@ -60,7 +60,7 @@ sealed trait CustomersOutsideUK0 {
 
   private  def write: Write[CustomersOutsideUK, UrlFormEncoded] = Write {
     case CustomersOutsideUK(Some(countries)) => countries.zipWithIndex.map(i => s"countries[${i._2}]" -> Seq(i._1.code)).toMap
-    case _ => throw new IllegalArgumentException("Eep")
+    case _ => throw new IllegalArgumentException("")
   }
 
   val formR: Rule[UrlFormEncoded, CustomersOutsideUK] = {

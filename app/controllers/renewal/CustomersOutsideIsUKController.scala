@@ -20,6 +20,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
+import models.businessmatching.{BusinessMatching, HighValueDealing}
 import models.renewal.{CustomersOutsideIsUK, Renewal}
 import services.{AutoCompleteService, RenewalService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -58,9 +59,16 @@ class CustomersOutsideIsUKController @Inject()(val dataCacheConnector: DataCache
               (for {
                 cache <- optionalCache
                 renewal <- cache.getEntry[Renewal](Renewal.key)
+                businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
               } yield {
-                renewalService.updateRenewal(renewal.customersOutsideIsUK(data)) map {
-                  _ => Redirect(routes.CustomersOutsideIsUKController.get())
+                renewalService.updateRenewal(renewal.customersOutsideIsUK(data)) map { _ =>
+                  data match {
+                    case CustomersOutsideIsUK(true) => Redirect(routes.CustomersOutsideUKController.get())
+                    case CustomersOutsideIsUK(false) => businessMatching.activities.get.businessActivities match {
+                      case x if x.contains(HighValueDealing) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
+                      case _ => Redirect(routes.SummaryController.get())
+                    }
+                  }
                 }
               }) getOrElse Future.successful(InternalServerError("Unable to get data from the cache"))
             }

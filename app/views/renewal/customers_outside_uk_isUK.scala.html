@@ -31,28 +31,27 @@
 }
 
 @main(
-    title = Messages("renewal.customer.outside.uk.countries.title") + " - " + Messages("summary.renewal"),
+    title = Messages("renewal.customer.outside.uk.title") + " - " + Messages("summary.renewal"),
     heading = header
 ) {
     @form(f, controllers.renewal.routes.CustomersOutsideIsUKController.post(edit)) {
 
         @fieldsetWithErrorGroup(
-            heading = "renewal.customer.outside.uk.countries.title",
+            heading = "renewal.customer.outside.uk.title",
             section = "summary.renewal",
             panel = false,
-            f = f("isOutside")
+            f = f("isOutside"),
+            classes = Seq("inline")
         ) {
             @radio(
                 f = f("isOutside"),
                 labelText = "lbl.yes",
-                value = "true",
-                inline = true
+                value = "true"
             )
             @radio(
                 f = f("isOutside"),
                 labelText = "lbl.no",
-                value = "false",
-                inline = true
+                value = "false"
             )
         }
 
