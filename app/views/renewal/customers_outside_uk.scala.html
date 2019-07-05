@@ -30,6 +30,10 @@
     @errorSummary(f)
 }
 
+@supportingContent = {
+    <p>@Messages("renewal.customer.outside.uk.countries.text")</p>
+}
+
 @main(
     title = Messages("renewal.customer.outside.uk.countries.title") + " - " + Messages("summary.renewal"),
     heading = header
@@ -40,6 +44,7 @@
             heading = "renewal.customer.outside.uk.countries.title",
             section = "summary.renewal",
             f = f("countries"),
+            supportingContent = supportingContent,
             hint = "businessactivities.hight.value.customer.lbl.hint",
             panel = false
         ) {
