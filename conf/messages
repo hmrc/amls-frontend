@@ -354,7 +354,7 @@ error.required.renewal.hvd.receive.cash.payments = Select yes if you received an
 error.required.renewal.hvd.choose.option = Select one or more options to show how you received these payments
 error.required.renewal.hvd.describe = Enter details of how you received these payments
 
-error.required.renewal.ba.turnover.from.mlr = Select the total net profit your business made from services registered for anti-money laundering supervision
+error.required.renewal.ba.turnover.from.mlr = Select how much total net profit your business made from services registered for anti-money laundering supervision in the last 12 months
 
 error.required.renewal.ba.business.turnover = Select the total net profit your business made in the last 12 months
 
