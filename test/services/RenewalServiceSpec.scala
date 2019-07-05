@@ -420,6 +420,16 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           await(service.isRenewalComplete(model)) mustBe false
         }
 
+        "customersOutsideUk is defined and percentageOfCashPaymentsOver15000 is defined and receivedCashPayments is defined" when {
+          "CashPaymentsCustomerNotMet is true but payments missing" in new HVDFixture {
+            val model = preFilledModel.copy(
+              customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+              percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
+              receiveCashPayments = Some(CashPayments(CashPaymentsCustomerNotMet(true), None))
+            )
+            await(service.isRenewalComplete(model)) mustBe false
+          }
+        }
       }
 
       "ASP and HVD are selected business activities and section is incomplete with standard renewal flow questions complete" when {
