@@ -36,7 +36,6 @@ sealed trait CustomersOutsideUK0 {
 
   private implicit def rule[A]
   (implicit
-   bR: Path => Rule[A, Boolean],
    sR: Path => Rule[A, Seq[String]],
    cR: Rule[Seq[String], Seq[Country]]
   ): Rule[A, CustomersOutsideUK] =
@@ -50,40 +49,19 @@ sealed trait CustomersOutsideUK0 {
         case s => Some(s)
       }
 
-      val boolR =
-        bR andThen {
-          _ withMessage "error.required.renewal.ba.select.country"
-        }
-
       val countrySeqR = {
         (seqToOptionSeq[String] andThen flattenR[String] andThen cR)
           .andThen(minLengthR[Seq[Country]](minLength) withMessage "error.required.renewal.country.name")
           .andThen(maxLengthR[Seq[Country]](maxLength))
       }
 
-      (__ \ "isOutside").read(boolR).flatMap[Option[Seq[Country]]] {
-        case true =>
           (__ \ "countries").read(countrySeqR) map Some.apply
-        case false =>
-          Rule(_ => Valid(None))
       } map CustomersOutsideUK.apply
-    }
 
-  private implicit def write[A]
-  (implicit
-   mon: cats.Monoid[A],
-   a: Path => WriteLike[Boolean, A],
-   b: Path => WriteLike[Option[Seq[Country]], A]
-  ): Write[CustomersOutsideUK, A] =
-    To[A] { __ =>
-      (
-        (__ \ "isOutside").write[Boolean].contramap[Option[_]] {
-          case Some(_) => true
-          case None => false
-        } ~
-          (__ \ "countries").write[Option[Seq[Country]]]
-        ) (a => (a.countries, a.countries))
-    }
+  private  def write: Write[CustomersOutsideUK, UrlFormEncoded] = Write {
+    case CustomersOutsideUK(countries) => countries.map(c => c.zipWithIndex.map(i => s"countries[${i._2}]" -> Seq(i._1.code)).toMap
+    case _ => throw new IllegalArgumentException("Eep")
+  }
 
   val formR: Rule[UrlFormEncoded, CustomersOutsideUK] = {
     import jto.validation.forms.Rules._
