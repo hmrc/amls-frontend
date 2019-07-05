@@ -24,10 +24,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching._
 import models.renewal._
-import play.api.mvc.Result
 import services.RenewalService
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.renewal.uses_foreign_currencies
 
@@ -49,7 +46,6 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
         }
 
         block getOrElse Ok(uses_foreign_currencies(EmptyForm, edit))
-
   }
 
   def post(edit: Boolean = false) = Authorised.async {
