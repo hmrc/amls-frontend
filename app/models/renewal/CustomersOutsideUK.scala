@@ -59,7 +59,7 @@ sealed trait CustomersOutsideUK0 {
       } map CustomersOutsideUK.apply
 
   private  def write: Write[CustomersOutsideUK, UrlFormEncoded] = Write {
-    case CustomersOutsideUK(countries) => countries.map(c => c.zipWithIndex.map(i => s"countries[${i._2}]" -> Seq(i._1.code)).toMap
+    case CustomersOutsideUK(Some(countries)) => countries.zipWithIndex.map(i => s"countries[${i._2}]" -> Seq(i._1.code)).toMap
     case _ => throw new IllegalArgumentException("Eep")
   }
 
@@ -73,26 +73,15 @@ sealed trait CustomersOutsideUK0 {
     implicitly
   }
 
-  val formW: Write[CustomersOutsideUK, UrlFormEncoded] = {
-    import cats.implicits._
-    import utils.MappingUtils.MonoidImplicits.urlMonoid
-    import jto.validation.forms.Writes._
-    implicitly
-  }
+  implicit val formW: Write[CustomersOutsideUK, UrlFormEncoded] = write
+
 
   val jsonW = Writes[CustomersOutsideUK] { x =>
     val countries = x.countries.fold[Seq[String]](Seq.empty)(x => x.map(m => m.code))
-    countries.nonEmpty match {
-      case true => Json.obj(
-        "isOutside" -> true,
+    Json.obj(
         "countries" -> countries
       )
-      case false =>
-        Json.obj(
-          "isOutside" -> false
-        )
     }
-  }
 }
 
 object CustomersOutsideUK {
