@@ -139,14 +139,14 @@ class MoneySourcesControllerSpec extends AmlsSpec with MockitoSugar {
         }
       }
 
-      "redirect to CustomersOutsideTheUKController" when {
+      "redirect to CustomersOutsideIsUKController" when {
         "the business is HVD and not an ASP" in new RoutingFixture {
           setupBusinessMatching(Set(HighValueDealing), Set(TransmittingMoney))
 
           val result = controller.post()(validFormRequest)
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe controllers.renewal.routes.CustomersOutsideUKController.get().url.some
+          redirectLocation(result) mustBe controllers.renewal.routes.CustomersOutsideIsUKController.get().url.some
         }
 
         "the business is HVD and ASP" in new RoutingFixture {
@@ -155,7 +155,7 @@ class MoneySourcesControllerSpec extends AmlsSpec with MockitoSugar {
           val result = controller.post()(validFormRequest)
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe controllers.renewal.routes.CustomersOutsideUKController.get().url.some
+          redirectLocation(result) mustBe controllers.renewal.routes.CustomersOutsideIsUKController.get().url.some
         }
       }
 

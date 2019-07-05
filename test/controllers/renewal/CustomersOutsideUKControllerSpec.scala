@@ -136,7 +136,7 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
 
-        val pageTitle = Messages("renewal.customer.outside.uk.title") + " - " +
+        val pageTitle = Messages("renewal.customer.outside.uk.countries.title") + " - " +
           Messages("summary.renewal") + " - " +
           Messages("title.amls") + " - " + Messages("title.gov")
 
@@ -152,8 +152,6 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("input[name=isOutside]").size mustEqual 2
-        document.select("input[name=isOutside][checked]").`val` mustEqual "true"
         document.select("select[name=countries[0]] > option[value=GB]").hasAttr("selected") must be(true)
 
       }
