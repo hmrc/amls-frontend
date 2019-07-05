@@ -21,8 +21,10 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
-import models.renewal.{CashPayments, CashPaymentsCustomerNotMet}
+import models.renewal.{CashPayments, CashPaymentsCustomerNotMet, Renewal}
 import services.RenewalService
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.renewal.cash_payments_customers_not_met
 
@@ -57,12 +59,26 @@ class CashPaymentsCustomersNotMetController @Inject()(
         case ValidForm(_, data) =>
           for {
             renewal <- renewalService.getRenewal
-            _ <- renewalService.updateRenewal(renewal.receiveCashPayments(CashPayments(cashPaymentsCustomerNotMet = data, None)))
+            _ <- updateCashPayments(data, renewal)
           } yield data match {
-            case CashPaymentsCustomerNotMet(true) => Redirect(routes.HowCashPaymentsReceivedController.get())
+            case CashPaymentsCustomerNotMet(true) => Redirect(routes.HowCashPaymentsReceivedController.get(edit))
             case CashPaymentsCustomerNotMet(false) => Redirect(routes.SummaryController.get())
           }
       }
+    }
+  }
+
+  private def updateCashPayments(data: CashPaymentsCustomerNotMet, renewal: Option[Renewal])
+                                (implicit ac: AuthContext, hc: HeaderCarrier) = {
+
+    val noCashPaymentFromCustomer = CashPayments(cashPaymentsCustomerNotMet = data, None)
+
+    if (!data.receiveCashPayments) {
+      renewalService.updateRenewal(renewal.receiveCashPayments(noCashPaymentFromCustomer))
+    } else {
+      renewalService.updateRenewal(renewal.receiveCashPayments(
+        renewal.receiveCashPayments.map(
+          rcp => CashPayments(data, rcp.howCashPaymentsReceived)).getOrElse(noCashPaymentFromCustomer)))
     }
   }
 }
