@@ -127,7 +127,7 @@ error.max.length.bm.businesstype.type = You can’t enter more than 40 character
 ###############################  Business Details ###############################
 error.required.atb.previously.registered = Select yes if your business is currently registered with HMRC for anti-money laundering supervision
 error.required.atb.confirm.office = Select yes if this is the address of your registered office
-error.required.atb.registered.office.uk.or.overseas = Select yes if this is a UK address
+error.required.atb.registered.office.uk.or.overseas = Select yes if your registered office is in the UK
 error.required.atb.registered.office.not.uk= Enter a country that is not the United Kingdom because your registered office is not in the UK
 error.required.atb.letters.address.not.uk= Enter a country that is not the United Kingdom because your address for letters is not in the UK
 error.required.atb.registered.for.vat = Select yes if your business is registered for VAT in the UK
@@ -136,6 +136,7 @@ error.required.atb.corporation.tax.number = Enter a valid Corporation Tax refere
 error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax reference number
 error.required.atb.lettersaddress = Select yes if this is the right address to send you letters about your supervision
 error.mismatch.atb.email = The email addresses you’ve entered do not match
+
 
 error.businessmatching.updateservice.responsiblepeople = Select at least one option to show which responsible people have passed the HMRC Money Laundering Regulations fit and proper test
 error.businessmatching.updateservice.addmoreactivities = Select yes if you want to add another type of business
@@ -993,11 +994,14 @@ businessdetails.contactingyou.website.lbl = Website address (optional)
 businessdetails.contactingyou.businessaddress = Business address:
 businessdetails.contactingyou.invalid.phone = Invalid Phone Number
 businessdetails.contactingyou.invalid.mobile = Invalid Mobile Number
-businessdetails.correspondenceaddress.title = What is the right address to send you letters?
-businessdetails.correspondenceaddress.lbl = Is this a UK address?
+
+businessdetails.correspondenceaddress.isuk.title = Is the address to send you letters about your supervision in the UK?
+businessdetails.correspondenceaddress.isuk.error = Select yes if the address to send you letters about your supervision is in the UK
+businessdetails.correspondenceaddress.title = What is the right address to send you letters about your supervision?
+
 businessdetails.correspondenceaddress.p = We’ll send letters about your supervision to this address.
 businessdetails.correspondenceaddress.contact.info = Contact person or business
-businessdetails.correspondenceaddress.yourName = Name of the person
+businessdetails.correspondenceaddress.yourName = Your name
 businessdetails.correspondenceaddress.businessName = Name of the business
 businessdetails.correspondenceaddress.ukAddress = Yes
 businessdetails.correspondenceaddress.nonUkAddress = No
@@ -1009,8 +1013,8 @@ businessdetails.registeredformlr.lbl = This only refers to registration with HMR
 businessdetails.registeredformlr.mlrregno.lbl = Money Laundering Regulations registration number
 businessdetails.registeredformlr.taxReferenceHint = This is 8 numbers, like 12345678. Find it on the certificate you received from HMRC when you registered for anti-money laundering supervision.
 businessdetails.confirmingyouraddress.title = Is this your registered office?
-businessdetails.registeredoffice.title = Where is your registered office or main place of business?
-businessdetails.registeredoffice.lbl = Is this a UK address?
+businessdetails.registeredoffice.where.title = Where is your registered office or main place of business?
+businessdetails.registeredoffice.title = Is your registered office in the UK?
 businessdetails.registeredoffice.address.lbl = Address
 businessdetails.registeredoffice.postcode.lbl = Postcode
 businessdetails.registeredoffice.country.lbl = Country

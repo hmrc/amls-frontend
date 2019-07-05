@@ -19,7 +19,7 @@ package audit
 import audit.AddressConversions._
 import cats.implicits._
 import models.Country
-import models.businessdetails.{NonUKCorrespondenceAddress, RegisteredOfficeNonUK, RegisteredOfficeUK, UKCorrespondenceAddress}
+import models.businessdetails.{CorrespondenceAddressNonUk, RegisteredOfficeNonUK, RegisteredOfficeUK, CorrespondenceAddressUk}
 import models.responsiblepeople.{PersonAddressNonUK, PersonAddressUK}
 import models.tradingpremises.{Address => TradingPremisesAddress}
 import play.api.test.FakeRequest
@@ -103,7 +103,7 @@ class AddressCreatedEventSpec extends AmlsSpec {
       }
 
       "given a correspondence address in the UK" in {
-        val address = UKCorrespondenceAddress("not used", "not used", "CA Line 1", "CA Line 2", "CA Line 3".some, None, "NE1 1ET")
+        val address = CorrespondenceAddressUk("not used", "not used", "CA Line 1", "CA Line 2", "CA Line 3".some, None, "NE1 1ET")
         val event = AddressCreatedEvent(address)
         val expected = headerCarrier.toAuditDetails() ++ Map(
           "addressLine1" -> "CA Line 1",
@@ -117,7 +117,7 @@ class AddressCreatedEventSpec extends AmlsSpec {
       }
 
       "given a correspondence address outside the UK" in {
-        val address = NonUKCorrespondenceAddress("not used", "not used", "CA Line 1", "CA Line 2", "CA Line 3".some, None, Country("Finland", "FIN"))
+        val address = CorrespondenceAddressNonUk("not used", "not used", "CA Line 1", "CA Line 2", "CA Line 3".some, None, Country("Finland", "FIN"))
         val event = AddressCreatedEvent(address)
         val expected = headerCarrier.toAuditDetails() ++ Map(
           "addressLine1" -> "CA Line 1",
