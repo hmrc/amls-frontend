@@ -2204,7 +2204,7 @@ renewal.msb.send.money.title = Did you send money to other countries in the last
 renewal.msb.most.transactions.title = Where did you send the most transactions in the last 12 months?
 
 renewal.msb.transfers.header = How many money transfers did you make in the last 12 months?
-renewal.msb.transfers.value.invalid = Enter the number of money transfers you made in the last 12 months
+renewal.msb.transfers.value.invalid = Enter how many money transfers your business made in the last 12 months
 
 renewal.hvd.percentage.title = What percentage of your turnover came from cash payments of €10,000 or more?
 
