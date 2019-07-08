@@ -53,10 +53,9 @@ class HowCashPaymentsReceivedControllerSpec extends AmlsSpec {
       .thenReturn(Future.successful(new CacheMap("", Map.empty)))
   }
 
-  "HowCashPaymentsReceived" when {
+  "HowCashPaymentsReceived controller" when {
     "get is called" must {
-      "load the page" when {
-        "renewal data is found for how cash payments received and pre-populate the data" in new Fixture {
+      "load the page if renewal data is found" in new Fixture {
           when(mockRenewalService.getRenewal(any(),any(),any()))
             .thenReturn(Future.successful(Some(Renewal(receiveCashPayments = Some(receiveCashPayments)))))
 
@@ -71,7 +70,7 @@ class HowCashPaymentsReceivedControllerSpec extends AmlsSpec {
           page.select("input[type=text][name=cashPaymentMethods.details]").first().`val`() must be("other")
         }
 
-        "no renewal data is found and show an empty form" in new Fixture {
+        "show an empty form if no renewal data is found for this question" in new Fixture {
           val result = controller.get()(request)
           status(result) mustEqual OK
 
@@ -81,29 +80,31 @@ class HowCashPaymentsReceivedControllerSpec extends AmlsSpec {
           page.select("input[type=checkbox][name=cashPaymentMethods.other][value=true]").hasAttr("checked") must be(false)
           page.select("input[type=text][name=cashPaymentMethods.details]").first().`val`() must be("")
         }
-      }
     }
 
-    "post is called" must {
-      "show a bad request with an invalid request" in new Fixture {
+    "post is called" when {
+      "an invalid request is made" must {
+        "show a bad request" in new Fixture {
+          val result = controller.post()(request)
 
-        val result = controller.post()(request)
-        status(result) mustEqual BAD_REQUEST
+          status(result) mustEqual BAD_REQUEST
+        }
       }
 
-      "redirect to summary page if valid request" in new Fixture {
+      "a valid request is made" must {
+        "redirect to summary page" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody(
+            "cashPaymentMethods.courier" -> "true",
+            "cashPaymentMethods.direct" -> "true",
+            "cashPaymentMethods.other" -> "true",
+            "cashPaymentMethods.details" -> "other"
+          )
 
-        val newRequest = request.withFormUrlEncodedBody(
-          "cashPaymentMethods.courier" -> "true",
-          "cashPaymentMethods.direct" -> "true",
-          "cashPaymentMethods.other" -> "true",
-          "cashPaymentMethods.details" -> "other"
-        )
+          val result = controller.post()(newRequest)
 
-        val result = controller.post()(newRequest)
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+        }
       }
     }
   }

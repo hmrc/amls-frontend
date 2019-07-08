@@ -27,7 +27,7 @@ object CashPayments {
     ((__ \ "receivePayments").read[Boolean] map CashPaymentsCustomerNotMet.apply and
       (__ \ "paymentMethods").readNullable[PaymentMethods].map {
         case Some(methods) => Some(HowCashPaymentsReceived.apply(methods))
-        case None => None
+        case _ => None
       })(CashPayments.apply _ )
   }
 

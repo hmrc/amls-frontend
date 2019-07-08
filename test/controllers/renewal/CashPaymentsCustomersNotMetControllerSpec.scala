@@ -53,11 +53,10 @@ class CashPaymentsCustomersNotMetControllerSpec extends AmlsSpec {
       .thenReturn(Future.successful(new CacheMap("", Map.empty)))
   }
 
-  "CashPaymentsCustomersNotMet" when {
+  "CashPaymentsCustomersNotMet controller" when {
     "get is called" must {
-      "load the page" when {
-        "renewal data is found for receiving payments and pre-populate the data" in new Fixture {
-          when(mockRenewalService.getRenewal(any(),any(),any()))
+      "load the page if business is receiving payments from customers not met in person" in new Fixture {
+          when(mockRenewalService.getRenewal(any(), any(), any()))
             .thenReturn(Future.successful(Some(Renewal(receiveCashPayments = Some(receiveCashPayments)))))
 
           val result = controller.get()(request)
@@ -68,58 +67,61 @@ class CashPaymentsCustomersNotMetControllerSpec extends AmlsSpec {
           page.select("input[type=radio][name=receiveCashPayments][value=false]").hasAttr("checked") must be(false)
         }
 
-        "renewal data is found for not receiving payments and pre-populate the data" in new Fixture {
-          when(mockRenewalService.getRenewal(any(),any(),any()))
-            .thenReturn(Future.successful(Some(Renewal(receiveCashPayments = Some(doNotreceiveCashPayments)))))
+      "load the page if business is not receiving payments from customers not met in person" in new Fixture {
+        when(mockRenewalService.getRenewal(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Renewal(receiveCashPayments = Some(doNotreceiveCashPayments)))))
 
-          val result = controller.get()(request)
-          status(result) mustEqual OK
+        val result = controller.get()(request)
+        status(result) mustEqual OK
 
-          val page = Jsoup.parse(contentAsString(result))
-          page.select("input[type=radio][name=receiveCashPayments][value=true]").hasAttr("checked") must be(false)
-          page.select("input[type=radio][name=receiveCashPayments][value=false]").hasAttr("checked") must be(true)
-        }
+        val page = Jsoup.parse(contentAsString(result))
+        page.select("input[type=radio][name=receiveCashPayments][value=true]").hasAttr("checked") must be(false)
+        page.select("input[type=radio][name=receiveCashPayments][value=false]").hasAttr("checked") must be(true)
+      }
 
-        "no renewal data is found and show an empty form" in new Fixture {
-          val result = controller.get()(request)
-          status(result) mustEqual OK
+      "show an empty form if no renewal data is found for this question" in new Fixture {
+        val result = controller.get()(request)
+        status(result) mustEqual OK
 
-          val page = Jsoup.parse(contentAsString(result))
-          page.select("input[type=radio][name=receiveCashPayments][value=true]").hasAttr("checked") must be(false)
-          page.select("input[type=radio][name=receiveCashPayments][value=false]").hasAttr("checked") must be(false)
-        }
+        val page = Jsoup.parse(contentAsString(result))
+        page.select("input[type=radio][name=receiveCashPayments][value=true]").hasAttr("checked") must be(false)
+        page.select("input[type=radio][name=receiveCashPayments][value=false]").hasAttr("checked") must be(false)
       }
     }
 
-    "post is called" must {
-      "show a bad request with an invalid request" in new Fixture {
+    "post is called" when {
+      "an invalid request is made" must {
+        "show a bad request" in new Fixture {
+          val result = controller.post()(request)
 
-        val result = controller.post()(request)
-        status(result) mustEqual BAD_REQUEST
+          status(result) mustEqual BAD_REQUEST
+        }
       }
 
-      "redirect to summary if false" in new Fixture {
+      "a valid request is made" must {
+        "redirect to summary page if false is passed in the form" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody(
+            "receiveCashPayments" -> "false"
+          )
 
-        val newRequest = request.withFormUrlEncodedBody(
-          "receiveCashPayments" -> "false"
-        )
+          val result = controller.post()(newRequest)
 
-        val result = controller.post()(newRequest)
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
+        }
       }
 
-      "redirect to HowPaymentsReceived if true" in new Fixture {
+      "a valid request is made" must {
+        "redirect to HowCashPaymentsReceivedController if true is passed in the form" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody(
+            "receiveCashPayments" -> "true"
+          )
 
-        val newRequest = request.withFormUrlEncodedBody(
-          "receiveCashPayments" -> "true"
-        )
+          val result = controller.post()(newRequest)
 
-        val result = controller.post()(newRequest)
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result) mustEqual Some(routes.HowCashPaymentsReceivedController.get().url)
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result) mustEqual Some(routes.HowCashPaymentsReceivedController.get().url)
+        }
       }
     }
   }
