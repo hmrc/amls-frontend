@@ -89,17 +89,6 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
         val document = Jsoup.parse(contentAsString(result))
         document.select("input[value=01]").hasAttr("checked") must be(true)
       }
-
-      "redirect to Page not found" when {
-        "application is in variation mode" in new Fixture {
-
-          when(controller.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionDecisionApproved))
-
-          val result = controller.get()(request)
-          status(result) must be(NOT_FOUND)
-        }
-      }
     }
 
     "post is called" must {
