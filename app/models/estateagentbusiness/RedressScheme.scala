@@ -20,6 +20,7 @@ import cats.data.Validated.Valid
 import jto.validation.{ValidationError, _}
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
+import models.FormTypes.basicPunctuationPattern
 import play.api.libs.json._
 
 sealed trait RedressScheme
@@ -36,7 +37,8 @@ object RedressScheme {
 
   val maxRedressOtherTypeLength = 255
   val redressOtherType = notEmpty.withMessage("error.required.eab.redress.scheme.name") andThen
-    maxLength(maxRedressOtherTypeLength).withMessage("error.invalid.eab.redress.scheme.name")
+    maxLength(maxRedressOtherTypeLength).withMessage("error.invalid.eab.redress.scheme.name") andThen
+    basicPunctuationPattern("error.invalid.characters.eab.redress.scheme.name")
 
   implicit val formRedressRule: Rule[UrlFormEncoded, RedressScheme] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._

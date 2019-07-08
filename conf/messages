@@ -224,13 +224,18 @@ error.required.tp.confirm.address = Select yes if this is the address of your tr
 
 ###############################  Estate Agency Business ###############################
 error.required.eab.redress.scheme = Select yes if the business is registered with a redress scheme
-error.required.eab.which.redress.scheme = Select one option to show the redress scheme the business is registered with
-error.required.eab.redress.scheme.name = Enter the name of the redress scheme
-error.invalid.eab.redress.scheme.name = You can’t enter more than 255 characters
-error.required.eab.business.services = Select one or more options to show the services your business provides
-error.required.eab.penalised.under.act = Select yes if the business, or anyone in it, have ever been penalised under the Estate Agents Act 1979
-error.required.eab.info.about.penalty = Give a brief description of what the penalty was, and when it occurred
-error.required.eab.penalised.by.professional.body = Select yes if the business, or anyone in it, has ever been penalised by a professional body
+error.required.eab.which.redress.scheme = Select which redress scheme your business is registered with
+error.required.eab.redress.scheme.name = Enter the redress scheme your business is registered with
+error.invalid.eab.redress.scheme.name = Redress scheme must be 255 characters or less
+error.invalid.characters.eab.redress.scheme.name = Redress scheme can include letters a to z, numbers, spaces, and most punctuation and special characters
+error.required.eab.business.services = Select which services your business provides
+error.required.eab.penalised.under.act = Select yes if the business, or anyone in the business, has ever been penalised under the Estate Agents Act 1979
+error.required.eab.info.about.penalty = Enter a description of the penalty received and when it occurred
+error.invalid.eab.penalised.description.length = Description of the penalty must be 255 characters or less
+error.invalid.characters.eab.penalised.description = Description of the penalty can include letters a to z, numbers, spaces, and most punctuation and special characters
+error.required.eab.penalised.by.professional.body = Select yes if the business, or anyone in the business, has ever been penalised by a professional body for estate agency business activities
+error.invalid.eab.penalised.by.professional.body.description.length = Description of the penalty must be 255 characters or less
+error.invalid.characters.eab.penalised.by.professional.body.description = Description of the penalty can include letters a to z, numbers, spaces, and most punctuation and special characters
 
 ############################### Responsible People ###############################
 error.required.rp.is.uk.resident = Select yes if {0} is a UK resident
