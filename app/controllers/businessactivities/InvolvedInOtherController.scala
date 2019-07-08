@@ -37,22 +37,18 @@ class InvolvedInOtherController @Inject() ( val dataCacheConnector: DataCacheCon
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      ControllerHelper.allowedToEdit flatMap {
-        case true =>
-          dataCacheConnector.fetchAll map {
-            optionalCache =>
-              (for {
-                cache <- optionalCache
-                businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-              } yield {
-                (for {
-                  businessActivities <- cache.getEntry[BusinessActivities](BusinessActivities.key)
-                  involvedInOther <- businessActivities.involvedInOther
-                } yield Ok(involved_in_other_name(Form2[InvolvedInOther](involvedInOther), edit, businessMatching.prefixedAlphabeticalBusinessTypes)))
-                  .getOrElse(Ok(involved_in_other_name(EmptyForm, edit, businessMatching.prefixedAlphabeticalBusinessTypes)))
-              }) getOrElse Ok(involved_in_other_name(EmptyForm, edit, None))
-          }
-        case false => Future.successful(NotFound(notFoundView))
+      dataCacheConnector.fetchAll map {
+        optionalCache =>
+          (for {
+            cache <- optionalCache
+            businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+          } yield {
+            (for {
+              businessActivities <- cache.getEntry[BusinessActivities](BusinessActivities.key)
+              involvedInOther <- businessActivities.involvedInOther
+            } yield Ok(involved_in_other_name(Form2[InvolvedInOther](involvedInOther), edit, businessMatching.prefixedAlphabeticalBusinessTypes)))
+              .getOrElse(Ok(involved_in_other_name(EmptyForm, edit, businessMatching.prefixedAlphabeticalBusinessTypes)))
+          }) getOrElse Ok(involved_in_other_name(EmptyForm, edit, None))
       }
   }
 
