@@ -61,9 +61,12 @@ class CustomersOutsideIsUKController @Inject()(val dataCacheConnector: DataCache
                 renewal <- cache.getEntry[Renewal](Renewal.key)
                 businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
               } yield {
-                renewalService.updateRenewal(renewal.customersOutsideIsUK(data)) map { _ =>
+                renewalService.updateRenewal(data.isUK match {
+                  case false => renewal.customersOutsideIsUK(data).copy(customersOutsideUK = None)
+                  case true => renewal.customersOutsideIsUK(data)
+                }) map { _ =>
                   data match {
-                    case CustomersOutsideIsUK(true) => Redirect(routes.CustomersOutsideUKController.get())
+                    case CustomersOutsideIsUK(true) => Redirect(routes.CustomersOutsideUKController.get(true))
                     case CustomersOutsideIsUK(false) => (businessMatching.activities.get.businessActivities, edit) match {
                       case (x, false) if x.contains(HighValueDealing) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
                       case _ => Redirect(routes.SummaryController.get())
