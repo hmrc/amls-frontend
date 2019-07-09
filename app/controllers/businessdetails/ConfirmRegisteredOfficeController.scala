@@ -69,8 +69,8 @@ class ConfirmRegisteredOfficeController @Inject () (
           bma <- OptionT.liftF(getAddress(dataCache.fetch[BusinessMatching](BusinessMatching.key)))
         } yield (hra,bma) match {
           case (Some(false),Some(data)) => Ok(confirm_registered_office_or_main_place(EmptyForm, data))
-          case _ => Redirect(routes.RegisteredOfficeController.get(edit))
-        }).getOrElse(Redirect(routes.RegisteredOfficeController.get(edit)))
+          case _ => Redirect(routes.RegisteredOfficeIsUKController.get(edit))
+        }).getOrElse(Redirect(routes.RegisteredOfficeIsUKController.get(edit)))
 
   }
 
@@ -81,7 +81,7 @@ class ConfirmRegisteredOfficeController @Inject () (
           case f: InvalidForm =>
             getAddress(dataCache.fetch[BusinessMatching](BusinessMatching.key)) map {
               case Some(data) => BadRequest(confirm_registered_office_or_main_place(f, data))
-              case _ => Redirect(routes.RegisteredOfficeController.get(edit))
+              case _ => Redirect(routes.RegisteredOfficeIsUKController.get(edit))
             }
           case ValidForm(_, data) =>
 
@@ -98,7 +98,7 @@ class ConfirmRegisteredOfficeController @Inject () (
                 if (data.isRegOfficeOrMainPlaceOfBusiness) {
                   Redirect(routes.ContactingYouController.get(edit))
                 } else {
-                  Redirect(routes.RegisteredOfficeController.get(edit))
+                  Redirect(routes.RegisteredOfficeIsUKController.get(edit))
                 }
               }
             }
@@ -110,7 +110,7 @@ class ConfirmRegisteredOfficeController @Inject () (
               result <- OptionT.liftF(updateRegisteredOfficeAndRedirect(bm, businessDetails))
             } yield {
               result
-            }).getOrElse(Redirect(routes.RegisteredOfficeController.get(edit)))
+            }).getOrElse(Redirect(routes.RegisteredOfficeIsUKController.get(edit)))
         }
   }
 }
