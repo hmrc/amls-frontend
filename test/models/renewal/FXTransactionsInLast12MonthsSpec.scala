@@ -43,14 +43,14 @@ class FXTransactionsInLast12MonthsSpec extends PlaySpec {
         val map = Map("fxTransaction" -> Seq("asas"))
 
         FXTransactionsInLast12Months.formRule.validate(map) must be(Invalid(
-          Seq(Path \ "fxTransaction" -> Seq(ValidationError("error.invalid.msb.transactions.in.12months")))))
+          Seq(Path \ "fxTransaction" -> Seq(ValidationError("error.invalid.renewal.fx.transactions.in.12months")))))
       }
 
       "fail validation on invalid field when it exceeds the max length" in {
         val map = Map("fxTransaction" -> Seq("123" * 10))
 
         FXTransactionsInLast12Months.formRule.validate(map) must be(Invalid(
-          Seq(Path \ "fxTransaction" -> Seq(ValidationError("error.invalid.msb.transactions.in.12months")))))
+          Seq(Path \ "fxTransaction" -> Seq(ValidationError("error.invalid.renewal.fx.transactions.in.12months")))))
       }
 
       "fail validation on invalid field1" in {

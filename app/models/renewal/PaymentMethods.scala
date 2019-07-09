@@ -64,8 +64,8 @@ sealed trait PaymentMethods0 {
 
       val detailsR: Rule[String, String] =
         (minLengthR(minLength) withMessage "error.required.renewal.hvd.describe") andThen
-        (maxLengthR(maxLength) withMessage "error.invalid.maxlength.255") andThen
-        basicPunctuationPattern()
+        (maxLengthR(maxLength) withMessage "error.invalid.renewal.hvd.describe.too.long") andThen
+        basicPunctuationPattern("error.invalid.renewal.hvd.describe.characters")
 
       val booleanR = b andThen { _ map { case Some(b) => b; case None => false } }
 
