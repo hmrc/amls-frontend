@@ -38,18 +38,17 @@ import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks}
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
 
-class RegisteredOfficeControllerSpec extends AmlsSpec with  MockitoSugar{
+class RegisteredOfficeUKControllerSpec extends AmlsSpec with  MockitoSugar{
 
   trait Fixture extends AuthorisedFixture with AutoCompleteServiceMocks {
     self => val request = addToken(authRequest)
 
-    val controller = new RegisteredOfficeController(
+    val controller = new RegisteredOfficeUKController(
       dataCacheConnector = mock[DataCacheConnector],
       authConnector = self.authConnector,
       statusService = mock[StatusService],
-      auditConnector = mock[AuditConnector],
-      autoCompleteService = mockAutoComplete
-      )
+      auditConnector = mock[AuditConnector]
+    )
 
     when {
       controller.auditConnector.sendEvent(any())(any(), any())
@@ -58,18 +57,18 @@ class RegisteredOfficeControllerSpec extends AmlsSpec with  MockitoSugar{
 
   val emptyCache = CacheMap("", Map.empty)
 
-  "RegisteredOfficeController" must {
+  "RegisteredOfficeUKController" must {
 
     val ukAddress = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "AA1 1AA")
 
     "load the where is your registered office or main place of business place page" in new Fixture {
 
-       when(controller.dataCacheConnector.fetch[BusinessDetails](any())
+      when(controller.dataCacheConnector.fetch[BusinessDetails](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include (Messages("businessdetails.registeredoffice.title"))
+      contentAsString(result) must include (Messages("businessdetails.registeredoffice.where.title"))
 
       val document = Jsoup.parse(contentAsString(result))
       document.select("input[name=isUK]").`val` must be("true")
@@ -80,7 +79,7 @@ class RegisteredOfficeControllerSpec extends AmlsSpec with  MockitoSugar{
     "pre select uk when not in edit mode" in new Fixture {
 
       when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any())).
-        thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(ukAddress), None))))
+        thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, None, Some(ukAddress), None))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -92,9 +91,9 @@ class RegisteredOfficeControllerSpec extends AmlsSpec with  MockitoSugar{
     "pre populate where is your registered office or main place of business page with saved data" in new Fixture {
 
       when(controller.statusService.getStatus(any(),any(),any()))
-          .thenReturn(Future.successful(SubmissionDecisionRejected))
+        .thenReturn(Future.successful(SubmissionDecisionRejected))
       when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(BusinessDetails(None, None, None, None, None, Some(ukAddress), None))))
+        .thenReturn(Future.successful(Some(BusinessDetails(None, None, None, None, None, None, Some(ukAddress), None))))
 
       val result = controller.get(true)(request)
       status(result) must be(OK)
@@ -105,7 +104,7 @@ class RegisteredOfficeControllerSpec extends AmlsSpec with  MockitoSugar{
       when(controller.statusService.getStatus(any(),any(),any()))
         .thenReturn(Future.successful(SubmissionDecisionRejected))
       when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(ukAddress), None))))
+        .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, None, Some(ukAddress), None))))
       when (controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
@@ -138,7 +137,7 @@ class RegisteredOfficeControllerSpec extends AmlsSpec with  MockitoSugar{
       when(controller.statusService.getStatus(any(),any(),any()))
         .thenReturn(Future.successful(SubmissionDecisionRejected))
       when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(ukAddress), None))))
+        .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, None, Some(ukAddress), None))))
       when (controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
@@ -222,7 +221,7 @@ class RegisteredOfficeControllerSpec extends AmlsSpec with  MockitoSugar{
       "the submission has been approved and registeredOffice has changed" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(ukAddress), None))))
+          .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, None, Some(ukAddress), None))))
         when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
         when(controller.statusService.getStatus(any(), any(), any()))
@@ -245,7 +244,7 @@ class RegisteredOfficeControllerSpec extends AmlsSpec with  MockitoSugar{
       "status is ready for renewal and registeredOffice has changed" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(ukAddress), None))))
+          .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, None, Some(ukAddress), None))))
         when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
         when(controller.statusService.getStatus(any(), any(), any()))

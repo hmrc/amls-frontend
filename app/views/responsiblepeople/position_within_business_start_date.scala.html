@@ -33,7 +33,7 @@
     } else {
         <p>@Messages("responsiblepeople.position_within_business.startDate.toldus.multiple", personName)</p>
         <ul class="list list-bullet business-roles">
-            @positions.map(p => PositionWithinBusiness.getPrettyName(p).toLowerCase).toList.sorted.map(p => <li class="business-role">{p}</li>)
+            @positions.map(p => PositionWithinBusiness.getPrettyName(p).toLowerCase).toList.map(p => <li class="business-role">{p}</li>)
         </ul>
         <p>@Messages("responsiblepeople.position_within_business.startDate.toldus.selectfirst", personName)</p>
     }

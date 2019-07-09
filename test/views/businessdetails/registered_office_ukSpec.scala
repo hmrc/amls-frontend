@@ -17,16 +17,15 @@
 package views.businessdetails
 
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import jto.validation.{Path, ValidationError}
 import models.businessdetails.{RegisteredOffice, RegisteredOfficeUK}
 import org.scalatest.MustMatchers
-import utils.{AmlsSpec, AutoCompleteServiceMocks}
-import jto.validation.Path
-import jto.validation.ValidationError
 import play.api.i18n.Messages
+import utils.{AmlsSpec, AutoCompleteServiceMocks}
 import views.Fixture
 
 
-class registered_officeSpec extends AmlsSpec with MustMatchers  {
+class registered_office_ukSpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks {
     implicit val requestWithToken = addToken(request)
@@ -37,18 +36,18 @@ class registered_officeSpec extends AmlsSpec with MustMatchers  {
 
       val form2: ValidForm[RegisteredOffice] = Form2(RegisteredOfficeUK("line1","line2",None,None,"AB12CD"))
 
-      def view = views.html.businessdetails.registered_office(form2, true, mockAutoComplete.getCountries)
+      def view = views.html.businessdetails.registered_office_uk(form2, true)
 
-      doc.title must startWith(Messages("businessdetails.registeredoffice.title") + " - " + Messages("summary.businessdetails"))
+      doc.title must startWith(Messages("businessdetails.registeredoffice.where.title") + " - " + Messages("summary.businessdetails"))
     }
 
     "have correct headings" in new ViewFixture {
 
       val form2: ValidForm[RegisteredOffice] = Form2(RegisteredOfficeUK("line1","line2",None,None,"AB12CD"))
 
-      def view = views.html.businessdetails.registered_office(form2, true, mockAutoComplete.getCountries)
+      def view = views.html.businessdetails.registered_office_uk(form2, true)
 
-      heading.html must be(Messages("businessdetails.registeredoffice.title"))
+      heading.html must be(Messages("businessdetails.registeredoffice.where.title"))
       subHeading.html must include(Messages("summary.businessdetails"))
 
     }
@@ -57,32 +56,22 @@ class registered_officeSpec extends AmlsSpec with MustMatchers  {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "isUK") -> Seq(ValidationError("not a message Key")),
-          (Path \ "postCode-fieldset") -> Seq(ValidationError("second not a message Key")),
-          (Path \ "country-fieldset") -> Seq(ValidationError("third not a message Key"))
+          (Path \ "postCode-fieldset") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.businessdetails.registered_office(form2, true, mockAutoComplete.getCountries)
+      def view = views.html.businessdetails.registered_office_uk(form2, true)
 
       errorSummary.html() must include("not a message Key")
-      errorSummary.html() must include("second not a message Key")
-      errorSummary.html() must include("third not a message Key")
-
-      doc.getElementById("isUK")
-        .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
       doc.getElementById("postCode-fieldset")
-        .getElementsByClass("error-notification").first().html() must include("second not a message Key")
-
-      doc.getElementById("country-fieldset")
-        .getElementsByClass("error-notification").first().html() must include("third not a message Key")
+        .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
     }
 
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.businessdetails.registered_office(form2, true, mockAutoComplete.getCountries)
+      def view = views.html.businessdetails.registered_office_uk(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
