@@ -68,7 +68,7 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
 
     def formData(data: Option[FakeRequest[AnyContentAsFormUrlEncoded]]) = data match {
       case Some(d) => d
-      case None => request.withFormUrlEncodedBody("isUK" -> "true")
+      case None => request.withFormUrlEncodedBody("isOutside" -> "true")
     }
 
     def formRequest(data: Option[FakeRequest[AnyContentAsFormUrlEncoded]]) = formData(data)
@@ -138,7 +138,7 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
 
-        val pageTitle = Messages("renewal.customer.outside.uk.countries.title") + " - " +
+        val pageTitle = Messages("renewal.customer.outside.uk.title") + " - " +
           Messages("summary.renewal") + " - " +
           Messages("title.amls") + " - " + Messages("title.gov")
 
@@ -170,7 +170,10 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
           "in edit mode" in new FormSubmissionFixture {
             post(edit = true, businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness))))) { result =>
               result.header.status mustBe SEE_OTHER
-              result.header.headers.get("Location") mustBe Some(routes.CustomersOutsideUKController.get().url)
+              result.header.headers.get("Location") mustBe Some(routes.CustomersOutsideUKController.get(true).url)
+              println(result)
+              println(result.header)
+              println(result.header.status)
             }
           }
 

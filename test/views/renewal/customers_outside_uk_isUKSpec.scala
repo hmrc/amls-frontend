@@ -38,7 +38,7 @@ class customers_outside_uk_isUKSpec extends AmlsSpec with MustMatchers  {
 
       def view = views.html.renewal.customers_outside_uk_isUK(form2, true)
 
-      doc.title must startWith(Messages("renewal.customer.outside.uk.countries.title") + " - " + Messages("summary.renewal"))
+      doc.title must startWith(Messages("renewal.customer.outside.uk.title") + " - " + Messages("summary.renewal"))
     }
 
     "have correct headings" in new ViewFixture {
@@ -47,7 +47,7 @@ class customers_outside_uk_isUKSpec extends AmlsSpec with MustMatchers  {
 
       def view = views.html.renewal.customers_outside_uk_isUK(form2, true)
 
-      heading.html must be(Messages("renewal.customer.outside.uk.countries.title"))
+      heading.html must be(Messages("renewal.customer.outside.uk.title"))
       subHeading.html must include(Messages("summary.renewal"))
 
     }

@@ -56,7 +56,7 @@ class customers_outside_ukSpec extends AmlsSpec with MustMatchers  {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "isOutside") -> Seq(ValidationError("not a message Key"))
+          (Path \ "countries") -> Seq(ValidationError("not a message Key"))
         ))
 
       def view = views.html.renewal.customers_outside_uk(form2, true, mockAutoComplete.getCountries)
