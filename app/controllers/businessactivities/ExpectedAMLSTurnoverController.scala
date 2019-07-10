@@ -37,21 +37,18 @@ class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCach
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      ControllerHelper.allowedToEdit flatMap {
-        case true => dataCacheConnector.fetchAll map {
-          optionalCache =>
+      dataCacheConnector.fetchAll map {
+        optionalCache =>
+          (for {
+            cache <- optionalCache
+            businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+          } yield {
             (for {
-              cache <- optionalCache
-              businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-            } yield {
-              (for {
-                businessActivities <- cache.getEntry[BusinessActivities](BusinessActivities.key)
-                expectedTurnover <- businessActivities.expectedAMLSTurnover
-              } yield Ok(expected_amls_turnover(Form2[ExpectedAMLSTurnover](expectedTurnover), edit, businessMatching.prefixedAlphabeticalBusinessTypes)))
-                .getOrElse (Ok(expected_amls_turnover(EmptyForm, edit, businessMatching.prefixedAlphabeticalBusinessTypes)))
-            }) getOrElse Ok(expected_amls_turnover(EmptyForm, edit, None))
-        }
-        case false => Future.successful(NotFound(notFoundView))
+              businessActivities <- cache.getEntry[BusinessActivities](BusinessActivities.key)
+              expectedTurnover <- businessActivities.expectedAMLSTurnover
+            } yield Ok(expected_amls_turnover(Form2[ExpectedAMLSTurnover](expectedTurnover), edit, businessMatching.prefixedAlphabeticalBusinessTypes)))
+              .getOrElse (Ok(expected_amls_turnover(EmptyForm, edit, businessMatching.prefixedAlphabeticalBusinessTypes)))
+          }) getOrElse Ok(expected_amls_turnover(EmptyForm, edit, None))
       }
   }
 

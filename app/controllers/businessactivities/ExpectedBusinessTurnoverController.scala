@@ -35,16 +35,13 @@ class ExpectedBusinessTurnoverController @Inject() (val dataCacheConnector: Data
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      ControllerHelper.allowedToEdit flatMap {
-        case true => dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
-          response =>
-            val form: Form2[ExpectedBusinessTurnover] = (for {
-              businessActivities <- response
-              expectedTurnover <- businessActivities.expectedBusinessTurnover
-            } yield Form2[ExpectedBusinessTurnover](expectedTurnover)).getOrElse(EmptyForm)
-            Ok(expected_business_turnover(form, edit))
-        }
-        case false => Future.successful(NotFound(notFoundView))
+      dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
+        response =>
+          val form: Form2[ExpectedBusinessTurnover] = (for {
+            businessActivities <- response
+            expectedTurnover <- businessActivities.expectedBusinessTurnover
+          } yield Form2[ExpectedBusinessTurnover](expectedTurnover)).getOrElse(EmptyForm)
+          Ok(expected_business_turnover(form, edit))
       }
   }
 
