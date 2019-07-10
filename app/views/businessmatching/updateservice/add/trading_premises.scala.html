@@ -37,7 +37,8 @@
             heading = Messages("businessmatching.updateservice.tradingpremises.heading", Messages(s"businessmatching.registerservices.servicename.lbl.$activity.phrased")),
             section = "summary.updateservice",
             panel = false,
-            errorGroupPlaceholder = Messages(s"businessmatching.registerservices.servicename.lbl.$activity.phrased")
+            errorGroupPlaceholder = Messages(s"businessmatching.registerservices.servicename.lbl.$activity.phrased"),
+            classes = Seq("inline")
         ) {
             @radio(
                 f = f("tradingPremisesNewActivities"),

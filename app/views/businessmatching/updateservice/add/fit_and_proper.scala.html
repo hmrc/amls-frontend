@@ -41,8 +41,8 @@
             heading = "businessmatching.updateservice.fitandproper.heading",
             section = "summary.updateservice",
             panel = false,
-            supportingContent = supportingContent
-
+            supportingContent = supportingContent,
+            classes = Seq("inline")
         ) {
             @radio(
                 f = f("passedFitAndProper"),
@@ -55,8 +55,6 @@
                 value = "false"
             )
         }
-
-        <p></p>
 
         @detailsSummary(
             summary = Messages("businessmatching.updateservice.fitandproper.text.info")
