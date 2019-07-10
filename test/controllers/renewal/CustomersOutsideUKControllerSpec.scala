@@ -19,7 +19,7 @@ package controllers.renewal
 import connectors.{DataCacheConnector, KeystoreConnector}
 import models.Country
 import models.businessmatching._
-import models.renewal.{CustomersOutsideUK, MostTransactions, Renewal, SendTheLargestAmountsOfMoney}
+import models.renewal._
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -68,7 +68,7 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
 
     def formData(data: Option[FakeRequest[AnyContentAsFormUrlEncoded]]) = data match {
       case Some(d) => d
-      case None => request.withFormUrlEncodedBody("isOutside" -> "false")
+      case None => request.withFormUrlEncodedBody("countries" -> "GB")
     }
 
     def formRequest(data: Option[FakeRequest[AnyContentAsFormUrlEncoded]]) = formData(data)
@@ -78,6 +78,7 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
     val sendTheLargestAmountsOfMoney = SendTheLargestAmountsOfMoney(Seq(Country("GB","GB")))
     val mostTransactions = MostTransactions(Seq(Country("GB","GB")))
     val customersOutsideUK = CustomersOutsideUK(Some(Seq(Country("GB", "GB"))))
+    val customersOutsideIsUK = CustomersOutsideIsUK(true)
 
     when {
       renewalService.updateRenewal(any())(any(), any(), any())
@@ -90,6 +91,7 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
     when {
       cache.getEntry[Renewal](Renewal.key)
     } thenReturn Some(Renewal(
+      customersOutsideIsUK = Some(customersOutsideIsUK),
       customersOutsideUK = Some(customersOutsideUK),
       sendTheLargestAmountsOfMoney = Some(sendTheLargestAmountsOfMoney),
       mostTransactions = Some(mostTransactions)
@@ -107,6 +109,7 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
       } thenReturn Some(renewal match {
         case Some(r) => r
         case None => Renewal(
+          customersOutsideIsUK = Some(customersOutsideIsUK),
           customersOutsideUK = Some(customersOutsideUK),
           sendTheLargestAmountsOfMoney = Some(sendTheLargestAmountsOfMoney),
           mostTransactions = Some(mostTransactions)
@@ -177,6 +180,13 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
               result.header.headers.get("Location") mustBe Some(routes.SummaryController.get().url)
             }
           }
+
+          "business is an msb and asp" in new FormSubmissionFixture {
+            post(businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness, AccountancyServices))))) { result =>
+              result.header.status mustBe SEE_OTHER
+              result.header.headers.get("Location") mustBe Some(routes.SummaryController.get().url)
+            }
+          }
         }
 
         "redirect to the PercentageOfCashPaymentOver15000Controller" when {
@@ -187,21 +197,11 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
             }
           }
         }
-
-        "redirect to the CYA page" when {
-          "business is an msb and asp" in new FormSubmissionFixture {
-            post(businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness, AccountancyServices))))) { result =>
-              result.header.status mustBe SEE_OTHER
-              result.header.headers.get("Location") mustBe Some(routes.SummaryController.get().url)
-            }
-          }
-        }
-
       }
 
       "given invalid data" must {
         "respond with BAD_REQUEST" in new FormSubmissionFixture {
-          post(data = Some(request.withFormUrlEncodedBody("isOutside" -> "abc"))) { result =>
+          post(data = Some(request.withFormUrlEncodedBody("countries" -> "abc"))) { result =>
             result.header.status mustBe BAD_REQUEST
           }
         }

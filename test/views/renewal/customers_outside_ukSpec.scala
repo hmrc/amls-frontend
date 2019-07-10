@@ -63,7 +63,7 @@ class customers_outside_ukSpec extends AmlsSpec with MustMatchers  {
 
       errorSummary.html() must include("not a message Key")
 
-      doc.getElementById("isOutside")
+      doc.getElementById("countries")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
     }
 
