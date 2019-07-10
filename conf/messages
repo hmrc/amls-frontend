@@ -20,9 +20,9 @@ error.required.address.line1 = Enter the first line of the address
 error.required.address.line2 = Enter the second line of the address
 error.max.length.address.line = You can’t enter more than 35 characters
 error.invalid.postcode = Enter a valid postcode
-error.required.country = Enter an official country name: for example, Holland is Netherlands
-error.invalid.country = Enter an official country name: for example, Holland is Netherlands
-error.required.country.name = Enter an official country name: for example, Holland is Netherlands
+error.required.country = Enter a country name, like France
+error.invalid.country = Enter a country name, like France
+error.required.country.name = Enter a country name, like France
 error.required.nationality = Select one or more options to show this person’s nationality
 error.required.uk.or.overseas = Select yes if this is a UK address
 
@@ -191,6 +191,7 @@ error.required.ba.business.use.accountant = Select yes if your business receives
 error.required.ba.suspicious.activity = Select yes if your business has written guidance for staff on how to report suspicious activity
 error.required.ba.tax.matters = Select yes if your professional adviser also manages your tax affairs with HMRC
 error.required.ba.advisor.name = Enter your professional adviser’s name
+error.required.ba.select.yes = Select yes if you had customers who lived or worked outside of the UK in the last 12 months
 
 ###############################  Trading premises ###############################
 error.required.tp.activity.your.business.do = Select one or more options to show what your business does at these premises
@@ -366,6 +367,7 @@ error.required.renewal.hvd.percentage = Select one option to show the proportion
 error.invalid.renewal.msb.wc.moneySources = Select one or more options to show who supplied your foreign currency
 
 error.required.renewal.country.name = Enter an official country name: for example, Holland is Netherlands
+error.required.renewal.customer.country.name = Enter the countries where customers lived or worked
 
 error.required.renewal.ce.transactions.in.12months = Enter the number of currency exchange transactions you made in the last 12 months
 error.required.renewal.fx.transactions.in.12months = Enter the number of foreign exchange transactions you made in the last 12 months

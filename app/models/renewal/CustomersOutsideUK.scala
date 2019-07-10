@@ -18,11 +18,10 @@ package models.renewal
 
 import models.{Country, businessactivities}
 import jto.validation.forms._
-import jto.validation.{From, Rule, Success, Write}
+import jto.validation.{From, Rule, Write}
 import jto.validation._
-import play.api.libs.json.{JsObject, Json, Reads, Writes}
+import play.api.libs.json.{Json, Reads, Writes}
 import utils.{JsonMapping, TraversableValidators}
-import cats.data.Validated.{Invalid, Valid}
 
 case class CustomersOutsideUK(countries: Option[Seq[Country]])
 
@@ -51,7 +50,7 @@ sealed trait CustomersOutsideUK0 {
 
       val countrySeqR = {
         (seqToOptionSeq[String] andThen flattenR[String] andThen cR)
-          .andThen(minLengthR[Seq[Country]](minLength) withMessage "error.required.renewal.country.name")
+          .andThen(minLengthR[Seq[Country]](minLength) withMessage "error.required.renewal.customer.country.name")
           .andThen(maxLengthR[Seq[Country]](maxLength))
       }
 

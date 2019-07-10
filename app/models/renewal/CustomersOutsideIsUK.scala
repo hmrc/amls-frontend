@@ -46,7 +46,7 @@ object CustomersOutsideIsUK {
   implicit val formRule: Rule[UrlFormEncoded, CustomersOutsideIsUK] =
     From[UrlFormEncoded] { __ =>
       import jto.validation.forms.Rules._
-      (__ \ "isOutside").read[Boolean].withMessage("error.required.atb.registered.office.uk.or.overseas") map CustomersOutsideIsUK.apply
+      (__ \ "isOutside").read[Boolean].withMessage("error.required.ba.select.yes") map CustomersOutsideIsUK.apply
     }
 
   implicit val formWrites: Write[CustomersOutsideIsUK, UrlFormEncoded] =

@@ -148,7 +148,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
         status(result) must be(BAD_REQUEST)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("a[href=#largestAmountsOfMoney]").html() must include(Messages("error.required.renewal.country.name"))
+        document.select("a[href=#largestAmountsOfMoney]").html() must include(Messages("error.required.country"))
       }
     }
   }
