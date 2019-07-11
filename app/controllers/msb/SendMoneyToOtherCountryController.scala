@@ -78,50 +78,42 @@ class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCa
                   }
                 }
               }
-              result.map(_.flatMap(identity)) getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
+              result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
             }
         }
       }
   }
 
-  private def shouldAnswerCurrencyExchangeQuestion(
-                                                          services: Set[BusinessMatchingMsbService],
-                                                          register: ServiceChangeRegister,
-                                                          msb: MoneyServiceBusiness,
-                                                          isPreSubmission: Boolean
-                                                  ): Boolean = {
+  private def shouldAnswerCurrencyExchangeQuestion(services: Set[BusinessMatchingMsbService],
+                                                    register: ServiceChangeRegister,
+                                                    msb: MoneyServiceBusiness): Boolean = {
+
     currencyExchangeAddedPostSubmission(services, register) ||
-            (isPreSubmission && services.contains(CurrencyExchange) && msb.sendTheLargestAmountsOfMoney.isEmpty)
+            (services.contains(CurrencyExchange) && msb.sendTheLargestAmountsOfMoney.isEmpty)
   }
 
-  private def shouldAnswerForeignExchangeQuestion(
-                                                         services: Set[BusinessMatchingMsbService],
-                                                         register: ServiceChangeRegister,
-                                                         msb: MoneyServiceBusiness,
-                                                         isPreSubmission: Boolean
-                                                 ): Boolean = {
+  private def shouldAnswerForeignExchangeQuestion(services: Set[BusinessMatchingMsbService],
+                                                   register: ServiceChangeRegister,
+                                                   msb: MoneyServiceBusiness): Boolean = {
+
     foreignExchangeAddedPostSubmission(services, register) ||
-            (isPreSubmission && services.contains(ForeignExchange) && msb.sendTheLargestAmountsOfMoney.isEmpty)
+            (services.contains(ForeignExchange) && msb.sendTheLargestAmountsOfMoney.isEmpty)
   }
 
-  private def routing(
-                             shouldRouteToNext: Boolean,
-                             services: Set[BusinessMatchingMsbService],
-                             register: ServiceChangeRegister,
-                             msb: MoneyServiceBusiness,
-                             edit: Boolean
-                     )
-                             (implicit ac: AuthContext, hc: HeaderCarrier) = {
-    statusService.isPreSubmission map { isPreSubmission =>
-      if (shouldRouteToNext) {
-        Redirect(routes.SendTheLargestAmountsOfMoneyController.get(edit))
-      } else if (shouldAnswerCurrencyExchangeQuestion(services, register, msb, isPreSubmission)) {
-        Redirect(routes.CETransactionsInNext12MonthsController.get(edit))
-      } else if (shouldAnswerForeignExchangeQuestion(services, register, msb, isPreSubmission)) {
-        Redirect(routes.FXTransactionsInNext12MonthsController.get(edit))
-      } else {
-        Redirect(routes.SummaryController.get())
-      }
+  private def routing(shouldRouteToNext: Boolean,
+                       services: Set[BusinessMatchingMsbService],
+                       register: ServiceChangeRegister,
+                       msb: MoneyServiceBusiness,
+                       edit: Boolean)(implicit ac: AuthContext, hc: HeaderCarrier) = {
+
+    if (shouldRouteToNext) {
+      Redirect(routes.SendTheLargestAmountsOfMoneyController.get(edit))
+    } else if (shouldAnswerCurrencyExchangeQuestion(services, register, msb)) {
+      Redirect(routes.CETransactionsInNext12MonthsController.get(edit))
+    } else if (shouldAnswerForeignExchangeQuestion(services, register, msb)) {
+      Redirect(routes.FXTransactionsInNext12MonthsController.get(edit))
+    } else {
+      Redirect(routes.SummaryController.get())
     }
   }
 }
