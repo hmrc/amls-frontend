@@ -59,7 +59,7 @@ sealed trait CustomersOutsideUK0 {
 
   private  def write: Write[CustomersOutsideUK, UrlFormEncoded] = Write {
     case CustomersOutsideUK(Some(countries)) => countries.zipWithIndex.map(i => s"countries[${i._2}]" -> Seq(i._1.code)).toMap
-    case _ => throw new IllegalArgumentException("")
+    case _ => throw new IllegalArgumentException("No countries added")
   }
 
   val formR: Rule[UrlFormEncoded, CustomersOutsideUK] = {
@@ -75,8 +75,8 @@ sealed trait CustomersOutsideUK0 {
   implicit val formW: Write[CustomersOutsideUK, UrlFormEncoded] = write
 
 
-  val jsonW = Writes[CustomersOutsideUK] { x =>
-    val countries = x.countries.fold[Seq[String]](Seq.empty)(x => x.map(m => m.code))
+  val jsonW = Writes[CustomersOutsideUK] { customer =>
+    val countries = customer.countries.fold[Seq[String]](Seq.empty)(customer => customer.map(country => country.code))
     Json.obj(
         "countries" -> countries
       )
