@@ -300,26 +300,24 @@
                 editLinkTag = "receivecashpaymentshowreceived-edit",
                 editUrl = controllers.renewal.routes.HowCashPaymentsReceivedController.get(true).toString
             ) {
-                <ul class="list list--comma">
-                    <li>@methods match {
-                        case PaymentMethods(false, false, None) => { Unknown }
-                        case PaymentMethods(false, false, Some(txt)) => { @txt }
-                        case PaymentMethods(false, true, None) => { @Messages("hvd.receiving.option.02") }
-                        case PaymentMethods(false, true, Some(txt)) => { @Messages("hvd.receiving.option.02"), @txt }
-                        case PaymentMethods(true, false, None) => { @Messages("hvd.receiving.option.01") }
-                        case PaymentMethods(true, false, Some(txt)) => { @Messages("hvd.receiving.option.01"), @txt }
-                        case PaymentMethods(true, true, None) => { @Messages("hvd.receiving.option.01"), @Messages("hvd.receiving.option.02") }
-                        case PaymentMethods(true, true, Some(txt)) => { @Messages("hvd.receiving.option.01"), @Messages("hvd.receiving.option.02"), @txt }
-                    }</li>
+                <ul class="list list-bullet">
+                    @if(methods.courier){
+                        <li>@Messages("hvd.receiving.option.01")</li>
+                    }
+
+                    @if(methods.direct){
+                        <li>@Messages("hvd.receiving.option.02")</li>
+                    }
+
+                    @if(methods.other.isDefined){
+                        <li>@methods.other.getOrElse("")</li>
+                    }
                 </ul>
             }
         }
-            case _ => { }
-
-            }
+        case _ => { }
         }
-
-
+    }
 
     @form(f, controllers.renewal.routes.SummaryController.post()) {
         @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
