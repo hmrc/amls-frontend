@@ -20,6 +20,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
+import models.businessactivities.BusinessActivities
 import models.businessmatching.{BusinessMatching, HighValueDealing}
 import models.renewal.{CustomersOutsideIsUK, Renewal}
 import services.{AutoCompleteService, RenewalService}
@@ -60,6 +61,7 @@ class CustomersOutsideIsUKController @Inject()(val dataCacheConnector: DataCache
                 cache <- optionalCache
                 renewal <- cache.getEntry[Renewal](Renewal.key)
                 businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+                ba <- businessMatching.activities.map {a => a.businessActivities}
               } yield {
                 renewalService.updateRenewal(data.isUK match {
                   case false => renewal.customersOutsideIsUK(data).copy(customersOutsideUK = None)
@@ -68,7 +70,7 @@ class CustomersOutsideIsUKController @Inject()(val dataCacheConnector: DataCache
                   (data, edit) match {
                     case (CustomersOutsideIsUK(true), false) => Redirect(routes.CustomersOutsideUKController.get())
                     case (CustomersOutsideIsUK(true), true) => Redirect(routes.CustomersOutsideUKController.get(true))
-                    case (CustomersOutsideIsUK(false), _) => (businessMatching.activities.get.businessActivities, edit) match {
+                    case (CustomersOutsideIsUK(false), _) => (ba, edit) match {
                       case (x, false) if x.contains(HighValueDealing) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
                       case _ => Redirect(routes.SummaryController.get())
                     }
@@ -78,7 +80,6 @@ class CustomersOutsideIsUKController @Inject()(val dataCacheConnector: DataCache
             }
         }
   }
-
 }
 
 

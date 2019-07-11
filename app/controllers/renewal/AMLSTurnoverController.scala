@@ -24,6 +24,7 @@ import models.businessmatching._
 import models.renewal.{AMLSTurnover, Renewal}
 import services.RenewalService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.ControllerHelper
 import views.html.renewal.amls_turnover
 
 @Singleton
@@ -71,18 +72,26 @@ class AMLSTurnoverController @Inject()(
               renewal <- renewalService.getRenewal
               _ <- renewalService.updateRenewal(renewal.turnover(data))
               businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
-            } yield (edit, businessMatching) match {
-              case (true, _) => Redirect(routes.SummaryController.get())
-              case (false, Some(bm)) if bm.activities.isDefined => bm.activities.get.businessActivities match {
-                case x if x.contains(MoneyServiceBusiness) => Redirect(routes.TotalThroughputController.get())
-                case x if x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideIsUKController.get())
-                case x if x.contains(HighValueDealing) => Redirect(routes.CustomersOutsideIsUKController.get())
-                case _ => Redirect(routes.SummaryController.get())
+            } yield {
+              if (edit) {
+                Redirect(routes.SummaryController.get())
+              } else {
+                getRouting(ControllerHelper.getBusinessActivity(businessMatching))
               }
-              case _ => InternalServerError("Unable to redirect from Turnover page")
             }
         }
       }
   }
 
+  private def getRouting(ba: Option[BusinessActivities]) = {
+    ba match {
+      case Some(activities) => activities.businessActivities match {
+        case x if x.contains(MoneyServiceBusiness) => Redirect(routes.TotalThroughputController.get())
+        case x if x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideIsUKController.get())
+        case x if x.contains(HighValueDealing) => Redirect(routes.CustomersOutsideIsUKController.get())
+        case _ => Redirect(routes.SummaryController.get())
+      }
+      case _ => InternalServerError("Unable to redirect from Turnover page")
+    }
+  }
 }

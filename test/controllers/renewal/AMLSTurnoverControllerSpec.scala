@@ -290,7 +290,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
           }
         }
 
-        "go to renewal CustomerOutsideIsUK" when {
+        "go to renewal CustomerOutsideIsUKController" when {
           "it has business type of HVD and not (ASP or MSB)" in new Fixture {
             val newRequest = request.withFormUrlEncodedBody(
               "turnover" -> "01"

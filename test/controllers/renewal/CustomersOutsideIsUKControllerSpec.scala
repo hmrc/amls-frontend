@@ -44,9 +44,6 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
     self =>
     val request = addToken(authRequest)
 
-    implicit val authContext = mock[AuthContext]
-    implicit val headerCarrier = HeaderCarrier()
-
     val dataCacheConnector = mock[DataCacheConnector]
     val renewalService = mock[RenewalService]
 
@@ -171,9 +168,6 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
             post(edit = true, businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness))))) { result =>
               result.header.status mustBe SEE_OTHER
               result.header.headers.get("Location") mustBe Some(routes.CustomersOutsideUKController.get(true).url)
-              println(result)
-              println(result.header)
-              println(result.header.status)
             }
           }
 

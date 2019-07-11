@@ -191,7 +191,7 @@ error.required.ba.business.use.accountant = Select yes if your business receives
 error.required.ba.suspicious.activity = Select yes if your business has written guidance for staff on how to report suspicious activity
 error.required.ba.tax.matters = Select yes if your professional adviser also manages your tax affairs with HMRC
 error.required.ba.advisor.name = Enter your professional adviser’s name
-error.required.ba.select.yes = Select yes if you had customers who lived or worked outside of the UK in the last 12 months
+error.required.ba.renewal.select.yes = Select yes if you had customers who lived or worked outside of the UK in the last 12 months
 
 ###############################  Trading premises ###############################
 error.required.tp.activity.your.business.do = Select one or more options to show what your business does at these premises
@@ -1467,8 +1467,8 @@ businessactivities.ncaRegistered.p1 = To report suspicious activity to the NCA y
 businessactivities.ncaRegistered.p2 = You’re not legally required to register.
 
 businessactivities.customer.outside.uk.title = Do you have customers who live or work outside of the UK?
-businessactivities.hight.value.customer.lbl = Where do these customers live or work?
-businessactivities.hight.value.customer.lbl.hint = List up to 10 countries. Include countries for customers who bring in the most revenue to your business.
+businessactivities.high.value.customer.lbl = Where do these customers live or work?
+businessactivities.high.value.customer.lbl.hint = List up to 10 countries. Include countries for customers who bring in the most revenue to your business.
 businessactivities.upto.10.countries = List up to 10 countries.
 businessactivities.accountantForAMLSRegulations.title = Does your business receive professional advice on Money Laundering Regulations and due diligence?
 businessactivities.accountantForAMLSRegulations.subtext = This only applies to guidance from a professional adviser who is not part of your business, like an accountant.
