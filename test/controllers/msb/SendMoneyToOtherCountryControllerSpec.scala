@@ -467,7 +467,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.CETransactionsInNext12MonthsController.get(true).url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
     }
 
     "on valid post where the value is false in edit mode (CE, FX)" in new FalseInEditModeFixture {
@@ -477,7 +477,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.CETransactionsInNext12MonthsController.get(true).url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
     }
 
     "on valid post where the value is false in edit mode (FX)" in new FalseInEditModeFixture {
@@ -487,7 +487,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.FXTransactionsInNext12MonthsController.get(true).url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
     }
 
     "on valid post where the value is false in edit mode (Non-CE, Non-FX)" in new FalseInEditModeFixture {

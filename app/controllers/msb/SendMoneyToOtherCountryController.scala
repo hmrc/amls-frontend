@@ -23,6 +23,7 @@ import javax.inject.Inject
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessMatching, BusinessMatchingMsbService, CurrencyExchange, ForeignExchange}
 import models.moneyservicebusiness.{MoneyServiceBusiness, SendMoneyToOtherCountry}
+import play.api.mvc.Result
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -66,7 +67,7 @@ class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCa
               } yield {
                 data.money match {
                   case true => dataCacheConnector.save(MoneyServiceBusiness.key, msb.sendMoneyToOtherCountry(data)) map {
-                    _ => routing(data.money, services.msbServices,register, msb, edit)
+                    _ => Redirect(routes.SendTheLargestAmountsOfMoneyController.get(edit))
                   }
                   case _ => val newModel = msb
                     .sendMoneyToOtherCountry(data)
@@ -74,7 +75,11 @@ class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCa
                     .mostTransactions(None)
 
                     dataCacheConnector.save(MoneyServiceBusiness.key, newModel) map {
-                    _ => routing(data.money, services.msbServices,register, newModel, edit)
+                    _ => if(edit) {
+                      Redirect(routes.SummaryController.get())
+                    } else {
+                      routing(services.msbServices,register, newModel, edit)
+                    }
                   }
                 }
               }
@@ -100,20 +105,15 @@ class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCa
             (services.contains(ForeignExchange) && msb.sendTheLargestAmountsOfMoney.isEmpty)
   }
 
-  private def routing(shouldRouteToNext: Boolean,
-                       services: Set[BusinessMatchingMsbService],
-                       register: ServiceChangeRegister,
-                       msb: MoneyServiceBusiness,
-                       edit: Boolean)(implicit ac: AuthContext, hc: HeaderCarrier) = {
+  private def routing(services: Set[BusinessMatchingMsbService], register: ServiceChangeRegister, msb: MoneyServiceBusiness, edit: Boolean)
+                     (implicit ac: AuthContext, hc: HeaderCarrier) = {
 
-    if (shouldRouteToNext) {
-      Redirect(routes.SendTheLargestAmountsOfMoneyController.get(edit))
-    } else if (shouldAnswerCurrencyExchangeQuestion(services, register, msb)) {
-      Redirect(routes.CETransactionsInNext12MonthsController.get(edit))
-    } else if (shouldAnswerForeignExchangeQuestion(services, register, msb)) {
-      Redirect(routes.FXTransactionsInNext12MonthsController.get(edit))
-    } else {
-      Redirect(routes.SummaryController.get())
+    val (ceQuestion, fxQuestion) = (shouldAnswerCurrencyExchangeQuestion(services, register, msb), shouldAnswerForeignExchangeQuestion(services, register, msb))
+
+    (ceQuestion, fxQuestion) match {
+      case (true, _ ) => Redirect(routes.CETransactionsInNext12MonthsController.get(edit))
+      case (_, true) => Redirect(routes.FXTransactionsInNext12MonthsController.get(edit))
+      case _ =>Redirect(routes.SummaryController.get())
     }
   }
 }
