@@ -248,7 +248,7 @@
             editLinkTag = "customersoutsideisuk-edit",
             editUrl = controllers.renewal.routes.CustomersOutsideIsUKController.get(true).toString
         ) {
-            <p>@boa.isUK match {
+            <p>@boa.isOutside match {
                 case true => {@Messages("lbl.yes")}
                 case false => {@Messages("lbl.no")}
             }</p>

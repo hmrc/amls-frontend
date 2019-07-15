@@ -20,7 +20,7 @@ import jto.validation.forms._
 import jto.validation.{From, Rule, Write}
 import play.api.libs.json.Json
 
-case class CustomersOutsideIsUK(isUK: Boolean)
+case class CustomersOutsideIsUK(isOutside: Boolean)
 
 object CustomersOutsideIsUK {
 

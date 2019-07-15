@@ -62,7 +62,7 @@ class CustomersOutsideIsUKController @Inject()(val dataCacheConnector: DataCache
                 businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
                 ba <- businessMatching.activities.map { a => a.businessActivities}
               } yield {
-                renewalService.updateRenewal(data.isUK match {
+                renewalService.updateRenewal(data.isOutside match {
                   case false => renewal.customersOutsideIsUK(data).copy(customersOutsideUK = None)
                   case true => renewal.customersOutsideIsUK(data)
                 }) map { _ =>
