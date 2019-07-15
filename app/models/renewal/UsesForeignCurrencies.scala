@@ -33,7 +33,7 @@ object UsesForeignCurrencies {
 
   implicit val formRule: Rule[UrlFormEncoded, UsesForeignCurrencies] =
     From[UrlFormEncoded] { __ =>
-      (__ \ "usesForeignCurrencies").read[Boolean].withMessage("error.required.msb.wc.foreignCurrencies") map {
+      (__ \ "usesForeignCurrencies").read[Boolean].withMessage("error.required.renewal.wc.foreign.currencies") map {
         case true => UsesForeignCurrenciesYes
         case false => UsesForeignCurrenciesNo
       }
