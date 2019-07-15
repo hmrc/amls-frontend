@@ -19,7 +19,7 @@ package models.renewal
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.{Path, Rule, ValidationError}
 import models.ValidationRule
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, Reads}
 
 case class Renewal(
                     involvedInOtherActivities: Option[InvolvedInOther] = None,
@@ -107,7 +107,34 @@ object Renewal {
   val key = "renewal"
   val sectionKey = "renewal"
 
-  implicit val formats = Json.format[Renewal]
+  implicit val format = Json.writes[Renewal]
+
+  implicit val jsonReads: Reads[Renewal] = {
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json.Reads._
+    import play.api.libs.json._
+
+    (
+      (__ \ "involvedInOtherActivities").readNullable[InvolvedInOther] and
+        (__ \ "businessTurnover").readNullable[BusinessTurnover] and
+        (__ \ "turnover").readNullable[AMLSTurnover] and
+        ((__ \ "customersOutsideUK" \"isOutside").read[Boolean].map(c => Option(CustomersOutsideIsUK(c))) or
+          (__ \ "customersOutsideIsUK").readNullable[CustomersOutsideIsUK]) and
+        (__ \ "customersOutsideUK").readNullable[CustomersOutsideUK] and
+        (__ \ "percentageOfCashPaymentOver15000").readNullable[PercentageOfCashPaymentOver15000] and
+        (__ \ "receiveCashPayments").readNullable[ReceiveCashPayments] and
+        (__ \ "totalThroughput").readNullable[TotalThroughput] and
+        (__ \ "whichCurrencies").readNullable[WhichCurrencies] and
+        (__ \ "transactionsInLast12Months").readNullable[TransactionsInLast12Months] and
+        (__ \ "sendTheLargestAmountsOfMoney").readNullable[SendTheLargestAmountsOfMoney] and
+        (__ \ "mostTransactions").readNullable[MostTransactions] and
+        (__ \ "ceTransactionsInLast12Months").readNullable[CETransactionsInLast12Months] and
+        (__ \ "fxTransactionsInLast12Months").readNullable[FXTransactionsInLast12Months] and
+        (__ \ "hasChanged").read[Boolean] and
+        (__ \ "sendMoneyToOtherCountry").readNullable[SendMoneyToOtherCountry] and
+        (__ \ "hasAccepted").read[Boolean]
+      ).apply(Renewal.apply _)
+  }
 
   implicit def default(renewal: Option[Renewal]): Renewal =
     renewal.getOrElse(Renewal())
