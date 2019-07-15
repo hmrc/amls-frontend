@@ -37,7 +37,7 @@ class summaryPreRelease7Spec extends  AmlsSpec with MustMatchers {
 
       val model = MoneyServiceBusiness(whichCurrencies = Some(WhichCurrencies(Seq("GBP"), None, None)))
 
-      def view = views.html.msb.summary(model, Some(BusinessMatchingMsbServices(Set(CurrencyExchange))), false, ServiceChangeRegister())
+      def view = views.html.msb.summary(model, Some(BusinessMatchingMsbServices(Set(CurrencyExchange))), ServiceChangeRegister())
 
       html.contains(Messages("msb.which_currencies.foreign_currencies_question")) must be(false)
 

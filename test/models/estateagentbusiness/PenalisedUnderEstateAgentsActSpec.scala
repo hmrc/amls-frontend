@@ -51,7 +51,7 @@ class PenalisedUnderEstateAgentsActSpec extends PlaySpec with MockitoSugar {
 
       PenalisedUnderEstateAgentsAct.formRule.validate(data) must
         be(Invalid(Seq(
-          (Path \ "penalisedUnderEstateAgentsActDetails") -> Seq(ValidationError("err.text.validation"))
+          (Path \ "penalisedUnderEstateAgentsActDetails") -> Seq(ValidationError("error.invalid.characters.eab.penalised.description"))
         )))
     }
 
@@ -85,7 +85,7 @@ class PenalisedUnderEstateAgentsActSpec extends PlaySpec with MockitoSugar {
 
       PenalisedUnderEstateAgentsAct.formRule.validate(data) must
         be(Invalid(Seq(
-          (Path \ "penalisedUnderEstateAgentsActDetails") -> Seq(ValidationError("error.invalid.maxlength.255"))
+          (Path \ "penalisedUnderEstateAgentsActDetails") -> Seq(ValidationError("error.invalid.eab.penalised.description.length"))
         )))
     }
 

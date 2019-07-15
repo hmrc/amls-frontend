@@ -24,15 +24,18 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import utils.AmlsSpec
+import views.Fixture
 
 class roles_within_businessSpec extends AmlsSpec with MustMatchers {
 
-  trait ViewFixture {
+  trait ViewFixture extends Fixture {
 
-    def view: HtmlFormat.Appendable
+    override def view: HtmlFormat.Appendable
 
-    lazy val html = view.body
-    implicit lazy val doc = Jsoup.parse(html)
+    override lazy val html = view.body
+    override implicit lazy val doc = Jsoup.parse(html)
+
+    implicit val requestWithToken = addToken(request)
 
     def validateOtherSelection = {
       val (otherCheckbox, otherLabel) = checkboxAndLabel("positions-other")(doc)

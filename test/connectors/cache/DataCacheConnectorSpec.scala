@@ -16,16 +16,19 @@
 
 package connectors.cache
 
+import config.AppConfig
+import connectors.{AuthConnector, Authority}
+import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito._
-import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.prop.PropertyChecks
 import play.api.libs.json.{JsBoolean, JsString, JsValue, Json}
 import services.cache.{Cache, MongoCacheClient, MongoCacheClientFactory}
 import uk.gov.hmrc.play.frontend.auth.LoggedInUser
+import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
 import utils.AmlsSpec
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class DataCacheConnectorSpec
   extends AmlsSpec
@@ -43,16 +46,37 @@ class DataCacheConnectorSpec
 
     implicit val user = mock[LoggedInUser]
     val key = "key"
-    val cacheId = arbitrary[String].sample.get
-    val cache = Cache(cacheId, referenceMap())
+    val oId = "oldId"
+    val credId = "12345678"
+    val cache = Cache(oId, referenceMap())
+    val newCache = cache.copy(id = credId)
+    implicit val ec = mock[ExecutionContext]
 
     when(authContext.user) thenReturn user
-    when(user.oid) thenReturn cacheId
-  }
+    when(user.oid) thenReturn oId
 
-  val factory = mock[MongoCacheClientFactory]
-  val client = mock[MongoCacheClient]
-  when(factory.createClient) thenReturn client
+    val mockAuthConnector = mock[AuthConnector]
+
+    val factory = mock[MongoCacheClientFactory]
+    val client = mock[MongoCacheClient]
+    val authority = Authority("", Accounts(), "/user-details", "/ids", credId)
+
+    when(factory.createClient) thenReturn client
+
+    when {
+      mockAuthConnector.getCurrentAuthority(any(), any())
+    } thenReturn Future.successful(authority)
+
+    when {
+      mockAuthConnector.getCredId(any(), any())
+    } thenReturn Future.successful(credId)
+
+    val appConfig = mock[AppConfig]
+
+    val dataCacheConnector = new MongoCacheConnector(factory, mockAuthConnector) {
+      override lazy val mongoCache: MongoCacheClient =  mock[MongoCacheClient]
+    }
+  }
 
   def referenceMap(str1: String = "", str2: String = ""): Map[String, JsValue] = Map(
     "dataKey" -> JsBoolean(true),
@@ -63,55 +87,65 @@ class DataCacheConnectorSpec
     )
   )
 
-  object DataCacheConnector extends MongoCacheConnector(factory) {
-    override lazy val mongoCache: MongoCacheClient = mock[MongoCacheClient]
-  }
-
   "DataCacheConnector" must {
-
     "save data to Mongo" in new Fixture {
-
       val model = Model("data")
 
       when {
-        DataCacheConnector.mongoCache.createOrUpdate(cacheId, model, key)
-      } thenReturn Future.successful(cache)
+        dataCacheConnector.mongoCache.createOrUpdate(credId, Some(oId), model, key)
+      } thenReturn Future.successful(newCache)
 
-      whenReady(DataCacheConnector.save(key, model)) { _ mustBe toCacheMap(cache) }
+      whenReady(dataCacheConnector.save(key, model)) { result =>
+        result mustBe toCacheMap(newCache)
+        result.id mustBe credId
+      }
     }
 
     "fetch saved data from Mongo" in new Fixture {
-
       val model = Model("data")
 
       when {
-        DataCacheConnector.mongoCache.find[Model](cacheId, key)
+        dataCacheConnector.mongoCache.find[Model](credId, Some(oId), key)
       } thenReturn Future.successful(Some(model))
 
-      whenReady(DataCacheConnector.fetch[Model](key)) { _ mustBe Some(model) }
+      whenReady(dataCacheConnector.fetch[Model](key)) { _ mustBe Some(model) }
     }
 
     "fetch all data from Mongo" in new Fixture {
-
       val model = Model("data")
 
       when {
-        DataCacheConnector.mongoCache.fetchAll(cacheId)
-      } thenReturn Future.successful(Some(cache))
+        dataCacheConnector.mongoCache.fetchAll(Some(credId), deprecatedFilter = false)
+      } thenReturn Future.successful(Some(newCache))
 
-      whenReady(DataCacheConnector.fetchAll) { _ mustBe Some(toCacheMap(cache)) }
+      whenReady(dataCacheConnector.fetchAll) { _ mustBe Some(toCacheMap(newCache)) }
     }
 
-    "remove data from Mongo" in new Fixture {
+    "remove data from Mongo for CredId" in new Fixture {
+      when {
+        dataCacheConnector.mongoCache.removeById(oId, deprecatedFilter = true)
+      } thenReturn Future.successful(true)
 
-      forAll(arbitrary[Boolean]) { v =>
-        when {
-          DataCacheConnector.mongoCache.removeById(cacheId)
-        } thenReturn Future.successful(v)
+      when {
+        dataCacheConnector.mongoCache.removeById(credId, deprecatedFilter = false)
+      } thenReturn Future.successful(true)
 
-        whenReady(DataCacheConnector.remove) {
-          _ mustBe (v)
-        }
+      whenReady(dataCacheConnector.remove) {
+        _ mustBe true
+      }
+    }
+
+    "remove data from Mongo for Oid" in new Fixture {
+      when {
+        dataCacheConnector.mongoCache.removeById(any(), meq(false))
+      } thenReturn Future.successful(false)
+
+      when {
+        dataCacheConnector.mongoCache.removeById(oId, deprecatedFilter = true)
+      } thenReturn Future.successful(true)
+
+      whenReady(dataCacheConnector.remove) {
+        _ mustBe true
       }
     }
   }

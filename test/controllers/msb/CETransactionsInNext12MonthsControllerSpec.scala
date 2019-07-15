@@ -19,7 +19,7 @@ package controllers.msb
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import models.moneyservicebusiness._
-import models.status.{NotCompleted, SubmissionDecisionApproved}
+import models.status.NotCompleted
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -98,17 +98,6 @@ class CETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
       status(result) must be(OK)
       contentAsString(result) must include(Messages("msb.ce.transactions.expected.in.12.months.title"))
-    }
-
-    "redirect to Page not found" when {
-      "application is in variation mode" in new Fixture {
-
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved))
-
-        val result = controller.get()(request)
-        status(result) must be(NOT_FOUND)
-      }
     }
 
     "Show error message when user has not filled the mandatory fields" in new Fixture {

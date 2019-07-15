@@ -23,7 +23,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("msb.most.transactions.title", "summary.msb")
 }
 
 @main(
@@ -33,26 +32,22 @@
 
     @form(f, controllers.msb.routes.MostTransactionsController.post(edit)) {
 
-        @fieldset(
-            f = f("mostTransactionsCountries-fieldset"),
-            legend = "msb.most.transactions.list.countries",
-            legendHidden = true,
+        @fieldsetWithErrorGroup(
+            f = f("mostTransactionsCountries"),
+            heading = "msb.most.transactions.title",
+            section = "summary.msb",
+            hint = "lbl.list.upto.3.countries",
             panel = false,
             classes = Seq("inline")
         ) {
-            @hint("lbl.list.upto.3.countries")
-            @errorGroup(
-                field = f("mostTransactionsCountries")
-            ) {
-                @for(i <- 0 until 3) {
-                    @defining(
-                        f(s"mostTransactionsCountries[$i]")
-                    ) { field => @country_autocomplete(
-                        field = field,
-                        labelText = s"lbl.country.line${i + 1}",
-                        data = countryData.getOrElse(Seq.empty)
-                    ) }
-                }
+            @for(i <- 0 until 3) {
+                @defining(
+                    f(s"mostTransactionsCountries[$i]")
+                ) { field => @country_autocomplete(
+                    field = field,
+                    labelText = s"lbl.country.line${i + 1}",
+                    data = countryData.getOrElse(Seq.empty)
+                ) }
             }
         }
         @submit(edit)

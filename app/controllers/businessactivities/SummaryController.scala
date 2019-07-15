@@ -38,7 +38,7 @@ class SummaryController @Inject() (val dataCache: DataCacheConnector,
 
   def get = Authorised.async {
     implicit authContext => implicit request =>
-      dataCache.fetchAll flatMap {
+      dataCache.fetchAll map {
         optionalCache =>
           (for {
             cache <- optionalCache
@@ -47,9 +47,8 @@ class SummaryController @Inject() (val dataCache: DataCacheConnector,
             bmActivities <- businessMatching.activities
           } yield {
             val hideReceiveAdvice = bmActivities.businessActivities.contains(AccountancyServices)
-            ControllerHelper.allowedToEdit map(isEditable =>
-              Ok(summary(EmptyForm, businessActivity, businessMatching.alphabeticalBusinessTypes, isEditable, hideReceiveAdvice)))
-          }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+              Ok(summary(EmptyForm, businessActivity, businessMatching.alphabeticalBusinessTypes, hideReceiveAdvice))
+          }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
 

@@ -22,7 +22,6 @@
 @header = {
   @components.back_link()
   @errorSummary(f)
-  @heading("dateofchange.title", subheadingMessage)
 }
 
 @main(
@@ -35,9 +34,9 @@
     @date(
       f = f,
       p = "dateOfChange",
-      labelText = "dateofchange.title",
+      heading = "dateofchange.title",
       example = true,
-      legendHidden = true
+      section = subheadingMessage
     )
 
     @submit(false, Some(Messages("button.saveandcontinue")), returnLink)

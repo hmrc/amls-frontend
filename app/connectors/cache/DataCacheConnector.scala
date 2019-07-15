@@ -37,16 +37,8 @@ class DataCacheConnector @Inject()(val cacheConnector: MongoCacheConnector){
   def save[T](id: String, key: String, data: T)(implicit hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
     cacheConnector.save(id, key, data)
 
-  def upsert[T](
-                            targetCache: CacheMap,
-                            cacheId: String,
-                            data: T
-                          )
-                          (
-                            implicit authContext: AuthContext,
-                            hc: HeaderCarrier,
-                            format: Format[T]
-                          ): CacheMap =
+  def upsert[T](targetCache: CacheMap, cacheId: String, data: T)
+               (implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): CacheMap =
     cacheConnector.upsert(targetCache, cacheId, data)
 
   def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =

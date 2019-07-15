@@ -23,7 +23,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @headingWithPlaceholder(("responsiblepeople.legalnamechangedate.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
@@ -35,14 +34,12 @@
         @date(
             f = f,
             p = "date",
-            labelText = "responsiblepeople.legalnamechangedate.title",
-            legendHidden = true,
+            heading = Messages("responsiblepeople.legalnamechangedate.heading", personName),
+            section = "summary.responsiblepeople",
             example = true
 
         )
 
-
         @submit(edit)
-
     }
 }

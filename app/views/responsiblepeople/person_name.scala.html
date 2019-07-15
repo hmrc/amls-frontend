@@ -23,7 +23,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("responsiblepeople.personName.title", "summary.responsiblepeople")
 }
 
 @main(
@@ -32,12 +31,12 @@
 ) {
     @form(f, controllers.responsiblepeople.routes.PersonNameController.post(index, edit, flow)) {
 
-        @fieldset(
+        @fieldsetWithErrorGroup(
             panel = false,
-            legend = "responsiblepeople.personName.title",
-            legendHidden = true,
+            heading = "responsiblepeople.personName.title",
+            section = "summary.responsiblepeople",
             jsHidden = false,
-            f = f("personname-fieldset")
+            f = f("personname")
         ) {
 
             @input(

@@ -66,7 +66,7 @@ class remove_responsible_personSpec extends AmlsSpec with MustMatchers  {
       def view = views.html.responsiblepeople.remove_responsible_person(form2, 1, "Gary", showDateField = true)
 
       heading.html() must be(Messages("responsiblepeople.remove.named.responsible.person", "Gary"))
-      doc.getElementsByAttributeValue("id", "endDate-fieldset") must not be empty
+      doc.getElementsByAttributeValue("id", "endDate") must not be empty
     }
 
     "show errors in correct places when validation fails" in new ViewFixture {

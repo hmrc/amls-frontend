@@ -22,7 +22,6 @@
 @header = {
     @components.back_link()
     @errorSummaryWithPlaceholder(f, personName)
-    @headingWithPlaceholder(("responsiblepeople.date.of.birth.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
@@ -35,13 +34,12 @@
         @date(
             f = f,
             p = "dateOfBirth",
-            labelText = "responsiblepeople.date.of.birth.title",
-            legendHidden = true,
-            hintText = "",
+            heading = Messages("responsiblepeople.date.of.birth.heading", personName),
+            section = "summary.responsiblepeople",
             example = true
         )
 
         @submit()
 
-        }
+    }
 }

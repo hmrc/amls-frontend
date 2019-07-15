@@ -22,7 +22,7 @@
 @import forms.EmptyForm
 @import models.businessmatching.updateservice.ServiceChangeRegister
 
-@(model: MoneyServiceBusiness, bmMsbServices: Option[BusinessMatchingMsbServices], isEditable: Boolean, register: ServiceChangeRegister)(implicit request: Request[_], m: Messages, lang: Lang)
+@(model: MoneyServiceBusiness, bmMsbServices: Option[BusinessMatchingMsbServices], register: ServiceChangeRegister)(implicit request: Request[_], m: Messages, lang: Lang)
 
 @header = {
 @heading("title.cya", "summary.msb")
@@ -38,9 +38,7 @@
             @checkYourAnswers(
                 question = Messages("msb.throughput.title"),
                 editLinkTag = "msbthroughput-edit",
-                editUrl = if(isEditable) {
-                    controllers.msb.routes.ExpectedThroughputController.get(true).toString
-                } else ""
+                editUrl = controllers.msb.routes.ExpectedThroughputController.get(true).toString
             ) {
                 <p>@throughput match {
                     case ExpectedThroughput.First => {
@@ -69,21 +67,38 @@
         }
 
         @model.branchesOrAgents.map { boa =>
-            @checkYourAnswers(
-                question = Messages("msb.branchesoragents.title"),
-                editLinkTag = "msbbranchesoragents-edit",
-                editUrl = controllers.msb.routes.BranchesOrAgentsController.get(true).toString
-            ) {
-                @boa.branches.fold {
-                    <p>@Messages("lbl.no")</p>
-                } { branches =>
-                    <ul class="list list--comma">
-                        @branches.map { country =>
-                            <li>@country</li>
+                @checkYourAnswers(
+                    question = Messages("msb.branchesoragents.title"),
+                    editLinkTag = "msbbranchesoragents-edit",
+                    editUrl = controllers.msb.routes.BranchesOrAgentsController.get(true).toString
+                ) {
+                    <p>@boa.hasCountries match {
+                        case BranchesOrAgentsHasCountries(true) => {
+                            @Messages("lbl.yes")
                         }
-                    </ul>
+                        case _ => {
+                            @Messages("lbl.no")
+                        }
+                    }</p>
                 }
-            }
+
+                @boa.hasCountries match {
+                    case BranchesOrAgentsHasCountries(true) => {
+                        @checkYourAnswers(
+                            question = Messages("msb.branchesoragents.countries.title"),
+                            editLinkTag = "msbwhichcountries-edit",
+                            editUrl = controllers.msb.routes.BranchesOrAgentsWhichCountriesController.get(true).toString
+                        ) {
+                            @boa.branches.map { branches =>
+                                <ul class="list list--comma">
+                                    @branches.branches.map { country => <li>@country</li> }
+                                </ul>
+                            }
+                        }
+                    }
+                    case _ => { }
+                }
+
         }
 
         @model.identifyLinkedTransactions.map { ilt =>
@@ -145,9 +160,7 @@
                 @checkYourAnswers(
                     question = Messages("msb.transactions.expected.title"),
                     editLinkTag = "msbtransactionsexpected-edit",
-                    editUrl = if(isEditable || register.addedSubSectors.fold(false)(_.contains(TransmittingMoney))) {
-                        controllers.msb.routes.TransactionsInNext12MonthsController.get(true).toString
-                    } else ""
+                    editUrl = controllers.msb.routes.TransactionsInNext12MonthsController.get(true).toString
                 ) {
                     <p>@trans.txnAmount</p>
                 }
@@ -206,9 +219,7 @@
                 @checkYourAnswers(
                     question = Messages("msb.ce.transactions.expected.in.12.months.title"),
                     editLinkTag = "msbcetransactionsexpected-edit",
-                    editUrl = if(isEditable || register.addedSubSectors.fold(false)(_.contains(CurrencyExchange))) {
-                        controllers.msb.routes.CETransactionsInNext12MonthsController.get(true).toString
-                    } else ""
+                    editUrl = controllers.msb.routes.CETransactionsInNext12MonthsController.get(true).toString
                 ) {
                     <p>@trans.ceTransaction</p>
                 }
@@ -218,9 +229,7 @@
                 @checkYourAnswers(
                     question = Messages("msb.which_currencies.title"),
                     editLinkTag = "msbwhichcurrencies-edit",
-                    editUrl = if(isEditable || register.addedSubSectors.fold(false)(_.contains(CurrencyExchange))) {
-                        controllers.msb.routes.WhichCurrenciesController.get(true).toString
-                    } else ""
+                    editUrl = controllers.msb.routes.WhichCurrenciesController.get(true).toString
                 ) {
                     <ul class="list list--comma">
                     @wc.currencies.map { cur =>
@@ -235,9 +244,7 @@
                     @checkYourAnswers(
                         question = Messages("msb.deal_foreign_currencies.title"),
                         editLinkTag = "msbwhichcurrencies-edit",
-                        editUrl = if(isEditable || register.addedSubSectors.fold(false)(_.contains(CurrencyExchange))) {
-                            controllers.msb.routes.UsesForeignCurrenciesController.get(true).toString
-                        } else ""
+                        editUrl = controllers.msb.routes.UsesForeignCurrenciesController.get(true).toString
                     ) {
                         @ufc match {
                             case UsesForeignCurrenciesYes => {
@@ -257,9 +264,7 @@
                         @checkYourAnswers(
                             question = Messages("msb.supply_foreign_currencies.title"),
                             editLinkTag = "msbwhichcurrencies-edit",
-                            editUrl = if(isEditable || register.addedSubSectors.fold(false)(_.contains(CurrencyExchange))) {
-                                controllers.msb.routes.MoneySourcesController.get(true).toString
-                            } else ""
+                            editUrl = controllers.msb.routes.MoneySourcesController.get(true).toString
                         ) {
                             @ms.bankMoneySource.map { bms =>
                                 <p>@Messages("msb.bank.names"): @bms.bankNames</p>
@@ -283,9 +288,7 @@
                 @checkYourAnswers(
                     question = Messages("msb.fx.transactions.expected.in.12.months.title"),
                     editLinkTag = "msbfxtransactionsexpected-edit",
-                    editUrl = if(isEditable || register.addedSubSectors.fold(false)(_.contains(ForeignExchange))) {
-                        controllers.msb.routes.FXTransactionsInNext12MonthsController.get(true).toString
-                    } else ""
+                    editUrl = controllers.msb.routes.FXTransactionsInNext12MonthsController.get(true).toString
                 ) {
                     <p>@trans.fxTransaction</p>
                 }

@@ -64,7 +64,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include("What percentage of your turnover came from cash payments of over €10,000?")
+        contentAsString(result) must include("What percentage of your turnover came from cash payments of €10,000 or more?")
       }
 
       "display the Percentage Of CashPayment Over 15000 page with pre populated data" in new Fixture {

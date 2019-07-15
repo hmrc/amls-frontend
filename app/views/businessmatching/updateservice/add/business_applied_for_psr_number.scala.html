@@ -27,7 +27,10 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessmatching.psr.number.title", "summary.updateservice")
+}
+
+@supportingContent = {
+    <p>@m("businessmatching.updateservice.psr.number.hint")</p>
 }
 
 @main(
@@ -36,52 +39,41 @@
 )  {
 
     @form(f, controllers.businessmatching.updateservice.add.routes.BusinessAppliedForPSRNumberController.post(edit)) {
-        <p>
-            @m("businessmatching.updateservice.psr.number.hint")
-        </p>
-        @fieldset(
-            f = f("appliedfor-fieldset"),
-            legend = "businessmatching.updateservice.psr.number.title",
-            legendHidden = true,
-            panel = false,
-            classes = Seq("inline")
+
+        @fieldsetWithErrorGroup(
+            f = f("appliedFor"),
+            heading = "businessmatching.updateservice.psr.number.title",
+            section = "summary.updateservice",
+            panel = false
         ) {
-
-            @errorGroup(
-                field = f("appliedFor")
+            @radio(
+                f = f("appliedFor"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = s"#$target"
+            )
+            @panel(
+                field = Some(f(s"$target")),
+                id = target
             ) {
-
-                @radio(
-                    f = f("appliedFor"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    target = s"#$target",
-                    inline = true
-                )
-                @radio(
-                    f = f("appliedFor"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
+                @input(
+                    attrMaxlength = "6",
+                    attrPattern = "[0-9]{1,6}",
+                    attrType = "number",
+                    dataAttrs = digitsOnlyAttributes,
+                    field = f("regNumber"),
+                    hintText = "businessmatching.psr.number.hint",
+                    labelText = "businessmatching.updateservice.psr.number.lbl"
                 )
             }
-        }
-
-        @panel(
-            field = Some(f(s"$target")),
-            id = target
-        ) {
-            @input(
-                attrMaxlength = "6",
-                attrPattern = "[0-9]{1,6}",
-                attrType = "number",
-                dataAttrs = digitsOnlyAttributes,
-                field = f("regNumber"),
-                hintText = "",
-                labelText = "businessmatching.updateservice.psr.number.lbl"
+            @radio(
+                f = f("appliedFor"),
+                labelText = "lbl.no",
+                value = "false"
             )
         }
-
         @submit(edit, returnLink = false, buttonId = Some("appliedspsr-submit"))
-   }
+    }
+
 }
+

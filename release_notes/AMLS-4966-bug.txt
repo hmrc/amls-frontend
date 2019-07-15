@@ -1,0 +1,1 @@
+ + [AMLS-4966-bug] - | 'Fix to bug: uses foreign currencies question was clearing data of nex one when not necessary'

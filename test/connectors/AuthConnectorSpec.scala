@@ -86,6 +86,14 @@ class AuthConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
         verify(authConnector.http).GET[Ids](eqTo(s"/auth/${completeAuthorityModel.normalisedIds}"))(any(), any(), any())
       }
     }
+
+    "getCredId should return credId for current authority" in new Fixture {
+        when {
+          authConnector.http.GET[Authority](any())(any(), any(), any())
+        } thenReturn Future.successful(completeAuthorityModel)
+
+        whenReady(authConnector.getCredId) { _ mustBe "12345678"}
+      }
   }
 
   "the userDetails method" when {

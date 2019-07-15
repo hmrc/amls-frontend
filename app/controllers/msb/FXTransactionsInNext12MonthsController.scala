@@ -20,12 +20,10 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
-import models.businessmatching.{ForeignExchange, MoneyServiceBusiness => MsbActivity}
 import models.moneyservicebusiness.{FXTransactionsInNext12Months, MoneyServiceBusiness}
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
 import views.html.msb.fx_transaction_in_next_12_months
 
 import scala.concurrent.Future
@@ -39,16 +37,13 @@ class FXTransactionsInNext12MonthsController @Inject()(val authConnector: AuthCo
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        ControllerHelper.allowedToEdit(MsbActivity, Some(ForeignExchange)) flatMap {
-          case true => dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
-            response =>
-              val form: Form2[FXTransactionsInNext12Months] = (for {
-                msb <- response
-                transactions <- msb.fxTransactionsInNext12Months
-              } yield Form2[FXTransactionsInNext12Months](transactions)).getOrElse(EmptyForm)
-              Ok(fx_transaction_in_next_12_months(form, edit))
-          }
-          case false => Future.successful(NotFound(notFoundView))
+        dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+          response =>
+            val form: Form2[FXTransactionsInNext12Months] = (for {
+              msb <- response
+              transactions <- msb.fxTransactionsInNext12Months
+            } yield Form2[FXTransactionsInNext12Months](transactions)).getOrElse(EmptyForm)
+            Ok(fx_transaction_in_next_12_months(form, edit))
         }
   }
 

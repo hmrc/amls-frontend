@@ -26,6 +26,14 @@ import play.api.libs.json.{Json, Reads, Writes}
 
 sealed trait RegisteredOffice {
 
+  def isUK: Option[Boolean] = {
+    this match {
+      case registeredOffice: RegisteredOfficeUK => Some(true)
+      case registeredOffice: RegisteredOfficeNonUK => Some(false)
+      case _ => None
+    }
+  }
+
   def toLines: Seq[String] = this match {
     case a: RegisteredOfficeUK =>
       Seq(

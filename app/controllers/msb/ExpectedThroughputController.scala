@@ -20,12 +20,10 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
-import models.businessmatching.{TransmittingMoney, MoneyServiceBusiness => MsbActivity}
 import models.moneyservicebusiness.{ExpectedThroughput, MoneyServiceBusiness}
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
 import views.html.msb.expected_throughput
 
 import scala.concurrent.Future
@@ -39,16 +37,13 @@ class ExpectedThroughputController @Inject() (val authConnector: AuthConnector,
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      ControllerHelper.allowedToEdit(MsbActivity, Some(TransmittingMoney)) flatMap {
-        case true => dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
-          response =>
-            val form: Form2[ExpectedThroughput] = (for {
-              msb <- response
-              expectedThroughput <- msb.throughput
-            } yield Form2[ExpectedThroughput](expectedThroughput)).getOrElse(EmptyForm)
-            Ok(expected_throughput(form, edit))
-        }
-        case false => Future.successful(NotFound(notFoundView))
+      dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+        response =>
+          val form: Form2[ExpectedThroughput] = (for {
+            msb <- response
+            expectedThroughput <- msb.throughput
+          } yield Form2[ExpectedThroughput](expectedThroughput)).getOrElse(EmptyForm)
+          Ok(expected_throughput(form, edit))
       }
   }
 

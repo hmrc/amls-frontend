@@ -19,7 +19,7 @@
 @import models.businessactivities._
 @import config.ApplicationConfig
 
-@(f: forms.Form2[_], model: BusinessActivities, bmBusinessActivities:Option[List[String]], isEditable:Boolean, hideReceiveAdvice:Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: forms.Form2[_], model: BusinessActivities, bmBusinessActivities:Option[List[String]], hideReceiveAdvice:Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.businessactivities")
@@ -32,7 +32,7 @@
 
     @checkYourAnswers(
         question = Messages("businessactivities.confirm-activities.title"),
-        editUrl = if(isEditable){controllers.businessactivities.routes.InvolvedInOtherController.get(true).toString} else ""
+        editUrl = controllers.businessactivities.routes.InvolvedInOtherController.get(true).toString
     ) {
         <p>@model.involvedInOther.map {
             case InvolvedInOtherNo => { @Messages("lbl.no") }
@@ -43,7 +43,7 @@
     @model.expectedBusinessTurnover.map { turnover =>
         @checkYourAnswers(
             question = Messages("businessactivities.business-turnover.title"),
-            editUrl = if(isEditable){controllers.businessactivities.routes.ExpectedBusinessTurnoverController.get(true).toString} else ""
+            editUrl = controllers.businessactivities.routes.ExpectedBusinessTurnoverController.get(true).toString
         ) {
             <p>@turnover match {
                 case ExpectedBusinessTurnover.First => { @Messages("businessactivities.turnover.lbl.01") }
@@ -60,7 +60,7 @@
     @model.expectedAMLSTurnover.map { turnover =>
         @checkYourAnswers(
             question = Messages("businessactivities.turnover.title"),
-            editUrl = if(isEditable){controllers.businessactivities.routes.ExpectedAMLSTurnoverController.get(true).toString} else ""
+            editUrl = controllers.businessactivities.routes.ExpectedAMLSTurnoverController.get(true).toString
         ) {
             <ul class="list list-bullet">
                 @bmBusinessActivities.map { businessActivities =>
@@ -181,10 +181,10 @@
                 question = Messages("businessactivities.document.riskassessment.policy.title"),
                 editUrl = controllers.businessactivities.routes.DocumentRiskAssessmentController.get(true).toString
             ) {
-                <ul class="list list--comma">
-                @v.map {
-                        case Digital => { <p>@Messages("businessactivities.RiskAssessmentType.lbl.02")</p> }
-                        case PaperBased => { <p>@Messages("businessactivities.RiskAssessmentType.lbl.01")</p> }
+                <ul class="list list-bullet">
+                    @v.map {
+                        case Digital => { <li>@Messages("businessactivities.RiskAssessmentType.lbl.02")</li> }
+                        case PaperBased => { <li>@Messages("businessactivities.RiskAssessmentType.lbl.01")</li> }
                     }
                 </ul>
             }

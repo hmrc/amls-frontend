@@ -57,7 +57,7 @@ class business_use_an_ipspSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.msb.business_use_an_ipsp(form2, true)
 
-      heading.html must be(Messages("msb.ipsp.title"))
+      heading.html must include(Messages("msb.ipsp.title"))
       subHeading.html must include(Messages("summary.msb"))
 
     }

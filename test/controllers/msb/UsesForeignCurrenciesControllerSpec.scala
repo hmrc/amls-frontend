@@ -161,17 +161,6 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
       }
     }
 
-    "redirect to Page not found" when {
-      "application is in variation mode" in new Fixture {
-
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved))
-
-        val result = controller.get()(request)
-        status(result) must be(NOT_FOUND)
-      }
-    }
-
     "post is called " when {
       "data is valid" should {
           "clear the foreign currency data when not using foreign currencies" in new Fixture2 {
@@ -187,6 +176,22 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
             verify(controller.dataCacheConnector).save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), captor.capture())(any(), any(), any())
             captor.getValue match {
               case result: MoneyServiceBusiness => result must be(outgoingModel)
+            }
+          }
+
+        "keep the foreign currency data when using foreign currencies" in new Fixture2 {
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "usesForeignCurrencies" -> "true"
+            )
+
+            val result = controller.post()(newRequest)
+            status(result) must be(SEE_OTHER)
+
+            val captor = ArgumentCaptor.forClass(classOf[MoneyServiceBusiness])
+            verify(controller.dataCacheConnector).save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), captor.capture())(any(), any(), any())
+            captor.getValue match {
+              case result: MoneyServiceBusiness => result must be(completeMsb)
             }
           }
         }

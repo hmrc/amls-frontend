@@ -41,7 +41,7 @@ class summarySpec extends AmlsSpec
   "summary view" must {
     "have correct title" in new ViewFixture {
 
-      def view = views.html.msb.summary(MoneyServiceBusiness(), None, true, ServiceChangeRegister())
+      def view = views.html.msb.summary(MoneyServiceBusiness(), None, ServiceChangeRegister())
 
       doc.title must be(Messages("title.cya") +
         " - " + Messages("summary.msb") +
@@ -51,7 +51,7 @@ class summarySpec extends AmlsSpec
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.msb.summary(MoneyServiceBusiness(), None, true, ServiceChangeRegister())
+      def view = views.html.msb.summary(MoneyServiceBusiness(), None, ServiceChangeRegister())
 
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.msb"))
@@ -67,7 +67,8 @@ class summarySpec extends AmlsSpec
       ("msb.supply_foreign_currencies.title",checkElementTextIncludes(_, "msb.which_currencies.source.customers")),
       ("msb.send.money.title",checkElementTextIncludes(_, "lbl.yes")),
       ("msb.fundstransfer.title",checkElementTextIncludes(_, "lbl.no")),
-      ("msb.branchesoragents.title",checkElementTextIncludes(_, "United Kingdom")),
+      ("msb.branchesoragents.title",checkElementTextIncludes(_, "Yes")),
+      ("msb.branchesoragents.countries.title",checkElementTextIncludes(_, "United Kingdom")),
       ("msb.send.the.largest.amounts.of.money.title",checkElementTextIncludes(_, "United Kingdom")),
       ("msb.most.transactions.title",checkElementTextIncludes(_, "United Kingdom")),
       ("msb.transactions.expected.title",checkElementTextIncludes(_, "10")),
@@ -82,7 +83,7 @@ class summarySpec extends AmlsSpec
       Some(WhichCurrencies(Seq("USD", "GBP", "EUR"), Some(UsesForeignCurrenciesYes), Some(MoneySources(None, None, Some(true))))),
       Some(SendMoneyToOtherCountry(true)),
       Some(FundsTransfer(false)),
-      Some(BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))),
+      Some(BranchesOrAgents(BranchesOrAgentsHasCountries(true), Some(BranchesOrAgentsWhichCountries(Seq(Country("United Kingdom", "GB")))))),
       Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))),
       Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
       Some(TransactionsInNext12Months("10")),
@@ -97,7 +98,6 @@ class summarySpec extends AmlsSpec
       def view = views.html.msb.summary(
         fullMSB,
         Some(msbServices),
-        true,
         ServiceChangeRegister()
       )
 
@@ -114,26 +114,26 @@ class summarySpec extends AmlsSpec
     }
 
     trait NoSubsectorsViewFixture extends ViewFixture {
-      def view = views.html.msb.summary(fullMSB, Some(BusinessMatchingMsbServices(Set())), true, ServiceChangeRegister())
+      def view = views.html.msb.summary(fullMSB, Some(BusinessMatchingMsbServices(Set())), ServiceChangeRegister())
     }
 
     trait TMViewFixture extends ViewFixture {
-      def view = views.html.msb.summary(fullMSB, Some(BusinessMatchingMsbServices(Set(TransmittingMoney))), true, ServiceChangeRegister())
+      def view = views.html.msb.summary(fullMSB, Some(BusinessMatchingMsbServices(Set(TransmittingMoney))), ServiceChangeRegister())
     }
 
     trait TMNotSendViewFixture extends ViewFixture {
       def view = views.html.msb.summary(
         fullMSB.copy(sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false))),
-        Some(BusinessMatchingMsbServices(Set(TransmittingMoney))), true, ServiceChangeRegister()
+        Some(BusinessMatchingMsbServices(Set(TransmittingMoney))), ServiceChangeRegister()
       )
     }
 
     trait CEViewFixture extends ViewFixture {
-      def view = views.html.msb.summary(fullMSB, Some(BusinessMatchingMsbServices(Set(CurrencyExchange))), true, ServiceChangeRegister())
+      def view = views.html.msb.summary(fullMSB, Some(BusinessMatchingMsbServices(Set(CurrencyExchange))), ServiceChangeRegister())
     }
 
     trait FXViewFixture extends ViewFixture {
-      def view = views.html.msb.summary(fullMSB, Some(BusinessMatchingMsbServices(Set(ForeignExchange))), true, ServiceChangeRegister())
+      def view = views.html.msb.summary(fullMSB, Some(BusinessMatchingMsbServices(Set(ForeignExchange))), ServiceChangeRegister())
     }
 
     "business use an IPSP" when {

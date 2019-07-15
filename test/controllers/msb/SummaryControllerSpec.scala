@@ -45,7 +45,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       whichCurrencies = Some(WhichCurrencies(Seq("USD", "GBP", "EUR"), Some(UsesForeignCurrenciesYes), Some(MoneySources(None, None, Some(true))))),
       sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
       fundsTransfer = Some(FundsTransfer(true)),
-      branchesOrAgents = Some(BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))),
+      branchesOrAgents = Some(BranchesOrAgents(BranchesOrAgentsHasCountries(true), Some(BranchesOrAgentsWhichCountries(Seq(Country("United Kingdom", "GB")))))),
       sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))),
       mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
       transactionsInNext12Months = Some(TransactionsInNext12Months("12345678963")),
@@ -112,7 +112,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       status(result) must be(SEE_OTHER)
     }
 
-    "hide edit link for involved in other, turnover expected from activities and amls turnover expected page" when {
+    "show all edit link for involved in other, turnover expected from activities and amls turnover expected page" when {
       "application in variation mode" in new Fixture {
 
         val bm = Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney,CurrencyExchange,
@@ -130,18 +130,19 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
 
-        document.getElementsByTag("section").get(0).getElementsByTag("a").hasClass("change-answer") must be(false)
+        document.getElementsByTag("section").get(0).getElementsByTag("a").hasClass("change-answer") must be(true)
         document.getElementsByTag("section").get(1).getElementsByTag("a").hasClass("change-answer") must be(true)
         document.getElementsByTag("section").get(2).getElementsByTag("a").hasClass("change-answer") must be(true)
         document.getElementsByTag("section").get(3).getElementsByTag("a").hasClass("change-answer") must be(true)
         document.getElementsByTag("section").get(4).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByTag("section").get(5).getElementsByTag("a").hasClass("change-answer") must be(false)
+        document.getElementsByTag("section").get(5).getElementsByTag("a").hasClass("change-answer") must be(true)
         document.getElementsByTag("section").get(6).getElementsByTag("a").hasClass("change-answer") must be(true)
         document.getElementsByTag("section").get(7).getElementsByTag("a").hasClass("change-answer") must be(true)
         document.getElementsByTag("section").get(8).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByTag("section").get(9).getElementsByTag("a").hasClass("change-answer") must be(false)
-        document.getElementsByTag("section").get(10).getElementsByTag("a").hasClass("change-answer") must be(false)
-        document.getElementsByTag("section").get(11).getElementsByTag("a").hasClass("change-answer") must be(false)
+        document.getElementsByTag("section").get(9).getElementsByTag("a").hasClass("change-answer") must be(true)
+        document.getElementsByTag("section").get(10).getElementsByTag("a").hasClass("change-answer") must be(true)
+        document.getElementsByTag("section").get(11).getElementsByTag("a").hasClass("change-answer") must be(true)
+        document.getElementsByTag("section").get(12).getElementsByTag("a").hasClass("change-answer") must be(true)
       }
     }
 
