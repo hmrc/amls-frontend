@@ -351,8 +351,8 @@ error.required.renewal.transactions.in.12months = Enter the number of currency e
 error.required.renewal.percentage = Select one option to show the proportion of your turnover that came from cash payments over €10,000 in the last 12 months
 
 error.required.renewal.hvd.receive.cash.payments = Select yes if you received cash payments of €10,000 or more from customers you have not met in person
-error.required.renewal.hvd.choose.option = Select how you received cash payments from customers you’ve not met in person
-error.required.renewal.hvd.describe = Enter how you received cash payments from customers you’ve not met in person
+error.required.renewal.hvd.choose.option = Select how you received cash payments from customers you have not met in person
+error.required.renewal.hvd.describe = Enter how you received cash payments from customers you have not met in person
 error.required.renewal.hvd.describe.invalid.length = Description of how you received cash payments must be 255 characters or less
 error.required.renewal.hvd.describe.invalid.characters = Description of how you received cash payments can include letters a to z, numbers, spaces, and most punctuation and special characters
 
