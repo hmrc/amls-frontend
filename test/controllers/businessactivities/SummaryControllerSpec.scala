@@ -106,7 +106,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       status(result) must be(SEE_OTHER)
     }
 
-    "hide edit link for involved in other, turnover expected from activities and amls turnover expected page" when {
+    "show edit link for involved in other, turnover expected from activities and amls turnover expected page" when {
       "application in variation mode" in new Fixture {
         when(controller.dataCache.fetchAll(any(), any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -125,9 +125,9 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
 
-        document.getElementsByTag("section").get(0).getElementsByTag("a").hasClass("change-answer") must be(false)
-        document.getElementsByTag("section").get(1).getElementsByTag("a").hasClass("change-answer") must be(false)
-        document.getElementsByTag("section").get(2).getElementsByTag("a").hasClass("change-answer") must be(false)
+        document.getElementsByTag("section").get(0).getElementsByTag("a").hasClass("change-answer") must be(true)
+        document.getElementsByTag("section").get(1).getElementsByTag("a").hasClass("change-answer") must be(true)
+        document.getElementsByTag("section").get(2).getElementsByTag("a").hasClass("change-answer") must be(true)
       }
     }
 

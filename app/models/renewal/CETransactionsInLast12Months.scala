@@ -30,7 +30,7 @@ object CETransactionsInLast12Months {
 
   implicit val format = Json.format[CETransactionsInLast12Months]
 
-  private val txnAmountRegex = regexWithMsg("^[0-9]{1,11}$".r, "error.invalid.msb.transactions.in.12months")
+  private val txnAmountRegex = regexWithMsg("^[0-9]{1,11}$".r, "error.invalid.renewal.ce.transactions.in.12months")
   private val txnAmountType = notEmptyStrip andThen
     notEmpty.withMessage("error.required.renewal.ce.transactions.in.12months") andThen txnAmountRegex
 

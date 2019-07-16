@@ -43,12 +43,12 @@ class UsesForeignCurrenciesSpec extends AmlsSpec with CharacterSets {
         val model = Map[String, Seq[String]]()
 
         UsesForeignCurrencies.formRule.validate(model) must
-          be(Invalid(List((Path \ "usesForeignCurrencies", Seq(ValidationError("error.required.msb.wc.foreignCurrencies"))))))
+          be(Invalid(List((Path \ "usesForeignCurrencies", Seq(ValidationError("error.required.renewal.wc.foreign.currencies"))))))
       }
 
       "given no data represented by an empty Map" in {
         UsesForeignCurrencies.formRule.validate(Map.empty) must
-          be(Invalid(Seq((Path \ "usesForeignCurrencies") -> Seq(ValidationError("error.required.msb.wc.foreignCurrencies")))))
+          be(Invalid(Seq((Path \ "usesForeignCurrencies") -> Seq(ValidationError("error.required.renewal.wc.foreign.currencies")))))
       }
     }
 

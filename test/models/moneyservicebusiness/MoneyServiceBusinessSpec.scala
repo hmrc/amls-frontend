@@ -96,6 +96,10 @@ class MoneyServiceBusinessSpec extends AmlsSpec with MoneyServiceBusinessTestDat
       "correctly show if the model is incomplete" in {
         emptyMsb.isComplete(false, false, true) must be(false)
       }
+
+      "show as incomplete where agents or countries and no countries" in {
+        incompleteMsbNoBranchesOrAgentsCountries.isComplete(true, true, true) must be(false)
+      }
     }
 
     "Serialise to expected Json" when {
@@ -136,6 +140,10 @@ trait MoneyServiceBusinessTestData {
     fxTransactionsInNext12Months = Some(FXTransactionsInNext12Months("12345678963")),
     false,
     true
+  )
+
+  val incompleteMsbNoBranchesOrAgentsCountries = completeMsb.copy(
+    branchesOrAgents = Some(BranchesOrAgents(BranchesOrAgentsHasCountries(true), None))
   )
 
   val emptyMsb = MoneyServiceBusiness(None)

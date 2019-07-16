@@ -20,9 +20,9 @@ error.required.address.line1 = Enter the first line of the address
 error.required.address.line2 = Enter the second line of the address
 error.max.length.address.line = You can’t enter more than 35 characters
 error.invalid.postcode = Enter a valid postcode
-error.required.country = Enter an official country name: for example, Holland is Netherlands
-error.invalid.country = Enter an official country name: for example, Holland is Netherlands
-error.required.country.name = Enter an official country name: for example, Holland is Netherlands
+error.required.country = Enter a country name, like France
+error.invalid.country = Enter a country name, like France
+error.required.country.name = Enter a country name, like France
 error.required.nationality = Select one or more options to show this person’s nationality
 error.required.uk.or.overseas = Select yes if this is a UK address
 
@@ -127,7 +127,7 @@ error.max.length.bm.businesstype.type = You can’t enter more than 40 character
 ###############################  Business Details ###############################
 error.required.atb.previously.registered = Select yes if your business is currently registered with HMRC for anti-money laundering supervision
 error.required.atb.confirm.office = Select yes if this is the address of your registered office
-error.required.atb.registered.office.uk.or.overseas = Select yes if this is a UK address
+error.required.atb.registered.office.uk.or.overseas = Select yes if your registered office is in the UK
 error.required.atb.registered.office.not.uk= Enter a country that is not the United Kingdom because your registered office is not in the UK
 error.required.atb.letters.address.not.uk= Enter a country that is not the United Kingdom because your address for letters is not in the UK
 error.required.atb.registered.for.vat = Select yes if your business is registered for VAT in the UK
@@ -223,13 +223,18 @@ error.required.tp.confirm.address = Select yes if this is the address of your tr
 
 ###############################  Estate Agency Business ###############################
 error.required.eab.redress.scheme = Select yes if the business is registered with a redress scheme
-error.required.eab.which.redress.scheme = Select one option to show the redress scheme the business is registered with
-error.required.eab.redress.scheme.name = Enter the name of the redress scheme
-error.invalid.eab.redress.scheme.name = You can’t enter more than 255 characters
-error.required.eab.business.services = Select one or more options to show the services your business provides
-error.required.eab.penalised.under.act = Select yes if the business, or anyone in it, have ever been penalised under the Estate Agents Act 1979
-error.required.eab.info.about.penalty = Give a brief description of what the penalty was, and when it occurred
-error.required.eab.penalised.by.professional.body = Select yes if the business, or anyone in it, has ever been penalised by a professional body
+error.required.eab.which.redress.scheme = Select which redress scheme your business is registered with
+error.required.eab.redress.scheme.name = Enter the redress scheme your business is registered with
+error.invalid.eab.redress.scheme.name = Redress scheme must be 255 characters or less
+error.invalid.characters.eab.redress.scheme.name = Redress scheme can include letters a to z, numbers, spaces, and most punctuation and special characters
+error.required.eab.business.services = Select which services your business provides
+error.required.eab.penalised.under.act = Select yes if the business, or anyone in the business, has ever been penalised under the Estate Agents Act 1979
+error.required.eab.info.about.penalty = Enter a description of the penalty received and when it occurred
+error.invalid.eab.penalised.description.length = Description of the penalty must be 255 characters or less
+error.invalid.characters.eab.penalised.description = Description of the penalty can include letters a to z, numbers, spaces, and most punctuation and special characters
+error.required.eab.penalised.by.professional.body = Select yes if the business, or anyone in the business, has ever been penalised by a professional body for estate agency business activities
+error.invalid.eab.penalised.by.professional.body.description.length = Description of the penalty must be 255 characters or less
+error.invalid.characters.eab.penalised.by.professional.body.description = Description of the penalty can include letters a to z, numbers, spaces, and most punctuation and special characters
 
 ############################### Responsible People ###############################
 error.required.rp.is.uk.resident = Select yes if {0} is a UK resident
@@ -317,18 +322,23 @@ error.invalid.msb.ipsp.name = You can’t enter more than 140 characters
 error.required.msb.linked.txn = Select yes if your systems can identify linked transactions
 error.required.msb.psr.options = Select yes if your business has a PSR number
 error.invalid.msb.psr.number = Enter a valid PSR registration number
-error.required.msb.send.money = Select yes if you send money to other countries
+error.required.msb.send.money = Select yes if you sent money to other countries in the last 12 months
 error.required.msb.transactions.in.12months = Enter the number of transactions you expect in the next 12 months
 error.required.msb.fx.transactions.in.12months = Enter the number of foreign exchange transactions you expect in the next 12 months
-error.invalid.msb.transactions.in.12months = Enter up to 11 numbers only
+error.invalid.msb.transactions.in.12months = Number of money transfers must be 11 numbers or less
+error.invalid.renewal.fx.transactions.in.12months = Number of foreign exchange transactions must be 11 numbers or less
+error.invalid.renewal.ce.transactions.in.12months = Number of currency exchange transactions must be 11 numbers or less
 error.required.msb.fundsTransfer = Select yes if you transfer money without using formal banking systems
 error.invalid.countries.msb.branchesOrAgents = Enter an official country name: for example, Holland is Netherlands
 error.required.hasCountries.msb.branchesOrAgents = Select yes if you have branches or agents in other countries
 error.invalid.msb.wc.currencies = Enter a valid 3 character currency code
+error.required.renewal.wc.currencies = Enter currencies you supplied the most to your customers in the last 12 months
+error.invalid.renewal.wc.currencies = Enter a currency code in the correct format
 error.invalid.msb.wc.moneySources = Select one or more options to show who will supply your foreign currency
 error.invalid.msb.wc.bankNames = Enter the names of the banks that will supply your foreign currency
 error.invalid.msb.wc.wholesalerNames = Enter the names of the currency wholesalers that will supply your foreign currency
 error.required.msb.wc.foreignCurrencies = Select yes if you deal in physical foreign currencies
+error.required.renewal.wc.foreign.currencies = Select yes if you dealt in physical foreign currencies in the last 12 months
 error.required.countries.msb.most.transactions = Enter an official country name: for example, Holland is Netherlands
 
 ############################### High Value Dealer ###############################
@@ -356,27 +366,32 @@ error.required.renewal.hvd.describe = Enter how you received cash payments from 
 error.required.renewal.hvd.describe.invalid.length = Description of how you received cash payments must be 255 characters or less
 error.required.renewal.hvd.describe.invalid.characters = Description of how you received cash payments can include letters a to z, numbers, spaces, and most punctuation and special characters
 
-error.required.renewal.ba.turnover.from.mlr = Select the total net profit your business made from services registered for anti-money laundering supervision
+error.required.renewal.ba.turnover.from.mlr = Select how much total net profit your business made from services registered for anti-money laundering supervision in the last 12 months
 
 error.required.renewal.ba.business.turnover = Select the total net profit your business made in the last 12 months
 
-error.invalid.renewal.msb.wc.bankNames = Enter the names of the banks that supplied your foreign currency
-error.invalid.renewal.msb.wc.wholesalerNames = Enter the names of the currency wholesalers that supplied your foreign currency
+error.invalid.renewal.msb.wc.bankNames = Enter banks that supplied your foreign currency
+error.invalid.maxlength.140.bankNames = Bank names must be 140 characters or less
+error.invalid.characters.renewal.msb.wc.bankNames = Bank names can include letters a to z, numbers, spaces, and most punctuation and special characters
+error.invalid.renewal.msb.wc.wholesalerNames = Enter currency wholesalers that supplied your foreign currency
+error.invalid.maxlength.140.wholesalerNames = Currency wholesaler names must be 140 characters or less
+error.invalid.characters.renewal.msb.wc.wholesalerNames = Currency wholesaler names can include letters a to z, numbers, spaces, and most punctuation and special characters
 
-error.required.renewal.hvd.percentage = Select one option to show the proportion of your turnover that came from cash payments over €10,000 in the last 12 months
+error.required.renewal.hvd.percentage = Select the percentage of your turnover that came from cash payments of €10,000 or more
 
-error.invalid.renewal.msb.wc.moneySources = Select one or more options to show who supplied your foreign currency
+error.invalid.renewal.msb.wc.moneySources = Select who supplied your physical foreign currency in the last 12 months
 
-error.required.renewal.country.name = Enter an official country name: for example, Holland is Netherlands
+error.required.renewal.country.name = Enter the countries you sent the most transactions to in the last 12 months
+error.required.renewal.customers.outside.uk = Enter the countries where customers lived or worked
 
-error.required.renewal.ce.transactions.in.12months = Enter the number of currency exchange transactions you made in the last 12 months
-error.required.renewal.fx.transactions.in.12months = Enter the number of foreign exchange transactions you made in the last 12 months
+error.required.renewal.ce.transactions.in.12months = Enter how many currency exchange transactions you made in the last 12 months
+error.required.renewal.fx.transactions.in.12months = Enter how many foreign exchange transactions you made in the last 12 months
 
-error.required.renewal.ba.select.country = Select yes if you had customers in the last 12 months who lived or worked outside of the UK
+error.required.renewal.ba.select.country = Select yes if you had customers who lived or worked outside of the UK in the last 12 months
 
 error.required.renewal.ba.involved.in.other = Select yes if your business was involved in any other activities in the last 12 months
 error.required.renewal.ba.involved.in.other.text = Enter the other activities your business was involved in
-error.text.validation.renewal.ba.involved.in.other = Activities must only include letters a to z, numbers 0 to 9, and basic punctuation
+error.text.validation.renewal.ba.involved.in.other = Activities can include letters a to z, numbers, spaces, and most punctuation and special characters
 error.invalid.maxlength.255.renewal.ba.involved.in.other = Activities must be 255 characters or less
 
 error.required.withdrawal.reason = You must select a reason for withdrawing your application
@@ -460,7 +475,7 @@ lbl.date.example = For example, 31 03 2017.
 lbl.nationality = Country of nationality
 lbl.nationality.hint = If your nationality is British, select ‘United Kingdom’
 lbl.nino = National Insurance number
-lbl.nino.hint = Find it on your National Insurance card, benefit letter, payslip or P60. For example, QQ 12 34 56 C
+lbl.nino.hint = Find it on your National Insurance card, benefit letter, payslip or P60. For example, QQ 12 34 56 C.
 lbl.passport.number = {0}’s passport number
 lbl.uk = UK
 lbl.overseas = Overseas
@@ -961,7 +976,7 @@ main.sidebar.information = Information is saved automatically. If you sign out, 
 
 aboutyou.yourdetails.title = What’s your name?
 aboutyou.rolewithinbusiness.title = What’s your role in the business?
-aboutyou.rolewithinbusiness.lbl.01 = Beneficial shareholder
+aboutyou.rolewithinbusiness.lbl.01 = Beneficial owner (holding more than 25% of shares in the business)
 aboutyou.rolewithinbusiness.lbl.02 = Director
 aboutyou.rolewithinbusiness.lbl.03 = External accountant
 aboutyou.rolewithinbusiness.lbl.04 = Internal accountant
@@ -995,11 +1010,14 @@ businessdetails.contactingyou.website.lbl = Website address (optional)
 businessdetails.contactingyou.businessaddress = Business address:
 businessdetails.contactingyou.invalid.phone = Invalid Phone Number
 businessdetails.contactingyou.invalid.mobile = Invalid Mobile Number
-businessdetails.correspondenceaddress.title = What is the right address to send you letters?
-businessdetails.correspondenceaddress.lbl = Is this a UK address?
+
+businessdetails.correspondenceaddress.isuk.title = Is the address to send you letters about your supervision in the UK?
+businessdetails.correspondenceaddress.isuk.error = Select yes if the address to send you letters about your supervision is in the UK
+businessdetails.correspondenceaddress.title = What is the right address to send you letters about your supervision?
+
 businessdetails.correspondenceaddress.p = We’ll send letters about your supervision to this address.
 businessdetails.correspondenceaddress.contact.info = Contact person or business
-businessdetails.correspondenceaddress.yourName = Name of the person
+businessdetails.correspondenceaddress.yourName = Your name
 businessdetails.correspondenceaddress.businessName = Name of the business
 businessdetails.correspondenceaddress.ukAddress = Yes
 businessdetails.correspondenceaddress.nonUkAddress = No
@@ -1011,8 +1029,8 @@ businessdetails.registeredformlr.lbl = This only refers to registration with HMR
 businessdetails.registeredformlr.mlrregno.lbl = Money Laundering Regulations registration number
 businessdetails.registeredformlr.taxReferenceHint = This is 8 numbers, like 12345678. Find it on the certificate you received from HMRC when you registered for anti-money laundering supervision.
 businessdetails.confirmingyouraddress.title = Is this your registered office?
-businessdetails.registeredoffice.title = Where is your registered office or main place of business?
-businessdetails.registeredoffice.lbl = Is this a UK address?
+businessdetails.registeredoffice.where.title = Where is your registered office or main place of business?
+businessdetails.registeredoffice.title = Is your registered office in the UK?
 businessdetails.registeredoffice.address.lbl = Address
 businessdetails.registeredoffice.postcode.lbl = Postcode
 businessdetails.registeredoffice.country.lbl = Country
@@ -1433,7 +1451,7 @@ businessactivities.confirm-activities.line1.text = Is your business involved in 
 businessactivities.confirm-activities.subtitle = You have told us you’re registering the following services for anti-money laundering supervision:
 businessactivities.confirm-activities.subtitle_2 = You’re registering
 businessactivities.confirm-activities.subtitle_3 = for anti-money laundering supervision.
-businessactivities.confirm-activities.subtitle_4 = You have told us your business is
+businessactivities.confirm-activities.subtitle_4 = You’ve told us your business is
 businessactivities.identify-suspicious-activity.title = Does your business have written guidance for staff on how to identify and report suspicious activity?
 businessactivities.turnover.title = How much total net profit does your business expect in the next 12 months from services you’re registering for anti-money laundering supervision?
 businessactivities.turnover.heading = How much total net profit does your business expect in the next 12 months from services you’re registering for anti-money laundering supervision?
@@ -1527,7 +1545,7 @@ declaration.addperson.lastname = Last name
 declaration.addperson.whatsyourrole = What’s your role in the business?
 declaration.addperson.amendment.title = What is your name?
 declaration.declaration.header = Declaration
-declaration.addperson.lbl.01 = Beneficial shareholder
+declaration.addperson.lbl.01 = Beneficial owner (holding more than 25% of shares in the business)
 declaration.addperson.lbl.02 = Director
 declaration.addperson.lbl.03 = External accountant
 declaration.addperson.lbl.04 = Internal accountant
@@ -1589,7 +1607,7 @@ responsiblepeople.whatyouneed.line_8 = Unique Taxpayer Reference number (UTR) if
 responsiblepeople.whatyouneed.line_9 = VAT number, if they are the sole proprietor of another business and are VAT registered
 responsiblepeople.whatyouneed.line_10 = if they have passed the fit and proper test
 responsiblepeople.whatyouneed.line_11 = if they have been charged for the approval check
-responsiblepeople.personName.title = What is the name of this responsible person?
+responsiblepeople.personName.title = What is this responsible person’s name?
 responsiblepeople.personName.firstname = First name
 responsiblepeople.personName.middlename = Middle name (optional)
 responsiblepeople.personName.lastname = Last name
@@ -1673,7 +1691,7 @@ responsiblepeople.position_within_business.startDate.toldus.single = You have to
 responsiblepeople.position_within_business.startDate.toldus.multiple = You have told us {0} is a:
 responsiblepeople.position_within_business.startDate.toldus.selectfirst = If the start dates of these positions are different, give the earliest.
 responsiblepeople.position_within_business.important = The business must have a nominated officer. Only one person can register as the nominated officer.
-responsiblepeople.position_within_business.lbl.01 = Beneficial owner (holding more than 25% of shares)
+responsiblepeople.position_within_business.lbl.01 = Beneficial owner (holding more than 25% of shares in the business)
 responsiblepeople.position_within_business.lbl.02 = Director
 responsiblepeople.position_within_business.lbl.03 = Internal accountant
 responsiblepeople.position_within_business.lbl.04 = Nominated officer
@@ -1741,6 +1759,7 @@ responsiblepeople.check_your_answers.complete = Complete
 responsiblepeople.check_your_answers.you.have.registered = You have registered
 responsiblepeople.check_your_answers.visuallyhidden.the.responsible.person = the responsible person
 responsiblepeople.check_your_answers.visuallyhidden.from.your = from your responsible people
+responsiblepeople.check_your_answers.button = Accept and add this responsible person
 
 responsiblepeople.check_your_answers.hasNonUKresident.1 = Because at least one of the people you’ve registered lives outside of the UK, HMRC will likely need more information about them.
 responsiblepeople.check_your_answers.hasNonUKresident.2 = They’ll contact you on the email address you give in the ‘Business Details’ section and let you know what they need.
@@ -1748,13 +1767,13 @@ responsiblepeople.check_your_answers.hasNonUKresident.2 = They’ll contact you 
 responsiblepeople.fit_and_proper.notice.title = HMRC’s fit and proper test and HMRC’s approval check
 responsiblepeople.fit_and_proper.notice.text1 = HMRC checks that the responsible people running your business meet the requirements of the Money Laundering Regulations. This is part of the registration process.
 responsiblepeople.fit_and_proper.notice.heading1 = HMRC’s fit and proper test
-responsiblepeople.fit_and_proper.notice.text2 = The fit and proper test is for money service businesses and trusts or company service providers. It is different to the test carried out by the Financial Conduct Authority.
+responsiblepeople.fit_and_proper.notice.text2 = The fit and proper test is for money service businesses and trust or company service providers. It is different to the test carried out by the Financial Conduct Authority.
 responsiblepeople.fit_and_proper.notice.heading2 = HMRC’s approval check
 responsiblepeople.fit_and_proper.notice.text3 = The approval check is for accountancy service providers, estate agent businesses, and high value dealers.
 
 responsiblepeople.fit_and_proper.heading = Has {0} passed HMRC’s fit and proper test?
 responsiblepeople.fit_and_proper.title = Has this person passed the fit and proper test?
-responsiblepeople.fit_and_proper.details = HMRC carries out the fit and proper test as part of the registration process for money service businesses and trusts or company service providers. It is different to the test carried out by the Financial Conduct Authority.
+responsiblepeople.fit_and_proper.details = HMRC carries out the fit and proper test as part of the registration process for money service businesses and trust or company service providers. It is different to the test carried out by the Financial Conduct Authority.
 responsiblepeople.fit_and_proper.details2 = If a responsible person has already passed the test, either in their current role or in a previous role, they do not need to pass it again.
 
 responsiblepeople.approval_check.heading = Has HMRC charged your business or another business to do an approval check about {0}?
@@ -2190,7 +2209,7 @@ renewal.cash.payments.received.lbl3.hint = Describe how you received cash paymen
 
 renewal.msb.throughput.header = What was your total throughput in the last 12 months?
 renewal.msb.throughput.info = Throughput is the total value of money you transfer, currency you exchange, and cheques you cash.
-renewal.msb.throughput.selection.required = Select one option to show your total throughput in the last 12 months
+renewal.msb.throughput.selection.required = Select your total throughput in the last 12 months
 renewal.msb.throughput.selection.invalid = Select one option to show your total throughput in the last 12 months
 renewal.msb.throughput.selection.1 = £0 to £99,999
 renewal.msb.throughput.selection.2 = £100,000 to £499,999
@@ -2211,11 +2230,12 @@ renewal.msb.send.money.title = Did you send money to other countries in the last
 renewal.msb.most.transactions.title = Where did you send the most transactions in the last 12 months?
 
 renewal.msb.transfers.header = How many money transfers did you make in the last 12 months?
-renewal.msb.transfers.value.invalid = Enter the number of money transfers you made in the last 12 months
+renewal.msb.transfers.value.invalid = Enter how many money transfers your business made in the last 12 months
 
 renewal.hvd.percentage.title = What percentage of your turnover came from cash payments of €10,000 or more?
 
 renewal.msb.largest.amounts.title = Which countries did you send the largest amounts of money to in the last 12 months?
+error.required.renewal.largest.amounts.country = Enter the countries you sent the largest amounts of money to in the last 12 months
 
 renewal.customers.outside.uk.hint.lbl = Where did these customers live or work?
 ############################### Survey ###############################

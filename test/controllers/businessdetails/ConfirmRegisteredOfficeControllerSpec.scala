@@ -47,7 +47,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
   }
 
   private val ukAddress = RegisteredOfficeUK("line1", "line2", Some("line3"), Some("line4"), "AA1 1AA")
-  private val businessDetails = BusinessDetails(None, None, None, None, None, Some(ukAddress), None)
+  private val businessDetails = BusinessDetails(None, None, None, None, None, None, Some(ukAddress), None)
   val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
     Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "ghghg")
   val bm = BusinessMatching(Some(reviewDtls))
@@ -80,7 +80,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.get()(request)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.businessdetails.routes.RegisteredOfficeController.get().url))
+        redirectLocation(result) must be(Some(controllers.businessdetails.routes.RegisteredOfficeIsUKController.get().url))
 
       }
 
@@ -94,7 +94,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.get()(request)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.businessdetails.routes.RegisteredOfficeController.get().url))
+        redirectLocation(result) must be(Some(controllers.businessdetails.routes.RegisteredOfficeIsUKController.get().url))
       }
     }
 
@@ -143,7 +143,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.businessdetails.routes.RegisteredOfficeController.get().url))
+        redirectLocation(result) must be(Some(controllers.businessdetails.routes.RegisteredOfficeIsUKController.get().url))
         verify(
           controller.dataCache).save[BusinessDetails](any(),
           meq(businessDetails.copy(registeredOffice = None)))(any(), any(), any()

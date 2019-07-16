@@ -157,17 +157,6 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
           status(result) must be(OK)
         }
       }
-
-      "respond with NOT_FOUND" when {
-        "allowedToEdit is false (status is not SubmissionReady | NotCompleted | SubmissionReadyForReview)" in new Fixture {
-
-          when(controller.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionDecisionApproved))
-
-          val result = controller.get()(request)
-          status(result) must be(NOT_FOUND)
-        }
-      }
     }
 
 

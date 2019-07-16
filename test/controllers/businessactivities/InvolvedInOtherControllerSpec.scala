@@ -136,17 +136,6 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
         page.select("input[type=radio][name=involvedInOther][value=false]").hasAttr("checked") must be(false)
         page.select("textarea[name=details]").`val` must be("test")
       }
-
-      "redirect to Page not found" when {
-        "allowedToEdit is false (status is not SubmissionReady | NotCompleted | SubmissionReadyForReview)" in new Fixture {
-
-          when(controller.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionDecisionApproved))
-
-          val result = controller.get()(request)
-          status(result) must be(NOT_FOUND)
-        }
-      }
     }
 
     "post is called" must {
@@ -295,8 +284,6 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
           contentAsString(result) must include(Messages("error.required.ba.involved.in.other.text"))
         }
       }
-
-
     }
   }
 }

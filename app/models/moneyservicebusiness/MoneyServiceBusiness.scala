@@ -79,6 +79,13 @@ case class MoneyServiceBusiness(
   private def allComplete: Boolean =
     this.throughput.isDefined &&
       this.branchesOrAgents.isDefined &&
+      (
+        this.branchesOrAgents match {
+          case Some(BranchesOrAgents(BranchesOrAgentsHasCountries(true), Some(_))) => true
+          case Some(BranchesOrAgents(BranchesOrAgentsHasCountries(false), None)) => true
+          case _ => false
+        }
+      ) &&
       this.identifyLinkedTransactions.isDefined
 
   private def mtComplete(mtFlag: Boolean): Boolean =

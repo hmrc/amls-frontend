@@ -57,7 +57,7 @@ sealed trait CustomersOutsideUK0 {
 
       val countrySeqR = {
         (seqToOptionSeq[String] andThen flattenR[String] andThen cR)
-          .andThen(minLengthR[Seq[Country]](minLength) withMessage "error.required.renewal.country.name")
+          .andThen(minLengthR[Seq[Country]](minLength) withMessage "error.required.renewal.customers.outside.uk")
           .andThen(maxLengthR[Seq[Country]](maxLength))
       }
 
