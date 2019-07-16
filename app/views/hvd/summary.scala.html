@@ -21,7 +21,7 @@
 @import utils.DateHelper
 @import config.ApplicationConfig
 
-@(f: forms.Form2[_], model: Hvd, isEditable:Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: forms.Form2[_], model: Hvd)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.hvd")
@@ -139,7 +139,7 @@
         @checkYourAnswers(
             question = Messages("hvd.receiving.title"),
             editLinkTag = "hvdreceivecashpayments-edit",
-            editUrl = if(isEditable){controllers.hvd.routes.ReceiveCashPaymentsController.get(true).toString} else ""
+            editUrl = controllers.hvd.routes.ReceiveCashPaymentsController.get(true).toString
         ) {
             @if(rcp){
                 <p>@Messages("lbl.yes")</p>
@@ -153,7 +153,7 @@
         @checkYourAnswers(
             question = Messages("hvd.receiving.expect.to.receive"),
             editLinkTag = "hvdcashpaymentmethods-edit",
-            editUrl = if(isEditable){controllers.hvd.routes.ExpectToReceiveCashPaymentsController.get(true).toString} else ""
+            editUrl = controllers.hvd.routes.ExpectToReceiveCashPaymentsController.get(true).toString
         ) {
             <ul class="list">
                 @pm match {
@@ -179,7 +179,7 @@
         @checkYourAnswers(
             question = Messages("hvd.percentage.title"),
             editLinkTag = "hvdpercentcashpayment-edit",
-            editUrl = if(isEditable){controllers.hvd.routes.PercentageOfCashPaymentOver15000Controller.get(true).toString} else ""
+            editUrl = controllers.hvd.routes.PercentageOfCashPaymentOver15000Controller.get(true).toString
         ) {
             <p>@p match {
                 case First => {@Messages("hvd.percentage.lbl.01")}

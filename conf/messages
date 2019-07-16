@@ -20,9 +20,9 @@ error.required.address.line1 = Enter the first line of the address
 error.required.address.line2 = Enter the second line of the address
 error.max.length.address.line = You can’t enter more than 35 characters
 error.invalid.postcode = Enter a valid postcode
-error.required.country = Enter an official country name: for example, Holland is Netherlands
-error.invalid.country = Enter an official country name: for example, Holland is Netherlands
-error.required.country.name = Enter an official country name: for example, Holland is Netherlands
+error.required.country = Enter a country name, like France
+error.invalid.country = Enter a country name, like France
+error.required.country.name = Enter a country name, like France
 error.required.nationality = Select one or more options to show this person’s nationality
 error.required.uk.or.overseas = Select yes if this is a UK address
 
@@ -323,18 +323,23 @@ error.invalid.msb.ipsp.name = You can’t enter more than 140 characters
 error.required.msb.linked.txn = Select yes if your systems can identify linked transactions
 error.required.msb.psr.options = Select yes if your business has a PSR number
 error.invalid.msb.psr.number = Enter a valid PSR registration number
-error.required.msb.send.money = Select yes if you send money to other countries
+error.required.msb.send.money = Select yes if you sent money to other countries in the last 12 months
 error.required.msb.transactions.in.12months = Enter the number of transactions you expect in the next 12 months
 error.required.msb.fx.transactions.in.12months = Enter the number of foreign exchange transactions you expect in the next 12 months
-error.invalid.msb.transactions.in.12months = Enter up to 11 numbers only
+error.invalid.msb.transactions.in.12months = Number of money transfers must be 11 numbers or less
+error.invalid.renewal.fx.transactions.in.12months = Number of foreign exchange transactions must be 11 numbers or less
+error.invalid.renewal.ce.transactions.in.12months = Number of currency exchange transactions must be 11 numbers or less
 error.required.msb.fundsTransfer = Select yes if you transfer money without using formal banking systems
 error.invalid.countries.msb.branchesOrAgents = Enter an official country name: for example, Holland is Netherlands
 error.required.hasCountries.msb.branchesOrAgents = Select yes if you have branches or agents in other countries
 error.invalid.msb.wc.currencies = Enter a valid 3 character currency code
+error.required.renewal.wc.currencies = Enter currencies you supplied the most to your customers in the last 12 months
+error.invalid.renewal.wc.currencies = Enter a currency code in the correct format
 error.invalid.msb.wc.moneySources = Select one or more options to show who will supply your foreign currency
 error.invalid.msb.wc.bankNames = Enter the names of the banks that will supply your foreign currency
 error.invalid.msb.wc.wholesalerNames = Enter the names of the currency wholesalers that will supply your foreign currency
 error.required.msb.wc.foreignCurrencies = Select yes if you deal in physical foreign currencies
+error.required.renewal.wc.foreign.currencies = Select yes if you dealt in physical foreign currencies in the last 12 months
 error.required.countries.msb.most.transactions = Enter an official country name: for example, Holland is Netherlands
 
 ############################### High Value Dealer ###############################
@@ -356,31 +361,38 @@ error.required.hvd.percentage = Select one option to show how much of your turno
 error.required.renewal.transactions.in.12months = Enter the number of currency exchange transactions you made in the last 12 months
 error.required.renewal.percentage = Select one option to show the proportion of your turnover that came from cash payments over €10,000 in the last 12 months
 
-error.required.renewal.hvd.receive.cash.payments = Select yes if you received any cash payments over €10,000 in the last 12 months from customers you’ve not met in person
-error.required.renewal.hvd.choose.option = Select one or more options to show how you received these payments
-error.required.renewal.hvd.describe = Enter details of how you received these payments
+error.required.renewal.hvd.receive.cash.payments = Select yes if you received cash payments of €10,000 or more from customers you have not met in person
+error.required.renewal.hvd.choose.option = Select how you received cash payments from customers you have not met in person
+error.required.renewal.hvd.describe = Enter how you received cash payments from customers you have not met in person
+error.invalid.renewal.hvd.describe.too.long = Description of how you received cash payments must be 255 characters or less
+error.invalid.renewal.hvd.describe.characters = Description of how you received cash payments can include letters a to z, numbers, spaces, and most punctuation and special characters
 
-error.required.renewal.ba.turnover.from.mlr = Select the total net profit your business made from services registered for anti-money laundering supervision
+error.required.renewal.ba.turnover.from.mlr = Select how much total net profit your business made from services registered for anti-money laundering supervision in the last 12 months
 
 error.required.renewal.ba.business.turnover = Select the total net profit your business made in the last 12 months
 
-error.invalid.renewal.msb.wc.bankNames = Enter the names of the banks that supplied your foreign currency
-error.invalid.renewal.msb.wc.wholesalerNames = Enter the names of the currency wholesalers that supplied your foreign currency
+error.invalid.renewal.msb.wc.bankNames = Enter banks that supplied your foreign currency
+error.invalid.maxlength.140.bankNames = Bank names must be 140 characters or less
+error.invalid.characters.renewal.msb.wc.bankNames = Bank names can include letters a to z, numbers, spaces, and most punctuation and special characters
+error.invalid.renewal.msb.wc.wholesalerNames = Enter currency wholesalers that supplied your foreign currency
+error.invalid.maxlength.140.wholesalerNames = Currency wholesaler names must be 140 characters or less
+error.invalid.characters.renewal.msb.wc.wholesalerNames = Currency wholesaler names can include letters a to z, numbers, spaces, and most punctuation and special characters
 
-error.required.renewal.hvd.percentage = Select one option to show the proportion of your turnover that came from cash payments over €10,000 in the last 12 months
+error.required.renewal.hvd.percentage = Select the percentage of your turnover that came from cash payments of €10,000 or more
 
-error.invalid.renewal.msb.wc.moneySources = Select one or more options to show who supplied your foreign currency
+error.invalid.renewal.msb.wc.moneySources = Select who supplied your physical foreign currency in the last 12 months
 
-error.required.renewal.country.name = Enter an official country name: for example, Holland is Netherlands
+error.required.renewal.country.name = Enter the countries you sent the most transactions to in the last 12 months
+error.required.renewal.customers.outside.uk = Enter the countries where customers lived or worked
 
-error.required.renewal.ce.transactions.in.12months = Enter the number of currency exchange transactions you made in the last 12 months
-error.required.renewal.fx.transactions.in.12months = Enter the number of foreign exchange transactions you made in the last 12 months
+error.required.renewal.ce.transactions.in.12months = Enter how many currency exchange transactions you made in the last 12 months
+error.required.renewal.fx.transactions.in.12months = Enter how many foreign exchange transactions you made in the last 12 months
 
-error.required.renewal.ba.select.country = Select yes if you had customers in the last 12 months who lived or worked outside of the UK
+error.required.renewal.ba.select.country = Select yes if you had customers who lived or worked outside of the UK in the last 12 months
 
 error.required.renewal.ba.involved.in.other = Select yes if your business was involved in any other activities in the last 12 months
 error.required.renewal.ba.involved.in.other.text = Enter the other activities your business was involved in
-error.text.validation.renewal.ba.involved.in.other = Activities must only include letters a to z, numbers 0 to 9, and basic punctuation
+error.text.validation.renewal.ba.involved.in.other = Activities can include letters a to z, numbers, spaces, and most punctuation and special characters
 error.invalid.maxlength.255.renewal.ba.involved.in.other = Activities must be 255 characters or less
 
 error.required.withdrawal.reason = You must select a reason for withdrawing your application
@@ -2193,7 +2205,7 @@ renewal.receiving.give.details.lbl = Describe how you received cash payments ove
 
 renewal.msb.throughput.header = What was your total throughput in the last 12 months?
 renewal.msb.throughput.info = Throughput is the total value of money you transfer, currency you exchange, and cheques you cash.
-renewal.msb.throughput.selection.required = Select one option to show your total throughput in the last 12 months
+renewal.msb.throughput.selection.required = Select your total throughput in the last 12 months
 renewal.msb.throughput.selection.invalid = Select one option to show your total throughput in the last 12 months
 renewal.msb.throughput.selection.1 = £0 to £99,999
 renewal.msb.throughput.selection.2 = £100,000 to £499,999
@@ -2214,11 +2226,12 @@ renewal.msb.send.money.title = Did you send money to other countries in the last
 renewal.msb.most.transactions.title = Where did you send the most transactions in the last 12 months?
 
 renewal.msb.transfers.header = How many money transfers did you make in the last 12 months?
-renewal.msb.transfers.value.invalid = Enter the number of money transfers you made in the last 12 months
+renewal.msb.transfers.value.invalid = Enter how many money transfers your business made in the last 12 months
 
 renewal.hvd.percentage.title = What percentage of your turnover came from cash payments of €10,000 or more?
 
 renewal.msb.largest.amounts.title = Which countries did you send the largest amounts of money to in the last 12 months?
+error.required.renewal.largest.amounts.country = Enter the countries you sent the largest amounts of money to in the last 12 months
 
 renewal.customers.outside.uk.hint.lbl = Where did these customers live or work?
 ############################### Survey ###############################

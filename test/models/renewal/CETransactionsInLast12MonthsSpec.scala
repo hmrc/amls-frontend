@@ -45,14 +45,14 @@ class CETransactionsInLast12MonthsSpec extends PlaySpec {
 
         val map = Map("ceTransaction" -> Seq("asas"))
         CETransactionsInLast12Months.formRule.validate(map) must be(Invalid(
-          Seq( Path \ "ceTransaction" -> Seq(ValidationError("error.invalid.msb.transactions.in.12months")))))
+          Seq( Path \ "ceTransaction" -> Seq(ValidationError("error.invalid.renewal.ce.transactions.in.12months")))))
       }
 
       "fail validation on invalid field when it exceeds the max length" in {
 
         val map = Map("ceTransaction" -> Seq("123"*10))
         CETransactionsInLast12Months.formRule.validate(map) must be(Invalid(
-          Seq( Path \ "ceTransaction" -> Seq(ValidationError("error.invalid.msb.transactions.in.12months")))))
+          Seq( Path \ "ceTransaction" -> Seq(ValidationError("error.invalid.renewal.ce.transactions.in.12months")))))
       }
 
       "fail validation on invalid field1" in {

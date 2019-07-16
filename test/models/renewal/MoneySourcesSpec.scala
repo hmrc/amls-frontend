@@ -184,8 +184,8 @@ class MoneySourcesSpec extends AmlsSpec {
           "bankNames" -> Seq(buildString(141))
         )
         val expected = Invalid(Seq(
-          (Path \ "bankNames") -> Seq(ValidationError("error.invalid.maxlength.140")),
-          (Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.maxlength.140"))))
+          (Path \ "bankNames") -> Seq(ValidationError("error.invalid.maxlength.140.bankNames")),
+          (Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.maxlength.140.wholesalerNames"))))
 
         MoneySources.formRule.validate(form) must be(expected)
       }
@@ -198,8 +198,8 @@ class MoneySourcesSpec extends AmlsSpec {
           "bankNames" -> Seq(symbols5.mkString(""))
         )
         val expected = Invalid(Seq(
-          (Path \ "bankNames") -> Seq(ValidationError("err.text.validation")),
-          (Path \ "wholesalerNames") -> Seq(ValidationError("err.text.validation"))))
+          (Path \ "bankNames") -> Seq(ValidationError("error.invalid.characters.renewal.msb.wc.bankNames")),
+          (Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.characters.renewal.msb.wc.wholesalerNames"))))
 
         MoneySources.formRule.validate(form) must be(expected)
       }
