@@ -41,13 +41,13 @@ class summarySpec extends AmlsSpec
 
   "summary view" must {
     "have correct title" in new ViewFixture {
-      def view = views.html.hvd.summary(EmptyForm, Hvd(), true)
+      def view = views.html.hvd.summary(EmptyForm, Hvd())
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.hvd"))
     }
 
     "have correct headings" in new ViewFixture {
-      def view = views.html.hvd.summary(EmptyForm, Hvd(), true)
+      def view = views.html.hvd.summary(EmptyForm, Hvd())
 
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.hvd"))
@@ -96,7 +96,7 @@ class summarySpec extends AmlsSpec
           linkedCashPayment = Some(LinkedCashPayments(true))
         )
 
-        views.html.hvd.summary(EmptyForm, testdata, true)
+        views.html.hvd.summary(EmptyForm, testdata)
       }
 
       forAll(sectionChecks) { (key, check) => {

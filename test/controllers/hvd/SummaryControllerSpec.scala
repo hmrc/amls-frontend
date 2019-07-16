@@ -101,7 +101,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
       status(result) must be(SEE_OTHER)
     }
 
-    "hide edit link for involved in other, turnover expected from activities and amls turnover expected page" when {
+    "show edit link for involved in other, turnover expected from activities and amls turnover expected page" when {
       "application in variation mode" in new Fixture {
 
         when(controller.dataCache.fetch[Hvd](eqTo(Hvd.key))
@@ -120,8 +120,9 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
         document.getElementsByTag("section").get(3).getElementsByTag("a").hasClass("change-answer") must be(true)
         document.getElementsByTag("section").get(4).getElementsByTag("a").hasClass("change-answer") must be(true)
         document.getElementsByTag("section").get(5).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByTag("section").get(6).getElementsByTag("a").hasClass("change-answer") must be(false)
-        document.getElementsByTag("section").get(7).getElementsByTag("a").hasClass("change-answer") must be(false)
+        document.getElementsByTag("section").get(6).getElementsByTag("a").hasClass("change-answer") must be(true)
+        document.getElementsByTag("section").get(7).getElementsByTag("a").hasClass("change-answer") must be(true)
+        document.getElementsByTag("section").get(8).getElementsByTag("a").hasClass("change-answer") must be(true)
       }
     }
 
