@@ -49,14 +49,14 @@ object WhichCurrencies {
 
   private val currencyListType = TraversableValidators.seqToOptionSeq(emptyToNone) andThen
     TraversableValidators.flattenR[String] andThen
-    TraversableValidators.minLengthR[Seq[String]](1) andThen
-    GenericRules.traversableR(GenericValidators.inList(currenciesSeq))
+    TraversableValidators.minLengthR[Seq[String]](1).withMessage("error.required.renewal.wc.currencies") andThen
+    GenericRules.traversableR(GenericValidators.inList(currenciesSeq)).withMessage("error.invalid.renewal.wc.currencies")
 
 
   implicit def formRule: Rule[UrlFormEncoded, WhichCurrencies] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
 
-    (__ \ "currencies").read(currencyListType).withMessage("error.invalid.msb.wc.currencies").flatMap(r => WhichCurrencies(r.toSeq))
+    (__ \ "currencies").read(currencyListType).flatMap(r => WhichCurrencies(r.toSeq))
   }
 
   implicit val formWrite: Write[WhichCurrencies, UrlFormEncoded] = To[UrlFormEncoded] { __ =>

@@ -23,8 +23,8 @@ import cats.implicits._
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{Form2, InvalidForm, ValidForm}
-import models.businessdetails.{BusinessDetails, CorrespondenceAddress, UKCorrespondenceAddress}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessdetails.{BusinessDetails, CorrespondenceAddress, CorrespondenceAddressNonUk}
 import play.api.mvc.Request
 import services.AutoCompleteService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -35,50 +35,44 @@ import views.html.businessdetails._
 
 import scala.concurrent.Future
 
-class CorrespondenceAddressController @Inject () (
+class CorrespondenceAddressNonUkController @Inject ()(
                                                  val dataConnector: DataCacheConnector,
                                                  val authConnector: AuthConnector,
                                                  val auditConnector: AuditConnector,
                                                  val autoCompleteService: AutoCompleteService
                                                  ) extends BaseController {
 
-
-
-  private val initialiseWithUK = UKCorrespondenceAddress("","", "", "", None, None, "")
-
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataConnector.fetch[BusinessDetails](BusinessDetails.key) map {
         response =>
-          val form: Form2[CorrespondenceAddress] = (for {
+          val form: Form2[CorrespondenceAddressNonUk] = (for {
             businessDetails <- response
             correspondenceAddress <- businessDetails.correspondenceAddress
-          } yield Form2[CorrespondenceAddress](correspondenceAddress)).getOrElse(Form2[CorrespondenceAddress](initialiseWithUK))
-          Ok(correspondence_address(form, edit, autoCompleteService.getCountries))
+            ukAddress <- correspondenceAddress.nonUkAddress
+          } yield Form2[CorrespondenceAddressNonUk](ukAddress)).getOrElse(EmptyForm)
+          Ok(correspondence_address_non_uk(form, edit, autoCompleteService.getCountries))
       }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-      Form2[CorrespondenceAddress](request.body) match {
+      Form2[CorrespondenceAddressNonUk](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(correspondence_address(f, edit, autoCompleteService.getCountries)))
+          Future.successful(BadRequest(correspondence_address_non_uk(f, edit, autoCompleteService.getCountries)))
         case ValidForm(_, data) =>
           val doUpdate = for {
-            businessDetails <- OptionT(dataConnector.fetch[BusinessDetails](BusinessDetails.key))
-            _ <- OptionT.liftF(dataConnector.save[BusinessDetails](BusinessDetails.key, businessDetails.correspondenceAddress(data)))
-            _ <- OptionT.liftF(auditAddressChange(data, businessDetails.correspondenceAddress, edit)) orElse OptionT.some(Success)
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
-            case _ => Redirect(routes.SummaryController.get())
-          }
-
+            businessDetails:BusinessDetails <- OptionT(dataConnector.fetch[BusinessDetails](BusinessDetails.key))
+            _ <- OptionT.liftF(dataConnector.save[BusinessDetails]
+              (BusinessDetails.key, businessDetails.correspondenceAddress(CorrespondenceAddress(None, Some(data)))))
+            _ <- OptionT.liftF(auditAddressChange(data, businessDetails.correspondenceAddress.flatMap(a => a.nonUkAddress), edit)) orElse OptionT.some(Success)
+          } yield Redirect(routes.SummaryController.get())
           doUpdate getOrElse InternalServerError("Could not update correspondence address")
       }
     }
   }
 
-  def auditAddressChange(currentAddress: CorrespondenceAddress, oldAddress: Option[CorrespondenceAddress], edit: Boolean)
+  def auditAddressChange(currentAddress: CorrespondenceAddressNonUk, oldAddress: Option[CorrespondenceAddressNonUk], edit: Boolean)
                         (implicit hc: HeaderCarrier, request: Request[_]): Future[AuditResult] = {
     if (edit) {
       auditConnector.sendEvent(AddressModifiedEvent(currentAddress, oldAddress))

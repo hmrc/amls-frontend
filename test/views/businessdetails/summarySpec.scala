@@ -63,7 +63,8 @@ class summarySpec extends AmlsSpec
       ("businessdetails.registeredformlr.title",checkElementTextIncludes(_, "businessdetails.registeredformlr.mlrregno.lbl", "1234")),
       ("businessdetails.activity.start.date.title",checkElementTextIncludes(_, "lbl.start.date", "2 January 2016")),
       ("businessdetails.registeredforvat.title",checkElementTextIncludes(_, "lbl.vat.reg.number", "2345")),
-      ("businessdetails.registeredoffice.title",checkElementTextIncludes(_, "line1","line2","line3","line4","AB12CD")),
+      ("businessdetails.registeredoffice.title",checkElementTextIncludes(_, "lbl.yes")),
+      ("businessdetails.registeredoffice.where.title",checkElementTextIncludes(_, "line1","line2","line3","line4","AB12CD")),
       ("businessdetails.contactingyou.email.title",checkElementTextIncludes(_, "businessdetails.contactingyou.email.lbl", "test@test.com")),
       ("businessdetails.contactingyou.phone.title",checkElementTextIncludes(_, "businessdetails.contactingyou.phone.lbl", "01234567890")),
       ("businessdetails.correspondenceaddress.title",
@@ -80,9 +81,11 @@ class summarySpec extends AmlsSpec
           Some(VATRegisteredYes("2345")),
           Some(CorporationTaxRegisteredYes("3456")),
           Some(ContactingYou(Some("01234567890"), Some("test@test.com"))),
+          Some(RegisteredOfficeIsUK(true)),
           Some(RegisteredOfficeUK("line1","line2",Some("line3"),Some("line4"),"AB12CD")),
           Some(true),
-          Some(UKCorrespondenceAddress("your name", "business name","line1","line2",Some("line3"),Some("line4"),"AB12CD")),
+          Some(CorrespondenceAddressIsUk(true)),
+          Some(CorrespondenceAddress(Some(CorrespondenceAddressUk("your name", "business name","line1","line2",Some("line3"),Some("line4"),"AB12CD")), None)),
           false
         ),true
       )

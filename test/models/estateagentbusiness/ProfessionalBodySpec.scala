@@ -91,7 +91,7 @@ class ProfessionalBodySpec extends PlaySpec with MockitoSugar {
 
         ProfessionalBody.formRule.validate(data) must
           be(Invalid(Seq(
-            (Path \ "professionalBody") -> Seq(ValidationError("error.invalid.maxlength.255"))
+            (Path \ "professionalBody") -> Seq(ValidationError("error.invalid.eab.penalised.by.professional.body.description.length"))
           )))
       }
 
@@ -104,7 +104,7 @@ class ProfessionalBodySpec extends PlaySpec with MockitoSugar {
 
         ProfessionalBody.formRule.validate(data) must
           be(Invalid(Seq(
-            (Path \ "professionalBody") -> Seq(ValidationError("err.text.validation"))
+            (Path \ "professionalBody") -> Seq(ValidationError("error.invalid.characters.eab.penalised.by.professional.body.description"))
           )))
       }
     }

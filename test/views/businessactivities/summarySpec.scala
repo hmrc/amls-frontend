@@ -78,25 +78,25 @@ class summarySpec extends AmlsSpec
     "include the provided data" in new ViewFixture {
 
       def view = views.html.businessactivities.summary(
-        EmptyForm,
-        BusinessActivities(
-          Some(InvolvedInOtherYes("OtherActivities")),
-          Some(ExpectedBusinessTurnover.First),
-          Some(ExpectedAMLSTurnover.First),
-          Some(BusinessFranchiseYes("FranchiseName")),
-          Some(true),
-          None, // This is only present in renewal
-          Some(NCARegistered(true)),
-          Some(AccountantForAMLSRegulations(true)),
-          Some(IdentifySuspiciousActivity(true)),
-          Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(Digital, PaperBased)))),
-          Some(HowManyEmployees(Some("123"), Some("456"))),
-          Some(WhoIsYourAccountant("AccountantName",Some("tradingName"),UkAccountantsAddress("line1","line2",Some("line3"),Some("line4"),"AB12CD"))),
-          Some(TaxMatters(true)),
-          Some(TransactionTypes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("SoftwareName"))))
+        f = EmptyForm,
+        model = BusinessActivities(
+          involvedInOther = Some(InvolvedInOtherYes("OtherActivities")),
+          expectedBusinessTurnover = Some(ExpectedBusinessTurnover.First),
+          expectedAMLSTurnover = Some(ExpectedAMLSTurnover.First),
+          businessFranchise = Some(BusinessFranchiseYes("FranchiseName")),
+          transactionRecord = Some(true),
+          customersOutsideUK = None, // This is only present in renewal
+          ncaRegistered = Some(NCARegistered(true)),
+          accountantForAMLSRegulations = Some(AccountantForAMLSRegulations(true)),
+          identifySuspiciousActivity = Some(IdentifySuspiciousActivity(true)),
+          riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(Digital, PaperBased)))),
+          howManyEmployees = Some(HowManyEmployees(Some("123"), Some("456"))),
+          whoIsYourAccountant = Some(WhoIsYourAccountant("AccountantName", Some("tradingName"), UkAccountantsAddress("line1", "line2", Some("line3"), Some("line4"), "AB12CD"))),
+          taxMatters = Some(TaxMatters(true)),
+          transactionRecordTypes = Some(TransactionTypes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("SoftwareName"))))
         ),
-        None,
-        true
+        bmBusinessActivities = None,
+        hideReceiveAdvice = false
       )
 
       forAll(sectionChecks) { (key, check) => {
@@ -104,7 +104,7 @@ class summarySpec extends AmlsSpec
 
         val hTwo = hTwos.toList.find(e => e.text() == Messages(key, "AccountantName"))
 
-        hTwo must not be (None)
+        hTwo must not be None
         val section = hTwo.get.parents().select("section").first()
         check(section) must be(true)
       }

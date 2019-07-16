@@ -35,7 +35,7 @@
 
     @form(f, controllers.tcsp.routes.TcspTypesController.post(edit)) {
 
-        @fieldset(
+        @fieldsetWithErrorGroup(
             f = f("serviceProviders"),
             heading = "tcsp.kind.of.service.provider.title",
             section = "summary.tcsp",
