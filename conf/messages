@@ -179,7 +179,7 @@ error.invalid.ba.employee.count = Enter numbers only
 error.max.length.ba.employee.count = You can’t enter a number larger than 99999999999
 error.required.ba.employee.count2 = Enter the number of people in your business who work on activities covered by Money Laundering Regulations, it must be at least 1
 error.required.ba.select.country = Select yes if you have customers who live or work outside the UK
-error.invalid.ba.select.country = Enter an official country name: for example, Holland is Netherlands
+error.invalid.ba.select.country = Enter a country name, like France
 error.required.ba.select.transaction.record = Select yes if you keep records of all your transaction with customers
 error.required.ba.atleast.one.transaction.record = Select one or more options to show how you record transactions
 error.required.ba.software.package.name = Enter the names of the software packages you use to record transactions
@@ -238,7 +238,7 @@ error.invalid.characters.eab.penalised.by.professional.body.description = Descri
 
 ############################### Responsible People ###############################
 error.required.rp.is.uk.resident = Select yes if {0} is a UK resident
-error.required.rp.birth.country = Enter an official country name: for example, Holland is Netherlands
+error.required.rp.birth.country = Enter a country name, like France
 error.required.rp.nationality = Enter a nationality
 error.required.rp.passport.option = Select one or more options to show what kind of passport this person has
 error.required.rp.register.another.person = Select yes if you want to register another responsible person
@@ -322,14 +322,14 @@ error.invalid.msb.ipsp.name = You can’t enter more than 140 characters
 error.required.msb.linked.txn = Select yes if your systems can identify linked transactions
 error.required.msb.psr.options = Select yes if your business has a PSR number
 error.invalid.msb.psr.number = Enter a valid PSR registration number
-error.required.msb.send.money = Select yes if you sent money to other countries in the last 12 months
+error.required.msb.send.money = Select yes if you send money to other countries
 error.required.msb.transactions.in.12months = Enter the number of transactions you expect in the next 12 months
 error.required.msb.fx.transactions.in.12months = Enter the number of foreign exchange transactions you expect in the next 12 months
 error.invalid.msb.transactions.in.12months = Number of money transfers must be 11 numbers or less
 error.invalid.renewal.fx.transactions.in.12months = Number of foreign exchange transactions must be 11 numbers or less
 error.invalid.renewal.ce.transactions.in.12months = Number of currency exchange transactions must be 11 numbers or less
 error.required.msb.fundsTransfer = Select yes if you transfer money without using formal banking systems
-error.invalid.countries.msb.branchesOrAgents = Enter an official country name: for example, Holland is Netherlands
+error.invalid.countries.msb.branchesOrAgents = Enter a country name, like France
 error.required.hasCountries.msb.branchesOrAgents = Select yes if you have branches or agents in other countries
 error.invalid.msb.wc.currencies = Enter a valid 3 character currency code
 error.required.renewal.wc.currencies = Enter currencies you supplied the most to your customers in the last 12 months
@@ -339,7 +339,8 @@ error.invalid.msb.wc.bankNames = Enter the names of the banks that will supply y
 error.invalid.msb.wc.wholesalerNames = Enter the names of the currency wholesalers that will supply your foreign currency
 error.required.msb.wc.foreignCurrencies = Select yes if you deal in physical foreign currencies
 error.required.renewal.wc.foreign.currencies = Select yes if you dealt in physical foreign currencies in the last 12 months
-error.required.countries.msb.most.transactions = Enter an official country name: for example, Holland is Netherlands
+error.required.countries.msb.most.transactions = Enter a country name, like France
+error.required.renewal.send.money = Select yes if you sent money to other countries in the last 12 months
 
 ############################### High Value Dealer ###############################
 error.required.hvd.accepted.cash.payment = Select yes if you’ve already accepted cash payments of €10,000 or more
@@ -2205,7 +2206,7 @@ renewal.cash.payments.received.text = You’ve told us you received cash payment
 renewal.cash.payments.received.lbl1 = By courier
 renewal.cash.payments.received.lbl2 = Directly into a bank account
 renewal.cash.payments.received.lbl3 = Other
-renewal.cash.payments.received.lbl3.hint = Describe how you received cash payments from customers you’ve not met in person
+renewal.cash.payments.received.lbl3.hint = Describe how you received cash payments from customers you have not met in person
 
 renewal.msb.throughput.header = What was your total throughput in the last 12 months?
 renewal.msb.throughput.info = Throughput is the total value of money you transfer, currency you exchange, and cheques you cash.

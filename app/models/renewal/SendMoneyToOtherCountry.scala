@@ -30,7 +30,7 @@ object SendMoneyToOtherCountry {
 
   implicit val formRule: Rule[UrlFormEncoded, SendMoneyToOtherCountry] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    (__ \ "money").read[Boolean].withMessage("error.required.msb.send.money") map SendMoneyToOtherCountry.apply
+    (__ \ "money").read[Boolean].withMessage("error.required.renewal.send.money") map SendMoneyToOtherCountry.apply
   }
 
   implicit val formWrites: Write[SendMoneyToOtherCountry, UrlFormEncoded] = Write {x =>
