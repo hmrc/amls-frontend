@@ -74,7 +74,7 @@ class LettersAddressController @Inject () (
                   case true =>
                     businessDetails.altCorrespondenceAddress(false).copy(correspondenceAddress = None, correspondenceAddressIsUk = None)
                   case false =>
-                    businessDetails.altCorrespondenceAddress(true).copy(correspondenceAddress = None, correspondenceAddressIsUk = None)
+                    businessDetails.altCorrespondenceAddress(true)
                 })
 
                 getRouting(data.lettersAddress, edit)
