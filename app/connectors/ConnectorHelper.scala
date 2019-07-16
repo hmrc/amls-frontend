@@ -39,6 +39,7 @@ object ConnectorHelper {
     }
   }
 
+  // TODO - New auth: When converting connectors we need to remove the call to accountTypeAndId (above) and use;
   protected[connectors] def accountTypeAndIdFromEnrolments(affinityGroup: AffinityGroup,
                                                            enrolments: Enrolments,
                                                            credId: String): (String, String) = {
