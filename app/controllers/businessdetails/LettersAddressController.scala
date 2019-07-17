@@ -25,6 +25,8 @@ import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import com.google.inject.Inject
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
+import scala.concurrent.Future
+
 
 class LettersAddressController @Inject () (
                                           val dataCache: DataCacheConnector,
@@ -64,9 +66,9 @@ class LettersAddressController @Inject () (
               }
           }
         case ValidForm(_, data) =>
-          dataCache.fetchAll map {
+          dataCache.fetchAll flatMap {
             optionalCache =>
-              (for {
+              val result = for {
                 cache <- optionalCache
                 businessDetails <- cache.getEntry[BusinessDetails](BusinessDetails.key)
               } yield {
@@ -75,10 +77,11 @@ class LettersAddressController @Inject () (
                     businessDetails.altCorrespondenceAddress(false).copy(correspondenceAddress = None, correspondenceAddressIsUk = None)
                   case false =>
                     businessDetails.altCorrespondenceAddress(true)
-                })
-
-                getRouting(data.lettersAddress, edit)
-              }).getOrElse(Redirect(routes.ConfirmRegisteredOfficeController.get(edit)))
+                }) map {
+                  _ => getRouting(data.lettersAddress, edit)
+                }
+              }
+              result getOrElse Future.successful(Redirect(routes.ConfirmRegisteredOfficeController.get(edit)))
           }
       }
   }

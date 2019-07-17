@@ -17,9 +17,7 @@
 package controllers.businessdetails
 
 import connectors.DataCacheConnector
-import models.{Country, DateOfChange}
 import models.businessdetails._
-import org.joda.time.LocalDate
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Matchers._
@@ -49,7 +47,9 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar {
   }
 
   private val ukAddress = RegisteredOfficeUK("line_1", "line_2", Some(""), Some(""), "AA1 1AA")
-  private val businessDetails = BusinessDetails(None, None, None, None, None, None, Some(ukAddress), None)
+  private val businessDetails = BusinessDetails(None, None, None, None, None, None, Some(ukAddress), None,
+    correspondenceAddressIsUk = Some(CorrespondenceAddressIsUk(true)),
+    correspondenceAddress = Some(CorrespondenceAddress(Some(CorrespondenceAddressUk("", "", "", "", Some(""), Some(""), "")), None)))
 
   "ConfirmRegisteredOfficeController" must {
 
@@ -103,11 +103,19 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar {
           "lettersAddress" -> "true"
         )
 
-        val completeBusinessDetails = BusinessDetails(Some(PreviouslyRegisteredNo),
-          Some(ActivityStartDate(new LocalDate())), Some(VATRegisteredNo),
-          Some(CorporationTaxRegisteredNo), Some(ContactingYou(Some(""), Some(""))),
-          Some(RegisteredOfficeIsUK(true)), Some(ukAddress), Some(true), Some(CorrespondenceAddressIsUk(true)),
-          Some(CorrespondenceAddress(Some(CorrespondenceAddressUk("", "", "", "", Some(""), Some(""), "")), None)), false, false)
+        val completeBusinessDetails = BusinessDetails(
+          registeredOfficeIsUK = Some(RegisteredOfficeIsUK(true)),
+          registeredOffice = Some(ukAddress),
+          altCorrespondenceAddress = Some(true),
+          correspondenceAddressIsUk = Some(CorrespondenceAddressIsUk(true)),
+          correspondenceAddress = Some(CorrespondenceAddress(Some(CorrespondenceAddressUk("", "", "", "", Some(""), Some(""), "")), None)))
+
+        val expectedBusinessDetails = completeBusinessDetails.copy(altCorrespondenceAddress = Some(false),
+          correspondenceAddressIsUk = None,
+          correspondenceAddress = None,
+          hasChanged = true,
+          hasAccepted = false
+        )
 
         when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -116,15 +124,44 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar {
           .thenReturn(Some(completeBusinessDetails))
 
         when(controller.dataCache.save[BusinessDetails](meq(BusinessDetails.key), any[BusinessDetails])(any(), any(), any()))
-          .thenReturn(Future.successful(mock[CacheMap]))
+          .thenReturn(Future.successful(mockCacheMap))
 
         val result = controller.post()(newRequest)
 
         val captor = ArgumentCaptor.forClass(classOf[BusinessDetails])
         verify(controller.dataCache).save[BusinessDetails](meq(BusinessDetails.key), captor.capture())(any(), any(), any())
 
-        captor.getValue.altCorrespondenceAddress match {
-          case Some(address) => address must be(false)
+        captor.getValue match {
+          case bd: BusinessDetails => bd must be(expectedBusinessDetails)
+        }
+      }
+
+      "keep the data for following questions if 'No' [this is letters address]" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "lettersAddress" -> "false"
+        )
+
+        when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
+          .thenReturn(Some(businessDetails))
+
+        when (controller.dataCache.save(any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+
+        val captor = ArgumentCaptor.forClass(classOf[BusinessDetails])
+        verify(controller.dataCache).save[BusinessDetails](meq(BusinessDetails.key), captor.capture())(any(), any(), any())
+
+        captor.getValue.correspondenceAddressIsUk match {
+          case Some(isUk) => isUk mustBe CorrespondenceAddressIsUk(true)
+        }
+
+        captor.getValue.correspondenceAddress match {
+          case Some(correspondenceAddress) => correspondenceAddress.ukAddress mustBe defined
         }
       }
 
@@ -145,6 +182,13 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar {
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.businessdetails.routes.CorrespondenceAddressIsUkController.get().url))
+
+        val captor = ArgumentCaptor.forClass(classOf[BusinessDetails])
+        verify(controller.dataCache).save[BusinessDetails](meq(BusinessDetails.key), captor.capture())(any(), any(), any())
+
+        captor.getValue.correspondenceAddressIsUk match {
+          case Some(isUk) => isUk mustBe CorrespondenceAddressIsUk(true)
+        }
       }
 
 
