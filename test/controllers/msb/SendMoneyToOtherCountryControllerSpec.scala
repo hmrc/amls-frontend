@@ -338,7 +338,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
     }
 
-    "redirect to the summary page" when {
+    "redirect to the CETransactionsInNext12Months page" when {
       "the application is registered as Currency Exchange, but it has not just been added to the application" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody("money" -> "false")
 
@@ -363,7 +363,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+        redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get().url)
       }
     }
 
@@ -467,7 +467,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.CETransactionsInNext12MonthsController.get(true).url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
     }
 
     "on valid post where the value is false in edit mode (CE, FX)" in new FalseInEditModeFixture {
@@ -477,7 +477,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.CETransactionsInNext12MonthsController.get(true).url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
     }
 
     "on valid post where the value is false in edit mode (FX)" in new FalseInEditModeFixture {
@@ -487,7 +487,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.FXTransactionsInNext12MonthsController.get(true).url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
     }
 
     "on valid post where the value is false in edit mode (Non-CE, Non-FX)" in new FalseInEditModeFixture {
