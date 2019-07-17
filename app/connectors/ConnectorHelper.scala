@@ -20,7 +20,7 @@ import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolments}
 import uk.gov.hmrc.domain.{CtUtr, Org, SaUtr}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.{CtAccount, OrgAccount, SaAccount}
-import utils.UrlSafe
+import utils.UrlHelper
 
 object ConnectorHelper {
 
@@ -57,7 +57,7 @@ object ConnectorHelper {
      */
 
     affinityGroup match {
-      case AffinityGroup.Organisation => ("org", UrlSafe.hash(credId))
+      case AffinityGroup.Organisation => ("org", UrlHelper.hash(credId))
       case _ =>
 
         val sa = for {

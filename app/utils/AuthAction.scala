@@ -58,7 +58,7 @@ class DefaultAuthAction @Inject() (
       Some(request.session)
     )
 
-    Logger.debug("DefaultAuthAction calling authorised(User) - User: " + User)
+    Logger.debug("DefaultAuthAction calling authorised(Admin) - Admin: " + Admin)
 
     authorised(Admin).retrieve(
       Retrievals.allEnrolments and

@@ -23,7 +23,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.play.frontend.auth.connectors.domain._
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser, Principal}
-import utils.UrlSafe
+import utils.UrlHelper
 
 class ConnectorHelperSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
@@ -100,7 +100,7 @@ class ConnectorHelperSpec extends PlaySpec with MockitoSugar with ScalaFutures {
           Enrolment("ORG", Seq(EnrolmentIdentifier("UTR", "org")), "Activated")
         ))
 
-        ConnectorHelper.accountTypeAndIdFromEnrolments(affinityGroup, enrolments, credId) must be(("org", UrlSafe.hash(credId)))
+        ConnectorHelper.accountTypeAndIdFromEnrolments(affinityGroup, enrolments, credId) must be(("org", UrlHelper.hash(credId)))
       }
     }
 
