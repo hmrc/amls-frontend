@@ -51,8 +51,8 @@ object Conversions {
       val hvdSection = request.hvdSection flatMap { hvd =>
         Some(hvd.copy(
           percentageOfCashPaymentOver15000 = renewal.percentageOfCashPaymentOver15000 contramap PercentageOfCashPaymentOver15000.convert,
-          receiveCashPayments = Some((renewal.receiveCashPayments contramap ReceiveCashPayments.convert).isDefined),
-          cashPaymentMethods = renewal.receiveCashPayments flatMap ReceiveCashPayments.convert
+          receiveCashPayments = Some((renewal.receiveCashPayments contramap CashPayments.convert).isDefined),
+          cashPaymentMethods = renewal.receiveCashPayments flatMap CashPayments.convert
         ))
       }
       request.copy(businessActivitiesSection = baSection, msbSection = msbSection, hvdSection = hvdSection)

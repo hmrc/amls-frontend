@@ -29,7 +29,10 @@ class ReceiveCashPaymentsSpec extends PlaySpec {
 
     "roundtrip through form" in {
       val data = ReceiveCashPayments(Some(paymentMethods))
-      ReceiveCashPayments.formR.validate(ReceiveCashPayments.formW.writes(data)) mustEqual Valid(data)
+      val given = ReceiveCashPayments.formW.writes(data)
+      val gthen = ReceiveCashPayments.formR.validate(given)
+      val expected = Valid(data)
+      gthen mustEqual expected
     }
 
     "roundtrip through json" in {

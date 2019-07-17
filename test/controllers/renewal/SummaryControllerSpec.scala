@@ -71,7 +71,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       Some(AMLSTurnover.First),
       Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
       Some(PercentageOfCashPaymentOver15000.First),
-      Some(ReceiveCashPayments(Some(PaymentMethods(true,true,Some("other"))))),
+      Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other")))))),
       Some(TotalThroughput("01")),
       Some(WhichCurrencies(Seq("EUR"),None,Some(MoneySources(None,None,None)))),
       Some(TransactionsInLast12Months("1500")),

@@ -43,7 +43,7 @@ class SendMoneyToOtherCountrySpec extends PlaySpec {
       "fail validation on missing field" in {
 
         SendMoneyToOtherCountry.formRule.validate(Map.empty) must be(Invalid(
-          Seq( Path \ "money" -> Seq(ValidationError("error.required.msb.send.money")))))
+          Seq( Path \ "money" -> Seq(ValidationError("error.required.renewal.send.money")))))
       }
 
       "successfully write form data" in {
