@@ -16,18 +16,19 @@
 
 package controllers.businessactivities
 
-import controllers.BaseController
+import controllers.DefaultBaseController
 import javax.inject.Inject
 import models.status._
 import services.StatusService
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.businessactivities._
 
-class WhatYouNeedController @Inject()(val authConnector: AuthConnector, statusService: StatusService) extends BaseController {
+class WhatYouNeedController @Inject()(val authConnector: AuthConnector, statusService: StatusService, authAction: AuthAction, implicit val ac: AuthContext) extends DefaultBaseController {
 
-  def get = Authorised.async {
-    implicit authContext => implicit request =>
-
+  def get = authAction.async {
+    implicit request =>
       statusService.getStatus map { status =>
         val nextPageUrl = status match {
           case NotCompleted | SubmissionReady | SubmissionReadyForReview =>
