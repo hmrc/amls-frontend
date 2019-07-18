@@ -17,6 +17,7 @@
 package controllers.businessactivities
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.businessactivities.{BusinessActivities, IdentifySuspiciousActivity}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -39,7 +40,7 @@ class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSug
 
     val controller = new IdentifySuspiciousActivityController (
       dataCacheConnector = mock[DataCacheConnector],
-      authConnector = self.authConnector
+      SuccessfulAuthAction
     )
   }
 
@@ -48,7 +49,7 @@ class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSug
     "get is called" must {
       "display the Identify suspicious activity page with an empty form" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -63,7 +64,7 @@ class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSug
 
       "display the identify suspicious activity page with pre populated data" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(BusinessActivities(
             identifySuspiciousActivity = Some(IdentifySuspiciousActivity(true))
           ))))

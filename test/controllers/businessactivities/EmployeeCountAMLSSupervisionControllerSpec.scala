@@ -17,6 +17,7 @@
 package controllers.businessactivities
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.businessactivities.{BusinessActivities, HowManyEmployees}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -35,7 +36,7 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
     self => val request = addToken(authRequest)
     val controller = new EmployeeCountAMLSSupervisionController (
       dataCacheConnector = mock[DataCacheConnector],
-      authConnector = self.authConnector
+      SuccessfulAuthAction
     )
   }
 
@@ -46,7 +47,7 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
     "get is called" must {
       "display the how many employees work on activities covered by AMLS page with an empty form" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -59,7 +60,7 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
 
       "display the how many employees work on activities covered by AMLS page with pre populated data" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(BusinessActivities(howManyEmployees = Some(HowManyEmployees(Some("163"), Some("17")))))))
 
         val result = controller.get()(request)

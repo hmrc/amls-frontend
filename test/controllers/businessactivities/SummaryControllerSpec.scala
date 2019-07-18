@@ -17,15 +17,16 @@
 package controllers.businessactivities
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businessactivities._
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
-import models.status.{SubmissionDecisionApproved, NotCompleted}
+import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
+import utils.AmlsSpec
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -40,7 +41,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
     val controller = new SummaryController (
       dataCache = mock[DataCacheConnector],
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       statusService = mock[StatusService]
     )
 
@@ -188,7 +189,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
         val newRequest = request.withFormUrlEncodedBody( "hasAccepted" -> "true")
 
-        when(controller.dataCache.fetch[BusinessActivities](any())(any(), any(), any()))
+        when(controller.dataCache.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(completeModel.copy(hasAccepted = false))))
 
         when(controller.dataCache.save[BusinessActivities](eqTo(BusinessActivities.key), any())(any(), any(), any()))

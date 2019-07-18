@@ -17,6 +17,7 @@
 package controllers.businessactivities
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businessactivities.{BusinessActivities, NonUkAccountantsAddress, WhoIsYourAccountant}
 import org.jsoup.Jsoup
@@ -42,7 +43,7 @@ class WhoIsYourAccountantControllerSpec extends AmlsSpec
 
     val controller = new WhoIsYourAccountantController (
       dataCacheConnector = mock[DataCacheConnector],
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       autoCompleteService = mockAutoComplete
     )
   }
@@ -56,7 +57,7 @@ class WhoIsYourAccountantControllerSpec extends AmlsSpec
     "get is called" must {
       "show the who is your accountant page with default UK address selected when there is no existing data" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -77,7 +78,7 @@ class WhoIsYourAccountantControllerSpec extends AmlsSpec
 
       "show the who is your accountant page when there is existing data" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(BusinessActivities(
             whoIsYourAccountant = Some(WhoIsYourAccountant(
               "testname",

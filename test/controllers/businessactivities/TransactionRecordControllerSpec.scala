@@ -17,12 +17,13 @@
 package controllers.businessactivities
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.businessactivities._
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo, any}
+import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -36,7 +37,7 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
     self =>
 
     val request = addToken(authRequest)
-    val controller = new TransactionRecordController(self.authConnector, mockCacheConnector)
+    val controller = new TransactionRecordController(SuccessfulAuthAction, mockCacheConnector)
 
     mockCacheSave[BusinessActivities]
   }

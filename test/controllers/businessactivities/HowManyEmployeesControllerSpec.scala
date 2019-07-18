@@ -18,6 +18,7 @@ package controllers.businessactivities
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.businessactivities.{BusinessActivities, HowManyEmployees}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -25,7 +26,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -40,7 +41,7 @@ class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with Sca
     self => val request = addToken(authRequest)
     val controller = new HowManyEmployeesController (
       dataCacheConnector = mock[DataCacheConnector],
-      authConnector = self.authConnector
+      SuccessfulAuthAction
     )
   }
 
@@ -51,7 +52,7 @@ class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with Sca
     "get is called" must {
       "display the how many employees page with an empty form" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -64,7 +65,7 @@ class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
       "display the how many employees page with pre populated data" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(BusinessActivities(howManyEmployees = Some(HowManyEmployees(Some("163"), Some("17")))))))
 
         val result = controller.get()(request)

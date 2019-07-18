@@ -17,6 +17,7 @@
 package controllers.businessactivities
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.businessactivities.{BusinessActivities, InvolvedInOtherYes}
 import models.businessmatching.{BusinessActivities => BMActivities, _}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
@@ -26,7 +27,7 @@ import org.mockito.Mockito._
 import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
@@ -44,7 +45,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
      val controller = new InvolvedInOtherController (
        dataCacheConnector = mock[DataCacheConnector],
-       authConnector = self.authConnector,
+       authAction = SuccessfulAuthAction,
        statusService = mock[StatusService]
     )
   }
@@ -148,7 +149,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
               "details" -> "test"
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
               .thenReturn(Future.successful(None))
 
             when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
@@ -165,7 +166,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
               "details" -> "test"
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
               .thenReturn(Future.successful(Some(BusinessActivities())))
 
             when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
@@ -182,7 +183,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
               "involvedInOther" -> "false"
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
               .thenReturn(Future.successful(None))
 
             when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
@@ -199,7 +200,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
               "involvedInOther" -> "false"
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
               .thenReturn(Future.successful(Some(BusinessActivities())))
 
             when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
@@ -218,7 +219,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
               "details" -> "test"
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
               .thenReturn(Future.successful(None))
 
             when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
@@ -235,7 +236,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
               "involvedInOther" -> "false"
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
               .thenReturn(Future.successful(None))
 
             when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))

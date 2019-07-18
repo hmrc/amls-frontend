@@ -17,20 +17,20 @@
 package controllers.businessactivities
 
 import connectors.DataCacheConnector
-import models.businessactivities.{ExpectedBusinessTurnover, BusinessActivities}
+import controllers.actions.SuccessfulAuthAction
+import models.businessactivities.{BusinessActivities, ExpectedBusinessTurnover}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
-
 
 import scala.concurrent.Future
 
@@ -41,7 +41,7 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
 
     val controller = new ExpectedBusinessTurnoverController (
       dataCacheConnector = mock[DataCacheConnector],
-      authConnector = self.authConnector,
+      SuccessfulAuthAction,
       statusService = mock[StatusService]
     )
   }
