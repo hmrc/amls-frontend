@@ -192,6 +192,7 @@ error.required.ba.business.use.accountant = Select yes if your business receives
 error.required.ba.suspicious.activity = Select yes if your business has written guidance for staff on how to report suspicious activity
 error.required.ba.tax.matters = Select yes if your professional adviser also manages your tax affairs with HMRC
 error.required.ba.advisor.name = Enter your professional adviser’s name
+error.required.ba.select.yes = Select yes if you had customers who lived or worked outside of the UK in the last 12 months
 
 ###############################  Trading premises ###############################
 error.required.tp.activity.your.business.do = Select one or more options to show what your business does at these premises
@@ -402,6 +403,8 @@ error.required.deregistration.reason = You must select a reason for de-registeri
 error.required.deregistration.reason.other = You haven’t specified the reason for de-registering the business. Enter the reason for de-registering
 
 error.updateanyInformation.validationerror = Select yes if you want to update any other information
+
+error.required.ba.renewal.select.yes = Select yes if you had customers who lived or worked outside of the UK in the last 12 months
 
 ################################# Declaration #####################################
 error.required.declaration.nominated.officer = Select one of your responsible people or register someone else as the nominated officer for the business
@@ -1487,7 +1490,7 @@ businessactivities.ncaRegistered.p2 = You’re not legally required to register.
 
 businessactivities.customer.outside.uk.title = Do you have customers who live or work outside of the UK?
 businessactivities.high.value.customer.lbl = Where do these customers live or work?
-businessactivities.high.value.customer.lbl.hint = List up to 10 countries. Include countries for customers who bring in the most revenue to your business.
+businessactivities.high.value.customer.lbl.hint = List up to 10 countries. If there are more than 10, list the countries for the customers who brought in the most revenue.
 businessactivities.upto.10.countries = List up to 10 countries.
 businessactivities.accountantForAMLSRegulations.title = Does your business receive professional advice on Money Laundering Regulations and due diligence?
 businessactivities.accountantForAMLSRegulations.subtext = This only applies to guidance from a professional adviser who is not part of your business, like an accountant.
@@ -2181,6 +2184,8 @@ renewal.involvedinother.listline3 = selling software packages
 
 
 renewal.customer.outside.uk.title = In the last 12 months did you have customers who lived or worked outside of the UK?
+renewal.customer.outside.uk.countries.title = Which countries did these customers live or work in?
+renewal.customer.outside.uk.countries.text = You’ve told us you have customers who lived or worked outside of the UK in the last 12 months.
 
 renewal.turnover.title.single.service = How much total net profit did your business make in the last 12 months from the following service?
 renewal.turnover.title = How much total net profit did your business make from services registered for anti-money laundering supervision in the last 12 months?
