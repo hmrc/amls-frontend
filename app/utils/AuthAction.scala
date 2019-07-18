@@ -21,7 +21,6 @@ import java.net.URLEncoder
 import config.ApplicationConfig
 import javax.inject.Inject
 import models.ReturnLocation
-import play.api.Logger
 import play.api.mvc._
 import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.auth.core._
@@ -36,7 +35,10 @@ final case class AuthorisedRequest[A](request: Request[A],
                                       amlsRefNumber: Option[String],
                                       cacheId: String,
                                       affinityGroup: AffinityGroup,
-                                      enrolments: Enrolments) extends WrappedRequest[A](request)
+                                      enrolments: Enrolments,
+                                      accountTypeId: (String, String)) extends WrappedRequest[A](request)
+
+final case class enrolmentNotFound(msg: String = "enrolmentNotFound") extends AuthorisationException(msg)
 
 class DefaultAuthAction @Inject() (
                              val authConnector: AuthConnector
@@ -44,21 +46,14 @@ class DefaultAuthAction @Inject() (
 
   private val amlsKey = "HMRC-MLR-ORG"
   private val amlsNumberKey = "MLRRefNumber"
-
   private lazy val unauthorisedUrl = URLEncoder.encode(
     ReturnLocation(controllers.routes.AmlsController.unauthorised_role()).absoluteUrl, "utf-8"
   )
-
   def signoutUrl = s"${ApplicationConfig.logoutUrl}?continue=$unauthorisedUrl"
 
   override final protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] = {
 
-    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(
-      request.headers,
-      Some(request.session)
-    )
-
-    Logger.debug("DefaultAuthAction calling authorised(Admin) - Admin: " + Admin)
+    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
 
     authorised(Admin).retrieve(
       Retrievals.allEnrolments and
@@ -66,24 +61,71 @@ class DefaultAuthAction @Inject() (
       Retrievals.affinityGroup
     ) {
       case enrolments ~ Some(credentials) ~ Some(affinityGroup) =>
-
-        val amlsRefNumber = for {
-          enrolment      <- enrolments.getEnrolment(amlsKey)
-          amlsIdentifier <- enrolment.getIdentifier(amlsNumberKey)
-        } yield amlsIdentifier.value
-
-        Logger.debug(s"DefaultAuthAction calling authorised(User) - success")
-        Future.successful(Right(AuthorisedRequest(request, amlsRefNumber, credentials.providerId, affinityGroup, enrolments)))
+        Future.successful(
+          Right(
+            AuthorisedRequest(
+              request,
+              amlsRefNumber(getMlrEnrolment(enrolments)),
+              credentials.providerId,
+              affinityGroup,
+              enrolments,
+              accountTypeAndId(affinityGroup, enrolments, credentials.providerId)
+            )
+          )
+        )
       case _ =>
         Future.successful(Left(Redirect(Call("GET", signoutUrl))))
     }.recover[Either[Result, AuthorisedRequest[A]]] {
+      case _: NoActiveSession =>
+        Left(Redirect(Call("GET", signoutUrl)))
+      case _: InsufficientEnrolments =>
+        Left(Redirect(Call("GET", signoutUrl)))
+      case _: InsufficientConfidenceLevel =>
+        Left(Redirect(Call("GET", signoutUrl)))
+      case _: UnsupportedAuthProvider =>
+        Left(Redirect(Call("GET", signoutUrl)))
+      case _: UnsupportedAffinityGroup =>
+        Left(Redirect(Call("GET", signoutUrl)))
+      case _: UnsupportedCredentialRole =>
+        Left(Redirect(Call("GET", signoutUrl)))
+      case _: enrolmentNotFound =>
+        Left(Redirect(Call("GET", signoutUrl)))
       case e : AuthorisationException =>
-        Logger.debug("DefaultAuthAction calling authorised(User) - fail with exception: " + e)
         Left(Redirect(Call("GET", signoutUrl)))
     }
   }
-}
 
+  private def getMlrEnrolment(enrolments: Enrolments) = {
+    enrolments.getEnrolment(amlsKey).getOrElse(throw new enrolmentNotFound)
+  }
+
+  private def amlsRefNumber(enrolment: Enrolment) = {
+    for {
+      amlsIdentifier <- enrolment.getIdentifier(amlsNumberKey)
+    } yield amlsIdentifier.value
+  }
+
+  private def accountTypeAndId(affinityGroup: AffinityGroup,
+                               enrolments: Enrolments,
+                               credId: String) = {
+    affinityGroup match {
+      case AffinityGroup.Organisation => ("org", UrlHelper.hash(credId))
+      case _ =>
+
+        val sa = for {
+          enrolment <- enrolments.getEnrolment("IR-SA")
+          utr       <- enrolment.getIdentifier("UTR")
+        } yield "sa" -> utr.value
+
+        val ct = for {
+          enrolment <- enrolments.getEnrolment("IR-CT")
+          utr       <- enrolment.getIdentifier("UTR")
+        } yield "ct" -> utr.value
+
+        (sa orElse ct).getOrElse(throw new enrolmentNotFound)
+    }
+  }
+}
 
 @com.google.inject.ImplementedBy(classOf[DefaultAuthAction])
 trait AuthAction extends ActionRefiner[Request, AuthorisedRequest] with ActionBuilder[AuthorisedRequest]
