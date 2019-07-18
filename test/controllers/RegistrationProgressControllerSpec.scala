@@ -34,6 +34,7 @@ import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, ProgressService, SectionsProvider}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
@@ -464,7 +465,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           val sections = Seq(models.moneyservicebusiness.MoneyServiceBusiness.section)
 
           when {
-            controller.sectionsProvider.sections(any())
+            controller.sectionsProvider.sections(any[CacheMap])
           } thenReturn sections
 
           val newSections = Set(

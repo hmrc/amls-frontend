@@ -86,11 +86,11 @@ class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSug
           "hasWrittenGuidance" -> "true"
         )
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(CacheMap(BusinessActivities.key, Map("" -> Json.obj()))))
+        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(CacheMap(BusinessActivities.key, Map("" -> Json.obj()))))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -115,11 +115,11 @@ class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSug
           "hasWrittenGuidance" -> "true"
         )
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(CacheMap(BusinessActivities.key, Map("" -> Json.obj()))))
+        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(CacheMap(BusinessActivities.key, Map("" -> Json.obj()))))
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)

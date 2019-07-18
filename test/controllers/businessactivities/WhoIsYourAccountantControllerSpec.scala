@@ -115,7 +115,6 @@ class WhoIsYourAccountantControllerSpec extends AmlsSpec
 
           val result = controller.post()(request)
           status(result) must be(BAD_REQUEST)
-
         }
       }
 
@@ -133,11 +132,11 @@ class WhoIsYourAccountantControllerSpec extends AmlsSpec
             "postCode" -> "AA11AA"
           )
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-            (any(), any(), any())).thenReturn(Future.successful(None))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+            .thenReturn(Future.successful(None))
 
-          when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(true)(newRequest)
           status(result) must be(SEE_OTHER)
@@ -160,11 +159,11 @@ class WhoIsYourAccountantControllerSpec extends AmlsSpec
             "postCode" -> "AA11AA"
           )
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-            (any(), any(), any())).thenReturn(Future.successful(None))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+            .thenReturn(Future.successful(None))
 
-          when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(false)(newRequest)
           status(result) must be(SEE_OTHER)

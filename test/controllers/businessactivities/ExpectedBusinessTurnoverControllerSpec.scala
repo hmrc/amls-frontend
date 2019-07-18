@@ -41,7 +41,7 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
 
     val controller = new ExpectedBusinessTurnoverController (
       dataCacheConnector = mock[DataCacheConnector],
-      SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction,
       statusService = mock[StatusService]
     )
   }
@@ -53,8 +53,8 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
     "get is called" must {
       "display the Expected Business Turnover page with an empty form when there is no existing data" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[ExpectedBusinessTurnover](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.fetch[ExpectedBusinessTurnover](any(), any())(any(), any()))
+          .thenReturn(Future.successful(None))
 
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(NotCompleted))
@@ -80,8 +80,8 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(NotCompleted))
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(expectedBusinessTurnover = Some(ExpectedBusinessTurnover.First)))))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          .thenReturn(Future.successful(Some(BusinessActivities(expectedBusinessTurnover = Some(ExpectedBusinessTurnover.First)))))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -112,11 +112,11 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
             "expectedBusinessTurnover" -> "01"
           )
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-            (any(), any(), any())).thenReturn(Future.successful(None))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+            .thenReturn(Future.successful(None))
 
-          when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(false)(newRequest)
           status(result) must be(SEE_OTHER)
@@ -129,11 +129,11 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
             "expectedBusinessTurnover" -> "01"
           )
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-            (any(), any(), any())).thenReturn(Future.successful(None))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+            .thenReturn(Future.successful(None))
 
-          when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(true)(newRequest)
           status(result) must be(SEE_OTHER)

@@ -97,7 +97,7 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
           when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post()(newRequest)
@@ -121,7 +121,7 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
           when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post()(newRequest)
@@ -146,7 +146,7 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
           when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post()(newRequest)
@@ -170,7 +170,7 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
           when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post()(newRequest)
@@ -184,11 +184,11 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
             val newRequest = request.withFormUrlEncodedBody(
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-              (any(), any(), any())).thenReturn(Future.successful(None))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(),any())(any(), any()))
+              .thenReturn(Future.successful(None))
 
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-              (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+              .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post()(newRequest)
             status(result) must be(BAD_REQUEST)
@@ -203,11 +203,11 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
               "hasPolicy" -> ""
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-              (any(), any(), any())).thenReturn(Future.successful(None))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(),any())(any(), any()))
+              .thenReturn(Future.successful(None))
 
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-              (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+              .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post()(newRequest)
             status(result) must be(BAD_REQUEST)
@@ -236,7 +236,7 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
           when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(true)(newRequest)
@@ -260,7 +260,7 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
           when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(true)(newRequest)
@@ -284,7 +284,7 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
           when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(true)(newRequest)

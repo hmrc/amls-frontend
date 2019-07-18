@@ -35,8 +35,8 @@ class TransactionTypesControllerSpec extends AmlsSpec
     val request = addToken(authRequest)
     val controller = new TransactionTypesController(SuccessfulAuthAction, mockCacheConnector)
 
-    mockCacheSave[BusinessActivities]
-    mockCacheFetch(Some(BusinessActivities()))
+    mockCacheSaveNewAuth[BusinessActivities]
+    mockCacheFetchNewAuth(Some(BusinessActivities()))
   }
 
   "get" when {
@@ -50,7 +50,7 @@ class TransactionTypesControllerSpec extends AmlsSpec
 
       "return OK status with a populated form" in new Fixture {
         val model = BusinessActivities(transactionRecordTypes = Some(TransactionTypes(Set(Paper))))
-        mockCacheFetch(Some(model))
+        mockCacheFetchNewAuth(Some(model))
 
         val result = controller.get()(request)
         status(result) mustBe OK
@@ -78,7 +78,7 @@ class TransactionTypesControllerSpec extends AmlsSpec
         redirectLocation(result) mustBe Some(controllers.businessactivities.routes.IdentifySuspiciousActivityController.get().url)
 
         val captor = ArgumentCaptor.forClass(classOf[BusinessActivities])
-        verify(mockCacheConnector).save[BusinessActivities](eqTo(BusinessActivities.key), captor.capture())(any(), any(), any())
+        verify(mockCacheConnector).save[BusinessActivities](any(), eqTo(BusinessActivities.key), captor.capture())(any(), any())
 
         captor.getValue.transactionRecordTypes mustBe
           Some(TransactionTypes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("example software"))))
@@ -106,7 +106,7 @@ class TransactionTypesControllerSpec extends AmlsSpec
         status(result) mustBe BAD_REQUEST
         contentAsString(result) must include(messages("businessactivities.do.keep.records"))
 
-        verify(mockCacheConnector, never).save[BusinessActivities](any(), any())(any(), any(), any())
+        verify(mockCacheConnector, never).save[BusinessActivities](any(), any(), any())(any(), any())
       }
     }
   }

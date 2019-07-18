@@ -20,16 +20,15 @@ import controllers.DefaultBaseController
 import javax.inject.Inject
 import models.status._
 import services.StatusService
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthAction
 import views.html.businessactivities._
 
-class WhatYouNeedController @Inject()(val authConnector: AuthConnector, statusService: StatusService, authAction: AuthAction, implicit val ac: AuthContext) extends DefaultBaseController {
+class WhatYouNeedController @Inject()(val authConnector: AuthConnector, statusService: StatusService, authAction: AuthAction) extends DefaultBaseController {
 
   def get = authAction.async {
     implicit request =>
-      statusService.getStatus map { status =>
+      statusService.getStatus(request.amlsRefNumber, request.affinityGroup, request.enrolments, request.cacheId) map { status =>
         val nextPageUrl = status match {
           case NotCompleted | SubmissionReady | SubmissionReadyForReview =>
             routes.InvolvedInOtherController.get().url

@@ -98,7 +98,7 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
           when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post()(newRequest)
@@ -138,10 +138,10 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
             val newRequest = request.withFormUrlEncodedBody(
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
               .thenReturn(Future.successful(None))
 
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post()(newRequest)
@@ -158,10 +158,10 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
               "riskassessments[1]" -> ""
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
               .thenReturn(Future.successful(None))
 
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post()(newRequest)
@@ -193,7 +193,7 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
           when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(true)(newRequest)

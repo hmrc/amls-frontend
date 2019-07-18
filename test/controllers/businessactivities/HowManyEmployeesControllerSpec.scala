@@ -93,11 +93,11 @@ class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with Sca
           "employeeCount" -> "456"
         )
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
@@ -110,11 +110,11 @@ class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with Sca
           "employeeCount" -> "54321"
         )
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(emptyCache))
 
         val resultTrue = controller.post(true)(newRequest)
         status(resultTrue) must be(SEE_OTHER)

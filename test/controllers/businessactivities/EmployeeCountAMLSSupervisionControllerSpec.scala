@@ -88,11 +88,11 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
           "employeeCountAMLSSupervision" -> "123"
         )
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
@@ -105,11 +105,11 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
           "employeeCountAMLSSupervision" -> "12345"
         )
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(emptyCache))
 
         val resultTrue = controller.post(true)(newRequest)
         status(resultTrue) must be(SEE_OTHER)

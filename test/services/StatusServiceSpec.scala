@@ -17,6 +17,7 @@
 package services
 
 import connectors.AmlsConnector
+import controllers.actions.SuccessfulAuthAction
 import models.ReadStatusResponse
 import models.registrationprogress.{Completed, NotStarted, Section}
 import models.status._

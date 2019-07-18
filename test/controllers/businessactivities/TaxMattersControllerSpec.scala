@@ -88,14 +88,11 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
           "manageYourTaxAffairs" -> "true"
         )
 
-        when(
-          controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any())
-        ).thenReturn(Future.successful(None))
-        when(
-          controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any())
-        ).thenReturn(
-          Future.successful(CacheMap(BusinessActivities.key, Map("" -> Json.obj())))
-        )
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          .thenReturn(Future.successful(None))
+
+        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(CacheMap(BusinessActivities.key, Map("" -> Json.obj()))))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -125,15 +122,11 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
           "manageYourTaxAffairs" -> "true"
         )
 
-        when(
-          controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any())
-        ).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          .thenReturn(Future.successful(None))
 
-        when(
-          controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any())
-        ).thenReturn(
-          Future.successful(CacheMap(BusinessActivities.key, Map("" -> Json.obj())))
-        )
+        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(CacheMap(BusinessActivities.key, Map("" -> Json.obj()))))
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)

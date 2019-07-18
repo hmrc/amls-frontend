@@ -32,4 +32,8 @@ trait StatusMocks extends MockitoSugar {
     service.getStatus(any(), any(), any())
   } thenReturn Future.successful(status)
 
+  def mockApplicationStatusNewAuth(status: SubmissionStatus)(implicit service: StatusService) = when {
+    service.getStatus(any(), any(), any(), any())(any(), any())
+  } thenReturn Future.successful(status)
+
 }

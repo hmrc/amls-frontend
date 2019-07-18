@@ -85,7 +85,7 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar {
         when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(true)(newRequest)
@@ -99,7 +99,7 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar {
         when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(false)(newRequest)
@@ -117,7 +117,7 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar {
       when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
         .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+      when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
@@ -132,7 +132,7 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar {
       when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
         .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+      when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(false)(newRequest)

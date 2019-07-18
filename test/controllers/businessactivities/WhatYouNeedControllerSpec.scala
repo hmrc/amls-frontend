@@ -22,7 +22,6 @@ import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
@@ -35,7 +34,6 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
     val controller = new WhatYouNeedController(
       authAction = SuccessfulAuthAction,
       statusService = mockStatusService,
-      ac = mock[AuthContext],
       authConnector = mock[AuthConnector])
   }
 
@@ -43,7 +41,7 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
     "get" must {
       "load the page with the correct 'next page' link" when {
         "creating a new submission" in new Fixture {
-          mockApplicationStatus(SubmissionReadyForReview)
+          mockApplicationStatusNewAuth(SubmissionReadyForReview)
 
           val result = controller.get(request)
           status(result) must be(OK)
@@ -54,7 +52,7 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
         }
 
         "performing a variation" in new Fixture {
-          mockApplicationStatus(SubmissionDecisionApproved)
+          mockApplicationStatusNewAuth(SubmissionDecisionApproved)
 
           val result = controller.get(request)
           status(result) must be(OK)
@@ -65,7 +63,7 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
         }
 
         "in a renewal pending status" in new Fixture {
-          mockApplicationStatus(ReadyForRenewal(None))
+          mockApplicationStatusNewAuth(ReadyForRenewal(None))
 
           val result = controller.get(request)
           status(result) must be(OK)
@@ -76,7 +74,7 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
         }
 
         "in a renewal submitted status" in new Fixture {
-          mockApplicationStatus(RenewalSubmitted(None))
+          mockApplicationStatusNewAuth(RenewalSubmitted(None))
 
           val result = controller.get(request)
           status(result) must be(OK)

@@ -76,7 +76,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
-      when(controller.dataCache.fetchAll(any(), any()))
+      when(controller.dataCache.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -94,7 +94,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
-      when(controller.dataCache.fetchAll(any(), any()))
+      when(controller.dataCache.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -109,7 +109,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
     "show edit link for involved in other, turnover expected from activities and amls turnover expected page" when {
       "application in variation mode" in new Fixture {
-        when(controller.dataCache.fetchAll(any(), any()))
+        when(controller.dataCache.fetchAll(any())(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -134,7 +134,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
     "show edit link" when {
       "application not in variation mode" in new Fixture {
-        when(controller.dataCache.fetchAll(any(), any()))
+        when(controller.dataCache.fetchAll(any())(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -159,7 +159,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
     "pre load Business matching business activities data in " +
       "'How much total net profit does your business expect in the next 12 months, from the following activities?'" in new Fixture {
 
-      when(controller.dataCache.fetchAll(any(), any()))
+      when(controller.dataCache.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -192,7 +192,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
         when(controller.dataCache.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(completeModel.copy(hasAccepted = false))))
 
-        when(controller.dataCache.save[BusinessActivities](eqTo(BusinessActivities.key), any())(any(), any(), any()))
+        when(controller.dataCache.save[BusinessActivities](any(), eqTo(BusinessActivities.key), any())(any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
