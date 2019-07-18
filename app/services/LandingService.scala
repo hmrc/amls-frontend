@@ -20,23 +20,23 @@ import cats.data.OptionT
 import cats.implicits._
 import com.google.inject.Inject
 import connectors.{AmlsConnector, BusinessMatchingConnector, DataCacheConnector, KeystoreConnector}
-import models.businessdetails.BusinessDetails
+import models._
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.{BusinessActivities, ExpectedAMLSTurnover, ExpectedBusinessTurnover}
 import models.businesscustomer.ReviewDetails
+import models.businessdetails.BusinessDetails
 import models.businessmatching.{BusinessMatching, BusinessActivities => BMActivities}
 import models.declaration.AddPerson
 import models.estateagentbusiness.EstateAgentBusiness
-import models.hvd.Hvd
+import models.hvd.{Hvd, ReceiveCashPayments}
 import models.moneyservicebusiness.{MostTransactions => _, SendTheLargestAmountsOfMoney => _, WhichCurrencies => _, _}
-import models.renewal.{ReceiveCashPayments, _}
+import models.renewal._
 import models.responsiblepeople.ResponsiblePerson
 import models.status.RenewalSubmitted
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import models._
 import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -255,7 +255,7 @@ class LandingService @Inject() (
                              (implicit authContext: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
 
     import models.businessactivities.{InvolvedInOther => BAInvolvedInOther}
-    import models.hvd.{PercentageOfCashPaymentOver15000 => HvdRPercentageOfCashPaymentOver15000, ReceiveCashPayments => HvdReceiveCashPayments}
+    import models.hvd.{PercentageOfCashPaymentOver15000 => HvdRPercentageOfCashPaymentOver15000}
     import models.moneyservicebusiness.{WhichCurrencies => MsbWhichCurrencies}
 
     for {
@@ -271,8 +271,8 @@ class LandingService @Inject() (
           percentageOfCashPaymentOver15000 = viewResponse.hvdSection.fold[Option[PercentageOfCashPaymentOver15000]](None)
             (_.percentageOfCashPaymentOver15000.map(p => HvdRPercentageOfCashPaymentOver15000.convert(p))),
 
-          receiveCashPayments = viewResponse.hvdSection.fold[Option[ReceiveCashPayments]](None) { hvd =>
-            hvd.receiveCashPayments.map(r => HvdReceiveCashPayments.convert(hvd))
+          receiveCashPayments = viewResponse.hvdSection.fold[Option[CashPayments]](None) { hvd =>
+            hvd.receiveCashPayments.map(r => ReceiveCashPayments.convert(hvd))
           },
 
           totalThroughput = viewResponse.msbSection.fold[Option[TotalThroughput]](None)(_.throughput.map(t => ExpectedThroughput.convert(t))),

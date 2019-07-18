@@ -84,7 +84,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         redirectLocation(result) mustBe Some(controllers.msb.routes.ExpectedThroughputController.get().url)
       }
 
-      "redirect to the branches or agents controller if not in pre-submission status" in new Fixture {
+      "redirect to the expected throughput page if not in pre-submission status" in new Fixture {
 
         when {
           mockStatusService.isPreSubmission(any(), any(), any())
@@ -92,7 +92,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
 
         val result = controller.post(request)
-        redirectLocation(result) mustBe Some(controllers.msb.routes.BranchesOrAgentsController.get().url)
+        redirectLocation(result) mustBe Some(controllers.msb.routes.ExpectedThroughputController.get().url)
       }
     }
   }

@@ -25,18 +25,10 @@ import utils.AuthAction
 import views.html.businessactivities._
 
 class WhatYouNeedController @Inject()(val authConnector: AuthConnector, statusService: StatusService, authAction: AuthAction) extends DefaultBaseController {
+import scala.concurrent.Future
 
   def get = authAction.async {
     implicit request =>
-      statusService.getStatus(request.amlsRefNumber, request.affinityGroup, request.enrolments, request.cacheId) map { status =>
-        val nextPageUrl = status match {
-          case NotCompleted | SubmissionReady | SubmissionReadyForReview =>
-            routes.InvolvedInOtherController.get().url
-          case _ =>
-            routes.BusinessFranchiseController.get().url
-        }
-
-        Ok(what_you_need(nextPageUrl))
-      }
+      Future.successful(Ok(what_you_need(routes.InvolvedInOtherController.get().url)))
   }
 }

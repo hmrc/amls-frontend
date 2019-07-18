@@ -18,8 +18,12 @@ package controllers.businessdetails
 
 import connectors.DataCacheConnector
 import models.businessdetails._
+import org.mockito.ArgumentCaptor
+import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfter
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
@@ -29,13 +33,19 @@ import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
-class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar {
+class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with BeforeAndAfter {
+
+  val dataCacheConnector = mock[DataCacheConnector]
+
+  before {
+    reset(dataCacheConnector)
+  }
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
     val controller = new LettersAddressController (
-      dataCache = mock[DataCacheConnector],
+      dataCache = dataCacheConnector,
       authConnector = self.authConnector
     )
 
@@ -45,14 +55,20 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar {
   }
 
   private val ukAddress = RegisteredOfficeUK("line_1", "line_2", Some(""), Some(""), "AA1 1AA")
-  private val businessDetails = BusinessDetails(None, None, None, None, None, None, Some(ukAddress), None)
+  private val businessDetails = BusinessDetails(None, None, None, None, None, None, Some(ukAddress), None,
+    correspondenceAddressIsUk = Some(CorrespondenceAddressIsUk(true)),
+    correspondenceAddress = Some(CorrespondenceAddress(Some(CorrespondenceAddressUk("", "", "", "", Some(""), Some(""), "")), None)))
+
+  private val completeBusinessDetails = BusinessDetails(
+    registeredOfficeIsUK = Some(RegisteredOfficeIsUK(true)),
+    registeredOffice = Some(ukAddress),
+    altCorrespondenceAddress = Some(true),
+    correspondenceAddressIsUk = Some(CorrespondenceAddressIsUk(true)),
+    correspondenceAddress = Some(CorrespondenceAddress(Some(CorrespondenceAddressUk("", "", "", "", Some(""), Some(""), "")), None)))
 
   "ConfirmRegisteredOfficeController" must {
-
-    "Get Option:" must {
-
+    "Get" must {
       "load register Office" in new Fixture {
-
         when(controller.dataCache.fetch[BusinessDetails](any())(any(),any(),any()))
           .thenReturn(Future.successful(Some(businessDetails)))
         val result = controller.get()(request)
@@ -60,30 +76,33 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar {
       }
 
       "load Registered office or main place of business when Business Address from mongoCache returns None" in new Fixture {
-
         when(controller.dataCache.fetch[BusinessDetails](any())(any(),any(),any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.businessdetails.routes.CorrespondenceAddressIsUkController.get().url))
-
       }
     }
 
     "Post" must {
-
-      "successfully redirect to the page on selection of 'Yes' [this is letters address]" in new Fixture {
-
+      "remove the data for following questions and successfully redirect to the page on selection of 'Yes' [this is letters address]" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody(
           "lettersAddress" -> "true"
+        )
+
+        val expectedBusinessDetails = completeBusinessDetails.copy(altCorrespondenceAddress = Some(false),
+          correspondenceAddressIsUk = None,
+          correspondenceAddress = None,
+          hasChanged = true,
+          hasAccepted = false
         )
 
         when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
-          .thenReturn(Some(businessDetails))
+          .thenReturn(Some(completeBusinessDetails))
 
         when (controller.dataCache.save(any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
@@ -91,10 +110,16 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar {
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.businessdetails.routes.SummaryController.get().url))
+
+        val captor = ArgumentCaptor.forClass(classOf[BusinessDetails])
+        verify(controller.dataCache).save[BusinessDetails](meq(BusinessDetails.key), captor.capture())(any(), any(), any())
+
+        captor.getValue match {
+          case bd: BusinessDetails => bd must be(expectedBusinessDetails)
+        }
       }
 
-      "successfully redirect to the page on selection of Option 'No' [this is not letters address]" in new Fixture {
-
+      "keep the data and successfully redirect to the page on selection of Option 'No' [this is not letters address]" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody(
           "lettersAddress" -> "false"
         )
@@ -103,19 +128,30 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar {
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
-          .thenReturn(Some(businessDetails))
+          .thenReturn(Some(completeBusinessDetails))
 
         when (controller.dataCache.save(any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.businessdetails.routes.CorrespondenceAddressIsUkController.get().url))
+
+        val captor = ArgumentCaptor.forClass(classOf[BusinessDetails])
+        verify(controller.dataCache).save[BusinessDetails](meq(BusinessDetails.key), captor.capture())(any(), any(), any())
+
+        captor.getValue.correspondenceAddressIsUk match {
+          case Some(isUk) => isUk mustBe CorrespondenceAddressIsUk(true)
+        }
+
+        captor.getValue.correspondenceAddress match {
+          case Some(correspondenceAddress) => correspondenceAddress.ukAddress mustBe defined
+        }
       }
 
       "on post invalid data" in new Fixture {
-
         val newRequest = request.withFormUrlEncodedBody(
         )
+
         when(controller.dataCache.fetch[BusinessDetails](any())(any(),any(),any()))
           .thenReturn(Future.successful(Some(businessDetails)))
 
@@ -123,7 +159,6 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-
       }
 
       "on post with invalid data show error" in new Fixture {
@@ -137,11 +172,9 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-
       }
 
       "on post with no data" in new Fixture {
-
         val newRequest = request.withFormUrlEncodedBody(
         )
 
@@ -153,7 +186,6 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar {
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.businessdetails.routes.CorrespondenceAddressIsUkController.get().url))
-
       }
     }
   }

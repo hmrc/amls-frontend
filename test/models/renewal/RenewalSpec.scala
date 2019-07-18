@@ -29,7 +29,6 @@ class RenewalSpec extends AmlsSpec {
       val model = Renewal()
 
       Json.fromJson[Renewal](Json.toJson(model)) mustBe JsSuccess(model)
-
     }
 
   }

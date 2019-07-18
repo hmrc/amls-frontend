@@ -70,7 +70,7 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector,
               } yield {
                 cacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
                   msb.mostTransactions(Some(data))
-                ) flatMap {
+                ) map {
                   _ => routing(services.msbServices, register, msb, edit)
                 }
               }
@@ -80,38 +80,33 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector,
         }
   }
 
-  private def shouldAnswerCurrencyExchangeQuestions(
-                                                           msbServices: Set[BusinessMatchingMsbService],
-                                                           register: ServiceChangeRegister,
-                                                           isPreSubmission: Boolean,
-                                                           msb: MoneyServiceBusiness,
-                                                           edit: Boolean
-                                                   ): Boolean = {
+  private def shouldAnswerCurrencyExchangeQuestions(msbServices: Set[BusinessMatchingMsbService],
+                                                     register: ServiceChangeRegister,
+                                                     msb: MoneyServiceBusiness,
+                                                     edit: Boolean): Boolean = {
+
     currencyExchangeAddedPostSubmission(msbServices, register) ||
-            (isPreSubmission && msbServices.contains(CurrencyExchange) && (msb.ceTransactionsInNext12Months.isEmpty || !edit))
+            (msbServices.contains(CurrencyExchange) && (msb.ceTransactionsInNext12Months.isEmpty || !edit))
   }
 
-  private def shouldAnswerForeignExchangeQuestions(
-                                                          msbServices: Set[BusinessMatchingMsbService],
-                                                          register: ServiceChangeRegister,
-                                                          isPreSubmission: Boolean,
-                                                          msb: MoneyServiceBusiness,
-                                                          edit: Boolean
-                                                  ): Boolean = {
+  private def shouldAnswerForeignExchangeQuestions(msbServices: Set[BusinessMatchingMsbService],
+                                                    register: ServiceChangeRegister,
+                                                    msb: MoneyServiceBusiness,
+                                                    edit: Boolean): Boolean = {
+
     foreignExchangeAddedPostSubmission(msbServices, register) ||
-            (isPreSubmission && msbServices.contains(ForeignExchange) && (msb.fxTransactionsInNext12Months.isEmpty || !edit))
+            (msbServices.contains(ForeignExchange) && (msb.fxTransactionsInNext12Months.isEmpty || !edit))
   }
 
   private def routing(msbServices: Set[BusinessMatchingMsbService], register: ServiceChangeRegister, msb: MoneyServiceBusiness, edit: Boolean)
-                     (implicit hc: HeaderCarrier, auth: AuthContext): Future[Result] = {
-    statusService.isPreSubmission map { isPreSubmission =>
-      if (shouldAnswerCurrencyExchangeQuestions(msbServices, register, isPreSubmission, msb, edit)) {
-        Redirect(routes.CETransactionsInNext12MonthsController.get(edit))
-      } else if (shouldAnswerForeignExchangeQuestions(msbServices, register, isPreSubmission, msb, edit)) {
-        Redirect(routes.FXTransactionsInNext12MonthsController.get(edit))
-      } else {
-        Redirect(routes.SummaryController.get())
-      }
+                     (implicit hc: HeaderCarrier, auth: AuthContext) = {
+
+    if (shouldAnswerCurrencyExchangeQuestions(msbServices, register, msb, edit)) {
+      Redirect(routes.CETransactionsInNext12MonthsController.get(edit))
+    } else if (shouldAnswerForeignExchangeQuestions(msbServices, register, msb, edit)) {
+      Redirect(routes.FXTransactionsInNext12MonthsController.get(edit))
+    } else {
+      Redirect(routes.SummaryController.get())
     }
   }
 }

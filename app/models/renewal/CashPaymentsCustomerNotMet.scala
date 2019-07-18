@@ -16,27 +16,23 @@
 
 package models.renewal
 
-import jto.validation.forms._
+import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, Write}
-import play.api.libs.json.Json
 
-case class SendMoneyToOtherCountry(money: Boolean)
+case class CashPaymentsCustomerNotMet(receiveCashPayments: Boolean)
 
-object SendMoneyToOtherCountry {
+object CashPaymentsCustomerNotMet {
 
   import utils.MappingUtils.Implicits._
 
-  implicit val format =  Json.format[SendMoneyToOtherCountry]
-
-  implicit val formRule: Rule[UrlFormEncoded, SendMoneyToOtherCountry] = From[UrlFormEncoded] { __ =>
+  implicit val formRule: Rule[UrlFormEncoded, CashPaymentsCustomerNotMet] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    (__ \ "money").read[Boolean].withMessage("error.required.renewal.send.money") map SendMoneyToOtherCountry.apply
+    (__ \ "receiveCashPayments").read[Boolean].withMessage("error.required.renewal.hvd.receive.cash.payments") flatMap {
+      CashPaymentsCustomerNotMet.apply
+    }
   }
 
-  implicit val formWrites: Write[SendMoneyToOtherCountry, UrlFormEncoded] = Write {x =>
-    "money" -> x.money.toString
+  implicit def formWrites: Write[CashPaymentsCustomerNotMet, UrlFormEncoded] = Write {
+    case CashPaymentsCustomerNotMet(accepted) => Map("receiveCashPayments" -> Seq(accepted.toString))
   }
 }
-
-
-

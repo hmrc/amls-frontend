@@ -291,7 +291,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       }
     }
 
-    "redirect to Check Your Answers on valid submission when CE is available but has not just been added to the application " in new Fixture {
+    "redirect to CETransactionsInNext12Months on valid submission when CE is available but has not just been added to the application " in new Fixture {
 
       val msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
       val incomingModel = MoneyServiceBusiness()
@@ -321,7 +321,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       val result = controller.post()(newRequest)
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+      redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get().url)
     }
 
     "on valid submission (no edit) (non-CE, non-FE)" in new Fixture {

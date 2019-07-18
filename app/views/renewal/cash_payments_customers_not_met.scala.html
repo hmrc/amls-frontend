@@ -1,0 +1,70 @@
+@*
+ * Copyright 2019 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@header = {
+@components.back_link()
+@errorSummary(f)
+}
+
+@supportingContent = {
+    <p>@Messages("renewal.receiving.info.line1")</p>
+    <p>@Messages("renewal.receiving.info.line2")</p>
+
+    <ul class="list list-bullet">
+        <li>@Messages("renewal.receiving.list.line1")</li>
+        <li>@Messages("renewal.receiving.list.line2")</li>
+        <li>@Messages("renewal.receiving.list.line3")</li>
+    </ul>
+
+    <p>@Messages("renewal.receiving.text")</p>
+}
+
+@main(
+    title = Messages("renewal.receiving.title") + " - " + Messages("summary.renewal"),
+    heading = header
+) {
+
+    @form(f, controllers.renewal.routes.CashPaymentsCustomersNotMetController.post(edit)) {
+
+        @fieldsetWithErrorGroup(
+            f = f("receiveCashPayments"),
+            heading = "renewal.receiving.title",
+            section = "summary.renewal",
+            panel = false,
+            supportingContent = supportingContent,
+            classes = Seq("inline")
+        ) {
+            @radio(
+                f = f("receiveCashPayments"),
+                labelText = "lbl.yes",
+                value = "true"
+            )
+
+            @radio(
+                f = f("receiveCashPayments"),
+                labelText = "lbl.no",
+                value = "false"
+            )
+        }
+
+        @submit(edit, returnLocation = Some("renewal"))
+    }
+}
