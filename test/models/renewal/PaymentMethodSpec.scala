@@ -55,7 +55,7 @@ class PaymentMethodSpec extends PlaySpec {
       )
 
       PaymentMethods.formR.validate(data) must be(
-        Invalid(Seq((Path \ "details") -> Seq(ValidationError("error.invalid.renewal.hvd.describe.characters"))))
+        Invalid(Seq((Path \ "details") -> Seq(ValidationError("error.required.renewal.hvd.describe.invalid.characters"))))
       )
     }
   }

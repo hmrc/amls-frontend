@@ -23,7 +23,7 @@
 @(f: forms.Form2[_], model: Renewal, activities: Option[List[String]], bmMsbServices: Option[BusinessMatchingMsbServices], canSubmit: Boolean)(implicit request: Request[_], messages: Messages, lang: Lang)
 
 @header = {
-    @heading("title.cya", "summary.renewal")
+@heading("title.cya", "summary.renewal")
 }
 
 @main(
@@ -119,10 +119,10 @@
 
             @model.sendMoneyToOtherCountry.map { oc =>
                 @checkYourAnswers(
-                question = Messages("renewal.msb.send.money.title"),
-                editLinkTag = "msbsendmoney-edit",
-                editUrl = controllers.renewal.routes.SendMoneyToOtherCountryController.get(edit = true).url
-            )   {
+                    question = Messages("renewal.msb.send.money.title"),
+                    editLinkTag = "msbsendmoney-edit",
+                    editUrl = controllers.renewal.routes.SendMoneyToOtherCountryController.get(edit = true).url
+                )   {
                     <p>@oc.money match {
                         case true => { @Messages("lbl.yes") }
                         case false => { @Messages("lbl.no") }
@@ -137,9 +137,9 @@
                     editUrl = controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get(edit = true).toString
                 ) {
                     <ul class="list list--comma">
-                        @lom.countries.map { country =>
-                            <li>@country.name</li>
-                        }
+                    @lom.countries.map { country =>
+                        <li>@country.name</li>
+                    }
                     </ul>
                 }
             }
@@ -151,9 +151,9 @@
                     editUrl = controllers.renewal.routes.MostTransactionsController.get(edit = true).url
                 ) {
                     <ul class="list list--comma">
-                        @mt.countries.map { country =>
-                            <li>@country.name</li>
-                        }
+                    @mt.countries.map { country =>
+                        <li>@country.name</li>
+                    }
                     </ul>
                 }
             }
@@ -285,41 +285,52 @@
                 case PercentageOfCashPaymentOver15000.Third => {@Messages("hvd.percentage.lbl.03")}
                 case PercentageOfCashPaymentOver15000.Fourth => {@Messages("hvd.percentage.lbl.04")}
                 case PercentageOfCashPaymentOver15000.Fifth => {@Messages("hvd.percentage.lbl.05")}
-                }</p>
-            }
-        }
-
-        @model.receiveCashPayments.map { rcp =>
-            @checkYourAnswers(
-                question = Messages("renewal.receiving.title"),
-                editLinkTag = "receivecashpayments-edit",
-                editUrl = controllers.renewal.routes.ReceiveCashPaymentsController.get(true).toString
-            ) {
-                @rcp.paymentMethods match {
-                    case None => {<p>@Messages("lbl.no")</p>}
-                    case Some(pm:PaymentMethods) => {
-                        <p>@Messages("lbl.yes")</p>
-                        @checkYourAnswersExtra(
-                            question = Messages("renewal.receiving.expect.to.receive")
-                        ) {
-                            <ul class="list list--comma">
-                                <li>@pm match {
-                                    case PaymentMethods(false, false, None) => { Unknown }
-                                    case PaymentMethods(false, false, Some(txt)) => { @txt }
-                                    case PaymentMethods(false, true, None) => { @Messages("hvd.receiving.option.02") }
-                                    case PaymentMethods(false, true, Some(txt)) => { @Messages("hvd.receiving.option.02"), @txt }
-                                    case PaymentMethods(true, false, None) => { @Messages("hvd.receiving.option.01") }
-                                    case PaymentMethods(true, false, Some(txt)) => { @Messages("hvd.receiving.option.01"), @txt }
-                                    case PaymentMethods(true, true, None) => { @Messages("hvd.receiving.option.01"), @Messages("hvd.receiving.option.02") }
-                                    case PaymentMethods(true, true, Some(txt)) => { @Messages("hvd.receiving.option.01"), @Messages("hvd.receiving.option.02"), @txt }
-                                    }</li>
-                            </ul>
-                        }
-                    }
-                }
+            }</p>
         }
     }
 
+    @model.receiveCashPayments.map { rcp =>
+        @checkYourAnswers(
+            question = Messages("renewal.receiving.title"),
+            editLinkTag = "receivecashpayments-edit",
+            editUrl = controllers.renewal.routes.CashPaymentsCustomersNotMetController.get(true).toString
+        ) {
+            @rcp.cashPaymentsCustomerNotMet match {
+                case CashPaymentsCustomerNotMet(false) => {<p>@Messages("lbl.no")</p>}
+                case CashPaymentsCustomerNotMet(true) => {<p>@Messages("lbl.yes")</p>}
+            }
+        }
+    }
+
+
+
+
+    @model.receiveCashPayments.map { rcp =>
+        @rcp.howCashPaymentsReceived match {
+        case Some(HowCashPaymentsReceived(methods)) => {
+            @checkYourAnswers(
+                question = Messages("renewal.cash.payments.received.title"),
+                editLinkTag = "receivecashpaymentshowreceived-edit",
+                editUrl = controllers.renewal.routes.HowCashPaymentsReceivedController.get(true).toString
+            ) {
+                <ul class="list list-bullet">
+                    @if(methods.courier){
+                        <li>@Messages("hvd.receiving.option.01")</li>
+                    }
+
+                    @if(methods.direct){
+                        <li>@Messages("hvd.receiving.option.02")</li>
+                    }
+
+                    @if(methods.other.isDefined){
+                        <li>@methods.other.getOrElse("")</li>
+                    }
+                </ul>
+            }
+        }
+        case _ => { }
+        }
+    }
 
     @form(f, controllers.renewal.routes.SummaryController.post()) {
         @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)

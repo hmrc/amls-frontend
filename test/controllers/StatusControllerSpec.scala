@@ -36,8 +36,6 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.http.Status.OK
 import play.api.i18n.Messages
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.HttpResponse
@@ -560,7 +558,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
           Some(CustomersOutsideIsUK(true)),
           Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
           Some(PercentageOfCashPaymentOver15000.First),
-          Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
+          Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other")))))),
           Some(TotalThroughput("01")),
           Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
           Some(TransactionsInLast12Months("1500")),

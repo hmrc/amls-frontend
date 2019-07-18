@@ -23,20 +23,12 @@ import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessactivities._
 
+import scala.concurrent.Future
+
 class WhatYouNeedController @Inject()(val authConnector: AuthConnector, statusService: StatusService) extends BaseController {
 
   def get = Authorised.async {
     implicit authContext => implicit request =>
-
-      statusService.getStatus map { status =>
-        val nextPageUrl = status match {
-          case NotCompleted | SubmissionReady | SubmissionReadyForReview =>
-            routes.InvolvedInOtherController.get().url
-          case _ =>
-            routes.BusinessFranchiseController.get().url
-        }
-
-        Ok(what_you_need(nextPageUrl))
-      }
+      Future.successful(Ok(what_you_need(routes.InvolvedInOtherController.get().url)))
   }
 }

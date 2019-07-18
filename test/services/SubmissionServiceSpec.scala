@@ -17,20 +17,20 @@
 package services
 
 import config.AppConfig
-import connectors.{AmlsConnector, KeystoreConnector}
+import connectors.AmlsConnector
 import exceptions.{DuplicateSubscriptionException, NoEnrolmentException}
 import generators.ResponsiblePersonGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models._
-import models.businessdetails.{BusinessDetails, RegisteredOfficeUK}
 import models.bankdetails.BankDetails
 import models.businessactivities.{BusinessActivities => BusActivities}
 import models.businesscustomer.ReviewDetails
+import models.businessdetails.{BusinessDetails, RegisteredOfficeUK}
 import models.businessmatching.BusinessType.SoleProprietor
 import models.businessmatching._
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
-import models.moneyservicebusiness.{BankMoneySource, MoneyServiceBusiness}
+import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal._
 import models.responsiblepeople.ResponsiblePerson
 import models.tradingpremises.TradingPremises
@@ -39,7 +39,6 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalacheck.Gen
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.Helpers._
@@ -316,7 +315,7 @@ class SubmissionServiceSpec extends AmlsSpec
         ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("12345678963")),
         transactionsInLast12Months = Some(TransactionsInLast12Months("2500")),
         percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
-        receiveCashPayments = Some(ReceiveCashPayments(Some(PaymentMethods(courier = true, direct = true, Some("other")))))
+        receiveCashPayments = Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other"))))))
       )
 
       val result = await(submissionService.renewal(renewal))
@@ -369,7 +368,7 @@ class SubmissionServiceSpec extends AmlsSpec
         ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("12345678963")),
         transactionsInLast12Months = Some(TransactionsInLast12Months("2500")),
         percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
-        receiveCashPayments = Some(ReceiveCashPayments(Some(PaymentMethods(courier = true, direct = true, Some("other")))))
+        receiveCashPayments = Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other"))))))
       )
 
       val result = await(submissionService.renewalAmendment(renewal))

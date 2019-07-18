@@ -70,7 +70,7 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
                 register <- cacheMap.getEntry[ServiceChangeRegister](ServiceChangeRegister.key) orElse Some(ServiceChangeRegister())
               } yield {
                 dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
-                  updateCurrencies(msb, data)) flatMap {
+                  updateCurrencies(msb, data)) map {
                   _ => routing(services.msbServices, register, msb, edit, data)
                 }
               }
@@ -89,26 +89,24 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
 
   private def shouldAnswerForeignExchangeQuestions( msbServices: Set[BusinessMatchingMsbService],
                                                     register: ServiceChangeRegister,
-                                                    isPreSubmission: Boolean,
                                                     msb: MoneyServiceBusiness,
                                                     edit: Boolean): Boolean = {
     foreignExchangeAddedPostSubmission(msbServices, register) ||
-      (isPreSubmission && msbServices.contains(ForeignExchange) && (msb.fxTransactionsInNext12Months.isEmpty || !edit))
+      (msbServices.contains(ForeignExchange) && (msb.fxTransactionsInNext12Months.isEmpty || !edit))
   }
 
   private def routing(msbServices: Set[BusinessMatchingMsbService],
                       register: ServiceChangeRegister,
                       msb: MoneyServiceBusiness,
                       edit: Boolean,
-                      data: UsesForeignCurrencies)(implicit hc: HeaderCarrier, auth: AuthContext): Future[Result] = {
-    statusService.isPreSubmission map { isPreSubmission =>
-          if (data == UsesForeignCurrenciesYes) {
-          Redirect(routes.MoneySourcesController.get(edit))
-        } else if (shouldAnswerForeignExchangeQuestions(msbServices, register, isPreSubmission, msb, edit)) {
-          Redirect(routes.FXTransactionsInNext12MonthsController.get(edit))
-        } else {
-          Redirect(routes.SummaryController.get())
-        }
+                      data: UsesForeignCurrencies)(implicit hc: HeaderCarrier, auth: AuthContext) = {
+
+    if (data == UsesForeignCurrenciesYes) {
+        Redirect(routes.MoneySourcesController.get(edit))
+      } else if (shouldAnswerForeignExchangeQuestions(msbServices, register, msb, edit)) {
+        Redirect(routes.FXTransactionsInNext12MonthsController.get(edit))
+      } else {
+        Redirect(routes.SummaryController.get())
       }
     }
   }
