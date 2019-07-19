@@ -83,17 +83,6 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
       }
     }
 
-    "the user hasn't enrolled in AMLS" must {
-      "redirect the user to the signoutUrl" in {
-        val authAction = new DefaultAuthAction(fakeAuthConnector(emptyAuthRetrievals))
-        val controller = new Harness(authAction)
-
-        val result = controller.onPageLoad()(fakeRequest)
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(signoutUrl)
-      }
-    }
-
     "erroneous retrievals are obtained" must {
       "redirect the user to signoutUrl" in {
         val authAction = new DefaultAuthAction(fakeAuthConnector(erroneousRetrievals))

@@ -16,14 +16,12 @@
 
 package connectors
 
-import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolment, EnrolmentIdentifier, Enrolments}
 import uk.gov.hmrc.domain.{CtUtr, SaUtr}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.play.frontend.auth.connectors.domain._
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser, Principal}
-import utils.UrlHelper
 
 class ConnectorHelperSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
@@ -87,59 +85,6 @@ class ConnectorHelperSpec extends PlaySpec with MockitoSugar with ScalaFutures {
         None,
         None, None)
       an[IllegalArgumentException] should be thrownBy ConnectorHelper.accountTypeAndId(ctAcct)
-    }
-  }
-
-  "accountTypeAndIdFromEnrolments" when {
-    "return org account type and reference" when {
-      "Logged in user is org account type" in {
-        val affinityGroup = AffinityGroup.Organisation
-        val credId = "123456789"
-
-        val enrolments = Enrolments(Set(
-          Enrolment("ORG", Seq(EnrolmentIdentifier("UTR", "org")), "Activated")
-        ))
-
-        ConnectorHelper.accountTypeAndIdFromEnrolments(affinityGroup, enrolments, credId) must be(("org", UrlHelper.hash(credId)))
-      }
-    }
-
-    "return sa account type and reference" when {
-      "Logged in user is sa account type" in {
-        val affinityGroup = AffinityGroup.Agent
-        val credId = "123456789"
-
-        val enrolments = Enrolments(Set(
-          Enrolment("IR-SA", Seq(EnrolmentIdentifier("UTR", "saRef")), "Activated")
-        ))
-
-        ConnectorHelper.accountTypeAndIdFromEnrolments(affinityGroup, enrolments, credId) must be(("sa", "saRef"))
-      }
-    }
-
-    "return ct account type and reference" when {
-      "Logged in user is ct account type" in {
-        val affinityGroup = AffinityGroup.Agent
-        val credId = "123456789"
-
-        val enrolments = Enrolments(Set(
-          Enrolment("IR-CT", Seq(EnrolmentIdentifier("UTR", "ctRef")), "Activated")
-        ))
-
-        ConnectorHelper.accountTypeAndIdFromEnrolments(affinityGroup, enrolments, credId) must be(("ct", "ctRef"))
-      }
-    }
-
-    "fail on not finding correct accountType" in {
-
-      val affinityGroup = AffinityGroup.Agent
-      val credId = "123456789"
-
-      val enrolments = Enrolments(Set(
-        Enrolment("IR-FOO", Seq(EnrolmentIdentifier("UTR", "BAR")), "Activated")
-      ))
-
-      an[IllegalArgumentException] should be thrownBy ConnectorHelper.accountTypeAndIdFromEnrolments(affinityGroup, enrolments, credId)
     }
   }
 }
