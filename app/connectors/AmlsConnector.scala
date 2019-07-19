@@ -85,10 +85,10 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     }
   }
 
-  def status(amlsRegistrationNumber: String, affinityGroup: AffinityGroup, enrolments: Enrolments, credId: String)
+  def status(amlsRegistrationNumber: String, accountTypeId: (String, String), credId: String)
             (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, reqW: Writes[ReadStatusResponse]): Future[ReadStatusResponse] = {
 
-    val (accountType, accountId) = ConnectorHelper.accountTypeAndIdFromEnrolments(affinityGroup, enrolments, credId)
+    val (accountType, accountId) = accountTypeId
 
     val getUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/status"
     val prefix = "[AmlsConnector][status]"

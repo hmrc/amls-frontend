@@ -36,9 +36,18 @@ trait RepeatingSection {
       case _ => None
     }
 
+  @deprecated("To be removed when new auth in place")
   def getData[T](index: Int)
                 (implicit user: AuthContext, hc: HeaderCarrier, formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[Option[T]] = {
     getData[T] map {
+      case data if index > 0 && index <= data.length + 1 => data lift (index - 1)
+      case _ => None
+    }
+  }
+
+  def getData[T](cacheId: String, index: Int)
+                (implicit hc: HeaderCarrier, formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[Option[T]] = {
+    getData[T](cacheId) map {
       case data if index > 0 && index <= data.length + 1 => data lift (index - 1)
       case _ => None
     }
@@ -48,8 +57,12 @@ trait RepeatingSection {
                 (implicit user: AuthContext, hc: HeaderCarrier, formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Seq[T] =
     cache.getEntry[Seq[T]](key()).fold(Seq.empty[T])(identity)
 
+  @deprecated("To be removed when new auth in place")
   def getData[T](implicit user: AuthContext, hc: HeaderCarrier, formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[Seq[T]] = {
     dataCacheConnector.fetch[Seq[T]](key()) map { _.fold(Seq.empty[T])(identity) }
+  }
+  def getData[T](cacheId: String)(implicit hc: HeaderCarrier, formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[Seq[T]] = {
+    dataCacheConnector.fetch[Seq[T]](cacheId, key()) map { _.fold(Seq.empty[T])(identity) }
   }
 
   def addData[T](data: T)(implicit user: AuthContext, hc: HeaderCarrier, formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[Int] = {
@@ -78,11 +91,20 @@ trait RepeatingSection {
     }
   }
 
+  @deprecated("old auth")
   protected def updateDataStrict[T](index: Int)(fn: T => T)
                                    (implicit user: AuthContext, hc: HeaderCarrier, formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[CacheMap] =
     getData[T] flatMap {
       data => {
         putData(data.patch(index - 1, Seq(fn(data(index - 1))), 1))
+      }
+    }
+
+  protected def updateDataStrict[T](cacheId: String, index: Int)(fn: T => T)
+                                   (implicit hc: HeaderCarrier, formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[CacheMap] =
+    getData[T](cacheId) flatMap {
+      data => {
+        putData(cacheId, data.patch(index - 1, Seq(fn(data(index - 1))), 1))
       }
     }
 
@@ -94,9 +116,14 @@ trait RepeatingSection {
       }
     }
 
+  @deprecated("old auth")
   protected def putData[T](data: Seq[T])
                           (implicit user: AuthContext, hc: HeaderCarrier, formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[CacheMap] =
     dataCacheConnector.save[Seq[T]](key(), data)
+
+  protected def putData[T](cacheId: String, data: Seq[T])
+                          (implicit hc: HeaderCarrier, formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[CacheMap] =
+    dataCacheConnector.save[Seq[T]](cacheId, key(), data)
 
 }
 

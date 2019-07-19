@@ -100,6 +100,7 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     }
   }
 
+  @deprecated("old auth")
   def getStatus(implicit hc: HeaderCarrier, authContext: AuthContext, ec: ExecutionContext): Future[SubmissionStatus] = {
     enrolmentsService.amlsRegistrationNumber flatMap {
       case Some(mlrRegNumber) =>
@@ -111,12 +112,12 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     }
   }
 
-  def getStatus(amlsRegistrationNo: Option[String], affinityGroup: AffinityGroup, enrolments: Enrolments, credId: String)
+  def getStatus(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)
                (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[SubmissionStatus] = {
     amlsRegistrationNo match {
         case Some(mlrRegNumber) =>
           Logger.debug("StatusService:getStatus:mlrRegNumber:" + mlrRegNumber)
-          etmpStatus(mlrRegNumber, affinityGroup, enrolments, credId)(hc, ec)
+          etmpStatus(mlrRegNumber, accountTypeId, credId)(hc, ec)
         case None =>
           Logger.debug("StatusService:getStatus: No mlrRegNumber")
           notYetSubmitted(credId)(hc, ec)
@@ -188,10 +189,10 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     }
   }
 
-  private def etmpStatus(amlsRefNumber: String, affinityGroup: AffinityGroup, enrolments: Enrolments, credId: String)
+  private def etmpStatus(amlsRefNumber: String, accountTypeId: (String, String), credId: String)
                         (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[SubmissionStatus] = {
     {
-      amlsConnector.status(amlsRefNumber, affinityGroup, enrolments, credId) map {
+      amlsConnector.status(amlsRefNumber, accountTypeId, credId) map {
         response => getETMPStatus(response)
       }
     }
