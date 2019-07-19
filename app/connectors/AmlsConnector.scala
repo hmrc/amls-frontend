@@ -65,6 +65,7 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     }
   }
 
+  @deprecated("to be removed when new auth completely implemented")
   def status(amlsRegistrationNumber: String)
             (implicit
              headerCarrier: HeaderCarrier,
@@ -85,10 +86,10 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     }
   }
 
-  def status(amlsRegistrationNumber: String, affinityGroup: AffinityGroup, enrolments: Enrolments, credId: String)
+  def status(amlsRegistrationNumber: String, accountTypeId: (String, String))
             (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, reqW: Writes[ReadStatusResponse]): Future[ReadStatusResponse] = {
 
-    val (accountType, accountId) = ConnectorHelper.accountTypeAndIdFromEnrolments(affinityGroup, enrolments, credId)
+    val (accountType, accountId) = accountTypeId
 
     val getUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/status"
     val prefix = "[AmlsConnector][status]"
