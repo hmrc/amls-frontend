@@ -100,7 +100,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
       val result = controller.post()(request.withFormUrlEncodedBody())
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.required.msb.send.money"))
+      contentAsString(result) must include(Messages("error.required.renewal.send.money"))
     }
 
     "throw exception when Msb services in Business Matching returns none" in new Fixture {

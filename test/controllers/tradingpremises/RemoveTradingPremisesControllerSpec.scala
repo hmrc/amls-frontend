@@ -335,9 +335,6 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.tradingpremises.routes.YourTradingPremisesController.get().url))
-
-          //TODO: slawek
-
         }
       }
 

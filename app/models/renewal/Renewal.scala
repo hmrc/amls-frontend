@@ -27,7 +27,7 @@ case class Renewal(
                     turnover: Option[AMLSTurnover] = None,
                     customersOutsideUK: Option[CustomersOutsideUK] = None,
                     percentageOfCashPaymentOver15000: Option[PercentageOfCashPaymentOver15000] = None,
-                    receiveCashPayments: Option[ReceiveCashPayments] = None,
+                    receiveCashPayments: Option[CashPayments] = None,
                     totalThroughput: Option[TotalThroughput] = None,
                     whichCurrencies: Option[WhichCurrencies] = None,
                     transactionsInLast12Months: Option[TransactionsInLast12Months] = None,
@@ -61,7 +61,7 @@ case class Renewal(
   def percentageOfCashPaymentOver15000(v: PercentageOfCashPaymentOver15000): Renewal =
     this.copy(percentageOfCashPaymentOver15000 = Some(v))
 
-  def receiveCashPayments(p: ReceiveCashPayments): Renewal =
+  def receiveCashPayments(p: CashPayments): Renewal =
     this.copy(receiveCashPayments = Some(p), hasChanged = hasChanged || !this.receiveCashPayments.contains(p),
       hasAccepted = hasAccepted && this.receiveCashPayments.contains(p))
 
@@ -155,11 +155,18 @@ object Renewal {
       case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for accountancy service provider"))))
     }
 
-    val hvdRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
-      case r if r.percentageOfCashPaymentOver15000.isDefined && r.receiveCashPayments.isDefined &&
-        r.customersOutsideUK.isDefined => Valid(r)
+    val hvdBaseRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
+      case r if r.percentageOfCashPaymentOver15000.isDefined && r.customersOutsideUK.isDefined => Valid(r)
       case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for high value dealing"))))
     }
+
+    val receiveCashPaymentsRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
+      case r@Renewal(_,_,_,_,_,Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(_))),_,_,_,_,_,_,_,_,_,_) => Valid(r)
+      case r@Renewal(_,_,_,_,_,Some(CashPayments(CashPaymentsCustomerNotMet(false), None)),_,_,_,_,_,_,_,_,_,_) => Valid(r)
+      case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for high value dealing"))))
+    }
+
+    val hvdRule: ValidationRule[Renewal] = hvdBaseRule andThen receiveCashPaymentsRule
 
     val hasAcceptedRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
       case r if r.hasAccepted => Valid(r)

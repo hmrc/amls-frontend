@@ -49,18 +49,6 @@ class WhatYouNeedController @Inject()(val authConnector: AuthConnector,
   def post = Authorised.async {
     implicit authContext =>
       implicit request =>
-        dataCacheConnector.fetch[ServiceChangeRegister](ServiceChangeRegister.key) flatMap {
-          case Some(register) if register.addedActivities.fold(false)(_.contains(MsbActivity)) =>
-            Future.successful(Redirect(routes.ExpectedThroughputController.get()))
-          case _ =>
-            statusService.isPreSubmission map { status =>
-              if (status) {
-                Redirect(routes.ExpectedThroughputController.get())
-              }
-              else {
-                Redirect(routes.BranchesOrAgentsController.get())
-              }
-            }
-        }
+        Future.successful(Redirect(routes.ExpectedThroughputController.get()))
   }
 }

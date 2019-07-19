@@ -23,16 +23,16 @@ import models.registrationprogress.{Completed, Section}
 import models.status._
 import org.joda.time.LocalDate
 import play.api.{Logger, Mode, Play}
+import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolments}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import utils.AuthAction
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class StatusService @Inject() (
-                                val amlsConnector: AmlsConnector,
-                                val enrolmentsService: AuthEnrolmentsService,
-                                val sectionsProvider: SectionsProvider
-                              ){
+class StatusService @Inject() (val amlsConnector: AmlsConnector,
+                               val enrolmentsService: AuthEnrolmentsService,
+                               val sectionsProvider: SectionsProvider){
   private val renewalPeriod = 30
 
   val Pending = "Pending"
@@ -111,6 +111,18 @@ class StatusService @Inject() (
     }
   }
 
+  def getStatus(amlsRegistrationNo: Option[String], affinityGroup: AffinityGroup, enrolments: Enrolments, credId: String)
+               (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[SubmissionStatus] = {
+    amlsRegistrationNo match {
+        case Some(mlrRegNumber) =>
+          Logger.debug("StatusService:getStatus:mlrRegNumber:" + mlrRegNumber)
+          etmpStatus(mlrRegNumber, affinityGroup, enrolments, credId)(hc, ec)
+        case None =>
+          Logger.debug("StatusService:getStatus: No mlrRegNumber")
+          notYetSubmitted(credId)(hc, ec)
+      }
+  }
+
   def getStatus(mlrRegNumber: String)(implicit hc: HeaderCarrier, authContext: AuthContext, ec: ExecutionContext): Future[SubmissionStatus] = {
         etmpStatus(mlrRegNumber)(hc, authContext, ec)
   }
@@ -130,7 +142,7 @@ class StatusService @Inject() (
   def getReadStatus(mlrRefNo: String)
                    (implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext) = etmpReadStatus(mlrRefNo)
 
-  private def notYetSubmitted(implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext) = {
+  private def notYetSubmitted(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext) = {
 
     def isComplete(seq: Seq[Section]): Boolean =
       seq forall {
@@ -149,9 +161,37 @@ class StatusService @Inject() (
     }
   }
 
+  private def notYetSubmitted(cacheId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext) = {
+
+    def isComplete(seq: Seq[Section]): Boolean =
+      seq forall {
+        _.status == Completed
+      }
+
+    sectionsProvider.sections(cacheId) map {
+      sections =>
+        if (isComplete(sections)) {
+          Logger.debug("StatusService:notYetSubmitted: SubmissionReady")
+          SubmissionReady
+        } else {
+          Logger.debug("StatusService:notYetSubmitted: NotCompleted")
+          NotCompleted
+        }
+    }
+  }
+
   private def etmpStatus(amlsRefNumber: String)(implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext): Future[SubmissionStatus] = {
     {
       amlsConnector.status(amlsRefNumber) map {
+        response => getETMPStatus(response)
+      }
+    }
+  }
+
+  private def etmpStatus(amlsRefNumber: String, affinityGroup: AffinityGroup, enrolments: Enrolments, credId: String)
+                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[SubmissionStatus] = {
+    {
+      amlsConnector.status(amlsRefNumber, affinityGroup, enrolments, credId) map {
         response => getETMPStatus(response)
       }
     }

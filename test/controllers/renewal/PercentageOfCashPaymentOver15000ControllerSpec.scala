@@ -107,7 +107,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.renewal.routes.ReceiveCashPaymentsController.get().url))
+          redirectLocation(result) must be(Some(controllers.renewal.routes.CashPaymentsCustomersNotMetController.get().url))
         }
       }
 

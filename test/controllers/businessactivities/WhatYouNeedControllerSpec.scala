@@ -16,12 +16,14 @@
 
 package controllers.businessactivities
 
+import controllers.actions.SuccessfulAuthAction
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved, SubmissionReadyForReview}
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
@@ -29,14 +31,17 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
     self =>
 
     val request = addToken(authRequest)
-    val controller = new WhatYouNeedController(self.authConnector, mockStatusService)
+    val controller = new WhatYouNeedController(
+      authAction = SuccessfulAuthAction,
+      statusService = mockStatusService,
+      authConnector = mock[AuthConnector])
   }
 
   "WhatYouNeedController" must {
     "get" must {
-      "load the page with the correct 'next page' link" when {
+      "redirect to InvolvedInOtherController" when {
         "creating a new submission" in new Fixture {
-          mockApplicationStatus(SubmissionReadyForReview)
+          mockApplicationStatusNewAuth(SubmissionReadyForReview)
 
           val result = controller.get(request)
           status(result) must be(OK)
@@ -47,40 +52,38 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
         }
 
         "performing a variation" in new Fixture {
-          mockApplicationStatus(SubmissionDecisionApproved)
+          mockApplicationStatusNewAuth(SubmissionDecisionApproved)
 
           val result = controller.get(request)
           status(result) must be(OK)
 
           val doc = Jsoup.parse(contentAsString(result))
 
-          doc.getElementById("ba-whatyouneed-button").attr("href") mustBe routes.BusinessFranchiseController.get().url
+          doc.getElementById("ba-whatyouneed-button").attr("href") mustBe routes.InvolvedInOtherController.get().url
         }
 
         "in a renewal pending status" in new Fixture {
-          mockApplicationStatus(ReadyForRenewal(None))
+          mockApplicationStatusNewAuth(ReadyForRenewal(None))
 
           val result = controller.get(request)
           status(result) must be(OK)
 
           val doc = Jsoup.parse(contentAsString(result))
 
-          doc.getElementById("ba-whatyouneed-button").attr("href") mustBe routes.BusinessFranchiseController.get().url
+          doc.getElementById("ba-whatyouneed-button").attr("href") mustBe routes.InvolvedInOtherController.get().url
         }
 
         "in a renewal submitted status" in new Fixture {
-          mockApplicationStatus(RenewalSubmitted(None))
+          mockApplicationStatusNewAuth(RenewalSubmitted(None))
 
           val result = controller.get(request)
           status(result) must be(OK)
 
           val doc = Jsoup.parse(contentAsString(result))
 
-          doc.getElementById("ba-whatyouneed-button").attr("href") mustBe routes.BusinessFranchiseController.get().url
+          doc.getElementById("ba-whatyouneed-button").attr("href") mustBe routes.InvolvedInOtherController.get().url
         }
-
       }
-
     }
   }
 }

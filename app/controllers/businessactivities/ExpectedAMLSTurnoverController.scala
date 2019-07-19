@@ -18,26 +18,25 @@ package controllers.businessactivities
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, ExpectedAMLSTurnover}
 import models.businessmatching._
 import play.api.i18n.Messages
 import services.StatusService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
+import utils.{AuthAction, ControllerHelper}
 import views.html.businessactivities._
 
 import scala.concurrent.Future
 
 class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                                override val authConnector: AuthConnector,
+                                                val authAction: AuthAction,
                                                 implicit val statusService: StatusService
-                                               )extends BaseController {
+                                               ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetchAll map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetchAll(request.cacheId) map {
         optionalCache =>
           (for {
             cache <- optionalCache
@@ -52,20 +51,20 @@ class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCach
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request =>
       Form2[ExpectedAMLSTurnover](request.body) match {
         case f: InvalidForm =>
           for {
-            businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
+            businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.cacheId, BusinessMatching.key)
           } yield {
             BadRequest(expected_amls_turnover(f, edit, businessMatching.prefixedAlphabeticalBusinessTypes))
           }
 
         case ValidForm(_, data) =>
           for {
-            businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key,
+            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](request.cacheId, BusinessActivities.key,
               businessActivities.expectedAMLSTurnover(data)
             )
           } yield edit match {
@@ -74,5 +73,4 @@ class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCach
           }
       }
     }
-  }
 }

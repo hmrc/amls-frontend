@@ -18,23 +18,24 @@ package controllers.businessactivities
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessactivities.{BusinessActivities, RiskAssessmentHasPolicy, RiskAssessmentPolicy}
+import models.businessactivities.{BusinessActivities, RiskAssessmentHasPolicy}
 import models.businessmatching.BusinessMatching
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.HeaderCarrierConverter
+import utils.{AuthAction, ControllerHelper}
 import views.html.businessactivities._
 
 import scala.concurrent.Future
 
 class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                          override val authConnector: AuthConnector
-                                         )extends BaseController {
+                                          val authAction: AuthAction
+                                         )extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key) map {
         response =>
           val form: Form2[RiskAssessmentHasPolicy] = (for {
             businessActivities <- response
@@ -44,22 +45,22 @@ class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConne
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    import jto.validation.forms.Rules._
-    implicit authContext => implicit request =>
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      import jto.validation.forms.Rules._
       Form2[RiskAssessmentHasPolicy](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(risk_assessment_policy(f, edit)))
         case ValidForm(_, data: RiskAssessmentHasPolicy) => {
-          dataCacheConnector.fetchAll flatMap { maybeCache =>
+          dataCacheConnector.fetchAll(request.cacheId) flatMap { maybeCache =>
             val businessMatching = for {
               cacheMap <- maybeCache
               bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
             } yield bm
 
             for {
-              businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
-              _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key, businessActivities.riskAssessmentHasPolicy(data))
+              businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key)
+              _ <- dataCacheConnector.save[BusinessActivities](request.cacheId, BusinessActivities.key, businessActivities.riskAssessmentHasPolicy(data))
             } yield redirectDependingOnAccountancyServices(ControllerHelper.isAccountancyServicesSelected(Some(businessMatching)), data)
           }
         } recoverWith {

@@ -24,11 +24,9 @@ import utils.JsonMapping
 import cats.data.Validated.{Invalid, Valid}
 
 
-case class PaymentMethods(
-                         courier: Boolean,
+case class PaymentMethods(courier: Boolean,
                          direct: Boolean,
-                         other: Option[String]
-                         )
+                         other: Option[String])
 
 sealed trait PaymentMethods0 {
 
@@ -64,8 +62,8 @@ sealed trait PaymentMethods0 {
 
       val detailsR: Rule[String, String] =
         (minLengthR(minLength) withMessage "error.required.renewal.hvd.describe") andThen
-        (maxLengthR(maxLength) withMessage "error.invalid.renewal.hvd.describe.too.long") andThen
-        basicPunctuationPattern("error.invalid.renewal.hvd.describe.characters")
+        (maxLengthR(maxLength) withMessage "error.required.renewal.hvd.describe.invalid.length") andThen
+        basicPunctuationPattern("error.required.renewal.hvd.describe.invalid.characters")
 
       val booleanR = b andThen { _ map { case Some(b) => b; case None => false } }
 

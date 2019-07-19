@@ -17,6 +17,7 @@
 package controllers.businessactivities
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.businessactivities.{BusinessActivities, InvolvedInOtherYes}
 import models.businessmatching.{BusinessActivities => BMActivities, _}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
@@ -26,7 +27,7 @@ import org.mockito.Mockito._
 import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
@@ -44,7 +45,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
      val controller = new InvolvedInOtherController (
        dataCacheConnector = mock[DataCacheConnector],
-       authConnector = self.authConnector,
+       authAction = SuccessfulAuthAction,
        statusService = mock[StatusService]
     )
   }
@@ -72,7 +73,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(businessMatching))
 
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get()(request)
@@ -105,7 +106,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(NotCompleted))
 
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -124,7 +125,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(BusinessMatching()))
 
-        when(controller.dataCacheConnector.fetchAll(any(), any()))
+        when(controller.dataCacheConnector.fetchAll(any())(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get()(request)
@@ -148,10 +149,10 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
               "details" -> "test"
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
               .thenReturn(Future.successful(None))
 
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post()(newRequest)
@@ -165,10 +166,10 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
               "details" -> "test"
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
               .thenReturn(Future.successful(Some(BusinessActivities())))
 
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post()(newRequest)
@@ -182,10 +183,10 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
               "involvedInOther" -> "false"
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
               .thenReturn(Future.successful(None))
 
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post()(newRequest)
@@ -199,10 +200,10 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
               "involvedInOther" -> "false"
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
               .thenReturn(Future.successful(Some(BusinessActivities())))
 
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post()(newRequest)
@@ -218,10 +219,10 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
               "details" -> "test"
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
               .thenReturn(Future.successful(None))
 
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post(true)(newRequest)
@@ -235,10 +236,10 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
               "involvedInOther" -> "false"
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
               .thenReturn(Future.successful(None))
 
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post(true)(newRequest)
@@ -251,7 +252,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
             .thenReturn(Future.successful(None))
 
           val newRequest = request.withFormUrlEncodedBody(
@@ -270,7 +271,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
             activities = Some(BMActivities(Set(AccountancyServices)))
           )
 
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(businessMatching)))
 
           val newRequest = request.withFormUrlEncodedBody(

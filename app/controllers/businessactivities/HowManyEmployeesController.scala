@@ -18,27 +18,26 @@ package controllers.businessactivities
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, EmployeeCount, HowManyEmployees}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.businessactivities._
 
 import scala.concurrent.Future
 
 class HowManyEmployeesController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                            override val authConnector: AuthConnector
-                                           ) extends BaseController {
+                                            val authAction: AuthAction
+                                           ) extends DefaultBaseController {
 
   def updateData(howManyEmployees: Option[HowManyEmployees], data: EmployeeCount): HowManyEmployees = {
     howManyEmployees.fold[HowManyEmployees](HowManyEmployees(employeeCount = Some(data.employeeCount)))(x =>
       x.copy(employeeCount = Some(data.employeeCount)))
   }
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request => {
-        dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
+        dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key) map {
           response =>
             val form: Form2[HowManyEmployees] = (for {
               businessActivities <- response
@@ -49,15 +48,15 @@ class HowManyEmployeesController @Inject() (val dataCacheConnector: DataCacheCon
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request => {
       Form2[EmployeeCount](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(business_employees(f, edit)))
         case ValidForm(_, data) =>
           for {
-            businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key,
+            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](request.cacheId, BusinessActivities.key,
               businessActivities.howManyEmployees(updateData(businessActivities.howManyEmployees, data)))
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())
