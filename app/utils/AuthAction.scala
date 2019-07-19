@@ -108,6 +108,19 @@ class DefaultAuthAction @Inject() (
   private def accountTypeAndId(affinityGroup: AffinityGroup,
                                enrolments: Enrolments,
                                credId: String) = {
+    /*
+    * Set the `accountType` to `"org"` if `affinityGroup = "Organisation"` (which you get through retrievals)
+    * Set the `accountId` as a hash of the CredId. Its possible to get the `credId` through retrievals
+    */
+
+    /*
+     * For an affinity group other than Org;
+     * Retrieve the enrolments through retrievals.
+     * If one of them is `"IR-SA"`, you can set `accountType` to `"sa"` and `accountId` to the `value` for `key` `"UTR"`
+     * If one of them is `"IR-CT"`, you can set `accountType` to `"ct"` and `accountId` to the `value` for `key` `"UTR"`
+
+     */
+
     affinityGroup match {
       case AffinityGroup.Organisation => ("org", UrlHelper.hash(credId))
       case _ =>

@@ -51,6 +51,7 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
    ac: AuthContext
   ): Future[SubscriptionResponse] = {
 
+    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
     val postUrl = s"$url/$accountType/$accountId/$safeId"

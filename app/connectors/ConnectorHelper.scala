@@ -16,14 +16,15 @@
 
 package connectors
 
-import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolments}
 import uk.gov.hmrc.domain.{CtUtr, Org, SaUtr}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.{CtAccount, OrgAccount, SaAccount}
-import utils.UrlHelper
 
 object ConnectorHelper {
 
+
+  //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes.
+  @deprecated
   protected[connectors] def accountTypeAndId(implicit ac: AuthContext): (String, String) = {
     val accounts = ac.principal.accounts
 
@@ -36,42 +37,6 @@ object ConnectorHelper {
           case _ =>throw new IllegalArgumentException("authcontext does not contain any of the expected account types")
         }
       }
-    }
-  }
-
-  // TODO - New auth: When converting connectors we need to remove the call to accountTypeAndId (above) and use;
-  // TODO - Can we build this into the auth action?
-  protected[connectors] def accountTypeAndIdFromEnrolments(affinityGroup: AffinityGroup,
-                                                           enrolments: Enrolments,
-                                                           credId: String): (String, String) = {
-
-    /*
-     * Set the `accountType` to `"org"` if `affinityGroup = "Organisation"` (which you get through retrievals)
-     * Set the `accountId` as a hash of the CredId. Its possible to get the `credId` through retrievals
-     */
-
-    /*
-     * For an affinity group other than Org;
-     * Retrieve the enrolments through retrievals.
-     * If one of them is `"IR-SA"`, you can set `accountType` to `"sa"` and `accountId` to the `value` for `key` `"UTR"`
-     * If one of them is `"IR-CT"`, you can set `accountType` to `"ct"` and `accountId` to the `value` for `key` `"UTR"`
-     */
-
-    affinityGroup match {
-      case AffinityGroup.Organisation => ("org", UrlHelper.hash(credId))
-      case _ =>
-
-        val sa = for {
-          enrolment <- enrolments.getEnrolment("IR-SA")
-          utr       <- enrolment.getIdentifier("UTR")
-        } yield "sa" -> utr.value
-
-        val ct = for {
-          enrolment <- enrolments.getEnrolment("IR-CT")
-          utr       <- enrolment.getIdentifier("UTR")
-        } yield "ct" -> utr.value
-
-        (sa orElse ct).getOrElse(throw new IllegalArgumentException("auth does not contain any of the expected account types"))
     }
   }
 }
