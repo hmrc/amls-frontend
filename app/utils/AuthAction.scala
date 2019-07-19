@@ -28,6 +28,7 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.HeaderCarrierConverter
+import play.api.{Logger}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -41,8 +42,8 @@ final case class AuthorisedRequest[A](request: Request[A],
 final case class enrolmentNotFound(msg: String = "enrolmentNotFound") extends AuthorisationException(msg)
 
 class DefaultAuthAction @Inject() (
-                             val authConnector: AuthConnector
-                           )(implicit ec: ExecutionContext) extends AuthAction with AuthorisedFunctions {
+                                    val authConnector: AuthConnector
+                                  )(implicit ec: ExecutionContext) extends AuthAction with AuthorisedFunctions {
 
   private val amlsKey = "HMRC-MLR-ORG"
   private val amlsNumberKey = "MLRRefNumber"
@@ -57,15 +58,17 @@ class DefaultAuthAction @Inject() (
 
     authorised(Admin).retrieve(
       Retrievals.allEnrolments and
-      Retrievals.credentials and
-      Retrievals.affinityGroup
+        Retrievals.credentials and
+        Retrievals.affinityGroup
     ) {
       case enrolments ~ Some(credentials) ~ Some(affinityGroup) =>
+        Logger.debug("DefaultAuthAction:Refine - Enrolments:" + enrolments)
+
         Future.successful(
           Right(
             AuthorisedRequest(
               request,
-              amlsRefNumber(getMlrEnrolment(enrolments)),
+              amlsRefNo(enrolments),
               credentials.providerId,
               affinityGroup,
               enrolments,
@@ -74,35 +77,42 @@ class DefaultAuthAction @Inject() (
           )
         )
       case _ =>
+        Logger.debug("DefaultAuthAction:Refine - Non match (enrolments ~ Some(credentials) ~ Some(affinityGroup))")
         Future.successful(Left(Redirect(Call("GET", signoutUrl))))
     }.recover[Either[Result, AuthorisedRequest[A]]] {
-      case _: NoActiveSession =>
+      case nas: NoActiveSession =>
+        Logger.debug("DefaultAuthAction:Refine - NoActiveSession:" + nas)
         Left(Redirect(Call("GET", signoutUrl)))
-      case _: InsufficientEnrolments =>
+      case ie: InsufficientEnrolments =>
+        Logger.debug("DefaultAuthAction:Refine - InsufficientEnrolments:" + ie)
         Left(Redirect(Call("GET", signoutUrl)))
-      case _: InsufficientConfidenceLevel =>
+      case icl: InsufficientConfidenceLevel =>
+        Logger.debug("DefaultAuthAction:Refine - InsufficientConfidenceLevel:" + icl)
         Left(Redirect(Call("GET", signoutUrl)))
-      case _: UnsupportedAuthProvider =>
+      case uap: UnsupportedAuthProvider =>
+        Logger.debug("DefaultAuthAction:Refine - UnsupportedAuthProvider:" + uap)
         Left(Redirect(Call("GET", signoutUrl)))
-      case _: UnsupportedAffinityGroup =>
+      case uag: UnsupportedAffinityGroup =>
+        Logger.debug("DefaultAuthAction:Refine - UnsupportedAffinityGroup:" + uag)
         Left(Redirect(Call("GET", signoutUrl)))
-      case _: UnsupportedCredentialRole =>
+      case ucr: UnsupportedCredentialRole =>
+        Logger.debug("DefaultAuthAction:Refine - UnsupportedCredentialRole:" + ucr)
         Left(Redirect(Call("GET", signoutUrl)))
-      case _: enrolmentNotFound =>
+      case enf: enrolmentNotFound =>
+        Logger.debug("DefaultAuthAction:Refine - enrolmentNotFound:" + enf)
         Left(Redirect(Call("GET", signoutUrl)))
       case e : AuthorisationException =>
+        Logger.debug("DefaultAuthAction:Refine - AuthorisationException:" + e)
         Left(Redirect(Call("GET", signoutUrl)))
     }
   }
 
-  private def getMlrEnrolment(enrolments: Enrolments) = {
-    enrolments.getEnrolment(amlsKey).getOrElse(throw new enrolmentNotFound)
-  }
-
-  private def amlsRefNumber(enrolment: Enrolment) = {
-    for {
+  private def amlsRefNo(enrolments: Enrolments):Option[String] = {
+    val amlsRefNumber = for {
+      enrolment      <- enrolments.getEnrolment(amlsKey)
       amlsIdentifier <- enrolment.getIdentifier(amlsNumberKey)
     } yield amlsIdentifier.value
+    amlsRefNumber
   }
 
   private def accountTypeAndId(affinityGroup: AffinityGroup,
