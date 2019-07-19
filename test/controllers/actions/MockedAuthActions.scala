@@ -29,7 +29,7 @@ object SuccessfulAuthAction extends AuthAction {
   val enrolments = Enrolments(Set(Enrolment("HMRC-MLR-ORG")))
 
   override protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] =
-    Future.successful(Right(AuthorisedRequest(request, Some("amlsRefNumber"), "internalId", affinityGroup, enrolments)))
+    Future.successful(Right(AuthorisedRequest(request, Some("amlsRefNumber"), "internalId", affinityGroup, enrolments, ("accType", "id"))))
 }
 
 object FailedAuthAction extends AuthAction {
