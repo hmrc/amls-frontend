@@ -183,14 +183,13 @@ object Renewal {
     }
 
     val aspRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
-      case r if r.customersOutsideUK.isDefined &&
-        r.customersOutsideIsUK.isDefined => Valid(r)
+      case r@Renewal(_,_,_,Some(CustomersOutsideIsUK(true)),Some(_),_,_,_,_,_,_,_,_,_,_,_,_) => Valid(r)
+      case r@Renewal(_,_,_,Some(CustomersOutsideIsUK(false)),_,_,_,_,_,_,_,_,_,_,_,_,_) => Valid(r)
       case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for accountancy service provider"))))
     }
 
     val hvdBaseRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
-      case r if r.percentageOfCashPaymentOver15000.isDefined &&
-        r.customersOutsideUK.isDefined && r.customersOutsideIsUK.isDefined => Valid(r)
+      case r if r.percentageOfCashPaymentOver15000.isDefined => Valid(r)
       case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for high value dealing"))))
     }
 
@@ -200,7 +199,7 @@ object Renewal {
       case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for high value dealing"))))
     }
 
-    val hvdRule: ValidationRule[Renewal] = hvdBaseRule andThen receiveCashPaymentsRule
+    val hvdRule: ValidationRule[Renewal] = hvdBaseRule andThen receiveCashPaymentsRule andThen aspRule
 
     val hasAcceptedRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
       case r if r.hasAccepted => Valid(r)
