@@ -65,6 +65,7 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     }
   }
 
+  @deprecated("to be removed when new auth completely implemented")
   def status(amlsRegistrationNumber: String)
             (implicit
              headerCarrier: HeaderCarrier,
@@ -85,7 +86,7 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     }
   }
 
-  def status(amlsRegistrationNumber: String, accountTypeId: (String, String), credId: String)
+  def status(amlsRegistrationNumber: String, accountTypeId: (String, String))
             (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, reqW: Writes[ReadStatusResponse]): Future[ReadStatusResponse] = {
 
     val (accountType, accountId) = accountTypeId

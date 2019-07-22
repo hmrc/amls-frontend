@@ -117,7 +117,7 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     amlsRegistrationNo match {
         case Some(mlrRegNumber) =>
           Logger.debug("StatusService:getStatus:mlrRegNumber:" + mlrRegNumber)
-          etmpStatus(mlrRegNumber, accountTypeId, credId)(hc, ec)
+          etmpStatus(mlrRegNumber, accountTypeId)(hc, ec)
         case None =>
           Logger.debug("StatusService:getStatus: No mlrRegNumber")
           notYetSubmitted(credId)(hc, ec)
@@ -189,10 +189,10 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     }
   }
 
-  private def etmpStatus(amlsRefNumber: String, accountTypeId: (String, String), credId: String)
+  private def etmpStatus(amlsRefNumber: String, accountTypeId: (String, String))
                         (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[SubmissionStatus] = {
     {
-      amlsConnector.status(amlsRefNumber, accountTypeId, credId) map {
+      amlsConnector.status(amlsRefNumber, accountTypeId) map {
         response => getETMPStatus(response)
       }
     }
