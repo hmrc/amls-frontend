@@ -31,6 +31,11 @@
         <p>@Messages("status.submissionreadyforreview.description")
         <a id="submission-ready-pay-the-fee" href="@controllers.routes.ConfirmationController.get() "> @Messages("status.submissionreadyforreview.description.link")</a>
         <p>@Messages("status.submissionreadyforreview.description.2")</p>
+        <ul class="list list-bullet">
+            <li>@Messages("status.submissionreadyforreview.description.2.listline1")</li>
+            <li>@Messages("status.submissionreadyforreview.description.2.listline2")</li>
+            <li>@Messages("status.submissionreadyforreview.description.2.listline3")</li>
+        </ul>
         <p>@Messages("status.submissionreadyforreview.description.3")</p>
     }
     case None => {
