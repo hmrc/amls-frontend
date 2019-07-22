@@ -83,7 +83,7 @@ class status_submittedSpec extends AmlsSpec with MustMatchers with AmlsReference
       doc.getElementsByClass("status-list").first().child(2).hasClass("status-list--end") must be(true)
 
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description"))
-      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.3"))
+      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.2"))
       Option(doc.getElementById("submission-ready-pay-the-fee")) mustBe defined
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") mustBe controllers.routes.NotificationController.getMessages().url
@@ -112,8 +112,8 @@ class status_submittedSpec extends AmlsSpec with MustMatchers with AmlsReference
       doc.getElementsByClass("status-list").first().child(2).hasClass("status-list--end") must be(true)
 
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.nofee.description"))
+      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.2"))
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.3"))
-      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.4"))
       Option(doc.getElementsByClass("partial-deskpro-form").first()) mustBe defined
 
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
