@@ -598,6 +598,7 @@ status.submissionreadyforreview.description.2.listline1 = we need to contact you
 status.submissionreadyforreview.description.2.listline2 = we need to contact you about additional fees you need to pay
 status.submissionreadyforreview.description.2.listline3 = you make an update to your application
 status.submissionreadyforreview.description.3 = We’ll email you when we have made a decision.
+status.submissionreadyforreview.description.4 = You can trade and carry out business activities while your application is pending.
 status.submissionreadyforreview.description.link = pay your fees now.
 status.submissionreadyforreview.nofee.description = You have submitted your application. You have 28 days to pay the fees from the date you submitted.
 status.submissionreadyforreview.nofee.description.link = If you have not already paid
