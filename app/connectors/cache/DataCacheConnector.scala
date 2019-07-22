@@ -29,9 +29,13 @@ class DataCacheConnector @Inject()(val cacheConnector: MongoCacheConnector){
 
   def fetch[T](cacheId: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
     cacheConnector.fetch(cacheId)
+  def fetch[T](id: String, cacheId: String)(implicit hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
+    cacheConnector.fetch(id, cacheId)
 
   def save[T](cacheId: String, data: T)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
     cacheConnector.save(cacheId, data)
+  def save[T](id: String, key: String, data: T)(implicit hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
+    cacheConnector.save(id, key, data)
 
   def upsert[T](targetCache: CacheMap, cacheId: String, data: T)
                (implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): CacheMap =
@@ -39,6 +43,8 @@ class DataCacheConnector @Inject()(val cacheConnector: MongoCacheConnector){
 
   def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =
     cacheConnector.fetchAll
+  def fetchAll(id: String)(implicit hc: HeaderCarrier): Future[Option[CacheMap]] =
+    cacheConnector.fetchAll(id)
 
   def fetchAllWithDefault(implicit hc: HeaderCarrier, authContext: AuthContext): Future[CacheMap] =
     cacheConnector.fetchAllWithDefault
