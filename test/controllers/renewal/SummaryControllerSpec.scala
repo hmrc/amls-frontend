@@ -58,7 +58,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
     )
 
     when {
-      mockSectionsProvider.sections(any())
+      mockSectionsProvider.sections(any[CacheMap])
     } thenReturn Seq.empty[Section]
 
     when {

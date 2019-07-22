@@ -18,28 +18,27 @@ package controllers.businessactivities
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessactivities.{BusinessActivities}
+import models.businessactivities.BusinessActivities
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessactivities._
 import javax.inject.Inject
+import utils.AuthAction
 import utils.BooleanFormReadWrite._
+
 import scala.concurrent.Future
 
-class TransactionRecordController @Inject()
-(
-  val authConnector: AuthConnector,
-  val dataCacheConnector: DataCacheConnector
-) extends BaseController {
+class TransactionRecordController @Inject()(val authAction: AuthAction,
+                                            val dataCacheConnector: DataCacheConnector) extends DefaultBaseController {
 
   val fieldName = "isRecorded"
   implicit val reader = formRule(fieldName, "error.required.ba.select.transaction.record")
   implicit val writer = formWrites(fieldName)
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key) map {
         response =>
           val form: Form2[Boolean] = (for {
             businessActivities <- response
@@ -50,15 +49,15 @@ class TransactionRecordController @Inject()
       }
   }
 
-  def post(edit : Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+  def post(edit : Boolean = false) = authAction.async {
+    implicit request =>
       Form2[Boolean](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(customer_transaction_records(f, edit)))
         case ValidForm(_, data) => {
           for {
-            businessActivity <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key, businessActivity.transactionRecord(data))
+            businessActivity <- dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](request.cacheId, BusinessActivities.key, businessActivity.transactionRecord(data))
           } yield (edit, data) match {
             case (false, true) => Redirect(routes.TransactionTypesController.get())
             case (false, false) => Redirect(routes.IdentifySuspiciousActivityController.get())
