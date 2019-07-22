@@ -68,24 +68,26 @@ class SendMoneyToOtherCountryController @Inject()(
                       mostTransactions = None, sendTheLargestAmountsOfMoney = None)
                     case true => renewal.sendMoneyToOtherCountry(model)
                   }) map { _ =>
-                    redirect(
-                      model.money,
-                      services.msbServices,
-                      activities.businessActivities,
-                      edit
-                    )
+                    if (model.money) {
+                      Redirect(routes.SendTheLargestAmountsOfMoneyController.get(edit))
+                    } else {
+                      redirect(
+                        services.msbServices,
+                        activities.businessActivities,
+                        edit
+                      )
+                    }
                   }
                 }) getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
             }
         }
   }
 
-  private def redirect(sendMoneyToOtherCountry: Boolean, services: Set[BusinessMatchingMsbService], activities: Set[BusinessActivity], edit: Boolean) = {
-    (sendMoneyToOtherCountry, edit, services, activities) match {
-      case (true, _, _, _) => Redirect(routes.SendTheLargestAmountsOfMoneyController.get(edit))
-      case (_, false, x, _) if x.contains(CurrencyExchange) =>  Redirect(routes.CETransactionsInLast12MonthsController.get())
-      case (_, false, x, _) if x.contains(ForeignExchange) =>  Redirect(routes.FXTransactionsInLast12MonthsController.get())
-      case (_, false, _, x) if x.contains(HighValueDealing) || x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideUKController.get())
+  private def redirect(services: Set[BusinessMatchingMsbService], activities: Set[BusinessActivity], edit: Boolean) = {
+    (edit, services, activities) match {
+      case (false, x, _) if x.contains(CurrencyExchange) =>  Redirect(routes.CETransactionsInLast12MonthsController.get())
+      case (false, x, _) if x.contains(ForeignExchange) =>  Redirect(routes.FXTransactionsInLast12MonthsController.get())
+      case (false, _, x) if x.contains(HighValueDealing) || x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideIsUKController.get())
       case _ => Redirect(routes.SummaryController.get())
     }
   }

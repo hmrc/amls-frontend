@@ -19,12 +19,13 @@ package models.renewal
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.{Path, Rule, ValidationError}
 import models.ValidationRule
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, Reads}
 
 case class Renewal(
                     involvedInOtherActivities: Option[InvolvedInOther] = None,
                     businessTurnover: Option[BusinessTurnover] = None,
                     turnover: Option[AMLSTurnover] = None,
+                    customersOutsideIsUK: Option[CustomersOutsideIsUK] = None,
                     customersOutsideUK: Option[CustomersOutsideUK] = None,
                     percentageOfCashPaymentOver15000: Option[PercentageOfCashPaymentOver15000] = None,
                     receiveCashPayments: Option[CashPayments] = None,
@@ -53,6 +54,10 @@ case class Renewal(
   def turnover(model: AMLSTurnover): Renewal =
     this.copy(turnover = Some(model), hasChanged = hasChanged || !this.turnover.contains(model),
       hasAccepted = hasAccepted && this.turnover.contains(model))
+
+  def customersOutsideIsUK(model: CustomersOutsideIsUK): Renewal =
+    this.copy(customersOutsideIsUK = Some(model), hasChanged = hasChanged || !this.customersOutsideIsUK.contains(model),
+      hasAccepted = hasAccepted && this.customersOutsideIsUK.contains(model))
 
   def customersOutsideUK(model: CustomersOutsideUK): Renewal =
     this.copy(customersOutsideUK = Some(model), hasChanged = hasChanged || !this.customersOutsideUK.contains(model),
@@ -102,7 +107,34 @@ object Renewal {
   val key = "renewal"
   val sectionKey = "renewal"
 
-  implicit val formats = Json.format[Renewal]
+  implicit val format = Json.writes[Renewal]
+
+  implicit val jsonReads: Reads[Renewal] = {
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json.Reads._
+    import play.api.libs.json._
+
+    (
+      (__ \ "involvedInOtherActivities").readNullable[InvolvedInOther] and
+        (__ \ "businessTurnover").readNullable[BusinessTurnover] and
+        (__ \ "turnover").readNullable[AMLSTurnover] and
+        ((__ \ "customersOutsideUK" \"isOutside").read[Boolean].map(c => Option(CustomersOutsideIsUK(c))) or
+          (__ \ "customersOutsideIsUK").readNullable[CustomersOutsideIsUK]) and
+        (__ \ "customersOutsideUK").readNullable[CustomersOutsideUK] and
+        (__ \ "percentageOfCashPaymentOver15000").readNullable[PercentageOfCashPaymentOver15000] and
+        (__ \ "receiveCashPayments").readNullable[CashPayments] and
+        (__ \ "totalThroughput").readNullable[TotalThroughput] and
+        (__ \ "whichCurrencies").readNullable[WhichCurrencies] and
+        (__ \ "transactionsInLast12Months").readNullable[TransactionsInLast12Months] and
+        (__ \ "sendTheLargestAmountsOfMoney").readNullable[SendTheLargestAmountsOfMoney] and
+        (__ \ "mostTransactions").readNullable[MostTransactions] and
+        (__ \ "ceTransactionsInLast12Months").readNullable[CETransactionsInLast12Months] and
+        (__ \ "fxTransactionsInLast12Months").readNullable[FXTransactionsInLast12Months] and
+        (__ \ "hasChanged").read[Boolean] and
+        (__ \ "sendMoneyToOtherCountry").readNullable[SendMoneyToOtherCountry] and
+        (__ \ "hasAccepted").read[Boolean]
+      ).apply(Renewal.apply _)
+  }
 
   implicit def default(renewal: Option[Renewal]): Renewal =
     renewal.getOrElse(Renewal())
@@ -151,22 +183,23 @@ object Renewal {
     }
 
     val aspRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
-      case r if r.customersOutsideUK.isDefined => Valid(r)
+      case r@Renewal(_,_,_,Some(CustomersOutsideIsUK(true)),Some(_),_,_,_,_,_,_,_,_,_,_,_,_) => Valid(r)
+      case r@Renewal(_,_,_,Some(CustomersOutsideIsUK(false)),_,_,_,_,_,_,_,_,_,_,_,_,_) => Valid(r)
       case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for accountancy service provider"))))
     }
 
     val hvdBaseRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
-      case r if r.percentageOfCashPaymentOver15000.isDefined && r.customersOutsideUK.isDefined => Valid(r)
+      case r if r.percentageOfCashPaymentOver15000.isDefined => Valid(r)
       case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for high value dealing"))))
     }
 
     val receiveCashPaymentsRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
-      case r@Renewal(_,_,_,_,_,Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(_))),_,_,_,_,_,_,_,_,_,_) => Valid(r)
-      case r@Renewal(_,_,_,_,_,Some(CashPayments(CashPaymentsCustomerNotMet(false), None)),_,_,_,_,_,_,_,_,_,_) => Valid(r)
+      case r@Renewal(_,_,_,_,_,_,Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(_))),_,_,_,_,_,_,_,_,_,_) => Valid(r)
+      case r@Renewal(_,_,_,_,_,_,Some(CashPayments(CashPaymentsCustomerNotMet(false), None)),_,_,_,_,_,_,_,_,_,_) => Valid(r)
       case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for high value dealing"))))
     }
 
-    val hvdRule: ValidationRule[Renewal] = hvdBaseRule andThen receiveCashPaymentsRule
+    val hvdRule: ValidationRule[Renewal] = hvdBaseRule andThen receiveCashPaymentsRule andThen aspRule
 
     val hasAcceptedRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
       case r if r.hasAccepted => Valid(r)
