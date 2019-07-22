@@ -63,11 +63,7 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
     }
   }
   def save[T](id: String, key: String, data: T)(implicit hc: HeaderCarrier, format: Format[T]): Future[CacheMap] = {
-    authConnector.getCredId flatMap {
-      credId => {
-        mongoCache.createOrUpdate(credId, None, data, key).map(toCacheMap)
-      }
-    }
+    mongoCache.createOrUpdate(id, None, data, key).map(toCacheMap)
   }
 
   /**
