@@ -94,26 +94,6 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
       status(result) must be(SEE_OTHER)
     }
 
-    "hide the edit links when not in pre-approved status and is pending" in new Fixture {
-      val model = businessMatchingWithTypesGen(Some(LPrLLP)).sample.get
-
-      mockGetModel(Some(model))
-
-      when {
-        controller.statusService.isPreSubmission(any())
-      } thenReturn false
-
-      when {
-        controller.statusService.isPending(any())
-      } thenReturn true
-
-      val result = controller.get()(request)
-      status(result) mustBe OK
-
-      val html = Jsoup.parse(contentAsString(result))
-      html.select("a.change-answer").size mustBe 0
-    }
-
     "show the 'Register Services' page when the user wants to change their services" in new Fixture {
       val model = BusinessMatching(
         activities = Some(BusinessActivities(Set(EstateAgentBusinessService)))
