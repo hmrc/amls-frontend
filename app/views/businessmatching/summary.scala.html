@@ -57,7 +57,6 @@
                     @checkYourAnswers(
                         question = Messages("businessmatching.registrationnumber.title"),
                         editUrl = controllers.businessmatching.routes.CompanyRegistrationNumberController.get(true).toString,
-                        allowEdit = !isPending,
                         editLinkTag = "edit-registration-number"
                     ) {
                         <p id="registration-number">@model.companyRegistrationNumber.map { number =>
@@ -130,7 +129,6 @@
                         @checkYourAnswers(
                             question = Messages("businessmatching.psr.number.title"),
                             editUrl = controllers.businessmatching.routes.PSRNumberController.get(true).toString,
-                            allowEdit = !isPending,
                             editLinkTag = "edit-psr-number"
                         ) {
                             <p id="psr">@psr match {
