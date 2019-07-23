@@ -93,7 +93,7 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
 
         case Hvd(Some(cp), Some(_), Some(_), Some(_), Some(_), Some(false), _, Some(_), _, _, true)
         if cp.isCashPaymentsComplete => true
-          
+
         case _ => false
       }
   }
