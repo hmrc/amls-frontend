@@ -84,11 +84,23 @@ class status_submittedSpec extends AmlsSpec with MustMatchers with AmlsReference
 
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description"))
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.2"))
+      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.2.listline1"))
+      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.2.listline2"))
+      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.2.listline3"))
+      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.3"))
+      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.4"))
+      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.5"))
+
       Option(doc.getElementById("submission-ready-pay-the-fee")) mustBe defined
+
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") mustBe controllers.routes.NotificationController.getMessages().url
-    }
 
+      doc.getElementsMatchingOwnText(Messages("status.submissionreadyforreview.description.link"))
+        .attr("href")must be(controllers.routes.ConfirmationController.get().toString)
+      doc.getElementsMatchingOwnText(Messages("status.submissionreadyforreview.description.5.link"))
+        .attr("href") must be("https://www.gov.uk/government/collections/anti-money-laundering-businesses-supervised-by-hm-revenue-and-customs")
+    }
 
     "contain the no fee response content elements" in new ViewFixture {
 
@@ -111,16 +123,23 @@ class status_submittedSpec extends AmlsSpec with MustMatchers with AmlsReference
 
       doc.getElementsByClass("status-list").first().child(2).hasClass("status-list--end") must be(true)
 
-      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.nofee.description"))
+      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description"))
+      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.no.link"))
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.2"))
+      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.2.listline1"))
+      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.2.listline2"))
+      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.2.listline3"))
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.3"))
-      Option(doc.getElementsByClass("partial-deskpro-form").first()) mustBe defined
+      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.4"))
+      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.5"))
 
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") mustBe controllers.routes.NotificationController.getMessages().url
+
+      doc.getElementsMatchingOwnText(Messages("status.submissionreadyforreview.description.5.link"))
+        .attr("href") must be("https://www.gov.uk/government/collections/anti-money-laundering-businesses-supervised-by-hm-revenue-and-customs")
+
     }
-
-
 
     "contain 'update/amend information' content and link" in new ViewFixture {
 
@@ -158,9 +177,6 @@ class status_submittedSpec extends AmlsSpec with MustMatchers with AmlsReference
 
         doc.getElementsContainingOwnText(Messages("status.submittedForReview.submitteddate.text")).isEmpty must be(true)
 
-        doc.getElementsByTag("details").text() must include(Messages("fee.details.dup_nofees.heading"))
-        doc.html must include(Messages("status.submissionreadyforreview.nofee.description.link"))
-        doc.html must include(Messages("fee.details.dup_nofees.heading"))
       }
 
     }

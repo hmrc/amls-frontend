@@ -602,6 +602,7 @@ status.submissionreadyforreview.description.4 = You can trade and carry out busi
 status.submissionreadyforreview.description.5 = Contact HMRC if you have a question about
 status.submissionreadyforreview.description.5.link = the Money Laundering Regulations
 status.submissionreadyforreview.description.link = pay your fees now
+status.submissionreadyforreview.description.no.link = pay your fees now.
 status.submissionreadyforreview.nofee.description = You have submitted your application. You have 28 days to pay the fees from the date you submitted.
 status.submissionreadyforreview.nofee.description.link = If you have not already paid
 status.submissionreadyforreview.duplicate.title = Something went wrong with your submission
