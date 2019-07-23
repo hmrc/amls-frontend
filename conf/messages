@@ -191,6 +191,7 @@ error.required.ba.business.use.accountant = Select yes if your business receives
 error.required.ba.suspicious.activity = Select yes if your business has written guidance for staff on how to report suspicious activity
 error.required.ba.tax.matters = Select yes if your professional adviser also manages your tax affairs with HMRC
 error.required.ba.advisor.name = Enter your professional adviser’s name
+error.required.ba.select.yes = Select yes if you had customers who lived or worked outside of the UK in the last 12 months
 
 ###############################  Trading premises ###############################
 error.required.tp.activity.your.business.do = Select one or more options to show what your business does at these premises
@@ -382,8 +383,8 @@ error.required.renewal.hvd.percentage = Select the percentage of your turnover t
 
 error.invalid.renewal.msb.wc.moneySources = Select who supplied your physical foreign currency in the last 12 months
 
-error.required.renewal.country.name = Enter the countries you sent the most transactions to in the last 12 months
-error.required.renewal.customers.outside.uk = Enter the countries where customers lived or worked
+error.required.renewal.country.name = Enter an official country name: for example, Holland is Netherlands
+error.required.renewal.customer.country.name = Enter the countries where customers lived or worked
 
 error.required.renewal.ce.transactions.in.12months = Enter how many currency exchange transactions you made in the last 12 months
 error.required.renewal.fx.transactions.in.12months = Enter how many foreign exchange transactions you made in the last 12 months
@@ -402,6 +403,8 @@ error.required.deregistration.reason = You must select a reason for de-registeri
 error.required.deregistration.reason.other = You haven’t specified the reason for de-registering the business. Enter the reason for de-registering
 
 error.updateanyInformation.validationerror = Select yes if you want to update any other information
+
+error.required.ba.renewal.select.yes = Select yes if you had customers who lived or worked outside of the UK in the last 12 months
 
 ################################# Declaration #####################################
 error.required.declaration.nominated.officer = Select one of your responsible people or register someone else as the nominated officer for the business
@@ -1492,10 +1495,10 @@ businessactivities.ncaRegistered.p1 = To report suspicious activity to the NCA y
 businessactivities.ncaRegistered.p2 = You’re not legally required to register.
 
 businessactivities.customer.outside.uk.title = Do you have customers who live or work outside of the UK?
-businessactivities.hight.value.customer.lbl = Where do these customers live or work?
-businessactivities.hight.value.customer.lbl.hint = List up to 10 countries. Include countries for customers who bring in the most revenue to your business.
+businessactivities.high.value.customer.lbl = Where do these customers live or work?
+businessactivities.high.value.customer.lbl.hint = List up to 10 countries. If there are more than 10, list the countries for the customers who brought in the most revenue.
 businessactivities.upto.10.countries = List up to 10 countries.
-businessactivities.accountantForAMLSRegulations.title = Does your business receive professional advice on Money Laundering Regulations and due diligence? 
+businessactivities.accountantForAMLSRegulations.title = Does your business receive professional advice on Money Laundering Regulations and due diligence?
 businessactivities.accountantForAMLSRegulations.subtext = This only applies to guidance from a professional adviser who is not part of your business, like an accountant.
 businessactivities.riskassessment.policy.title = Does your business have a documented risk assessment policy and procedure?
 businessactivities.document.riskassessment.policy.title = How do you document your risk assessment policy and procedure?
@@ -2187,6 +2190,8 @@ renewal.involvedinother.listline3 = selling software packages
 
 
 renewal.customer.outside.uk.title = In the last 12 months did you have customers who lived or worked outside of the UK?
+renewal.customer.outside.uk.countries.title = Which countries did these customers live or work in?
+renewal.customer.outside.uk.countries.text = You’ve told us you have customers who lived or worked outside of the UK in the last 12 months.
 
 renewal.turnover.title.single.service = How much total net profit did your business make in the last 12 months from the following service?
 renewal.turnover.title = How much total net profit did your business make from services registered for anti-money laundering supervision in the last 12 months?

@@ -93,6 +93,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           Some(InvolvedInOtherYes("test")),
           Some(BusinessTurnover.First),
           Some(AMLSTurnover.First),
+          Some(CustomersOutsideIsUK(true)),
           Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
           Some(PercentageOfCashPaymentOver15000.First),
           Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other")))))),
@@ -206,6 +207,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
       "ASP is selected business activity and section is complete along with standard renewal flow questions" in new ASPFixture {
         val model = preFilledModel.copy(
+          customersOutsideIsUK = Some(CustomersOutsideIsUK(true)),
           customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB")))))
         )
         await(service.isRenewalComplete(model)) mustBe true
@@ -213,6 +215,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
       "HVD is selected business activity and section is complete along with standard renewal flow questions" in new HVDFixture {
         val model = preFilledModel.copy(
+          customersOutsideIsUK = Some(CustomersOutsideIsUK(true)),
           customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
           percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
           receiveCashPayments = Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other"))))))
@@ -223,6 +226,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
       "ASP and HVD are selected business activities and section is complete along with standard renewal flow questions" in new ASPHVDFixture {
         val model = preFilledModel.copy(
+          customersOutsideIsUK = Some(CustomersOutsideIsUK(true)),
           customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
           percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
           receiveCashPayments = Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other"))))))
