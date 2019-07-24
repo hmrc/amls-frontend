@@ -24,8 +24,9 @@ object CashPayments {
 
   implicit val jsonReads: Reads[CashPayments] = {
     (__ \ "receivePayments").read[Boolean] flatMap {
-      case true => (__ \ "paymentMethods").read[PaymentMethods] map { x =>
-        CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(x)))
+      case true => (__ \ "paymentMethods").readNullable[PaymentMethods] map {
+        case Some(x) => CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(x)))
+        case _ => CashPayments(CashPaymentsCustomerNotMet(true), None)
       }
       case false => Reads(_ => JsSuccess(CashPayments(CashPaymentsCustomerNotMet(false), None)))
     }
