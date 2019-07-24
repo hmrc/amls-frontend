@@ -31,4 +31,7 @@ class ServiceFlow @Inject()(businessMatchingService: BusinessMatchingService, ca
 
   def isNewActivity(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =
     businessMatchingService.getAdditionalBusinessActivities map {_.contains(activity)} getOrElse false
+
+  def isNewActivity(cacheId: String, activity: BusinessActivity)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =
+    businessMatchingService.getAdditionalBusinessActivities(cacheId) map {_.contains(activity)} getOrElse false
 }
