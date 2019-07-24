@@ -83,7 +83,7 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
     Logger.debug(s"[Hvd][isComplete] $this")
     this match {
         case Hvd(Some(cp), Some(pr), _, Some(_), Some(_), Some(true), Some(_), Some(_), _, _, true)
-          if pr.items.forall(item => item != Alcohol && item != Tobacco) & cp.isCashPaymentsComplete => true
+          if pr.items.forall(item => item != Alcohol && item != Tobacco) && cp.isCashPaymentsComplete => true
 
         case Hvd(Some(cp), Some(_), Some(_), Some(_), Some(_), Some(true), Some(_), Some(_), _, _, true)
         if cp.isCashPaymentsComplete => true
