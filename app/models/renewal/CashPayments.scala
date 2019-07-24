@@ -16,40 +16,40 @@
 
 package models.renewal
 
-import play.api.libs.json.{Json, Reads, Writes, __}
+import play.api.libs.json._
 
 case class CashPayments(cashPaymentsCustomerNotMet: CashPaymentsCustomerNotMet, howCashPaymentsReceived: Option[HowCashPaymentsReceived])
 
 object CashPayments {
 
   implicit val jsonReads: Reads[CashPayments] = {
-    import play.api.libs.functional.syntax._
-    ((__ \ "receivePayments").read[Boolean] map CashPaymentsCustomerNotMet.apply and
-      (__ \ "paymentMethods").readNullable[PaymentMethods].map {
-        case Some(methods) => Some(HowCashPaymentsReceived.apply(methods))
-        case _ => None
-      })(CashPayments.apply _ )
+    (__ \ "receivePayments").read[Boolean] flatMap {
+      case true => (__ \ "paymentMethods").read[PaymentMethods] map { x =>
+        CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(x)))
+      }
+      case false => Reads(_ => JsSuccess(CashPayments(CashPaymentsCustomerNotMet(false), None)))
+    }
   }
 
   implicit val jsonWrites: Writes[CashPayments] = {
     Writes[CashPayments] {
-        case CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(cp))) =>
-          val maybeOther = if(cp.other.isDefined) {
-            Json.obj("details" -> cp.other)
-          } else {
-            Json.obj()
-          }
+      case CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(cp))) =>
+        val maybeOther = if (cp.other.isDefined) {
+          Json.obj("details" -> cp.other)
+        } else {
+          Json.obj()
+        }
 
-          val payMet = Json.obj(
-            "courier" -> cp.courier,
-            "direct" -> cp.direct,
-            "other" -> cp.other.isDefined
-          ) ++ maybeOther
+        val payMet = Json.obj(
+          "courier" -> cp.courier,
+          "direct" -> cp.direct,
+          "other" -> cp.other.isDefined
+        ) ++ maybeOther
 
-         Json.obj("receivePayments" -> true,
+        Json.obj("receivePayments" -> true,
           "paymentMethods" -> payMet)
-        case CashPayments(CashPaymentsCustomerNotMet(receivePayments), _) => Json.obj("receivePayments" -> receivePayments)
-      }
+      case CashPayments(CashPaymentsCustomerNotMet(receivePayments), _) => Json.obj("receivePayments" -> receivePayments)
+    }
   }
 
   implicit def convert(model: CashPayments): Option[models.hvd.PaymentMethods] = model.howCashPaymentsReceived map { pm =>
