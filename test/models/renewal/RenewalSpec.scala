@@ -20,15 +20,108 @@ import models.Country
 import play.api.libs.json.{JsSuccess, Json}
 import utils.AmlsSpec
 
+import scala.collection.Seq
+
 class RenewalSpec extends AmlsSpec {
 
   "The Renewal model" must {
+    "succesfully validate if model is complete" when {
+      "json is complete" in {
+        val completeRenewal = Renewal(customersOutsideIsUK = Some(CustomersOutsideIsUK(true)),
+          customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))))
+
+        val json = Json.obj(
+          "customersOutsideIsUK" -> Json.obj(
+            "isOutside" -> true
+          ),
+          "customersOutsideUK" -> Json.obj(
+            "countries" -> Seq("GB")
+          ),
+          "hasChanged" -> false,
+          "hasAccepted" -> true
+        )
+
+        json.as[Renewal] must be(completeRenewal)
+      }
+    }
+
+    "succesfully validate json" when {
+      "CustomersOutsideIsUK is false" in {
+        val renewal = Renewal(customersOutsideIsUK = Some(CustomersOutsideIsUK(false)), customersOutsideUK = Some(CustomersOutsideUK(None)))
+
+        val json = Json.obj(
+          "customersOutsideUK" -> Json.obj(
+            "isOutside" -> false
+          ),
+          "hasChanged" -> false,
+          "hasAccepted" -> true
+        )
+
+        json.as[Renewal] must be(renewal)
+      }
+    }
 
     "serialize to and from JSON" in {
 
-      val model = Renewal()
+     val completeRenewal = Renewal(
+        Some(InvolvedInOtherYes("test")),
+        Some(BusinessTurnover.First),
+        Some(AMLSTurnover.First),
+        Some(CustomersOutsideIsUK(false)),
+        None,
+        Some(PercentageOfCashPaymentOver15000.First),
+        Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other")))))),
+        Some(TotalThroughput("01")),
+        Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
+        Some(TransactionsInLast12Months("1500")),
+        Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))),
+        Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+        Some(CETransactionsInLast12Months("123")),
+        hasChanged = true
+      )
 
-      Json.fromJson[Renewal](Json.toJson(model)) mustBe JsSuccess(model)
+      val json = Json.parse("""
+         {"involvedInOtherActivities":
+         {"involvedInOther":true,"details":"test"},
+         "businessTurnover":{"businessTurnover":"01"},
+         "turnover":{"turnover":"01"},
+         "customersOutsideIsUK":{"isOutside":false},
+         "percentageOfCashPaymentOver15000":{"percentage":"01"},
+         "receiveCashPayments":{"receivePayments":true,"paymentMethods":{"courier":true,"direct":true,"other":true,"details":"other"}},
+         "totalThroughput":{"throughput":"01"},
+         "whichCurrencies":{"currencies":["EUR"],
+         "usesForeignCurrencies":null,"moneySources":{}},
+         "transactionsInLast12Months":{"transfers":"1500"},
+         "sendTheLargestAmountsOfMoney":{"country_1":"GB"},
+         "mostTransactions":{"mostTransactionsCountries":["GB"]},
+         "ceTransactionsInLast12Months":{"ceTransaction":"123"},
+         "hasChanged":true,
+         "hasAccepted":true}
+          """.stripMargin)
+
+      Json.fromJson[Renewal](json) mustBe JsSuccess(completeRenewal)
+    }
+
+    "roundtrip through json" in {
+
+      val completeRenewal = Renewal(
+        Some(InvolvedInOtherYes("test")),
+        Some(BusinessTurnover.First),
+        Some(AMLSTurnover.First),
+        Some(CustomersOutsideIsUK(false)),
+        None,
+        Some(PercentageOfCashPaymentOver15000.First),
+        Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other")))))),
+        Some(TotalThroughput("01")),
+        Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
+        Some(TransactionsInLast12Months("1500")),
+        Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))),
+        Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+        Some(CETransactionsInLast12Months("123")),
+        hasChanged = true
+      )
+
+      Json.fromJson[Renewal](Json.toJson(completeRenewal)) mustEqual JsSuccess(completeRenewal)
     }
 
   }

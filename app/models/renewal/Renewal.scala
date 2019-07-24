@@ -18,7 +18,7 @@ package models.renewal
 
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.{Path, Rule, ValidationError}
-import models.ValidationRule
+import models.{Country, ValidationRule}
 import play.api.libs.json.{Json, Reads}
 
 case class Renewal(
@@ -118,9 +118,10 @@ object Renewal {
       (__ \ "involvedInOtherActivities").readNullable[InvolvedInOther] and
         (__ \ "businessTurnover").readNullable[BusinessTurnover] and
         (__ \ "turnover").readNullable[AMLSTurnover] and
-        ((__ \ "customersOutsideUK" \"isOutside").read[Boolean].map(c => Option(CustomersOutsideIsUK(c))) or
+        ((__ \ "customersOutsideUK" \"isOutside").read[Boolean].map(c => Option(CustomersOutsideIsUK(c))) orElse
           (__ \ "customersOutsideIsUK").readNullable[CustomersOutsideIsUK]) and
-        (__ \ "customersOutsideUK").readNullable[CustomersOutsideUK] and
+        ((__ \ "customersOutsideUK" \"countries").readNullable[Seq[Country]].map(c => Option(CustomersOutsideUK(c))) orElse
+          (__ \ "customersOutsideUK").readNullable[CustomersOutsideUK]) and
         (__ \ "percentageOfCashPaymentOver15000").readNullable[PercentageOfCashPaymentOver15000] and
         (__ \ "receiveCashPayments").readNullable[CashPayments] and
         (__ \ "totalThroughput").readNullable[TotalThroughput] and
