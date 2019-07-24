@@ -27,12 +27,12 @@ class CashPaymentsSpec extends AmlsSpec {
   "CashPayments" must {
     "roundtrip through json for true" in {
       val data = CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(paymentMethods)))
-      CashPayments.jsonReads.reads(CashPayments.jsonWrites.writes(data)) mustEqual JsSuccess(data)
+      CashPayments.jsonReads.reads(CashPayments.jsonWrites.writes(data)).asOpt.value mustEqual data
     }
 
     "roundtrip through json for false" in {
       val data = CashPayments(CashPaymentsCustomerNotMet(false), None)
-      CashPayments.jsonReads.reads(CashPayments.jsonWrites.writes(data)) mustEqual JsSuccess(data)
+      CashPayments.jsonReads.reads(CashPayments.jsonWrites.writes(data)).asOpt.value mustEqual data
     }
   }
 

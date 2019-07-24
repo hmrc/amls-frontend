@@ -125,4 +125,21 @@ class RenewalSpec extends AmlsSpec {
     }
 
   }
+
+  "successfully validate json" when {
+    "receiveCashPayments is false" in {
+      val renewal = Renewal(receiveCashPayments = Some(CashPayments(CashPaymentsCustomerNotMet(false), None)))
+
+      val json = Json.obj(
+        "receiveCashPayments" -> Json.obj(
+          "receivePayments" -> false,
+          "paymentMethods" -> Json.obj()
+        ),
+        "hasChanged" -> false,
+        "hasAccepted" -> true
+      )
+
+      json.as[Renewal] must be(renewal)
+    }
+  }
 }
