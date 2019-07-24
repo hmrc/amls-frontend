@@ -41,6 +41,7 @@ class FeeConnector @Inject()(
                                              ac: AuthContext
   ): Future[FeeResponse] = {
 
+    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
     val getUrl = s"$feePaymentUrl/$accountType/$accountId/$amlsRegistrationNumber"

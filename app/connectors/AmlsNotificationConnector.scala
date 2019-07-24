@@ -38,6 +38,7 @@ class AmlsNotificationConnector @Inject()(val http: WSHttp,
                                                           ac: AuthContext
   ): Future[Seq[NotificationRow]] = {
 
+    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
     val getUrl = s"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber"

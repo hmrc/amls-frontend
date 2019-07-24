@@ -114,7 +114,7 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
   /**
     * Inserts data into the cache with the specified key. If the data does not exist, it will be created.
     */
-  def createOrUpdate[T](credId: String, oId: String, data: T, key: String)(implicit writes: Writes[T]): Future[Cache] = {
+  def createOrUpdate[T](credId: String, oId: Option[String], data: T, key: String)(implicit writes: Writes[T]): Future[Cache] = {
     val jsonData = if (appConfig.mongoEncryptionEnabled) {
       val jsonEncryptor = new JsonEncryptor[T]()
       Json.toJson(Protected(data))(jsonEncryptor)
@@ -122,7 +122,7 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
       Json.toJson(data)
     }
 
-    fetchAll(credId, deprecatedFilter = false) flatMap { maybeNewCache =>
+    fetchAll(Some(credId), deprecatedFilter = false) flatMap { maybeNewCache =>
       fetchAll(oId, deprecatedFilter = true) flatMap { maybeCache =>
         val cache: Cache = maybeNewCache.getOrElse(maybeCache.getOrElse(Cache(credId, Map.empty)))
 
@@ -143,9 +143,9 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
   /**
     * Removes the item with the specified key from the cache
     */
-  def removeByKey[T](credId: String, oId: String, key: String)(implicit writes: Writes[T]): Future[Cache] = {
+  def removeByKey[T](credId: String, oId: Option[String], key: String)(implicit writes: Writes[T]): Future[Cache] = {
 
-    fetchAll(credId, deprecatedFilter = false) flatMap { maybeNewCache =>
+    fetchAll(Some(credId), deprecatedFilter = false) flatMap { maybeNewCache =>
       fetchAll(oId, deprecatedFilter = true) flatMap { maybeCache =>
         val cache = maybeNewCache.getOrElse(maybeCache.getOrElse(Cache(credId, Map.empty)))
 
@@ -189,8 +189,8 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
       case _ => None
     }
 
-  def find[T](credId: String, oId: String, key: String)(implicit reads: Reads[T]): Future[Option[T]] = {
-    val cacheWithCredId: Future[Option[T]] = fetchAll(credId, deprecatedFilter = false) map {
+  def find[T](credId: String, oId: Some[String], key: String)(implicit reads: Reads[T]): Future[Option[T]] = {
+    val cacheWithCredId: Future[Option[T]] = fetchAll(Some(credId), deprecatedFilter = false) map {
       case Some(cache) => decryptOrGetValue(cache, key)(reads)
       case _ => None
     }
@@ -212,10 +212,13 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
     case c => c
   }
 
-  def fetchAll(id: String, deprecatedFilter: Boolean): Future[Option[Cache]] = {
-    collection.find(key(id, deprecatedFilter)).one[Cache] map {
-      case Some(c) if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c, compositeSymmetricCrypto))
-      case c => c
+  def fetchAll(id: Option[String], deprecatedFilter: Boolean): Future[Option[Cache]] = {
+    id match {
+      case Some(x) =>  collection.find(key(x, deprecatedFilter)).one[Cache] map {
+        case Some(c) if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c, compositeSymmetricCrypto))
+        case c => c
+      }
+      case _ => Future.successful(None)
     }
   }
 
@@ -223,9 +226,9 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
     * Fetches the whole cache and returns default where not exists
     */
   def fetchAllWithDefault(id: String, deprecatedFilter: Boolean): Future[Cache] =
-    fetchAll(id, deprecatedFilter).map {
-    _.getOrElse(Cache(id, Map.empty))
-  }
+    fetchAll(Some(id), deprecatedFilter).map {
+      _.getOrElse(Cache(id, Map.empty))
+    }
 
   /**
     * Removes the item with the specified id from the cache
@@ -303,9 +306,9 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
   private def tryDecrypt(value: Crypted): PlainText = Try {
     compositeSymmetricCrypto.decrypt(value).value
   } match {
-      case Success(v) => PlainText(v)
-      case Failure(e) if e.isInstanceOf[SecurityException] => PlainText(value.value)
-      case Failure(e) => throw e
+    case Success(v) => PlainText(v)
+    case Failure(e) if e.isInstanceOf[SecurityException] => PlainText(value.value)
+    case Failure(e) => throw e
   }
 
   private def decryptOrGetValue[T](cache: Cache, key: String)(implicit reads: Reads[T] ) =

@@ -25,6 +25,7 @@ import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawSubscriptionRespo
 import models.{AmendVariationRenewalResponse, _}
 import play.api.Logger
 import play.api.libs.json.{Json, Writes}
+import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolments}
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
@@ -51,6 +52,7 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
    ac: AuthContext
   ): Future[SubscriptionResponse] = {
 
+    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
     val postUrl = s"$url/$accountType/$accountId/$safeId"
@@ -63,6 +65,7 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     }
   }
 
+  @deprecated("to be removed when new auth completely implemented")
   def status(amlsRegistrationNumber: String)
             (implicit
              headerCarrier: HeaderCarrier,
@@ -71,6 +74,22 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
              ac: AuthContext): Future[ReadStatusResponse] = {
 
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+
+    val getUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/status"
+    val prefix = "[AmlsConnector][status]"
+    Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
+
+    httpGet.GET[ReadStatusResponse](getUrl) map {
+      response =>
+        Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
+        response
+    }
+  }
+
+  def status(amlsRegistrationNumber: String, accountTypeId: (String, String))
+            (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, reqW: Writes[ReadStatusResponse]): Future[ReadStatusResponse] = {
+
+    val (accountType, accountId) = accountTypeId
 
     val getUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/status"
     val prefix = "[AmlsConnector][status]"
