@@ -48,8 +48,8 @@ class ServicesOfBusinessController @Inject()(val dataCacheConnector: DataCacheCo
   }
 
   def post(edit: Boolean = false) = authAction.async {
-    import jto.validation.forms.Rules._
       implicit request =>
+        import jto.validation.forms.Rules._
         Form2[ServicesOfBusiness](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(services_of_business(f, edit)))

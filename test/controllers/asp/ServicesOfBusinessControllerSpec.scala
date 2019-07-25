@@ -16,6 +16,7 @@
 
 package controllers.asp
 
+import controllers.actions.SuccessfulAuthAction
 import models.asp._
 import models.businessmatching.AccountancyServices
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
@@ -25,26 +26,26 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
 
   val emptyCache = CacheMap("", Map.empty)
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
     val request = addToken(authRequest)
 
     val controller = new ServicesOfBusinessController(
       mockCacheConnector,
       mockStatusService,
-      self.authConnector,
+      authAction = SuccessfulAuthAction,
       mockServiceFlow
     )
 
     mockCacheFetch[Asp](None)
     mockCacheSave[Asp]
-    mockIsNewActivity(false)
+    mockIsNewActivityNewAuth(false)
   }
 
   "ServicesOfBusinessController" must {
@@ -63,7 +64,7 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
         "services" -> "04"
       )
 
-      mockApplicationStatus(SubmissionDecisionRejected)
+      mockApplicationStatusNewAuth(SubmissionDecisionRejected)
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -113,7 +114,7 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
         "services[2]" -> "03"
       )
 
-      mockApplicationStatus(SubmissionDecisionRejected)
+      mockApplicationStatusNewAuth(SubmissionDecisionRejected)
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -123,7 +124,7 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
     "go to the date of change page" when {
       "the submission has been approved and registeredOffice has changed" in new Fixture {
 
-        mockApplicationStatus(SubmissionDecisionApproved)
+        mockApplicationStatusNewAuth(SubmissionDecisionApproved)
 
         val newRequest = request.withFormUrlEncodedBody(
           "services[0]" -> "02",
@@ -139,7 +140,7 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
     "go to the date of change page" when {
       "status is ready for renewal and services selection has changed" in new Fixture {
 
-        mockApplicationStatus(ReadyForRenewal(None))
+        mockApplicationStatusNewAuth(ReadyForRenewal(None))
 
         val newRequest = request.withFormUrlEncodedBody(
           "services[0]" -> "02",
@@ -161,8 +162,8 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
               "services[1]" -> "01",
               "services[2]" -> "03")
 
-            mockApplicationStatus(SubmissionDecisionApproved)
-            mockIsNewActivity(true, Some(AccountancyServices))
+            mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+            mockIsNewActivityNewAuth(true, Some(AccountancyServices))
 
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
