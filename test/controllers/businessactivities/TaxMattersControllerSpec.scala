@@ -17,6 +17,7 @@
 package controllers.businessactivities
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.businessactivities._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -40,7 +41,7 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
     val controller = new TaxMattersController (
       dataCacheConnector = mock[DataCacheConnector],
-      authConnector = self.authConnector
+      SuccessfulAuthAction
     )
   }
 
@@ -49,7 +50,7 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
     "get is called" must {
       "display the 'Manage Your Tax Affairs?' page with an empty form" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(BusinessActivities(
             whoIsYourAccountant = Some(WhoIsYourAccountant(accountantsName = "Accountant name",
               accountantsTradingName = None,
@@ -66,7 +67,7 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
       "display the 'Manage Your Tax Affairs?' page with pre populated data if found in cache" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(BusinessActivities(taxMatters = Some(TaxMatters(true)),
             whoIsYourAccountant = Some(WhoIsYourAccountant(accountantsName = "Accountant name",
               accountantsTradingName = None, address = UkAccountantsAddress("", "", None, None, "")))))))
@@ -87,14 +88,11 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
           "manageYourTaxAffairs" -> "true"
         )
 
-        when(
-          controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any())
-        ).thenReturn(Future.successful(None))
-        when(
-          controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any())
-        ).thenReturn(
-          Future.successful(CacheMap(BusinessActivities.key, Map("" -> Json.obj())))
-        )
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          .thenReturn(Future.successful(None))
+
+        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(CacheMap(BusinessActivities.key, Map("" -> Json.obj()))))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -102,7 +100,7 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
       }
 
       "respond with Bad Request on post with invalid data" in new Fixture {
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(BusinessActivities(
             whoIsYourAccountant = Some(WhoIsYourAccountant(accountantsName = "Accountant name",
               accountantsTradingName = None,
@@ -124,15 +122,11 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
           "manageYourTaxAffairs" -> "true"
         )
 
-        when(
-          controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any())
-        ).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          .thenReturn(Future.successful(None))
 
-        when(
-          controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any())
-        ).thenReturn(
-          Future.successful(CacheMap(BusinessActivities.key, Map("" -> Json.obj())))
-        )
+        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(CacheMap(BusinessActivities.key, Map("" -> Json.obj()))))
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)

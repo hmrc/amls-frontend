@@ -18,18 +18,20 @@ package controllers.businessactivities
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.businessactivities.{BusinessFranchiseYes, BusinessActivities}
+import controllers.actions.SuccessfulAuthAction
+import models.businessactivities.{BusinessActivities, BusinessFranchiseYes}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
+import utils.AmlsSpec
 import play.api.test.Helpers._
 import play.api.i18n.Messages
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
+
 import scala.concurrent.Future
 
 class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures{
@@ -39,7 +41,7 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
 
     val controller = new BusinessFranchiseController (
       dataCacheConnector = mock[DataCacheConnector],
-      authConnector = self.authConnector
+      SuccessfulAuthAction
     )
   }
 
@@ -49,7 +51,7 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
 
     "get is called" must {
       "on get display the is your business a franchise page" in new Fixture {
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -63,7 +65,7 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
       }
 
       "on get display the is your business a franchise page with pre populated data" in new Fixture {
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(BusinessActivities(businessFranchise = Some(BusinessFranchiseYes("test test"))))))
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -86,11 +88,11 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
             "franchiseName" -> "test test"
           )
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-            (any(), any(), any())).thenReturn(Future.successful(None))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+            .thenReturn(Future.successful(None))
 
-          when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(false)(newRequest)
           status(result) must be(SEE_OTHER)
@@ -103,11 +105,11 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
             "franchiseName" -> "test"
           )
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-            (any(), any(), any())).thenReturn(Future.successful(None))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+            .thenReturn(Future.successful(None))
 
-          when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(true)(newRequest)
           status(result) must be(SEE_OTHER)

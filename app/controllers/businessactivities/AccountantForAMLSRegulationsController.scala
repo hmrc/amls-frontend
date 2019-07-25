@@ -17,22 +17,22 @@
 package controllers.businessactivities
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import com.google.inject.Inject
 import models.businessactivities.{AccountantForAMLSRegulations, BusinessActivities}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.businessactivities._
 
 import scala.concurrent.Future
 
 class AccountantForAMLSRegulationsController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                                        override val authConnector: AuthConnector
-                                                       ) extends BaseController {
+                                                        val authAction: AuthAction
+                                                       ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key) map {
         response =>
           val form: Form2[AccountantForAMLSRegulations] = (for {
             businessActivities <- response
@@ -43,15 +43,15 @@ class AccountantForAMLSRegulationsController @Inject() (val dataCacheConnector: 
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request => {
       Form2[AccountantForAMLSRegulations](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(accountant_for_amls_regulations(f, edit)))
         case ValidForm(_, data) =>
           for {
-            businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key, updateModel(businessActivities, Some(data)))
+            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.cacheId,BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](request.cacheId, BusinessActivities.key, updateModel(businessActivities, Some(data)))
           } yield (edit, data.accountantForAMLSRegulations) match {
             case (false, true) | (true, true) => Redirect(routes.WhoIsYourAccountantController.get())
             case _ => Redirect(routes.SummaryController.get())
