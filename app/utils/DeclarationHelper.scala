@@ -68,9 +68,18 @@ object DeclarationHelper {
       case _ => declaration.routes.WhoIsTheBusinessNominatedOfficerController.getWithAmendment()
     }
   }
-
+@deprecated("To be removed when auth upgrade is in place")
   def statusSubtitle()(implicit statusService: StatusService, hc: HeaderCarrier, auth: AuthContext): Future[String] = {
     statusService.getStatus map {
+      case SubmissionReady => "submit.registration"
+      case SubmissionReadyForReview | SubmissionDecisionApproved => "submit.amendment.application"
+      case ReadyForRenewal(_) | RenewalSubmitted(_) => "submit.renewal.application"
+      case _ => throw new Exception("Incorrect status - Page not permitted for this status")
+    }
+  }
+
+  def statusSubtitle(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)(implicit statusService: StatusService, hc: HeaderCarrier): Future[String] = {
+    statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) map {
       case SubmissionReady => "submit.registration"
       case SubmissionReadyForReview | SubmissionDecisionApproved => "submit.amendment.application"
       case ReadyForRenewal(_) | RenewalSubmitted(_) => "submit.renewal.application"

@@ -17,11 +17,10 @@
 package controllers.declaration
 
 import javax.inject.{Inject, Singleton}
-
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.declaration.BusinessPartners
 import models.responsiblepeople.ResponsiblePerson._
@@ -30,20 +29,37 @@ import models.status.{RenewalSubmitted, _}
 import play.api.mvc.{AnyContent, Request, Result}
 import services.{ProgressService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.DeclarationHelper._
-import utils.StatusConstants
+import utils.AuthAction
 import views.html.declaration.register_partners
 
 import scala.concurrent.Future
 
 @Singleton
-class RegisterPartnersController @Inject()(val authConnector: AuthConnector,
+class RegisterPartnersController @Inject()(authAction: AuthAction,
                                            val dataCacheConnector: DataCacheConnector,
                                            implicit val statusService: StatusService,
                                            implicit val progressService: ProgressService
-                                          ) extends BaseController {
-
+                                          ) extends DefaultBaseController {
+  def businessPartnersView(amlsRegistrationNo: Option[String],
+                           accountTypeId: (String, String),
+                           cacheId: String,
+                           status: Status,
+                           form: Form2[BusinessPartners],
+                           rp: Seq[ResponsiblePerson])
+                          (implicit request: Request[AnyContent]): Future[Result] = {
+    statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) map {
+      case SubmissionReady =>
+        status(register_partners("submit.registration", form, getNonPartners(rp), currentPartnersNames(rp)))
+      case SubmissionReadyForReview | SubmissionDecisionApproved =>
+        status(register_partners("submit.amendment.application", form, getNonPartners(rp), currentPartnersNames(rp)))
+      case ReadyForRenewal(_) | RenewalSubmitted(_) =>
+        status(register_partners("submit.renewal.application", form, getNonPartners(rp), currentPartnersNames(rp)))
+      case _ =>
+        throw new Exception("Incorrect status - Page not permitted for this status")
+    }
+  }
+  @deprecated("To be removed when auth upgrade is in place")
   def businessPartnersView(status: Status, form: Form2[BusinessPartners], rp: Seq[ResponsiblePerson])
                           (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] = {
     statusService.getStatus map {
@@ -57,13 +73,27 @@ class RegisterPartnersController @Inject()(val authConnector: AuthConnector,
         throw new Exception("Incorrect status - Page not permitted for this status")
     }
   }
-
+@deprecated("To be removed when auth upgardes are done")
   private def saveAndRedirect(data : BusinessPartners) (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] = {
     (for {
       responsiblePeople <- dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key)
       rp <- updatePartners(responsiblePeople, data)
       _ <- dataCacheConnector.save(ResponsiblePerson.key, rp)
       url <- progressService.getSubmitRedirect
+    } yield url match {
+      case Some(x) => Redirect(x)
+      case _ => InternalServerError("Unable to get redirect url")
+    }) recoverWith {
+      case _ : Throwable => Future.successful(InternalServerError("Unable to save data and get redirect link"))
+    }
+  }
+
+  private def saveAndRedirect(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String, data : BusinessPartners) (implicit request: Request[AnyContent]): Future[Result] = {
+    (for {
+      responsiblePeople <- dataCacheConnector.fetch[Seq[ResponsiblePerson]](cacheId, ResponsiblePerson.key)
+      rp <- updatePartners(responsiblePeople, data)
+      _ <- dataCacheConnector.save(cacheId, ResponsiblePerson.key, rp)
+      url <- progressService.getSubmitRedirect(amlsRegistrationNo, accountTypeId, cacheId)
     } yield url match {
       case Some(x) => Redirect(x)
       case _ => InternalServerError("Unable to get redirect url")
@@ -93,12 +123,12 @@ class RegisterPartnersController @Inject()(val authConnector: AuthConnector,
     people.filter(_.positions.fold(false)(p => !p.positions.contains(Partner)))
   }
 
-  def get() = Authorised.async {
-    implicit authContext => implicit request => {
+  def get() = authAction.async {
+    implicit request => {
 
       val result = for {
-        subtitle <- OptionT.liftF(statusSubtitle())
-        responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key))
+        subtitle <- OptionT.liftF(statusSubtitle(request.amlsRefNumber, request.accountTypeId, request.cacheId))
+        responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.cacheId, ResponsiblePerson.key))
       } yield {
         Ok(views.html.declaration.register_partners(
           subtitle,
@@ -111,16 +141,16 @@ class RegisterPartnersController @Inject()(val authConnector: AuthConnector,
     }
   }
 
-  def post() = Authorised.async {
-    implicit authContext => implicit request => {
+  def post() = authAction.async {
+    implicit request => {
       Form2[BusinessPartners](request.body) match {
         case f: InvalidForm => {
-          dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key) flatMap {
+          dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.cacheId, ResponsiblePerson.key) flatMap {
             case Some(data) => {
-              businessPartnersView(BadRequest, f, data)
+              businessPartnersView(request.amlsRefNumber, request.accountTypeId, request.cacheId, BadRequest, f, data)
             }
             case None =>
-              businessPartnersView(BadRequest, f, Seq.empty)
+              businessPartnersView(request.amlsRefNumber, request.accountTypeId, request.cacheId, BadRequest, f, Seq.empty)
           }
         }
         case ValidForm(_, data) => {
@@ -128,7 +158,7 @@ class RegisterPartnersController @Inject()(val authConnector: AuthConnector,
             case "-1" =>
               Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, Some(flowFromDeclaration))))
             case _ =>
-              saveAndRedirect(data)
+              saveAndRedirect(request.amlsRefNumber, request.accountTypeId, request.cacheId, data)
           }
         }
       }

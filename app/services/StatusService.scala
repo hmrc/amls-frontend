@@ -111,7 +111,7 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     }
   }
 
-  def getStatus(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)
+  def getStatus(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)
                (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[SubmissionStatus] = {
     amlsRegistrationNo match {
         case Some(mlrRegNumber) =>
@@ -119,7 +119,7 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
           etmpStatus(mlrRegNumber, accountTypeId)(hc, ec)
         case None =>
           Logger.debug("StatusService:getStatus: No mlrRegNumber")
-          notYetSubmitted(credId)(hc, ec)
+          notYetSubmitted(cacheId)(hc, ec)
       }
   }
 
