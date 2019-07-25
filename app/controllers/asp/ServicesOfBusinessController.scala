@@ -17,14 +17,13 @@
 package controllers.asp
 
 import connectors.DataCacheConnector
-import controllers.{BaseController, DefaultBaseController}
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.asp.{Asp, ServicesOfBusiness}
 import models.businessmatching.AccountancyServices
 import services.StatusService
 import services.businessmatching.ServiceFlow
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthAction, DateOfChangeHelper}
 import views.html.asp._
 

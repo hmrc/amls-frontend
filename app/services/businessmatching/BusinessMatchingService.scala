@@ -48,6 +48,7 @@ class BusinessMatchingService @Inject()(
     } yield bm.preAppComplete
   } getOrElse false
 
+  @deprecated("To be removed when auth implementation is complete")
   def getModel(implicit ac:AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, BusinessMatching] =
     OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
 
@@ -57,7 +58,7 @@ class BusinessMatchingService @Inject()(
   def updateModel(model: BusinessMatching)
                  (implicit ac:AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, CacheMap] =
       OptionT.liftF(dataCacheConnector.save[BusinessMatching](BusinessMatching.key, model))
-
+  @deprecated("To be removed when auth implementation is complete")
   private def fetchActivitySet(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext) =
     for {
       viewResponse <- OptionT(dataCacheConnector.fetch[ViewResponse](ViewResponse.key))
@@ -77,7 +78,7 @@ class BusinessMatchingService @Inject()(
     } yield (current.businessActivities, current.removeActivities.fold(submitted.businessActivities) { removed =>
       submitted.businessActivities diff removed
     })
-
+  @deprecated("To be removed when auth implementation is complete")
   private def getActivitySet(fn: (Set[BusinessActivity], Set[BusinessActivity]) => Set[BusinessActivity])
                             (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
     fetchActivitySet map fn.tupled
@@ -85,7 +86,7 @@ class BusinessMatchingService @Inject()(
   private def getActivitySet(cacheId: String, fn: (Set[BusinessActivity], Set[BusinessActivity]) => Set[BusinessActivity])
                             (implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
     fetchActivitySet(cacheId) map fn.tupled
-
+  @deprecated("To be removed when auth implementation is complete")
   def getAdditionalBusinessActivities(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
     getActivitySet(_ diff _)
 

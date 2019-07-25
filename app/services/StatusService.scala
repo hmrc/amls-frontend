@@ -99,7 +99,7 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
         }
     }
   }
-
+  @deprecated("To be removed when auth implementation is complete")
   def getStatus(implicit hc: HeaderCarrier, authContext: AuthContext, ec: ExecutionContext): Future[SubmissionStatus] = {
     enrolmentsService.amlsRegistrationNumber flatMap {
       case Some(mlrRegNumber) =>

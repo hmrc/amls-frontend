@@ -27,11 +27,14 @@ import scala.concurrent.Future
 
 class DataCacheConnector @Inject()(val cacheConnector: MongoCacheConnector){
 
+  @deprecated("To be removed when auth implementation is complete")
   def fetch[T](cacheId: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
     cacheConnector.fetch(cacheId)
+
   def fetch[T](id: String, cacheId: String)(implicit hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
     cacheConnector.fetch(id, cacheId)
 
+  @deprecated("To be removed when auth implementation is complete")
   def save[T](cacheId: String, data: T)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
     cacheConnector.save(cacheId, data)
   def save[T](id: String, key: String, data: T)(implicit hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
