@@ -17,7 +17,7 @@
 package controllers.asp
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.DateOfChange
@@ -25,33 +25,31 @@ import models.businessdetails.BusinessDetails
 import models.asp.Asp
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.date_of_change
 
 import scala.concurrent.Future
 
 class ServicesOfBusinessDateOfChangeController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                        val authConnector: AuthConnector
-                                                       ) extends BaseController {
+                                                         val authAction: AuthAction
+                                                       ) extends DefaultBaseController {
 
-  def get = Authorised.async {
-    implicit authContext =>
+  def get = authAction.async {
       implicit request =>
         Future.successful(Ok(date_of_change(EmptyForm, "summary.asp", routes.ServicesOfBusinessDateOfChangeController.post())))
   }
 
 
-  def post = Authorised.async {
-    implicit authContext =>
+  def post = authAction.async {
       implicit request =>
-        getModelWithDateMap() flatMap {
+        getModelWithDateMap(request.cacheId) flatMap {
           case (asp, startDate) =>
             Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDate) match {
               case f: InvalidForm =>
                 Future.successful(BadRequest(date_of_change(f, "summary.asp", routes.ServicesOfBusinessDateOfChangeController.post())))
               case ValidForm(_, data) => {
                 for {
-                  _ <- dataCacheConnector.save[Asp](Asp.key,
+                  _ <- dataCacheConnector.save[Asp](request.cacheId, Asp.key,
                     asp.services match {
                       case Some(service) => {
                         val a = asp.copy(services = Some(service.copy(dateOfChange = Some(data))))
@@ -69,6 +67,21 @@ class ServicesOfBusinessDateOfChangeController @Inject()(val dataCacheConnector:
 
   private def getModelWithDateMap()(implicit authContext: AuthContext, hc: HeaderCarrier): Future[(Asp, Map[_ <: String, Seq[String]])] = {
     dataCacheConnector.fetchAll map {
+      optionalCache =>
+        (for {
+          cache <- optionalCache
+          businessDetails <- cache.getEntry[BusinessDetails](BusinessDetails.key)
+          asp <- cache.getEntry[Asp](Asp.key)
+        } yield (asp, businessDetails.activityStartDate)) match {
+          case Some((asp, Some(activityStartDate))) => (asp, Map("activityStartDate" -> Seq(activityStartDate.startDate.toString("yyyy-MM-dd"))))
+          case Some((asp, _)) => (asp, Map())
+          case _ => (Asp(), Map())
+        }
+    }
+  }
+
+  private def getModelWithDateMap(cacheId: String)(implicit hc: HeaderCarrier): Future[(Asp, Map[_ <: String, Seq[String]])] = {
+    dataCacheConnector.fetchAll(cacheId) map {
       optionalCache =>
         (for {
           cache <- optionalCache

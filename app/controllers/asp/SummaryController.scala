@@ -17,23 +17,22 @@
 package controllers.asp
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms._
 import javax.inject.Inject
 import models.asp.Asp
 import services.StatusService
 import services.businessmatching.ServiceFlow
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.asp.summary
 
 class SummaryController @Inject()(val dataCache: DataCacheConnector,
                                   val serviceFlow: ServiceFlow,
                                   val statusService: StatusService,
-                                  val authConnector: AuthConnector) extends BaseController {
-  def get = Authorised.async {
-    implicit authContext =>
+                                  authAction: AuthAction) extends DefaultBaseController {
+  def get = authAction.async {
       implicit request =>
-        dataCache.fetch[Asp](Asp.key) map {
+        dataCache.fetch[Asp](request.cacheId, Asp.key) map {
           case Some(data) =>
             Ok(summary(EmptyForm, data))
           case _ =>
@@ -41,12 +40,11 @@ class SummaryController @Inject()(val dataCache: DataCacheConnector,
         }
   }
 
-  def post = Authorised.async {
-    implicit authContext =>
+  def post = authAction.async {
       implicit request =>
         for {
-          asp <- dataCache.fetch[Asp](Asp.key)
-          _ <- dataCache.save[Asp](Asp.key, asp.copy(hasAccepted = true))
+          asp <- dataCache.fetch[Asp](request.cacheId, Asp.key)
+          _ <- dataCache.save[Asp](request.cacheId, Asp.key, asp.copy(hasAccepted = true))
         } yield Redirect(controllers.routes.RegistrationProgressController.get())
   }
 }
