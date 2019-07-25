@@ -49,7 +49,7 @@ class BranchesOrAgentsWhichCountriesController @Inject()(val dataCacheConnector:
     implicit authContext => implicit request =>
       Form2[BranchesOrAgentsWhichCountries](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.msb.branches_or_agents_which_countries(f, edit, autoCompleteService.getCountries)))
+          Future.successful(BadRequest(views.html.msb.branches_or_agents_which_countries(removeEmptyFields(f), edit, autoCompleteService.getCountries)))
         case ValidForm(_, data) =>
           for {
             msb <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
@@ -62,5 +62,15 @@ class BranchesOrAgentsWhichCountriesController @Inject()(val dataCacheConnector:
               Redirect(routes.SummaryController.get())
           }
       }
+  }
+
+  def removeEmptyFields(f: InvalidForm): InvalidForm = {
+    val csrfToken = f.data.head
+    val fieldsWithData:Map[String, Seq[String]] = f.data
+      .filter(field => field._1.contains("countries"))
+      .filter(field => field._2.exists(s => s.nonEmpty))
+      .zipWithIndex
+      .map((tuple: ((String, Seq[String]), Int)) => (tuple._1._1.replaceFirst("[\\d]", s"${tuple._2 / 2}"), tuple._1._2))
+    f.copy(data = fieldsWithData + csrfToken)
   }
 }

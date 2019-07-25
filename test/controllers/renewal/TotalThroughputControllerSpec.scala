@@ -171,21 +171,21 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
         }
       }
 
-      "redirect to PercentageOfCashPaymentOver15000Controller if HVD and ASP" in new RenewalModelFormSubmissionFixture {
+      "redirect to CustomersOutsideIsUK if HVD and ASP" in new RenewalModelFormSubmissionFixture {
         setupBusinessMatching(Set(HighValueDealing, AccountancyServices), Set(ChequeCashingScrapMetal))
 
         post() { result =>
           result.header.status mustBe SEE_OTHER
-          result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.CustomersOutsideUKController.get().url)
+          result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.CustomersOutsideIsUKController.get().url)
         }
       }
 
-      "redirect to CustomersOutsideUK if HVD and NOT ASP" in new RenewalModelFormSubmissionFixture {
+      "redirect to CustomersOutsideIsUK if HVD and NOT ASP" in new RenewalModelFormSubmissionFixture {
         setupBusinessMatching(Set(HighValueDealing), Set(ChequeCashingScrapMetal))
 
         post() { result =>
           result.header.status mustBe SEE_OTHER
-          result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.CustomersOutsideUKController.get().url)
+          result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.CustomersOutsideIsUKController.get().url)
         }
       }
     }

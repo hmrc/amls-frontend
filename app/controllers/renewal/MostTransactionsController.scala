@@ -64,21 +64,24 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector,
                   ba <- bm.activities
                   services <- bm.msbServices
                 } yield renewalService.updateRenewal(renewal.mostTransactions(data)) map { _ =>
-                  redirectTo(services.msbServices, ba.businessActivities, edit)
+                  if (!edit) {
+                    redirectTo(services.msbServices, ba.businessActivities)
+                  } else {
+                    Redirect(routes.SummaryController.get())
+                  }
                 }
                 result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
             }
         }
   }
 
-  private def redirectTo(services: Set[BusinessMatchingMsbService], businessActivities: Set[BusinessActivity], edit: Boolean): Result = {
-    (edit, services, businessActivities) match {
-      case (false, x, _) if x.contains(CurrencyExchange) => Redirect(routes.CETransactionsInLast12MonthsController.get())
-      case (false, x, _) if x.contains(ForeignExchange) => Redirect(routes.FXTransactionsInLast12MonthsController.get())
-      case (false, _, x) if x.contains(HighValueDealing) && x.contains(AccountancyServices) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
-      case (false, _, x) if x.contains(HighValueDealing) => Redirect(routes.CustomersOutsideUKController.get())
-      case _ => Redirect(routes.SummaryController.get())
-    }
+  private def redirectTo(services: Set[BusinessMatchingMsbService], businessActivities: Set[BusinessActivity]): Result = {
+      (services, businessActivities) match {
+        case (x, _) if x.contains(CurrencyExchange) => Redirect(routes.CETransactionsInLast12MonthsController.get())
+        case (x, _) if x.contains(ForeignExchange) => Redirect(routes.FXTransactionsInLast12MonthsController.get())
+        case (_, x) if x.contains(HighValueDealing) && x.contains(AccountancyServices) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
+        case (_, x) if x.contains(HighValueDealing) => Redirect(routes.CustomersOutsideIsUKController.get())
+        case _ => Redirect(routes.SummaryController.get())
+      }
   }
-
 }
