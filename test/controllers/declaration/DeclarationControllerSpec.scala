@@ -46,7 +46,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     val declarationController = new DeclarationController (
       authAction = SuccessfulAuthAction,
       dataCacheConnector = mock[DataCacheConnector],
-      statusService = mock[StatusService]
+      statusService = mockStatusService
     )
     val response = SubscriptionResponse(
       etmpFormBundleNumber = "",
@@ -74,10 +74,10 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
     "redirect to the declaration-persons page if name and/or business matching not found" in new Fixture {
 
-      when(declarationController.dataCacheConnector.fetch[AddPerson](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
+        (any(), any())).thenReturn(Future.successful(None))
 
-      when(declarationController.statusService.getStatus(None, any(), any())(any(), any())).thenReturn(Future.successful(NotCompleted))
+      mockApplicationStatusNewAuth(NotCompleted)
 
       val result = declarationController.get()(request)
       status(result) must be(SEE_OTHER)
@@ -87,10 +87,10 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
     "load the declaration page for pre-submissions if name and business matching is found" in new Fixture {
 
-      when(declarationController.dataCacheConnector.fetch[AddPerson](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(addPerson)))
+      when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(addPerson)))
 
-      when(declarationController.statusService.getStatus(None, any(), any())(any(), any())).thenReturn(Future.successful(NotCompleted))
+      mockApplicationStatusNewAuth(NotCompleted)
 
       val result = declarationController.get()(request)
       status(result) must be(OK)
@@ -103,10 +103,10 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
     "load the declaration page for pre-submissions if name and business matching is found (renewal)" in new Fixture {
 
-      when(declarationController.dataCacheConnector.fetch[AddPerson](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(addPerson)))
+      when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(addPerson)))
 
-      when(declarationController.statusService.getStatus(None, any(), any())(any(), any())).thenReturn(Future.successful(ReadyForRenewal(Some(new LocalDate()))))
+      mockApplicationStatusNewAuth(ReadyForRenewal(Some(new LocalDate())))
 
       val result = declarationController.get()(request)
       status(result) must be(OK)
@@ -119,10 +119,10 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
     "load the declaration page for pre-submissions if name and business matching is found (amendment)" in new Fixture {
 
-      when(declarationController.dataCacheConnector.fetch[AddPerson](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(addPerson)))
+      when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(addPerson)))
 
-      when(declarationController.statusService.getStatus(None, any(), any())(any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
+      mockApplicationStatusNewAuth(SubmissionReadyForReview)
 
       val result = declarationController.get()(request)
       status(result) must be(OK)
@@ -134,10 +134,10 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     }
 
     "report error if retrieval of amlsRegNo fails" in new Fixture {
-      when(declarationController.dataCacheConnector.fetch[AddPerson](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(addPerson)))
+      when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(addPerson)))
 
-      when(declarationController.statusService.getStatus(None, any(), any())(any(), any())).thenReturn(Future.successful(NotCompleted))
+      mockApplicationStatusNewAuth(NotCompleted)
 
       val result = declarationController.get()(request)
       status(result) must be(OK)
@@ -154,8 +154,8 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
   "Declaration getWithAmendment" must {
     "load the declaration for amendments page for submissions if name and business matching is found" in new Fixture {
 
-      when(declarationController.dataCacheConnector.fetch[AddPerson](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(addPerson)))
+      when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(addPerson)))
 
       val result = declarationController.getWithAmendment()(request)
       status(result) must be(OK)
@@ -169,10 +169,10 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
     "redirect to the declaration-persons page if name and/or business matching not found" in new Fixture {
 
-      when(declarationController.dataCacheConnector.fetch[AddPerson](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
+        (any(), any())).thenReturn(Future.successful(None))
 
-      when(declarationController.statusService.getStatus(None, any(), any())(any(), any())).thenReturn(Future.successful(NotCompleted))
+      mockApplicationStatusNewAuth(NotCompleted)
 
       val result = declarationController.getWithAmendment()(request)
       status(result) must be(SEE_OTHER)
@@ -182,10 +182,10 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
     "redirect to the declaration-persons for amendments page if name and/or business matching not found and submission is ready for review" in new Fixture {
 
-      when(declarationController.dataCacheConnector.fetch[AddPerson](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
+        (any(), any())).thenReturn(Future.successful(None))
 
-      when(declarationController.statusService.getStatus(None, any(), any())(any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
+      mockApplicationStatusNewAuth(SubmissionReadyForReview)
 
       val result = declarationController.getWithAmendment()(request)
       status(result) must be(SEE_OTHER)

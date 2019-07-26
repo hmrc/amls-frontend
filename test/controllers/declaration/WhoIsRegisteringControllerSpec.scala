@@ -72,13 +72,13 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
 
     def run(status: SubmissionStatus, renewal: Option[Renewal] = None, people: Seq[ResponsiblePerson] = responsiblePeople)(block: Unit => Any) = {
       when {
-        controller.renewalService.getRenewal(any(), any(), any())
+        controller.renewalService.getRenewal(any())(any(), any())
       } thenReturn Future.successful(renewal)
 
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(cacheMap)))
 
-      when(controller.statusService.getStatus(None, any(), any())(any(), any()))
+      when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any()))
         .thenReturn(Future.successful(status))
 
       when(cacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
@@ -87,13 +87,13 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
 //      when(cacheMap.getEntry[WhoIsRegistering](WhoIsRegistering.key))
 //        .thenReturn(None)
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(people)))
 
-      when(controller.dataCacheConnector.save[AddPerson](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[AddPerson](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
-      when(controller.dataCacheConnector.save[WhoIsRegistering](any(), any())(any(), any(), any()))
+      when(controller.dataCacheConnector.save[WhoIsRegistering](any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
       block()
@@ -210,7 +210,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
           redirectLocation(result) mustBe Some(routes.DeclarationController.get().url)
 
           val expectedAddPersonModel = AddPerson(name.firstName, name.middleName, name.lastName, RoleWithinBusinessRelease7(Set(models.declaration.release7.InternalAccountant)))
-          verify(controller.dataCacheConnector).save[AddPerson](eqTo(AddPerson.key), eqTo(expectedAddPersonModel))(any(), any(), any())
+          verify(controller.dataCacheConnector).save[AddPerson](any(), eqTo(AddPerson.key), eqTo(expectedAddPersonModel))(any(), any())
         }
 
       }
@@ -223,7 +223,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.DeclarationController.get().url))
 
-          verify(controller.dataCacheConnector).save[AddPerson](eqTo(AddPerson.key), any())(any(), any(), any())
+          verify(controller.dataCacheConnector).save[AddPerson](any(), eqTo(AddPerson.key), any())(any(), any())
         }
       }
 
@@ -293,7 +293,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
             status(result) must be(SEE_OTHER)
             redirectLocation(result) mustBe Some(routes.DeclarationController.getWithAmendment().url)
 
-            verify(controller.dataCacheConnector).save[AddPerson](eqTo(AddPerson.key), any())(any(), any(), any())
+            verify(controller.dataCacheConnector).save[AddPerson](any(), eqTo(AddPerson.key), any())(any(), any())
           }
         }
 
@@ -305,7 +305,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
             status(result) must be(SEE_OTHER)
             redirectLocation(result) mustBe Some(routes.DeclarationController.get().url)
 
-            verify(controller.dataCacheConnector).save[AddPerson](eqTo(AddPerson.key), any())(any(), any(), any())
+            verify(controller.dataCacheConnector).save[AddPerson](any(), eqTo(AddPerson.key), any())(any(), any())
           }
         }
       }

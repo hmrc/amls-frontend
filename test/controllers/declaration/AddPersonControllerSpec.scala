@@ -35,9 +35,8 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
@@ -74,9 +73,9 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
         )
 
     val defaultBM = BusinessMatching(reviewDetails = Some(defaultReviewDetails))
-    when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
-      (any(), any(), any())).thenReturn(Future.successful(Some(defaultBM)))
-    when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
+    when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
+      (any(), any())).thenReturn(Future.successful(Some(defaultBM)))
+    when(addPersonController.dataCacheConnector.save[AddPerson](any(), any(), any())(any(), any()))
       .thenReturn(Future.successful(emptyCache))
     mockApplicationStatusNewAuth(SubmissionReady)
   }
@@ -252,8 +251,8 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
         "business type is SoleProprietor and position is not filled" in new Fixture {
           val rd = defaultReviewDetails.copy(businessType = Some(SoleProprietor))
           val bm = BusinessMatching(reviewDetails = Some(rd))
-          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
+          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
+            (any(), any())).thenReturn(Future.successful(Some(bm)))
 
           val roleMissingInRequest = request.withFormUrlEncodedBody(
             "firstName" -> "firstName",
@@ -270,8 +269,8 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
         "business type is Partnership and position is not filled" in new Fixture {
           val rd = defaultReviewDetails.copy(businessType = Some(Partnership))
           val bm = BusinessMatching(reviewDetails = Some(rd))
-          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
+          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
+            (any(), any())).thenReturn(Future.successful(Some(bm)))
 
           val roleMissingInRequest = request.withFormUrlEncodedBody(
             "firstName" -> "firstName",
@@ -288,8 +287,8 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
         "business type is LPrLLP and position is not filled" in new Fixture {
           val rd = defaultReviewDetails.copy(businessType = Some(LPrLLP))
           val bm = BusinessMatching(reviewDetails = Some(rd))
-          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
+          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
+            (any(), any())).thenReturn(Future.successful(Some(bm)))
 
           val roleMissingInRequest = request.withFormUrlEncodedBody(
             "firstName" -> "firstName",
@@ -306,8 +305,8 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
         "business type is UnincorporatedBody and position is not filled" in new Fixture {
           val rd = defaultReviewDetails.copy(businessType = Some(UnincorporatedBody))
           val bm = BusinessMatching(reviewDetails = Some(rd))
-          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
+          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
+            (any(), any())).thenReturn(Future.successful(Some(bm)))
 
           val roleMissingInRequest = request.withFormUrlEncodedBody(
             "firstName" -> "firstName",
@@ -355,8 +354,8 @@ class AddPersonControllerWithoutAmendmentSpec extends AmlsSpec with MockitoSugar
       "on get display the persons page" when {
         "status is pending" in new Fixture {
 
-          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
-            (any(), any(), any())).thenReturn(Future.successful(None))
+          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
+            (any(), any())).thenReturn(Future.successful(None))
 
           mockApplicationStatusNewAuth(SubmissionReadyForReview)
 
