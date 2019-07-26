@@ -32,8 +32,7 @@ import utils.{AuthAction, ControllerHelper}
 
 import scala.concurrent.Future
 
-class AddPersonController @Inject () (
-                                       val dataCacheConnector: DataCacheConnector,
+class AddPersonController @Inject () (val dataCacheConnector: DataCacheConnector,
                                        val statusService: StatusService,
                                        authAction: AuthAction
                                      ) extends DefaultBaseController {

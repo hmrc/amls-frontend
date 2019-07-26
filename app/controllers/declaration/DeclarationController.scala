@@ -18,7 +18,7 @@ package controllers.declaration
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.{BaseController, DefaultBaseController}
+import controllers.DefaultBaseController
 import models.declaration.AddPerson
 import models.status.{ReadyForRenewal, SubmissionReadyForReview}
 import play.api.mvc.Result

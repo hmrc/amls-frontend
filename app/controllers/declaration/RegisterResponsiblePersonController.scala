@@ -18,15 +18,10 @@ package controllers.declaration
 
 import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
-import controllers.{BaseController, DefaultBaseController}
+import controllers.DefaultBaseController
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReadyForReview}
 import services.StatusService
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthAction
-
-import scala.concurrent.Future
-
 
 @Singleton
 class RegisterResponsiblePersonController @Inject()(

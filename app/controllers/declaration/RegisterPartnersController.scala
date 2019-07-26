@@ -41,6 +41,52 @@ class RegisterPartnersController @Inject()(authAction: AuthAction,
                                            implicit val statusService: StatusService,
                                            implicit val progressService: ProgressService
                                           ) extends DefaultBaseController {
+  def get() = authAction.async {
+    implicit request => {
+
+      val result = for {
+        subtitle <- OptionT.liftF(statusSubtitle(request.amlsRefNumber, request.accountTypeId, request.cacheId))
+        responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.cacheId, ResponsiblePerson.key))
+      } yield {
+        Ok(views.html.declaration.register_partners(
+          subtitle,
+          EmptyForm,
+          nonPartners(responsiblePeople),
+          currentPartnersNames(responsiblePeople)
+        ))
+      }
+      result getOrElse InternalServerError("failure getting status")
+    }
+  }
+
+  def post() = authAction.async {
+    implicit request => {
+      Form2[BusinessPartners](request.body) match {
+        case f: InvalidForm => {
+          dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.cacheId, ResponsiblePerson.key) flatMap {
+            case Some(data) => {
+              businessPartnersView(request.amlsRefNumber, request.accountTypeId, request.cacheId, BadRequest, f, data)
+            }
+            case None =>
+              businessPartnersView(request.amlsRefNumber, request.accountTypeId, request.cacheId, BadRequest, f, Seq.empty)
+          }
+        }
+        case ValidForm(_, data) => {
+          data.value match {
+            case "-1" =>
+              Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, Some(flowFromDeclaration))))
+            case _ =>
+              saveAndRedirect(request.amlsRefNumber, request.accountTypeId, request.cacheId, data)
+          }
+        }
+      }
+    }
+  }
+
+  def getNonPartners(people: Seq[ResponsiblePerson]) = {
+    people.filter(_.positions.fold(false)(p => !p.positions.contains(Partner)))
+  }
+
   def businessPartnersView(amlsRegistrationNo: Option[String],
                            accountTypeId: (String, String),
                            cacheId: String,
@@ -73,7 +119,7 @@ class RegisterPartnersController @Inject()(authAction: AuthAction,
         throw new Exception("Incorrect status - Page not permitted for this status")
     }
   }
-@deprecated("To be removed when auth upgardes are done")
+  @deprecated("To be removed when auth upgardes are done")
   private def saveAndRedirect(data : BusinessPartners) (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] = {
     (for {
       responsiblePeople <- dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key)
@@ -116,52 +162,6 @@ class RegisterPartnersController @Inject()(authAction: AuthAction,
         }
         Future.successful(Some(updatedList))
       case _ => Future.successful(eventualMaybePeoples)
-    }
-  }
-
-  def getNonPartners(people: Seq[ResponsiblePerson]) = {
-    people.filter(_.positions.fold(false)(p => !p.positions.contains(Partner)))
-  }
-
-  def get() = authAction.async {
-    implicit request => {
-
-      val result = for {
-        subtitle <- OptionT.liftF(statusSubtitle(request.amlsRefNumber, request.accountTypeId, request.cacheId))
-        responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.cacheId, ResponsiblePerson.key))
-      } yield {
-        Ok(views.html.declaration.register_partners(
-          subtitle,
-          EmptyForm,
-          nonPartners(responsiblePeople),
-          currentPartnersNames(responsiblePeople)
-        ))
-      }
-      result getOrElse InternalServerError("failure getting status")
-    }
-  }
-
-  def post() = authAction.async {
-    implicit request => {
-      Form2[BusinessPartners](request.body) match {
-        case f: InvalidForm => {
-          dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.cacheId, ResponsiblePerson.key) flatMap {
-            case Some(data) => {
-              businessPartnersView(request.amlsRefNumber, request.accountTypeId, request.cacheId, BadRequest, f, data)
-            }
-            case None =>
-              businessPartnersView(request.amlsRefNumber, request.accountTypeId, request.cacheId, BadRequest, f, Seq.empty)
-          }
-        }
-        case ValidForm(_, data) => {
-          data.value match {
-            case "-1" =>
-              Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, Some(flowFromDeclaration))))
-            case _ =>
-              saveAndRedirect(request.amlsRefNumber, request.accountTypeId, request.cacheId, data)
-          }
-        }
-      }
     }
   }
 }

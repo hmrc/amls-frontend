@@ -18,7 +18,7 @@ package controllers.declaration
 
 import com.google.inject.Inject
 import connectors.{AmlsConnector, DataCacheConnector}
-import controllers.{BaseController, DefaultBaseController}
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.declaration._
