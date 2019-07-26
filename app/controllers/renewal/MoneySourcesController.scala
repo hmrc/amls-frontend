@@ -89,7 +89,7 @@ class MoneySourcesController @Inject()(val authConnector: AuthConnector,
   private def standardRouting(services: Set[BusinessMatchingMsbService], businessActivities: Set[BusinessActivity], edit: Boolean): Result =
     (services, businessActivities, edit) match {
       case (x, _, false) if x.contains(ForeignExchange) => Redirect(routes.FXTransactionsInLast12MonthsController.get())
-      case (_, x, false) if x.contains(HighValueDealing) || x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideUKController.get())
+      case (_, x, false) if x.contains(HighValueDealing) || x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideIsUKController.get())
       case _ => Redirect(routes.SummaryController.get())
     }
 }

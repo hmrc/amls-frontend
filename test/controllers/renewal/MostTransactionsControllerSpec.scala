@@ -189,13 +189,13 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
             }
           }
         }
-        "go to the CustomersOutsideUKController" when {
+        "go to the CustomersOutsideIsUKController" when {
           "activities include hvd and NOT asp" in new RenewalModelFormSubmissionFixture {
             setupBusinessMatching(Set(HighValueDealing))
 
             post() { result =>
               result.header.status mustBe SEE_OTHER
-              result.header.headers.get("Location") mustEqual routes.CustomersOutsideUKController.get().url.some
+              result.header.headers.get("Location") mustEqual routes.CustomersOutsideIsUKController.get().url.some
             }
           }
 

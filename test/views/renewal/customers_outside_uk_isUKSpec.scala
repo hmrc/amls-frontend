@@ -25,7 +25,7 @@ import play.api.i18n.Messages
 import utils.{AmlsSpec, AutoCompleteServiceMocks}
 import views.Fixture
 
-class customers_outside_ukSpec extends AmlsSpec with MustMatchers  {
+class customers_outside_uk_isUKSpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks{
     implicit val requestWithToken = addToken(request)
@@ -36,18 +36,18 @@ class customers_outside_ukSpec extends AmlsSpec with MustMatchers  {
 
       val form2: ValidForm[CustomersOutsideUK] = Form2(CustomersOutsideUK(Option(Seq.empty[Country])))
 
-      def view = views.html.renewal.customers_outside_uk(form2, true, mockAutoComplete.getCountries)
+      def view = views.html.renewal.customers_outside_uk_isUK(form2, true)
 
-      doc.title must startWith(Messages("renewal.customer.outside.uk.countries.title") + " - " + Messages("summary.renewal"))
+      doc.title must startWith(Messages("renewal.customer.outside.uk.title") + " - " + Messages("summary.renewal"))
     }
 
     "have correct headings" in new ViewFixture {
 
       val form2: ValidForm[CustomersOutsideUK] = Form2(CustomersOutsideUK(Option(Seq.empty[Country])))
 
-      def view = views.html.renewal.customers_outside_uk(form2, true, mockAutoComplete.getCountries)
+      def view = views.html.renewal.customers_outside_uk_isUK(form2, true)
 
-      heading.html must be(Messages("renewal.customer.outside.uk.countries.title"))
+      heading.html must be(Messages("renewal.customer.outside.uk.title"))
       subHeading.html must include(Messages("summary.renewal"))
 
     }
@@ -56,14 +56,14 @@ class customers_outside_ukSpec extends AmlsSpec with MustMatchers  {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "countries") -> Seq(ValidationError("not a message Key"))
+          (Path \ "isOutside") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.renewal.customers_outside_uk(form2, true, mockAutoComplete.getCountries)
+      def view = views.html.renewal.customers_outside_uk_isUK(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
-      doc.getElementById("countries")
+      doc.getElementById("isOutside")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
     }
 
@@ -71,7 +71,7 @@ class customers_outside_ukSpec extends AmlsSpec with MustMatchers  {
 
       val form2: ValidForm[CustomersOutsideUK] = Form2(CustomersOutsideUK(Option(Seq.empty[Country])))
 
-      def view = views.html.renewal.customers_outside_uk(form2, true, mockAutoComplete.getCountries)
+      def view = views.html.renewal.customers_outside_uk_isUK(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
