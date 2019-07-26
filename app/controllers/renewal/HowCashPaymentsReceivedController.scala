@@ -57,10 +57,11 @@ class HowCashPaymentsReceivedController @Inject()(
         case ValidForm(_, data) =>
           for {
             renewal <- renewalService.getRenewal
-            _ <- renewalService.updateRenewal(renewal.receiveCashPayments(renewal.receiveCashPayments match {
-              case Some(cp) if cp.cashPaymentsCustomerNotMet.receiveCashPayments => CashPayments(CashPaymentsCustomerNotMet(true), Some(data))
-              case Some(cp) if !cp.cashPaymentsCustomerNotMet.receiveCashPayments => CashPayments(CashPaymentsCustomerNotMet(false), None)
-              case _ => CashPayments(CashPaymentsCustomerNotMet(false), None)
+            _ <- renewalService.updateRenewal(
+              renewal.receiveCashPayments(renewal.receiveCashPayments match {
+                case Some(cp) if cp.cashPaymentsCustomerNotMet.receiveCashPayments => CashPayments(CashPaymentsCustomerNotMet(true), Some(data))
+                case Some(cp) if !cp.cashPaymentsCustomerNotMet.receiveCashPayments => CashPayments(CashPaymentsCustomerNotMet(false), None)
+                case _ => CashPayments(CashPaymentsCustomerNotMet(false), None)
             }))
           } yield Redirect(routes.SummaryController.get())
       }
