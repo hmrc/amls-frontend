@@ -19,24 +19,23 @@ package controllers.bankdetails
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import javax.inject.Inject
 import models.bankdetails.BankDetails
 import models.bankdetails.BankDetails.Filters._
 import play.api.mvc.Call
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.bankdetails._
 
-class WhatYouNeedController @Inject()(val authConnector: AuthConnector,
-                                      dataCacheConnector: DataCacheConnector) extends BaseController {
+class WhatYouNeedController @Inject()(val authAction: AuthAction,
+                                      dataCacheConnector: DataCacheConnector) extends DefaultBaseController {
 
-  def get = Authorised.async {
-    implicit authContext =>
+  def get = authAction.async {
       implicit request =>
         val view = what_you_need.apply(_: Call)(request, implicitly)
 
         val result = for {
-            bankDetails <- OptionT(dataCacheConnector.fetch[Seq[BankDetails]](BankDetails.key))
+            bankDetails <- OptionT(dataCacheConnector.fetch[Seq[BankDetails]](request.cacheId, BankDetails.key))
           } yield {
             if (bankDetails.exists(visibleAccountsFilter)) {
               Ok(view(routes.BankAccountNameController.getNoIndex()))

@@ -30,13 +30,13 @@ import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{RepeatingSection, StatusConstants}
+import utils.{AuthAction, RepeatingSection, StatusConstants}
 
 import scala.concurrent.Future
 
 @Singleton
 class BankAccountNameController @Inject()(
-                                           val authConnector: AuthConnector,
+                                           val authAction: AuthAction,
                                            val dataCacheConnector: DataCacheConnector,
                                            val statusService: StatusService
                                          ) extends BankDetailsController {
@@ -49,36 +49,32 @@ class BankAccountNameController @Inject()(
     (__ \ "accountName").read(FormTypes.accountNameType)
   }
 
-  def getNoIndex: Action[AnyContent] = Authorised.async {
-    implicit authContext =>
+  def getNoIndex: Action[AnyContent] = authAction.async {
       implicit request =>
-        handleGet(None)
+        handleGet(None, false, request.amlsRefNumber, request.accountTypeId, request.cacheId)
   }
 
-  def getIndex(index: Int, edit: Boolean = false): Action[AnyContent] = Authorised.async {
-    implicit authContext =>
+  def getIndex(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>
-        handleGet(Some(index), edit)
+        handleGet(Some(index), edit, request.amlsRefNumber, request.accountTypeId, request.cacheId)
   }
   
-  def postNoIndex: Action[AnyContent] = Authorised.async {
-    implicit authContext =>
+  def postNoIndex: Action[AnyContent] = authAction.async {
       implicit request =>
-        handlePost(None)
+        handlePost(None, false, request.cacheId)
   }
 
-  def postIndex(index: Int, edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def postIndex(index: Int, edit: Boolean = false) = authAction.async {
       implicit request =>
-        handlePost(Some(index), edit)
+        handlePost(Some(index), edit, request.cacheId)
   }
 
-  private def handleGet(index: Option[Int] = None, edit: Boolean = false)
-                       (implicit hc: HeaderCarrier, request: Request[_], authContext: AuthContext): Future[Result] = {
+  private def handleGet(index: Option[Int] = None, edit: Boolean = false, amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)
+                       (implicit hc: HeaderCarrier, request: Request[_]): Future[Result] = {
     index match {
       case Some(i) => for {
-        status <- statusService.getStatus
-        data <- getData[BankDetails](i)
+        status <- statusService.getStatus(amlsRegistrationNo, accountTypeId, credId)
+        data <- getData[BankDetails](credId, i)
       } yield data match {
         case Some(x) if !x.canEdit(status) => NotFound(notFoundView)
         case Some(BankDetails(_, Some(name), _, _, _, _, _)) =>
@@ -91,15 +87,15 @@ class BankAccountNameController @Inject()(
     }
   }
 
-  private def handlePost(index: Option[Int] = None, edit: Boolean = false)
-                (implicit hc: HeaderCarrier, request: Request[AnyContent], authContext: AuthContext) = {
+  private def handlePost(index: Option[Int] = None, edit: Boolean = false, credId: String)
+                (implicit hc: HeaderCarrier, request: Request[AnyContent]) = {
     Form2[String](request.body) match {
       case f: InvalidForm =>
         Future.successful(BadRequest(views.html.bankdetails.bank_account_name(f, edit, index)))
       case ValidForm(_, data) =>
         val newBankDetails = BankDetails(accountName = Some(data))
         index match {
-          case Some(i) => updateDataStrict[BankDetails](i) { bd =>
+          case Some(i) => updateDataStrict[BankDetails](credId, i) { bd =>
             bd.copy(
               accountName = Some(data),
               status = Some(if (edit) {
@@ -115,9 +111,9 @@ class BankAccountNameController @Inject()(
               Redirect(routes.BankAccountTypeController.get(i))
             }
           }
-          case _ => dataCacheConnector.fetch[Seq[BankDetails]](BankDetails.key) flatMap { maybeBankDetails =>
+          case _ => dataCacheConnector.fetch[Seq[BankDetails]](credId, BankDetails.key) flatMap { maybeBankDetails =>
             val newList = maybeBankDetails.getOrElse(Seq.empty) ++ Seq(newBankDetails.copy(status = Some(StatusConstants.Added)))
-            dataCacheConnector.save(BankDetails.key, newList) map { _ => Redirect(routes.BankAccountTypeController.get(newList.size)) }
+            dataCacheConnector.save(credId, BankDetails.key, newList) map { _ => Redirect(routes.BankAccountTypeController.get(newList.size)) }
           }
         }
     }

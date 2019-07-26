@@ -16,6 +16,7 @@
 
 package controllers.bankdetails
 
+import controllers.actions.SuccessfulAuthAction
 import generators.bankdetails.BankDetailsGenerator
 import models.bankdetails.BankDetails
 import org.jsoup.Jsoup
@@ -24,7 +25,7 @@ import org.scalacheck.Gen
 import org.scalatest.concurrent.ScalaFutures
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth, StatusConstants}
 import views.TitleValidator
 
 class WhatYouNeedControllerSpec
@@ -33,10 +34,10 @@ class WhatYouNeedControllerSpec
     with TitleValidator
     with BankDetailsGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
     val request = addToken(authRequest)
-    val controller = new WhatYouNeedController(self.authConnector, mockCacheConnector)
+    val controller = new WhatYouNeedController(SuccessfulAuthAction, mockCacheConnector)
 
     def assertHref(url: String)(implicit doc: Document) = {
       doc.getElementById("bankwhatyouneed-button").attr("href") mustBe url

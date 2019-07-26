@@ -20,19 +20,20 @@ import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models.bankdetails.BankDetails
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 
 import scala.concurrent.Future
 
 @Singleton
 class SummaryController @Inject()(
                                    val dataCacheConnector: DataCacheConnector,
-                                   val authConnector: AuthConnector
+                                   val authAction: AuthAction
                                  ) extends BankDetailsController {
 
-  def get(index: Int) = Authorised.async {
-    implicit authContext => implicit request =>
+  def get(index: Int) = authAction.async {
+    implicit request =>
       for {
-        bankDetails <- getData[BankDetails](index)
+        bankDetails <- getData[BankDetails](request.cacheId, index)
       } yield bankDetails match {
         case Some(data) =>
           Ok(views.html.bankdetails.summary(data, index))
@@ -40,10 +41,10 @@ class SummaryController @Inject()(
       }
   }
 
-  def post(index: Int) = Authorised.async {
-    implicit authContext => implicit request =>
+  def post(index: Int) = authAction.async {
+    implicit request =>
       (for {
-        _ <- updateDataStrict[BankDetails](index) { bd => bd.copy(hasAccepted = true) }
+        _ <- updateDataStrict[BankDetails](request.cacheId, index) { bd => bd.copy(hasAccepted = true) }
       } yield Redirect(controllers.bankdetails.routes.YourBankAccountsController.get())) recoverWith {
         case _: Throwable => Future.successful(InternalServerError("Unable to save data and get redirect link"))
       }
