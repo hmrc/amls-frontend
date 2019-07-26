@@ -16,10 +16,8 @@
 
 package controllers.declaration
 
-import connectors.{DataCacheConnector, KeystoreConnector}
+import connectors.DataCacheConnector
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
-import org.mockito.Matchers._
-import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
@@ -28,17 +26,15 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthorisedFixture}
-
-import scala.concurrent.Future
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 class RegisterResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
-    val statusService = mock[StatusService]
+    val statusService = mockStatusService
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
@@ -56,8 +52,7 @@ class RegisterResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar
     "status is ReadyForRenewal" must {
       "respond with OK and show the correct subtitle" in new Fixture {
 
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(ReadyForRenewal(None)))
+        mockApplicationStatusNewAuth(ReadyForRenewal(None))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -68,8 +63,7 @@ class RegisterResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar
     "status is SubmissionDecisionApproved" must {
       "respond with OK and show the correct subtitle" in new Fixture {
 
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved))
+        mockApplicationStatusNewAuth(SubmissionDecisionApproved)
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -80,8 +74,7 @@ class RegisterResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar
     "status is SubmissionReadyForReview" must {
       "respond with OK and show the correct subtitle" in new Fixture {
 
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionReadyForReview))
+        mockApplicationStatusNewAuth(SubmissionReadyForReview)
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -92,8 +85,7 @@ class RegisterResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar
     "status is other e.g. SubmissionReady" must {
       "respond with OK and show the correct subtitle" in new Fixture {
 
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionReady))
+        mockApplicationStatusNewAuth(SubmissionReady)
 
         val result = controller.get()(request)
         status(result) must be(OK)

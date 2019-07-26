@@ -19,8 +19,8 @@ package controllers.declaration
 import java.util.UUID
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import forms.{EmptyForm, InvalidForm}
-import javax.swing.plaf.synth.SynthPopupMenuUI
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
@@ -37,22 +37,22 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
 
 class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
 
     val request = addToken(authRequest)
 
     val addPersonController = new AddPersonController (
       dataCacheConnector = mock[DataCacheConnector],
-      authConnector = self.authConnector,
-      statusService = mock[StatusService]
+      authAction = SuccessfulAuthAction,
+      statusService = mockStatusService
     )
 
     val emptyCache = CacheMap("", Map.empty)
@@ -78,8 +78,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
       (any(), any(), any())).thenReturn(Future.successful(Some(defaultBM)))
     when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())(any(), any(), any()))
       .thenReturn(Future.successful(emptyCache))
-    when(addPersonController.statusService.getStatus(any(), any(), any()))
-      .thenReturn(Future.successful(SubmissionReady))
+    mockApplicationStatusNewAuth(SubmissionReady)
   }
 
   "AddPersonController" when {
@@ -108,8 +107,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             "roleWithinBusiness[]" -> "ExternalAccountant"
           )
 
-          when(addPersonController.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionReadyForReview))
+          mockApplicationStatusNewAuth(SubmissionReadyForReview)
 
           val result = addPersonController.get()(requestWithParams)
           status(result) must be(OK)
@@ -124,8 +122,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             "roleWithinBusiness[]" -> "ExternalAccountant"
           )
 
-          when(addPersonController.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(ReadyForRenewal(Some(new LocalDate))))
+          mockApplicationStatusNewAuth(ReadyForRenewal(Some(new LocalDate)))
 
           val result = addPersonController.get()(requestWithParams)
           status(result) must be(OK)
@@ -184,8 +181,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             "positions" -> "08"
           )
 
-          when(addPersonController.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionReadyForReview))
+          mockApplicationStatusNewAuth(SubmissionReadyForReview)
 
           val result = addPersonController.post()(requestWithParams)
           status(result) must be(SEE_OTHER)
@@ -342,13 +338,13 @@ class AddPersonControllerWithoutAmendmentSpec extends AmlsSpec with MockitoSugar
   val userId = s"user-${UUID.randomUUID()}"
   val mockDataCacheConnector = mock[DataCacheConnector]
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self => val request = addToken(authRequest)
 
     val addPersonController = new AddPersonController (
       dataCacheConnector = mockDataCacheConnector,
-      authConnector = self.authConnector,
-      statusService = mock[StatusService]
+      authAction = SuccessfulAuthAction,
+      statusService = mockStatusService
     )
   }
 
@@ -362,8 +358,7 @@ class AddPersonControllerWithoutAmendmentSpec extends AmlsSpec with MockitoSugar
           when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
             (any(), any(), any())).thenReturn(Future.successful(None))
 
-          when(addPersonController.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionReadyForReview))
+          mockApplicationStatusNewAuth(SubmissionReadyForReview)
 
           val result = addPersonController.get()(request)
           status(result) must be(OK)

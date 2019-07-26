@@ -17,6 +17,7 @@
 package controllers.declaration
 
 import connectors.{AmlsConnector, DataCacheConnector}
+import controllers.actions.SuccessfulAuthAction
 import forms.InvalidForm
 import generators.ResponsiblePersonGenerator
 import jto.validation.{Path, ValidationError}
@@ -31,26 +32,24 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.AmlsSpec
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth, StatusConstants}
 import play.api.i18n.Messages
-import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AuthorisedFixture, StatusConstants}
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
 class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePersonGenerator {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
     val request = addToken(authRequest)
     val controller = new WhoIsRegisteringController (
       dataCacheConnector = mock[DataCacheConnector],
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       amlsConnector = mock[AmlsConnector],
       statusService = mock[StatusService],
       renewalService = mock[RenewalService]
@@ -79,7 +78,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
       when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(cacheMap)))
 
-      when(controller.statusService.getStatus(any(), any(), any()))
+      when(controller.statusService.getStatus(None, any(), any())(any(), any()))
         .thenReturn(Future.successful(status))
 
       when(cacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))

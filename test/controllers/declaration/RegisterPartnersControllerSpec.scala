@@ -30,14 +30,14 @@ import play.api.test.Helpers._
 import services.{ProgressService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthorisedFixture, StatusConstants}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth, StatusConstants}
 
 import scala.concurrent.Future
 
 
 class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
@@ -87,7 +87,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
         } thenReturn Future.successful(Some(Seq(ResponsiblePerson())))
 
         when {
-          statusService.getStatus(any(),any(),any())
+          statusService.getStatus(None, any(), any())(any(), any())
         } thenReturn Future.successful(SubmissionDecisionApproved)
 
         val result = controller.get()(request)
@@ -106,7 +106,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
-          when(controller.statusService.getStatus(any(),any(),any()))
+          when(controller.statusService.getStatus(None, any(), any())(any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
 
           val updatedList = Seq(rp.copy(positions = Some(positions.copy(positions
@@ -115,7 +115,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
           when(controller.dataCacheConnector.save[Option[Seq[ResponsiblePerson]]](any(), meq(Some(updatedList)))(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(controller.progressService.getSubmitRedirect(any(), any(), any()))
+          when(controller.progressService.getSubmitRedirect(None, any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(controllers.declaration.routes.WhoIsRegisteringController.get())))
 
           val result = controller.post()(newRequest)
@@ -130,7 +130,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
-          when(controller.statusService.getStatus(any(),any(),any()))
+          when(controller.statusService.getStatus(None, any(), any())(any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
 
           val result = controller.post()(newRequest)
@@ -144,7 +144,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
-          when(controller.statusService.getStatus(any(),any(),any()))
+          when(controller.statusService.getStatus(None, any(), any())(any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
           val result = controller.post()(newRequest)
@@ -158,7 +158,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
-          when(controller.statusService.getStatus(any(),any(),any()))
+          when(controller.statusService.getStatus(None, any(), any())(any(), any()))
             .thenReturn(Future.successful(ReadyForRenewal(Some(new LocalDate()))))
 
           val result = controller.post()(newRequest)
@@ -172,7 +172,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(None))
 
-          when(controller.statusService.getStatus(any(),any(),any()))
+          when(controller.statusService.getStatus(None, any(), any())(any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
 
           val result = controller.post()(newRequest)

@@ -18,6 +18,7 @@ package controllers.declaration
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.declaration.{AddPerson, InternalAccountant}
 import models.status.{NotCompleted, ReadyForRenewal, SubmissionReadyForReview}
@@ -27,29 +28,26 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.AmlsSpec
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
 class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
     val request = addToken(authRequest)
 
     val declarationController = new DeclarationController (
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       dataCacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService]
     )
-
-    val mockCacheMap = mock[CacheMap]
     val response = SubscriptionResponse(
       etmpFormBundleNumber = "",
       amlsRefNo = "", Some(SubscriptionFees(
@@ -79,7 +77,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       when(declarationController.dataCacheConnector.fetch[AddPerson](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(declarationController.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted))
+      when(declarationController.statusService.getStatus(None, any(), any())(any(), any())).thenReturn(Future.successful(NotCompleted))
 
       val result = declarationController.get()(request)
       status(result) must be(SEE_OTHER)
@@ -92,7 +90,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       when(declarationController.dataCacheConnector.fetch[AddPerson](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(addPerson)))
 
-      when(declarationController.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted))
+      when(declarationController.statusService.getStatus(None, any(), any())(any(), any())).thenReturn(Future.successful(NotCompleted))
 
       val result = declarationController.get()(request)
       status(result) must be(OK)
@@ -108,7 +106,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       when(declarationController.dataCacheConnector.fetch[AddPerson](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(addPerson)))
 
-      when(declarationController.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(ReadyForRenewal(Some(new LocalDate()))))
+      when(declarationController.statusService.getStatus(None, any(), any())(any(), any())).thenReturn(Future.successful(ReadyForRenewal(Some(new LocalDate()))))
 
       val result = declarationController.get()(request)
       status(result) must be(OK)
@@ -124,7 +122,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       when(declarationController.dataCacheConnector.fetch[AddPerson](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(addPerson)))
 
-      when(declarationController.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
+      when(declarationController.statusService.getStatus(None, any(), any())(any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
 
       val result = declarationController.get()(request)
       status(result) must be(OK)
@@ -139,7 +137,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       when(declarationController.dataCacheConnector.fetch[AddPerson](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(addPerson)))
 
-      when(declarationController.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted))
+      when(declarationController.statusService.getStatus(None, any(), any())(any(), any())).thenReturn(Future.successful(NotCompleted))
 
       val result = declarationController.get()(request)
       status(result) must be(OK)
@@ -174,7 +172,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       when(declarationController.dataCacheConnector.fetch[AddPerson](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(declarationController.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted))
+      when(declarationController.statusService.getStatus(None, any(), any())(any(), any())).thenReturn(Future.successful(NotCompleted))
 
       val result = declarationController.getWithAmendment()(request)
       status(result) must be(SEE_OTHER)
@@ -187,7 +185,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       when(declarationController.dataCacheConnector.fetch[AddPerson](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(declarationController.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
+      when(declarationController.statusService.getStatus(None, any(), any())(any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
 
       val result = declarationController.getWithAmendment()(request)
       status(result) must be(SEE_OTHER)
