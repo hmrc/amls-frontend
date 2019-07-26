@@ -17,12 +17,13 @@
 package controllers.declaration
 
 import javax.inject.{Inject, Singleton}
-
 import connectors.DataCacheConnector
-import controllers.BaseController
-import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview, ReadyForRenewal}
+import controllers.{BaseController, DefaultBaseController}
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReadyForReview}
 import services.StatusService
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 
 import scala.concurrent.Future
 
@@ -30,14 +31,14 @@ import scala.concurrent.Future
 @Singleton
 class RegisterResponsiblePersonController @Inject()(
                                                      val dataCacheConnector: DataCacheConnector,
-                                                     val authConnector: AuthConnector,
+                                                     authAction: AuthAction,
                                                      val statusService: StatusService
-                                                   ) extends BaseController {
+                                                   ) extends DefaultBaseController {
 
-  def get() = Authorised.async {
-    implicit authContext => implicit request => {
+  def get() = authAction.async {
+    implicit request => {
 
-      statusService.getStatus map {
+      statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.cacheId) map {
         case ReadyForRenewal(_) |
              SubmissionDecisionApproved |
              SubmissionReadyForReview => Ok(views.html.declaration.register_responsible_person("submit.amendment.application"))

@@ -53,9 +53,12 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
       case _ => Future.successful(notStarted)
     }
   }
-
+@deprecated("To be removed when auth upgrade is implemented")
   def getRenewal(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, ec: ExecutionContext) =
     dataCache.fetch[Renewal](Renewal.key)
+
+  def getRenewal(cacheId: String)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext) =
+    dataCache.fetch[Renewal](cacheId, Renewal.key)
 
   def updateRenewal(renewal: Renewal)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, ec: ExecutionContext) =
     dataCache.save[Renewal](Renewal.key, renewal)
