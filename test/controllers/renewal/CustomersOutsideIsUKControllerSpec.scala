@@ -16,7 +16,7 @@
 
 package controllers.renewal
 
-import connectors.{DataCacheConnector, KeystoreConnector}
+import connectors.DataCacheConnector
 import models.Country
 import models.businessmatching._
 import models.renewal._
@@ -38,14 +38,11 @@ import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
-class CustomersOutsideUKControllerSpec extends AmlsSpec {
+class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
 
   trait Fixture extends AuthorisedFixture {
     self =>
     val request = addToken(authRequest)
-
-    implicit val authContext = mock[AuthContext]
-    implicit val headerCarrier = HeaderCarrier()
 
     val dataCacheConnector = mock[DataCacheConnector]
     val renewalService = mock[RenewalService]
@@ -60,7 +57,7 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
       .overrides(bind[RenewalService].to(renewalService))
       .build()
 
-    val controller = app.injector.instanceOf[CustomersOutsideUKController]
+    val controller = app.injector.instanceOf[CustomersOutsideIsUKController]
 
   }
 
@@ -68,15 +65,15 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
 
     def formData(data: Option[FakeRequest[AnyContentAsFormUrlEncoded]]) = data match {
       case Some(d) => d
-      case None => request.withFormUrlEncodedBody("countries" -> "GB")
+      case None => request.withFormUrlEncodedBody("isOutside" -> "true")
     }
 
     def formRequest(data: Option[FakeRequest[AnyContentAsFormUrlEncoded]]) = formData(data)
 
     val cache = mock[CacheMap]
 
-    val sendTheLargestAmountsOfMoney = SendTheLargestAmountsOfMoney(Seq(Country("GB","GB")))
-    val mostTransactions = MostTransactions(Seq(Country("GB","GB")))
+    val sendTheLargestAmountsOfMoney = SendTheLargestAmountsOfMoney(Seq(Country("GB", "GB")))
+    val mostTransactions = MostTransactions(Seq(Country("GB", "GB")))
     val customersOutsideUK = CustomersOutsideUK(Some(Seq(Country("GB", "GB"))))
     val customersOutsideIsUK = CustomersOutsideIsUK(true)
 
@@ -91,7 +88,6 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
     when {
       cache.getEntry[Renewal](Renewal.key)
     } thenReturn Some(Renewal(
-      customersOutsideIsUK = Some(customersOutsideIsUK),
       customersOutsideUK = Some(customersOutsideUK),
       sendTheLargestAmountsOfMoney = Some(sendTheLargestAmountsOfMoney),
       mostTransactions = Some(mostTransactions)
@@ -118,7 +114,7 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
 
       when {
         cache.getEntry[BusinessMatching](BusinessMatching.key)
-      } thenReturn{
+      } thenReturn {
         Some(businessMatching)
       }
 
@@ -131,7 +127,7 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
     "get is called" must {
       "load the page" in new Fixture {
 
-        when(renewalService.getRenewal(any(),any(),any()))
+        when(renewalService.getRenewal(any(), any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -139,7 +135,7 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
 
-        val pageTitle = Messages("renewal.customer.outside.uk.countries.title") + " - " +
+        val pageTitle = Messages("renewal.customer.outside.uk.title") + " - " +
           Messages("summary.renewal") + " - " +
           Messages("title.amls") + " - " + Messages("title.gov")
 
@@ -148,14 +144,15 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
 
       "pre-populate the Customer outside UK Page" in new Fixture {
 
-        when(renewalService.getRenewal(any(),any(),any()))
-          .thenReturn(Future.successful(Some(Renewal(customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB")))))))))
+        when(renewalService.getRenewal(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Renewal(customersOutsideIsUK = Some(CustomersOutsideIsUK(true))))))
 
         val result = controller.get()(request)
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("select[name=countries[0]] > option[value=GB]").hasAttr("selected") must be(true)
+        document.select("input[name=isOutside]").size mustEqual 2
+        document.select("input[name=isOutside][checked]").`val` mustEqual "true"
 
       }
 
@@ -165,48 +162,39 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
 
       "given valid data" must {
 
-        "redirect to the summary page" when {
+        "redirect to the CustomersOutsideUK page" when {
 
           "in edit mode" in new FormSubmissionFixture {
             post(edit = true, businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness))))) { result =>
               result.header.status mustBe SEE_OTHER
-              result.header.headers.get("Location") mustBe Some(routes.SummaryController.get().url)
+              result.header.headers.get("Location") mustBe Some(routes.CustomersOutsideUKController.get(true).url)
             }
           }
 
           "business is an asp and not an hvd or an msb" in new FormSubmissionFixture {
             post(businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(AccountancyServices))))) { result =>
               result.header.status mustBe SEE_OTHER
-              result.header.headers.get("Location") mustBe Some(routes.SummaryController.get().url)
-            }
-          }
-
-          "business is an msb and asp" in new FormSubmissionFixture {
-            post(businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness, AccountancyServices))))) { result =>
-              result.header.status mustBe SEE_OTHER
-              result.header.headers.get("Location") mustBe Some(routes.SummaryController.get().url)
+              result.header.headers.get("Location") mustBe Some(routes.CustomersOutsideUKController.get().url)
             }
           }
         }
-
-        "redirect to the PercentageOfCashPaymentOver15000Controller" when {
-          "business is an hvd but not an asp" in new FormSubmissionFixture {
-            post(businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(HighValueDealing, MoneyServiceBusiness))))) { result =>
-              result.header.status mustBe SEE_OTHER
-              result.header.headers.get("Location") mustBe Some(routes.PercentageOfCashPaymentOver15000Controller.get().url)
-            }
+        "business is an msb and asp" in new FormSubmissionFixture {
+          post(businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness, AccountancyServices))))) { result =>
+            result.header.status mustBe SEE_OTHER
+            result.header.headers.get("Location") mustBe Some(routes.CustomersOutsideUKController.get().url)
           }
         }
       }
 
-      "given invalid data" must {
-        "respond with BAD_REQUEST" in new FormSubmissionFixture {
-          post(data = Some(request.withFormUrlEncodedBody("countries" -> "abc"))) { result =>
-            result.header.status mustBe BAD_REQUEST
-          }
+    }
+
+    "given invalid data" must {
+      "respond with BAD_REQUEST" in new FormSubmissionFixture {
+        post(data = Some(request.withFormUrlEncodedBody("isOutside" -> "abc"))) { result =>
+          result.header.status mustBe BAD_REQUEST
         }
       }
     }
-
   }
+
 }

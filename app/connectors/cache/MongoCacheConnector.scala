@@ -148,6 +148,8 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
       credId =>
         mongoCache.removeByKey(credId, Some(authContext.user.oid), key).map(toCacheMap)
     }
+  def removeByKey[T](credId: String, key: String)(implicit hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
+        mongoCache.removeByKey(credId, None, key).map(toCacheMap)
 
   /**
     * Saves the given cache map into the mongo store

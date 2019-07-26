@@ -17,7 +17,6 @@
 package utils
 
 import connectors.DataCacheConnector
-import models.businessmatching.BusinessMatching
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.when

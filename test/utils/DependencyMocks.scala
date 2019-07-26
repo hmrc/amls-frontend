@@ -17,5 +17,4 @@
 package utils
 
 trait DependencyMocks extends CacheMocks with StatusMocks with ServiceFlowMocks with RouterMocks with AutoCompleteServiceMocks
-
 trait DependencyMocksNewAuth extends CacheMocksNewAuth with StatusMocks with ServiceFlowMocks with RouterMocks with AutoCompleteServiceMocks

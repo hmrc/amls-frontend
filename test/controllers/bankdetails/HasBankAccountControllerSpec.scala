@@ -16,17 +16,18 @@
 
 package controllers.bankdetails
 
+import controllers.actions.SuccessfulAuthAction
 import models.bankdetails.BankDetails
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import play.api.test.Helpers._
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 class HasBankAccountControllerSpec extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
 
     val request = addToken(authRequest)
-    val controller = new HasBankAccountController(self.authConnector, mockCacheConnector)
+    val controller = new HasBankAccountController(SuccessfulAuthAction, mockCacheConnector)
 
   }
 
