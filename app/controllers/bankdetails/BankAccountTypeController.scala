@@ -23,22 +23,22 @@ import models.bankdetails._
 import play.api.mvc.Request
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 
 import scala.concurrent.Future
 
 @Singleton
 class BankAccountTypeController @Inject()(
-                                           val authConnector: AuthConnector,
+                                           val authAction: AuthAction,
                                            val dataCacheConnector: DataCacheConnector,
                                            val statusService: StatusService
                                          ) extends BankDetailsController {
 
-  def get(index: Int, edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(index: Int, edit: Boolean = false) = authAction.async {
       implicit request => {
         for {
-          bankDetail <- getData[BankDetails](index)
-          status <- statusService.getStatus
+          bankDetail <- getData[BankDetails](request.cacheId, index)
+          status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.cacheId)
         } yield bankDetail match {
           case Some(details@BankDetails(Some(data), _, _, _, _, _, _)) if details.canEdit(status) =>
             Ok(view.apply(Form2[Option[BankAccountType]](Some(data)), edit, index))
@@ -49,15 +49,14 @@ class BankAccountTypeController @Inject()(
       }
   }
 
-  def post(index: Int, edit: Boolean = false, count: Int = 0) = Authorised.async {
-    implicit authContext =>
+  def post(index: Int, edit: Boolean = false, count: Int = 0) = authAction.async {
       implicit request => {
         Form2[Option[BankAccountType]](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(view(request)(f, edit, index)))
           case ValidForm(_, data) => {
             for {
-              _ <- updateDataStrict[BankDetails](index) { bd =>
+              _ <- updateDataStrict[BankDetails](request.cacheId, index) { bd =>
                 data match {
                   case Some(NoBankAccountUsed) => bd.bankAccountType(data).bankAccount(None)
                   case _ => bd.bankAccountType(data)
