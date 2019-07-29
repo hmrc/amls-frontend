@@ -21,7 +21,7 @@ private object AppDependencies {
   private val okHttpVersion = "3.9.1"
   private val jsonEncryptionVersion = "3.2.0"
   private val playReactivemongoVersion = "6.2.0"
-  private val authVersion = "2.24checkout .0-play-25"
+  private val authVersion = "2.24.0-play-25"
 
   private val playJars = ExclusionRule(organization = "com.typesafe.play")
 
