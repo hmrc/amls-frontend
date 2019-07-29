@@ -27,6 +27,8 @@ import play.api.libs.json.{JsValue, Json, JsObject}
 
 import scala.collection.{GenTraversableOnce, TraversableLike}
 import cats.data.Validated.{Valid, Invalid}
+
+// $COVERAGE-OFF$
 object TraversableValidators {
 
   implicit def seqToOptionSeq[A]

@@ -25,6 +25,8 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
+// $COVERAGE-OFF$
+// Coverage has been turned off for these types until we remove the deprecated methods
 trait RepeatingSection {
 
   def dataCacheConnector: DataCacheConnector

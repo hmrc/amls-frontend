@@ -25,6 +25,8 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.Future
 
+// $COVERAGE-OFF$
+// Coverage has been turned off for these types until we remove the deprecated methods
 class DataCacheConnector @Inject()(val cacheConnector: MongoCacheConnector){
 
   @deprecated("To be removed when auth implementation is complete")
