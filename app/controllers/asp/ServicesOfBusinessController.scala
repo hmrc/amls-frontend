@@ -17,29 +17,27 @@
 package controllers.asp
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.asp.{Asp, ServicesOfBusiness}
 import models.businessmatching.AccountancyServices
 import services.StatusService
 import services.businessmatching.ServiceFlow
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.DateOfChangeHelper
+import utils.{AuthAction, DateOfChangeHelper}
 import views.html.asp._
 
 import scala.concurrent.Future
 
 class ServicesOfBusinessController @Inject()(val dataCacheConnector: DataCacheConnector,
                                              val statusService: StatusService,
-                                             val authConnector: AuthConnector,
+                                             authAction: AuthAction,
                                              val serviceFlow: ServiceFlow
-                                            ) extends BaseController with DateOfChangeHelper {
+                                            ) extends DefaultBaseController with DateOfChangeHelper {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        dataCacheConnector.fetch[Asp](Asp.key) map {
+        dataCacheConnector.fetch[Asp](request.cacheId, Asp.key) map {
           response =>
             val form = (for {
               business <- response
@@ -49,21 +47,20 @@ class ServicesOfBusinessController @Inject()(val dataCacheConnector: DataCacheCo
         }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    import jto.validation.forms.Rules._
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request =>
+        import jto.validation.forms.Rules._
         Form2[ServicesOfBusiness](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(services_of_business(f, edit)))
           case ValidForm(_, data) =>
 
             for {
-              businessServices <- dataCacheConnector.fetch[Asp](Asp.key)
-              _ <- dataCacheConnector.save[Asp](Asp.key,
+              businessServices <- dataCacheConnector.fetch[Asp](request.cacheId, Asp.key)
+              _ <- dataCacheConnector.save[Asp](request.cacheId, Asp.key,
                 businessServices.services(data))
-              status <- statusService.getStatus
-              isNewActivity <- serviceFlow.isNewActivity(AccountancyServices)
+              status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.cacheId)
+              isNewActivity <- serviceFlow.isNewActivity(request.cacheId, AccountancyServices)
             } yield {
               if (!isNewActivity && redirectToDateOfChange[ServicesOfBusiness](status, businessServices.services, data)) {
                 Redirect(routes.ServicesOfBusinessDateOfChangeController.get())
