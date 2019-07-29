@@ -56,6 +56,8 @@ class DefaultAuthAction @Inject() (
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
 
+    // TODO - Auth will currently play ticket AIV-1097 meaning authorisation can take place on `User` in place of `Admin`
+    // TODO - Note: This can not be changed to User until this ticket has been played out.
     authorised(Admin).retrieve(
       Retrievals.allEnrolments and
         Retrievals.credentials and
