@@ -17,6 +17,7 @@
 package controllers.businessdetails
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.autocomplete.NameValuePair
 import models.businessdetails.{BusinessDetails, CorrespondenceAddress, CorrespondenceAddressIsUk, CorrespondenceAddressUk}
 import org.jsoup.Jsoup
@@ -46,9 +47,9 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
 
     val controller = new CorrespondenceAddressUkController (
       dataConnector = mock[DataCacheConnector],
-      authConnector = self.authConnector,
       auditConnector = mock[AuditConnector],
-      autoCompleteService = mock[AutoCompleteService]
+      autoCompleteService = mock[AutoCompleteService],
+      authAction = SuccessfulAuthAction
     )
 
     when {
@@ -72,7 +73,7 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
         val correspondenceAddress = CorrespondenceAddress(Some(CorrespondenceAddressUk("Name Test", "Test", "Test", "Test", Some("test"), None, "POSTCODE")), None)
         val businessDetails = BusinessDetails(None, None, None, None, None, None,None, None, Some(CorrespondenceAddressIsUk(true)), Some(correspondenceAddress))
 
-        when(controller.dataConnector.fetch[BusinessDetails](any())(any(), any(), any()))
+        when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(businessDetails)))
 
         val result = controller.get(false)(request)
@@ -91,7 +92,7 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
 
       "no data exists in the keystore" in new Fixture {
 
-        when(controller.dataConnector.fetch[BusinessDetails](any())(any(), any(), any()))
+        when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get(false)(request)
@@ -122,11 +123,11 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
           "postCode" -> "AA1 1AA"
         )
 
-        when(controller.dataConnector.fetch[BusinessDetails](any())
-          (any(), any(), any())).thenReturn(fetchResult)
+        when(controller.dataConnector.fetch[BusinessDetails](any(), any())
+          (any(), any())).thenReturn(fetchResult)
 
-        when(controller.dataConnector.save[BusinessDetails](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataConnector.save[BusinessDetails](any(), any(), any())
+          (any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
@@ -160,11 +161,11 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
           "postCode" -> "AA1 1AA"
         )
 
-        when(controller.dataConnector.fetch[BusinessDetails](any())
-          (any(), any(), any())).thenReturn(fetchResult)
+        when(controller.dataConnector.fetch[BusinessDetails](any(), any())
+          (any(), any())).thenReturn(fetchResult)
 
-        when(controller.dataConnector.save[BusinessDetails](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataConnector.save[BusinessDetails](any(), any(), any())
+          (any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(edit = true)(newRequest)
         status(result) must be(SEE_OTHER)
@@ -200,11 +201,11 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
           "postCode" -> "AA1 1AA"
         )
 
-        when(controller.dataConnector.fetch[BusinessDetails](any())
-          (any(), any(), any())).thenReturn(fetchResult)
+        when(controller.dataConnector.fetch[BusinessDetails](any(), any())
+          (any(), any())).thenReturn(fetchResult)
 
-        when(controller.dataConnector.save[BusinessDetails](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataConnector.save[BusinessDetails](any(), any(), any())
+          (any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(false)(newRequest)
         status(result) must be(BAD_REQUEST)
@@ -228,9 +229,7 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
 
         val result = controller.post(false)(newRequest)
         status(result) must be(BAD_REQUEST)
-
       }
     }
   }
-
 }
