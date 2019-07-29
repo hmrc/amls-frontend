@@ -16,26 +16,26 @@
 
 package controllers.businessdetails
 
-import connectors.DataCacheConnector
-import controllers.BaseController
-import models.businessdetails.{BusinessDetails, LettersAddress, RegisteredOffice}
-import views.html.businessdetails._
-import play.api.mvc.Result
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import com.google.inject.Inject
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import connectors.DataCacheConnector
+import controllers.DefaultBaseController
+import models.businessdetails.{BusinessDetails, LettersAddress, RegisteredOffice}
+import play.api.mvc.Result
+import utils.AuthAction
+import views.html.businessdetails._
 
 import scala.concurrent.Future
 
 
 class LettersAddressController @Inject () (
                                           val dataCache: DataCacheConnector,
-                                          val authConnector: AuthConnector
-                                          )extends BaseController {
+                                          val authAction: AuthAction
+                                          ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCache.fetch[BusinessDetails](BusinessDetails.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      dataCache.fetch[BusinessDetails](request.cacheId, BusinessDetails.key) map {
         response =>
           (for {
             atb <- response
@@ -50,11 +50,11 @@ class LettersAddressController @Inject () (
 
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request =>
       Form2[LettersAddress](request.body) match {
         case f: InvalidForm =>
-          dataCache.fetch[BusinessDetails](BusinessDetails.key) map {
+          dataCache.fetch[BusinessDetails](request.cacheId, BusinessDetails.key) map {
             response =>
               val regOffice: Option[RegisteredOffice] = (for {
                 businessDetails <- response
@@ -66,13 +66,13 @@ class LettersAddressController @Inject () (
               }
           }
         case ValidForm(_, data) =>
-          dataCache.fetchAll flatMap {
+          dataCache.fetchAll(request.cacheId) flatMap {
             optionalCache =>
               val result = for {
                 cache <- optionalCache
                 businessDetails <- cache.getEntry[BusinessDetails](BusinessDetails.key)
               } yield {
-                dataCache.save[BusinessDetails](BusinessDetails.key, data.lettersAddress match {
+                dataCache.save[BusinessDetails](request.cacheId, BusinessDetails.key, data.lettersAddress match {
                   case true =>
                     businessDetails.altCorrespondenceAddress(false).copy(correspondenceAddress = None, correspondenceAddressIsUk = None)
                   case false =>

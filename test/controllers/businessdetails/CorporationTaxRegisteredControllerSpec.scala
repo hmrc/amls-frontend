@@ -16,24 +16,21 @@
 
 package controllers.businessdetails
 
-import connectors.{BusinessMatchingConnector, DataCacheConnector}
+import connectors.BusinessMatchingConnector
+import controllers.actions.SuccessfulAuthAction
 import models.Country
-import models.businessdetails.{BusinessDetails, CorporationTaxRegisteredYes}
 import models.businesscustomer.{Address, ReviewDetails}
+import models.businessdetails.{BusinessDetails, CorporationTaxRegisteredYes}
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.{LimitedCompany, SoleProprietor, UnincorporatedBody}
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo, _}
-import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
-import scala.concurrent.Future
-
-class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with DependencyMocks {
+class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with DependencyMocksNewAuth {
 
   trait Fixture extends AuthorisedFixture { self =>
 
@@ -54,8 +51,8 @@ class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar 
 
     val controller = new CorporationTaxRegisteredController (
       dataCacheConnector = mockCacheConnector,
-      authConnector = self.authConnector,
-      businessMatchingConnector = mock[BusinessMatchingConnector]
+      businessMatchingConnector = mock[BusinessMatchingConnector],
+      authAction = SuccessfulAuthAction
     )
   }
 
@@ -127,7 +124,6 @@ class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar 
            status(result) must be(NOT_FOUND)
         }
       }
-
     }
 
     "post is called" when {
@@ -197,9 +193,6 @@ class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar 
           status(result) must be(NOT_FOUND)
         }
       }
-
     }
-
   }
-
 }

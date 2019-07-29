@@ -18,40 +18,36 @@ package controllers.businessdetails
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{Form2, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.businessdetails.{BusinessDetails, RegisteredOfficeNonUK, RegisteredOfficeUK}
 import org.joda.time.LocalDate
 import services.StatusService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.DateOfChangeHelper
+import utils.{AuthAction, DateOfChangeHelper}
 
 import scala.concurrent.Future
 
 class RegisteredOfficeDateOfChangeController @Inject () (
                                                           val dataCacheConnector: DataCacheConnector,
                                                           val statusService: StatusService,
-                                                          val authConnector: AuthConnector
-                                                        ) extends BaseController with DateOfChangeHelper {
+                                                          val authAction: AuthAction
+                                                        ) extends DefaultBaseController with DateOfChangeHelper {
 
 
 
-  def get = {
-    Authorised {
-      implicit authContext => implicit request =>
-        Ok(views.html.date_of_change(
+  def get = authAction.async {
+      implicit request =>
+        Future(Ok(views.html.date_of_change(
           Form2[DateOfChange](DateOfChange(LocalDate.now)),
           "summary.businessdetails",
           controllers.businessdetails.routes.RegisteredOfficeDateOfChangeController.post()
-        ))
+        )))
     }
-  }
 
-  def post = Authorised.async {
-    implicit authContext =>
+  def post = authAction.async {
       implicit request =>
-        dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key) flatMap { businessDetails =>
+        dataCacheConnector.fetch[BusinessDetails](request.cacheId, BusinessDetails.key) flatMap { businessDetails =>
           val extraFields: Map[String, Seq[String]] = businessDetails.get.activityStartDate match {
             case Some(date) => Map("activityStartDate" -> Seq(date.startDate.toString("yyyy-MM-dd")))
             case None => Map()
@@ -64,7 +60,7 @@ class RegisteredOfficeDateOfChangeController @Inject () (
               ))
             case ValidForm(_, dateOfChange) =>
               for {
-                _ <- dataCacheConnector.save[BusinessDetails](BusinessDetails.key,
+                _ <- dataCacheConnector.save[BusinessDetails](request.cacheId, BusinessDetails.key,
                   businessDetails.registeredOffice(businessDetails.registeredOffice match {
                     case Some(office: RegisteredOfficeUK) => office.copy(dateOfChange = Some(dateOfChange))
                     case Some(office: RegisteredOfficeNonUK) => office.copy(dateOfChange = Some(dateOfChange))

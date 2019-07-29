@@ -22,7 +22,7 @@ import cats.data.OptionT
 import cats.implicits._
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.{BaseController, DefaultBaseController}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessdetails.{BusinessDetails, CorrespondenceAddress, CorrespondenceAddressNonUk}
 import play.api.mvc.Request
@@ -31,20 +31,21 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.businessdetails._
 
 import scala.concurrent.Future
 
 class CorrespondenceAddressNonUkController @Inject ()(
                                                  val dataConnector: DataCacheConnector,
-                                                 val authConnector: AuthConnector,
                                                  val auditConnector: AuditConnector,
-                                                 val autoCompleteService: AutoCompleteService
-                                                 ) extends BaseController {
+                                                 val autoCompleteService: AutoCompleteService,
+                                                 val authAction: AuthAction
+                                                 ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataConnector.fetch[BusinessDetails](BusinessDetails.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      dataConnector.fetch[BusinessDetails](request.cacheId, BusinessDetails.key) map {
         response =>
           val form: Form2[CorrespondenceAddressNonUk] = (for {
             businessDetails <- response
@@ -55,16 +56,16 @@ class CorrespondenceAddressNonUkController @Inject ()(
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request => {
       Form2[CorrespondenceAddressNonUk](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(correspondence_address_non_uk(f, edit, autoCompleteService.getCountries)))
         case ValidForm(_, data) =>
           val doUpdate = for {
-            businessDetails:BusinessDetails <- OptionT(dataConnector.fetch[BusinessDetails](BusinessDetails.key))
+            businessDetails:BusinessDetails <- OptionT(dataConnector.fetch[BusinessDetails](request.cacheId, BusinessDetails.key))
             _ <- OptionT.liftF(dataConnector.save[BusinessDetails]
-              (BusinessDetails.key, businessDetails.correspondenceAddress(CorrespondenceAddress(None, Some(data)))))
+              (request.cacheId, BusinessDetails.key, businessDetails.correspondenceAddress(CorrespondenceAddress(None, Some(data)))))
             _ <- OptionT.liftF(auditAddressChange(data, businessDetails.correspondenceAddress.flatMap(a => a.nonUkAddress), edit)) orElse OptionT.some(Success)
           } yield Redirect(routes.SummaryController.get())
           doUpdate getOrElse InternalServerError("Could not update correspondence address")

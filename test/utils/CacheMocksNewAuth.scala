@@ -84,7 +84,7 @@ trait CacheMocksNewAuth extends MockitoSugar {
       val funcCaptor = ArgumentCaptor.forClass(classOf[Option[T] => T])
 
       when {
-        cache.update[T](eqTo(k))(funcCaptor.capture())(any(), any(), any())
+        cache.update[T](any(), eqTo(k))(funcCaptor.capture())(any(), any())
       } thenAnswer new Answer[Future[Option[T]]] {
         override def answer(invocation: InvocationOnMock): Future[Option[T]] = {
           Future.successful(Some(funcCaptor.getValue()(Some(dbModel))))
