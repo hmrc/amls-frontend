@@ -21,25 +21,24 @@ import jto.validation.{Path, Rule, ValidationError}
 import models.{Country, ValidationRule}
 import play.api.libs.json.{Json, Reads}
 
-case class Renewal(
-                    involvedInOtherActivities: Option[InvolvedInOther] = None,
-                    businessTurnover: Option[BusinessTurnover] = None,
-                    turnover: Option[AMLSTurnover] = None,
-                    customersOutsideIsUK: Option[CustomersOutsideIsUK] = None,
-                    customersOutsideUK: Option[CustomersOutsideUK] = None,
-                    percentageOfCashPaymentOver15000: Option[PercentageOfCashPaymentOver15000] = None,
-                    receiveCashPayments: Option[CashPayments] = None,
-                    totalThroughput: Option[TotalThroughput] = None,
-                    whichCurrencies: Option[WhichCurrencies] = None,
-                    transactionsInLast12Months: Option[TransactionsInLast12Months] = None,
-                    sendTheLargestAmountsOfMoney: Option[SendTheLargestAmountsOfMoney] = None,
-                    mostTransactions: Option[MostTransactions] = None,
-                    ceTransactionsInLast12Months: Option[CETransactionsInLast12Months] = None,
-                    fxTransactionsInLast12Months: Option[FXTransactionsInLast12Months] = None,
-                    hasChanged: Boolean = false,
-                    sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None,
-                    hasAccepted: Boolean = true
-) {
+case class Renewal(involvedInOtherActivities: Option[InvolvedInOther] = None,
+                   businessTurnover: Option[BusinessTurnover] = None,
+                   turnover: Option[AMLSTurnover] = None,
+                   customersOutsideIsUK: Option[CustomersOutsideIsUK] = None,
+                   customersOutsideUK: Option[CustomersOutsideUK] = None,
+                   percentageOfCashPaymentOver15000: Option[PercentageOfCashPaymentOver15000] = None,
+                   receiveCashPayments: Option[CashPayments] = None,
+                   totalThroughput: Option[TotalThroughput] = None,
+                   whichCurrencies: Option[WhichCurrencies] = None,
+                   transactionsInLast12Months: Option[TransactionsInLast12Months] = None,
+                   sendTheLargestAmountsOfMoney: Option[SendTheLargestAmountsOfMoney] = None,
+                   mostTransactions: Option[MostTransactions] = None,
+                   ceTransactionsInLast12Months: Option[CETransactionsInLast12Months] = None,
+                   fxTransactionsInLast12Months: Option[FXTransactionsInLast12Months] = None,
+                   hasChanged: Boolean = false,
+                   sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None,
+                   hasAccepted: Boolean = true) {
+
   def involvedInOtherActivities(model: InvolvedInOther): Renewal =
     this.copy(involvedInOtherActivities = Some(model), hasChanged = hasChanged || !this.involvedInOtherActivities.contains(model),
       hasAccepted = hasAccepted && this.involvedInOtherActivities.contains(model))
