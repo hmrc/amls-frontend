@@ -18,24 +18,22 @@ package controllers.businessdetails
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms._
 import models.businessdetails._
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.DateOfChangeHelper
+import utils.{AuthAction, DateOfChangeHelper}
 import views.html.businessdetails._
 
 import scala.concurrent.Future
 
 class RegisteredOfficeIsUKController @Inject ()(
                                             val dataCacheConnector: DataCacheConnector,
-                                            val authConnector: AuthConnector
-                                            ) extends BaseController with DateOfChangeHelper {
+                                            val authAction: AuthAction
+                                            ) extends DefaultBaseController with DateOfChangeHelper {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key) map {
+        dataCacheConnector.fetch[BusinessDetails](request.cacheId, BusinessDetails.key) map {
           response =>
             response.flatMap(businessDetails =>
               businessDetails.registeredOfficeIsUK.map(isUk => isUk.isUK)
@@ -45,16 +43,16 @@ class RegisteredOfficeIsUKController @Inject ()(
         }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request =>
         Form2[RegisteredOfficeIsUK](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(registered_office_is_uk(f, edit)))
           case ValidForm(_, data) =>
             for {
-              businessDetails: Option[BusinessDetails] <- dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key)
-              _ <- dataCacheConnector.save[BusinessDetails](BusinessDetails.key, businessDetails.registeredOfficeIsUK(data))
-              _ <- if (isUkHasChanged(businessDetails.registeredOffice, isUk = data)) { dataCacheConnector.save[BusinessDetails](BusinessDetails.key,
+              businessDetails: Option[BusinessDetails] <- dataCacheConnector.fetch[BusinessDetails](request.cacheId, BusinessDetails.key)
+              _ <- dataCacheConnector.save[BusinessDetails](request.cacheId, BusinessDetails.key, businessDetails. registeredOfficeIsUK(data))
+              _ <- if (isUkHasChanged(businessDetails.registeredOffice, isUk = data)) { dataCacheConnector.save[BusinessDetails](request.cacheId, BusinessDetails.key,
                 businessDetails.copy(registeredOffice = None)) } else { Future.successful(None) }
             } yield {
               data match {

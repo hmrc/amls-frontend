@@ -17,19 +17,18 @@
 package controllers.businessdetails
 
 import com.google.inject.Inject
-import controllers.BaseController
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import controllers.DefaultBaseController
+import utils.AuthAction
 import views.html.businessdetails._
 
 import scala.concurrent.Future
 
 class WhatYouNeedController @Inject () (
-                                       val authConnector: AuthConnector
-                                       ) extends BaseController {
+                                       val authAction: AuthAction
+                                       ) extends DefaultBaseController {
 
-  def get = Authorised.async {
-    implicit authContext => implicit request =>
+  def get = authAction.async {
+    implicit request =>
       Future.successful(Ok(what_you_need()))
   }
-
 }

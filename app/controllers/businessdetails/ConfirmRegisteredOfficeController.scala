@@ -18,22 +18,24 @@ package controllers.businessdetails
 
 import cats.data.OptionT
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.{BaseController, DefaultBaseController}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessdetails.{BusinessDetails, ConfirmRegisteredOffice, RegisteredOffice, RegisteredOfficeUK}
 import models.businesscustomer.Address
 import models.businessmatching.BusinessMatching
 import views.html.businessdetails._
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import cats.implicits._
 import com.google.inject.Inject
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 
 class ConfirmRegisteredOfficeController @Inject () (
                                                    val dataCache: DataCacheConnector,
-                                                   val authConnector: AuthConnector
-                                                   ) extends BaseController {
+                                                   val authAction: AuthAction
+                                                   ) extends DefaultBaseController {
 
 
   def updateBMAddress(bm: BusinessMatching): Option[RegisteredOffice] = {
@@ -61,56 +63,53 @@ class ConfirmRegisteredOfficeController @Inject () (
   }
 
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
-      implicit request =>
-        (for {
-          hra <- OptionT.liftF(hasRegisteredAddress(dataCache.fetch[BusinessDetails](BusinessDetails.key)))
-          bma <- OptionT.liftF(getAddress(dataCache.fetch[BusinessMatching](BusinessMatching.key)))
-        } yield (hra,bma) match {
-          case (Some(false),Some(data)) => Ok(confirm_registered_office_or_main_place(EmptyForm, data))
-          case _ => Redirect(routes.RegisteredOfficeIsUKController.get(edit))
-        }).getOrElse(Redirect(routes.RegisteredOfficeIsUKController.get(edit)))
-
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      (for {
+        hra <- OptionT.liftF(hasRegisteredAddress(dataCache.fetch[BusinessDetails](request.cacheId, BusinessDetails.key)))
+        bma <- OptionT.liftF(getAddress(dataCache.fetch[BusinessMatching](request.cacheId, BusinessMatching.key)))
+      } yield (hra,bma) match {
+        case (Some(false),Some(data)) => Ok(confirm_registered_office_or_main_place(EmptyForm, data))
+        case _ => Redirect(routes.RegisteredOfficeIsUKController.get(edit))
+      }).getOrElse(Redirect(routes.RegisteredOfficeIsUKController.get(edit)))
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
-      implicit request =>
-        Form2[ConfirmRegisteredOffice](request.body) match {
-          case f: InvalidForm =>
-            getAddress(dataCache.fetch[BusinessMatching](BusinessMatching.key)) map {
-              case Some(data) => BadRequest(confirm_registered_office_or_main_place(f, data))
-              case _ => Redirect(routes.RegisteredOfficeIsUKController.get(edit))
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      Form2[ConfirmRegisteredOffice](request.body) match {
+        case f: InvalidForm =>
+          getAddress(dataCache.fetch[BusinessMatching](request.cacheId, BusinessMatching.key)) map {
+            case Some(data) => BadRequest(confirm_registered_office_or_main_place(f, data))
+            case _ => Redirect(routes.RegisteredOfficeIsUKController.get(edit))
+          }
+        case ValidForm(_, data) =>
+
+          def updateRegisteredOfficeAndRedirect(bm: BusinessMatching,
+                                                businessDetails: BusinessDetails) = {
+
+            val address = if (data.isRegOfficeOrMainPlaceOfBusiness) {
+              updateBMAddress(bm)
+            } else {
+              None
             }
-          case ValidForm(_, data) =>
 
-            def updateRegisteredOfficeAndRedirect(bm: BusinessMatching,
-                                                  businessDetails: BusinessDetails) = {
-
-              val address = if (data.isRegOfficeOrMainPlaceOfBusiness) {
-                updateBMAddress(bm)
+            dataCache.save[BusinessDetails](request.cacheId, BusinessDetails.key, businessDetails.copy(registeredOffice = address)) map { _ =>
+              if (data.isRegOfficeOrMainPlaceOfBusiness) {
+                Redirect(routes.ContactingYouController.get(edit))
               } else {
-                None
-              }
-
-              dataCache.save[BusinessDetails](BusinessDetails.key, businessDetails.copy(registeredOffice = address)) map { _ =>
-                if (data.isRegOfficeOrMainPlaceOfBusiness) {
-                  Redirect(routes.ContactingYouController.get(edit))
-                } else {
-                  Redirect(routes.RegisteredOfficeIsUKController.get(edit))
-                }
+                Redirect(routes.RegisteredOfficeIsUKController.get(edit))
               }
             }
+          }
 
-            (for {
-              cache <- OptionT(dataCache.fetchAll)
-              bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
-              businessDetails <- OptionT.fromOption[Future](cache.getEntry[BusinessDetails](BusinessDetails.key))
-              result <- OptionT.liftF(updateRegisteredOfficeAndRedirect(bm, businessDetails))
-            } yield {
-              result
-            }).getOrElse(Redirect(routes.RegisteredOfficeIsUKController.get(edit)))
-        }
+          (for {
+            cache <- OptionT(dataCache.fetchAll(request.cacheId))
+            bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
+            businessDetails <- OptionT.fromOption[Future](cache.getEntry[BusinessDetails](BusinessDetails.key))
+            result <- OptionT.liftF(updateRegisteredOfficeAndRedirect(bm, businessDetails))
+          } yield {
+            result
+          }).getOrElse(Redirect(routes.RegisteredOfficeIsUKController.get(edit)))
+      }
   }
 }
