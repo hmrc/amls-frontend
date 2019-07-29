@@ -32,7 +32,7 @@ class AccountantForAMLSRegulationsController @Inject() (val dataCacheConnector: 
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key) map {
+      dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
         response =>
           val form: Form2[AccountantForAMLSRegulations] = (for {
             businessActivities <- response
@@ -50,8 +50,8 @@ class AccountantForAMLSRegulationsController @Inject() (val dataCacheConnector: 
           Future.successful(BadRequest(accountant_for_amls_regulations(f, edit)))
         case ValidForm(_, data) =>
           for {
-            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.cacheId,BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](request.cacheId, BusinessActivities.key, updateModel(businessActivities, Some(data)))
+            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId,BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key, updateModel(businessActivities, Some(data)))
           } yield (edit, data.accountantForAMLSRegulations) match {
             case (false, true) | (true, true) => Redirect(routes.WhoIsYourAccountantController.get())
             case _ => Redirect(routes.SummaryController.get())

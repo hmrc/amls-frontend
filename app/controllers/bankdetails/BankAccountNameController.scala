@@ -51,22 +51,22 @@ class BankAccountNameController @Inject()(
 
   def getNoIndex: Action[AnyContent] = authAction.async {
       implicit request =>
-        handleGet(None, false, request.amlsRefNumber, request.accountTypeId, request.cacheId)
+        handleGet(None, false, request.amlsRefNumber, request.accountTypeId, request.credId)
   }
 
   def getIndex(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>
-        handleGet(Some(index), edit, request.amlsRefNumber, request.accountTypeId, request.cacheId)
+        handleGet(Some(index), edit, request.amlsRefNumber, request.accountTypeId, request.credId)
   }
   
   def postNoIndex: Action[AnyContent] = authAction.async {
       implicit request =>
-        handlePost(None, false, request.cacheId)
+        handlePost(None, false, request.credId)
   }
 
   def postIndex(index: Int, edit: Boolean = false) = authAction.async {
       implicit request =>
-        handlePost(Some(index), edit, request.cacheId)
+        handlePost(Some(index), edit, request.credId)
   }
 
   private def handleGet(index: Option[Int] = None, edit: Boolean = false, amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)

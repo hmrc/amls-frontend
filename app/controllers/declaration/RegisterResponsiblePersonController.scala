@@ -33,7 +33,7 @@ class RegisterResponsiblePersonController @Inject()(
   def get() = authAction.async {
     implicit request => {
 
-      statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.cacheId) map {
+      statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) map {
         case ReadyForRenewal(_) |
              SubmissionDecisionApproved |
              SubmissionReadyForReview => Ok(views.html.declaration.register_responsible_person("submit.amendment.application"))

@@ -39,8 +39,8 @@ class BankAccountIsUKController @Inject()(
   def get(index: Int, edit: Boolean = false) = authAction.async{
       implicit request =>
         for {
-          bankDetails <- getData[BankDetails](request.cacheId, index)
-          status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.cacheId)
+          bankDetails <- getData[BankDetails](request.credId, index)
+          status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
         } yield bankDetails match {
           case Some(x@BankDetails(_, _, Some(data), _, _, _, _)) if x.canEdit(status) =>
             Ok(views.html.bankdetails.bank_account_is_uk(Form2[Account](data), edit, index))
@@ -54,7 +54,7 @@ class BankAccountIsUKController @Inject()(
       implicit request => {
 
         lazy val sendAudit = for {
-          details <- OptionT(getData[BankDetails](request.cacheId, index))
+          details <- OptionT(getData[BankDetails](request.credId, index))
           result <- OptionT.liftF(auditConnector.sendEvent(audit.AddBankAccountEvent(details)))
         } yield result
 
@@ -62,7 +62,7 @@ class BankAccountIsUKController @Inject()(
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.bankdetails.bank_account_is_uk(f, edit, index)))
           case ValidForm(_, data) =>
-            updateDataStrict[BankDetails](request.cacheId, index) { bd =>
+            updateDataStrict[BankDetails](request.credId, index) { bd =>
               bd.copy(
                 bankAccount = Some(data),
                 status = Some(if (edit) {

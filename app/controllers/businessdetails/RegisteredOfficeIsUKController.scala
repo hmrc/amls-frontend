@@ -33,7 +33,7 @@ class RegisteredOfficeIsUKController @Inject ()(
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        dataCacheConnector.fetch[BusinessDetails](request.cacheId, BusinessDetails.key) map {
+        dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
           response =>
             response.flatMap(businessDetails =>
               businessDetails.registeredOfficeIsUK.map(isUk => isUk.isUK)
@@ -50,9 +50,9 @@ class RegisteredOfficeIsUKController @Inject ()(
             Future.successful(BadRequest(registered_office_is_uk(f, edit)))
           case ValidForm(_, data) =>
             for {
-              businessDetails: Option[BusinessDetails] <- dataCacheConnector.fetch[BusinessDetails](request.cacheId, BusinessDetails.key)
-              _ <- dataCacheConnector.save[BusinessDetails](request.cacheId, BusinessDetails.key, businessDetails. registeredOfficeIsUK(data))
-              _ <- if (isUkHasChanged(businessDetails.registeredOffice, isUk = data)) { dataCacheConnector.save[BusinessDetails](request.cacheId, BusinessDetails.key,
+              businessDetails: Option[BusinessDetails] <- dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key)
+              _ <- dataCacheConnector.save[BusinessDetails](request.credId, BusinessDetails.key, businessDetails. registeredOfficeIsUK(data))
+              _ <- if (isUkHasChanged(businessDetails.registeredOffice, isUk = data)) { dataCacheConnector.save[BusinessDetails](request.credId, BusinessDetails.key,
                 businessDetails.copy(registeredOffice = None)) } else { Future.successful(None) }
             } yield {
               data match {

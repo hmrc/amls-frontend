@@ -34,7 +34,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 final case class AuthorisedRequest[A](request: Request[A],
                                       amlsRefNumber: Option[String],
-                                      cacheId: String,
+                                      credId: String,
                                       affinityGroup: AffinityGroup,
                                       enrolments: Enrolments,
                                       accountTypeId: (String, String)) extends WrappedRequest[A](request)

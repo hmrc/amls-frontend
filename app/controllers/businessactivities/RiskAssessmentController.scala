@@ -35,7 +35,7 @@ class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConne
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key) map {
+      dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
         response =>
           val form: Form2[RiskAssessmentHasPolicy] = (for {
             businessActivities <- response
@@ -52,15 +52,15 @@ class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConne
         case f: InvalidForm =>
           Future.successful(BadRequest(risk_assessment_policy(f, edit)))
         case ValidForm(_, data: RiskAssessmentHasPolicy) => {
-          dataCacheConnector.fetchAll(request.cacheId) flatMap { maybeCache =>
+          dataCacheConnector.fetchAll(request.credId) flatMap { maybeCache =>
             val businessMatching = for {
               cacheMap <- maybeCache
               bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
             } yield bm
 
             for {
-              businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key)
-              _ <- dataCacheConnector.save[BusinessActivities](request.cacheId, BusinessActivities.key, businessActivities.riskAssessmentHasPolicy(data))
+              businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
+              _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key, businessActivities.riskAssessmentHasPolicy(data))
             } yield redirectDependingOnAccountancyServices(ControllerHelper.isAccountancyServicesSelected(Some(businessMatching)), data)
           }
         } recoverWith {

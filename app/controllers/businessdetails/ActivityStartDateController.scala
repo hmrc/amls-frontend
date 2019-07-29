@@ -36,7 +36,7 @@ class ActivityStartDateController @Inject () (
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
-      dataCache.fetch[BusinessDetails](request.cacheId, BusinessDetails.key) map {
+      dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
         response =>
           val form: Form2[ActivityStartDate] = (for {
             businessDetails <- response
@@ -52,7 +52,7 @@ class ActivityStartDateController @Inject () (
         case f: InvalidForm =>
           Future.successful(BadRequest(activity_start_date(f, edit)))
         case ValidForm(_, data) => {
-            dataCache.fetchAll(request.cacheId) flatMap  { maybeCache =>
+            dataCache.fetchAll(request.credId) flatMap  { maybeCache =>
               val businessMatching = for {
                 cacheMap <- maybeCache
                 bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
@@ -68,7 +68,7 @@ class ActivityStartDateController @Inject () (
               } yield atb
 
               for {
-                _ <- dataCache.save[BusinessDetails](request.cacheId, BusinessDetails.key, businessDetails.activityStartDate(data))
+                _ <- dataCache.save[BusinessDetails](request.credId, BusinessDetails.key, businessDetails.activityStartDate(data))
               } yield  getRouting(businessType, edit)
 
             }

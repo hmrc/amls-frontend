@@ -37,7 +37,7 @@ class EmployeeCountAMLSSupervisionController @Inject() (val dataCacheConnector: 
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request => {
-        dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key) map {
+        dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
           response =>
             val form: Form2[HowManyEmployees] = (for {
               businessActivities <- response
@@ -55,8 +55,8 @@ class EmployeeCountAMLSSupervisionController @Inject() (val dataCacheConnector: 
           Future.successful(BadRequest(business_employees_amls_supervision(f, edit)))
         case ValidForm(_, data) =>
           for {
-            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](request.cacheId, BusinessActivities.key,
+            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
               businessActivities.howManyEmployees(updateData(businessActivities.howManyEmployees, data)))
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())

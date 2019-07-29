@@ -31,7 +31,7 @@ class YourBankAccountsController @Inject()(
   def get(complete: Boolean = false) = authAction.async {
       implicit request =>
         for {
-          bankDetails <- dataCacheConnector.fetch[Seq[BankDetails]](request.cacheId, BankDetails.key)
+          bankDetails <- dataCacheConnector.fetch[Seq[BankDetails]](request.credId, BankDetails.key)
         } yield bankDetails match {
           case Some(data) =>
             val filteredBankDetails = data.zipWithIndex.visibleAccounts

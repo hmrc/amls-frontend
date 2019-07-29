@@ -32,7 +32,7 @@ class OtherBusinessTaxMattersController @Inject()(val dataCacheConnector: DataCa
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        dataCacheConnector.fetch[Asp](request.cacheId, Asp.key) map {
+        dataCacheConnector.fetch[Asp](request.credId, Asp.key) map {
           response =>
             val form: Form2[OtherBusinessTaxMatters] = (for {
               asp <- response
@@ -49,8 +49,8 @@ class OtherBusinessTaxMattersController @Inject()(val dataCacheConnector: DataCa
             Future.successful(BadRequest(other_business_tax_matters(f, edit)))
           case ValidForm(_, data) =>
             for {
-              asp <- dataCacheConnector.fetch[Asp](request.cacheId, Asp.key)
-              _ <- dataCacheConnector.save[Asp](request.cacheId, Asp.key,
+              asp <- dataCacheConnector.fetch[Asp](request.credId, Asp.key)
+              _ <- dataCacheConnector.save[Asp](request.credId, Asp.key,
                 asp.otherBusinessTaxMatters(data)
               )
             } yield Redirect(routes.SummaryController.get())

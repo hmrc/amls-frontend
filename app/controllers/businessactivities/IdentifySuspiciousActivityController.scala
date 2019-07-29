@@ -32,7 +32,7 @@ class IdentifySuspiciousActivityController @Inject() ( val dataCacheConnector: D
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key) map {
+      dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
         response =>
           val form: Form2[IdentifySuspiciousActivity] = (for {
             businessActivities <- response
@@ -49,8 +49,8 @@ class IdentifySuspiciousActivityController @Inject() ( val dataCacheConnector: D
           Future.successful(BadRequest(identify_suspicious_activity(f, edit)))
         case ValidForm(_, data) =>
           for {
-            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](request.cacheId, BusinessActivities.key,
+            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
               businessActivities.identifySuspiciousActivity(data)
             )
           } yield edit match {

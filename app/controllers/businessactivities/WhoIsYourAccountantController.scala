@@ -37,7 +37,7 @@ class WhoIsYourAccountantController @Inject() ( val dataCacheConnector: DataCach
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key) map {
+      dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
         response =>
           val form = (for {
             businessActivities <- response
@@ -56,8 +56,8 @@ class WhoIsYourAccountantController @Inject() ( val dataCacheConnector: DataCach
           Future.successful(BadRequest(views.html.businessactivities.who_is_your_accountant(f, edit, autoCompleteService.getCountries)))
         case ValidForm(_, data) => {
           for {
-            businessActivity <- dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](request.cacheId, BusinessActivities.key,
+            businessActivity <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
               businessActivity.whoIsYourAccountant(Some(data))
             )
           } yield if (edit) {

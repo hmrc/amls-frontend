@@ -35,7 +35,7 @@ class LettersAddressController @Inject () (
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
-      dataCache.fetch[BusinessDetails](request.cacheId, BusinessDetails.key) map {
+      dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
         response =>
           (for {
             atb <- response
@@ -54,7 +54,7 @@ class LettersAddressController @Inject () (
     implicit request =>
       Form2[LettersAddress](request.body) match {
         case f: InvalidForm =>
-          dataCache.fetch[BusinessDetails](request.cacheId, BusinessDetails.key) map {
+          dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
             response =>
               val regOffice: Option[RegisteredOffice] = (for {
                 businessDetails <- response
@@ -66,13 +66,13 @@ class LettersAddressController @Inject () (
               }
           }
         case ValidForm(_, data) =>
-          dataCache.fetchAll(request.cacheId) flatMap {
+          dataCache.fetchAll(request.credId) flatMap {
             optionalCache =>
               val result = for {
                 cache <- optionalCache
                 businessDetails <- cache.getEntry[BusinessDetails](BusinessDetails.key)
               } yield {
-                dataCache.save[BusinessDetails](request.cacheId, BusinessDetails.key, data.lettersAddress match {
+                dataCache.save[BusinessDetails](request.credId, BusinessDetails.key, data.lettersAddress match {
                   case true =>
                     businessDetails.altCorrespondenceAddress(false).copy(correspondenceAddress = None, correspondenceAddressIsUk = None)
                   case false =>

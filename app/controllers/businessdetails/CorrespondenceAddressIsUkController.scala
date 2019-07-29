@@ -35,7 +35,7 @@ class CorrespondenceAddressIsUkController @Inject ()(
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
-      dataConnector.fetch[BusinessDetails](request.cacheId, BusinessDetails.key) map {
+      dataConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
         response => {
           response.flatMap(businessDetails =>
             businessDetails.correspondenceAddressIsUk.map(isUk => isUk.isUk)
@@ -52,9 +52,9 @@ class CorrespondenceAddressIsUkController @Inject ()(
         case f: InvalidForm => Future.successful(BadRequest(correspondence_address_is_uk(f, edit)))
         case ValidForm(_, isUk) =>
           for {
-            businessDetails <- dataConnector.fetch[BusinessDetails](request.cacheId, BusinessDetails.key)
-            _ <- dataConnector.save[BusinessDetails](request.cacheId, BusinessDetails.key, businessDetails.correspondenceAddressIsUk(isUk))
-            _ <- if (isUkHasChanged(businessDetails.correspondenceAddress, isUk = isUk)) { dataConnector.save[BusinessDetails](request.cacheId, BusinessDetails.key,
+            businessDetails <- dataConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key)
+            _ <- dataConnector.save[BusinessDetails](request.credId, BusinessDetails.key, businessDetails.correspondenceAddressIsUk(isUk))
+            _ <- if (isUkHasChanged(businessDetails.correspondenceAddress, isUk = isUk)) { dataConnector.save[BusinessDetails](request.credId, BusinessDetails.key,
               businessDetails.correspondenceAddress(CorrespondenceAddress(None, None))) } else { Future.successful(None) }
           } yield isUk match {
             case CorrespondenceAddressIsUk(true) => Redirect(routes.CorrespondenceAddressUkController.get(edit))
