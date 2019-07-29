@@ -177,4 +177,11 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
           mongoCache.createOrUpdate(credId, Some(ac.user.oid), transformed, key) map { _ => Some(transformed) }
         }
     }
+
+
+  def update[T](credId: String, key: String)(f: Option[T] => T)(implicit hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
+      mongoCache.find[T](credId, key) flatMap { maybeModel =>
+        val transformed = f(maybeModel)
+        mongoCache.createOrUpdate(credId, None, transformed, key) map { _ => Some(transformed) }
+      }
 }

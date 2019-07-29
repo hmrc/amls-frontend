@@ -43,6 +43,7 @@ class DataCacheConnector @Inject()(val cacheConnector: MongoCacheConnector){
 
   def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =
     cacheConnector.fetchAll
+
   def fetchAll(id: String)(implicit hc: HeaderCarrier): Future[Option[CacheMap]] =
     cacheConnector.fetchAll(id)
 
@@ -58,6 +59,9 @@ class DataCacheConnector @Inject()(val cacheConnector: MongoCacheConnector){
 
   def update[T](cacheId: String)(f: Option[T] => T)(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
     cacheConnector.update(cacheId)(f)
+
+  def update[T](cacheId: String, key: String)(f: Option[T] => T)(implicit hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
+    cacheConnector.update(cacheId, key)(f)
 
   def saveAll(cacheMap: Future[CacheMap])(implicit hc: HeaderCarrier, ac: AuthContext): Future[CacheMap] =
     cacheConnector.saveAll(cacheMap)
