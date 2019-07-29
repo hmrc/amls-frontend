@@ -17,6 +17,7 @@
 package controllers.declaration
 
 import connectors.{AmlsConnector, DataCacheConnector}
+import controllers.actions.SuccessfulAuthAction
 import models.declaration.BusinessNominatedOfficer
 import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import models.responsiblepeople._
@@ -28,18 +29,17 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.StatusService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
+import utils._
 
 class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
 
     val request = addToken(authRequest)
 
     lazy val defaultBuilder = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[AmlsConnector].to(mock[AmlsConnector]))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
       .overrides(bind[StatusService].to(mockStatusService))
@@ -76,7 +76,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
         "status is pre-submission" in new Fixture {
 
-          mockApplicationStatus(SubmissionReady)
+          mockApplicationStatusNewAuth(SubmissionReady)
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
           mockCacheGetEntry[BusinessNominatedOfficer](None, BusinessNominatedOfficer.key)
 
@@ -88,7 +88,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
         "status is pending" in new Fixture {
 
-          mockApplicationStatus(SubmissionReadyForReview)
+          mockApplicationStatusNewAuth(SubmissionReadyForReview)
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
           mockCacheGetEntry[BusinessNominatedOfficer](None, BusinessNominatedOfficer.key)
 
@@ -100,7 +100,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
         "status is approved" in new Fixture {
 
-          mockApplicationStatus(SubmissionDecisionApproved)
+          mockApplicationStatusNewAuth(SubmissionDecisionApproved)
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
           mockCacheGetEntry[BusinessNominatedOfficer](None, BusinessNominatedOfficer.key)
 
@@ -112,7 +112,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
         "status is ready for renewal" in new Fixture {
 
-          mockApplicationStatus(ReadyForRenewal(Some(new LocalDate())))
+          mockApplicationStatusNewAuth(ReadyForRenewal(Some(new LocalDate())))
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
           mockCacheGetEntry[BusinessNominatedOfficer](None, BusinessNominatedOfficer.key)
 
@@ -136,7 +136,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
           ), rp2)
 
           mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeoples), Some(ResponsiblePerson.key))
-          mockApplicationStatus(SubmissionDecisionApproved)
+          mockApplicationStatusNewAuth(SubmissionDecisionApproved)
           mockCacheSave[Option[Seq[ResponsiblePerson]]](Some(updatedList))
 
           val result = controller.post()(newRequest)
@@ -153,7 +153,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
           ), rp2)
 
           mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeoples), Some(ResponsiblePerson.key))
-          mockApplicationStatus(SubmissionReadyForReview)
+          mockApplicationStatusNewAuth(SubmissionReadyForReview)
           mockCacheSave[Option[Seq[ResponsiblePerson]]](Some(updatedList))
 
           val result = controller.post()(newRequest)
@@ -169,7 +169,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
         val newRequest = request.withFormUrlEncodedBody("value" -> "-1")
 
         mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
-        mockApplicationStatus(SubmissionReady)
+        mockApplicationStatusNewAuth(SubmissionReady)
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -182,7 +182,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
         val newRequest = request.withFormUrlEncodedBody()
 
         mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeoples), Some(ResponsiblePerson.key))
-        mockApplicationStatus(SubmissionReady)
+        mockApplicationStatusNewAuth(SubmissionReady)
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
