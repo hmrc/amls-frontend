@@ -32,7 +32,7 @@ class BusinessFranchiseController @Inject() (val dataCacheConnector: DataCacheCo
 
   def get(edit: Boolean = false) = authAction.async {
    implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key) map {
+      dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
         response =>
           val form: Form2[BusinessFranchise] = (for {
             businessActivities <- response
@@ -49,8 +49,8 @@ class BusinessFranchiseController @Inject() (val dataCacheConnector: DataCacheCo
           Future.successful(BadRequest(business_franchise_name(f, edit)))
         case ValidForm(_, data) =>
           for {
-            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](request.cacheId, BusinessActivities.key,
+            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
               businessActivities.businessFranchise(data)
             )
           } yield edit match {

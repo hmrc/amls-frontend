@@ -45,7 +45,7 @@ class CorrespondenceAddressUkController @Inject ()(
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
-      dataConnector.fetch[BusinessDetails](request.cacheId, BusinessDetails.key) map {
+      dataConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
         response =>
           val form: Form2[CorrespondenceAddressUk] = (for {
             businessDetails <- response
@@ -63,9 +63,9 @@ class CorrespondenceAddressUkController @Inject ()(
           Future.successful(BadRequest(correspondence_address_uk(f, edit)))
         case ValidForm(_, data) =>
           val doUpdate = for {
-            businessDetails:BusinessDetails <- OptionT(dataConnector.fetch[BusinessDetails](request.cacheId, BusinessDetails.key))
+            businessDetails:BusinessDetails <- OptionT(dataConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key))
             _ <- OptionT.liftF(dataConnector.save[BusinessDetails]
-              (request.cacheId, BusinessDetails.key, businessDetails.correspondenceAddress(CorrespondenceAddress(Some(data), None))))
+              (request.credId, BusinessDetails.key, businessDetails.correspondenceAddress(CorrespondenceAddress(Some(data), None))))
             _ <- OptionT.liftF(auditAddressChange(data, businessDetails.correspondenceAddress.flatMap(a => a.ukAddress), edit)) orElse OptionT.some(Success)
           } yield Redirect(routes.SummaryController.get())
           doUpdate getOrElse InternalServerError("Could not update correspondence address")

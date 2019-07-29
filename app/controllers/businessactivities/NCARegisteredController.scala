@@ -33,7 +33,7 @@ class NCARegisteredController @Inject() (val dataCacheConnector: DataCacheConnec
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request => {
-      dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key) map {
+      dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
         response =>
           val form: Form2[NCARegistered] = (for {
             businessActivities <- response
@@ -51,8 +51,8 @@ class NCARegisteredController @Inject() (val dataCacheConnector: DataCacheConnec
           Future.successful(BadRequest(nca_registered(f, edit)))
         case ValidForm(_, data) =>
           for {
-            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](request.cacheId, BusinessActivities.key,
+            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
               businessActivities.ncaRegistered(data)
             )
           } yield edit match {

@@ -37,7 +37,7 @@ class ServicesOfBusinessController @Inject()(val dataCacheConnector: DataCacheCo
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        dataCacheConnector.fetch[Asp](request.cacheId, Asp.key) map {
+        dataCacheConnector.fetch[Asp](request.credId, Asp.key) map {
           response =>
             val form = (for {
               business <- response
@@ -56,11 +56,11 @@ class ServicesOfBusinessController @Inject()(val dataCacheConnector: DataCacheCo
           case ValidForm(_, data) =>
 
             for {
-              businessServices <- dataCacheConnector.fetch[Asp](request.cacheId, Asp.key)
-              _ <- dataCacheConnector.save[Asp](request.cacheId, Asp.key,
+              businessServices <- dataCacheConnector.fetch[Asp](request.credId, Asp.key)
+              _ <- dataCacheConnector.save[Asp](request.credId, Asp.key,
                 businessServices.services(data))
-              status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.cacheId)
-              isNewActivity <- serviceFlow.isNewActivity(request.cacheId, AccountancyServices)
+              status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+              isNewActivity <- serviceFlow.isNewActivity(request.credId, AccountancyServices)
             } yield {
               if (!isNewActivity && redirectToDateOfChange[ServicesOfBusiness](status, businessServices.services, data)) {
                 Redirect(routes.ServicesOfBusinessDateOfChangeController.get())

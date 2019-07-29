@@ -45,8 +45,8 @@ class RegisterPartnersController @Inject()(authAction: AuthAction,
     implicit request => {
 
       val result = for {
-        subtitle <- OptionT.liftF(statusSubtitle(request.amlsRefNumber, request.accountTypeId, request.cacheId))
-        responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.cacheId, ResponsiblePerson.key))
+        subtitle <- OptionT.liftF(statusSubtitle(request.amlsRefNumber, request.accountTypeId, request.credId))
+        responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key))
       } yield {
         Ok(views.html.declaration.register_partners(
           subtitle,
@@ -63,12 +63,12 @@ class RegisterPartnersController @Inject()(authAction: AuthAction,
     implicit request => {
       Form2[BusinessPartners](request.body) match {
         case f: InvalidForm => {
-          dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.cacheId, ResponsiblePerson.key) flatMap {
+          dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key) flatMap {
             case Some(data) => {
-              businessPartnersView(request.amlsRefNumber, request.accountTypeId, request.cacheId, BadRequest, f, data)
+              businessPartnersView(request.amlsRefNumber, request.accountTypeId, request.credId, BadRequest, f, data)
             }
             case None =>
-              businessPartnersView(request.amlsRefNumber, request.accountTypeId, request.cacheId, BadRequest, f, Seq.empty)
+              businessPartnersView(request.amlsRefNumber, request.accountTypeId, request.credId, BadRequest, f, Seq.empty)
           }
         }
         case ValidForm(_, data) => {
@@ -76,7 +76,7 @@ class RegisterPartnersController @Inject()(authAction: AuthAction,
             case "-1" =>
               Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, Some(flowFromDeclaration))))
             case _ =>
-              saveAndRedirect(request.amlsRefNumber, request.accountTypeId, request.cacheId, data)
+              saveAndRedirect(request.amlsRefNumber, request.accountTypeId, request.credId, data)
           }
         }
       }

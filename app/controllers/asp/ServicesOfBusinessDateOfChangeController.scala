@@ -42,14 +42,14 @@ class ServicesOfBusinessDateOfChangeController @Inject()(val dataCacheConnector:
 
   def post = authAction.async {
       implicit request =>
-        getModelWithDateMap(request.cacheId) flatMap {
+        getModelWithDateMap(request.credId) flatMap {
           case (asp, startDate) =>
             Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDate) match {
               case f: InvalidForm =>
                 Future.successful(BadRequest(date_of_change(f, "summary.asp", routes.ServicesOfBusinessDateOfChangeController.post())))
               case ValidForm(_, data) => {
                 for {
-                  _ <- dataCacheConnector.save[Asp](request.cacheId, Asp.key,
+                  _ <- dataCacheConnector.save[Asp](request.credId, Asp.key,
                     asp.services match {
                       case Some(service) => {
                         val a = asp.copy(services = Some(service.copy(dateOfChange = Some(data))))

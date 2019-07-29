@@ -35,7 +35,7 @@ class WhatYouNeedController @Inject()(val authAction: AuthAction,
         val view = what_you_need.apply(_: Call)(request, implicitly)
 
         val result = for {
-            bankDetails <- OptionT(dataCacheConnector.fetch[Seq[BankDetails]](request.cacheId, BankDetails.key))
+            bankDetails <- OptionT(dataCacheConnector.fetch[Seq[BankDetails]](request.credId, BankDetails.key))
           } yield {
             if (bankDetails.exists(visibleAccountsFilter)) {
               Ok(view(routes.BankAccountNameController.getNoIndex()))

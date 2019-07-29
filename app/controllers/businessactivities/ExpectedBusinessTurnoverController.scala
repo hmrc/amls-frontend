@@ -34,7 +34,7 @@ class ExpectedBusinessTurnoverController @Inject() (val dataCacheConnector: Data
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key) map {
+      dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
         response =>
           val form: Form2[ExpectedBusinessTurnover] = (for {
             businessActivities <- response
@@ -51,8 +51,8 @@ class ExpectedBusinessTurnoverController @Inject() (val dataCacheConnector: Data
           Future.successful(BadRequest(expected_business_turnover(f, edit)))
         case ValidForm(_, data) =>
           for {
-            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](request.cacheId, BusinessActivities.key,
+            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
               businessActivities.expectedBusinessTurnover(data)
             )
           } yield edit match {

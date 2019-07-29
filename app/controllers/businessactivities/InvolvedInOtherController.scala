@@ -36,7 +36,7 @@ class InvolvedInOtherController @Inject() ( val dataCacheConnector: DataCacheCon
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
-      dataCacheConnector.fetchAll(request.cacheId) map {
+      dataCacheConnector.fetchAll(request.credId) map {
         optionalCache =>
           (for {
             cache <- optionalCache
@@ -56,15 +56,15 @@ class InvolvedInOtherController @Inject() ( val dataCacheConnector: DataCacheCon
       Form2[InvolvedInOther](request.body) match {
         case f: InvalidForm =>
           for {
-            businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.cacheId, BusinessMatching.key)
+            businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
           } yield businessMatching match {
             case Some(x) => BadRequest(involved_in_other_name(f, edit, businessMatching.prefixedAlphabeticalBusinessTypes))
             case None => BadRequest(involved_in_other_name(f, edit, None))
           }
         case ValidForm(_, data) =>
           for {
-            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](request.cacheId, BusinessActivities.key, getUpdatedBA(businessActivities, data))
+            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key, getUpdatedBA(businessActivities, data))
 
           } yield redirectDependingOnResponse(data, edit)
       }

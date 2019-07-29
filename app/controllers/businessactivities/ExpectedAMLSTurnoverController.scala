@@ -36,7 +36,7 @@ class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCach
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
-      dataCacheConnector.fetchAll(request.cacheId) map {
+      dataCacheConnector.fetchAll(request.credId) map {
         optionalCache =>
           (for {
             cache <- optionalCache
@@ -56,15 +56,15 @@ class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCach
       Form2[ExpectedAMLSTurnover](request.body) match {
         case f: InvalidForm =>
           for {
-            businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.cacheId, BusinessMatching.key)
+            businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
           } yield {
             BadRequest(expected_amls_turnover(f, edit, businessMatching.prefixedAlphabeticalBusinessTypes))
           }
 
         case ValidForm(_, data) =>
           for {
-            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](request.cacheId, BusinessActivities.key,
+            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
               businessActivities.expectedAMLSTurnover(data)
             )
           } yield edit match {

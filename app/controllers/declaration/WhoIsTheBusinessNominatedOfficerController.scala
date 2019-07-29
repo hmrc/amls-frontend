@@ -67,13 +67,13 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
 
   def get = authAction.async {
       implicit request =>
-        dataCacheConnector.fetchAll(request.cacheId) flatMap {
+        dataCacheConnector.fetchAll(request.credId) flatMap {
           optionalCache =>
             (for {
               cache <- optionalCache
               responsiblePeople <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
-            } yield businessNominatedOfficerView(request.amlsRefNumber, request.accountTypeId, request.cacheId, Ok, EmptyForm, ResponsiblePerson.filter(responsiblePeople))
-              ) getOrElse businessNominatedOfficerView(request.amlsRefNumber, request.accountTypeId, request.cacheId, Ok, EmptyForm, Seq.empty)
+            } yield businessNominatedOfficerView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, EmptyForm, ResponsiblePerson.filter(responsiblePeople))
+              ) getOrElse businessNominatedOfficerView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, EmptyForm, Seq.empty)
         }
   }
 
@@ -98,14 +98,14 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
 
   def post = authAction.async {
     implicit request =>
-      validateRequest(request.amlsRefNumber, request.accountTypeId, request.cacheId, Form2[BusinessNominatedOfficer](request.body)){ data =>
+      validateRequest(request.amlsRefNumber, request.accountTypeId, request.credId, Form2[BusinessNominatedOfficer](request.body)){ data =>
           data.value match {
             case "-1" => Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, Some(flowFromDeclaration))))
             case _ => for {
-              serviceStatus <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.cacheId)
-              responsiblePeople <- dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.cacheId, ResponsiblePerson.key)
+              serviceStatus <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+              responsiblePeople <- dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key)
               rp <- updateNominatedOfficer(responsiblePeople, data)
-              _ <- dataCacheConnector.save(request.cacheId, ResponsiblePerson.key, rp)
+              _ <- dataCacheConnector.save(request.credId, ResponsiblePerson.key, rp)
             } yield {
               Redirect(routes.WhoIsRegisteringController.get())
             }

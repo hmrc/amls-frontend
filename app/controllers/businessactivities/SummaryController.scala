@@ -37,7 +37,7 @@ class SummaryController @Inject() (val dataCache: DataCacheConnector,
 
   def get = authAction.async {
     implicit request =>
-      dataCache.fetchAll(request.cacheId) map {
+      dataCache.fetchAll(request.credId) map {
         optionalCache =>
           (for {
             cache <- optionalCache
@@ -54,8 +54,8 @@ class SummaryController @Inject() (val dataCache: DataCacheConnector,
   def post = authAction.async {
     implicit request =>
       (for {
-        businessActivity <- OptionT(dataCache.fetch[BusinessActivities](request.cacheId, BusinessActivities.key))
-        _ <- OptionT.liftF(dataCache.save[BusinessActivities](request.cacheId, BusinessActivities.key,
+        businessActivity <- OptionT(dataCache.fetch[BusinessActivities](request.credId, BusinessActivities.key))
+        _ <- OptionT.liftF(dataCache.save[BusinessActivities](request.credId, BusinessActivities.key,
           businessActivity.copy(hasAccepted = true))
         )
       } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Could not update HVD")

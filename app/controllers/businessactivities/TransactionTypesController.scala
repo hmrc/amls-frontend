@@ -37,7 +37,7 @@ class TransactionTypesController @Inject()(val authAction: AuthAction,
       def form(ba: BusinessActivities) = ba.transactionRecordTypes.fold[Form2[TransactionTypes]](EmptyForm)(Form2(_))
 
       for {
-        ba <- OptionT(cacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key))
+        ba <- OptionT(cacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key))
       } yield Ok(transaction_types(form(ba), edit))
     } getOrElse InternalServerError("Cannot fetch business activities")
   }
@@ -53,8 +53,8 @@ class TransactionTypesController @Inject()(val authAction: AuthAction,
       Form2[TransactionTypes](request.body) match {
         case ValidForm(_, data) => {
           for {
-            bm <- OptionT(cacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key))
-            _ <- OptionT.liftF(cacheConnector.save[BusinessActivities](request.cacheId, BusinessActivities.key, bm.transactionRecordTypes(data)))
+            bm <- OptionT(cacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key))
+            _ <- OptionT.liftF(cacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key, bm.transactionRecordTypes(data)))
           } yield redirect
         } getOrElse InternalServerError("Unable to update Business Activities Transaction Types")
 

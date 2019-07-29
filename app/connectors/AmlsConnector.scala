@@ -31,6 +31,8 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
+// $COVERAGE-OFF$
+// Coverage has been turned off for these types until we remove the deprecated methods
 class AmlsConnector @Inject()(val httpPost: WSHttp,
                               val httpGet: WSHttp,
                               val httpPut: WSHttp,

@@ -36,8 +36,8 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
     */
   private def fetchByOid[T](key: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
     mongoCache.find(authContext.user.oid, key)
-  def fetch[T](id: String, key: String)(implicit hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
-    mongoCache.find(id, key)
+  def fetch[T](credId: String, key: String)(implicit hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
+    mongoCache.find(credId, key)
 
   private def fetchByCredId[T](key: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] = {
     authConnector.getCredId flatMap {
@@ -62,8 +62,8 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
       }
     }
   }
-  def save[T](id: String, key: String, data: T)(implicit hc: HeaderCarrier, format: Format[T]): Future[CacheMap] = {
-    mongoCache.createOrUpdate(id, None, data, key).map(toCacheMap)
+  def save[T](credId: String, key: String, data: T)(implicit hc: HeaderCarrier, format: Format[T]): Future[CacheMap] = {
+    mongoCache.createOrUpdate(credId, None, data, key).map(toCacheMap)
   }
 
   /**
@@ -85,8 +85,8 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
         mongoCache.fetchAll(Some(credId), deprecatedFilter = false).map(_.map(toCacheMap))
     }
   }
-  private def fetchAllByCredId(id: String)(implicit hc: HeaderCarrier): Future[Option[CacheMap]] = {
-    mongoCache.fetchAll(Some(id), deprecatedFilter = false).map(_.map(toCacheMap))
+  private def fetchAllByCredId(credId: String)(implicit hc: HeaderCarrier): Future[Option[CacheMap]] = {
+    mongoCache.fetchAll(Some(credId), deprecatedFilter = false).map(_.map(toCacheMap))
   }
 
   def fetchAll[T](implicit authContext: AuthContext, hc: HeaderCarrier): Future[Option[CacheMap]] = {
@@ -95,8 +95,8 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
       case _ => fetchAllByOid
     }
   }
-  def fetchAll[T](id: String)(implicit hc: HeaderCarrier): Future[Option[CacheMap]] = {
-    fetchAllByCredId(id)
+  def fetchAll[T](credId: String)(implicit hc: HeaderCarrier): Future[Option[CacheMap]] = {
+    fetchAllByCredId(credId)
   }
 
   /**

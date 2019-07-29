@@ -39,7 +39,7 @@ class ContactingYouPhoneController @Inject () (
     implicit request =>
       for {
         businessDetails <-
-        dataCache.fetch[BusinessDetails](request.cacheId, BusinessDetails.key)
+        dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key)
       } yield businessDetails match {
         case Some(BusinessDetails(_,_, _, _, Some(details), _, _, _, _, _, _, _)) if details.phoneNumber.isDefined =>
           Ok(contacting_you_phone(Form2[ContactingYouPhone](ContactingYouPhone (details.phoneNumber.getOrElse(""))), edit))
@@ -54,8 +54,8 @@ class ContactingYouPhoneController @Inject () (
           Future.successful(BadRequest(contacting_you_phone(f, edit)))
         case ValidForm(_, data) =>
           for {
-            businessDetails <- dataCache.fetch[BusinessDetails](request.cacheId, BusinessDetails.key)
-            _ <- dataCache.save[BusinessDetails](request.cacheId, BusinessDetails.key,
+            businessDetails <- dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key)
+            _ <- dataCache.save[BusinessDetails](request.credId, BusinessDetails.key,
                 businessDetails.contactingYou(updateData(businessDetails.contactingYou, data))
             )
           } yield {

@@ -36,8 +36,8 @@ class SummaryController @Inject () (
   def get = authAction.async {
     implicit request =>
       for {
-        businessDetails <- dataCache.fetch[BusinessDetails](request.cacheId, BusinessDetails.key)
-        status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.cacheId)
+        businessDetails <- dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key)
+        status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
       } yield businessDetails match {
         case Some(data) => {
           val showRegisteredForMLR = status match {
@@ -53,8 +53,8 @@ class SummaryController @Inject () (
   def post = authAction.async {
     implicit request =>
       for {
-        businessDetails <- dataCache.fetch[BusinessDetails](request.cacheId, BusinessDetails.key)
-        _ <- dataCache.save[BusinessDetails](request.cacheId, BusinessDetails.key,
+        businessDetails <- dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key)
+        _ <- dataCache.save[BusinessDetails](request.credId, BusinessDetails.key,
           businessDetails.copy(hasAccepted = true)
         )
       } yield {

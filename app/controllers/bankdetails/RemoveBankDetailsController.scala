@@ -31,7 +31,7 @@ class RemoveBankDetailsController @Inject()(
 
   def get(index: Int) = authAction.async {
       implicit request =>
-        getData[BankDetails](request.cacheId, index) map {
+        getData[BankDetails](request.credId, index) map {
           case Some(BankDetails(_, Some(name), _, _, _, _, _)) =>
             Ok(views.html.bankdetails.remove_bank_details(EmptyForm, index, name))
           case _ => NotFound(notFoundView)
@@ -41,7 +41,7 @@ class RemoveBankDetailsController @Inject()(
   def remove(index: Int) = authAction.async {
       implicit request => {
         for {
-          _ <- updateDataStrict[BankDetails](request.cacheId, index) { ba =>
+          _ <- updateDataStrict[BankDetails](request.credId, index) { ba =>
             ba.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
           }
         } yield Redirect(routes.YourBankAccountsController.get())

@@ -51,7 +51,7 @@ class HasBankAccountController @Inject()(val authAction: AuthAction,
             Future.successful(Redirect(router(data)))
 
           case ValidForm(_, data) =>
-            cacheConnector.save(request.cacheId, BankDetails.key, Seq.empty[BankDetails]) map { _ => Redirect(router(data)) }
+            cacheConnector.save(request.credId, BankDetails.key, Seq.empty[BankDetails]) map { _ => Redirect(router(data)) }
 
           case f: InvalidForm => Future.successful(BadRequest(view.apply(f)))
         }

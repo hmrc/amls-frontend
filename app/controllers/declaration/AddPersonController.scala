@@ -40,7 +40,7 @@ class AddPersonController @Inject () (val dataCacheConnector: DataCacheConnector
 
   def get() = authAction.async {
     implicit request => {
-          addPersonView(request.amlsRefNumber, request.accountTypeId, request.cacheId, Ok,EmptyForm)
+          addPersonView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok,EmptyForm)
       }
   }
 
@@ -51,15 +51,15 @@ class AddPersonController @Inject () (val dataCacheConnector: DataCacheConnector
       Form2[AddPerson](request.body) match {
         case f: InvalidForm =>
 
-          dataCacheConnector.fetch[BusinessMatching](request.cacheId, BusinessMatching.key) flatMap { bm =>
+          dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) flatMap { bm =>
             val businessType = ControllerHelper.getBusinessType(bm)
             val updatedForm = updateFormErrors(f, businessType)
-            addPersonView(request.amlsRefNumber, request.accountTypeId, request.cacheId, BadRequest, updatedForm)
+            addPersonView(request.amlsRefNumber, request.accountTypeId, request.credId, BadRequest, updatedForm)
           }
 
         case ValidForm(_, data) =>
-          dataCacheConnector.save[AddPerson](request.cacheId, AddPerson.key, data) flatMap { _ =>
-            statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.cacheId) map {
+          dataCacheConnector.save[AddPerson](request.credId, AddPerson.key, data) flatMap { _ =>
+            statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) map {
               case _ if isResponsiblePerson(data) => {
                 Redirect(routes.RegisterResponsiblePersonController.get())
               }

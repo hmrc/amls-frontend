@@ -33,7 +33,7 @@ class SummaryController @Inject()(
   def get(index: Int) = authAction.async {
     implicit request =>
       for {
-        bankDetails <- getData[BankDetails](request.cacheId, index)
+        bankDetails <- getData[BankDetails](request.credId, index)
       } yield bankDetails match {
         case Some(data) =>
           Ok(views.html.bankdetails.summary(data, index))
@@ -44,7 +44,7 @@ class SummaryController @Inject()(
   def post(index: Int) = authAction.async {
     implicit request =>
       (for {
-        _ <- updateDataStrict[BankDetails](request.cacheId, index) { bd => bd.copy(hasAccepted = true) }
+        _ <- updateDataStrict[BankDetails](request.credId, index) { bd => bd.copy(hasAccepted = true) }
       } yield Redirect(controllers.bankdetails.routes.YourBankAccountsController.get())) recoverWith {
         case _: Throwable => Future.successful(InternalServerError("Unable to save data and get redirect link"))
       }

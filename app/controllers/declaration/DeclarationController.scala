@@ -39,11 +39,11 @@ class DeclarationController @Inject () (
 
   def get() = authAction.async {
     implicit request => {
-      dataCacheConnector.fetch[AddPerson](request.cacheId, AddPerson.key) flatMap {
+      dataCacheConnector.fetch[AddPerson](request.credId, AddPerson.key) flatMap {
         case Some(addPerson) => {
           val name = s"${addPerson.firstName} ${addPerson.middleName getOrElse ""} ${addPerson.lastName}"
           for{
-            status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.cacheId)
+            status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
           } yield status match {
             case ReadyForRenewal(_) => Ok(
               views.html.declaration.declare("declaration.declaration.amendment.title", "submit.renewal.application", name, false))
@@ -53,7 +53,7 @@ class DeclarationController @Inject () (
               views.html.declaration.declare("declaration.declaration.amendment.title", "submit.registration", name, false))
           }
         }
-        case _ => redirectToAddPersonPage(request.amlsRefNumber, request.accountTypeId, request.cacheId)
+        case _ => redirectToAddPersonPage(request.amlsRefNumber, request.accountTypeId, request.credId)
       }
     }
   }
@@ -62,11 +62,11 @@ class DeclarationController @Inject () (
 
   private def declarationView(title: String, subtitle: String, isAmendment: Boolean) = authAction.async {
     implicit request =>
-      dataCacheConnector.fetch[AddPerson](request.cacheId, AddPerson.key) flatMap {
+      dataCacheConnector.fetch[AddPerson](request.credId, AddPerson.key) flatMap {
         case Some(addPerson) =>
           val name = s"${addPerson.firstName} ${addPerson.middleName getOrElse ""} ${addPerson.lastName}"
           Future.successful(Ok(views.html.declaration.declare(title, subtitle, name, isAmendment)))
-        case _ => redirectToAddPersonPage(request.amlsRefNumber, request.accountTypeId, request.cacheId)
+        case _ => redirectToAddPersonPage(request.amlsRefNumber, request.accountTypeId, request.credId)
       }
   }
 

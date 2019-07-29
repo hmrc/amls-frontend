@@ -31,7 +31,7 @@ class TaxMattersController @Inject() (val dataCacheConnector: DataCacheConnector
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key) map {
+      dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
           case Some(BusinessActivities(_,_,_,_,_,_,_,_,_,_,_,Some(whoIsYourAccountant), Some(taxMatters),_,_,_))
           => Ok(tax_matters(Form2[TaxMatters](taxMatters), edit, whoIsYourAccountant.accountantsName))
           case Some(BusinessActivities(_,_,_,_,_,_,_,_,_,_,_,Some(whoIsYourAccountant), _,_,_,_))
@@ -44,13 +44,13 @@ class TaxMattersController @Inject() (val dataCacheConnector: DataCacheConnector
     implicit request =>
       Form2[TaxMatters](request.body) match {
         case f: InvalidForm =>
-          dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key) map { ba =>
+          dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map { ba =>
           BadRequest(tax_matters(f, edit, ControllerHelper.accountantName(ba)))
           }
         case ValidForm(_, data) =>
           for {
-            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](request.cacheId,
+            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](request.credId,
               BusinessActivities.key,
               businessActivities.taxMatters(Some(data))
             )

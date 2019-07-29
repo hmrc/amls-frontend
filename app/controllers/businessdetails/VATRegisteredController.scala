@@ -38,7 +38,7 @@ class VATRegisteredController @Inject () (
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
-      dataCacheConnector.fetch[BusinessDetails](request.cacheId, BusinessDetails.key) map {
+      dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
         response =>
           val form: Form2[VATRegistered] = (for {
             businessDetails <- response
@@ -57,9 +57,9 @@ class VATRegisteredController @Inject () (
         case ValidForm(_, data) =>
 
           val redirect = for {
-            cache <- dataCacheConnector.fetchAll(request.cacheId)
+            cache <- dataCacheConnector.fetchAll(request.credId)
             businessType <- Future.successful(getBusinessType(cache))
-            _ <- dataCacheConnector.update[BusinessDetails](request.cacheId, BusinessDetails.key) {
+            _ <- dataCacheConnector.update[BusinessDetails](request.credId, BusinessDetails.key) {
               case Some(m) => m.vatRegistered(data)
               case _ => BusinessDetails().vatRegistered(data)
             }

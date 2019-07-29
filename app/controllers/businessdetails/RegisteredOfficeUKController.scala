@@ -41,7 +41,7 @@ class RegisteredOfficeUKController @Inject ()(
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        dataCacheConnector.fetch[BusinessDetails](request.cacheId, BusinessDetails.key) map {
+        dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
           response =>
             val form: Form2[RegisteredOffice] = (for {
               businessDetails <- response
@@ -58,9 +58,9 @@ class RegisteredOfficeUKController @Inject ()(
             Future.successful(BadRequest(registered_office_uk(f, edit)))
           case ValidForm(_, data) =>
             for {
-              businessDetails <- dataCacheConnector.fetch[BusinessDetails](request.cacheId, BusinessDetails.key)
-              _ <- dataCacheConnector.save[BusinessDetails](request.cacheId, BusinessDetails.key, businessDetails.registeredOffice(data))
-              status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.cacheId)
+              businessDetails <- dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key)
+              _ <- dataCacheConnector.save[BusinessDetails](request.credId, BusinessDetails.key, businessDetails.registeredOffice(data))
+              status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
               _ <- auditAddressChange(data, businessDetails flatMap { _.registeredOffice } , edit)
             } yield {
               if (redirectToDateOfChange[RegisteredOffice](status, businessDetails.registeredOffice, data)) {

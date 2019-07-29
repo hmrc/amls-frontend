@@ -44,14 +44,14 @@ class CorporationTaxRegisteredController @Inject () (
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
-      filterByBusinessType ( request.cacheId, cache =>
+      filterByBusinessType ( request.credId, cache =>
         cache.getEntry[BusinessDetails](BusinessDetails.key) match {
           case _ =>
             (for {
               bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
               details <- OptionT.fromOption[Future](bm.reviewDetails)
               utr <- OptionT.fromOption[Future](details.utr)
-              _ <- updateCache(request.cacheId, cache, CorporationTaxRegisteredYes(utr))
+              _ <- updateCache(request.credId, cache, CorporationTaxRegisteredYes(utr))
             } yield getRedirectLocation(edit)) getOrElse Ok(corporation_tax_registered(EmptyForm, edit))
         }
       )
@@ -59,12 +59,12 @@ class CorporationTaxRegisteredController @Inject () (
 
   def post(edit: Boolean = false) = authAction.async {
     implicit request => {
-      filterByBusinessType ( request.cacheId, cache =>
+      filterByBusinessType ( request.credId, cache =>
         Form2[CorporationTaxRegistered](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(corporation_tax_registered(f, edit)))
           case ValidForm(_, data) =>
-            updateCache(request.cacheId, cache, data) map { _ =>
+            updateCache(request.credId, cache, data) map { _ =>
               getRedirectLocation(edit)
             } getOrElse failedResult
         }

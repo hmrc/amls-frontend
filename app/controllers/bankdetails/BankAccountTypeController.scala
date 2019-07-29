@@ -37,8 +37,8 @@ class BankAccountTypeController @Inject()(
   def get(index: Int, edit: Boolean = false) = authAction.async {
       implicit request => {
         for {
-          bankDetail <- getData[BankDetails](request.cacheId, index)
-          status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.cacheId)
+          bankDetail <- getData[BankDetails](request.credId, index)
+          status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
         } yield bankDetail match {
           case Some(details@BankDetails(Some(data), _, _, _, _, _, _)) if details.canEdit(status) =>
             Ok(view.apply(Form2[Option[BankAccountType]](Some(data)), edit, index))
@@ -56,7 +56,7 @@ class BankAccountTypeController @Inject()(
             Future.successful(BadRequest(view(request)(f, edit, index)))
           case ValidForm(_, data) => {
             for {
-              _ <- updateDataStrict[BankDetails](request.cacheId, index) { bd =>
+              _ <- updateDataStrict[BankDetails](request.credId, index) { bd =>
                 data match {
                   case Some(NoBankAccountUsed) => bd.bankAccountType(data).bankAccount(None)
                   case _ => bd.bankAccountType(data)

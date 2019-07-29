@@ -38,7 +38,7 @@ class TransactionRecordController @Inject()(val authAction: AuthAction,
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key) map {
+      dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
         response =>
           val form: Form2[Boolean] = (for {
             businessActivities <- response
@@ -56,8 +56,8 @@ class TransactionRecordController @Inject()(val authAction: AuthAction,
           Future.successful(BadRequest(customer_transaction_records(f, edit)))
         case ValidForm(_, data) => {
           for {
-            businessActivity <- dataCacheConnector.fetch[BusinessActivities](request.cacheId, BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](request.cacheId, BusinessActivities.key, businessActivity.transactionRecord(data))
+            businessActivity <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key, businessActivity.transactionRecord(data))
           } yield (edit, data) match {
             case (false, true) => Redirect(routes.TransactionTypesController.get())
             case (false, false) => Redirect(routes.IdentifySuspiciousActivityController.get())

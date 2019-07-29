@@ -45,13 +45,13 @@ class WhoIsRegisteringController @Inject () (
 
   def get = authAction.async {
     implicit request =>
-      dataCacheConnector.fetchAll(request.cacheId) flatMap {
+      dataCacheConnector.fetchAll(request.credId) flatMap {
         optionalCache =>
           (for {
             cache <- optionalCache
             responsiblePeople <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
-          } yield whoIsRegisteringView(request.amlsRefNumber, request.accountTypeId, request.cacheId, Ok, EmptyForm, ResponsiblePerson.filter(responsiblePeople))
-          ) getOrElse whoIsRegisteringView(request.amlsRefNumber, request.accountTypeId, request.cacheId, Ok, EmptyForm, Seq.empty)
+          } yield whoIsRegisteringView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, EmptyForm, ResponsiblePerson.filter(responsiblePeople))
+          ) getOrElse whoIsRegisteringView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, EmptyForm, Seq.empty)
       }
   }
 
@@ -59,13 +59,13 @@ class WhoIsRegisteringController @Inject () (
     implicit request => {
       Form2[WhoIsRegistering](request.body) match {
         case f: InvalidForm =>
-          dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.cacheId, ResponsiblePerson.key) flatMap {
+          dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key) flatMap {
             case Some(data) =>
-              whoIsRegisteringViewWithError(request.amlsRefNumber, request.accountTypeId, request.cacheId, BadRequest, f, ResponsiblePerson.filter(data))
-            case None => whoIsRegisteringViewWithError(request.amlsRefNumber, request.accountTypeId, request.cacheId, BadRequest, f, Seq.empty)
+              whoIsRegisteringViewWithError(request.amlsRefNumber, request.accountTypeId, request.credId, BadRequest, f, ResponsiblePerson.filter(data))
+            case None => whoIsRegisteringViewWithError(request.amlsRefNumber, request.accountTypeId, request.credId, BadRequest, f, Seq.empty)
           }
         case ValidForm(_, data) =>
-          dataCacheConnector.fetchAll(request.cacheId) flatMap {
+          dataCacheConnector.fetchAll(request.credId) flatMap {
             optionalCache =>
               (for {
                 cache <- optionalCache
@@ -73,15 +73,15 @@ class WhoIsRegisteringController @Inject () (
               } yield {
                 data.person match {
                   case "-1" =>
-                    redirectToAddPersonPage(request.amlsRefNumber, request.accountTypeId, request.cacheId)
+                    redirectToAddPersonPage(request.amlsRefNumber, request.accountTypeId, request.credId)
                   case _ =>
                     getAddPerson(data, ResponsiblePerson.filter(responsiblePeople)) map { addPerson =>
-                      dataCacheConnector.save[AddPerson](request.cacheId, AddPerson.key, addPerson) flatMap {
-                        _ => redirectToDeclarationPage(request.amlsRefNumber, request.accountTypeId, request.cacheId)
+                      dataCacheConnector.save[AddPerson](request.credId, AddPerson.key, addPerson) flatMap {
+                        _ => redirectToDeclarationPage(request.amlsRefNumber, request.accountTypeId, request.credId)
                       }
                     } getOrElse Future.successful(NotFound(notFoundView))
                 }
-              }) getOrElse redirectToDeclarationPage(request.amlsRefNumber, request.accountTypeId, request.cacheId)
+              }) getOrElse redirectToDeclarationPage(request.amlsRefNumber, request.accountTypeId, request.credId)
           }
       }
     }

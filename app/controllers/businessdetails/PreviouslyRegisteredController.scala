@@ -36,7 +36,7 @@ class PreviouslyRegisteredController @Inject () (
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
-      dataCacheConnector.fetch[BusinessDetails](request.cacheId, BusinessDetails.key) map {
+      dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
         response =>
           val form: Form2[PreviouslyRegistered] = (for {
             businessDetails <- response
@@ -52,13 +52,13 @@ class PreviouslyRegisteredController @Inject () (
         case f: InvalidForm =>
           Future.successful(BadRequest(previously_registered(f, edit)))
         case ValidForm(_, data) =>
-          dataCacheConnector.fetchAll(request.cacheId) map {
+          dataCacheConnector.fetchAll(request.credId) map {
             optionalCache =>
               (for {
                 cache <- optionalCache
                 businessType <- ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
               } yield {
-                dataCacheConnector.save[BusinessDetails](request.cacheId, BusinessDetails.key,
+                dataCacheConnector.save[BusinessDetails](request.credId, BusinessDetails.key,
                   getUpdatedModel(businessType,  cache.getEntry[BusinessDetails](BusinessDetails.key), data))
                 getRouting(businessType, edit, data)
               }).getOrElse(Redirect(routes.ConfirmRegisteredOfficeController.get(edit)))
