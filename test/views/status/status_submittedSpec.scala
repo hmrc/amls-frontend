@@ -131,6 +131,7 @@ class status_submittedSpec extends AmlsSpec with MustMatchers with AmlsReference
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.2.listline3"))
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.3"))
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.4"))
+      Option(doc.getElementsByClass("partial-deskpro-form").first()) mustBe defined
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.5"))
 
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
