@@ -16,8 +16,9 @@
 
 package controllers.businessmatching.updateservice
 
-import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
+import models.businessmatching.{BillPaymentServices, BusinessActivities => BMBusinessActivities, _}
 import models.flowmanagement.RemoveBusinessTypeFlowModel
+import models.hvd.Hvd
 import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
@@ -38,13 +39,42 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
     )
   }
 
+  "RemoveBusinessTypeHelper" must {
+    "have removeSectionData method which" when {
+      "called with model" must {
+        "return updated cache map" in new Fixture {
+          val activitiesToRemove = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing)))
+
+          val testBusinessMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, BillPaymentServices))),
+            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo),
+            hasAccepted = true,
+            hasChanged = true)
+
+          mockCacheFetch[BusinessMatching](
+            Some(testBusinessMatching),
+            Some(BusinessMatching.key))
+
+          val expectedResult = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing))),
+            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo),
+            hasAccepted = true,
+            hasChanged = true)
+
+          mockCacheRemoveByKey[Hvd]
+
+          helper.removeSectionData(activitiesToRemove).returnsSome(Seq(mockCacheMap))
+        }
+      }
+    }
+  }
+
   "removing Responsible People types" when {
     "there is more than one business type" when {
       "the buisness is TCSP and they answered yes to F&P then do not remove the responsible people approval" in new Fixture {
 
         val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
 
-        val startResultRP = Seq(ResponsiblePerson(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(true)),
+        val startResultRP = Seq(ResponsiblePerson(
+          approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(true)),
           hasAccepted = true,
           hasChanged = true))
 
@@ -63,7 +93,8 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
           Some(startResultRP),
           Some(ResponsiblePerson.key))
 
-        val expectedResultRP = Seq(ResponsiblePerson(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(true)),
+        val expectedResultRP = Seq(ResponsiblePerson(
+          approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(true)),
           hasAccepted = true,
           hasChanged = true))
 
@@ -72,11 +103,13 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
         helper.removeFitAndProper(model).returnsSome(expectedResultRP)
       }
+
       "the buisness is TCSP and they answered no to F&P then do remove the responsible people approval" in new Fixture {
 
         val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
 
-        val startResultRP = Seq(ResponsiblePerson(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false), hasAlreadyPaidApprovalCheck = Some(true)),
+        val startResultRP = Seq(ResponsiblePerson(
+          approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false), hasAlreadyPaidApprovalCheck = Some(true)),
           hasAccepted = true,
           hasChanged = true))
 
@@ -95,7 +128,8 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
           Some(startResultRP),
           Some(ResponsiblePerson.key))
 
-        val expectedResultRP = Seq(ResponsiblePerson(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false), hasAlreadyPaidApprovalCheck = None),
+        val expectedResultRP = Seq(ResponsiblePerson(
+          approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false), hasAlreadyPaidApprovalCheck = None),
           hasAccepted = true,
           hasChanged = true))
 
