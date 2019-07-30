@@ -16,9 +16,6 @@
 
 package models.responsiblepeople
 
-import models.businessmatching.BusinessMatching
-import models.moneyservicebusiness.MoneyServiceBusiness
-import models.registrationprogress.{NotStarted, Section}
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
