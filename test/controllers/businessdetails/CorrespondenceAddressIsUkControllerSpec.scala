@@ -17,6 +17,7 @@
 package controllers.businessdetails
 
 import connectors.DataCacheConnector
+import models.Country
 import models.businessdetails._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
@@ -40,8 +41,10 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
+    val mockDataConnector = mock[DataCacheConnector]
+
     val controller = new CorrespondenceAddressIsUkController (
-      dataConnector = mock[DataCacheConnector],
+      mockDataConnector,
       authConnector = self.authConnector,
       auditConnector = mock[AuditConnector]
     )
@@ -50,8 +53,12 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
       controller.auditConnector.sendEvent(any())(any(), any())
     } thenReturn Future.successful(Success)
 
-    val correspondenceAddress = CorrespondenceAddress(Some(CorrespondenceAddressUk("test", "test", "line1", "line2", Some("line3"), Some("line4"), "AA1 1AA")), None)
-    val businessDetails = BusinessDetails(None, None, None, None, None, None, None, None, Some(CorrespondenceAddressIsUk(true)), Some(correspondenceAddress))
+    val correspondenceAddressUK = CorrespondenceAddress(Some(
+      CorrespondenceAddressUk("test", "test", "line1", "line2", Some("line3"), Some("line4"), "AA1 1AA")), None)
+    val correspondenceAddressNonUk = CorrespondenceAddress(None, Some(
+      CorrespondenceAddressNonUk("name", "name", "line1", "line2", Some("line3"), Some("line4"), Country("Hong Kong", "HK"))))
+
+    val businessDetails = BusinessDetails(None, None, None, None, None, None, None, None, Some(CorrespondenceAddressIsUk(true)), Some(correspondenceAddressUK))
   }
 
   "CorrespondenceAddressIsUkController" should {
@@ -68,13 +75,32 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
 
       "load isUk result when there is already an isUK answer in BusinessDetails" in new Fixture {
 
-        when(controller.dataConnector.fetch[BusinessDetails](meq(BusinessDetails.key))
+        when(mockDataConnector.fetch[BusinessDetails](meq(BusinessDetails.key))
           (any(), any(), any())).thenReturn(Future.successful(Some(businessDetails)))
 
         val result = controller.get()(request)
  
         status(result) must be(OK)
-        redirectLocation(result) must be(Some(controllers.businessdetails.routes.CorrespondenceAddressIsUkController.get().url))
+
+        val htmlValue = Jsoup.parse(contentAsString(result))
+        htmlValue.getElementById("isUK-true").hasAttr("checked") must be(true)
+        htmlValue.getElementById("isUK-false").hasAttr("checked") must be(false)
+      }
+
+      "load isUk result when there is already an nonUk answer in BusinessDetails" in new Fixture {
+
+        when(mockDataConnector.fetch[BusinessDetails](meq(BusinessDetails.key))
+          (any(), any(), any())).thenReturn(Future.successful(Some(businessDetails.copy(
+          correspondenceAddressIsUk = Some(CorrespondenceAddressIsUk(false)),
+          correspondenceAddress = Some(correspondenceAddressNonUk)))))
+
+        val result = controller.get()(request)
+
+        status(result) must be(OK)
+
+        val htmlValue = Jsoup.parse(contentAsString(result))
+        htmlValue.getElementById("isUK-true").hasAttr("checked") must be(false)
+        htmlValue.getElementById("isUK-false").hasAttr("checked") must be(true)
       }
     }
 
