@@ -30,9 +30,7 @@ import play.api.mvc.{AnyContentAsFormUrlEncoded, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.RenewalService
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AmlsSpec, AuthorisedFixture}
 
@@ -178,6 +176,21 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
             }
           }
         }
+
+        "redirect to the PercentageOfCashPaymentsOver15000 page" when {
+
+          "user answers no, not in edit mode and business is an hvd" in new FormSubmissionFixture {
+            post(
+              businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(HighValueDealing)))),
+              data = Some(request.withFormUrlEncodedBody("isOutside" -> "false"))
+            ) { result =>
+              result.header.status mustBe SEE_OTHER
+              result.header.headers.get("Location") mustBe Some(routes.PercentageOfCashPaymentOver15000Controller.get().url)
+            }
+          }
+        }
+
+
         "business is an msb and asp" in new FormSubmissionFixture {
           post(businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness, AccountancyServices))))) { result =>
             result.header.status mustBe SEE_OTHER
