@@ -17,27 +17,26 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching.{BusinessMatching, ForeignExchange}
 import models.moneyservicebusiness._
 import services.StatusService
 import services.businessmatching.ServiceFlow
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 
 import scala.concurrent.Future
 
-class MoneySourcesController @Inject()(val authConnector: AuthConnector,
+class MoneySourcesController @Inject()(authAction: AuthAction,
                                        implicit val dataCacheConnector: DataCacheConnector,
                                        implicit val statusService: StatusService,
                                        implicit val serviceFlow: ServiceFlow
-                                          ) extends BaseController {
+                                      ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request => {
-        dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+        dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
           response =>
             val form: Form2[MoneySources] = (for {
               msb <- response
@@ -50,18 +49,17 @@ class MoneySourcesController @Inject()(val authConnector: AuthConnector,
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request => {
         Form2[MoneySources](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.msb.money_sources(f, edit)))
           case ValidForm(_, data: MoneySources) =>
             for {
-              msb <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
-              _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key, updateMoneySources(msb, data))
-              updatedMsb <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
-              bm <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
+              msb <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
+              _ <- dataCacheConnector.save[MoneyServiceBusiness](request.credId,MoneyServiceBusiness.key, updateMoneySources(msb, data))
+              updatedMsb <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
+              bm <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
             } yield redirectToNextPage(updatedMsb, bm, edit).getOrElse(NotFound(notFoundView))
         }
       }
