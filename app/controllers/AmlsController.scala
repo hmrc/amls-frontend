@@ -18,12 +18,11 @@ package controllers
 
 import javax.inject.Inject
 import play.api.mvc._
-import uk.gov.hmrc.play.frontend.auth.Actions
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 
 import scala.concurrent.Future
 
-class AmlsController @Inject()(amlsAuthConnector: AuthConnector) extends Actions with BaseController{
+class AmlsController @Inject()(authAction: AuthAction) extends DefaultBaseController {
 
   val unauthorised = Action {
     implicit request =>
@@ -35,13 +34,10 @@ class AmlsController @Inject()(amlsAuthConnector: AuthConnector) extends Actions
       Unauthorized(views.html.unauthorised_role())
   }
 
-  val keep_alive = Authorised.async {
-    implicit authContext =>
+  val keep_alive = authAction.async {
       implicit request =>
         Future.successful(Ok("OK"))
   }
-
-  override protected def authConnector: AuthConnector = amlsAuthConnector
 }
 
 
