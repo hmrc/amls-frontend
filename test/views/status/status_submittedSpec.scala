@@ -123,8 +123,7 @@ class status_submittedSpec extends AmlsSpec with MustMatchers with AmlsReference
 
       doc.getElementsByClass("status-list").first().child(2).hasClass("status-list--end") must be(true)
 
-      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description"))
-      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.no.link"))
+      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.no.fee"))
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.2"))
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.2.listline1"))
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.2.listline2"))
