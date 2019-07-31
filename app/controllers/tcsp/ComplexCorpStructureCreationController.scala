@@ -26,10 +26,8 @@ import views.html.tcsp._
 
 import scala.concurrent.Future
 
-class ComplexCorpStructureCreationController @Inject()(
-                                                 val authAction: AuthAction,
-                                                 val dataCacheConnector: DataCacheConnector
-                                               ) extends DefaultBaseController {
+class ComplexCorpStructureCreationController @Inject()(val authAction: AuthAction,
+                                                       val dataCacheConnector: DataCacheConnector) extends DefaultBaseController {
 
   val NAME = "complexCorpStructureCreation"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(NAME)

@@ -16,32 +16,31 @@
 
 package controllers.tcsp
 
+import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
+import models.tcsp._
+import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import play.api.test.Helpers.{BAD_REQUEST, OK, SEE_OTHER, contentAsString, redirectLocation, status}
-import connectors.DataCacheConnector
-import models.tcsp._
-import org.mockito.Matchers.any
-import org.mockito.Mockito.{verify, when}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
-import play.api.test.Helpers._
+import play.api.test.Helpers.{BAD_REQUEST, OK, SEE_OTHER, contentAsString, redirectLocation, status, _}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthorisedFixture}
-import org.mockito.Matchers.{eq => eqTo, _}
+import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
 
 import scala.concurrent.Future
 
 
 class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(self.authRequest)
 
     val cache = mock[DataCacheConnector]
 
     val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[DataCacheConnector].to(self.cache))
       .build()
 
@@ -59,10 +58,10 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
       hasAccepted = true
     )
 
-    when(cache.fetch[Tcsp](any())(any(), any(), any()))
+    when(cache.fetch[Tcsp](any(), any())(any(), any()))
       .thenReturn(Future.successful(Some(tcsp)))
 
-    when(cache.save[Tcsp](any(), any())(any(), any(), any()))
+    when(cache.save[Tcsp](any(), any(), any())(any(), any()))
       .thenReturn(Future.successful(new CacheMap("", Map.empty)))
   }
 
@@ -126,13 +125,13 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
               hasChanged = true
             )
 
-            when(cache.fetch[Tcsp](any())(any(), any(), any()))
+            when(cache.fetch[Tcsp](any(), any())(any(), any()))
               .thenReturn(Future.successful(Some(companyFormationAgentTcsp)))
 
             val result = controller.post()(request.withFormUrlEncodedBody("onlyOffTheShelfCompsSold" -> "true"))
 
             status(result) mustBe SEE_OTHER
-            verify(controller.dataCacheConnector).save[Tcsp](any(), eqTo(expected))(any(), any(), any())
+            verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any(), any())
             redirectLocation(result) mustBe Some(controllers.tcsp.routes.ComplexCorpStructureCreationController.get().url)
           }
         }
@@ -157,7 +156,7 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
               val result = controller.post(true)(request.withFormUrlEncodedBody("onlyOffTheShelfCompsSold" -> "true"))
 
               status(result) mustBe SEE_OTHER
-              verify(controller.dataCacheConnector).save[Tcsp](any(), eqTo(expected))(any(), any(), any())
+              verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any(), any())
               redirectLocation(result) mustBe Some(controllers.tcsp.routes.SummaryController.get().url)
             }
           }
@@ -180,7 +179,7 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
 
               val result = controller.post(false)(request.withFormUrlEncodedBody("onlyOffTheShelfCompsSold" -> "false"))
               status(result) mustBe SEE_OTHER
-              verify(controller.dataCacheConnector).save[Tcsp](any(), eqTo(expected))(any(), any(), any())
+              verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any(), any())
               redirectLocation(result) mustBe Some(controllers.tcsp.routes.SummaryController.get().url)
             }
           }
