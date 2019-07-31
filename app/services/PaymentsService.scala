@@ -31,36 +31,23 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 
-class PaymentsService @Inject()(
-                                 val amlsConnector: AmlsConnector,
-                                 val paymentsConnector: PayApiConnector,
-                                 val statusService: StatusService
-                               ) {
+class PaymentsService @Inject()(val amlsConnector: AmlsConnector,
+                                val paymentsConnector: PayApiConnector,
+                                val statusService: StatusService) {
 
   def requestPaymentsUrl(fees: FeeResponse, returnUrl: String, amlsRefNo: String, safeId: String)
-                        (implicit hc: HeaderCarrier,
-                         ec: ExecutionContext,
-                         authContext: AuthContext,
-                         request: Request[_]): Future[NextUrl] =
+                        (implicit hc: HeaderCarrier, ec: ExecutionContext, authContext: AuthContext, request: Request[_]): Future[NextUrl] =
     fees match {
-      case f:FeeResponse if f.difference.isDefined & f.paymentReference.isDefined =>
+      case f: FeeResponse if f.difference.isDefined & f.paymentReference.isDefined =>
         paymentsUrlOrDefault(f.paymentReference.get, f.difference.get.toDouble, returnUrl, amlsRefNo, safeId)
-      case f:FeeResponse if f.paymentReference.isDefined =>
+      case f: FeeResponse if f.paymentReference.isDefined =>
         paymentsUrlOrDefault(f.paymentReference.get, f.totalFees.toDouble, returnUrl, amlsRefNo, safeId)
       case _ => Future.successful(NextUrl(ApplicationConfig.paymentsUrl))
     }
 
   //noinspection ScalaStyle
-  def paymentsUrlOrDefault(paymentReference: String,
-                           amount: Double,
-                           returnUrl: String,
-                           amlsRefNo: String,
-                           safeId: String)
-                          (implicit hc: HeaderCarrier,
-                           ec: ExecutionContext,
-                           authContext: AuthContext,
-                           request: Request[_]): Future[NextUrl] = {
-
+  def paymentsUrlOrDefault(paymentReference: String, amount: Double, returnUrl: String, amlsRefNo: String, safeId: String)
+                          (implicit hc: HeaderCarrier, ec: ExecutionContext, authContext: AuthContext, request: Request[_]): Future[NextUrl] = {
 
     val amountInPence = (amount * 100).toInt
 

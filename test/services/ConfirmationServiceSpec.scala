@@ -33,13 +33,16 @@ package services
  */
 import connectors.DataCacheConnector
 import generators.{AmlsReferenceNumberGenerator, ResponsiblePersonGenerator}
+import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import models._
 import models.businesscustomer.ReviewDetails
 import models.businessmatching._
 import models.confirmation.{BreakdownRow, Currency}
+import models.renewal.Renewal
 import models.responsiblepeople.{ApprovalFlags, PersonName, ResponsiblePerson}
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import models.tradingpremises.TradingPremises
-import org.joda.time.DateTime
+import org.joda.time.{DateTime, LocalDate}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -835,103 +838,101 @@ class ConfirmationServiceSpec extends PlaySpec
 
     "getSubmissionData is called" must {
 
-//      "return submission data" when {
-//
-//        "Amendment/SubmissionReadyForReview" when {
-//
-//          "feeResponse contains type SubscriptionResponse" in new Fixture {
-//
-//            val submissionData = Seq(
-//              BreakdownRow("confirmation.submission", 0, 0, 0),
-//              BreakdownRow("confirmation.responsiblepeople",0,100,0),
-//              BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
-//            )
-//
-//            when {
-//              cache.getEntry[SubscriptionResponse](SubscriptionResponse.key)
-//            } thenReturn Some(subscriptionResponse)
-//
-//            when {
-//              cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
-//            } thenReturn Some(Seq(TradingPremises()))
-//
-//            when {
-//              cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
-//            } thenReturn Some(Seq(ResponsiblePerson()))
-//
-//            val result = TestConfirmationService.getBreakdownRows(
-//              SubmissionReady,
-//              feeResponse(SubscriptionResponseType)
-//            )
-//
-//            await(result) mustBe Some(submissionData)
-//
-//          }
-//
-//          "feeResponse contains type AmendmentVariationResponse" in new Fixture {
-//
-//            val submissionData = Seq(
-//              BreakdownRow("confirmation.submission", 1, 100, 100),
-//              BreakdownRow("confirmation.responsiblepeople",0,100,0),
-//              BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
-//            )
-//
-//            when {
-//              cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
-//            } thenReturn Some(amendmentResponse.copy(difference = Some(100)))
-//
-//            when {
-//              cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
-//            } thenReturn Some(Seq(ResponsiblePerson()))
-//
-//            val result = TestConfirmationService.getBreakdownRows(
-//              SubmissionReadyForReview,
-//              feeResponse(AmendOrVariationResponseType)
-//            )
-//
-//            await(result) mustBe Some(submissionData)
-//
-//          }
-//        }
-//
-//        "Variation/SubmissionDecisionApproved" in new Fixture {
-//
-//          val submissionData = Seq()
-//
-//          when {
-//            cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
-//          } thenReturn Some(amendmentResponse.copy(difference = Some(100)))
-//
-//          val result = TestConfirmationService.getBreakdownRows(
-//            SubmissionDecisionApproved,
-//            feeResponse(AmendOrVariationResponseType)
-//          )
-//
-//          await(result) mustBe Some(submissionData)
-//
-//        }
-//
-//        "Renewal/ReadyForRenewal" in new Fixture {
-//
-//          val submissionData = Seq()
-//
-//          when {
-//            cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
-//          } thenReturn Some(amendmentResponse.copy(difference = Some(100)))
-//
-//          when {
-//            TestConfirmationService.cacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(),any(),any())
-//          } thenReturn Future.successful(Some(Renewal()))
-//
-//          val result = TestConfirmationService.getBreakdownRows(
-//            ReadyForRenewal(Some(LocalDate.now())),
-//            feeResponse(AmendOrVariationResponseType)
-//          )
-//
-//          await(result) mustBe Some(submissionData)
-//
-//        }
-//      }
+      "return submission data" when {
+
+        "Amendment/SubmissionReadyForReview" when {
+
+          "feeResponse contains type SubscriptionResponse" in new Fixture {
+
+            val submissionData = Seq(
+              BreakdownRow("confirmation.submission", 0, 0, 0),
+              BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
+            )
+
+            when {
+              cache.getEntry[SubscriptionResponse](SubscriptionResponse.key)
+            } thenReturn Some(subscriptionResponse)
+
+            when {
+              cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+            } thenReturn Some(Seq(TradingPremises()))
+
+            when {
+              cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
+            } thenReturn Some(Seq(ResponsiblePerson()))
+
+            val result = TestConfirmationService.getBreakdownRows(
+              SubmissionReady,
+              feeResponse(SubscriptionResponseType)
+            )
+
+            await(result) mustBe Some(submissionData)
+
+          }
+
+          "feeResponse contains type AmendmentVariationResponse" in new Fixture {
+
+            val submissionData = Seq(
+              BreakdownRow("confirmation.submission", 1, 100, 100),
+              BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
+            )
+
+            when {
+              cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
+            } thenReturn Some(amendmentResponse.copy(difference = Some(100)))
+
+            when {
+              cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
+            } thenReturn Some(Seq(ResponsiblePerson()))
+
+            val result = TestConfirmationService.getBreakdownRows(
+              SubmissionReadyForReview,
+              feeResponse(AmendOrVariationResponseType)
+            )
+
+            await(result) mustBe Some(submissionData)
+
+          }
+        }
+
+        "Variation/SubmissionDecisionApproved" in new Fixture {
+
+          val submissionData = Seq()
+
+          when {
+            cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
+          } thenReturn Some(amendmentResponse.copy(difference = Some(100)))
+
+          val result = TestConfirmationService.getBreakdownRows(
+            SubmissionDecisionApproved,
+            feeResponse(AmendOrVariationResponseType)
+          )
+
+          await(result) mustBe Some(submissionData)
+
+        }
+
+        "Renewal/ReadyForRenewal" in new Fixture {
+
+          val submissionData = Seq()
+
+          when {
+            cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
+          } thenReturn Some(amendmentResponse.copy(difference = Some(100)))
+
+          when {
+            TestConfirmationService.cacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(),any(),any())
+          } thenReturn Future.successful(Some(Renewal()))
+
+          val result = TestConfirmationService.getBreakdownRows(
+            ReadyForRenewal(Some(LocalDate.now())),
+            feeResponse(AmendOrVariationResponseType)
+          )
+
+          await(result) mustBe Some(submissionData)
+
+        }
+      }
     }
   }
 }
