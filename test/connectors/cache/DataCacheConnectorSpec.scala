@@ -92,7 +92,7 @@ class DataCacheConnectorSpec
       val model = Model("data")
 
       when {
-        dataCacheConnector.mongoCache.createOrUpdate(credId, oId, model, key)
+        dataCacheConnector.mongoCache.createOrUpdate(credId, Some(oId), model, key)
       } thenReturn Future.successful(newCache)
 
       whenReady(dataCacheConnector.save(key, model)) { result =>
@@ -105,7 +105,7 @@ class DataCacheConnectorSpec
       val model = Model("data")
 
       when {
-        dataCacheConnector.mongoCache.find[Model](credId, oId, key)
+        dataCacheConnector.mongoCache.find[Model](credId, Some(oId), key)
       } thenReturn Future.successful(Some(model))
 
       whenReady(dataCacheConnector.fetch[Model](key)) { _ mustBe Some(model) }
@@ -115,7 +115,7 @@ class DataCacheConnectorSpec
       val model = Model("data")
 
       when {
-        dataCacheConnector.mongoCache.fetchAll(credId, deprecatedFilter = false)
+        dataCacheConnector.mongoCache.fetchAll(Some(credId), deprecatedFilter = false)
       } thenReturn Future.successful(Some(newCache))
 
       whenReady(dataCacheConnector.fetchAll) { _ mustBe Some(toCacheMap(newCache)) }

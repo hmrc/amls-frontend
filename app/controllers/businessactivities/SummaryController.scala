@@ -20,25 +20,24 @@ import cats.data.OptionT
 import cats.implicits._
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.EmptyForm
 import models.businessactivities.BusinessActivities
 import models.businessmatching.{AccountancyServices, BusinessMatching}
 import services.StatusService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
+import utils.{AuthAction, ControllerHelper}
 import views.html.businessactivities.summary
 
 import scala.concurrent.Future
 
 class SummaryController @Inject() (val dataCache: DataCacheConnector,
                                    implicit val statusService: StatusService,
-                                   override val authConnector: AuthConnector
-                                  )extends BaseController {
+                                   val authAction: AuthAction
+                                  )extends DefaultBaseController {
 
-  def get = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCache.fetchAll map {
+  def get = authAction.async {
+    implicit request =>
+      dataCache.fetchAll(request.credId) map {
         optionalCache =>
           (for {
             cache <- optionalCache
@@ -52,11 +51,11 @@ class SummaryController @Inject() (val dataCache: DataCacheConnector,
       }
   }
 
-  def post = Authorised.async {
-    implicit authContext => implicit request =>
+  def post = authAction.async {
+    implicit request =>
       (for {
-        businessActivity <- OptionT(dataCache.fetch[BusinessActivities](BusinessActivities.key))
-        _ <- OptionT.liftF(dataCache.save[BusinessActivities](BusinessActivities.key,
+        businessActivity <- OptionT(dataCache.fetch[BusinessActivities](request.credId, BusinessActivities.key))
+        _ <- OptionT.liftF(dataCache.save[BusinessActivities](request.credId, BusinessActivities.key,
           businessActivity.copy(hasAccepted = true))
         )
       } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Could not update HVD")

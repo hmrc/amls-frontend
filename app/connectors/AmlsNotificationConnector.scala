@@ -38,6 +38,7 @@ class AmlsNotificationConnector @Inject()(val http: WSHttp,
                                                           ac: AuthContext
   ): Future[Seq[NotificationRow]] = {
 
+    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
     val getUrl = s"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber"
@@ -56,6 +57,7 @@ class AmlsNotificationConnector @Inject()(val http: WSHttp,
                                         ac: AuthContext
   ): Future[Seq[NotificationRow]] = {
 
+    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
     val getUrl = s"$baseUrl/$accountType/$accountId/safeId/$safeId"
@@ -71,6 +73,7 @@ class AmlsNotificationConnector @Inject()(val http: WSHttp,
   def getMessageDetailsByAmlsRegNo(amlsRegistrationNumber: String, contactNumber: String)
                        (implicit hc : HeaderCarrier, ec : ExecutionContext, ac: AuthContext): Future[Option[NotificationDetails]]= {
 
+    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
     val url = s"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber/$contactNumber"

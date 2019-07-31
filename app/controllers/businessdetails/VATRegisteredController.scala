@@ -19,27 +19,26 @@ package controllers.businessdetails
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import models.businessdetails._
-import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany}
 import models.businessmatching.BusinessMatching
+import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
+import utils.{AuthAction, ControllerHelper}
 import views.html.businessdetails._
 
 import scala.concurrent.Future
 
 class VATRegisteredController @Inject () (
                                          val dataCacheConnector: DataCacheConnector,
-                                         val authConnector: AuthConnector
-                                         ) extends BaseController {
+                                         val authAction: AuthAction
+                                         ) extends DefaultBaseController {
 
 
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
         response =>
           val form: Form2[VATRegistered] = (for {
             businessDetails <- response
@@ -49,8 +48,8 @@ class VATRegisteredController @Inject () (
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request => {
       Form2[VATRegistered](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(vat_registered(f, edit)))
@@ -58,9 +57,9 @@ class VATRegisteredController @Inject () (
         case ValidForm(_, data) =>
 
           val redirect = for {
-            cache <- dataCacheConnector.fetchAll
+            cache <- dataCacheConnector.fetchAll(request.credId)
             businessType <- Future.successful(getBusinessType(cache))
-            _ <- dataCacheConnector.update[BusinessDetails](BusinessDetails.key) {
+            _ <- dataCacheConnector.update[BusinessDetails](request.credId, BusinessDetails.key) {
               case Some(m) => m.vatRegistered(data)
               case _ => BusinessDetails().vatRegistered(data)
             }

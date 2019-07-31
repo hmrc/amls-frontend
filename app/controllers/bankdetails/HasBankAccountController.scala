@@ -17,19 +17,18 @@
 package controllers.bankdetails
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.bankdetails.BankDetails
 import play.api.mvc.{Call, Request}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.BooleanFormReadWrite
+import utils.{AuthAction, BooleanFormReadWrite}
 import views.html.bankdetails._
 
 import scala.concurrent.Future
 
-class HasBankAccountController @Inject()(val authConnector: AuthConnector,
-                                         cacheConnector: DataCacheConnector) extends BaseController {
+class HasBankAccountController @Inject()(val authAction: AuthAction,
+                                         cacheConnector: DataCacheConnector) extends DefaultBaseController {
 
   val router: Boolean => Call = {
     case true => routes.BankAccountNameController.getNoIndex()
@@ -40,21 +39,19 @@ class HasBankAccountController @Inject()(val authConnector: AuthConnector,
 
   implicit val formReads = BooleanFormReadWrite.formRule("hasBankAccount", "bankdetails.hasbankaccount.validation")
 
-  def get = Authorised.async {
-    implicit authContext =>
+  def get = authAction.async {
       implicit request =>
         Future.successful(Ok(view.apply(EmptyForm)))
   }
 
-  def post = Authorised.async {
-    implicit authContext =>
+  def post = authAction.async {
       implicit request =>
         Form2[Boolean](request.body) match {
           case ValidForm(_, data) if data =>
             Future.successful(Redirect(router(data)))
 
           case ValidForm(_, data) =>
-            cacheConnector.save(BankDetails.key, Seq.empty[BankDetails]) map { _ => Redirect(router(data)) }
+            cacheConnector.save(request.credId, BankDetails.key, Seq.empty[BankDetails]) map { _ => Redirect(router(data)) }
 
           case f: InvalidForm => Future.successful(BadRequest(view.apply(f)))
         }

@@ -17,7 +17,6 @@
 package utils
 
 import connectors.DataCacheConnector
-import models.businessmatching.BusinessMatching
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
@@ -45,6 +44,16 @@ trait CacheMocks extends MockitoSugar {
     } thenReturn Future.successful(item)
   }
 
+  def mockCacheFetchNewAuth[T](item: Option[T], key: Option[String] = None)(implicit cache: DataCacheConnector) = key match {
+    case Some(k) => when {
+      cache.fetch[T](any(), eqTo(k))(any(), any())
+    } thenReturn Future.successful(item)
+
+    case _ => when {
+      cache.fetch[T](any(), any())(any(), any())
+    } thenReturn Future.successful(item)
+  }
+
   def mockCacheGetEntry[T](item: Option[T], key: String)(implicit cache: CacheMap) = when {
     mockCacheMap.getEntry[T](eqTo(key))(any())
   } thenReturn item
@@ -55,6 +64,10 @@ trait CacheMocks extends MockitoSugar {
 
   def mockCacheSave[T](implicit cache: DataCacheConnector) = when {
     cache.save[T](any(), any())(any(), any(), any())
+  } thenReturn Future.successful(mockCacheMap)
+
+  def mockCacheSaveNewAuth[T](implicit cache: DataCacheConnector) = when {
+    cache.save[T](any(), any(), any())(any(), any())
   } thenReturn Future.successful(mockCacheMap)
 
   def mockCacheRemoveByKey[T](implicit cache: DataCacheConnector) = when {

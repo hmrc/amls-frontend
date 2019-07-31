@@ -18,26 +18,25 @@ package controllers.businessactivities
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms._
 import models.businessactivities.{BusinessActivities, _}
 import models.businessmatching._
 import play.api.i18n.Messages
 import services.StatusService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
+import utils.{AuthAction, ControllerHelper}
 import views.html.businessactivities._
 
 import scala.concurrent.Future
 
 class InvolvedInOtherController @Inject() ( val dataCacheConnector: DataCacheConnector,
                                             implicit val statusService: StatusService,
-                                            override val authConnector: AuthConnector
-                                          )extends BaseController {
+                                            val authAction: AuthAction
+                                          )extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetchAll map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetchAll(request.credId) map {
         optionalCache =>
           (for {
             cache <- optionalCache
@@ -52,20 +51,20 @@ class InvolvedInOtherController @Inject() ( val dataCacheConnector: DataCacheCon
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request => {
       Form2[InvolvedInOther](request.body) match {
         case f: InvalidForm =>
           for {
-            businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
+            businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
           } yield businessMatching match {
             case Some(x) => BadRequest(involved_in_other_name(f, edit, businessMatching.prefixedAlphabeticalBusinessTypes))
             case None => BadRequest(involved_in_other_name(f, edit, None))
           }
         case ValidForm(_, data) =>
           for {
-            businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key, getUpdatedBA(businessActivities, data))
+            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key, getUpdatedBA(businessActivities, data))
 
           } yield redirectDependingOnResponse(data, edit)
       }

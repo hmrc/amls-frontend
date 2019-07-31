@@ -19,19 +19,17 @@ package controllers.businessdetails
 import java.util.UUID
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.businessdetails.{BusinessDetails, ContactingYou}
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -46,7 +44,7 @@ class ContactingYouControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
     val controller = new ContactingYouController (
       dataCache = mock[DataCacheConnector],
-      authConnector = self.authConnector
+      authAction = SuccessfulAuthAction
     )
   }
 
@@ -58,8 +56,8 @@ class ContactingYouControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
       "load the page" in new Fixture {
 
-        when(controller.dataCache.fetch[BusinessDetails](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(businessDetailsWithData)))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(businessDetailsWithData)))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -68,8 +66,8 @@ class ContactingYouControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
       "load the page with the pre populated data" in new Fixture {
 
-        when(controller.dataCache.fetch[BusinessDetails](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(businessDetailsWithData)))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(businessDetailsWithData)))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -77,8 +75,8 @@ class ContactingYouControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
       }
 
       "load the page with no data" in new Fixture {
-        when(controller.dataCache.fetch[BusinessDetails](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())
+          (any(), any())).thenReturn(Future.successful(None))
         val result = controller.get()(request)
         status(result) must be(OK)
         contentAsString(result) must include(Messages("businessdetails.contactingyou.email.title"))
@@ -95,11 +93,11 @@ class ContactingYouControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
           "email" -> "test@test.com"
         )
 
-        when(controller.dataCache.fetch[BusinessDetails](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(businessDetailsWithData)))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(businessDetailsWithData)))
 
-        when(controller.dataCache.save[BusinessDetails](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataCache.save[BusinessDetails](any(), any(), any())
+          (any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -113,11 +111,11 @@ class ContactingYouControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
           "email" -> "test@test.com"
         )
 
-        when(controller.dataCache.fetch[BusinessDetails](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(businessDetailsWithData)))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(businessDetailsWithData)))
 
-        when(controller.dataCache.save[BusinessDetails](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataCache.save[BusinessDetails](any(), any(), any())
+          (any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
@@ -130,22 +128,15 @@ class ContactingYouControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
           "email" -> "test1@test.com"
         )
 
-        when(controller.dataCache.fetch[BusinessDetails](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(businessDetailsWithData)))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(businessDetailsWithData)))
 
-        when(controller.dataCache.save[BusinessDetails](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataCache.save[BusinessDetails](any(), any(), any())
+          (any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
       }
-
-
-
-
-
-
     }
   }
-
 }

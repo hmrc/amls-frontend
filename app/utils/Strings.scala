@@ -18,6 +18,7 @@ package utils
 
 import play.twirl.api.Html
 
+// $COVERAGE-OFF$
 object Strings {
 
   implicit class ConsoleHelpers(s: String) {

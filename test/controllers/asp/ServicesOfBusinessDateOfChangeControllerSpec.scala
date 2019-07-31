@@ -16,7 +16,8 @@
 
 package controllers.asp
 
-import models.businessdetails.{BusinessDetails, ActivityStartDate}
+import controllers.actions.SuccessfulAuthAction
+import models.businessdetails.{ActivityStartDate, BusinessDetails}
 import models.asp._
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
@@ -27,7 +28,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
@@ -35,11 +36,11 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
 
   val emptyCache = CacheMap("", Map.empty)
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
     val request = addToken(authRequest)
 
-    val controller = new ServicesOfBusinessDateOfChangeController(mockCacheConnector, authConnector = self.authConnector)
+    val controller = new ServicesOfBusinessDateOfChangeController(mockCacheConnector, SuccessfulAuthAction)
   }
 
   "ServicesDateOfChangeController" must {
@@ -64,11 +65,11 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
       when(mockCacheMap.getEntry[Asp](Asp.key))
         .thenReturn(None)
 
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.save[Asp](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[Asp](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
