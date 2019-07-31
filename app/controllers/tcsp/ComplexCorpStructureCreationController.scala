@@ -17,27 +17,27 @@
 package controllers.tcsp
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.tcsp._
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.tcsp._
 
 import scala.concurrent.Future
 
 class ComplexCorpStructureCreationController @Inject()(
-                                                 val authConnector: AuthConnector,
+                                                 val authAction: AuthAction,
                                                  val dataCacheConnector: DataCacheConnector
-                                               ) extends BaseController {
+                                               ) extends DefaultBaseController {
 
   val NAME = "complexCorpStructureCreation"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(NAME)
   implicit val boolRead = utils.BooleanFormReadWrite.formRule(NAME, "error.required.tcsp.complex.corporate.structures")
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[Tcsp](Tcsp.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[Tcsp](request.credId, Tcsp.key) map {
         response =>
           val form: Form2[ComplexCorpStructureCreation] = (for {
             tcsp <- response
@@ -47,8 +47,8 @@ class ComplexCorpStructureCreationController @Inject()(
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request =>
       Form2[Boolean](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(complex_corp_structure_creation(f, edit)))
@@ -58,8 +58,8 @@ class ComplexCorpStructureCreationController @Inject()(
             case false => ComplexCorpStructureCreationNo
           }
           for {
-            tcsp <- dataCacheConnector.fetch[Tcsp](Tcsp.key)
-            _ <- dataCacheConnector.save[Tcsp](Tcsp.key, tcsp.complexCorpStructureCreation(res))
+            tcsp <- dataCacheConnector.fetch[Tcsp](request.credId, Tcsp.key)
+            _ <- dataCacheConnector.save[Tcsp](request.credId, Tcsp.key, tcsp.complexCorpStructureCreation(res))
           } yield redirectTo(edit, tcsp)
       }
   }

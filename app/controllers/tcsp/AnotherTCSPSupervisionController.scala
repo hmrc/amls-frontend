@@ -22,6 +22,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.tcsp.{ServicesOfAnotherTCSP, Tcsp}
 import utils.AuthAction
+
 import scala.concurrent.Future
 
 class AnotherTCSPSupervisionController @Inject()(val authAction: AuthAction,
@@ -41,7 +42,6 @@ class AnotherTCSPSupervisionController @Inject()(val authAction: AuthAction,
 
   def post(edit: Boolean = false) = authAction.async {
     implicit request => {
-      import jto.validation.forms.Rules._
       Form2[ServicesOfAnotherTCSP](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.tcsp.another_tcsp_supervision(f, edit)))
