@@ -18,18 +18,17 @@ package controllers.msb
 
 
 import connectors.DataCacheConnector
-import controllers.{BaseController, DefaultBaseController}
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.moneyservicebusiness._
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthAction
 import views.html.msb.business_use_an_ipsp
 
 import scala.concurrent.Future
 
 class BusinessUseAnIPSPController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                             authAction: AuthAction,
+                                             authAction: AuthAction
                                             ) extends DefaultBaseController {
 
   def get(edit: Boolean = false) = authAction.async {
