@@ -17,23 +17,22 @@
 package controllers.tcsp
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms._
 import javax.inject.Inject
 import models.tcsp.{ProvidedServices, Tcsp}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.tcsp.provided_services
 
 import scala.concurrent.Future
 
 class ProvidedServicesController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                            val authConnector: AuthConnector
-                                           ) extends BaseController {
+                                            val authAction: AuthAction
+                                           ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        dataCacheConnector.fetch[Tcsp](Tcsp.key) map {
+        dataCacheConnector.fetch[Tcsp](request.credId, Tcsp.key) map {
           response =>
             val form: Form2[ProvidedServices] = (for {
               tcsp <- response
@@ -43,19 +42,17 @@ class ProvidedServicesController @Inject() (val dataCacheConnector: DataCacheCon
         }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request =>
         Form2[ProvidedServices](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(provided_services(f, edit)))
           case ValidForm(_, data) =>
             for {
-              tcsp <- dataCacheConnector.fetch[Tcsp](Tcsp.key)
-              _ <- dataCacheConnector.save[Tcsp](Tcsp.key,
-                tcsp.providedServices(data)
+              tcsp <- dataCacheConnector.fetch[Tcsp](request.credId, Tcsp.key)
+              _ <- dataCacheConnector.save[Tcsp](request.credId, Tcsp.key, tcsp.providedServices(data)
               )
-            } yield edit match {
+            } yield edit match{
               case true => Redirect(routes.SummaryController.get())
               case false => Redirect(routes.ServicesOfAnotherTCSPController.get())
             }
