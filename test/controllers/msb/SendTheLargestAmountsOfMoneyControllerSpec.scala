@@ -16,6 +16,7 @@
 
 package controllers.msb
 
+import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
@@ -27,15 +28,15 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, DependencyMocksNewAuth}
 
 class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSugar with PatienceConfiguration with IntegrationPatience {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self => val request = addToken(authRequest)
 
     val controller = new SendTheLargestAmountsOfMoneyController(
-      self.authConnector,
+      SuccessfulAuthAction,
       mockCacheConnector,
       mockStatusService,
       mockServiceFlow,
@@ -49,8 +50,8 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
 
   "SendTheLargestAmountsOfMoneyController" must {
     "load the 'Where to Send The Largest Amounts Of Money' page" in new Fixture  {
-      mockIsNewActivity(false)
-      mockApplicationStatus(NotCompleted)
+      mockIsNewActivityNewAuth(false)
+      mockApplicationStatusNewAuth(NotCompleted)
       mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
 
       val result = controller.get()(request)
@@ -66,8 +67,8 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
       val msb = Some(MoneyServiceBusiness(
         sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB"))))))
 
-      mockIsNewActivity(false)
-      mockApplicationStatus(NotCompleted)
+      mockIsNewActivityNewAuth(false)
+      mockApplicationStatusNewAuth(NotCompleted)
       mockCacheFetch[MoneyServiceBusiness](msb, Some(MoneyServiceBusiness.key))
 
       val result = controller.get()(request)
@@ -80,9 +81,9 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
 
     "render the SendTheLargestAmountOfMoney view" when {
       "application is in variation mode and a service has just been added" in new Fixture {
-        mockApplicationStatus(SubmissionDecisionApproved)
+        mockApplicationStatusNewAuth(SubmissionDecisionApproved)
         mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
-        mockIsNewActivity(true, Some(MoneyServiceBusinessActivity))
+        mockIsNewActivityNewAuth(true, Some(MoneyServiceBusinessActivity))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -90,9 +91,9 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
       }
 
       "application is in variation mode and no service has been added" in new Fixture {
-        mockApplicationStatus(SubmissionDecisionApproved)
+        mockApplicationStatusNewAuth(SubmissionDecisionApproved)
         mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
-        mockIsNewActivity(false)
+        mockIsNewActivityNewAuth(false)
 
         val result = controller.get()(request)
         status(result) must be(OK)

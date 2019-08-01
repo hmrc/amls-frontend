@@ -16,6 +16,7 @@
 
 package controllers.msb
 
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessMatching, HighValueDealing, MoneyServiceBusiness}
 import org.mockito.Matchers._
@@ -24,18 +25,18 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
 class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
     val request = addToken(authRequest)
 
     val controller = new WhatYouNeedController(
-      self.authConnector,
+      SuccessfulAuthAction,
       mockStatusService,
       mockCacheConnector)
 

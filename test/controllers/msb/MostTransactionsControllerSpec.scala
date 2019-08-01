@@ -16,6 +16,7 @@
 
 package controllers.msb
 
+import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity, _}
@@ -28,17 +29,17 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
 class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self => val request = addToken(authRequest)
 
     val controller = new MostTransactionsController(
-      self.authConnector,
+      SuccessfulAuthAction,
       mockCacheConnector,
       mockStatusService,
       mockServiceFlow,
@@ -47,7 +48,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
     mockCacheFetch[ServiceChangeRegister](None, None)
     mockCacheGetEntry[ServiceChangeRegister](Some(ServiceChangeRegister()), ServiceChangeRegister.key)
-    mockApplicationStatus(NotCompleted)
+    mockApplicationStatusNewAuth(NotCompleted)
 
     when {
       mockStatusService.isPreSubmission(any(), any(), any())
@@ -58,7 +59,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
     "show an empty form on get with no data in store" in new Fixture {
 
-      mockIsNewActivity(false)
+      mockIsNewActivityNewAuth(false)
       mockApplicationStatus(NotCompleted)
       mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
 
@@ -82,8 +83,8 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
         )
       )
 
-      mockIsNewActivity(false)
-      mockApplicationStatus(NotCompleted)
+      mockIsNewActivityNewAuth(false)
+      mockApplicationStatusNewAuth(NotCompleted)
       mockCacheFetch[MoneyServiceBusiness](Some(model), Some(MoneyServiceBusiness.key))
 
       val result = controller.get()(request)
@@ -98,9 +99,9 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
     "render the SendTheLargestAmountOfMoney view" when {
       "application is in variation and a service has just been added" in new Fixture {
-        mockApplicationStatus(SubmissionDecisionApproved)
+        mockApplicationStatusNewAuth(SubmissionDecisionApproved)
         mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
-        mockIsNewActivity(true, Some(MoneyServiceBusinessActivity))
+        mockIsNewActivityNewAuth(true, Some(MoneyServiceBusinessActivity))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -108,9 +109,9 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       }
 
       "application is in variation mode and no service has been added" in new Fixture {
-        mockApplicationStatus(SubmissionDecisionApproved)
+        mockApplicationStatusNewAuth(SubmissionDecisionApproved)
         mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
-        mockIsNewActivity(false)
+        mockIsNewActivityNewAuth(false)
 
         val result = controller.get()(request)
         status(result) must be(OK)

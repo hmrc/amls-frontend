@@ -16,6 +16,7 @@
 
 package controllers.msb
 
+import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businessmatching._
 import models.businessmatching.updateservice.ServiceChangeRegister
@@ -27,16 +28,16 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self => val request = addToken(authRequest)
 
-    val controller = new SummaryController(self.authConnector, mockCacheConnector, mockStatusService, mockServiceFlow)
+    val controller = new SummaryController(SuccessfulAuthAction, mockCacheConnector, mockStatusService, mockServiceFlow)
 
     val completeModel = MoneyServiceBusiness(
       throughput = Some(ExpectedThroughput.Second),
@@ -78,11 +79,11 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
         )
       )
 
-      mockIsNewActivity(false)
+      mockIsNewActivityNewAuth(false)
       mockCacheFetchAll
       mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
       mockCacheGetEntry[MoneyServiceBusiness]((Some(model)), MoneyServiceBusiness.key)
-      mockApplicationStatus(NotCompleted)
+      mockApplicationStatusNewAuth(NotCompleted)
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -90,7 +91,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
     }
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
-      when(controller.dataCache.fetchAll(any(), any()))
+      when(controller.dataCache.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
       val msbServices = Some(
         BusinessMatchingMsbServices(
@@ -104,7 +105,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
         )
       )
 
-      mockApplicationStatus(NotCompleted)
+      mockApplicationStatusNewAuth(NotCompleted)
       mockCacheGetEntry[BusinessMatching]((Some(BusinessMatching(msbServices = msbServices))), BusinessMatching.key)
       mockCacheGetEntry[MoneyServiceBusiness](None, MoneyServiceBusiness.key)
 
@@ -120,11 +121,11 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
           ChequeCashingScrapMetal,
           ForeignExchange)))))
 
-        mockIsNewActivity(false)
+        mockIsNewActivityNewAuth(false)
         mockCacheFetchAll
         mockCacheGetEntry[BusinessMatching](bm, BusinessMatching.key)
         mockCacheGetEntry[MoneyServiceBusiness](Some(completeModel), MoneyServiceBusiness.key)
-        mockApplicationStatus(SubmissionDecisionApproved)
+        mockApplicationStatusNewAuth(SubmissionDecisionApproved)
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -152,11 +153,11 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
           ChequeCashingNotScrapMetal,
           ChequeCashingScrapMetal)))))
 
-        mockIsNewActivity(false)
+        mockIsNewActivityNewAuth(false)
         mockCacheFetchAll
         mockCacheGetEntry[BusinessMatching](bm, BusinessMatching.key)
         mockCacheGetEntry[MoneyServiceBusiness](Some(completeModel), MoneyServiceBusiness.key)
-        mockApplicationStatus(NotCompleted)
+        mockApplicationStatusNewAuth(NotCompleted)
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -172,7 +173,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
   "Post" must {
     "redirect to RegistrationProgressController" when {
       "model has been saved with hasAccepted set to true" in new Fixture {
-        mockIsNewActivity(false)
+        mockIsNewActivityNewAuth(false)
         mockCacheFetch[MoneyServiceBusiness](Some(completeModel), Some(MoneyServiceBusiness.key))
         mockCacheSave[MoneyServiceBusiness]
 
