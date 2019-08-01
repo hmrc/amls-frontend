@@ -19,13 +19,14 @@ package controllers.changeofficer
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import generators.ResponsiblePersonGenerator
 import models.changeofficer.{ChangeOfficer, NewOfficer, RoleInBusiness, SoleProprietor}
 import models.responsiblepeople.ResponsiblePerson.flowChangeOfficer
 import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalacheck.Gen
 import org.scalatest.PrivateMethodTester
@@ -35,24 +36,22 @@ import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthorisedFixture, StatusConstants}
+import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocksNewAuth, StatusConstants}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 
 
-class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator with PrivateMethodTester with ScalaFutures {
+class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator with PrivateMethodTester with ScalaFutures with DependencyMocksNewAuth  {
 
-  trait TestFixture extends AuthorisedFixture { self =>
+  trait TestFixture extends AuthorisedFixture  { self =>
     val request = addToken(self.authRequest)
 
     val cache = mock[DataCacheConnector]
 
     val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[DataCacheConnector].to(cache))
       .build()
 
@@ -64,11 +63,11 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
     lazy val changeOfficer = ChangeOfficer(RoleInBusiness(Set(SoleProprietor)))
 
     when {
-      cache.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any())
+      cache.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any())
     } thenReturn Future.successful(Some(responsiblePeopleWithEmptyPerson))
 
     when {
-      cache.fetch[ChangeOfficer](eqTo(ChangeOfficer.key))(any(), any(), any())
+      cache.fetch[ChangeOfficer](eqTo(ChangeOfficer.key), any())(any(), any())
     } thenReturn Future.successful(Some(changeOfficer))
   }
 
@@ -106,16 +105,16 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
     lazy val responsiblePeopleWithEmptyPerson = responsiblePeopleGen :+ emptyPerson
 
     val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .build()
 
     when {
-      controller.dataCacheConnector.fetchAll(any(), any())
+      controller.dataCacheConnector.fetchAll(any())(any())
     } thenReturn Future.successful(Some(cacheMap))
 
     when {
-      controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any())
+      controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())( any(), any())
     } thenReturn Future.successful(Some(responsiblePeople))
 
     when {
@@ -127,7 +126,7 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
     } thenReturn Some(responsiblePeople)
 
     when {
-      controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any())
+      controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any())
     } thenReturn Future.successful(cacheMap)
 
     lazy val controller = injector.instanceOf[NewOfficerController]
@@ -153,7 +152,7 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
     ))
 
     when {
-      controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any())
+      controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any())
     } thenReturn Future.successful(Some(Seq(
       newOfficer.copy(
         positions = Some(Positions(newOfficer.positions.get.positions + NominatedOfficer, newOfficer.positions.get.startDate)),
@@ -175,7 +174,7 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
 
         status(result) mustBe OK
 
-        verify(cache).fetch(eqTo(ResponsiblePerson.key))(any(), any(), any())
+        verify(cache).fetch(any(),eqTo(ResponsiblePerson.key))(any(), any())
 
         val html = Jsoup.parse(contentAsString(result))
 
@@ -189,7 +188,7 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
 
         status(result) mustBe OK
 
-        verify(cache).fetch(eqTo(ResponsiblePerson.key))(any(), any(), any())
+        verify(cache).fetch(eqTo(ResponsiblePerson.key), any())(any(), any())
 
         val html = Jsoup.parse(contentAsString(result))
         html.select(s"input[type=radio][value=IncompletePerson]").size() mustBe 0
@@ -203,11 +202,11 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
         val model = ChangeOfficer(RoleInBusiness(Set(SoleProprietor)), Some(NewOfficer("TestPerson")))
 
         when {
-          cache.fetch[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any(), any(), any())
+          cache.fetch[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key), any())(any(), any())
         } thenReturn Future.successful(Some(responsiblePeople))
 
         when {
-          cache.fetch[ChangeOfficer](eqTo(ChangeOfficer.key))(any(), any(), any())
+          cache.fetch[ChangeOfficer](eqTo(ChangeOfficer.key),any())(any(), any())
         } thenReturn Future.successful(Some(model))
 
         val result = controller.get()(request)
@@ -225,11 +224,11 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
       "respond with SEE_OTHER and redirect to the RegistrationProgress controller" in new TestFixtureForChangeNominatedOfficer {
 
         when {
-          dataCacheConnector.fetch[ChangeOfficer](any())(any(), any(), any())
+          dataCacheConnector.fetch[ChangeOfficer](any(),any())(any(), any())
         } thenReturn Future.successful(Some(ChangeOfficer(RoleInBusiness(Set(SoleProprietor)), None)))
 
         when {
-          dataCacheConnector.save[ChangeOfficer](any(), any())(any(), any(), any())
+          dataCacheConnector.save[ChangeOfficer](any(), any(), any())(any(), any())
         } thenReturn Future.successful(mock[CacheMap])
 
         val result = controller.post()(request.withFormUrlEncodedBody("person" -> "testName"))
@@ -240,22 +239,23 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
         redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
 
         verify(dataCacheConnector).save(
+          any(),
           eqTo(ChangeOfficer.key),
           eqTo(ChangeOfficer(
             RoleInBusiness(Set(models.changeofficer.SoleProprietor)),
             Some(NewOfficer("testName"))
-          )))(any(), any(), any())
+          )))(any(), any())
 
       }
 
       "respond with SEE_OTHER and redirect to the ResponsiblePeopleAddController" in new TestFixture {
 
         when {
-          cache.fetch[ChangeOfficer](any())(any(), any(), any())
+          cache.fetch[ChangeOfficer](any(), any())(any(), any())
         } thenReturn Future.successful(Some(ChangeOfficer(RoleInBusiness(Set(SoleProprietor)), None)))
 
         when {
-          cache.save[ChangeOfficer](any(), any())(any(), any(), any())
+          cache.save[ChangeOfficer](any(), any(), any())(any(), any())
         } thenReturn Future.successful(mock[CacheMap])
 
         val result = controller.post()(request.withFormUrlEncodedBody("person" -> "someoneElse"))
@@ -294,12 +294,12 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
         )
 
         when {
-          cache.fetch[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any(), any(), any())
+          cache.fetch[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key), any())(any(), any())
         } thenReturn Future.successful(Some(responsiblePeople))
 
         val getPeopleAndSelectedOfficer = PrivateMethod[OptionT[Future, (NewOfficer, Seq[ResponsiblePerson])]]('getPeopleAndSelectedOfficer)
 
-        val result = controller invokePrivate getPeopleAndSelectedOfficer(HeaderCarrier(), mock[AuthContext]) getOrElse fail("Could not retrieve")
+        val result = controller invokePrivate getPeopleAndSelectedOfficer(HeaderCarrier(), mock[AuthAction]) getOrElse fail("Could not retrieve")
 
         await(result) must equal((
           NewOfficer(""),
@@ -371,7 +371,7 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
       "return cache map without deleted rp (if rp was not submitted)" in new TestFixtureForDeleteOldOfficer {
         val deleteOldOfficer = PrivateMethod[Future[Product]]('deleteOldOfficer)
 
-        val result = controller invokePrivate deleteOldOfficer(oldOfficer, 1, mock[AuthContext], HeaderCarrier())
+        val result = controller invokePrivate deleteOldOfficer(oldOfficer, 1, mock[AuthAction], HeaderCarrier())
 
         Await.result(result, 1 second) mustEqual cacheMap
 
@@ -393,7 +393,7 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
 
         val deleteOldOfficer = PrivateMethod[Future[Product]]('deleteOldOfficer)
 
-        val result = controller invokePrivate deleteOldOfficer(oldOfficer, 1, mock[AuthContext], HeaderCarrier())
+        val result = controller invokePrivate deleteOldOfficer(oldOfficer, 1, mock[AuthAction], HeaderCarrier())
 
         Await.result(result, 1 second) mustBe None
       }

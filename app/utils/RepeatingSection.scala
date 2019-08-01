@@ -110,11 +110,20 @@ trait RepeatingSection {
       }
     }
 
+  @deprecated("old auth")
   protected def removeDataStrict[T](index: Int)
                                    (implicit user: AuthContext, hc: HeaderCarrier, formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[CacheMap] =
     getData[T] flatMap {
       data => {
         putData(data.patch(index - 1, Nil, 1))
+      }
+    }
+
+  protected def removeDataStrict[T](credId: String, index: Int)
+                                   (implicit hc: HeaderCarrier, formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[CacheMap] =
+    getData[T](credId) flatMap {
+      data => {
+        putData(credId, data.patch(index - 1, Nil, 1))
       }
     }
 
