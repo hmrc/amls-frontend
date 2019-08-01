@@ -30,14 +30,14 @@ import scala.concurrent.Future
 @Singleton
 class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificationConnector, val messagesApi: MessagesApi) {
 
-  def getNotifications(safeId: String)(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[NotificationRow]] =
-    amlsNotificationConnector.fetchAllBySafeId(safeId) map {
+  def getNotifications(safeId: String, accountTypeId: (String, String))(implicit hc: HeaderCarrier): Future[Seq[NotificationRow]] =
+    amlsNotificationConnector.fetchAllBySafeId(safeId, accountTypeId) map {
       case notifications@(_::_) => notifications.sortWith((x, y) => x.receivedAt.isAfter(y.receivedAt))
       case notifications => notifications
     }
 
   def getMessageDetails(amlsRegNo: String, id: String, contactType: ContactType, templateVersion: String)
-                       (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
+                       (implicit hc: HeaderCarrier): Future[Option[NotificationDetails]] = {
 
     contactType match {
 
@@ -67,7 +67,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
   }
 
   private def handleStaticMessage(amlsRegNo: String, id: String, contactType: ContactType, templateVersion: String)
-                                 (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
+                                 (implicit hc: HeaderCarrier): Future[Option[NotificationDetails]] = {
 
     val staticMessage = Class.forName(s"services.notifications.${ templateVersion }.MessageDetails")
       .newInstance().asInstanceOf[{ def static(contactType: ContactType, url: String): String }]

@@ -40,6 +40,15 @@ object BusinessName {
       rd.businessName
     }
 
+  def getNameFromCache(credId: String)(implicit hc: HeaderCarrier, cache: DataCacheConnector, ec: ExecutionContext): OptionT[Future, String] =
+    for {
+      bm <- OptionT(cache.fetch[BusinessMatching](credId, BusinessMatching.key))
+      rd <- OptionT.fromOption[Future](bm.reviewDetails)
+    } yield {
+      Logger.debug(s"Found business name in cache: ${rd.businessName}")
+      rd.businessName
+    }
+
   def getNameFromAmls(safeId: String)
                      (implicit hc: HeaderCarrier, ac: AuthContext, amls: AmlsConnector, ec: ExecutionContext, dc: DataCacheConnector) = {
     OptionT(amls.registrationDetails(safeId) map { r =>
@@ -51,9 +60,24 @@ object BusinessName {
     })
   }
 
+  def getNameFromAmls(safeId: String, accountTypeId: (String, String))
+                     (implicit hc: HeaderCarrier, amls: AmlsConnector, ec: ExecutionContext, dc: DataCacheConnector) = {
+    OptionT(amls.registrationDetails(safeId, accountTypeId) map { r =>
+      Option(r.companyName)
+    } recover {
+      case ex =>
+        warn(s"Call to registrationDetails failed: ${ex.getMessage}. Falling back to cache..")
+        None
+    })
+  }
+
   def getName(safeId: Option[String])
              (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext, cache: DataCacheConnector, amls: AmlsConnector) =
     safeId.fold(getNameFromCache)(v => getNameFromAmls(v) orElse getNameFromCache)
+
+  def getName(credId: String, safeId: Option[String], accountTypeId: (String, String))
+             (implicit hc: HeaderCarrier, ec: ExecutionContext, cache: DataCacheConnector, amls: AmlsConnector) =
+    safeId.fold(getNameFromCache(credId))(v => getNameFromAmls(v, accountTypeId: (String, String)) orElse getNameFromCache(credId))
 
   def getBusinessNameFromAmls()(implicit hc: HeaderCarrier,
                                 context: AuthContext,

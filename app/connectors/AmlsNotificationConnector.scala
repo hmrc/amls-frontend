@@ -51,14 +51,10 @@ class AmlsNotificationConnector @Inject()(val http: WSHttp,
     }
   }
 
-  def fetchAllBySafeId(safeId: String)(implicit
-                                        headerCarrier: HeaderCarrier,
-                                        reqW: Writes[Seq[NotificationRow]],
-                                        ac: AuthContext
-  ): Future[Seq[NotificationRow]] = {
+  def fetchAllBySafeId(safeId: String, accountTypeId: (String, String))
+                      (implicit headerCarrier: HeaderCarrier, reqW: Writes[Seq[NotificationRow]]): Future[Seq[NotificationRow]] = {
 
-    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
-    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+    val (accountType, accountId) = accountTypeId
 
     val getUrl = s"$baseUrl/$accountType/$accountId/safeId/$safeId"
     val prefix = "[AmlsNotificationConnector][fetchAllBySafeId]"

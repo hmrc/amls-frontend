@@ -289,6 +289,14 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     httpGet.GET[RegistrationDetails](getUrl)
   }
 
+  def registrationDetails(safeId: String, accountTypeId: (String, String))(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[RegistrationDetails] = {
+    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
+    val (accountType, accountId) = accountTypeId
+    val getUrl = s"$registrationUrl/$accountType/$accountId/details/$safeId"
+
+    httpGet.GET[RegistrationDetails](getUrl)
+  }
+
   def updateBacsStatus(ref: String, request: UpdateBacsRequest)(implicit ec: ExecutionContext, hc: HeaderCarrier, ac: AuthContext): Future[HttpResponse] = {
     //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId

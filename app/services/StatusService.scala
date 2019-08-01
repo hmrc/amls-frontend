@@ -142,6 +142,9 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
   def getReadStatus(mlrRefNo: String)
                    (implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext) = etmpReadStatus(mlrRefNo)
 
+  def getReadStatus(amlsRegistrationNumber: String, accountTypeId: (String, String))
+                   (implicit hc: HeaderCarrier, ec: ExecutionContext) = etmpReadStatus(amlsRegistrationNumber, accountTypeId)
+
   private def notYetSubmitted(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext) = {
 
     def isComplete(seq: Seq[Section]): Boolean =
@@ -200,6 +203,15 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
   private def etmpReadStatus(amlsRefNumber: String)(implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext): Future[ReadStatusResponse] = {
     {
       val status = amlsConnector.status(amlsRefNumber)
+      Logger.debug("StatusService:etmpReadStatus:status:" + status)
+      status
+    }
+  }
+
+  private def etmpReadStatus(amlsRefNumber: String, accountTypeId: (String, String))
+                            (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ReadStatusResponse] = {
+    {
+      val status = amlsConnector.status(amlsRefNumber, accountTypeId)
       Logger.debug("StatusService:etmpReadStatus:status:" + status)
       status
     }
