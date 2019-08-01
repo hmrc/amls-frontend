@@ -27,8 +27,7 @@ import views.html.tcsp.provided_services
 import scala.concurrent.Future
 
 class ProvidedServicesController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                            val authAction: AuthAction
-                                           ) extends DefaultBaseController {
+                                            val authAction: AuthAction) extends DefaultBaseController {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

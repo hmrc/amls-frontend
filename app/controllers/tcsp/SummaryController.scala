@@ -19,26 +19,22 @@ package controllers.tcsp
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.{BaseController, DefaultBaseController}
+import controllers.DefaultBaseController
 import javax.inject.Inject
 import models.tcsp._
 import play.api.i18n.Messages
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.tcsp.summary
 import play.api.Logger
 import utils.AuthAction
 
-class SummaryController @Inject()
-(
-  val dataCache: DataCacheConnector,
-  authAction: AuthAction,
-  val serviceFlow: ServiceFlow,
-  val statusService: StatusService
-) extends DefaultBaseController {
+class SummaryController @Inject()(
+                                  val dataCache: DataCacheConnector,
+                                  val authAction: AuthAction,
+                                  val serviceFlow: ServiceFlow,
+                                  val statusService: StatusService) extends DefaultBaseController {
 
   def sortProviders(data: Tcsp): List[String] = {
 

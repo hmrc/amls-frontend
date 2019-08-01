@@ -16,6 +16,7 @@
 
 package controllers.tcsp
 
+import controllers.actions.SuccessfulAuthAction
 import models.tcsp._
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -23,16 +24,16 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
 class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture  with DependencyMocks{
+  trait Fixture extends AuthorisedFixture  with DependencyMocksNewAuth{
     self => val request = addToken(authRequest)
 
-    val controller = new TcspTypesController(mockCacheConnector, authConnector = self.authConnector)
+    val controller = new TcspTypesController(mockCacheConnector, authAction = SuccessfulAuthAction)
   }
 
   val cacheMap = CacheMap("", Map.empty)
@@ -43,8 +44,7 @@ class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
 
       "load the what kind of Tcsp are you page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Tcsp](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.fetch[Tcsp](any())(any(), any(), any())).thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -54,8 +54,7 @@ class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
 
         val tcspTypes = TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, CompanyDirectorEtc))
 
-        when(controller.dataCacheConnector.fetch[Tcsp](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Tcsp(Some(tcspTypes)))))
+        when(controller.dataCacheConnector.fetch[Tcsp](any())(any(), any(), any())).thenReturn(Future.successful(Some(Tcsp(Some(tcspTypes)))))
 
         val result = controller.get()(request)
         status(result) must be(OK)

@@ -28,8 +28,7 @@ import scala.concurrent.Future
 
 class ServicesOfAnotherTCSPController @Inject()(
                                                  val authAction: AuthAction,
-                                                 val dataCacheConnector: DataCacheConnector
-                                               ) extends DefaultBaseController {
+                                                 val dataCacheConnector: DataCacheConnector) extends DefaultBaseController {
 
   val NAME = "servicesOfAnotherTCSP"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(NAME)
