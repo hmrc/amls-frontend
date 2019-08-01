@@ -20,7 +20,7 @@ import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessActivities, BusinessMatching, BusinessMatchingMsbServices, ForeignExchange, MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import models.moneyservicebusiness._
-import models.status.{NotCompleted, SubmissionDecisionApproved}
+import models.status.NotCompleted
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -30,7 +30,7 @@ import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration, Sca
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
@@ -70,7 +70,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
       .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
   }
 
-  trait Fixture2 extends AuthorisedFixture with DependencyMocks with MoneyServiceBusinessTestData {
+  trait Fixture2 extends AuthorisedFixture with DependencyMocksNewAuth with MoneyServiceBusinessTestData {
     self =>
     val request = addToken(authRequest)
     val controller = new UsesForeignCurrenciesController(SuccessfulAuthAction, mockCacheConnector, mockStatusService, mockServiceFlow)
