@@ -17,13 +17,12 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.moneyservicebusiness.{MoneyServiceBusiness, SendTheLargestAmountsOfMoney}
 import services.businessmatching.ServiceFlow
 import services.{AutoCompleteService, StatusService}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthAction
 import views.html.msb.send_largest_amounts_of_money
 
@@ -34,7 +33,7 @@ class SendTheLargestAmountsOfMoneyController @Inject()(authAction: AuthAction,
                                                        implicit val statusService: StatusService,
                                                        implicit val serviceFlow: ServiceFlow,
                                                        val autoCompleteService: AutoCompleteService
-                                                      ) extends BaseController {
+                                                      ) extends DefaultBaseController {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

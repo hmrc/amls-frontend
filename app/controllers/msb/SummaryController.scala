@@ -16,7 +16,6 @@
 
 package controllers.msb
 
-import cats.data.OptionT
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
 import javax.inject.Inject
