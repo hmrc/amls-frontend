@@ -44,7 +44,8 @@ class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
 
       "load the what kind of Tcsp are you page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Tcsp](any())(any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any(), any())).thenReturn(Future.successful(None))
+
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -54,7 +55,7 @@ class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
 
         val tcspTypes = TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, CompanyDirectorEtc))
 
-        when(controller.dataCacheConnector.fetch[Tcsp](any())(any(), any(), any())).thenReturn(Future.successful(Some(Tcsp(Some(tcspTypes)))))
+        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any(), any())).thenReturn(Future.successful(Some(Tcsp(Some(tcspTypes)))))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -75,10 +76,8 @@ class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
           "serviceProviders[2]" -> "03"
         )
 
-        when(controller.dataCacheConnector.fetch[Tcsp](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
-        when(controller.dataCacheConnector.save[Tcsp](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(cacheMap))
+        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.save[Tcsp](any(), any(), any())(any(), any())).thenReturn(Future.successful(cacheMap))
 
         val result =  controller.post() (newRequest)
         status(result) must be(SEE_OTHER)
@@ -92,10 +91,8 @@ class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
           "serviceProviders[]" -> "01"
         )
 
-        when(controller.dataCacheConnector.fetch[Tcsp](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
-        when(controller.dataCacheConnector.save[Tcsp](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(cacheMap))
+        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.save[Tcsp](any(), any(), any())(any(), any())).thenReturn(Future.successful(cacheMap))
 
         val result =  controller.post() (newRequest)
         status(result) must be(SEE_OTHER)
@@ -109,10 +106,8 @@ class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
           "serviceProviders[]" -> "01"
         )
 
-        when(controller.dataCacheConnector.fetch[Tcsp](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
-        when(controller.dataCacheConnector.save[Tcsp](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(cacheMap))
+        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.save[Tcsp](any(), any(), any())(any(), any())).thenReturn(Future.successful(cacheMap))
 
         val result =  controller.post(true) (newRequest)
         status(result) must be(SEE_OTHER)
