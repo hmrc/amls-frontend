@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import config.AppConfig
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
@@ -29,24 +29,23 @@ import models.flowmanagement.{ChangeSubSectorFlowModel, SubSectorsPageId}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 
 import scala.concurrent.Future
 
-class MsbSubSectorsController @Inject()(val authConnector: AuthConnector,
+class MsbSubSectorsController @Inject()(authAction: AuthAction,
                                         val dataCacheConnector: DataCacheConnector,
                                         val router: Router[ChangeSubSectorFlowModel],
                                         val businessMatchingService: BusinessMatchingService,
                                         val statusService:StatusService,
                                         val helper: ChangeSubSectorHelper,
-                                        val config: AppConfig) extends BaseController {
+                                        val config: AppConfig) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
         (for {
-          bm <- businessMatchingService.getModel
-          status <- OptionT.liftF(statusService.getStatus)
+          bm <- businessMatchingService.getModel(request.credId)
+          status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
         } yield {
           val form: Form2[BusinessMatchingMsbServices] = bm.msbServices map
             Form2[BusinessMatchingMsbServices] getOrElse EmptyForm
@@ -54,22 +53,21 @@ class MsbSubSectorsController @Inject()(val authConnector: AuthConnector,
         }) getOrElse Ok(views.html.businessmatching.services(EmptyForm, edit, fxEnabledToggle = config.fxEnabledToggle))
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
+  def post(edit: Boolean = false) = authAction.async {
     import jto.validation.forms.Rules._
-    implicit authContext =>
       implicit request =>
         Form2[BusinessMatchingMsbServices](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.businessmatching.services(f, edit, fxEnabledToggle = config.fxEnabledToggle)))
 
           case ValidForm(_, data) =>
-            dataCacheConnector.update[ChangeSubSectorFlowModel](ChangeSubSectorFlowModel.key) {
+            dataCacheConnector.update[ChangeSubSectorFlowModel](request.credId, ChangeSubSectorFlowModel.key) {
               _.getOrElse(ChangeSubSectorFlowModel()).copy(subSectors = Some(data.msbServices))
             } flatMap {
               case Some(m@ChangeSubSectorFlowModel(Some(set), _)) if !(set contains TransmittingMoney) =>
-                helper.updateSubSectors(m) flatMap { _ => router.getRoute(SubSectorsPageId, m) }
+                helper.updateSubSectors(request.credId, m) flatMap { _ => router.getRoute(request.credId, SubSectorsPageId, m) }
               case Some(updatedModel) =>
-                router.getRoute(SubSectorsPageId, updatedModel)
+                router.getRoute(request.credId, SubSectorsPageId, updatedModel)
             }
         }
   }

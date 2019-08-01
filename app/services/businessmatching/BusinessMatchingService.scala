@@ -54,10 +54,15 @@ class BusinessMatchingService @Inject()(
 
   def getModel(cacheId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, BusinessMatching] =
     OptionT(dataCacheConnector.fetch[BusinessMatching](cacheId, BusinessMatching.key))
-
+@deprecated("To be removed when auth implementation is completed")
   def updateModel(model: BusinessMatching)
                  (implicit ac:AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, CacheMap] =
       OptionT.liftF(dataCacheConnector.save[BusinessMatching](BusinessMatching.key, model))
+
+  def updateModel(credId: String, model: BusinessMatching)
+                 (implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, CacheMap] =
+    OptionT.liftF(dataCacheConnector.save[BusinessMatching](credId, BusinessMatching.key, model))
+
   @deprecated("To be removed when auth implementation is complete")
   private def fetchActivitySet(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext) =
     for {
@@ -102,6 +107,7 @@ class BusinessMatchingService @Inject()(
       activities <- OptionT.fromOption[Future](model.activities)
     } yield BusinessActivities.all diff activities.businessActivities
 
+  @deprecated("To be removed when new auth is implemented")
   def clearSection(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier) = activity match {
     case AccountancyServices =>
       dataCacheConnector.removeByKey[Asp](Asp.key)
@@ -113,6 +119,19 @@ class BusinessMatchingService @Inject()(
       dataCacheConnector.removeByKey[Msb](Msb.key)
     case TrustAndCompanyServices =>
       dataCacheConnector.removeByKey[Tcsp](Tcsp.key)
+  }
+
+  def clearSection(credId: String, activity: BusinessActivity)(implicit hc: HeaderCarrier) = activity match {
+    case AccountancyServices =>
+      dataCacheConnector.removeByKey[Asp](credId, Asp.key)
+    case EstateAgentBusinessService =>
+      dataCacheConnector.removeByKey[EstateAgentBusiness](credId, EstateAgentBusiness.key)
+    case HighValueDealing =>
+      dataCacheConnector.removeByKey[Hvd](credId, Hvd.key)
+    case MoneyServiceBusiness =>
+      dataCacheConnector.removeByKey[Msb](credId, Msb.key)
+    case TrustAndCompanyServices =>
+      dataCacheConnector.removeByKey[Tcsp](credId, Tcsp.key)
   }
 
 }

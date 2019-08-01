@@ -17,22 +17,22 @@
 package controllers.businessmatching
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching.{BusinessMatching, TypeOfBusiness}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.businessmatching.type_of_business
 
 import scala.concurrent.Future
 
 class TypeOfBusinessController @Inject()(
                                 val dataCacheConnector: DataCacheConnector,
-                                val authConnector: AuthConnector) extends BaseController {
+                                authAction: AuthAction) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map {
         response =>
           val form: Form2[TypeOfBusiness] = (for {
             businessMatching <- response
@@ -42,15 +42,15 @@ class TypeOfBusinessController @Inject()(
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request => {
       Form2[TypeOfBusiness](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(type_of_business(f, edit)))
         case ValidForm(_, data) =>
           for {
-            businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
-            _ <- dataCacheConnector.save[BusinessMatching](BusinessMatching.key,
+            businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
+            _ <- dataCacheConnector.save[BusinessMatching](request.credId, BusinessMatching.key,
               businessMatching.typeOfBusiness(data)
             )
           } yield edit match {

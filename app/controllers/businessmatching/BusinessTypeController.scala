@@ -17,23 +17,23 @@
 package controllers.businessmatching
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching.BusinessType._
 import models.businessmatching.{BusinessMatching, BusinessType}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.businessmatching._
 
 import scala.concurrent.Future
 
 class BusinessTypeController @Inject()(
                             val dataCache: DataCacheConnector,
-                            val authConnector: AuthConnector) extends BaseController {
+                            authAction: AuthAction) extends DefaultBaseController {
 
-  def get() = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCache.fetch[BusinessMatching](BusinessMatching.key) map {
+  def get() = authAction.async {
+    implicit request =>
+      dataCache.fetch[BusinessMatching](request.credId, BusinessMatching.key) map {
         maybeBusinessMatching =>
           val redirect = for {
             businessMatching <- maybeBusinessMatching
@@ -51,13 +51,13 @@ class BusinessTypeController @Inject()(
       }
   }
 
-  def post() = Authorised.async {
-    implicit authContext => implicit request =>
+  def post() = authAction.async {
+    implicit request =>
       Form2[BusinessType](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(business_type(f)))
         case ValidForm(_, data) =>
-          dataCache.fetch[BusinessMatching](BusinessMatching.key) flatMap {
+          dataCache.fetch[BusinessMatching](request.credId, BusinessMatching.key) flatMap {
             bm =>
               val updatedDetails = for {
                 businessMatching <- bm
@@ -73,7 +73,7 @@ class BusinessTypeController @Inject()(
               }
               updatedDetails map {
                 details =>
-                  dataCache.save[BusinessMatching](BusinessMatching.key, updatedDetails) map {
+                  dataCache.save[BusinessMatching](request.credId, BusinessMatching.key, updatedDetails) map {
                     _ =>
                       data match {
                         case UnincorporatedBody =>

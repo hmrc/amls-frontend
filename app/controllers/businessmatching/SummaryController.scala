@@ -19,13 +19,14 @@ package controllers.businessmatching
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.{BaseController, DefaultBaseController}
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.businessmatching.summary
 
 import scala.concurrent.Future
@@ -33,19 +34,18 @@ import scala.concurrent.Future
 @Singleton
 class SummaryController @Inject()(
                                    val dataCache: DataCacheConnector,
-                                   val authConnector: AuthConnector,
+                                   authAction: AuthAction,
                                    val statusService: StatusService,
                                    val businessMatchingService: BusinessMatchingService
-                                 ) extends BaseController {
+                                 ) extends DefaultBaseController {
 
-  def get() = Authorised.async {
-    implicit authContext =>
+  def get() = authAction.async {
       implicit request =>
 
         (for {
-          bm <- businessMatchingService.getModel
+          bm <- businessMatchingService.getModel(request.credId)
           ba <- OptionT.fromOption[Future](bm.activities)
-          status <- OptionT.liftF(statusService.getStatus)
+          status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
         } yield {
           val isPreSubmission = statusService.isPreSubmission(status)
           val bmWithAdditionalActivities = bm.copy(
@@ -69,12 +69,11 @@ class SummaryController @Inject()(
         }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
   }
 
-  def post() = Authorised.async {
-    implicit authContext =>
+  def post() = authAction.async {
       implicit request => {
         for {
-          businessMatching <- businessMatchingService.getModel
-          _ <- businessMatchingService.updateModel(businessMatching.copy(hasAccepted = true, preAppComplete = true))
+          businessMatching <- businessMatchingService.getModel(request.credId)
+          _ <- businessMatchingService.updateModel(request.credId, businessMatching.copy(hasAccepted = true, preAppComplete = true))
         } yield Redirect(controllers.routes.RegistrationProgressController.get())
       } getOrElse InternalServerError("Unable to update business matching")
   }

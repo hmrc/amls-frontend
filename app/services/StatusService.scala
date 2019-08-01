@@ -209,8 +209,10 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     case SubmissionReadyForReview | RenewalSubmitted(_) => true
     case _ => false
   }
-
+@deprecated("To be removed when new auth is implemented")
   def isPreSubmission(implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext): Future[Boolean] = getStatus map { s => isPreSubmission(s) }
+
+  def isPreSubmission(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] = getStatus(amlsRegistrationNo, accountTypeId, credId) map { s => isPreSubmission(s) }
 
   def isPreSubmission(status: SubmissionStatus) = Set(NotCompleted, SubmissionReady).contains(status)
 }
