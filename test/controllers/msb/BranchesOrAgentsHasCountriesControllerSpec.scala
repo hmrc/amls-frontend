@@ -131,7 +131,7 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
         "hasCountries" -> "false"
       )
 
-      when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+      when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
         .thenReturn(Future.successful(Some(model)))
 
       when(mockCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key),any())(any(), any()))

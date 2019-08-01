@@ -48,7 +48,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec
     when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
       .thenReturn(Future.successful(None))
 
-    when(mockCacheConnector.save[MoneyServiceBusiness](any(), any())(any(), any(), any()))
+    when(mockCacheConnector.save[MoneyServiceBusiness](any(), any(), any())(any(), any()))
       .thenReturn(Future.successful(CacheMap("TESTID", Map())))
 
     val controller = new WhichCurrenciesController(dataCacheConnector = mockCacheConnector,

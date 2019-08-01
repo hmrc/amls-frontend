@@ -181,7 +181,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
         redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
 
-        verify(controller.dataCache).save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(completeModel.copy(hasAccepted = true)))(any(),any(),any())
+        verify(controller.dataCache).save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(completeModel.copy(hasAccepted = true)))(any(),any())
       }
     }
   }
