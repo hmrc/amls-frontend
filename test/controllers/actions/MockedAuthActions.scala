@@ -32,6 +32,15 @@ object SuccessfulAuthAction extends AuthAction {
     Future.successful(Right(AuthorisedRequest(request, Some("amlsRefNumber"), "internalId", affinityGroup, enrolments, ("accType", "id"))))
 }
 
+object SuccessfulAuthActionNoAmlsRefNo extends AuthAction {
+
+  val affinityGroup = AffinityGroup.Organisation
+  val enrolments = Enrolments(Set(Enrolment("HMRC-MLR-ORG")))
+
+  override protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] =
+    Future.successful(Right(AuthorisedRequest(request, None, "internalId", affinityGroup, enrolments, ("accType", "id"))))
+}
+
 object FailedAuthAction extends AuthAction {
 
   val signoutUrl = "/test/signout"

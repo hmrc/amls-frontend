@@ -51,23 +51,23 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
         request.amlsRefNumber match {
           case Some(mlrRegNumber) => {
               statusService.getReadStatus(mlrRegNumber, request.accountTypeId) flatMap {
-                case readStatus if readStatus.safeId.isDefined => generateNotificationView(readStatus.safeId.get, Some(mlrRegNumber), request.accountTypeId)
+                case readStatus if readStatus.safeId.isDefined => generateNotificationView(request.credId, readStatus.safeId.get, Some(mlrRegNumber), request.accountTypeId)
                 case _ => throw new Exception("Unable to retrieve SafeID")
               }
             }
           case _ => {
               businessMatchingService.getModel(request.credId).value flatMap {
-                case Some(model) if model.reviewDetails.isDefined => generateNotificationView(model.reviewDetails.get.safeId, None, request.accountTypeId)
+                case Some(model) if model.reviewDetails.isDefined => generateNotificationView(request.credId, model.reviewDetails.get.safeId, None, request.accountTypeId)
                 case _ => throw new Exception("Unable to retrieve SafeID from reviewDetails")
               }
             }
         }
   }
 
-  private def generateNotificationView(safeId: String, refNumber: Option[String], accountTypeId: (String, String))
+  private def generateNotificationView(credId: String, safeId: String, refNumber: Option[String], accountTypeId: (String, String))
                                       (implicit hc: HeaderCarrier, request: Request[_]): Future[Result] = {
     (for {
-      businessName <- BusinessName.getName(Some(safeId))
+      businessName <- BusinessName.getName(credId, Some(safeId), accountTypeId)
       records: Seq[NotificationRow] <- OptionT.liftF(amlsNotificationService.getNotifications(safeId, accountTypeId))
     } yield {
       val currentRecords: Seq[NotificationRow] = (for {
@@ -87,8 +87,8 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
             (for {
               safeId <- OptionT.fromOption[Future](readStatus.safeId)
               businessName <- BusinessName.getName(request.credId, readStatus.safeId, request.accountTypeId)
-              details <- OptionT(amlsNotificationService.getMessageDetails(amlsRegNo, id, contactType, templateVersion))
-              status <- OptionT.liftF(statusService.getStatus(amlsRegNo))
+              details <- OptionT(amlsNotificationService.getMessageDetails(amlsRegNo, id, contactType, templateVersion, request.accountTypeId))
+              status <- OptionT.liftF(statusService.getStatus(Some(amlsRegNo), request.accountTypeId, request.credId))
             } yield contactTypeToResponse(contactType, (amlsRegNo, safeId), businessName, details, status, templateVersion)) getOrElse NotFound(notFoundView)
           case r if r.safeId.isEmpty => throw new Exception("Unable to retrieve SafeID")
           case _ => Future.successful(BadRequest)

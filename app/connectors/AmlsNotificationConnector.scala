@@ -32,11 +32,9 @@ class AmlsNotificationConnector @Inject()(val http: WSHttp,
 
   private[connectors] def baseUrl : String = appConfig.allNotificationsUrl
 
-  def fetchAllByAmlsRegNo(amlsRegistrationNumber: String)(implicit
-                                                          headerCarrier: HeaderCarrier,
-                                                          reqW: Writes[Seq[NotificationRow]],
-                                                          ac: AuthContext
-  ): Future[Seq[NotificationRow]] = {
+  @deprecated("to be removed after complete auth implementation")
+  def fetchAllByAmlsRegNo(amlsRegistrationNumber: String)
+                         (implicit headerCarrier: HeaderCarrier, reqW: Writes[Seq[NotificationRow]], ac: AuthContext): Future[Seq[NotificationRow]] = {
 
     //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
@@ -44,6 +42,38 @@ class AmlsNotificationConnector @Inject()(val http: WSHttp,
     val getUrl = s"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber"
     val prefix = "[AmlsNotificationConnector][fetchAllByAmlsRegNo]"
     Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
+    http.GET[Seq[NotificationRow]](getUrl) map {
+      response =>
+        Logger.debug(s"$prefix - Response Body: $response")
+        response
+    }
+  }
+
+  def fetchAllByAmlsRegNo(amlsRegistrationNumber: String, accountTypeId: (String, String))
+                         (implicit headerCarrier: HeaderCarrier, reqW: Writes[Seq[NotificationRow]]): Future[Seq[NotificationRow]] = {
+
+    val (accountType, accountId) = accountTypeId
+
+    val getUrl = s"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber"
+    val prefix = "[AmlsNotificationConnector][fetchAllByAmlsRegNo]"
+    Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
+    http.GET[Seq[NotificationRow]](getUrl) map {
+      response =>
+        Logger.debug(s"$prefix - Response Body: $response")
+        response
+    }
+  }
+
+  @deprecated("to be removed after complete auth implementation")
+  def fetchAllBySafeId(safeId: String)
+                      (implicit headerCarrier: HeaderCarrier, reqW: Writes[Seq[NotificationRow]], ac: AuthContext): Future[Seq[NotificationRow]] = {
+
+    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
+    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+
+    val getUrl = s"$baseUrl/$accountType/$accountId/safeId/$safeId"
+    val prefix = "[AmlsNotificationConnector][fetchAllBySafeId]"
+    Logger.debug(s"$prefix - Request : $safeId")
     http.GET[Seq[NotificationRow]](getUrl) map {
       response =>
         Logger.debug(s"$prefix - Response Body: $response")
@@ -66,11 +96,25 @@ class AmlsNotificationConnector @Inject()(val http: WSHttp,
     }
   }
 
+  @deprecated("to be removed after complete auth implementation")
   def getMessageDetailsByAmlsRegNo(amlsRegistrationNumber: String, contactNumber: String)
                        (implicit hc : HeaderCarrier, ec : ExecutionContext, ac: AuthContext): Future[Option[NotificationDetails]]= {
 
     //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+
+    val url = s"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber/$contactNumber"
+    http.GET[NotificationDetails](url)
+      .map {Some(_)}
+      .recover {
+        case _:NotFoundException => None
+      }
+  }
+
+  def getMessageDetailsByAmlsRegNo(amlsRegistrationNumber: String, contactNumber: String, accountTypeId: (String, String))
+                                  (implicit hc : HeaderCarrier, ec : ExecutionContext): Future[Option[NotificationDetails]]= {
+
+    val (accountType, accountId) = accountTypeId
 
     val url = s"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber/$contactNumber"
     http.GET[NotificationDetails](url)
