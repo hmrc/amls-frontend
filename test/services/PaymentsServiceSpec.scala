@@ -17,15 +17,21 @@
 package services
 
 import config.ApplicationConfig
+import cats.implicits._
 import connectors.{AmlsConnector, PayApiConnector}
 import generators.PaymentGenerator
+import models.{FeeResponse, ReturnLocation}
+import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import models.confirmation.Currency
 import models.payments._
+import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.HttpResponse
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -37,8 +43,9 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
   trait Fixture extends AuthorisedFixture {
     self =>
 
+    val mockAmlsConnector = mock[AmlsConnector]
     val testPaymentService = new PaymentsService(
-      mock[AmlsConnector],
+      mockAmlsConnector,
       mock[PayApiConnector],
       mock[StatusService]
     )
@@ -49,6 +56,34 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
     val currency = Currency.fromInt(100)
 
     val data = (paymentRefNo, currency, Seq(), Some(currency))
+
+    val testFeeResponseSubscription = FeeResponse(
+      responseType = SubscriptionResponseType,
+      amlsReferenceNumber = "XAML0000000001",
+      registrationFee = BigDecimal(100),
+      fpFee = Some(BigDecimal(100)),
+      approvalCheckFee = None,
+      premiseFee = BigDecimal(100),
+      totalFees = BigDecimal(100),
+      paymentReference = Some("paymentReference"),
+      difference = None,
+      createdAt = new DateTime(2018, 1, 1, 0, 0)
+    )
+
+    val testFeeResponseAmendVariation = FeeResponse(
+      responseType = AmendOrVariationResponseType,
+      amlsReferenceNumber = "XAML0000000001",
+      registrationFee = BigDecimal(100),
+      fpFee = Some(BigDecimal(100)),
+      approvalCheckFee = None,
+      premiseFee = BigDecimal(100),
+      totalFees = BigDecimal(100),
+      paymentReference = Some("paymentReference"),
+      difference = Some(BigDecimal(100)),
+      createdAt = new DateTime(2018, 1, 1, 0, 0)
+    )
+
+    val paymentResponse = CreatePaymentResponse(nextUrl = NextUrl("http://return.com"), journeyId = "1234567890")
 
   }
 
@@ -104,4 +139,77 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
     }
   }
 
+  "requestPaymentsUrl" when {
+    "called" must {
+      "return payments url" when {
+        "difference and payment reference are defined in FeeResponse" in new Fixture {
+          when {
+            testPaymentService.paymentsConnector.createPayment(any())(any(), any())
+          } thenReturn Future.successful(Some(paymentResponse))
+
+          when {
+            mockAmlsConnector.savePayment(any(), any(), any())(any(), any(), any())
+          } thenReturn Future.successful(HttpResponse(CREATED))
+
+          whenReady(testPaymentService.requestPaymentsUrl(testFeeResponseAmendVariation, "http://return.com", "XAML0000000001", safeId)) { result =>
+            result mustBe NextUrl("http://return.com")
+          }
+        }
+
+        "payment reference is defined in FeeResponse" in new Fixture {
+          when {
+            testPaymentService.paymentsConnector.createPayment(any())(any(), any())
+          } thenReturn Future.successful(Some(paymentResponse))
+
+          when {
+            mockAmlsConnector.savePayment(any(), any(), any())(any(), any(), any())
+          } thenReturn Future.successful(HttpResponse(CREATED))
+
+          whenReady(testPaymentService.requestPaymentsUrl(testFeeResponseSubscription, "http://return.com", "XAML0000000001", safeId)) { result =>
+            result mustBe NextUrl("http://return.com")
+          }
+        }
+      }
+
+      "return default payments url" in new Fixture {
+
+        whenReady(testPaymentService.requestPaymentsUrl(
+          testFeeResponseAmendVariation.copy(difference = None, paymentReference = None), "http://return.com", "XAML0000000001", safeId)) { result =>
+          result mustBe NextUrl(ApplicationConfig.paymentsUrl)
+        }
+      }
+    }
+  }
+
+  "amountFromSubmissionData" when {
+    "called with fee response" must {
+      "return difference if it exists" in new Fixture {
+        val result = testPaymentService.amountFromSubmissionData(testFeeResponseAmendVariation)
+
+        result mustBe Currency(100).some
+      }
+
+      "return total fees if difference does not exists" in new Fixture {
+        val result = testPaymentService.amountFromSubmissionData(testFeeResponseSubscription)
+
+        result mustBe Currency(100).some
+      }
+    }
+  }
+
+  "savePaymentBeforeResponse" when {
+    "called" must {
+      "fail if cannot save payment" in new Fixture with PrivateMethodTester {
+        when {
+          mockAmlsConnector.savePayment(any(), any(), any())(any(), any(), any())
+        } thenThrow new IllegalArgumentException()
+
+        val savePaymentBeforeResponse = PrivateMethod[Future[Unit]]('savePaymentBeforeResponse)
+
+        intercept[IllegalArgumentException] {
+          testPaymentService invokePrivate savePaymentBeforeResponse(paymentResponse, "xxx", "zzz", headerCarrier, authContext)
+        }
+      }
+    }
+  }
 }
