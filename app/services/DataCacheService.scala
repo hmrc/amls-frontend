@@ -41,4 +41,15 @@ private[services] trait DataCacheService {
           new NotFoundException("No CacheMap found for user")
         }
     }
+
+  def getCache(credId: String)
+              (implicit ec: ExecutionContext, hc: HeaderCarrier): Future[CacheMap] =
+    cacheConnector.fetchAll(credId) flatMap {
+      case Some(cache) =>
+        Future.successful(cache)
+      case None =>
+        Future.failed {
+          new NotFoundException("No CacheMap found for user")
+        }
+    }
 }

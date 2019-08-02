@@ -57,10 +57,10 @@ class SubmissionService @Inject()
   config: AppConfig
 ) extends DataCacheService {
 
-  private def enrol(safeId: String, amlsRegistrationNumber: String, postcode: String)
-                   (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[_] =
+  private def enrol(safeId: String, amlsRegistrationNumber: String, postcode: String, groupId: Option[String])
+                   (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[_] =
     if (config.enrolmentStoreToggle) {
-      authEnrolmentsService.enrol(amlsRegistrationNumber, postcode)
+      authEnrolmentsService.enrol(amlsRegistrationNumber, postcode, groupId)
     } else {
       ggService.enrol(amlsRegistrationNumber, safeId, postcode)
     }
@@ -75,22 +75,40 @@ class SubmissionService @Inject()
     case _ => None
   }
 
-  def subscribe
-  (implicit
-   ec: ExecutionContext,
-   hc: HeaderCarrier,
-   ac: AuthContext
-  ): Future[SubscriptionResponse] = {
+//  def subscribe
+//  (implicit
+//   ec: ExecutionContext,
+//   hc: HeaderCarrier,
+//   ac: AuthContext
+//  ): Future[SubscriptionResponse] = {
+//    (for {
+//      cache <- getCache
+//      safeId <- safeId(cache)
+//      request <- Future.successful(createSubscriptionRequest(cache))
+//      subscription <- amlsConnector.subscribe(request, safeId)
+//      _ <- saveResponse(subscription, SubscriptionResponse.key)
+//      _ <- enrol(safeId, subscription.amlsRefNo, request.businessDetailsSection.fold("")(_.registeredOffice match {
+//        case Some(o: RegisteredOfficeUK) => o.postCode
+//        case _ => ""
+//      }))
+//    } yield subscription) recoverWith {
+//      case e: Upstream4xxResponse if e.upstreamResponseCode == UNPROCESSABLE_ENTITY =>
+//        Future.failed(SubscriptionErrorResponse.from(e).fold[Throwable](e)(r => DuplicateSubscriptionException(r.message)))
+//    }
+//  }
+
+  def subscribe(credId: String, accountTypeId: (String, String), groupId: Option[String])
+               (implicit ec: ExecutionContext, hc: HeaderCarrier): Future[SubscriptionResponse] = {
     (for {
-      cache <- getCache
+      cache <- getCache(credId)
       safeId <- safeId(cache)
-      request <- Future.successful(createSubscriptionRequest(cache))
-      subscription <- amlsConnector.subscribe(request, safeId)
-      _ <- saveResponse(subscription, SubscriptionResponse.key)
+      request <- Future.successful(createSubscriptionRequestNewAuth(cache))
+      subscription <- amlsConnector.subscribe(request, safeId, accountTypeId)
+      _ <- saveResponse(credId, subscription, SubscriptionResponse.key)
       _ <- enrol(safeId, subscription.amlsRefNo, request.businessDetailsSection.fold("")(_.registeredOffice match {
         case Some(o: RegisteredOfficeUK) => o.postCode
         case _ => ""
-      }))
+      }), groupId)
     } yield subscription) recoverWith {
       case e: Upstream4xxResponse if e.upstreamResponseCode == UNPROCESSABLE_ENTITY =>
         Future.failed(SubscriptionErrorResponse.from(e).fold[Throwable](e)(r => DuplicateSubscriptionException(r.message)))
@@ -104,6 +122,30 @@ class SubmissionService @Inject()
    hc: HeaderCarrier,
    ec: ExecutionContext
   ): SubscriptionRequest = {
+
+    def filteredResponsiblePeople = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key).map(_.filterEmpty)
+
+    def filteredTradingPremises = cache.getEntry[Seq[TradingPremises]](TradingPremises.key).map(_.filterEmpty)
+
+    SubscriptionRequest(
+      businessMatchingSection = cache.getEntry[BusinessMatching](BusinessMatching.key),
+      eabSection = cache.getEntry[EstateAgentBusiness](EstateAgentBusiness.key),
+      tradingPremisesSection = filteredTradingPremises,
+      businessDetailsSection = cache.getEntry[BusinessDetails](BusinessDetails.key),
+      bankDetailsSection = bankDetailsExceptDeleted(cache.getEntry[Seq[BankDetails]](BankDetails.key)),
+      aboutYouSection = cache.getEntry[AddPerson](AddPerson.key),
+      businessActivitiesSection = cache.getEntry[BusinessActivities](BusinessActivities.key),
+      responsiblePeopleSection = filteredResponsiblePeople,
+      tcspSection = cache.getEntry[Tcsp](Tcsp.key),
+      aspSection = cache.getEntry[Asp](Asp.key),
+      msbSection = cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key),
+      hvdSection = cache.getEntry[Hvd](Hvd.key),
+      supervisionSection = cache.getEntry[Supervision](Supervision.key)
+    )
+  }
+
+  private def createSubscriptionRequestNewAuth(cache: CacheMap)
+                                       (implicit hc: HeaderCarrier, ec: ExecutionContext): SubscriptionRequest = {
 
     def filteredResponsiblePeople = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key).map(_.filterEmpty)
 
@@ -189,6 +231,12 @@ class SubmissionService @Inject()
                              (implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext, fmt: Format[T]) = for {
     _ <- cacheConnector.save[T](key, response)
     c <- cacheConnector.save[SubmissionRequestStatus](SubmissionRequestStatus.key, SubmissionRequestStatus(true, Some(isRenewalAmendment)))
+  } yield c
+
+  private def saveResponse[T](credId: String, response: T, key: String, isRenewalAmendment: Boolean = false)
+                             (implicit hc: HeaderCarrier, ex: ExecutionContext, fmt: Format[T]) = for {
+    _ <- cacheConnector.save[T](credId, key, response)
+    c <- cacheConnector.save[SubmissionRequestStatus](credId, SubmissionRequestStatus.key, SubmissionRequestStatus(true, Some(isRenewalAmendment)))
   } yield c
 
   private def safeId(cache: CacheMap): Future[String] = {

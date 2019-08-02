@@ -73,11 +73,11 @@ class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector,
     }
   }
 
-  def enrol(amlsRegistrationNumber: String, postcode: String)
-           (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[HttpResponse] = {
+  def enrol(amlsRegistrationNumber: String, postcode: String, groupId: Option[String])
+           (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     authConnector.getCurrentAuthority flatMap {
       authority =>
-        enrolmentStore.enrol(AmlsEnrolmentKey(amlsRegistrationNumber), TaxEnrolment(authority.credId, postcode))
+        enrolmentStore.enrol(AmlsEnrolmentKey(amlsRegistrationNumber), TaxEnrolment(authority.credId, postcode), groupId)
     }
   }
 

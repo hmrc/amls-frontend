@@ -44,18 +44,26 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
 
   private[connectors] val paymentUrl: String= s"${appConfig.amlsUrl}/amls/payment"
 
-  def subscribe
-  (subscriptionRequest: SubscriptionRequest, safeId: String)
-  (implicit
-   headerCarrier: HeaderCarrier,
-   ec: ExecutionContext,
-   reqW: Writes[SubscriptionRequest],
-   resW: Writes[SubscriptionResponse],
-   ac: AuthContext
-  ): Future[SubscriptionResponse] = {
+  @deprecated("to be removed when new auth completely implemented")
+  def subscribe(subscriptionRequest: SubscriptionRequest, safeId: String)
+  (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, reqW: Writes[SubscriptionRequest], resW: Writes[SubscriptionResponse], ac: AuthContext): Future[SubscriptionResponse] = {
 
-    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+
+    val postUrl = s"$url/$accountType/$accountId/$safeId"
+    val prefix = "[AmlsConnector][subscribe]"
+    Logger.debug(s"$prefix - Request Body: ${Json.toJson(subscriptionRequest)}")
+    httpPost.POST[SubscriptionRequest, SubscriptionResponse](postUrl, subscriptionRequest) map {
+      response =>
+        Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
+        response
+    }
+  }
+
+  def subscribe(subscriptionRequest: SubscriptionRequest, safeId: String, accountTypeId: (String, String))
+               (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, reqW: Writes[SubscriptionRequest], resW: Writes[SubscriptionResponse]): Future[SubscriptionResponse] = {
+
+    val (accountType, accountId) = accountTypeId
 
     val postUrl = s"$url/$accountType/$accountId/$safeId"
     val prefix = "[AmlsConnector][subscribe]"

@@ -26,18 +26,17 @@ import services.{RenewalService, StatusService, SubmissionService}
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
-class SubmissionController @Inject()(
-                                     val subscriptionService: SubmissionService,
+class SubmissionController @Inject()(val subscriptionService: SubmissionService,
                                      val statusService: StatusService,
                                      val renewalService: RenewalService,
                                      val authenticator: AuthenticatorConnector,
-                                     val authConnector: AuthConnector
-                                    ) extends BaseController {
+                                     authAction: AuthAction) extends DefaultBaseController {
 
   private def handleRenewalAmendment()(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
     renewalService.getRenewal flatMap {
@@ -46,10 +45,9 @@ class SubmissionController @Inject()(
     }
   }
 
-  def post() = Authorised.async {
-    implicit authContext =>
+  def post() = authAction.async {
       implicit request => {
-        statusService.getStatus.flatMap[SubmissionResponse](subscribeBasedOnStatus)
+        statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId).flatMap[SubmissionResponse](status => subscribeBasedOnStatus(status, request.groupIdentifier))
       }.flatMap {
         case SubscriptionResponse(_, _, _, Some(true)) =>
           authenticator.refreshProfile map { _ =>
@@ -72,7 +70,7 @@ class SubmissionController @Inject()(
       }
   }
 
-  private def subscribeBasedOnStatus(status: SubmissionStatus)(implicit hc: HeaderCarrier, ac: AuthContext) = status match {
+  private def subscribeBasedOnStatus(status: SubmissionStatus, groupIdentifier: Option[String])(implicit hc: HeaderCarrier) = status match {
     case SubmissionReadyForReview => subscriptionService.update
     case SubmissionDecisionApproved => subscriptionService.variation
     case ReadyForRenewal(_) => renewalService.getRenewal flatMap {
