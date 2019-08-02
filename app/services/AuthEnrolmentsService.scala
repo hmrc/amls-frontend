@@ -81,11 +81,19 @@ class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector,
     }
   }
 
-  def deEnrol(amlsRegistrationNumber: String)
-             (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Boolean] = {
+//  def deEnrol(amlsRegistrationNumber: String)
+//             (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Boolean] = {
+//    for {
+//      _ <- enrolmentStore.removeKnownFacts(amlsRegistrationNumber)
+//      _ <- enrolmentStore.deEnrol(amlsRegistrationNumber)
+//    } yield true
+//  }
+
+  def deEnrol(amlsRegistrationNumber: String, groupId: Option[String])
+             (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] = {
     for {
       _ <- enrolmentStore.removeKnownFacts(amlsRegistrationNumber)
-      _ <- enrolmentStore.deEnrol(amlsRegistrationNumber)
+      _ <- enrolmentStore.deEnrol(amlsRegistrationNumber, groupId)
     } yield true
   }
 

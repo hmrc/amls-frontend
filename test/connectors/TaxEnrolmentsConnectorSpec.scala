@@ -146,7 +146,7 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
           http.DELETE[HttpResponse](any())(any(), any(), any())
         } thenReturn Future.successful(HttpResponse(NO_CONTENT))
 
-        whenReady(connector.deEnrol(amlsRegistrationNumber)) { _ =>
+        whenReady(connector.deEnrol(amlsRegistrationNumber, Some("GROUP_ID"))) { _ =>
           verify(authConnector).userDetails(any(), any(), any())
           verify(http).DELETE[HttpResponse](eqTo(endpointUrl))(any(), any(), any())
           verify(auditConnector).sendEvent(any())(any(), any())
@@ -159,7 +159,7 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
         when(authConnector.userDetails(any(), any(), any())).thenReturn(Future.successful(details))
 
         intercept[Exception] {
-          await(connector.deEnrol(amlsRegistrationNumber))
+          await(connector.deEnrol(amlsRegistrationNumber, None))
         } match {
           case ex => ex.getMessage mustBe "Group identifier is unavailable"
         }

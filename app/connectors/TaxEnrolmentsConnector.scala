@@ -82,13 +82,11 @@ class TaxEnrolmentsConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth:
     }
   }
 
-  def deEnrol(registrationNumber: String)
-             (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[HttpResponse] = {
+  def deEnrol(registrationNumber: String, groupId: Option[String])
+             (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     val enrolKey = AmlsEnrolmentKey(registrationNumber).key
-    auth.userDetails flatMap { details =>
       Logger.debug("TaxEnrolmentsConnector:deEnrol:enrolKey:" + enrolKey)
-      Logger.debug("TaxEnrolmentsConnector:deEnrol:auth.userDetails:" + details)
-      details.groupIdentifier match {
+      groupId match {
         case Some(groupId) =>
           val url = s"$baseUrl/groups/$groupId/enrolments/$enrolKey"
 
@@ -99,11 +97,10 @@ class TaxEnrolmentsConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth:
 
         case _ => throw new Exception("Group identifier is unavailable")
       }
-    }
   }
 
   def removeKnownFacts(registrationNumber: String)
-                      (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[HttpResponse] = {
+                      (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
 
     val enrolKey = AmlsEnrolmentKey(registrationNumber).key
     val url = s"$baseUrl/enrolments/$enrolKey"

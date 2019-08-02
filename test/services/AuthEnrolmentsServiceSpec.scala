@@ -105,17 +105,17 @@ class AuthEnrolmentsServiceSpec extends AmlsSpec
     "de-enrol the user and return true" in new Fixture {
 
       when {
-        enrolmentStore.deEnrol(eqTo(amlsRegistrationNumber))(any(), any(), any())
+        enrolmentStore.deEnrol(eqTo(amlsRegistrationNumber), any())(any(), any())
       } thenReturn Future.successful(HttpResponse(NO_CONTENT))
 
       when {
-        enrolmentStore.removeKnownFacts(eqTo(amlsRegistrationNumber))(any(), any(), any())
+        enrolmentStore.removeKnownFacts(eqTo(amlsRegistrationNumber))(any(), any())
       } thenReturn Future.successful(HttpResponse(NO_CONTENT))
 
-      whenReady(service.deEnrol(amlsRegistrationNumber)) { result =>
+      whenReady(service.deEnrol(amlsRegistrationNumber, Some("GROUP_ID"))) { result =>
         result mustBe true
-        verify(enrolmentStore).removeKnownFacts(eqTo(amlsRegistrationNumber))(any(), any(), any())
-        verify(enrolmentStore).deEnrol(eqTo(amlsRegistrationNumber))(any(), any(), any())
+        verify(enrolmentStore).removeKnownFacts(eqTo(amlsRegistrationNumber))(any(), any())
+        verify(enrolmentStore).deEnrol(eqTo(amlsRegistrationNumber), any())(any(), any())
       }
     }
   }

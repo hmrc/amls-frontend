@@ -18,6 +18,7 @@ package controllers
 
 import cats.implicits._
 import connectors._
+import controllers.actions.SuccessfulAuthAction
 import generators.PaymentGenerator
 import models.ResponseType.SubscriptionResponseType
 import models.businesscustomer.{Address, ReviewDetails}
@@ -40,7 +41,7 @@ import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, DependencyMocksNewAuth}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
@@ -49,7 +50,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
   val cacheMap = mock[CacheMap]
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self => val request = addToken(authRequest)
 
     val controller = new StatusController (
@@ -62,7 +63,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
        mock[AmlsConnector],
        mockCacheConnector,
        mock[AuthenticatorConnector],
-       self.authConnector,
+      SuccessfulAuthAction,
        mock[FeeResponseService]
     )
 
@@ -95,18 +96,17 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
     )
     val responsiblePeople = Seq(rp1, rp2)
 
-    when(controller.statusService.getDetailedStatus(any(), any(), any()))
+    when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
       .thenReturn(Future.successful((NotCompleted, None)))
 
     mockCacheFetch[BusinessMatching](Some(BusinessMatching(Some(reviewDetails), None)), Some(BusinessMatching.key))
     mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
 
-    when(controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber))(any(), any(), any()))
+    when(controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any[(String, String)]())(any(), any()))
       .thenReturn(Future.successful(Some(feeResponse)))
-
-    when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-      .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
-
+//
+//    when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+//      .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
   }
 
   val feeResponse = FeeResponse(
@@ -131,24 +131,24 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
         val httpResponse = mock[HttpResponse]
 
-        when(controller.statusService.getStatus(any(), any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]](), any(), any())(any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionRejected))
 
-        when(controller.enrolmentsService.deEnrol(any())(any(), any(), any()))
+        when(controller.enrolmentsService.deEnrol(any(), any())(any(), any()))
           .thenReturn(Future.successful(true))
 
         when(controller.authenticator.refreshProfile(any(), any()))
           .thenReturn(Future.successful(HttpResponse(OK)))
 
-        when(controller.dataCache.remove(any(), any()))
+        when(controller.dataCache.remove(any())(any()))
           .thenReturn(Future.successful(true))
 
-        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-          .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
+//        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+//          .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
         val result = controller.newSubmission()(request)
         status(result) must be(SEE_OTHER)
-        verify(controller.enrolmentsService).deEnrol(eqTo(amlsRegistrationNumber))(any(), any(), any())
+        verify(controller.enrolmentsService).deEnrol(eqTo(amlsRegistrationNumber), any())(any(), any())
         redirectLocation(result) must be(Some(controllers.routes.LandingController.start(true).url))
       }
 
@@ -159,7 +159,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(DeRegistered))
 
-        when(controller.enrolmentsService.deEnrol(any())(any(), any(), any()))
+        when(controller.enrolmentsService.deEnrol(any(), any())(any(), any()))
           .thenReturn(Future.successful(true))
 
         when(controller.authenticator.refreshProfile(any(), any()))
@@ -173,7 +173,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
         val result = controller.newSubmission()(request)
         status(result) must be(SEE_OTHER)
-        verify(controller.enrolmentsService).deEnrol(eqTo(amlsRegistrationNumber))(any(), any(), any())
+        verify(controller.enrolmentsService).deEnrol(eqTo(amlsRegistrationNumber), any())(any(), any())
         redirectLocation(result) must be(Some(controllers.routes.LandingController.start(true).url))
       }
     }

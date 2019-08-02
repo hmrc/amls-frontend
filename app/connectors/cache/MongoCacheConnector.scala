@@ -140,6 +140,10 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
     }
   }
 
+  def remove(cacheId: String)(implicit hc: HeaderCarrier): Future[Boolean] = {
+        mongoCache.removeById(cacheId, deprecatedFilter = false)
+  }
+
   /**
     * Removes the cache entry for a given key from the mongo store
     */

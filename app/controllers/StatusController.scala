@@ -31,49 +31,48 @@ import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{BusinessName, ControllerHelper}
+import utils.{AuthAction, BusinessName, ControllerHelper}
 import views.html.status._
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class StatusController @Inject()(val landingService: LandingService,
-                                  val statusService: StatusService,
-                                  val enrolmentsService: AuthEnrolmentsService,
-                                  val feeConnector: FeeConnector,
-                                  val renewalService: RenewalService,
-                                  val progressService: ProgressService,
-                                  val amlsConnector: AmlsConnector,
-                                  val dataCache: DataCacheConnector,
-                                  val authenticator: AuthenticatorConnector,
-                                  val authConnector: AuthConnector,
-                                 val feeResponseService: FeeResponseService
-                                 ) extends BaseController {
+                                 val statusService: StatusService,
+                                 val enrolmentsService: AuthEnrolmentsService,
+                                 val feeConnector: FeeConnector,
+                                 val renewalService: RenewalService,
+                                 val progressService: ProgressService,
+                                 val amlsConnector: AmlsConnector,
+                                 val dataCache: DataCacheConnector,
+                                 val authenticator: AuthenticatorConnector,
+                                 authAction: AuthAction,
+                                 val feeResponseService: FeeResponseService) extends DefaultBaseController {
 
-  def get(fromDuplicateSubmission: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(fromDuplicateSubmission: Boolean = false) = authAction.async {
       implicit request =>
         for {
-          mlrRegNumber <- enrolmentsService.amlsRegistrationNumber
-          statusInfo <- statusService.getDetailedStatus
+          statusInfo <- statusService.getDetailedStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
           statusResponse <- Future(statusInfo._2)
-          maybeBusinessName <- getBusinessName(statusResponse.fold(none[String])(_.safeId)).value
-          feeResponse <- getFeeResponse(mlrRegNumber, statusInfo._1)
-          responsiblePeople <- dataCache.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key)
-          bm <- dataCache.fetch[BusinessMatching](BusinessMatching.key)
+          maybeBusinessName <- getBusinessName(request.credId, statusResponse.fold(none[String])(_.safeId), request.accountTypeId).value
+          feeResponse <- getFeeResponse(request.amlsRefNumber, statusInfo._1, request.accountTypeId)
+          responsiblePeople <- dataCache.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key)
+          bm <- dataCache.fetch[BusinessMatching](request.credId, BusinessMatching.key)
           maybeActivities <- Future(bm.activities)
           page <- getPageBasedOnStatus(
-              mlrRegNumber,
+              request.amlsRefNumber,
               statusInfo,
               maybeBusinessName,
               feeResponse,
               fromDuplicateSubmission,
               responsiblePeople,
-              maybeActivities
-            )
+              maybeActivities,
+              request.accountTypeId,
+              request.credId)
         } yield page
   }
 
+  @deprecated("To be removed when auth implementation is complete")
   def getFeeResponse(mlrRegNumber: Option[String], submissionStatus: SubmissionStatus)(implicit authContext: AuthContext,
                                                                                        headerCarrier: HeaderCarrier): Future[Option[FeeResponse]] = {
     (mlrRegNumber, submissionStatus) match {
@@ -82,15 +81,22 @@ class StatusController @Inject()(val landingService: LandingService,
     }
   }
 
+  def getFeeResponse(mlrRegNumber: Option[String], submissionStatus: SubmissionStatus, accountTypeId: (String, String))
+                    (implicit headerCarrier: HeaderCarrier): Future[Option[FeeResponse]] = {
 
-  def newSubmission = Authorised.async {
-    implicit authContext =>
+    (mlrRegNumber, submissionStatus) match {
+      case (Some(mlNumber), (SubmissionReadyForReview | SubmissionDecisionApproved)) => feeResponseService.getFeeResponse(mlNumber, accountTypeId)
+      case _ => Future.successful(None)
+    }
+  }
+
+  def newSubmission = authAction.async {
       implicit request => {
         val redirect = for {
-          amlsRegNumber <- OptionT(enrolmentsService.amlsRegistrationNumber)
-          _ <- OptionT.liftF(enrolmentsService.deEnrol(amlsRegNumber))
+          amlsRegNumber <- OptionT.fromOption[Future](request.amlsRefNumber)
+          _ <- OptionT.liftF(enrolmentsService.deEnrol(amlsRegNumber, request.groupIdentifier))
           _ <- OptionT.liftF(authenticator.refreshProfile)
-          _ <- OptionT.liftF(dataCache.remove)
+          _ <- OptionT.liftF(dataCache.remove(request.credId))
         } yield Redirect(controllers.routes.LandingController.start(true))
 
         redirect getOrElse InternalServerError("New submission failed")
@@ -103,17 +109,19 @@ class StatusController @Inject()(val landingService: LandingService,
                                    feeResponse: Option[FeeResponse],
                                    fromDuplicateSubmission: Boolean,
                                    responsiblePeople: Option[Seq[ResponsiblePerson]],
-                                   activities: Option[BusinessActivities])
-                                  (implicit request: Request[AnyContent], authContext: AuthContext) = {
+                                   activities: Option[BusinessActivities],
+                                   accountTypeId: (String, String),
+                                   cacheId: String)
+                                  (implicit request: Request[AnyContent]) = {
     statusInfo match {
       case (NotCompleted, _) | (SubmissionReady, _) | (SubmissionReadyForReview, _) =>
-        getInitialSubmissionPage(mlrRegNumber, statusInfo._1, businessNameOption, feeResponse, fromDuplicateSubmission)
+        getInitialSubmissionPage(mlrRegNumber, statusInfo._1, businessNameOption, feeResponse, fromDuplicateSubmission, accountTypeId, cacheId)
       case (SubmissionDecisionApproved, _) | (SubmissionDecisionRejected, _) |
            (SubmissionDecisionRevoked, _) | (SubmissionDecisionExpired, _) |
            (SubmissionWithdrawn, _) | (DeRegistered, _) =>
         Future.successful(getDecisionPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople, activities))
       case (ReadyForRenewal(_), _) | (RenewalSubmitted(_), _) =>
-        getRenewalFlowPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople, activities)
+        getRenewalFlowPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople, activities, cacheId)
       case (_, _) => Future.successful(Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption)))
     }
   }
@@ -121,17 +129,16 @@ class StatusController @Inject()(val landingService: LandingService,
   private def getInitialSubmissionPage(mlrRegNumber: Option[String],
                                        status: SubmissionStatus,
                                        businessNameOption: Option[String],
-                                       feeResponse: Option[FeeResponse], fromDuplicateSubmission: Boolean)
-                                      (implicit request: Request[AnyContent], authContext: AuthContext): Future[Result] = {
-    val isBacsPayment = for {
-      amlsRegNo <- OptionT.fromOption[Future](mlrRegNumber)
-      payment <- OptionT(amlsConnector.getPaymentByAmlsReference(amlsRegNo))
-    } yield payment.isBacs.getOrElse(false)
+                                       feeResponse: Option[FeeResponse],
+                                       fromDuplicateSubmission: Boolean,
+                                       accountTypeId: (String, String),
+                                       cacheId: String)
+                                      (implicit request: Request[AnyContent]): Future[Result] = {
 
     status match {
       case NotCompleted => Future.successful(Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption)))
       case SubmissionReady => {
-        OptionT(progressService.getSubmitRedirect) map (
+        OptionT(progressService.getSubmitRedirect(mlrRegNumber, accountTypeId, cacheId)) map (
           url =>
             Ok(status_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption, url))
           ) getOrElse InternalServerError("Unable to get redirect data")
@@ -190,9 +197,9 @@ class StatusController @Inject()(val landingService: LandingService,
                                  statusInfo: (SubmissionStatus, Option[ReadStatusResponse]),
                                  businessNameOption: Option[String],
                                  responsiblePeople: Option[Seq[ResponsiblePerson]],
-                                 maybeActivities: Option[BusinessActivities])
-                                (implicit request: Request[AnyContent],
-                                 authContext: AuthContext) = {
+                                 maybeActivities: Option[BusinessActivities],
+                                 cacheId: String)
+                                (implicit request: Request[AnyContent]) = {
 
     val activities = maybeActivities.map(_.businessActivities.map(_.getMessage())) getOrElse Set.empty
 
@@ -205,9 +212,9 @@ class StatusController @Inject()(val landingService: LandingService,
           ControllerHelper.nominatedOfficerTitleName(responsiblePeople)
         )))
       case (ReadyForRenewal(renewalDate), _) => {
-        renewalService.getRenewal flatMap {
-          case Some(r) =>
-            renewalService.isRenewalComplete(r) flatMap { complete =>
+        renewalService.getRenewal(cacheId) flatMap {
+          case Some(renewal) =>
+            renewalService.isRenewalComplete(renewal, cacheId) flatMap { complete =>
               if (complete) {
                 Future.successful(Ok(status_renewal_not_submitted(
                   mlrRegNumber.getOrElse(""),
@@ -237,6 +244,9 @@ class StatusController @Inject()(val landingService: LandingService,
 
   private def getBusinessName(maybeSafeId: Option[String])(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext) =
     BusinessName.getName(maybeSafeId)(hc, ac, ec, dataCache, amlsConnector)
+
+  private def getBusinessName(credId: String, safeId: Option[String], accountTypeId: (String, String))(implicit hc: HeaderCarrier, ec: ExecutionContext) =
+    BusinessName.getName(credId, safeId, accountTypeId)(hc, ec, dataCache, amlsConnector)
 }
 
 

@@ -31,6 +31,7 @@ object BusinessName {
 
   private val warn: String => Unit = msg => Logger.warn(s"[BusinessName] $msg")
 
+  @deprecated("To be removed when auth implementation is complete")
   def getNameFromCache(implicit hc: HeaderCarrier, ac: AuthContext, cache: DataCacheConnector, ec: ExecutionContext): OptionT[Future, String] =
     for {
       bm <- OptionT(cache.fetch[BusinessMatching](BusinessMatching.key))
@@ -49,6 +50,7 @@ object BusinessName {
       rd.businessName
     }
 
+  @deprecated("To be removed when auth implementation is complete")
   def getNameFromAmls(safeId: String)
                      (implicit hc: HeaderCarrier, ac: AuthContext, amls: AmlsConnector, ec: ExecutionContext, dc: DataCacheConnector) = {
     OptionT(amls.registrationDetails(safeId) map { r =>
@@ -71,6 +73,7 @@ object BusinessName {
     })
   }
 
+  @deprecated("To be removed when auth implementation is complete")
   def getName(safeId: Option[String])
              (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext, cache: DataCacheConnector, amls: AmlsConnector) =
     safeId.fold(getNameFromCache)(v => getNameFromAmls(v) orElse getNameFromCache)

@@ -34,15 +34,27 @@ class FeeConnector @Inject()(
 
   val feePaymentUrl = appConfig.feePaymentUrl
 
-  def feeResponse(amlsRegistrationNumber: String)(implicit
-                                             headerCarrier: HeaderCarrier,
-                                             ec: ExecutionContext,
-                                             reqW: Writes[FeeResponse],
-                                             ac: AuthContext
-  ): Future[FeeResponse] = {
+  @deprecated("To be removed when auth implementation is complete")
+  def feeResponse(amlsRegistrationNumber: String)
+                 (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, reqW: Writes[FeeResponse], ac: AuthContext): Future[FeeResponse] = {
 
     //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+
+    val getUrl = s"$feePaymentUrl/$accountType/$accountId/$amlsRegistrationNumber"
+    val prefix = "[FeeConnector]"
+    Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
+    http.GET[FeeResponse](getUrl) map {
+      response =>
+        Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
+        response
+    }
+  }
+
+  def feeResponse(amlsRegistrationNumber: String, accountTypeId: (String, String))
+                 (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, reqW: Writes[FeeResponse]): Future[FeeResponse] = {
+
+    val (accountType, accountId) = accountTypeId
 
     val getUrl = s"$feePaymentUrl/$accountType/$accountId/$amlsRegistrationNumber"
     val prefix = "[FeeConnector]"
