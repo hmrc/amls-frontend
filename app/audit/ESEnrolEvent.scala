@@ -32,7 +32,7 @@ object ESEnrolEvent {
   ): DataEvent =
     DataEvent(
       auditSource = AuditHelper.appName,
-      auditType = "OutboundCall",
+      auditType = "EnrolEvent",
       tags = hc.toAuditTags("Enrolment", "N/A"),
       detail = hc.toAuditDetails() ++ Map(
         "enrolment" -> Json.toJson(enrolment).toString,
@@ -51,7 +51,7 @@ object ESDeEnrolEvent {
   ): DataEvent =
     DataEvent(
       auditSource = AuditHelper.appName,
-      auditType = "OutboundCall",
+      auditType = "DeEnrolEvent",
       tags = hc.toAuditTags("DeEnrolment", "N/A"),
       detail = hc.toAuditDetails() ++ Map(
         "enrolment" -> enrolmentKey,
@@ -69,7 +69,7 @@ object ESRemoveKnownFactsEvent {
   ): DataEvent =
     DataEvent(
       auditSource = AuditHelper.appName,
-      auditType = "OutboundCall",
+      auditType = "RemoveKnownFactsEvent",
       tags = hc.toAuditTags("RemoveKnownFacts", "N/A"),
       detail = hc.toAuditDetails() ++ Map(
         "enrolment" -> enrolmentKey,
@@ -89,11 +89,49 @@ object ESEnrolFailureEvent {
   ): DataEvent =
     DataEvent(
       auditSource = AuditHelper.appName,
-      auditType = "OutboundCall",
+      auditType = "EnrolFailureEvent",
       tags = hc.toAuditTags("Enrolment", "N/A"),
       detail = hc.toAuditDetails() ++ Map(
         "enrolment" -> Json.toJson(enrolment).toString,
         "key" -> key.key,
+        "exception" -> exception.getMessage
+      )
+    )
+}
+
+object ESDeEnrolFailureEvent {
+  def apply
+  (exception: Throwable, key: String, registrationNumber: String)
+  (implicit
+   hc: HeaderCarrier,
+   reqW: Writes[TaxEnrolment]
+  ): DataEvent =
+    DataEvent(
+      auditSource = AuditHelper.appName,
+      auditType = "DeEnrolFailureEvent",
+      tags = hc.toAuditTags("Enrolment", "N/A"),
+      detail = hc.toAuditDetails() ++ Map(
+        "regNo" -> Json.toJson(registrationNumber).toString,
+        "key" -> key,
+        "exception" -> exception.getMessage
+      )
+    )
+}
+
+object ESRemoveKnownFactsFailureEvent {
+  def apply
+  (exception: Throwable, key: String, registrationNumber: String)
+  (implicit
+   hc: HeaderCarrier,
+   reqW: Writes[TaxEnrolment]
+  ): DataEvent =
+    DataEvent(
+      auditSource = AuditHelper.appName,
+      auditType = "RemoveKnownFactsFailureEvent",
+      tags = hc.toAuditTags("Enrolment", "N/A"),
+      detail = hc.toAuditDetails() ++ Map(
+        "regNo" -> Json.toJson(registrationNumber).toString,
+        "key" -> key,
         "exception" -> exception.getMessage
       )
     )

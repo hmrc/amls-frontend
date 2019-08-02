@@ -16,6 +16,7 @@
 
 package connectors
 
+import audit.{ESDeEnrolFailureEvent, ESRemoveKnownFactsFailureEvent}
 import config.{AppConfig, WSHttp}
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
 import generators.auth.UserDetailsGenerator
@@ -24,11 +25,15 @@ import models.enrolment.{AmlsEnrolmentKey, ErrorResponse, TaxEnrolment}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.ScalaFutures
-import play.api.libs.json.Json
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HttpResponse, Upstream4xxResponse}
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.http.{HttpResponse, Upstream4xxResponse, Upstream5xxResponse}
 import utils.AmlsSpec
+import uk.gov.hmrc.play.audit.model.DataEvent
+import org.mockito.ArgumentCaptor
+import org.mockito.Mockito._
+import play.api.libs.json.Json
+import uk.gov.hmrc.audit.HandlerResult
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -164,6 +169,60 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
           case ex => ex.getMessage mustBe "Group identifier is unavailable"
         }
       }
+
+      "audits the exception when a 400 error is encountered" in new Fixture {
+        val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+        val auditResult = AuditResult.fromHandlerResult(HandlerResult.Success)
+
+        when {
+          http.DELETE[HttpResponse](any())(any(), any(), any())
+        } thenReturn Future.failed(Upstream4xxResponse(jsonError("BAD_REQUEST", "Some 400 error"), BAD_REQUEST, BAD_REQUEST))
+
+        when {
+          auditConnector.sendEvent(captor.capture())(any(), any())
+        } thenReturn Future.successful(auditResult)
+
+        intercept[Upstream4xxResponse] {
+          await(connector.deEnrol(amlsRegistrationNumber))
+        } match {
+          case ex => {
+            val event = ESDeEnrolFailureEvent(ex, enrolKey.key, amlsRegistrationNumber)
+            verify(auditConnector, times(1)).sendEvent(any())(any(), any())
+            val capturedEvent = captor.getValue
+            capturedEvent.auditSource mustEqual event.auditSource
+            capturedEvent.auditType mustEqual event.auditType
+            capturedEvent.detail mustEqual event.detail
+            ex.message must include("Some 400 error")
+          }
+        }
+      }
+
+      "audits the exception when a 500 error is encountered" in new Fixture {
+        val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+        val auditResult = AuditResult.fromHandlerResult(HandlerResult.Success)
+
+        when {
+          http.DELETE[HttpResponse](any())(any(), any(), any())
+        } thenReturn Future.failed(Upstream5xxResponse(jsonError("INTERNAL_SERVER_ERROR", "Some 500 error"), INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR))
+
+        when {
+          auditConnector.sendEvent(captor.capture())(any(), any())
+        } thenReturn Future.successful(auditResult)
+
+        intercept[Upstream5xxResponse] {
+          await(connector.deEnrol(amlsRegistrationNumber))
+        } match {
+          case ex => {
+            val event = ESDeEnrolFailureEvent(ex, enrolKey.key, amlsRegistrationNumber)
+            verify(auditConnector, times(1)).sendEvent(any())(any(), any())
+            val capturedEvent = captor.getValue
+            capturedEvent.auditSource mustEqual event.auditSource
+            capturedEvent.auditType mustEqual event.auditType
+            capturedEvent.detail mustEqual event.detail
+            ex.message must include("Some 500 error")
+          }
+        }
+      }
     }
   }
 
@@ -182,7 +241,60 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
           verify(auditConnector).sendEvent(any())(any(), any())
         }
       }
+
+      "audits the exception when a 400 error is encountered" in new Fixture {
+        val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+        val auditResult = AuditResult.fromHandlerResult(HandlerResult.Success)
+
+        when {
+          http.DELETE[HttpResponse](any())(any(), any(), any())
+        } thenReturn Future.failed(Upstream4xxResponse(jsonError("BAD_REQUEST", "Some 400 error"), BAD_REQUEST, BAD_REQUEST))
+
+        when {
+          auditConnector.sendEvent(captor.capture())(any(), any())
+        } thenReturn Future.successful(auditResult)
+
+        intercept[Upstream4xxResponse] {
+          await(connector.removeKnownFacts(amlsRegistrationNumber))
+        } match {
+          case ex => {
+            val event = ESRemoveKnownFactsFailureEvent(ex, enrolKey.key, amlsRegistrationNumber)
+            verify(auditConnector, times(1)).sendEvent(any())(any(), any())
+            val capturedEvent = captor.getValue
+            capturedEvent.auditSource mustEqual event.auditSource
+            capturedEvent.auditType mustEqual event.auditType
+            capturedEvent.detail mustEqual event.detail
+            ex.message must include("Some 400 error")
+          }
+        }
+      }
+
+      "audits the exception when a 500 error is encountered" in new Fixture {
+        val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+        val auditResult = AuditResult.fromHandlerResult(HandlerResult.Success)
+
+        when {
+          http.DELETE[HttpResponse](any())(any(), any(), any())
+        } thenReturn Future.failed(Upstream5xxResponse(jsonError("INTERNAL_SERVER_ERROR", "Some 500 error"), INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR))
+
+        when {
+          auditConnector.sendEvent(captor.capture())(any(), any())
+        } thenReturn Future.successful(auditResult)
+
+        intercept[Upstream5xxResponse] {
+          await(connector.removeKnownFacts(amlsRegistrationNumber))
+        } match {
+          case ex => {
+            val event = ESRemoveKnownFactsFailureEvent(ex, enrolKey.key, amlsRegistrationNumber)
+            verify(auditConnector, times(1)).sendEvent(any())(any(), any())
+            val capturedEvent = captor.getValue
+            capturedEvent.auditSource mustEqual event.auditSource
+            capturedEvent.auditType mustEqual event.auditType
+            capturedEvent.detail mustEqual event.detail
+            ex.message must include("Some 500 error")
+          }
+        }
+      }
     }
   }
-
 }

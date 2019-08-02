@@ -17,14 +17,14 @@
 package connectors
 
 import javax.inject.Inject
-import audit.{ESDeEnrolEvent, ESEnrolEvent, ESEnrolFailureEvent, ESRemoveKnownFactsEvent}
+import audit._
 import config.{AppConfig, WSHttp}
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
 import models.enrolment.ErrorResponse._
-import models.enrolment.{AmlsEnrolmentKey, EnrolmentKey, TaxEnrolment, ErrorResponse}
+import models.enrolment.{AmlsEnrolmentKey, EnrolmentKey, ErrorResponse, TaxEnrolment}
 import play.api.Logger
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, Upstream4xxResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, Upstream4xxResponse, Upstream5xxResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import play.api.http.Status._
@@ -70,7 +70,6 @@ class TaxEnrolmentsConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth:
                 case (FORBIDDEN, ResponseCodes.invalidCredentialRole) =>
                   throw InvalidEnrolmentCredentialsException(error.toString, e)
               }
-
             case e: Throwable =>
               audit.sendEvent(ESEnrolFailureEvent(enrolment, e, enrolKey))
               warn(e.getMessage)
@@ -95,6 +94,20 @@ class TaxEnrolmentsConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth:
           http.DELETE(url) map { response =>
             audit.sendEvent(ESDeEnrolEvent(response, enrolKey))
             response
+          } recoverWith {
+            case e: Upstream4xxResponse if Json.parse(e.message).asOpt[ErrorResponse].isDefined =>
+              val error = Json.parse(e.message).as[ErrorResponse]
+              audit.sendEvent(ESDeEnrolFailureEvent(e, enrolKey, registrationNumber))
+              warn(error.toString)
+              throw e
+            case e: Upstream5xxResponse =>
+              audit.sendEvent(ESDeEnrolFailureEvent(e, enrolKey, registrationNumber))
+              warn(e.toString)
+              throw e
+            case e: Throwable =>
+              audit.sendEvent(ESDeEnrolFailureEvent(e, enrolKey, registrationNumber))
+              warn(e.toString)
+              throw e
           }
 
         case _ => throw new Exception("Group identifier is unavailable")
@@ -111,7 +124,20 @@ class TaxEnrolmentsConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth:
     http.DELETE(url) map { response =>
       audit.sendEvent(ESRemoveKnownFactsEvent(response, enrolKey))
       response
+    } recoverWith {
+      case e: Upstream4xxResponse if Json.parse(e.message).asOpt[ErrorResponse].isDefined =>
+        val error = Json.parse(e.message).as[ErrorResponse]
+        audit.sendEvent(ESRemoveKnownFactsFailureEvent(e, enrolKey, registrationNumber))
+        warn(error.toString)
+        throw e
+      case e: Upstream5xxResponse =>
+        audit.sendEvent(ESRemoveKnownFactsFailureEvent(e, enrolKey, registrationNumber))
+        warn(e.toString)
+        throw e
+      case e: Throwable =>
+        Logger.warn("removeKnownFacts:deEnrol: - Failure: Exception", e)
+        audit.sendEvent(ESRemoveKnownFactsFailureEvent(e, enrolKey, registrationNumber))
+        Future.failed(e)
     }
   }
-
 }
