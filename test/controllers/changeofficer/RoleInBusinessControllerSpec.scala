@@ -21,7 +21,7 @@ import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
-import models.businessmatching.BusinessType.{SoleProprietor => BmSoleProprietor, _}
+import models.businessmatching.BusinessType.{SoleProprietor => BmSoleProprietor}
 import models.changeofficer.{ChangeOfficer, Role, RoleInBusiness}
 import models.responsiblepeople._
 import org.jsoup.Jsoup
@@ -32,12 +32,11 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
 
 import scala.concurrent.Future
 
-class RoleInBusinessControllerSpec extends AmlsSpec with DependencyMocksNewAuth{
+class RoleInBusinessControllerSpec extends AmlsSpec{
 
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(self.authRequest)
@@ -139,5 +138,4 @@ class RoleInBusinessControllerSpec extends AmlsSpec with DependencyMocksNewAuth{
       }
     }
   }
-
 }

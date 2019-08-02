@@ -16,20 +16,19 @@
 
 package controllers.changeofficer
 
-import javax.inject.Inject
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
 import controllers.changeofficer.Helpers._
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.{Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.businessmatching.BusinessMatching
 import models.changeofficer.{ChangeOfficer, Role, RoleInBusiness}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-
-import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
+
+import scala.concurrent.Future
 
 class RoleInBusinessController @Inject()
 (authAction: AuthAction, implicit val dataCacheConnector: DataCacheConnector) extends DefaultBaseController {
@@ -42,7 +41,6 @@ class RoleInBusinessController @Inject()
       } yield {
         Ok(views.html.changeofficer.role_in_business(Form2[RoleInBusiness](co.roleInBusiness), businessType, name))
       }
-
       result getOrElse InternalServerError("Unable to get nominated officer")
   }
 

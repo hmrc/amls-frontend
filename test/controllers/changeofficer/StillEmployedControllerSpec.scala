@@ -19,17 +19,16 @@ package controllers.changeofficer
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople._
+import org.mockito.Matchers._
+import org.mockito.Mockito._
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocksNewAuth}
-import org.mockito.Matchers._
-import org.mockito.Mockito._
+import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
 
 import scala.concurrent.Future
 
-class StillEmployedControllerSpec extends AmlsSpec with DependencyMocksNewAuth {
+class StillEmployedControllerSpec extends AmlsSpec {
 
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(self.authRequest)
@@ -78,7 +77,6 @@ class StillEmployedControllerSpec extends AmlsSpec with DependencyMocksNewAuth {
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result) must be(Some(routes.NewOfficerController.get().url))
-
         }
       }
     }

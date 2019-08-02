@@ -36,14 +36,14 @@ import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocksNewAuth, StatusConstants}
+import utils._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 
 
-class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator with PrivateMethodTester with ScalaFutures with DependencyMocksNewAuth  {
+class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator with PrivateMethodTester with ScalaFutures  {
 
   trait TestFixture extends AuthorisedFixture  { self =>
     val request = addToken(self.authRequest)
@@ -163,8 +163,6 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
 
     override lazy val controller = injector.instanceOf[NewOfficerController]
   }
-
-
 
   "The NewOfficerController" when {
     "get is called" must {

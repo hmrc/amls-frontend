@@ -16,15 +16,14 @@
 
 package controllers.changeofficer
 
-import javax.inject.Inject
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
 import controllers.changeofficer.Helpers._
+import controllers.changeofficer.routes._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.changeofficer.{StillEmployed, StillEmployedNo, StillEmployedYes}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import routes._
 import utils.AuthAction
 
 import scala.concurrent.Future
