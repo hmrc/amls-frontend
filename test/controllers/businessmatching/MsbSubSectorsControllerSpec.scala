@@ -19,6 +19,7 @@ package controllers.businessmatching
 import cats.data.OptionT
 import cats.implicits._
 import config.AppConfig
+import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
@@ -46,7 +47,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
     val config = mock[AppConfig]
 
     val controller = new MsbSubSectorsController(
-      self.authConnector,
+      SuccessfulAuthAction,
       mockCacheConnector,
       createRouter[ChangeSubSectorFlowModel],
       mock[BusinessMatchingService],
@@ -58,21 +59,21 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
     val cacheMapT = OptionT.some[Future, CacheMap](mockCacheMap)
 
     when {
-      controller.businessMatchingService.updateModel(any())(any(), any(), any())
+      controller.businessMatchingService.updateModel(any(), any())(any(), any())
     } thenReturn cacheMapT
 
     when {
-      controller.helper.updateSubSectors(any())(any(), any(), any())
+      controller.helper.updateSubSectors(any(), any())(any(), any())
     } thenReturn Future.successful(mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty)
 
     def setupModel(model: Option[BusinessMatching]): Unit = when {
-      controller.businessMatchingService.getModel(any(), any(), any())
+      controller.businessMatchingService.getModel(any())(any(), any())
     } thenReturn (model match {
       case Some(bm) => OptionT.pure[Future, BusinessMatching](bm)
       case _ => OptionT.none[Future, BusinessMatching]
     })
 
-    mockApplicationStatus(NotCompleted)
+    mockApplicationStatusNewAuth(NotCompleted)
   }
 
   "ServicesController" must {

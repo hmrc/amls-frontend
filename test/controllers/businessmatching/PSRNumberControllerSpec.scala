@@ -18,6 +18,7 @@ package controllers.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._
+import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
@@ -50,7 +51,7 @@ class PSRNumberControllerSpec extends AmlsSpec
     val request = addToken(authRequest)
 
     val controller = new PSRNumberController(
-      self.authConnector,
+      SuccessfulAuthAction,
       mockCacheConnector,
       mockStatusService,
       mock[BusinessMatchingService],
@@ -66,7 +67,7 @@ class PSRNumberControllerSpec extends AmlsSpec
       mockStatusService.isPending(any())
     } thenReturn false
 
-    mockApplicationStatus(NotCompleted)
+    mockApplicationStatusNewAuth(NotCompleted)
 
     val businessMatching = businessMatchingGen.sample.get
 
@@ -83,7 +84,7 @@ class PSRNumberControllerSpec extends AmlsSpec
           businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("1"))
         )
         when {
-          controller.businessMatchingService.getModel(any(), any(), any())
+          controller.businessMatchingService.getModel(any())(any(), any())
         } thenReturn OptionT.some[Future, BusinessMatching](model)
 
         val result = controller.get()(request)
@@ -99,7 +100,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         }
 
         when {
-          controller.businessMatchingService.getModel(any(), any(), any())
+          controller.businessMatchingService.getModel(any())(any(), any())
         } thenReturn OptionT.some[Future, BusinessMatching](businessMatching)
 
         val result = controller.get()(request)
@@ -116,11 +117,11 @@ class PSRNumberControllerSpec extends AmlsSpec
         val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
 
         when {
-          controller.helper.getOrCreateFlowModel(any(), any(), any())
+          controller.helper.getOrCreateFlowModel(any())(any(), any())
         } thenReturn Future.successful(flowModel)
 
         when {
-          controller.helper.updateSubSectors(any())(any(), any(), any())
+          controller.helper.updateSubSectors(any(), any())(any(), any())
         } thenReturn Future.successful((mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty))
 
         val newRequest = request.withFormUrlEncodedBody(
@@ -143,7 +144,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
 
         when {
-          controller.helper.getOrCreateFlowModel(any(), any(), any())
+          controller.helper.getOrCreateFlowModel(any())(any(), any())
         } thenReturn Future.successful(flowModel)
 
         mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel.empty)
@@ -165,7 +166,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         )
 
         when {
-          controller.businessMatchingService.getModel(any(), any(), any())
+          controller.businessMatchingService.getModel(any())(any(), any())
         } thenReturn OptionT.some[Future, BusinessMatching](businessMatching)
 
         val result = controller.post()(newRequest)

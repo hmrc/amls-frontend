@@ -66,7 +66,7 @@ class DataCacheConnector @Inject()(val cacheConnector: MongoCacheConnector){
   def removeByKey[T](credId: String, key: String)(implicit hc: HeaderCarrier, format: Format[T]): Future[CacheMap] = {
     cacheConnector.removeByKey(credId, key)
   }
-
+@deprecated
   def update[T](key: String)(f: Option[T] => T)(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
     cacheConnector.update(key)(f)
 
