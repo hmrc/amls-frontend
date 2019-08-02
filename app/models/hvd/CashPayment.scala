@@ -20,7 +20,16 @@ import org.joda.time.LocalDate
 import play.api.libs.json.{Reads, Writes, _}
 
 
-case class CashPayment(acceptedPayment: CashPaymentOverTenThousandEuros, firstDate: Option[CashPaymentFirstDate])
+case class CashPayment(acceptedPayment: CashPaymentOverTenThousandEuros, firstDate: Option[CashPaymentFirstDate]) {
+
+  def isCashPaymentsComplete: Boolean = {
+    this match {
+      case CashPayment(CashPaymentOverTenThousandEuros(true), Some(_)) => true
+      case CashPayment(CashPaymentOverTenThousandEuros(false), None) => true
+      case _ => false
+    }
+  }
+}
 
 object CashPayment {
 
