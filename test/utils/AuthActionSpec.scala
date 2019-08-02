@@ -181,7 +181,7 @@ object AuthActionSpec extends AmlsReferenceNumberGenerator{
     Enrolment("HMRC-MLR-ORG", Seq(EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Activated")
   ))
   private def orgAuthRetrievals = Future.successful(
-    new ~(new ~(enrolments, Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Organisation))
+    new ~ (new ~(new ~(enrolments, Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Organisation)), Some("groupIdentifier"))
   )
 
   val enrolmentsSa = Enrolments(Set(
@@ -190,7 +190,7 @@ object AuthActionSpec extends AmlsReferenceNumberGenerator{
     Enrolment("IR-SA", Seq(EnrolmentIdentifier("UTR", "saRef")), "Activated")
   ))
   private def agentSaAuthRetrievals = Future.successful(
-    new ~(new ~(enrolmentsSa, Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Agent))
+    new ~(new ~(new~(enrolmentsSa, Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Agent)), Some("groupIdentifier"))
   )
 
   val enrolmentsCt = Enrolments(Set(
@@ -199,14 +199,14 @@ object AuthActionSpec extends AmlsReferenceNumberGenerator{
     Enrolment("IR-CT", Seq(EnrolmentIdentifier("UTR", "ctRef")), "Activated")
   ))
   private def agentCtAuthRetrievals = Future.successful(
-    new ~(new ~(enrolmentsCt, Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Agent))
+    new ~(new ~(new ~(enrolmentsCt, Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Agent)), Some("groupIdentifier"))
   )
 
   private def emptyAuthRetrievals = Future.successful(
-    new ~(new ~(Enrolments(Set()), Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Organisation))
+    new ~(new ~(new ~(Enrolments(Set()), Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Organisation)), Some("groupIdentifier"))
   )
   private def erroneousRetrievals = Future.successful(
-    new ~(new ~(Enrolments(Set()), None), Some(AffinityGroup.Organisation))
+    new ~(new ~(new ~(Enrolments(Set()), None), Some(AffinityGroup.Organisation)), Some("groupIdentifier"))
   )
 
   class Harness(authAction: AuthAction) extends Controller {

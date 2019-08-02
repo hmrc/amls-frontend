@@ -38,7 +38,7 @@ final case class AuthorisedRequest[A](request: Request[A],
                                       affinityGroup: AffinityGroup,
                                       enrolments: Enrolments,
                                       accountTypeId: (String, String),
-                                      groupIdentifier: Option[String] = None) extends WrappedRequest[A](request)
+                                      groupIdentifier: Option[String]) extends WrappedRequest[A](request)
 
 final case class enrolmentNotFound(msg: String = "enrolmentNotFound") extends AuthorisationException(msg)
 
@@ -65,7 +65,7 @@ class DefaultAuthAction @Inject() (
         Retrievals.affinityGroup and
         Retrievals.groupIdentifier
     ) {
-      case enrolments ~ Some(credentials) ~ Some(affinityGroup) ~ groupId =>
+      case enrolments ~ Some(credentials) ~ Some(affinityGroup) ~ groupIdentifier =>
         Logger.debug("DefaultAuthAction:Refine - Enrolments:" + enrolments)
 
         Future.successful(
@@ -77,7 +77,7 @@ class DefaultAuthAction @Inject() (
               affinityGroup,
               enrolments,
               accountTypeAndId(affinityGroup, enrolments, credentials.providerId),
-              groupId
+              groupIdentifier
             )
           )
         )

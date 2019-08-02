@@ -42,8 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
-                                         implicit val dataCacheConnector: DataCacheConnector
-                                   ) {
+                                         implicit val dataCacheConnector: DataCacheConnector) {
 
   def removeSectionData(model: RemoveBusinessTypeFlowModel)
                        (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Seq[CacheMap]] = {

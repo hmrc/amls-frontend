@@ -159,7 +159,6 @@ class HvdSpec extends PlaySpec with MockitoSugar {
         when(cache.getEntry[Hvd]("hvd")) thenReturn None
 
         Hvd.section must be(notStartedSection)
-
       }
 
       "return a Completed Section when model is complete" in new HvdTestFixture {

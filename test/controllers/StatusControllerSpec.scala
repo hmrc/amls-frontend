@@ -265,7 +265,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
           val result = controller.get()(request)
           status(result) must be(OK)
 
-          contentAsString(result) must include(Messages("status.submissionreadyforreview.nofee.description"))
+          contentAsString(result) must include(Messages("status.submissionreadyforreview.description.no.fee"))
         }
       }
 
