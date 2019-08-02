@@ -17,6 +17,7 @@
 package controllers.changeofficer
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
@@ -28,11 +29,11 @@ import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, AmlsSpec, StatusConstants}
+import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocksNewAuth, StatusConstants}
 
 import scala.concurrent.Future
 
-class RemoveResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar {
+class RemoveResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar with DependencyMocksNewAuth {
 
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(self.authRequest)
@@ -40,7 +41,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar {
     val dataCacheConnector = mock[DataCacheConnector]
 
     val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .build()
 
@@ -57,11 +58,11 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar {
     )
 
     when {
-      dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any())
+      dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any())
     } thenReturn Future.successful(Some(Seq(nominatedOfficer, otherResponsiblePerson)))
 
     when {
-      controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any())
+      controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(),any(), any())( any(), any())
     } thenReturn Future.successful(CacheMap("", Map.empty))
 
   }
@@ -80,7 +81,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar {
         "nominated officer name cannot be found" in new TestFixture {
 
           when {
-            dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any())
+            dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any())
           } thenReturn Future.successful(None)
 
           val result = controller.get()(request)
@@ -118,7 +119,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar {
           "invalid form is submitted" in new TestFixture {
 
             when {
-              dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any())
+              dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(),any())( any(), any())
             } thenReturn Future.successful(None)
 
             val result = controller.post()(request)
@@ -128,7 +129,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar {
           "valid form is submitted" in new TestFixture {
 
             when {
-              dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any())
+              dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(),any())( any(), any())
             } thenReturn Future.successful(None)
 
             val result = controller.post()(request.withFormUrlEncodedBody(
@@ -155,7 +156,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar {
 
       status(result) mustBe SEE_OTHER
 
-      verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), meq(
+      verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(), meq(
         Seq(
           nominatedOfficer.copy(
             endDate = Some(ResponsiblePersonEndDate(new LocalDate(2001,11,10))),
@@ -164,7 +165,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar {
           ),
           otherResponsiblePerson
         )
-      ))(any(),any(),any())
+      ))(any(),any())
 
     }
   }

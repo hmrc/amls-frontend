@@ -39,6 +39,7 @@ class DataCacheConnector @Inject()(val cacheConnector: MongoCacheConnector){
   @deprecated("To be removed when auth implementation is complete")
   def save[T](key: String, data: T)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
     cacheConnector.save(key, data)
+
   def save[T](credId: String, key: String, data: T)(implicit hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
     cacheConnector.save(credId, key, data)
 

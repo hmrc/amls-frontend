@@ -17,33 +17,33 @@
 package controllers.changeofficer
 
 import javax.inject.Inject
-
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import controllers.changeofficer.Helpers._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.changeofficer.{StillEmployed, StillEmployedNo, StillEmployedYes}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import routes._
+import utils.AuthAction
 
 import scala.concurrent.Future
 
-class StillEmployedController @Inject()
-(val authConnector: AuthConnector, implicit val dataCacheConnector: DataCacheConnector) extends BaseController {
+class StillEmployedController @Inject()(authAction: AuthAction, implicit val dataCacheConnector: DataCacheConnector)
+                              extends DefaultBaseController {
 
-  def get = Authorised.async {
-    implicit authContext => implicit request =>
-      (getNominatedOfficerName map (name =>
+  def get = authAction.async {
+     implicit request =>
+      (getNominatedOfficerName(request.credId) map (name =>
         Ok(views.html.changeofficer.still_employed(EmptyForm, name))
         )) getOrElse Redirect(NewOfficerController.get())
   }
 
-  def post = Authorised.async {
-    implicit authContext => implicit request =>
+  def post = authAction.async {
+    implicit request =>
       Form2[StillEmployed](request.body) match {
         case x: InvalidForm =>
-          (getNominatedOfficerName map (name =>
+          (getNominatedOfficerName(request.credId) map (name =>
             BadRequest(views.html.changeofficer.still_employed(x, name))
             )) getOrElse InternalServerError("No responsible people found")
         case ValidForm(_, data) =>

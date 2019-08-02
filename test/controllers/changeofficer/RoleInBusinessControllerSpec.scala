@@ -17,6 +17,7 @@
 package controllers.changeofficer
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
@@ -32,11 +33,11 @@ import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
-class RoleInBusinessControllerSpec extends AmlsSpec {
+class RoleInBusinessControllerSpec extends AmlsSpec with DependencyMocksNewAuth{
 
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(self.authRequest)
@@ -44,7 +45,7 @@ class RoleInBusinessControllerSpec extends AmlsSpec {
     val cache = mock[DataCacheConnector]
 
     val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[DataCacheConnector].to(cache))
       .build()
 
@@ -67,15 +68,15 @@ class RoleInBusinessControllerSpec extends AmlsSpec {
       "XA123456789",
       None)
 
-    when(cache.fetch[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any(), any(), any()))
+    when(cache.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any(), any()))
       .thenReturn(Future.successful(Some(Seq(nominatedOfficer, otherResponsiblePerson))))
 
     when {
-      cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+      cache.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any())
     } thenReturn Future.successful(Some(BusinessMatching(Some(details))))
 
     when {
-      cache.fetch[ChangeOfficer](eqTo(ChangeOfficer.key))(any(), any(), any())
+      cache.fetch[ChangeOfficer](any(),eqTo(ChangeOfficer.key))(any(), any())
     } thenReturn Future.successful(Some(ChangeOfficer(RoleInBusiness(Set(models.changeofficer.SoleProprietor)))))
   }
 
@@ -104,7 +105,7 @@ class RoleInBusinessControllerSpec extends AmlsSpec {
       "redirect to NewOfficerController" when {
         "a role is selected without 'none of the above' being selected" in new TestFixture {
 
-          when(cache.save(any(), any())(any(),any(), any()))
+          when(cache.save(any(), any(), any())(any(),any()))
             .thenReturn(Future.successful(mock[CacheMap]))
 
           val result = controller.post()(request.withFormUrlEncodedBody("positions[]" -> "06"))
@@ -112,13 +113,13 @@ class RoleInBusinessControllerSpec extends AmlsSpec {
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(routes.NewOfficerController.get().url)
 
-          verify(cache).save(eqTo(ChangeOfficer.key), eqTo(ChangeOfficer(RoleInBusiness(Set(models.changeofficer.SoleProprietor)))))(any(),any(),any())
+          verify(cache).save(any(),eqTo(ChangeOfficer.key), eqTo(ChangeOfficer(RoleInBusiness(Set(models.changeofficer.SoleProprietor)))))(any(),any())
         }
       }
       "redirect to RemoveResponsiblePersonController" when {
         "'none of the above' is selected" in new TestFixture {
 
-          when(cache.save(any(), any())(any(),any(), any()))
+          when(cache.save(any(), any(), any())(any(),any()))
             .thenReturn(Future.successful(mock[CacheMap]))
 
           val result = controller.post()(request.withFormUrlEncodedBody("positions[]" -> ""))
@@ -126,7 +127,7 @@ class RoleInBusinessControllerSpec extends AmlsSpec {
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(routes.RemoveResponsiblePersonController.get().url)
 
-          verify(cache).save(eqTo(ChangeOfficer.key), eqTo(ChangeOfficer(RoleInBusiness(Set.empty[Role]))))(any(),any(),any())
+          verify(cache).save(any(), eqTo(ChangeOfficer.key), eqTo(ChangeOfficer(RoleInBusiness(Set.empty[Role]))))(any(),any())
         }
       }
 

@@ -67,7 +67,7 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
     } thenReturn Future.successful(Some(responsiblePeopleWithEmptyPerson))
 
     when {
-      cache.fetch[ChangeOfficer](eqTo(ChangeOfficer.key), any())(any(), any())
+      cache.fetch[ChangeOfficer](any(),eqTo(ChangeOfficer.key))(any(), any())
     } thenReturn Future.successful(Some(changeOfficer))
   }
 
@@ -188,7 +188,7 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
 
         status(result) mustBe OK
 
-        verify(cache).fetch(eqTo(ResponsiblePerson.key), any())(any(), any())
+        verify(cache).fetch(any(), eqTo(ResponsiblePerson.key))(any(), any())
 
         val html = Jsoup.parse(contentAsString(result))
         html.select(s"input[type=radio][value=IncompletePerson]").size() mustBe 0
@@ -202,11 +202,11 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
         val model = ChangeOfficer(RoleInBusiness(Set(SoleProprietor)), Some(NewOfficer("TestPerson")))
 
         when {
-          cache.fetch[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key), any())(any(), any())
+          cache.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any(), any())
         } thenReturn Future.successful(Some(responsiblePeople))
 
         when {
-          cache.fetch[ChangeOfficer](eqTo(ChangeOfficer.key),any())(any(), any())
+          cache.fetch[ChangeOfficer](any(), eqTo(ChangeOfficer.key))(any(), any())
         } thenReturn Future.successful(Some(model))
 
         val result = controller.get()(request)
@@ -294,12 +294,12 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
         )
 
         when {
-          cache.fetch[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key), any())(any(), any())
+          cache.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any(), any())
         } thenReturn Future.successful(Some(responsiblePeople))
 
         val getPeopleAndSelectedOfficer = PrivateMethod[OptionT[Future, (NewOfficer, Seq[ResponsiblePerson])]]('getPeopleAndSelectedOfficer)
 
-        val result = controller invokePrivate getPeopleAndSelectedOfficer(HeaderCarrier(), mock[AuthAction]) getOrElse fail("Could not retrieve")
+        val result = controller invokePrivate getPeopleAndSelectedOfficer("credid", HeaderCarrier()) getOrElse fail("Could not retrieve")
 
         await(result) must equal((
           NewOfficer(""),
@@ -371,7 +371,7 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
       "return cache map without deleted rp (if rp was not submitted)" in new TestFixtureForDeleteOldOfficer {
         val deleteOldOfficer = PrivateMethod[Future[Product]]('deleteOldOfficer)
 
-        val result = controller invokePrivate deleteOldOfficer(oldOfficer, 1, mock[AuthAction], HeaderCarrier())
+        val result = controller invokePrivate deleteOldOfficer("credid", oldOfficer, 1, HeaderCarrier())
 
         Await.result(result, 1 second) mustEqual cacheMap
 
@@ -393,7 +393,7 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
 
         val deleteOldOfficer = PrivateMethod[Future[Product]]('deleteOldOfficer)
 
-        val result = controller invokePrivate deleteOldOfficer(oldOfficer, 1, mock[AuthAction], HeaderCarrier())
+        val result = controller invokePrivate deleteOldOfficer("credid", oldOfficer, 1, HeaderCarrier())
 
         Await.result(result, 1 second) mustBe None
       }
