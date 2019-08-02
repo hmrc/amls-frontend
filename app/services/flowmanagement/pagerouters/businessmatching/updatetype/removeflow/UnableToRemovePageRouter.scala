@@ -40,6 +40,14 @@ class UnableToRemovePageRouter @Inject()(val statusService: StatusService,
                            ): Future[Result] = {
     Future.successful(Redirect(controllers.routes.StatusController.get()))
   }
+
+  override def getPageRouteNewAuth(credId: String, model: RemoveBusinessTypeFlowModel, edit: Boolean = false)
+                           (implicit hc: HeaderCarrier,
+                            ec: ExecutionContext
+
+                           ): Future[Result] = {
+    Future.successful(Redirect(controllers.routes.StatusController.get()))
+  }
 }
 
 

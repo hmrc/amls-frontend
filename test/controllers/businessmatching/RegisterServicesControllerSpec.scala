@@ -87,7 +87,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
     val controller = app.injector.instanceOf[RegisterServicesController]
 
     when {
-      controller.statusService.isPreSubmission(any())(any(), any())
+      controller.statusService.isPreSubmission(Some(any()), any(), any())(any(), any())
     } thenReturn Future.successful(true)
 
     when {
@@ -647,7 +647,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.businessMatchingService, times(1)).clearSection(any(), eqTo(HighValueDealing))(any(), any())
+          verify(controller.businessMatchingService, times(1)).clearSection(any(), eqTo(HighValueDealing))(any())
         }
 
         "MSB is not selected, but was previously" in new Fixture {

@@ -32,4 +32,11 @@ class NoPsrNumberPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
     routes.SummaryController.get()
 
   }
+
+  override def getPageRouteNewAuth(credId: String, model: ChangeSubSectorFlowModel, edit: Boolean)
+                           (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+
+    routes.SummaryController.get()
+
+  }
 }

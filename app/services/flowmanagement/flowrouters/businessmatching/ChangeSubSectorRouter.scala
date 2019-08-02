@@ -40,5 +40,12 @@ class ChangeSubSectorRouter @Inject()(
     case PsrNumberPageId => psrNumberRouter.getPageRoute(model, edit)
     case NoPSRPageId => noPsrRouter.getPageRoute(model, edit)
   }
+
+  override def getRouteNewAuth(credId: String, pageId: PageId, model: ChangeSubSectorFlowModel, edit: Boolean)
+                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = pageId match {
+    case SubSectorsPageId => subSectorRouter.getPageRouteNewAuth(credId, model, edit)
+    case PsrNumberPageId => psrNumberRouter.getPageRouteNewAuth(credId, model, edit)
+    case NoPSRPageId => noPsrRouter.getPageRouteNewAuth(credId, model, edit)
+  }
 }
 // $COVERAGE_ON$

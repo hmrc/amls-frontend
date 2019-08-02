@@ -38,4 +38,15 @@ class MsbSubSectorsPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
 
     result.fold(error(SubSectorsPageId))(Redirect)
   }
+
+  override def getPageRouteNewAuth(credId: String, model: ChangeSubSectorFlowModel, edit: Boolean)
+                           (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+    val result = model.subSectors map {
+      case sectors if sectors.contains(TransmittingMoney) =>
+        routes.PSRNumberController.get(edit)
+      case _ => routes.SummaryController.get()
+    }
+
+    result.fold(error(SubSectorsPageId))(Redirect)
+  }
 }

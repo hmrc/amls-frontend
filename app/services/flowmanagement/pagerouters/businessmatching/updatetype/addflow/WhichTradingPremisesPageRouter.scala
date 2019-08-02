@@ -43,6 +43,15 @@ class WhichTradingPremisesPageRouter @Inject()(val statusService: StatusService,
       case false => Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
     }
   }
+
+  override def getPageRouteNewAuth(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)
+                           (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+
+    model.subSectors.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.size > 1 match {
+      case true => Future.successful(Redirect(addRoutes.WhatDoYouDoHereController.get(edit)))
+      case false => Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
+    }
+  }
 }
 
 

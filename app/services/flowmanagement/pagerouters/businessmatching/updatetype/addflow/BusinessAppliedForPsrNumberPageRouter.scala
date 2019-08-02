@@ -47,6 +47,18 @@ class BusinessAppliedForPsrNumberPageRouter @Inject()(val statusService: StatusS
       case (_, None) => Future.successful(error(PsrNumberPageId))
     }
   }
+
+  override def getPageRouteNewAuth(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)
+                           (implicit hc: HeaderCarrier,
+                            ec: ExecutionContext
+                           ): Future[Result] = {
+    (edit, model.businessAppliedForPSRNumber) match {
+      case (true, Some(BusinessAppliedForPSRNumberYes(_))) => Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
+      case (false, Some(BusinessAppliedForPSRNumberYes(_))) => Future.successful(Redirect(addRoutes.FitAndProperController.get()))
+      case (_, Some(BusinessAppliedForPSRNumberNo)) => Future.successful(Redirect(addRoutes.NoPsrController.get()))
+      case (_, None) => Future.successful(error(PsrNumberPageId))
+    }
+  }
 }
 
 

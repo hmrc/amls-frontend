@@ -30,6 +30,11 @@ trait PageRouter[A] {
                                                               ec: ExecutionContext
   ): Future[Result]
 
+  def getPageRouteNewAuth(credId: String, model: A, edit: Boolean = false)(implicit
+                                                    hc: HeaderCarrier,
+                                                    ec: ExecutionContext
+  ): Future[Result]
+
   implicit def toFutureRedirect(call: Call): Future[Result] = Future.successful(Redirect(call))
   implicit def toFuture(result: Result): Future[Result] = Future.successful(result)
 

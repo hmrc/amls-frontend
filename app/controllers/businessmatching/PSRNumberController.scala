@@ -53,7 +53,7 @@ class PSRNumberController @Inject()(authAction: AuthAction,
 
   def post(edit: Boolean = false) = authAction.async {
       implicit request => {
-        val route = router.getRoute(request.credId, PsrNumberPageId, _: ChangeSubSectorFlowModel, edit)
+        val route = router.getRouteNewAuth(request.credId, PsrNumberPageId, _: ChangeSubSectorFlowModel, edit)
         Form2[BusinessAppliedForPSRNumber](request.body) match {
           case f: InvalidForm =>
             (for {

@@ -48,4 +48,16 @@ class RemoveBusinessTypeRouter @Inject()(val businessMatchingService: BusinessMa
       case _ => throw new Exception("PagId not in remove flow")
     }
   }
+
+  override def getRouteNewAuth(credId: String, pageId: PageId, model: RemoveBusinessTypeFlowModel, edit: Boolean = false)
+                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+    pageId match {
+      case WhatBusinessTypesToRemovePageId => whatServicesToRemovePageRouter.getPageRouteNewAuth(credId, model, edit)
+      case NeedToUpdatePageId => needToUpdatePageRouter.getPageRouteNewAuth(credId, model, edit)
+      case RemoveBusinessTypesSummaryPageId => removeServicesSummaryPageRouter.getPageRouteNewAuth(credId, model, edit)
+      case UnableToRemovePageId => unableToRemovePageRouter.getPageRouteNewAuth(credId, model, edit)
+      case WhatDateRemovedPageId => whatDateToRemovePageRouter.getPageRouteNewAuth(credId, model, edit)
+      case _ => throw new Exception("PagId not in remove flow")
+    }
+  }
 }

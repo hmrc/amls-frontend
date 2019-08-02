@@ -42,6 +42,15 @@ class WhichFitAndProperPageRouter @Inject()(val statusService: StatusService,
       case false => Future.successful(Redirect(addRoutes.TradingPremisesController.get(edit)))
     }
   }
+
+  override def getPageRouteNewAuth(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)
+                           (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+
+    edit match {
+      case true => Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
+      case false => Future.successful(Redirect(addRoutes.TradingPremisesController.get(edit)))
+    }
+  }
 }
 
 

@@ -41,6 +41,13 @@ class NoPSRPageRouter @Inject()(val statusService: StatusService,
                            ): Future[Result] = {
     Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
   }
+
+  override def getPageRouteNewAuth(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)
+                           (implicit hc: HeaderCarrier,
+                            ec: ExecutionContext
+                           ): Future[Result] = {
+    Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
+  }
 }
 
 

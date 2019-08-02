@@ -58,4 +58,25 @@ class RemoveBusinessTypesSummaryPageRouter @Inject()(val statusService: StatusSe
     }
 
   }
+
+  override def getPageRouteNewAuth(credId: String, model: RemoveBusinessTypeFlowModel, edit: Boolean = false)
+                           (implicit hc: HeaderCarrier,
+                            ec: ExecutionContext
+                           ): Future[Result] = {
+
+    val allTpComplete = (tp: Seq[TradingPremises]) => tp.forall(_.isComplete)
+
+    dataCacheConnector.fetch[Seq[TradingPremises]](credId, TradingPremises.key) map {
+
+      case Some(tp) =>
+        model.activitiesToRemove map { m =>
+          if(m.contains(AccountancyServices) || !allTpComplete(tp)) {
+            Redirect(removeRoutes.NeedMoreInformationController.get())
+          } else {
+            Redirect(controllers.routes.RegistrationProgressController.get())
+          }
+        }  getOrElse InternalServerError("Could not do the get the route for RemoveBusinessTypesSummaryPageRouter")
+    }
+
+  }
 }

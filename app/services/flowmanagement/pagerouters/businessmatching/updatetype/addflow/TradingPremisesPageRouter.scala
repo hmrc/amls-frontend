@@ -48,4 +48,19 @@ class TradingPremisesPageRouter @Inject()(val statusService: StatusService,
       }
     }
   }
+
+  override def getPageRouteNewAuth(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)
+                           (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+
+    if (edit && model.tradingPremisesActivities.isDefined) {
+      Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
+    } else {
+      model.areNewActivitiesAtTradingPremises match {
+        case Some(true) =>
+          Future.successful(Redirect(addRoutes.WhichTradingPremisesController.get(edit)))
+        case _ =>
+          Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
+      }
+    }
+  }
 }

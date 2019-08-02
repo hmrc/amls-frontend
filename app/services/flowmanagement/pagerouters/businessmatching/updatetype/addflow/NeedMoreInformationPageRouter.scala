@@ -38,4 +38,11 @@ class NeedMoreInformationPageRouter extends PageRouter[AddBusinessTypeFlowModel]
     Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
 
   }
+
+  override def getPageRouteNewAuth(credId: String, model: AddBusinessTypeFlowModel = new AddBusinessTypeFlowModel(), edit: Boolean = false)
+                           (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+
+    Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+
+  }
 }

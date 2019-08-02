@@ -41,6 +41,14 @@ class WhatDateToRemovePageRouter @Inject()(val statusService: StatusService,
                            ): Future[Result] = {
     Future.successful(Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get()))
   }
+
+  override def getPageRouteNewAuth(credId: String, model: RemoveBusinessTypeFlowModel, edit: Boolean = false)
+                           (implicit hc: HeaderCarrier,
+                            ec: ExecutionContext
+
+                           ): Future[Result] = {
+    Future.successful(Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get()))
+  }
 }
 
 

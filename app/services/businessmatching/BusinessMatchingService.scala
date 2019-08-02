@@ -100,10 +100,16 @@ class BusinessMatchingService @Inject()(
 
   def getSubmittedBusinessActivities(implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
     getActivitySet(_ intersect _)
-
+@deprecated("To be removed when wuth implementation is complete")
   def getRemainingBusinessActivities(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
     for {
       model <- getModel
+      activities <- OptionT.fromOption[Future](model.activities)
+    } yield BusinessActivities.all diff activities.businessActivities
+
+  def getRemainingBusinessActivities(credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
+    for {
+      model <- getModel(credId)
       activities <- OptionT.fromOption[Future](model.activities)
     } yield BusinessActivities.all diff activities.businessActivities
 

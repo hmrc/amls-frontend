@@ -54,8 +54,8 @@ class MsbSubSectorsController @Inject()(authAction: AuthAction,
   }
 
   def post(edit: Boolean = false) = authAction.async {
-    import jto.validation.forms.Rules._
       implicit request =>
+        import jto.validation.forms.Rules._
         Form2[BusinessMatchingMsbServices](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.businessmatching.services(f, edit, fxEnabledToggle = config.fxEnabledToggle)))
@@ -65,9 +65,9 @@ class MsbSubSectorsController @Inject()(authAction: AuthAction,
               _.getOrElse(ChangeSubSectorFlowModel()).copy(subSectors = Some(data.msbServices))
             } flatMap {
               case Some(m@ChangeSubSectorFlowModel(Some(set), _)) if !(set contains TransmittingMoney) =>
-                helper.updateSubSectors(request.credId, m) flatMap { _ => router.getRoute(request.credId, SubSectorsPageId, m) }
+                helper.updateSubSectors(request.credId, m) flatMap { _ => router.getRouteNewAuth(request.credId, SubSectorsPageId, m) }
               case Some(updatedModel) =>
-                router.getRoute(request.credId, SubSectorsPageId, updatedModel)
+                router.getRouteNewAuth(request.credId, SubSectorsPageId, updatedModel)
             }
         }
   }
