@@ -17,24 +17,24 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
-import models.moneyservicebusiness.{BranchesOrAgentsHasCountries, BranchesOrAgents, MoneyServiceBusiness}
+import models.moneyservicebusiness.{BranchesOrAgents, BranchesOrAgentsHasCountries, MoneyServiceBusiness}
 import play.api.mvc.Call
 import services.AutoCompleteService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 
 import scala.concurrent.Future
 
 class BranchesOrAgentsController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                            val authConnector: AuthConnector,
+                                            authAction: AuthAction,
                                             val autoCompleteService: AutoCompleteService
-                                           ) extends BaseController {
+                                           ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
         response =>
           val form = (for {
             msb <- response
@@ -45,21 +45,18 @@ class BranchesOrAgentsController @Inject() (val dataCacheConnector: DataCacheCon
   }
 
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request =>
       Form2[BranchesOrAgentsHasCountries](request.body) match {
-
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.msb.branches_or_agents(f, edit)))
-
         case ValidForm(_, data) => {
           for {
-            msb <-  dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
+            msb <-  dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
             boa: BranchesOrAgents <- Future(msb.flatMap((m:MoneyServiceBusiness) => m.branchesOrAgents)
               .map((boa:BranchesOrAgents) => BranchesOrAgents.update(boa, data))
               .getOrElse(BranchesOrAgents(data, None)))
-            _ <- dataCacheConnector.save(MoneyServiceBusiness.key, msb.branchesOrAgents(boa))
+            _ <- dataCacheConnector.save(request.credId, MoneyServiceBusiness.key, msb.branchesOrAgents(boa))
           } yield Redirect(getNextPage(data, edit))
         }
     }

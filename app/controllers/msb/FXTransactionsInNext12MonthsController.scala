@@ -17,27 +17,26 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.moneyservicebusiness.{FXTransactionsInNext12Months, MoneyServiceBusiness}
 import services.StatusService
 import services.businessmatching.ServiceFlow
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.msb.fx_transaction_in_next_12_months
 
 import scala.concurrent.Future
 
-class FXTransactionsInNext12MonthsController @Inject()(val authConnector: AuthConnector,
+class FXTransactionsInNext12MonthsController @Inject()(authAction: AuthAction,
                                                        implicit val dataCacheConnector: DataCacheConnector,
                                                        implicit val statusService: StatusService,
                                                        implicit val serviceFlow: ServiceFlow
-                                                      ) extends BaseController {
+                                                      ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+        dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
           response =>
             val form: Form2[FXTransactionsInNext12Months] = (for {
               msb <- response
@@ -47,16 +46,15 @@ class FXTransactionsInNext12MonthsController @Inject()(val authConnector: AuthCo
         }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request => {
         Form2[FXTransactionsInNext12Months](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(fx_transaction_in_next_12_months(f, edit)))
           case ValidForm(_, data) =>
             for {
-              msb <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
-              _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
+              msb <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
+              _ <- dataCacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
                 msb.fxTransactionsInNext12Months(data)
               )
             } yield Redirect(routes.SummaryController.get())

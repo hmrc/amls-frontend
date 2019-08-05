@@ -17,30 +17,27 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessMatching, BusinessMatchingMsbService, CurrencyExchange, ForeignExchange}
 import models.moneyservicebusiness.{MoneyServiceBusiness, SendMoneyToOtherCountry}
-import play.api.mvc.Result
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.msb.send_money_to_other_country
 
 import scala.concurrent.Future
 
 class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                  val authConnector: AuthConnector,
+                                                  authAction: AuthAction,
                                                   val statusService: StatusService
-                                                 ) extends BaseController {
+                                                 ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map { response =>
+        dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map { response =>
           val form: Form2[SendMoneyToOtherCountry] = (for {
             msb <- response
             money <- msb.sendMoneyToOtherCountry
@@ -50,14 +47,13 @@ class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCa
         }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request => {
         Form2[SendMoneyToOtherCountry](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(send_money_to_other_country(f, edit)))
           case ValidForm(_, data) =>
-            dataCacheConnector.fetchAll flatMap { maybeCache =>
+            dataCacheConnector.fetchAll(request.credId) flatMap { maybeCache =>
               val result = for {
                 cache <- maybeCache
                 msb <- cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
@@ -66,7 +62,7 @@ class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCa
                 register <- cache.getEntry[ServiceChangeRegister](ServiceChangeRegister.key) orElse Some(ServiceChangeRegister())
               } yield {
                 data.money match {
-                  case true => dataCacheConnector.save(MoneyServiceBusiness.key, msb.sendMoneyToOtherCountry(data)) map {
+                  case true => dataCacheConnector.save(request.credId, MoneyServiceBusiness.key, msb.sendMoneyToOtherCountry(data)) map {
                     _ => Redirect(routes.SendTheLargestAmountsOfMoneyController.get(edit))
                   }
                   case _ => val newModel = msb
@@ -74,7 +70,7 @@ class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCa
                     .sendTheLargestAmountsOfMoney(None)
                     .mostTransactions(None)
 
-                    dataCacheConnector.save(MoneyServiceBusiness.key, newModel) map {
+                    dataCacheConnector.save(request.credId, MoneyServiceBusiness.key, newModel) map {
                     _ => if(edit) {
                       Redirect(routes.SummaryController.get())
                     } else {
@@ -106,7 +102,7 @@ class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCa
   }
 
   private def routing(services: Set[BusinessMatchingMsbService], register: ServiceChangeRegister, msb: MoneyServiceBusiness, edit: Boolean)
-                     (implicit ac: AuthContext, hc: HeaderCarrier) = {
+                     (implicit hc: HeaderCarrier) = {
 
     val (ceQuestion, fxQuestion) = (shouldAnswerCurrencyExchangeQuestion(services, register, msb), shouldAnswerForeignExchangeQuestion(services, register, msb))
 
