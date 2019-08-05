@@ -17,26 +17,25 @@
 package controllers.supervision
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.supervision._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.supervision.supervision_end_reasons
 
 import scala.concurrent.Future
 
 class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                val authConnector: AuthConnector
-                                               ) extends BaseController {
+                                                val authAction: AuthAction
+                                               ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        dataCacheConnector.fetch[Supervision](Supervision.key) map {
+        dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map {
           case Some(Supervision(anotherBody, _, _, _, _, _)) if getEndReasons(anotherBody).isDefined
           => Ok(supervision_end_reasons(Form2[SupervisionEndReasons](SupervisionEndReasons(getEndReasons(anotherBody).get)), edit))
           case _ => Ok(supervision_end_reasons(EmptyForm, edit))
@@ -53,16 +52,15 @@ class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCach
     }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request =>
         Form2[SupervisionEndReasons](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(supervision_end_reasons(f, edit)))
           case ValidForm(_, data) =>
             (for {
-              supervision <- dataCacheConnector.fetch[Supervision](Supervision.key)
-              maybeCache <- dataCacheConnector.save[Supervision](Supervision.key,
+              supervision <- dataCacheConnector.fetch[Supervision](request.credId, Supervision.key)
+              maybeCache <- dataCacheConnector.save[Supervision](request.credId, Supervision.key,
                 updateData(supervision, data))
             } yield maybeCache) map {
               cache => redirectTo(edit, cache)
@@ -78,7 +76,7 @@ class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCach
     supervision.anotherBody(updatedAnotherBody).copy(hasAccepted = true)
   }
 
-  private def redirectTo(edit: Boolean, cache: CacheMap)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
+  private def redirectTo(edit: Boolean, cache: CacheMap)(implicit headerCarrier: HeaderCarrier) = {
       import utils.ControllerHelper.supervisionComplete
 
         supervisionComplete(cache) match {
