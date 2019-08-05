@@ -91,14 +91,14 @@ class AuthEnrolmentsServiceSpec extends AmlsSpec
       } thenReturn Future.successful(Authority("", Accounts(), "/user-details", "/ids", "12345678"))
 
       when {
-        service.enrolmentStore.enrol(any(), any())(any(), any(), any())
+        service.enrolmentStore.enrol(any(), any(), any())(any(), any())
       } thenReturn Future.successful(HttpResponse(OK))
 
       val postcode = postcodeGen.sample.get
 
-      whenReady(service.enrol(amlsRegistrationNumber, postcode)) { _ =>
+      whenReady(service.enrol(amlsRegistrationNumber, postcode, any())) { _ =>
         val enrolment = TaxEnrolment("12345678", postcode)
-        verify(enrolmentStore).enrol(eqTo(AmlsEnrolmentKey(amlsRegistrationNumber)), eqTo(enrolment))(any(), any(), any())
+        verify(enrolmentStore).enrol(eqTo(AmlsEnrolmentKey(amlsRegistrationNumber)), eqTo(enrolment), any())(any(), any())
       }
     }
 

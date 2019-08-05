@@ -315,6 +315,7 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     httpPost.POSTString[HttpResponse](postUrl, paymentId)
   }
 
+  @deprecated("to be removed after new auth changes implemented")
   def getPaymentByPaymentReference(paymentReference: String)
                                   (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[Option[Payment]] = {
     //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
@@ -330,10 +331,26 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     }
   }
 
+  @deprecated("to be removed after new auth changes implemented")
   def getPaymentByAmlsReference(amlsRef: String)
                                   (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[Option[Payment]] = {
     //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+    val getUrl = s"$paymentUrl/$accountType/$accountId/amlsref/$amlsRef"
+
+    Logger.debug(s"[AmlsConnector][getPaymentByAmlsReference]: Request to $getUrl with $amlsRef")
+
+    httpGet.GET[Payment](getUrl) map { result =>
+      Some(result)
+    } recover {
+      case _: NotFoundException => None
+    }
+  }
+
+  def getPaymentByAmlsReference(amlsRef: String, accountTypeId: (String, String))
+                               (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Payment]] = {
+
+    val (accountType, accountId) = accountTypeId
     val getUrl = s"$paymentUrl/$accountType/$accountId/amlsref/$amlsRef"
 
     Logger.debug(s"[AmlsConnector][getPaymentByAmlsReference]: Request to $getUrl with $amlsRef")

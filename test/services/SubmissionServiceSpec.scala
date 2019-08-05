@@ -46,7 +46,7 @@ import uk.gov.hmrc.domain.Org
 import uk.gov.hmrc.http.{HttpResponse, Upstream4xxResponse}
 import uk.gov.hmrc.play.frontend.auth.Principal
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, OrgAccount}
-import utils.{AmlsSpec, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks, DependencyMocksNewAuth}
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
@@ -61,7 +61,7 @@ class SubmissionServiceSpec extends AmlsSpec
     .configure("microservice.amounts.registration" -> 100)
     .build()
 
-  trait Fixture extends DependencyMocks {
+  trait Fixture extends DependencyMocksNewAuth {
 
     val config = mock[AppConfig]
 
@@ -164,14 +164,14 @@ class SubmissionServiceSpec extends AmlsSpec
           when(config.enrolmentStoreToggle) thenReturn false
 
           when {
-            submissionService.amlsConnector.subscribe(any(), eqTo(safeId))(any(), any(), any(), any(), any())
+            submissionService.amlsConnector.subscribe(any(), eqTo(safeId), any())(any(), any(), any(), any())
           } thenReturn Future.successful(subscriptionResponse)
 
           when {
             submissionService.ggService.enrol(any(), any(), any())(any(), any())
           } thenReturn Future.successful(enrolmentResponse)
 
-          whenReady(submissionService.subscribe) { response =>
+          whenReady(submissionService.subscribe(any(), any(), any())) { response =>
             response mustBe subscriptionResponse
             verify(submissionService.ggService).enrol(eqTo("amlsRef"), eqTo(safeId), eqTo("postcode"))(any(), any())
           }
@@ -183,14 +183,14 @@ class SubmissionServiceSpec extends AmlsSpec
           when(config.enrolmentStoreToggle) thenReturn true
 
           when {
-            submissionService.amlsConnector.subscribe(any(), eqTo(safeId))(any(), any(), any(), any(), any())
+            submissionService.amlsConnector.subscribe(any(), eqTo(safeId), any())(any(), any(), any(), any())
           } thenReturn Future.successful(subscriptionResponse)
 
           when {
-            submissionService.authEnrolmentsService.enrol(any(), any())(any(), any(), any())
+            submissionService.authEnrolmentsService.enrol(any(), any(), any())(any(), any())
           } thenReturn Future.successful(HttpResponse(OK))
 
-          whenReady(submissionService.subscribe) {
+          whenReady(submissionService.subscribe(any(), any(), any())) {
             _ mustBe subscriptionResponse
           }
         }
@@ -200,31 +200,31 @@ class SubmissionServiceSpec extends AmlsSpec
         when(config.enrolmentStoreToggle) thenReturn true
 
         when {
-          submissionService.amlsConnector.subscribe(any(), eqTo(safeId))(any(), any(), any(), any(), any())
+          submissionService.amlsConnector.subscribe(any(), eqTo(safeId), any())(any(), any(), any(), any())
         } thenReturn Future.failed(
           Upstream4xxResponse(Json.toJson(SubscriptionErrorResponse(amlsRegistrationNumber, "An error occurred")).toString(),
             UNPROCESSABLE_ENTITY,
             UNPROCESSABLE_ENTITY))
 
         intercept[DuplicateSubscriptionException] {
-          await(submissionService.subscribe)
+          await(submissionService.subscribe(any(), any(), any()))
         }
 
-        verify(submissionService.authEnrolmentsService, never).enrol(any(), any())(any(), any(), any())
+        verify(submissionService.authEnrolmentsService, never).enrol(any(), any(), any())(any(), any())
       }
 
       "throw the original error if 422 encountered without a json body" in new Fixture {
         when(config.enrolmentStoreToggle) thenReturn true
 
         when {
-          submissionService.amlsConnector.subscribe(any(), eqTo(safeId))(any(), any(), any(), any(), any())
+          submissionService.amlsConnector.subscribe(any(), eqTo(safeId), any())(any(), any(), any(), any())
         } thenReturn Future.failed(Upstream4xxResponse("Some other kind of error occurred", UNPROCESSABLE_ENTITY, UNPROCESSABLE_ENTITY))
 
         intercept[Upstream4xxResponse] {
-          await(submissionService.subscribe)
+          await(submissionService.subscribe(any(), any(), any()))
         }
 
-        verify(submissionService.authEnrolmentsService, never).enrol(any(), any())(any(), any(), any())
+        verify(submissionService.authEnrolmentsService, never).enrol(any(), any(), any())(any(), any())
       }
 
       "throw the original error if something other than a duplicate subscription is encountered" in new Fixture {
@@ -235,10 +235,10 @@ class SubmissionServiceSpec extends AmlsSpec
         } thenReturn Future.failed(Upstream4xxResponse("Some other kind of error occurred", BAD_REQUEST, BAD_REQUEST))
 
         intercept[Upstream4xxResponse] {
-          await(submissionService.subscribe)
+          await(submissionService.subscribe(any(), any(), any()))
         }
 
-        verify(submissionService.authEnrolmentsService, never).enrol(any(), any())(any(), any(), any())
+        verify(submissionService.authEnrolmentsService, never).enrol(any(), any(), any())(any(), any())
       }
 
     }
@@ -247,14 +247,14 @@ class SubmissionServiceSpec extends AmlsSpec
       "submit amendment" in new Fixture {
 
         when {
-          submissionService.amlsConnector.update(any(), eqTo(amlsRegistrationNumber))(any(), any(), any(), any(), any())
+          submissionService.amlsConnector.update(any(), eqTo(amlsRegistrationNumber), any())(any(), any(), any(), any())
         } thenReturn Future.successful(amendmentResponse)
 
-        when {
-          submissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
-        }.thenReturn(Future.successful(Some(amlsRegistrationNumber)))
+//        when {
+//          submissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+//        }.thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-        whenReady(submissionService.update) {
+        whenReady(submissionService.update(any[String](), any(), any())) {
           result =>
             result must equal(amendmentResponse)
         }
@@ -262,11 +262,7 @@ class SubmissionServiceSpec extends AmlsSpec
 
       "return failed future when no enrolment" in new Fixture {
 
-        when {
-          submissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
-        }.thenReturn(Future.successful(None))
-
-        whenReady(submissionService.update.failed) {
+        whenReady(submissionService.update(any[String](), any(), any()).failed) {
           result =>
             result mustBe a[NoEnrolmentException]
         }
@@ -277,14 +273,10 @@ class SubmissionServiceSpec extends AmlsSpec
       "submit variation" in new Fixture {
 
         when {
-          submissionService.amlsConnector.variation(any(), eqTo(amlsRegistrationNumber))(any(), any(), any(), any(), any())
+          submissionService.amlsConnector.variation(any(), eqTo(amlsRegistrationNumber), any())(any(), any(), any(), any())
         } thenReturn Future.successful(amendmentResponse)
 
-        when {
-          submissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
-        }.thenReturn(Future.successful(Some(amlsRegistrationNumber)))
-
-        whenReady(submissionService.variation) {
+        whenReady(submissionService.variation(any[String](), any(), any())) {
           result =>
             result must equal(amendmentResponse)
         }
@@ -294,11 +286,7 @@ class SubmissionServiceSpec extends AmlsSpec
     "submit a renewal" in new Fixture {
 
       when {
-        submissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
-      } thenReturn Future.successful(Some(amlsRegistrationNumber))
-
-      when {
-        submissionService.amlsConnector.renewal(any(), eqTo(amlsRegistrationNumber))(any(), any(), any())
+        submissionService.amlsConnector.renewal(any(), eqTo(amlsRegistrationNumber), any())(any(), any())
       } thenReturn Future.successful(mock[AmendVariationRenewalResponse])
 
       val renewal = Renewal(
@@ -318,10 +306,10 @@ class SubmissionServiceSpec extends AmlsSpec
         receiveCashPayments = Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other"))))))
       )
 
-      val result = await(submissionService.renewal(renewal))
+      val result = await(submissionService.renewal(any(), any(), any(), renewal))
 
       val captor = ArgumentCaptor.forClass(classOf[SubscriptionRequest])
-      verify(submissionService.amlsConnector).renewal(captor.capture(), any())(any(), any(), any())
+      verify(submissionService.amlsConnector).renewal(captor.capture(), any(), any())(any(), any())
 
       val submission = captor.getValue
 
@@ -347,11 +335,7 @@ class SubmissionServiceSpec extends AmlsSpec
     "submit a renewal amendment" in new Fixture {
 
       when {
-        submissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
-      } thenReturn Future.successful(Some(amlsRegistrationNumber))
-
-      when {
-        submissionService.amlsConnector.renewalAmendment(any(), eqTo(amlsRegistrationNumber))(any(), any(), any())
+        submissionService.amlsConnector.renewalAmendment(any(), eqTo(amlsRegistrationNumber), any())(any(), any())
       } thenReturn Future.successful(mock[AmendVariationRenewalResponse])
 
       val renewal = Renewal(
@@ -371,10 +355,10 @@ class SubmissionServiceSpec extends AmlsSpec
         receiveCashPayments = Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other"))))))
       )
 
-      val result = await(submissionService.renewalAmendment(renewal))
+      val result = await(submissionService.renewalAmendment(any(), any(), any(), renewal))
 
       val captor = ArgumentCaptor.forClass(classOf[SubscriptionRequest])
-      verify(submissionService.amlsConnector).renewalAmendment(captor.capture(), any())(any(), any(), any())
+      verify(submissionService.amlsConnector).renewalAmendment(captor.capture(), any(), any())(any(), any())
 
       val submission = captor.getValue
       // The actual values of these are tested in renewals.models.Conversions

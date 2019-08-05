@@ -48,14 +48,11 @@ import utils.StatusConstants
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SubmissionService @Inject()
-(
-  val cacheConnector: DataCacheConnector,
-  val ggService: GovernmentGatewayService,
-  val authEnrolmentsService: AuthEnrolmentsService,
-  val amlsConnector: AmlsConnector,
-  config: AppConfig
-) extends DataCacheService {
+class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
+                                  val ggService: GovernmentGatewayService,
+                                  val authEnrolmentsService: AuthEnrolmentsService,
+                                  val amlsConnector: AmlsConnector,
+                                  config: AppConfig) extends DataCacheService {
 
   private def enrol(safeId: String, amlsRegistrationNumber: String, postcode: String, groupId: Option[String])
                    (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[_] =

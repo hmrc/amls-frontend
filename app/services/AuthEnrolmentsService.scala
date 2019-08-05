@@ -73,12 +73,19 @@ class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector,
     }
   }
 
+  @deprecated("to be removed when new auth migration complete")
   def enrol(amlsRegistrationNumber: String, postcode: String, groupId: Option[String])
            (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     authConnector.getCurrentAuthority flatMap {
       authority =>
         enrolmentStore.enrol(AmlsEnrolmentKey(amlsRegistrationNumber), TaxEnrolment(authority.credId, postcode), groupId)
     }
+  }
+
+  def enrol(amlsRegistrationNumber: String, postcode: String, groupId: Option[String], credId: String)
+           (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+
+    enrolmentStore.enrol(AmlsEnrolmentKey(amlsRegistrationNumber), TaxEnrolment(credId, postcode), groupId)
   }
 
 //  def deEnrol(amlsRegistrationNumber: String)
