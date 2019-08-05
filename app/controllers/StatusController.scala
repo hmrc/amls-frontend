@@ -72,15 +72,6 @@ class StatusController @Inject()(val landingService: LandingService,
         } yield page
   }
 
-  @deprecated("To be removed when auth implementation is complete")
-  def getFeeResponse(mlrRegNumber: Option[String], submissionStatus: SubmissionStatus)(implicit authContext: AuthContext,
-                                                                                       headerCarrier: HeaderCarrier): Future[Option[FeeResponse]] = {
-    (mlrRegNumber, submissionStatus) match {
-      case (Some(mlNumber), (SubmissionReadyForReview | SubmissionDecisionApproved)) => feeResponseService.getFeeResponse(mlNumber)
-      case _ => Future.successful(None)
-    }
-  }
-
   def getFeeResponse(mlrRegNumber: Option[String], submissionStatus: SubmissionStatus, accountTypeId: (String, String))
                     (implicit headerCarrier: HeaderCarrier): Future[Option[FeeResponse]] = {
 
@@ -241,9 +232,6 @@ class StatusController @Inject()(val landingService: LandingService,
       }
     }
   }
-
-  private def getBusinessName(maybeSafeId: Option[String])(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext) =
-    BusinessName.getName(maybeSafeId)(hc, ac, ec, dataCache, amlsConnector)
 
   private def getBusinessName(credId: String, safeId: Option[String], accountTypeId: (String, String))(implicit hc: HeaderCarrier, ec: ExecutionContext) =
     BusinessName.getName(credId, safeId, accountTypeId)(hc, ec, dataCache, amlsConnector)
