@@ -388,9 +388,22 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     }
   }
 
+  @deprecated("to be removed after new auth changes implemented")
   def refreshPaymentStatus(paymentReference: String)(implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[PaymentStatusResult] = {
     //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+    val putUrl = s"$paymentUrl/$accountType/$accountId/refreshstatus"
+
+    Logger.debug(s"[AmlsConnector][refreshPaymentStatus]: Request to $putUrl with $paymentReference")
+
+    httpPut.PUT[RefreshPaymentStatusRequest, PaymentStatusResult](putUrl, RefreshPaymentStatusRequest(paymentReference))
+  }
+
+  def refreshPaymentStatus(paymentReference: String, accountTypeId: (String, String))
+                          (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[PaymentStatusResult] = {
+
+    val (accountType, accountId) = accountTypeId
+
     val putUrl = s"$paymentUrl/$accountType/$accountId/refreshstatus"
 
     Logger.debug(s"[AmlsConnector][refreshPaymentStatus]: Request to $putUrl with $paymentReference")
