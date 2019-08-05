@@ -24,8 +24,6 @@ import models.{SubmissionResponse, SubscriptionResponse}
 import play.api.Logger
 import services.{RenewalService, StatusService, SubmissionService}
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthAction
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -38,16 +36,19 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
                                      val authenticator: AuthenticatorConnector,
                                      authAction: AuthAction) extends DefaultBaseController {
 
-  private def handleRenewalAmendment()(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
-    renewalService.getRenewal flatMap {
-      case Some(r) => subscriptionService.renewalAmendment(r)
-      case _ => subscriptionService.variation
+  private def handleRenewalAmendment(credId: String, amlsRegistrationNumber: Option[String], accountTypeId: (String, String))
+                                    (implicit headerCarrier: HeaderCarrier) = {
+
+    renewalService.getRenewal(credId) flatMap {
+      case Some(renewal) => subscriptionService.renewalAmendment(credId, amlsRegistrationNumber, accountTypeId, renewal)
+      case _ => subscriptionService.variation(credId, amlsRegistrationNumber, accountTypeId)
     }
   }
 
   def post() = authAction.async {
       implicit request => {
-        statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId).flatMap[SubmissionResponse](status => subscribeBasedOnStatus(status, request.groupIdentifier))
+        statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId).flatMap[SubmissionResponse](status =>
+          subscribeBasedOnStatus(status, request.groupIdentifier, request.credId, request.amlsRefNumber, request.accountTypeId))
       }.flatMap {
         case SubscriptionResponse(_, _, _, Some(true)) =>
           authenticator.refreshProfile map { _ =>
@@ -70,14 +71,16 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
       }
   }
 
-  private def subscribeBasedOnStatus(status: SubmissionStatus, groupIdentifier: Option[String])(implicit hc: HeaderCarrier) = status match {
-    case SubmissionReadyForReview => subscriptionService.update
-    case SubmissionDecisionApproved => subscriptionService.variation
-    case ReadyForRenewal(_) => renewalService.getRenewal flatMap {
-      case Some(r) => subscriptionService.renewal(r)
-      case _ => subscriptionService.variation
-    }
-    case RenewalSubmitted(_) => handleRenewalAmendment()
-    case _ => subscriptionService.subscribe
+  private def subscribeBasedOnStatus(status: SubmissionStatus, groupIdentifier: Option[String], credId: String, amlsRegistrationNumber: Option[String], accountTypeId: (String, String))
+                                    (implicit hc: HeaderCarrier) =
+    status match {
+      case SubmissionReadyForReview => subscriptionService.update(credId, amlsRegistrationNumber, accountTypeId)
+      case SubmissionDecisionApproved => subscriptionService.variation(credId, amlsRegistrationNumber, accountTypeId)
+      case ReadyForRenewal(_) => renewalService.getRenewal(credId) flatMap {
+        case Some(renewal) => subscriptionService.renewal(credId, amlsRegistrationNumber, accountTypeId, renewal)
+        case _ => subscriptionService.variation(credId, amlsRegistrationNumber, accountTypeId)
+      }
+      case RenewalSubmitted(_) => handleRenewalAmendment(credId, amlsRegistrationNumber, accountTypeId)
+      case _ => subscriptionService.subscribe(credId, accountTypeId, groupIdentifier)
   }
 }

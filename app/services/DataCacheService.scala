@@ -27,6 +27,7 @@ private[services] trait DataCacheService {
 
   private[services] def cacheConnector: DataCacheConnector
 
+  @deprecated("to be removed when auth migration complete")
   def getCache
   (implicit
    ec: ExecutionContext,

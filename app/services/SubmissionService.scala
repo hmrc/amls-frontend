@@ -104,7 +104,7 @@ class SubmissionService @Inject()
       safeId <- safeId(cache)
       request <- Future.successful(createSubscriptionRequestNewAuth(cache))
       subscription <- amlsConnector.subscribe(request, safeId, accountTypeId)
-      _ <- saveResponse(credId, subscription, SubscriptionResponse.key)
+      _ <- saveResponseNewAuth(credId, subscription, SubscriptionResponse.key)
       _ <- enrol(safeId, subscription.amlsRefNo, request.businessDetailsSection.fold("")(_.registeredOffice match {
         case Some(o: RegisteredOfficeUK) => o.postCode
         case _ => ""
@@ -168,6 +168,7 @@ class SubmissionService @Inject()
     )
   }
 
+  @deprecated("to be removed when migration to new auth complete")
   def update
   (implicit
    ec: ExecutionContext,
@@ -185,6 +186,18 @@ class SubmissionService @Inject()
     } yield amendment
   }
 
+  def update(credId: String, amlsRegistrationNumber: Option[String], accountTypeId: (String, String))
+            (implicit ec: ExecutionContext, hc: HeaderCarrier): Future[AmendVariationRenewalResponse] = {
+    for {
+      cache <- getCache(credId)
+      amendment <- amlsConnector.update(
+        createSubscriptionRequestNewAuth(cache),
+        amlsRegistrationNumber.getOrElse(throw NoEnrolmentException("[SubmissionService][update] - No enrolment")), accountTypeId)
+      _ <- saveResponseNewAuth(credId, amendment, AmendVariationRenewalResponse.key)
+    } yield amendment
+  }
+
+  @deprecated("to be removed when migration to new auth complete")
   def variation
   (implicit
    ec: ExecutionContext,
@@ -203,6 +216,19 @@ class SubmissionService @Inject()
     } yield amendment
   }
 
+  def variation(credId: String, amlsRegistrationNumber: Option[String], accountTypeId: (String, String))
+               (implicit ec: ExecutionContext, hc: HeaderCarrier): Future[AmendVariationRenewalResponse] = {
+    for {
+      cache <- getCache(credId)
+      amendment <- amlsConnector.variation(
+        createSubscriptionRequestNewAuth(cache),
+        amlsRegistrationNumber.getOrElse(throw NoEnrolmentException("[SubmissionService][variation] - No enrolment")), accountTypeId)
+      _ <- saveResponseNewAuth(credId, amendment, AmendVariationRenewalResponse.key)
+
+    } yield amendment
+  }
+
+  @deprecated("to be removed when migration to new auth complete")
   def renewal(renewal: Renewal)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[SubmissionResponse] = {
     for {
       cache <- getCache
@@ -215,25 +241,37 @@ class SubmissionService @Inject()
     } yield response
   }
 
-  def renewalAmendment(renewal: Renewal)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[SubmissionResponse] = {
+  def renewal(credId: String, amlsRegistrationNumber: Option[String], accountTypeId: (String, String), renewal: Renewal)
+             (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[SubmissionResponse] = {
     for {
-      cache <- getCache
-      regNo <- authEnrolmentsService.amlsRegistrationNumber
-      response <- amlsConnector.renewalAmendment(
-        createSubscriptionRequest(cache).withRenewalData(renewal),
-        regNo.getOrElse(throw NoEnrolmentException("[SubmissionService][renewalAmendment] - No enrolment"))
-      )
-      _ <- saveResponse(response, AmendVariationRenewalResponse.key, isRenewalAmendment = true)
+      cache <- getCache(credId)
+      response <- amlsConnector.renewal(
+        createSubscriptionRequestNewAuth(cache).withRenewalData(renewal),
+        amlsRegistrationNumber.getOrElse(throw NoEnrolmentException("[SubmissionService][renewal] - No enrolment")), accountTypeId)
+      _ <- saveResponseNewAuth(credId, response, AmendVariationRenewalResponse.key)
     } yield response
   }
 
+  def renewalAmendment(credId: String, amlsRegistrationNumber: Option[String], accountTypeId: (String, String), renewal: Renewal)
+                      (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[SubmissionResponse] = {
+
+    for {
+      cache <- getCache(credId)
+      response <- amlsConnector.renewalAmendment(
+        createSubscriptionRequestNewAuth(cache).withRenewalData(renewal),
+        amlsRegistrationNumber.getOrElse(throw NoEnrolmentException("[SubmissionService][renewalAmendment] - No enrolment")), accountTypeId)
+      _ <- saveResponseNewAuth(credId, response, AmendVariationRenewalResponse.key, isRenewalAmendment = true)
+    } yield response
+  }
+
+  @deprecated("to be removed when migration to new auth complete")
   private def saveResponse[T](response: T, key: String, isRenewalAmendment: Boolean = false)
                              (implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext, fmt: Format[T]) = for {
     _ <- cacheConnector.save[T](key, response)
     c <- cacheConnector.save[SubmissionRequestStatus](SubmissionRequestStatus.key, SubmissionRequestStatus(true, Some(isRenewalAmendment)))
   } yield c
 
-  private def saveResponse[T](credId: String, response: T, key: String, isRenewalAmendment: Boolean = false)
+  private def saveResponseNewAuth[T](credId: String, response: T, key: String, isRenewalAmendment: Boolean = false)
                              (implicit hc: HeaderCarrier, ex: ExecutionContext, fmt: Format[T]) = for {
     _ <- cacheConnector.save[T](credId, key, response)
     c <- cacheConnector.save[SubmissionRequestStatus](credId, SubmissionRequestStatus.key, SubmissionRequestStatus(true, Some(isRenewalAmendment)))
