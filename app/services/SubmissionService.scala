@@ -72,28 +72,6 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
     case _ => None
   }
 
-//  def subscribe
-//  (implicit
-//   ec: ExecutionContext,
-//   hc: HeaderCarrier,
-//   ac: AuthContext
-//  ): Future[SubscriptionResponse] = {
-//    (for {
-//      cache <- getCache
-//      safeId <- safeId(cache)
-//      request <- Future.successful(createSubscriptionRequest(cache))
-//      subscription <- amlsConnector.subscribe(request, safeId)
-//      _ <- saveResponse(subscription, SubscriptionResponse.key)
-//      _ <- enrol(safeId, subscription.amlsRefNo, request.businessDetailsSection.fold("")(_.registeredOffice match {
-//        case Some(o: RegisteredOfficeUK) => o.postCode
-//        case _ => ""
-//      }))
-//    } yield subscription) recoverWith {
-//      case e: Upstream4xxResponse if e.upstreamResponseCode == UNPROCESSABLE_ENTITY =>
-//        Future.failed(SubscriptionErrorResponse.from(e).fold[Throwable](e)(r => DuplicateSubscriptionException(r.message)))
-//    }
-//  }
-
   def subscribe(credId: String, accountTypeId: (String, String), groupId: Option[String])
                (implicit ec: ExecutionContext, hc: HeaderCarrier): Future[SubscriptionResponse] = {
     (for {
@@ -165,24 +143,6 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
     )
   }
 
-  @deprecated("to be removed when migration to new auth complete")
-  def update
-  (implicit
-   ec: ExecutionContext,
-   hc: HeaderCarrier,
-   ac: AuthContext
-  ): Future[AmendVariationRenewalResponse] = {
-    for {
-      cache <- getCache
-      regNo <- authEnrolmentsService.amlsRegistrationNumber
-      amendment <- amlsConnector.update(
-        createSubscriptionRequest(cache),
-        regNo.getOrElse(throw NoEnrolmentException("[SubmissionService][update] - No enrolment"))
-      )
-      _ <- saveResponse(amendment, AmendVariationRenewalResponse.key)
-    } yield amendment
-  }
-
   def update(credId: String, amlsRegistrationNumber: Option[String], accountTypeId: (String, String))
             (implicit ec: ExecutionContext, hc: HeaderCarrier): Future[AmendVariationRenewalResponse] = {
     for {
@@ -191,25 +151,6 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
         createSubscriptionRequestNewAuth(cache),
         amlsRegistrationNumber.getOrElse(throw NoEnrolmentException("[SubmissionService][update] - No enrolment")), accountTypeId)
       _ <- saveResponseNewAuth(credId, amendment, AmendVariationRenewalResponse.key)
-    } yield amendment
-  }
-
-  @deprecated("to be removed when migration to new auth complete")
-  def variation
-  (implicit
-   ec: ExecutionContext,
-   hc: HeaderCarrier,
-   ac: AuthContext
-  ): Future[AmendVariationRenewalResponse] = {
-    for {
-      cache <- getCache
-      regNo <- authEnrolmentsService.amlsRegistrationNumber
-      amendment <- amlsConnector.variation(
-        createSubscriptionRequest(cache),
-        regNo.getOrElse(throw NoEnrolmentException("[SubmissionService][variation] - No enrolment"))
-      )
-      _ <- saveResponse(amendment, AmendVariationRenewalResponse.key)
-
     } yield amendment
   }
 
@@ -223,19 +164,6 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
       _ <- saveResponseNewAuth(credId, amendment, AmendVariationRenewalResponse.key)
 
     } yield amendment
-  }
-
-  @deprecated("to be removed when migration to new auth complete")
-  def renewal(renewal: Renewal)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[SubmissionResponse] = {
-    for {
-      cache <- getCache
-      regNo <- authEnrolmentsService.amlsRegistrationNumber
-      response <- amlsConnector.renewal(
-        createSubscriptionRequest(cache).withRenewalData(renewal),
-        regNo.getOrElse(throw NoEnrolmentException("[SubmissionService][renewal] - No enrolment"))
-      )
-      _ <- saveResponse(response, AmendVariationRenewalResponse.key)
-    } yield response
   }
 
   def renewal(credId: String, amlsRegistrationNumber: Option[String], accountTypeId: (String, String), renewal: Renewal)
@@ -260,13 +188,6 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
       _ <- saveResponseNewAuth(credId, response, AmendVariationRenewalResponse.key, isRenewalAmendment = true)
     } yield response
   }
-
-  @deprecated("to be removed when migration to new auth complete")
-  private def saveResponse[T](response: T, key: String, isRenewalAmendment: Boolean = false)
-                             (implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext, fmt: Format[T]) = for {
-    _ <- cacheConnector.save[T](key, response)
-    c <- cacheConnector.save[SubmissionRequestStatus](SubmissionRequestStatus.key, SubmissionRequestStatus(true, Some(isRenewalAmendment)))
-  } yield c
 
   private def saveResponseNewAuth[T](credId: String, response: T, key: String, isRenewalAmendment: Boolean = false)
                              (implicit hc: HeaderCarrier, ex: ExecutionContext, fmt: Format[T]) = for {
