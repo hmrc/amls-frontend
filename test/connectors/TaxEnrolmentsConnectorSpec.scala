@@ -17,14 +17,14 @@
 package connectors
 
 import config.{AppConfig, WSHttp}
-import controllers.actions.SuccessfulAuthAction
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
 import generators.auth.UserDetailsGenerator
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
 import models.enrolment.{AmlsEnrolmentKey, ErrorResponse, TaxEnrolment}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{AbstractPatienceConfiguration, ScalaFutures}
+import org.scalatest.time.{Millis, Seconds, Span}
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HttpResponse, Upstream4xxResponse}
@@ -40,13 +40,14 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
   with UserDetailsGenerator
   with BaseGenerator {
 
+  implicit override val patienceConfig = PatienceConfig(timeout = Span(2, Seconds), interval = Span(20, Millis))
+
   trait Fixture {
 
     val http = mock[WSHttp]
     val appConfig = mock[AppConfig]
-    //val authConnector = mock[AuthConnector]
     val auditConnector = mock[AuditConnector]
-    val groupIdentfier = "group_id"
+    val groupIdentfier = stringOfLengthGen(10).sample.get
 
     val connector = new TaxEnrolmentsConnector(http, appConfig, auditConnector)
     val baseUrl = "http://localhost:3001"
@@ -87,6 +88,7 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
   "enrol" when {
     "called" must {
       "call the ES8 enrolment store endpoint to enrol the user" in new Fixture {
+
         val endpointUrl = s"$baseUrl/${serviceStub}/groups/$groupIdentfier/enrolments/${enrolKey.key}"
 
         when {
@@ -137,7 +139,7 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
           http.DELETE[HttpResponse](any())(any(), any(), any())
         } thenReturn Future.successful(HttpResponse(NO_CONTENT))
 
-        whenReady(connector.deEnrol(amlsRegistrationNumber, Some("GROUP_ID"))) { _ =>
+        whenReady(connector.deEnrol(amlsRegistrationNumber, Some(groupIdentfier))) { _ =>
           verify(http).DELETE[HttpResponse](eqTo(endpointUrl))(any(), any(), any())
           verify(auditConnector).sendEvent(any())(any(), any())
         }
