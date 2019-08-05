@@ -25,7 +25,6 @@ import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawSubscriptionRespo
 import models.{AmendVariationRenewalResponse, _}
 import play.api.Logger
 import play.api.libs.json.{Json, Writes}
-import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolments}
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
@@ -303,6 +302,7 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     httpPost.POST[DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse](postUrl, request)
   }
 
+  @deprecated("to be removed after new auth changes implemented")
   def savePayment(paymentId: String, amlsRefNo: String, safeId: String)
                  (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[HttpResponse] = {
 
@@ -315,11 +315,37 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     httpPost.POSTString[HttpResponse](postUrl, paymentId)
   }
 
+  def savePayment(paymentId: String, amlsRefNo: String, safeId: String, accountTypeId: (String, String))
+                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+
+    val (accountType, accountId) = accountTypeId
+    val postUrl = s"$paymentUrl/$accountType/$accountId/$amlsRefNo/$safeId"
+
+    Logger.debug(s"[AmlsConnector][savePayment]: Request to $postUrl with paymentId $paymentId")
+
+    httpPost.POSTString[HttpResponse](postUrl, paymentId)
+  }
+
   @deprecated("to be removed after new auth changes implemented")
   def getPaymentByPaymentReference(paymentReference: String)
                                   (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[Option[Payment]] = {
     //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+    val getUrl = s"$paymentUrl/$accountType/$accountId/payref/$paymentReference"
+
+    Logger.debug(s"[AmlsConnector][getPaymentByPaymentReference]: Request to $getUrl with $paymentReference")
+
+    httpGet.GET[Payment](getUrl) map { result =>
+      Some(result)
+    } recover {
+      case _: NotFoundException => None
+    }
+  }
+
+  def getPaymentByPaymentReference(paymentReference: String, accountTypeId: (String, String))
+                                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Payment]] = {
+
+    val (accountType, accountId) = accountTypeId
     val getUrl = s"$paymentUrl/$accountType/$accountId/payref/$paymentReference"
 
     Logger.debug(s"[AmlsConnector][getPaymentByPaymentReference]: Request to $getUrl with $paymentReference")

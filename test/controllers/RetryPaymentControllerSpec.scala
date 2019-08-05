@@ -17,30 +17,24 @@
 package controllers
 
 import connectors._
+import controllers.actions.SuccessfulAuthAction
 import generators.submission.SubscriptionResponseGenerator
 import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
-import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import models.businesscustomer.{Address, ReviewDetails}
-import models.businessdetails.{BusinessDetails, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
+import models.businessdetails.{BusinessDetails, PreviouslyRegisteredNo}
 import models.businessmatching.BusinessMatching
-import models.confirmation.{BreakdownRow, Currency}
-import models.payments.PaymentStatuses.{Cancelled, Created, Failed}
+import models.confirmation.BreakdownRow
 import models.payments._
 import models.registrationdetails.RegistrationDetails
-import models.renewal.{InvolvedInOtherNo, Renewal}
-import models.status.{SubmissionDecisionApproved, _}
+import models.status._
 import models.{status => _, _}
-import org.joda.time.{DateTime, LocalDate, LocalDateTime}
-import org.jsoup.Jsoup
+import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalacheck.Gen
-import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
@@ -57,7 +51,7 @@ class RetryPaymentControllerSpec extends AmlsSpec
     val request = addToken(authRequest).copyFakeRequest(uri = baseUrl)
 
     val controller = new RetryPaymentController(
-      authConnector = self.authConnector,
+      SuccessfulAuthAction,
       statusService = mock[StatusService],
       dataCacheConnector = mock[DataCacheConnector],
       amlsConnector = mock[AmlsConnector],
@@ -77,11 +71,11 @@ class RetryPaymentControllerSpec extends AmlsSpec
     } thenReturn Future.successful(paymentStatusResultGen.sample.get.copy(currentStatus = PaymentStatuses.Successful))
 
     when {
-      controller.amlsConnector.getPaymentByPaymentReference(any())(any(), any(), any())
+      controller.amlsConnector.getPaymentByPaymentReference(any(), any())(any(), any())
     } thenReturn Future.successful(paymentGen.sample)
 
     when {
-      controller.amlsConnector.savePayment(any(), any(), any())(any(), any(), any())
+      controller.amlsConnector.savePayment(any(), any(), any(), any())(any(), any())
     } thenReturn Future.successful(HttpResponse(CREATED))
 
     when {
@@ -89,7 +83,7 @@ class RetryPaymentControllerSpec extends AmlsSpec
     } thenReturn Future.successful(RegistrationDetails(companyNameFromRegistration, isIndividual = false))
 
     when {
-      controller.dataCacheConnector.fetch[SubmissionRequestStatus](eqTo(SubmissionRequestStatus.key))(any(),any(),any())
+      controller.dataCacheConnector.fetch[SubmissionRequestStatus](any(), eqTo(SubmissionRequestStatus.key))(any(), any())
     } thenReturn Future.successful(Some(SubmissionRequestStatus(true)))
 
     def feeResponse(responseType: ResponseType) = FeeResponse(
@@ -109,7 +103,7 @@ class RetryPaymentControllerSpec extends AmlsSpec
 
     val businessDetails = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredNo))
     when {
-      controller.dataCacheConnector.fetch[BusinessDetails](eqTo(BusinessDetails.key))(any(), any(), any())
+      controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any(), any())
     } thenReturn Future.successful(Some(businessDetails))
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))
@@ -121,7 +115,7 @@ class RetryPaymentControllerSpec extends AmlsSpec
       )
 
       when {
-        controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+        controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any())
       } thenReturn Future.successful(Some(model))
 
     }
@@ -129,14 +123,14 @@ class RetryPaymentControllerSpec extends AmlsSpec
     def setupStatus(status: SubmissionStatus): Unit = {
 
       when {
-        controller.statusService.getStatus(any(), any(), any())
+        controller.statusService.getStatus(any[Option[String]](), any(), any())(any(), any())
       } thenReturn Future.successful(status)
 
       val statusResponse = mock[ReadStatusResponse]
       when(statusResponse.safeId) thenReturn safeIdGen.sample
 
       when {
-        controller.statusService.getDetailedStatus(any(), any(), any())
+        controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any())
       } thenReturn Future.successful((status, Some(statusResponse)))
     }
   }
@@ -150,11 +144,11 @@ class RetryPaymentControllerSpec extends AmlsSpec
       val paymentResponse = paymentResponseGen.sample.get
 
       when {
-        controller.amlsConnector.getPaymentByPaymentReference(eqTo(paymentReferenceNumber))(any(), any(), any())
+        controller.amlsConnector.getPaymentByPaymentReference(eqTo(paymentReferenceNumber), any())(any(), any())
       } thenReturn Future.successful(Some(payment.copy(reference = paymentReferenceNumber, amountInPence = amountInPence)))
 
       when {
-        controller.paymentsService.paymentsUrlOrDefault(any(), any(), any(), any(), any())(any(), any(), any(), any())
+        controller.paymentsService.paymentsUrlOrDefault(any(), any(), any(), any(), any(), any())(any(), any(), any())
       } thenReturn Future.successful(paymentResponse.nextUrl)
 
       val result = controller.retryPayment()(request.withFormUrlEncodedBody(postData))
@@ -171,7 +165,7 @@ class RetryPaymentControllerSpec extends AmlsSpec
       val postData = "paymentRef" -> paymentReferenceNumber
 
       when {
-        controller.amlsConnector.getPaymentByPaymentReference(eqTo(paymentReferenceNumber))(any(), any(), any())
+        controller.amlsConnector.getPaymentByPaymentReference(eqTo(paymentReferenceNumber), any())(any(), any())
       } thenReturn Future.successful(None)
 
       val result = controller.retryPayment()(request.withFormUrlEncodedBody(postData))

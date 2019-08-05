@@ -113,7 +113,8 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     }
   }
 
-  def getDetailedStatus(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[(SubmissionStatus, Option[ReadStatusResponse])] = {
+  def getDetailedStatus(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)
+                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[(SubmissionStatus, Option[ReadStatusResponse])] = {
     amlsRegistrationNumber match {
       case Some(mlrRegNumber) =>
         Logger.debug("StatusService:getDetailedStatus:mlrRegNumber:" + mlrRegNumber)
