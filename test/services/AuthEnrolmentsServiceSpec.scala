@@ -96,7 +96,7 @@ class AuthEnrolmentsServiceSpec extends AmlsSpec
 
       val postcode = postcodeGen.sample.get
 
-      whenReady(service.enrol(amlsRegistrationNumber, postcode, any())) { _ =>
+      whenReady(service.enrol(amlsRegistrationNumber, postcode, Some(groupId), "12345678")) { _ =>
         val enrolment = TaxEnrolment("12345678", postcode)
         verify(enrolmentStore).enrol(eqTo(AmlsEnrolmentKey(amlsRegistrationNumber)), eqTo(enrolment), any())(any(), any())
       }

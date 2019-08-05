@@ -82,6 +82,7 @@ class TaxEnrolmentsConnector @Inject()(http: WSHttp, appConfig: AppConfig, audit
 
   def deEnrol(registrationNumber: String, groupId: Option[String])
              (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+
     val enrolKey = AmlsEnrolmentKey(registrationNumber).key
       Logger.debug("TaxEnrolmentsConnector:deEnrol:enrolKey:" + enrolKey)
       groupId match {

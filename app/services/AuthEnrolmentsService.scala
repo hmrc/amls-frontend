@@ -88,6 +88,7 @@ class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector,
     enrolmentStore.enrol(AmlsEnrolmentKey(amlsRegistrationNumber), TaxEnrolment(credId, postcode), groupId)
   }
 
+//  @deprecated("to be removed when new auth migration complete")
 //  def deEnrol(amlsRegistrationNumber: String)
 //             (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Boolean] = {
 //    for {

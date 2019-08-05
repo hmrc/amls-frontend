@@ -54,10 +54,10 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
                                   val amlsConnector: AmlsConnector,
                                   config: AppConfig) extends DataCacheService {
 
-  private def enrol(safeId: String, amlsRegistrationNumber: String, postcode: String, groupId: Option[String])
+  private def enrol(safeId: String, amlsRegistrationNumber: String, postcode: String, groupId: Option[String], credId: String)
                    (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[_] =
     if (config.enrolmentStoreToggle) {
-      authEnrolmentsService.enrol(amlsRegistrationNumber, postcode, groupId)
+      authEnrolmentsService.enrol(amlsRegistrationNumber, postcode, groupId, credId)
     } else {
       ggService.enrol(amlsRegistrationNumber, safeId, postcode)
     }
@@ -105,7 +105,7 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
       _ <- enrol(safeId, subscription.amlsRefNo, request.businessDetailsSection.fold("")(_.registeredOffice match {
         case Some(o: RegisteredOfficeUK) => o.postCode
         case _ => ""
-      }), groupId)
+      }), groupId, credId)
     } yield subscription) recoverWith {
       case e: Upstream4xxResponse if e.upstreamResponseCode == UNPROCESSABLE_ENTITY =>
         Future.failed(SubscriptionErrorResponse.from(e).fold[Throwable](e)(r => DuplicateSubscriptionException(r.message)))
