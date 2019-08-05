@@ -420,6 +420,7 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
   }
 
   def registrationDetails(safeId: String, accountTypeId: (String, String))(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[RegistrationDetails] = {
+
     val (accountType, accountId) = accountTypeId
     val getUrl = s"$registrationUrl/$accountType/$accountId/details/$safeId"
 
