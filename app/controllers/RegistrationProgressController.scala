@@ -29,8 +29,7 @@ import services.businessmatching.{BusinessMatchingService, ServiceFlow}
 import services.{AuthEnrolmentsService, ProgressService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.registrationamendment.registration_amendment
 import views.html.registrationprogress.registration_progress
 
@@ -38,29 +37,27 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
-class RegistrationProgressController @Inject()(
-                                                protected[controllers] val authConnector: AuthConnector,
-                                                protected[controllers] val dataCache: DataCacheConnector,
-                                                protected[controllers] val enrolmentsService: AuthEnrolmentsService,
-                                                protected[controllers] val statusService: StatusService,
-                                                protected[controllers] val progressService: ProgressService,
-                                                protected[controllers] val sectionsProvider: SectionsProvider,
-                                                protected[controllers] val businessMatchingService: BusinessMatchingService,
-                                                protected[controllers] val serviceFlow: ServiceFlow
-                                              ) extends BaseController {
+class RegistrationProgressController @Inject()(protected[controllers] val authAction: AuthAction,
+                                               protected[controllers] val dataCache: DataCacheConnector,
+                                               protected[controllers] val enrolmentsService: AuthEnrolmentsService,
+                                               protected[controllers] val statusService: StatusService,
+                                               protected[controllers] val progressService: ProgressService,
+                                               protected[controllers] val sectionsProvider: SectionsProvider,
+                                               protected[controllers] val businessMatchingService: BusinessMatchingService,
+                                               protected[controllers] val serviceFlow: ServiceFlow
+                                              ) extends DefaultBaseController {
 
-  def get() = Authorised.async {
-    implicit authContext =>
+  def get() = authAction.async {
       implicit request =>
-        isRenewalFlow flatMap {
+        isRenewalFlow(request.amlsRefNumber, request.accountTypeId, request.credId) flatMap {
           case true => Future.successful(Redirect(controllers.renewal.routes.RenewalProgressController.get()))
           case _ =>
             (for {
-              status <- OptionT.liftF(statusService.getStatus)
-              cacheMap <- OptionT(dataCache.fetchAll)
-              completePreApp <- OptionT(preApplicationComplete(cacheMap, status))
+              status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
+              cacheMap <- OptionT(dataCache.fetchAll(request.credId))
+              completePreApp <- OptionT(preApplicationComplete(cacheMap, status, request.amlsRefNumber))
               businessMatching <- OptionT.fromOption[Future](cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-              newActivities <- getNewActivities orElse OptionT.some(Set.empty[BusinessActivity])
+              newActivities <- getNewActivities(request.credId) orElse OptionT.some(Set.empty[BusinessActivity])
             } yield {
               businessMatching.reviewDetails map { reviewDetails =>
                 val newSections = sectionsProvider.sectionsFromBusinessActivities(newActivities, businessMatching.msbServices)(cacheMap).toSeq
@@ -91,12 +88,11 @@ class RegistrationProgressController @Inject()(
         }
   }
 
-  private def isRenewalFlow()(implicit hc: HeaderCarrier,
-                              authContext: AuthContext,
-                              request: Request[AnyContent]): Future[Boolean] = {
-    statusService.getStatus flatMap {
+  private def isRenewalFlow(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)
+                           (implicit hc: HeaderCarrier, request: Request[AnyContent]): Future[Boolean] = {
+    statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) flatMap {
       case ReadyForRenewal(_) =>
-        dataCache.fetch[Renewal](Renewal.key) map {
+        dataCache.fetch[Renewal](cacheId, Renewal.key) map {
           case Some(_) => true
           case None => false
         }
@@ -124,7 +120,8 @@ class RegistrationProgressController @Inject()(
     }
   }
 
-  private def preApplicationComplete(cache: CacheMap, status: SubmissionStatus)(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[Boolean]] = {
+  private def preApplicationComplete(cache: CacheMap, status: SubmissionStatus, amlsRegistrationNumber: Option[String])
+                                    (implicit hc: HeaderCarrier): Future[Option[Boolean]] = {
 
     val preAppStatus: SubmissionStatus => Boolean = s => Set(NotCompleted, SubmissionReady).contains(s)
 
@@ -132,7 +129,7 @@ class RegistrationProgressController @Inject()(
       bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
     } yield (preAppStatus(status), bm.isComplete) match {
       case (_, true) | (false, _) =>
-        enrolmentsService.amlsRegistrationNumber map {
+        Future.successful(amlsRegistrationNumber) map {
           case Some(_) => status match {
             case NotCompleted | SubmissionReady => Some(false)
             case _ => Some(true)
@@ -143,13 +140,12 @@ class RegistrationProgressController @Inject()(
     }).getOrElse(Future.successful(None))
   }
 
-  private def getNewActivities(implicit hc: HeaderCarrier, authContext: AuthContext): OptionT[Future, Set[BusinessActivity]] =
-    businessMatchingService.getAdditionalBusinessActivities
+  private def getNewActivities(cacheId: String)(implicit hc: HeaderCarrier): OptionT[Future, Set[BusinessActivity]] =
+    businessMatchingService.getAdditionalBusinessActivities(cacheId)
 
-  def post() = Authorised.async {
-    implicit authContext =>
+  def post() = authAction.async {
       implicit request =>
-        progressService.getSubmitRedirect map {
+        progressService.getSubmitRedirect(request.amlsRefNumber, request.accountTypeId, request.credId) map {
           case Some(url) => Redirect(url)
           case _ => InternalServerError("Could not get data for redirect")
         }
