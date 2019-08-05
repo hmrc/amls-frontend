@@ -17,27 +17,26 @@
 package controllers
 
 import audit.SurveyEvent
-import config.AMLSAuthConnector
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.SatisfactionSurvey
 import play.api.Logger
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 
 import scala.concurrent.Future
 
 @Singleton
 class SatisfactionSurveyController @Inject()(val auditConnector: AuditConnector,
-                                             val authConnector: AuthConnector) extends BaseController {
+                                             authAction: AuthAction) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
       Future.successful(Ok(views.html.satisfaction_survey(EmptyForm)))
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request => {
       Form2[SatisfactionSurvey](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.satisfaction_survey(f)))
