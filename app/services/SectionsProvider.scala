@@ -39,6 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnector) {
 
+  @deprecated("to be removed when migration to new auth completed")
   def sections(implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[Seq[Section]] =
 
     cacheConnector.fetchAll map {
@@ -65,8 +66,9 @@ class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnecto
   }
 
   def sectionsFromBusinessActivities(activities: Set[BusinessActivity],
-                                     msbServices: Option[BusinessMatchingMsbServices]
-                                    )(implicit cache: CacheMap): Set[Section] =
+                                     msbServices: Option[BusinessMatchingMsbServices])
+                                    (implicit cache: CacheMap): Set[Section] =
+
     activities.foldLeft[Set[Section]](Set.empty) {
       (m, n) => n match {
         case AccountancyServices =>
