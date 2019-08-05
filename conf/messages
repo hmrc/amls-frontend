@@ -2068,7 +2068,7 @@ hvd.expect.to.receive.title = How do you expect to receive cash payments of €1
 
 hvd.excise.goods.title = Will you be buying or selling duty-suspended excise goods?
 
-hvd.percentage.title = What percentage of your turnover do you expect to come from cash payments of over €10,000?
+hvd.percentage.title = What percentage of your turnover do you expect to come from cash payments of €10,000 or more?
 hvd.percentage.text = If you do not use euros you’ll need to convert the amount to the currency you use.
 hvd.percentage.lbl.01 = 0% to 20%
 hvd.percentage.lbl.02 = 21% to 40%
