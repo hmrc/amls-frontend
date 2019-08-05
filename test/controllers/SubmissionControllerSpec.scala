@@ -17,6 +17,7 @@
 package controllers
 
 import connectors.AuthenticatorConnector
+import controllers.actions.SuccessfulAuthAction
 import exceptions._
 import generators.AmlsReferenceNumberGenerator
 import models.renewal.Renewal
@@ -46,7 +47,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       mock[StatusService],
       mock[RenewalService],
       mock[AuthenticatorConnector],
-      self.authConnector
+      SuccessfulAuthAction
     )
   }
 
@@ -86,10 +87,11 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       "return to the confirmation page on first submission" in new Fixture {
 
         when {
-          controller.subscriptionService.subscribe(any(), any(), any())
+          controller.subscriptionService.subscribe(any(), any(), any())(any(), any())
         } thenReturn Future.successful(response)
 
-        when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReady))
+        when(controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any()))
+          .thenReturn(Future.successful(SubmissionReady))
 
         val result = controller.post()(request)
 
@@ -99,14 +101,15 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
       "return to the landing controller when recovers from duplicate response" in new Fixture {
         when {
-          controller.subscriptionService.subscribe(any(), any(), any())
+          controller.subscriptionService.subscribe(any(), any(), any())(any(), any())
         } thenReturn Future.successful(response.copy(previouslySubmitted = Some(true)))
 
         when {
           controller.authenticator.refreshProfile(any(), any())
         } thenReturn Future.successful(HttpResponse(OK))
 
-        when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReady))
+        when(controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any()))
+          .thenReturn(Future.successful(SubmissionReady))
 
         val result = controller.post()(request)
 
@@ -119,10 +122,11 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
     "post must return the response from the service correctly when Submission Ready for review" in new Fixture {
 
       when {
-        controller.subscriptionService.update(any(), any(), any())
+        controller.subscriptionService.update(any[String](), any(), any())(any(), any())
       } thenReturn Future.successful(amendmentResponse)
 
-      when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
+      when(controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any()))
+        .thenReturn(Future.successful(SubmissionReadyForReview))
 
       val result = controller.post()(request)
 
@@ -134,11 +138,11 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       val msg = "HMRC-MLR-ORG duplicate enrolment"
 
       when {
-        controller.subscriptionService.subscribe(any(), any(), any())
+        controller.subscriptionService.subscribe(any(), any(), any())(any(), any())
       } thenReturn Future.failed(DuplicateEnrolmentException(msg, Upstream5xxResponse(msg, BAD_GATEWAY, BAD_GATEWAY)))
 
       when {
-        controller.statusService.getStatus(any(), any(), any())
+        controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any())
       } thenReturn Future.successful(SubmissionReady)
 
       val result = controller.post()(request)
@@ -153,11 +157,11 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       val msg = "HMRC-MLR-ORG duplicate subscription"
 
       when {
-        controller.subscriptionService.subscribe(any(), any(), any())
+        controller.subscriptionService.subscribe(any[String](), any(), any())(any(), any())
       } thenReturn Future.failed(DuplicateSubscriptionException(msg))
 
       when {
-        controller.statusService.getStatus(any(), any(), any())
+        controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any())
       } thenReturn Future.successful(SubmissionReady)
 
       val result = controller.post()(request)
@@ -172,11 +176,11 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       val msg = "invalid credentials"
 
       when {
-        controller.statusService.getStatus(any(), any(), any())
+        controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any())
       } thenReturn Future.successful(SubmissionReady)
 
       when {
-        controller.subscriptionService.subscribe(any(), any(), any())
+        controller.subscriptionService.subscribe(any[String](), any(), any())(any(), any())
       } thenReturn Future.failed(InvalidEnrolmentCredentialsException(msg, Upstream5xxResponse(msg, BAD_GATEWAY, BAD_GATEWAY)))
 
       val result = controller.post()(request)
@@ -191,11 +195,11 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       val msg = "Non-recoverable Error - The request could not be understood by the server due to malformed syntax"
 
       when {
-        controller.subscriptionService.subscribe(any(), any(), any())
+        controller.subscriptionService.subscribe(any[String](), any(), any())(any(), any())
       } thenReturn Future.failed(new BadRequestException("[amls][HttpStatusException][status] - API call failed with http response code: 400"))
 
       when {
-        controller.statusService.getStatus(any(), any(), any())
+        controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any())
       } thenReturn Future.successful(SubmissionReady)
 
       val result = controller.post()(request)
@@ -211,25 +215,27 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
     "Submission is approved" must {
       "call the variation method on the service" in new Fixture {
         when {
-          controller.subscriptionService.variation(any(), any(), any())
+          controller.subscriptionService.variation(any[String](), any(), any())(any(), any())
         } thenReturn Future.successful(mock[AmendVariationRenewalResponse])
 
-        when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionDecisionApproved))
+        when(controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
 
         val result = controller.post()(request)
 
         whenReady(result) { _ =>
-          verify(controller.subscriptionService).variation(any(), any(), any())
+          verify(controller.subscriptionService).variation(any[String](), any(), any())(any(), any())
         }
       }
 
 
       "Redirect to the correct confirmation page" in new Fixture {
         when {
-          controller.subscriptionService.variation(any(), any(), any())
+          controller.subscriptionService.variation(any[String](), any(), any())(any(), any())
         } thenReturn Future.successful(amendmentResponse)
 
-        when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionDecisionApproved))
+        when(controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
 
         val result = controller.post()(request)
 
@@ -241,11 +247,11 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         val msg = "Non-recoverable Error - The request could not be understood by the server due to malformed syntax"
 
         when {
-          controller.subscriptionService.variation(any(), any(), any())
+          controller.subscriptionService.variation(any[String](), any(), any())(any(), any())
         } thenReturn Future.failed(new BadRequestException("[amls][HttpStatusException][status] - API call failed with http response code: 400"))
 
         when {
-          controller.statusService.getStatus(any(), any(), any())
+          controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any())
         } thenReturn Future.successful(SubmissionDecisionApproved)
 
         val result = controller.post()(request)
@@ -261,15 +267,15 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       "call the renewal method on the service" in new Fixture {
 
         when {
-          controller.subscriptionService.renewal(any())(any(), any(), any())
+          controller.subscriptionService.renewal(any(), any(), any(), any())(any(), any())
         } thenReturn Future.successful(mock[SubmissionResponse])
 
         when {
-          controller.statusService.getStatus(any(), any(), any())
+          controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any())
         } thenReturn Future.successful(ReadyForRenewal(Some(LocalDate.now.plusDays(15))))
 
         when {
-          controller.renewalService.getRenewal(any(), any(), any())
+          controller.renewalService.getRenewal(any[String]())(any(), any())
         } thenReturn Future.successful(Some(mock[Renewal]))
 
         val result = controller.post()(request)
@@ -277,43 +283,42 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get().url)
 
-        verify(controller.renewalService).getRenewal(any(), any(), any())
-
+        verify(controller.renewalService).getRenewal(any[String]())(any(), any())
       }
 
       "do a variation if user is in renewal period but has no renewal object" in new Fixture {
 
         when {
-          controller.subscriptionService.variation(any(), any(), any())
+          controller.subscriptionService.variation(any[String](), any(), any())(any(), any())
         } thenReturn Future.successful(mock[AmendVariationRenewalResponse])
 
         when {
-          controller.statusService.getStatus(any(), any(), any())
+          controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any())
         } thenReturn Future.successful(ReadyForRenewal(Some(LocalDate.now.plusDays(15))))
 
         when {
-          controller.renewalService.getRenewal(any(), any(), any())
+          controller.renewalService.getRenewal(any[String]())(any(), any())
         } thenReturn Future.successful(None)
 
         val result = await(controller.post()(request))
 
-        verify(controller.subscriptionService).variation(any(), any(), any())
-        verify(controller.subscriptionService, never()).renewal(any())(any(), any(), any())
+        verify(controller.subscriptionService).variation(any[String](), any(), any())(any(), any())
+        verify(controller.subscriptionService, never()).renewal(any(), any(), any(), any())(any(), any())
       }
 
       "show the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {
         val msg = "Non-recoverable Error - The request could not be understood by the server due to malformed syntax"
 
         when {
-          controller.subscriptionService.variation(any(), any(), any())
+          controller.subscriptionService.variation(any[String](), any(), any())(any(), any())
         } thenReturn Future.failed(new BadRequestException("[amls][HttpStatusException][status] - API call failed with http response code: 400"))
 
         when {
-          controller.statusService.getStatus(any(), any(), any())
+          controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any())
         } thenReturn Future.successful(ReadyForRenewal(Some(LocalDate.now.plusDays(15))))
 
         when {
-          controller.renewalService.getRenewal(any(), any(), any())
+          controller.renewalService.getRenewal(any[String]())(any(), any())
         } thenReturn Future.successful(None)
 
         val result = controller.post()(request)
@@ -329,15 +334,15 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       "call the renewal amendment method on the service" in new Fixture {
 
         when {
-          controller.subscriptionService.renewalAmendment(any())(any(), any(), any())
+          controller.subscriptionService.renewalAmendment(any(), any(), any(), any())(any(), any())
         } thenReturn Future.successful(mock[SubmissionResponse])
 
         when {
-          controller.statusService.getStatus(any(), any(), any())
+          controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any())
         } thenReturn Future.successful(RenewalSubmitted(Some(LocalDate.now.plusDays(15))))
 
         when {
-          controller.renewalService.getRenewal(any(), any(), any())
+          controller.renewalService.getRenewal(any[String]())(any(), any())
         } thenReturn Future.successful(Some(mock[Renewal]))
 
         val result = controller.post()(request)
@@ -350,15 +355,15 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         val msg = "Non-recoverable Error - The request could not be understood by the server due to malformed syntax"
 
         when {
-          controller.subscriptionService.renewalAmendment(any())(any(), any(), any())
+          controller.subscriptionService.renewalAmendment(any(), any(), any(), any())(any(), any())
         } thenReturn Future.failed(new BadRequestException("[amls][HttpStatusException][status] - API call failed with http response code: 400"))
 
         when {
-          controller.statusService.getStatus(any(), any(), any())
+          controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any())
         } thenReturn Future.successful(RenewalSubmitted(Some(LocalDate.now.plusDays(15))))
 
         when {
-          controller.renewalService.getRenewal(any(), any(), any())
+          controller.renewalService.getRenewal(any[String]())(any(), any())
         } thenReturn Future.successful(Some(mock[Renewal]))
 
         val result = controller.post()(request)
