@@ -28,8 +28,7 @@ import utils.ControllerHelper
 import views.html.supervision.summary
 
 class SummaryController  @Inject() (val dataCacheConnector: DataCacheConnector,
-                                    val authAction: AuthAction
-                                   ) extends DefaultBaseController {
+                                    val authAction: AuthAction) extends DefaultBaseController {
 
   def get() = authAction.async {
     implicit request =>

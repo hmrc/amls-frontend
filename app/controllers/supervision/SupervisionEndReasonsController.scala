@@ -23,15 +23,13 @@ import javax.inject.Inject
 import models.supervision._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.AuthAction
 import views.html.supervision.supervision_end_reasons
 
 import scala.concurrent.Future
 
 class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                val authAction: AuthAction
-                                               ) extends DefaultBaseController {
+                                                val authAction: AuthAction) extends DefaultBaseController {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>
