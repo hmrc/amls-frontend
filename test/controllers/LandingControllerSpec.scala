@@ -20,6 +20,7 @@ import java.net.URLEncoder
 
 import config.ApplicationConfig
 import connectors.{DataCacheConnector, KeystoreConnector}
+import controllers.actions.SuccessfulAuthAction
 import generators.StatusGenerator
 import models.businessdetails.BusinessDetails
 import models.asp.Asp
@@ -72,7 +73,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
     val controller = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],
       landingService = mock[LandingService],
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       auditConnector = mock[AuditConnector],
       authService = mock[AuthService],
       cacheConnector = mock[DataCacheConnector],
@@ -90,7 +91,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
     }
 
     when {
-      controller.landingService.setAltCorrespondenceAddress(any())(any(), any(), any())
+      controller.landingService.setAltCorrespondenceAddress(any(), any(), any(), any())(any(), any())
     } thenReturn Future.successful(mock[CacheMap])
 
     val completeATB = mock[BusinessDetails]
@@ -246,9 +247,9 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
             businessAddress = Address("Line 1", "Line 2", None, None, Some("AA11AA"), Country("United Kingdom", "GB")),
             safeId = ""))
 
-          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(None)
+          when(controller.landingService.cacheMap(any[String]())(any(), any())) thenReturn Future.successful(None)
           when(controller.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(details))
-          when(controller.landingService.updateReviewDetails(any())(any(), any(), any())).thenReturn(Future.successful(mock[CacheMap]))
+          when(controller.landingService.updateReviewDetails(any(), any[String]())(any(), any())).thenReturn(Future.successful(mock[CacheMap]))
           when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
 
           val result = controller.get()(request)
@@ -265,9 +266,9 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
             businessAddress = Address("Line 1", "Line 2", None, None, Some("aa1 $ aa156"), Country("United Kingdom", "GB")),
             safeId = ""))
 
-          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(None)
+          when(controller.landingService.cacheMap(any[String]())(any(), any())) thenReturn Future.successful(None)
           when(controller.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(details))
-          when(controller.landingService.updateReviewDetails(any())(any(), any(), any())).thenReturn(Future.successful(mock[CacheMap]))
+          when(controller.landingService.updateReviewDetails(any(), any[String]())(any(), any())).thenReturn(Future.successful(mock[CacheMap]))
           when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
 
           val result = controller.get()(request)
@@ -342,7 +343,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
     val controller = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],
       landingService = mock[LandingService],
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       auditConnector = mock[AuditConnector],
       authService = mock[AuthService],
       cacheConnector = mock[DataCacheConnector],
@@ -353,10 +354,10 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       controller.authService.validateCredentialRole(any(), any(), any())
     } thenReturn Future.successful(true)
 
-    when(controller.landingService.refreshCache(any())(any(), any(), any())).thenReturn(Future.successful(mock[CacheMap]))
+    when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any())).thenReturn(Future.successful(mock[CacheMap]))
 
     when {
-      controller.landingService.setAltCorrespondenceAddress(any())(any(), any(), any())
+      controller.landingService.setAltCorrespondenceAddress(any[String](), any(), any(), any())(any(), any())
     } thenReturn Future.successful(mock[CacheMap])
 
 
@@ -575,7 +576,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
               status(result) must be(SEE_OTHER)
               redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
-              verify(controller.landingService, atLeastOnce()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+              verify(controller.landingService, atLeastOnce()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext])
             }
           }
         }
@@ -603,7 +604,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
             status(result) mustBe SEE_OTHER
             redirectLocation(result) mustBe Some(controllers.routes.StatusController.get().url)
-            verify(controller.landingService, never).refreshCache(any())(any(), any(), any())
+            verify(controller.landingService, never).refreshCache(any[String](), any(), any())(any(), any())
           }
 
           "redirect to the status page without refreshing the cache" when {
@@ -643,7 +644,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 status(result) must be(SEE_OTHER)
                 redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
 
-                verify(controller.landingService).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+                verify(controller.landingService).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext])
               }
             }
 
@@ -675,7 +676,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 status(result) must be(SEE_OTHER)
                 redirectLocation(result) must be(Some(controllers.routes.LoginEventController.get().url))
 
-                verify(controller.landingService).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+                verify(controller.landingService).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext])
               }
             }
           }
@@ -689,7 +690,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 )
 
                 when {
-                  controller.landingService.setAltCorrespondenceAddress(any(), any())(any(), any(), any())
+                  controller.landingService.setAltCorrespondenceAddress(any(), any(), any(), any())(any(), any())
                 } thenReturn Future.successful(testCacheMap)
 
                 setUpMocksForAnEnrolmentExists(controller)
@@ -708,7 +709,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 status(result) must be(SEE_OTHER)
                 redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
 
-                verify(controller.landingService, never()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+                verify(controller.landingService, never()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext])
               }
             }
 
@@ -724,7 +725,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 )
 
                 when {
-                  controller.landingService.setAltCorrespondenceAddress(any(), any())(any(), any(), any())
+                  controller.landingService.setAltCorrespondenceAddress(any(), any(), any(), any())(any(), any())
                 } thenReturn Future.successful(testCacheMap)
 
                 setUpMocksForAnEnrolmentExists(controller)
@@ -743,7 +744,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 status(result) must be(SEE_OTHER)
                 redirectLocation(result) must be(Some(controllers.routes.LoginEventController.get().url))
 
-                verify(controller.landingService, never()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+                verify(controller.landingService, never()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext])
               }
             }
           }
@@ -765,7 +766,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
-            verify(controller.landingService, atLeastOnce()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+            verify(controller.landingService, atLeastOnce()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext])
           }
 
           "refresh from API5 and redirect to status controller with duplicate submission flag set" in new Fixture {
@@ -785,7 +786,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.routes.StatusController.get(true).url))
-            verify(controller.landingService, atLeastOnce()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+            verify(controller.landingService, atLeastOnce()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext])
           }
 
           "refresh from API5 and redirect to status controller when there is no TP or RP data" in new Fixture {
@@ -819,7 +820,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
-            verify(controller.landingService, atLeastOnce()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+            verify(controller.landingService, atLeastOnce()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext])
           }
         }
       }
@@ -841,7 +842,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
-          verify(controller.landingService, atLeastOnce()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+          verify(controller.landingService, atLeastOnce()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext])
         }
       }
     }
@@ -864,7 +865,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
           val result = controller.get()(request)
 
-          verify(controller.landingService, never()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+          verify(controller.landingService, never()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext])
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
         }
@@ -877,7 +878,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             setUpMocksForNoDataInSaveForLater(controller)
             val reviewDetails = setUpMocksForDataExistsInKeystore(controller)
 
-            when(controller.landingService.updateReviewDetails(any[ReviewDetails])(any[HeaderCarrier], any[ExecutionContext], any[AuthContext]))
+            when(controller.landingService.updateReviewDetails(any[ReviewDetails], any[String])(any[HeaderCarrier], any[ExecutionContext]))
               .thenReturn(Future.successful(mock[CacheMap]))
 
             val result = controller.get()(request)
@@ -886,7 +887,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             redirectLocation(result) must be(Some(controllers.businessmatching.routes.BusinessTypeController.get().url))
 
             Mockito.verify(controller.landingService, times(1))
-              .updateReviewDetails(any[ReviewDetails])(any[HeaderCarrier], any[ExecutionContext], any[AuthContext])
+              .updateReviewDetails(any[ReviewDetails], any[String])(any[HeaderCarrier], any[ExecutionContext])
           }
         }
 

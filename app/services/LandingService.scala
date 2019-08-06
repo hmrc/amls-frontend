@@ -56,8 +56,6 @@ class LandingService @Inject() (
 
   def cacheMap(credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CacheMap]] = cacheConnector.fetchAll(credId)
 
-  def remove(implicit hc: HeaderCarrier, ac: AuthContext): Future[Boolean] = cacheConnector.remove
-
   def setAltCorrespondenceAddress(amlsRefNumber: String, maybeCacheMap: Option[CacheMap], accountTypeId: (String, String), credId: String)
                                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
     val cachedModel = for {

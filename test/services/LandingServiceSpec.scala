@@ -107,7 +107,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       setUpMockView(service.cacheConnector, cacheMap, BusinessDetails.key, businessDetails.copy(altCorrespondenceAddress = Some(true)))
 
 
-      await(service.setAltCorrespondenceAddress(businessDetails)) mustEqual cacheMap
+      await(service.setAltCorrespondenceAddress(businessDetails, any())) mustEqual cacheMap
 
     }
 
@@ -128,7 +128,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       setUpMockView(service.cacheConnector, cacheMap, BusinessDetails.key, businessDetails.copy(altCorrespondenceAddress = Some(false)))
 
 
-      await(service.setAltCorrespondenceAddress(businessDetails)) mustEqual cacheMap
+      await(service.setAltCorrespondenceAddress(businessDetails, any())) mustEqual cacheMap
 
     }
   }
@@ -177,7 +177,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
       setUpMockView(service.cacheConnector, cache, BusinessDetails.key, viewResponse.businessDetailsSection.copy(altCorrespondenceAddress = Some(true)))
 
-      await(service.setAltCorrespondenceAddress("regNo", None)) mustEqual cache
+      await(service.setAltCorrespondenceAddress("regNo", None, any(), any())) mustEqual cache
 
       verify(service.desConnector).view(any())(any(), any(), any(), any())
     }
@@ -200,7 +200,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
         setUpMockView(service.cacheConnector, cache, BusinessDetails.key, viewResponse.businessDetailsSection.copy(altCorrespondenceAddress = Some(true)))
 
-        await(service.setAltCorrespondenceAddress("regNo", Some(cache)))
+        await(service.setAltCorrespondenceAddress("regNo", Some(cache), any(), any()))
 
         verify(service.desConnector, never()).view(any())(any(), any(), any(), any())
       }
@@ -231,7 +231,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
     "update all saved sections" in {
       reset(service.cacheConnector)
 
-      when(service.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
+      when(service.statusService.getStatus(any[Option[String]], any(), any())(any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
 
       when {
         service.desConnector.view(any[String])(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]], any[AuthContext])
@@ -262,7 +262,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         service.cacheConnector.saveAll(any())(any(),any())
       } thenReturn Future.successful(cacheMap)
 
-      await(service.refreshCache("regNo")) mustEqual cacheMap
+      await(service.refreshCache("regNo", any(), any())) mustEqual cacheMap
 
       verify(service.cacheConnector).upsert(any(), eqTo(ViewResponse.key),
         eqTo(Some(viewResponse)))(any(), any(), any())
@@ -323,7 +323,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
       reset(service.cacheConnector)
 
-      when(service.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
+      when(service.statusService.getStatus(any[Option[String]], any(), any())(any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
 
       when {
         service.desConnector.view(any[String])(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]], any[AuthContext])
@@ -354,7 +354,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         service.cacheConnector.saveAll(any())(any(),any())
       } thenReturn Future.successful(cacheMap)
 
-      await(service.refreshCache("regNo")) mustEqual cacheMap
+      await(service.refreshCache("regNo", any(), any())) mustEqual cacheMap
 
       verify(service.cacheConnector).upsert(any(), eqTo(ViewResponse.key),
         eqTo(Some(viewResponse)))(any(), any(), any())
@@ -454,7 +454,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
     "update all saved sections" in {
       reset(service.cacheConnector)
 
-      when(service.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(RenewalSubmitted(None)))
+      when(service.statusService.getStatus(any[Option[String]], any(), any())(any(), any())).thenReturn(Future.successful(RenewalSubmitted(None)))
 
       when {
         service.cacheConnector.fetchAllWithDefault
@@ -482,7 +482,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         service.cacheConnector.saveAll(any())(any(), any())
       } thenReturn Future.successful(cacheMap)
 
-      await(service.refreshCache("regNo")) mustEqual cacheMap
+      await(service.refreshCache("regNo", any(), any())) mustEqual cacheMap
 
       verify(service.cacheConnector).upsert(any(), eqTo(ViewResponse.key),
         eqTo(Some(viewResponse)))(any(), any(), any())
@@ -566,7 +566,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         service.cacheConnector.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any())
       } thenReturn Future.successful(cacheMap)
 
-      whenReady (service.updateReviewDetails(reviewDetails)) {
+      whenReady (service.updateReviewDetails(reviewDetails, any())) {
         _ mustEqual cacheMap
       }
     }
@@ -576,7 +576,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         service.cacheConnector.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any())
       } thenReturn Future.failed(new Exception(""))
 
-      whenReady (service.updateReviewDetails(reviewDetails).failed) {
+      whenReady (service.updateReviewDetails(reviewDetails, any()).failed) {
         _ mustBe an[Exception]
       }
     }
