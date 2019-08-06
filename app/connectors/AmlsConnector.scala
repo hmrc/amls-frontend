@@ -411,6 +411,7 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     httpPut.PUT[RefreshPaymentStatusRequest, PaymentStatusResult](putUrl, RefreshPaymentStatusRequest(paymentReference))
   }
 
+  @deprecated("to be removed after new auth changes implemented")
   def registrationDetails(safeId: String)(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[RegistrationDetails] = {
     //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
