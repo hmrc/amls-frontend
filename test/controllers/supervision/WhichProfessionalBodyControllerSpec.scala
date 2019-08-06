@@ -134,7 +134,7 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
         "businessType[0]" -> "01",
         "businessType[1]" -> "02"
       )
-      
+
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
 
