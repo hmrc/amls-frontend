@@ -73,6 +73,10 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
                (implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): CacheMap =
     mongoCache.upsert(targetCache, data, key)
 
+  def upsertNewAuth[T](targetCache: CacheMap, key: String, data: T)
+               (implicit hc: HeaderCarrier, format: Format[T]): CacheMap =
+    mongoCache.upsert(targetCache, data, key)
+
   /**
     * Fetches the entire cache from the mongo store
     */
@@ -107,6 +111,10 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
       case data => Future.successful(data)
       case _ => fetchAllWithDefaultByOid
     }
+  }
+
+  def fetchAllWithDefault(credId: String)(implicit hc: HeaderCarrier): Future[CacheMap] = {
+    mongoCache.fetchAllWithDefault(credId, deprecatedFilter = false).map(toCacheMap)
   }
 
   private def fetchAllWithDefaultByOid(implicit hc: HeaderCarrier, authContext: AuthContext): Future[CacheMap] =
@@ -165,6 +173,13 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
           val cache = Cache(updateCache)
           mongoCache.saveAll(cache, credId) map { _ => toCacheMap(cache) }
         }
+    }
+  }
+
+  def saveAll(credId: String, cacheMap: Future[CacheMap])(implicit hc: HeaderCarrier): Future[CacheMap] = {
+    cacheMap.flatMap { updateCache =>
+      val cache = Cache(updateCache)
+      mongoCache.saveAll(cache, credId) map { _ => toCacheMap(cache) }
     }
   }
 

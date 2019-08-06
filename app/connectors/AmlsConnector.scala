@@ -112,6 +112,7 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     }
   }
 
+  @deprecated("to be removed when new auth completely implemented")
   def view(amlsRegistrationNumber: String)
           (implicit
            headerCarrier: HeaderCarrier,
@@ -122,6 +123,23 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
 
     //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+
+    val getUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber"
+    val prefix = "[AmlsConnector][view]"
+    Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
+
+    httpGet.GET[ViewResponse](getUrl) map {
+      response =>
+        Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
+        response
+    }
+
+  }
+
+  def view(amlsRegistrationNumber: String, accountTypeId: (String, String))
+          (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, reqW: Writes[ViewResponse]): Future[ViewResponse] = {
+
+    val (accountType, accountId) = accountTypeId
 
     val getUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber"
     val prefix = "[AmlsConnector][view]"

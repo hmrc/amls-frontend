@@ -51,44 +51,43 @@ class LandingService @Inject() (
                                val statusService: StatusService,
                                val businessMatchingConnector: BusinessMatchingConnector
                                ){
-
+  @deprecated("to be removed when new auth completely implemented")
   def cacheMap(implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[Option[CacheMap]] = cacheConnector.fetchAll
+
+  def cacheMap(credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CacheMap]] = cacheConnector.fetchAll(credId)
 
   def remove(implicit hc: HeaderCarrier, ac: AuthContext): Future[Boolean] = cacheConnector.remove
 
-  def setAltCorrespondenceAddress(amlsRefNumber: String, maybeCacheMap: Option[CacheMap])
-                                 (implicit authContext: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
+  def setAltCorrespondenceAddress(amlsRefNumber: String, maybeCacheMap: Option[CacheMap], accountTypeId: (String, String), credId: String)
+                                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
     val cachedModel = for {
       cache <- OptionT.fromOption[Future](maybeCacheMap)
       entry <- OptionT.fromOption[Future](cache.getEntry[BusinessDetails](BusinessDetails.key))
     } yield entry
 
-    lazy val etmpModel = OptionT.liftF(desConnector.view(amlsRefNumber) map { v => v.businessDetailsSection })
+    lazy val etmpModel = OptionT.liftF(desConnector.view(amlsRefNumber, accountTypeId) map { v => v.businessDetailsSection })
 
     (for {
       businessDetails <- cachedModel orElse etmpModel
-      cacheMap <- OptionT.liftF(cacheConnector.save[BusinessDetails](BusinessDetails.key, fixAddress(businessDetails)))
+      cacheMap <- OptionT.liftF(cacheConnector.save[BusinessDetails](credId, BusinessDetails.key, fixAddress(businessDetails)))
     } yield cacheMap) getOrElse (throw new Exception("Unable to update alt correspondence address"))
   }
 
-  def setAltCorrespondenceAddress(businessDetails: BusinessDetails)(implicit
-                                                                     authContext: AuthContext,
-                                                                     hc: HeaderCarrier,
-                                                                     ec: ExecutionContext
-  ): Future[CacheMap] = {
-    cacheConnector.save[BusinessDetails](BusinessDetails.key, fixAddress(businessDetails))
+  def setAltCorrespondenceAddress(businessDetails: BusinessDetails, credId: String)
+                                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
+    cacheConnector.save[BusinessDetails](credId, BusinessDetails.key, fixAddress(businessDetails))
   }
 
-  def refreshCache(amlsRefNumber: String)
-                  (implicit authContext: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
+  def refreshCache(amlsRefNumber: String, credId: String, accountTypeId: (String, String))
+                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
     for {
-      viewResponse           <- desConnector.view(amlsRefNumber)
-      subscriptionResponse   <- cacheConnector.fetch[SubscriptionResponse](SubscriptionResponse.key).recover { case _ => None }
-      amendVariationResponse <- cacheConnector.fetch[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key) recover { case _ => None }
-      _                      <- cacheConnector.remove // MUST clear cash first to remove stale data and reload from API5
-      appCache               <- cacheConnector.fetchAllWithDefault
+      viewResponse           <- desConnector.view(amlsRefNumber, accountTypeId)
+      subscriptionResponse   <- cacheConnector.fetch[SubscriptionResponse](credId, SubscriptionResponse.key).recover { case _ => None }
+      amendVariationResponse <- cacheConnector.fetch[AmendVariationRenewalResponse](credId, AmendVariationRenewalResponse.key) recover { case _ => None }
+      _                      <- cacheConnector.remove(credId) // MUST clear cash first to remove stale data and reload from API5
+      appCache               <- cacheConnector.fetchAllWithDefault(credId)
       refreshedCache         <- {
-       upsertCacheEntries(appCache, viewResponse, subscriptionResponse, amendVariationResponse)
+       upsertCacheEntries(appCache, viewResponse, subscriptionResponse, amendVariationResponse, amlsRefNumber, accountTypeId, credId)
       }
     } yield refreshedCache
   }
@@ -116,10 +115,10 @@ class LandingService @Inject() (
    * shouldn't be a problem as this should only happen when someone
    * first comes into the Application from Business Customer FE
    */
-  def updateReviewDetails(reviewDetails: ReviewDetails)
-                         (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[CacheMap] = {
+  def updateReviewDetails(reviewDetails: ReviewDetails, credId: String)
+                         (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
     val bm = BusinessMatching(reviewDetails = Some(reviewDetails))
-    cacheConnector.save[BusinessMatching](BusinessMatching.key, bm)
+    cacheConnector.save[BusinessMatching](credId, BusinessMatching.key, bm)
   }
 
   /* **********
@@ -127,51 +126,52 @@ class LandingService @Inject() (
    ************/
 
   private def upsertCacheEntries(appCache: CacheMap, viewResponse: ViewResponse, subscriptionResponse: Option[SubscriptionResponse],
-                                 amendVariationResponse: Option[AmendVariationRenewalResponse])
-                                (implicit authContext: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
+                                 amendVariationResponse: Option[AmendVariationRenewalResponse], amlsRegistrationNo: String,
+                                 accountTypeId: (String, String), cacheId: String)
+                                (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
 
-    val cachedViewResponse = cacheConnector.upsert[Option[ViewResponse]](appCache, ViewResponse.key, Some(viewResponse))
+    val cachedViewResponse = cacheConnector.upsertNewAuth[Option[ViewResponse]](appCache, ViewResponse.key, Some(viewResponse))
 
-    val cachedBusinessMatching = cacheConnector.upsert[BusinessMatching](cachedViewResponse, BusinessMatching.key,
+    val cachedBusinessMatching = cacheConnector.upsertNewAuth[BusinessMatching](cachedViewResponse, BusinessMatching.key,
       viewResponseSection(viewResponse))
 
-    val cachedEstateAgentBusiness = cacheConnector.upsert[Option[EstateAgentBusiness]](cachedBusinessMatching,
+    val cachedEstateAgentBusiness = cacheConnector.upsertNewAuth[Option[EstateAgentBusiness]](cachedBusinessMatching,
       EstateAgentBusiness.key, eabSection(viewResponse))
 
-    val cachedTradingPremises = cacheConnector.upsert[Option[Seq[TradingPremises]]](cachedEstateAgentBusiness, TradingPremises.key,
+    val cachedTradingPremises = cacheConnector.upsertNewAuth[Option[Seq[TradingPremises]]](cachedEstateAgentBusiness, TradingPremises.key,
       tradingPremisesSection(viewResponse.tradingPremisesSection))
 
-    val cachedBusinessDetails = cacheConnector.upsert[BusinessDetails](cachedTradingPremises, BusinessDetails.key, aboutSection(viewResponse))
+    val cachedBusinessDetails = cacheConnector.upsertNewAuth[BusinessDetails](cachedTradingPremises, BusinessDetails.key, aboutSection(viewResponse))
 
-    val cachedBankDetails = cacheConnector.upsert[Seq[BankDetails]](
-      cachedBusinessDetails, BankDetails.key, writeEmptyBankDetails(viewResponse.bankDetailsSection)
-    )
-    val cachedAddPerson = cacheConnector.upsert[AddPerson](cachedBankDetails, AddPerson.key, viewResponse.aboutYouSection)
+    val cachedBankDetails = cacheConnector.upsertNewAuth[Seq[BankDetails]](
+      cachedBusinessDetails, BankDetails.key, writeEmptyBankDetails(viewResponse.bankDetailsSection))
 
-    val cachedBusinessActivities = cacheConnector.upsert[BusinessActivities](cachedAddPerson, BusinessActivities.key, activitySection(viewResponse))
+    val cachedAddPerson = cacheConnector.upsertNewAuth[AddPerson](cachedBankDetails, AddPerson.key, viewResponse.aboutYouSection)
 
-    val cachedTcsp = cacheConnector.upsert[Option[Tcsp]](cachedBusinessActivities, Tcsp.key, tcspSection(viewResponse))
+    val cachedBusinessActivities = cacheConnector.upsertNewAuth[BusinessActivities](cachedAddPerson, BusinessActivities.key, activitySection(viewResponse))
 
-    val cachedAsp = cacheConnector.upsert[Option[Asp]](cachedTcsp, Asp.key, aspSection(viewResponse))
+    val cachedTcsp = cacheConnector.upsertNewAuth[Option[Tcsp]](cachedBusinessActivities, Tcsp.key, tcspSection(viewResponse))
 
-    val cachedMoneyServiceBusiness = cacheConnector.upsert[Option[MoneyServiceBusiness]](cachedAsp, MoneyServiceBusiness.key, msbSection(viewResponse))
+    val cachedAsp = cacheConnector.upsertNewAuth[Option[Asp]](cachedTcsp, Asp.key, aspSection(viewResponse))
 
-    val cachedHvd = cacheConnector.upsert[Option[Hvd]](cachedMoneyServiceBusiness, Hvd.key, hvdSection(viewResponse))
+    val cachedMoneyServiceBusiness = cacheConnector.upsertNewAuth[Option[MoneyServiceBusiness]](cachedAsp, MoneyServiceBusiness.key, msbSection(viewResponse))
 
-    val cachedSupervision = cacheConnector.upsert[Option[Supervision]](cachedHvd, Supervision.key, supervisionSection(viewResponse))
+    val cachedHvd = cacheConnector.upsertNewAuth[Option[Hvd]](cachedMoneyServiceBusiness, Hvd.key, hvdSection(viewResponse))
 
-    val cachedSubscriptionResponse = cacheConnector.upsert[Option[SubscriptionResponse]](cachedSupervision,
+    val cachedSupervision = cacheConnector.upsertNewAuth[Option[Supervision]](cachedHvd, Supervision.key, supervisionSection(viewResponse))
+
+    val cachedSubscriptionResponse = cacheConnector.upsertNewAuth[Option[SubscriptionResponse]](cachedSupervision,
       SubscriptionResponse.key, subscriptionResponse)
 
-    val cachedAmendVariationRenewalResponse = cacheConnector.upsert[Option[AmendVariationRenewalResponse]](cachedSubscriptionResponse,
+    val cachedAmendVariationRenewalResponse = cacheConnector.upsertNewAuth[Option[AmendVariationRenewalResponse]](cachedSubscriptionResponse,
       AmendVariationRenewalResponse.key, amendVariationResponse)
 
-    val cachedResponsiblePerson = cacheConnector.upsert[Option[Seq[ResponsiblePerson]]](cachedAmendVariationRenewalResponse,
+    val cachedResponsiblePerson = cacheConnector.upsertNewAuth[Option[Seq[ResponsiblePerson]]](cachedAmendVariationRenewalResponse,
       ResponsiblePerson.key, responsiblePeopleSection(viewResponse.responsiblePeopleSection))
 
-    val cachedRenewal = saveRenewalData(viewResponse, cachedResponsiblePerson)
+    val cachedRenewal = saveRenewalData(viewResponse, cachedResponsiblePerson, amlsRegistrationNo, accountTypeId, cacheId)
 
-    cacheConnector.saveAll(cachedRenewal)
+    cacheConnector.saveAll(cacheId, cachedRenewal)
   }
 
   private def viewResponseSection(viewResponse: ViewResponse) = {
@@ -251,15 +251,15 @@ class LandingService @Inject() (
   private def tradingPremisesSection(viewResponse: Option[Seq[TradingPremises]]): Option[Seq[TradingPremises]] =
     Some(viewResponse.fold(Seq.empty[TradingPremises])(_.map(tp => tp.copy(hasAccepted = true))))
 
-  private def saveRenewalData(viewResponse: ViewResponse, cacheMap: CacheMap)
-                             (implicit authContext: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
+  private def saveRenewalData(viewResponse: ViewResponse, cacheMap: CacheMap, amlsRegistrationNo: String, accountTypeId: (String, String), cacheId: String)
+                             (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
 
     import models.businessactivities.{InvolvedInOther => BAInvolvedInOther}
     import models.hvd.{PercentageOfCashPaymentOver15000 => HvdRPercentageOfCashPaymentOver15000}
     import models.moneyservicebusiness.{WhichCurrencies => MsbWhichCurrencies}
 
     for {
-      renewalStatus <- statusService.getStatus
+      renewalStatus <- statusService.getStatus(Option(amlsRegistrationNo), accountTypeId, cacheId)
     } yield renewalStatus match {
       case RenewalSubmitted(_) => {
         val renewal = Some(Renewal(
@@ -291,7 +291,7 @@ class LandingService @Inject() (
           ceTransactionsInLast12Months = viewResponse.msbSection.fold[Option[CETransactionsInLast12Months]](None)
             (_.ceTransactionsInNext12Months.map(t => CETransactionsInLast12Months(t.ceTransaction)))
         ))
-        cacheConnector.upsert[Renewal](cacheMap, Renewal.key, renewal)
+        cacheConnector.upsertNewAuth[Renewal](cacheMap, Renewal.key, renewal)
       }
       case _ => cacheMap
     }
