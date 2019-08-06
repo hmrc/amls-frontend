@@ -16,16 +16,29 @@
 
 package models.asp
 
-import models.DateOfChange
-import jto.validation.forms.UrlFormEncoded
-import jto.validation._
-import play.api.libs.json._
 import cats.data.Validated.{Invalid, Valid}
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.{Rule, ValidationError, _}
+import models.DateOfChange
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
+import play.api.i18n.{Lang, Messages}
+import play.api.libs.json.{Reads, Writes, _}
 import utils.TraversableValidators._
+
 
 case class ServicesOfBusiness(services: Set[Service], dateOfChange: Option[DateOfChange] = None)
 
-sealed trait Service
+sealed trait Service {
+  val message = "asp.service.lbl."
+  def getMessage(implicit lang: Lang): String =
+    this match {
+      case Accountancy => Messages(s"${message}01")
+      case PayrollServices => Messages(s"${message}02")
+      case BookKeeping => Messages(s"${message}03")
+      case Auditing => Messages(s"${message}04")
+      case FinancialOrTaxAdvice => Messages(s"${message}05")
+    }}
 
 case object Accountancy extends Service
 
@@ -89,6 +102,8 @@ object ServicesOfBusiness {
     From[UrlFormEncoded] { __ =>
        (__ \ "services").read(minLengthR[Set[Service]](1).withMessage("error.required.asp.business.services")) .flatMap(ServicesOfBusiness(_, None))
   }
+
+
 
   implicit def formWrites
   (implicit

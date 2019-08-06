@@ -36,17 +36,8 @@
             editUrl = controllers.asp.routes.ServicesOfBusinessController.get(true).toString,
             editLinkTag = "aspservices-edit"
         ) {
-            <ul class="list list--comma">
-            @a.services.toList.sortBy(_.toString).map { line =>
-                <li>@line match {
-                    case Accountancy => {@Messages("asp.service.lbl.01")}
-                    case PayrollServices => {@Messages("asp.service.lbl.02")}
-                    case BookKeeping => {@Messages("asp.service.lbl.03")}
-                    case Auditing => {@Messages("asp.service.lbl.04")}
-                    case FinancialOrTaxAdvice => {@Messages("asp.service.lbl.05")}
-                }</li>
-            }
-            </ul>
+
+           <li> @a.services.toList.sortBy(_.getMessage)</li>
         }
     }
 
