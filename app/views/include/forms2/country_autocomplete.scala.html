@@ -38,9 +38,13 @@
     }
     @if(field.hasErrors) {
         @if(placeholder.nonEmpty) {
-            <span class="error-notification" data-journey="error - field:user input:@field.name">@Messages(field.rpError, placeholder)</span>
+            <span class="error-notification" data-journey="error - field:user input:@field.name">
+                <span class="visuallyhidden">Error: </span>
+                @Messages(field.rpError, placeholder)</span>
         } else {
-            <span class="error-notification" data-journey="error - field:user input:@field.name">@field.error</span>
+            <span class="error-notification" data-journey="error - field:user input:@field.name">
+                <span class="visuallyhidden">Error: </span>
+                @field.error</span>
         }
     }
 
