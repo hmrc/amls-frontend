@@ -63,8 +63,7 @@ class ConfirmationControllerSpec extends AmlsSpec
       authEnrolmentsService = mock[AuthEnrolmentsService],
       feeResponseService = mock[FeeResponseService],
       authenticator = mock[AuthenticatorConnector],
-      confirmationService = mock[ConfirmationService]
-    )
+      confirmationService = mock[ConfirmationService])
 
     val amlsRegistrationNumber = "amlsRefNumber"
 
@@ -128,6 +127,7 @@ class ConfirmationControllerSpec extends AmlsSpec
     } thenReturn Future.successful(Some(breakdownRows))
 
     val businessDetails = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredNo))
+
     when {
       controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any(), any())
     } thenReturn Future.successful(Some(businessDetails))
