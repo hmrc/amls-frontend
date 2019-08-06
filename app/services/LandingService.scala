@@ -44,13 +44,12 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class LandingService @Inject() (
-                               val cacheConnector: DataCacheConnector,
-                               val keyStore: KeystoreConnector,
-                               val desConnector: AmlsConnector,
-                               val statusService: StatusService,
-                               val businessMatchingConnector: BusinessMatchingConnector
-                               ){
+class LandingService @Inject() (val cacheConnector: DataCacheConnector,
+                                val keyStore: KeystoreConnector,
+                                val desConnector: AmlsConnector,
+                                val statusService: StatusService,
+                                val businessMatchingConnector: BusinessMatchingConnector){
+
   @deprecated("to be removed when new auth completely implemented")
   def cacheMap(implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[Option[CacheMap]] = cacheConnector.fetchAll
 
