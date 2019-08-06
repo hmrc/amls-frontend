@@ -17,25 +17,24 @@
 package controllers.supervision
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.supervision.{AnotherBody, AnotherBodyNo, AnotherBodyYes, Supervision}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.supervision.another_body
 
 import scala.concurrent.Future
 
 class AnotherBodyController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                      val authConnector: AuthConnector
-                                     ) extends BaseController {
+                                      val authAction: AuthAction) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        dataCacheConnector.fetch[Supervision](Supervision.key) map {
+
+        dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map {
           response =>
             val form: Form2[AnotherBody] = (for {
               supervision <- response
@@ -45,17 +44,17 @@ class AnotherBodyController @Inject()(val dataCacheConnector: DataCacheConnector
         }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request =>
+
         Form2[AnotherBody](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(another_body(f, edit)))
           case ValidForm(_, data: AnotherBody) =>
             for {
-              supervision <- dataCacheConnector.fetch[Supervision](Supervision.key)
-              _ <- dataCacheConnector.save[Supervision](Supervision.key, updateData(supervision, data))
-              updatedSupervision <- dataCacheConnector.fetch[Supervision](Supervision.key)
+              supervision <- dataCacheConnector.fetch[Supervision](request.credId, Supervision.key)
+              _ <- dataCacheConnector.save[Supervision](request.credId, Supervision.key, updateData(supervision, data))
+              updatedSupervision <- dataCacheConnector.fetch[Supervision](request.credId, Supervision.key)
             } yield redirectTo(edit, updatedSupervision)
         }
   }
@@ -72,7 +71,7 @@ class AnotherBodyController @Inject()(val dataCacheConnector: DataCacheConnector
     supervision.anotherBody(updatedAnotherBody).copy(hasAccepted = true)
   }
 
-  private def redirectTo(edit: Boolean, maybeSupervision: Option[Supervision])(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
+  private def redirectTo(edit: Boolean, maybeSupervision: Option[Supervision])(implicit headerCarrier: HeaderCarrier) = {
 
     import utils.ControllerHelper.{anotherBodyComplete, isAnotherBodyYes}
 
