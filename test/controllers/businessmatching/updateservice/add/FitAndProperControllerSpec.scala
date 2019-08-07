@@ -16,6 +16,7 @@
 
 package controllers.businessmatching.updateservice.add
 
+import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
@@ -27,7 +28,7 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePersonGenerator with BusinessMatchingGenerator {
 
@@ -40,13 +41,13 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Respons
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
     val controller = new FitAndProperController(
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[AddBusinessTypeFlowModel]
     )
 
     mockCacheFetch(Some(AddBusinessTypeFlowModel(Some(HighValueDealing))))
-    mockApplicationStatus(SubmissionDecisionApproved)
+    mockApplicationStatusNewAuth(SubmissionDecisionApproved)
 
   }
 

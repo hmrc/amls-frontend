@@ -16,12 +16,14 @@
 
 package controllers.businessmatching.updateservice
 
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.flowmanagement.RemoveBusinessTypeFlowModel
 import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import utils._
+import org.mockito.Matchers.any
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -33,7 +35,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
     self =>
 
     val helper = new RemoveBusinessTypeHelper(
-      self.authConnector,
+      SuccessfulAuthAction,
       mockCacheConnector
     )
   }
@@ -70,7 +72,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
         mockCacheUpdate(Some(ResponsiblePerson.key), expectedResultRP)
 
-        helper.removeFitAndProper(model).returnsSome(expectedResultRP)
+        helper.removeFitAndProper(any(), model).returnsSome(expectedResultRP)
       }
       "the buisness is TCSP and they answered no to F&P then do remove the responsible people approval" in new Fixture {
 
@@ -101,7 +103,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
         mockCacheUpdate(Some(ResponsiblePerson.key), expectedResultRP)
 
-        helper.removeFitAndProper(model).returnsSome(expectedResultRP)
+        helper.removeFitAndProper(any(), model).returnsSome(expectedResultRP)
       }
     }
   }

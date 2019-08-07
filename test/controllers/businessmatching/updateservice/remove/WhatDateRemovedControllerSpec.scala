@@ -16,6 +16,7 @@
 
 package controllers.businessmatching.updateservice.remove
 
+import controllers.actions.SuccessfulAuthAction
 import models.DateOfChange
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, WhatDateRemovedPageId}
 import org.mockito.Matchers._
@@ -33,7 +34,7 @@ class WhatDateRemovedControllerSpec extends AmlsSpec {
     val request = addToken(authRequest)
 
     val controller = new WhatDateRemovedController(
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[RemoveBusinessTypeFlowModel]
     )

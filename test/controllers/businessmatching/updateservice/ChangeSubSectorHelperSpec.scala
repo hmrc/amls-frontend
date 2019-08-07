@@ -16,19 +16,14 @@
 
 package controllers.businessmatching.updateservice
 
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching._
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.ChangeSubSectorFlowModel
 import models.moneyservicebusiness.{MoneyServiceBusiness => MSB, _}
-import org.mockito.Mockito.{verify, never}
-import org.mockito.Matchers.{eq => eqTo, any}
-
-import models.tradingpremises.{
-  ChequeCashingScrapMetal => TPChequeCashingScrapMetal,
-  CurrencyExchange => TPCurrencyExchange,
-  TransmittingMoney => TPTransmittingMoney,
-  ChequeCashingNotScrapMetal => _, _}
-
+import org.mockito.Mockito.{never, verify}
+import org.mockito.Matchers.{any, eq => eqTo}
+import models.tradingpremises.{ChequeCashingScrapMetal => TPChequeCashingScrapMetal, CurrencyExchange => TPCurrencyExchange, TransmittingMoney => TPTransmittingMoney, ChequeCashingNotScrapMetal => _, _}
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
@@ -39,7 +34,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec {
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val helper = new ChangeSubSectorHelper(
-      self.authConnector,
+      SuccessfulAuthAction,
       mockCacheConnector)
   }
 

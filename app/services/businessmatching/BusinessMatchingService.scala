@@ -41,10 +41,16 @@ class BusinessMatchingService @Inject()(
                                          dataCacheConnector: DataCacheConnector,
                                          appConfig: AppConfig
                                        ) {
-
+@deprecated("To be removed when auth implementation is done")
   def preApplicationComplete(implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext): Future[Boolean] = {
     for {
       bm <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
+    } yield bm.preAppComplete
+  } getOrElse false
+
+  def preApplicationComplete(credId: String)(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Boolean] = {
+    for {
+      bm <- OptionT(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
     } yield bm.preAppComplete
   } getOrElse false
 
@@ -97,9 +103,13 @@ class BusinessMatchingService @Inject()(
 
   def getAdditionalBusinessActivities(cacheId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
     getActivitySet(cacheId, _ diff _)
-
+@deprecated("To be removed when auth implementation is complete")
   def getSubmittedBusinessActivities(implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
     getActivitySet(_ intersect _)
+
+  def getSubmittedBusinessActivities(credId: String)(implicit hc: HeaderCarrier, ex: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
+    getActivitySet(credId, _ intersect _)
+
 @deprecated("To be removed when wuth implementation is complete")
   def getRemainingBusinessActivities(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
     for {

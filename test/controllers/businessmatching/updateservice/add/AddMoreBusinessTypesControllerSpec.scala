@@ -16,23 +16,24 @@
 
 package controllers.businessmatching.updateservice.add
 
+import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
-import models.flowmanagement.{AddMoreBusinessTypesPageId, AddBusinessTypeFlowModel}
+import models.flowmanagement.{AddBusinessTypeFlowModel, AddMoreBusinessTypesPageId}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
 class AddMoreBusinessTypesControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
 
     val request = addToken(authRequest)
@@ -40,7 +41,7 @@ class AddMoreBusinessTypesControllerSpec extends AmlsSpec with BusinessMatchingG
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
     val controller = new AddMoreBusinessTypesController(
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[AddBusinessTypeFlowModel]
     )
@@ -52,7 +53,7 @@ class AddMoreBusinessTypesControllerSpec extends AmlsSpec with BusinessMatchingG
     mockCacheGetEntry[BusinessMatching](Some(bm), BusinessMatching.key)
 
     when {
-      mockBusinessMatchingService.preApplicationComplete(any(), any(), any())
+      mockBusinessMatchingService.preApplicationComplete(any())(any(), any())
     } thenReturn Future.successful(false)
 
   }

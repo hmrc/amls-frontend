@@ -18,6 +18,7 @@ package controllers.businessmatching.updateservice
 
 import cats.data.OptionT
 import cats.implicits._
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching._
 import models.businessmatching.updateservice.{Add, ChangeBusinessType, Remove}
 import models.businessmatching.updateservice.{Add, ChangeBusinessType}
@@ -43,7 +44,7 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
     val bmService = mock[BusinessMatchingService]
 
     val controller = new ChangeBusinessTypesController(
-      self.authConnector,
+      SuccessfulAuthAction,
       mockCacheConnector,
       bmService,
       createRouter[ChangeBusinessType],
@@ -57,11 +58,11 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
     mockCacheGetEntry[BusinessMatching](Some(businessMatching), BusinessMatching.key)
 
     when {
-      bmService.getRemainingBusinessActivities(any(), any(), any())
+      bmService.getRemainingBusinessActivities(any())(any(), any())
     } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
 
     when {
-      controller.helper.removeFlowData(any(), any(), any())
+      controller.helper.removeFlowData(any())(any(), any())
     } thenReturn OptionT.some[Future, RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel())
 
   }
@@ -80,7 +81,7 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
 
       "return OK with change_services view - no activities" in new Fixture {
         when {
-          bmService.getRemainingBusinessActivities(any(), any(), any())
+          bmService.getRemainingBusinessActivities(any())(any(), any())
         } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set.empty)
 
         val result = controller.get()(request)

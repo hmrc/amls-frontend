@@ -20,7 +20,6 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
-
 import models.asp.Asp
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, BusinessActivity => BMBusinessActivity, BusinessMatching => BMBusinessMatching, _}
 import models.estateagentbusiness.EstateAgentBusiness
@@ -35,12 +34,13 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
+class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
                                          implicit val dataCacheConnector: DataCacheConnector
                                    ) {
 

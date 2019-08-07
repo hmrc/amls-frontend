@@ -16,6 +16,7 @@
 
 package controllers.businessmatching.updateservice.add
 
+import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import models.businessmatching._
 import models.businessmatching.updateservice.ServiceChangeRegister
@@ -27,7 +28,7 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import utils.{AuthorisedFixture, DependencyMocks, FutureAssertions, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, FutureAssertions}
 
 class NeedMoreInformationControllerSpec extends AmlsSpec with MockitoSugar with FutureAssertions with ScalaFutures {
 
@@ -39,7 +40,7 @@ class NeedMoreInformationControllerSpec extends AmlsSpec with MockitoSugar with 
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
     val controller = new NeedMoreInformationController(
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[AddBusinessTypeFlowModel]
     )

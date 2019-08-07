@@ -16,6 +16,7 @@
 
 package controllers.businessmatching.updateservice.add
 
+import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
@@ -25,8 +26,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import org.mockito.Matchers._
-
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class TradingPremisesControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
 
@@ -38,7 +38,7 @@ class TradingPremisesControllerSpec extends AmlsSpec with BusinessMatchingGenera
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
     val controller = new TradingPremisesController(
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       dataCacheConnector = mockCacheConnector,
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,
@@ -47,7 +47,7 @@ class TradingPremisesControllerSpec extends AmlsSpec with BusinessMatchingGenera
     )
 
     mockCacheFetch(Some(AddBusinessTypeFlowModel(Some(HighValueDealing))))
-    mockApplicationStatus(SubmissionDecisionApproved)
+    mockApplicationStatusNewAuth(SubmissionDecisionApproved)
   }
 
   "TradingPremisesController" when {

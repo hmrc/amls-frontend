@@ -19,6 +19,7 @@ package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
+import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
@@ -52,7 +53,7 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
     val mockRPService = mock[ResponsiblePeopleService]
 
     val controller = new WhichFitAndProperController(
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       dataCacheConnector = mockCacheConnector,
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,
@@ -94,13 +95,13 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
         hasAccepted = false)), Some(AddBusinessTypeFlowModel.key))
 
     when {
-      controller.businessMatchingService.getModel(any(), any(), any())
+      controller.businessMatchingService.getModel(any())(any(), any())
     } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
       activities = Some(BusinessActivities(Set(MoneyServiceBusiness)))
     ))
 
     when {
-      mockRPService.getAll(any(), any(), any())
+      mockRPService.getAll(any())(any(), any())
     } thenReturn Future.successful(responsiblePeople)
   }
 
@@ -171,7 +172,7 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
     "be hidden from the selection list" when {
       "showing the page on a GET request" in new Fixture {
         when {
-          mockRPService.getAll(any(), any(), any())
+          mockRPService.getAll(any())(any(), any())
         } thenReturn Future.successful(peopleMixedWithInactive)
 
         val result = controller.get()(request)
@@ -185,7 +186,7 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
 
       "showing the page having POSTed with validation errors" in new Fixture {
         when {
-          mockRPService.getAll(any(), any(), any())
+          mockRPService.getAll(any())(any(), any())
         } thenReturn Future.successful(peopleMixedWithInactive)
 
         val result = controller.post()(request)

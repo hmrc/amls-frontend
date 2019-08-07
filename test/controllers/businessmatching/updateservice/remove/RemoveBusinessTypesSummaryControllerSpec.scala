@@ -18,6 +18,7 @@ package controllers.businessmatching.updateservice.remove
 
 import cats.data.OptionT
 import cats.implicits._
+import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
 import models.DateOfChange
 import models.businessmatching.{BusinessMatching, MoneyServiceBusiness}
@@ -49,7 +50,7 @@ class RemoveBusinessTypesSummaryControllerSpec extends AmlsSpec with TitleValida
     val router = createRouter[RemoveBusinessTypeFlowModel]
 
     val controller = new RemoveBusinessTypesSummaryController(
-      self.authConnector,
+      SuccessfulAuthAction,
       mockCacheConnector,
       removeServiceHelper,
       router
@@ -83,19 +84,19 @@ class RemoveBusinessTypesSummaryControllerSpec extends AmlsSpec with TitleValida
 
         mockCacheFetch(Some(flowModel), Some(RemoveBusinessTypeFlowModel.key))
 
-        when(removeServiceHelper.removeBusinessMatchingBusinessTypes(eqTo(flowModel))(any(), any(), any()))
+        when(removeServiceHelper.removeBusinessMatchingBusinessTypes(any(), eqTo(flowModel))(any(), any()))
           .thenReturn(OptionT.some[Future, BusinessMatching](mock[BusinessMatching]))
 
-        when(removeServiceHelper.removeFitAndProper(eqTo(flowModel))(any(), any(), any()))
+        when(removeServiceHelper.removeFitAndProper(any(), eqTo(flowModel))(any(), any()))
           .thenReturn(OptionT.some[Future, Seq[ResponsiblePerson]](Seq.empty))
 
-        when(removeServiceHelper.removeTradingPremisesBusinessTypes(eqTo(flowModel))(any(), any(), any()))
+        when(removeServiceHelper.removeTradingPremisesBusinessTypes(any(), eqTo(flowModel))(any(), any()))
           .thenReturn(OptionT.some[Future, Seq[TradingPremises]](Seq.empty))
 
-        when(removeServiceHelper.removeSectionData(eqTo(flowModel))(any(), any(), any()))
+        when(removeServiceHelper.removeSectionData(any(), eqTo(flowModel))(any(), any()))
           .thenReturn(OptionT.some[Future, Seq[CacheMap]](Seq.empty))
 
-        when(removeServiceHelper.removeFlowData(any(), any(), any()))
+        when(removeServiceHelper.removeFlowData(any())(any(), any()))
           .thenReturn(OptionT.some[Future, RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel()))
 
         val result = controller.post()(request.withFormUrlEncodedBody())

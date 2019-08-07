@@ -16,6 +16,7 @@
 
 package controllers.businessmatching.updateservice.remove
 
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.HighValueDealing
 import models.flowmanagement.{NeedToUpdatePageId, RemoveBusinessTypeFlowModel}
 import org.joda.time.LocalDate
@@ -33,7 +34,7 @@ class NeedMoreInformationControllerSpec extends AmlsSpec {
     val request = addToken(authRequest)
 
     val controller = new NeedMoreInformationController(
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[RemoveBusinessTypeFlowModel]
     )

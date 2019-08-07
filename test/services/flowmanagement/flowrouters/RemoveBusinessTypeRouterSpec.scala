@@ -17,6 +17,7 @@
 package services.flowmanagement.flowrouters
 
 
+import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
 import controllers.businessmatching.updateservice.remove.{routes => removeRoutes}
 import generators.tradingpremises.TradingPremisesGenerator
@@ -45,7 +46,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
     val removeBusinessTypeHelper = new RemoveBusinessTypeHelper(
-      self.authConnector,
+      SuccessfulAuthAction,
       mockCacheConnector
     )
 

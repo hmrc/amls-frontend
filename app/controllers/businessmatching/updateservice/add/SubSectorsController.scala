@@ -55,8 +55,8 @@ class SubSectorsController @Inject()(
   }
 
   def post(edit: Boolean = false) = authAction.async {
-    import jto.validation.forms.Rules._
       implicit request =>
+        import jto.validation.forms.Rules._
         Form2[BusinessMatchingMsbServices](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.businessmatching.updateservice.add.msb_subservices(f, edit, config.fxEnabledToggle)))

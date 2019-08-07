@@ -44,7 +44,7 @@ class ResponsiblePersonServiceSpec extends AmlsSpec with ResponsiblePersonGenera
 
   "getAll" must {
     "simply return all the people" in new Fixture {
-      await(service.getAll) mustBe responsiblePeople
+      await(service.getAll(any())) mustBe responsiblePeople
     }
   }
 

@@ -58,8 +58,8 @@ class WhatDoYouDoHereController @Inject()(
   }
 
   def post(edit: Boolean = false) = authAction.async {
-    import jto.validation.forms.Rules._
-      implicit request =>
+     implicit request =>
+       import jto.validation.forms.Rules._
         Form2[BusinessMatchingMsbServices](request.body) match {
           case f: InvalidForm => {
             Future.successful(BadRequest(what_do_you_do_here(f, edit, msbServiceValues)))

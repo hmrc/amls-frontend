@@ -27,11 +27,12 @@ import models.tradingpremises.{TradingPremises, TradingPremisesMsbServices}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 
 import scala.concurrent.{ExecutionContext, Future}
 
 
-class ChangeSubSectorHelper @Inject()(val authConnector: AuthConnector,
+class ChangeSubSectorHelper @Inject()(authAction: AuthAction,
                                       implicit val dataCacheConnector: DataCacheConnector) {
 
   def requiresPSRNumber(model: ChangeSubSectorFlowModel): Boolean = {
