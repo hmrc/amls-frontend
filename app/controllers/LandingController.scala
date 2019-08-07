@@ -45,6 +45,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, ControllerHelper}
+import uk.gov.hmrc.auth.core.User
 
 import scala.concurrent.Future
 
@@ -80,7 +81,7 @@ class LandingController @Inject()(val landingService: LandingService,
   def get() = authAction.async {
       implicit request =>
         request.credentialRole match {
-          case Some(uk.gov.hmrc.auth.core.User) => getWithAmendments(request.amlsRefNumber, request.credId, request.accountTypeId)
+          case Some(User) => getWithAmendments(request.amlsRefNumber, request.credId, request.accountTypeId)
           case _ => Future.successful(Redirect(signoutUrl))
         }
   }
@@ -121,6 +122,7 @@ class LandingController @Inject()(val landingService: LandingService,
 
   private def hasIncompleteResponsiblePeople(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)
                                             (implicit headerCarrier: HeaderCarrier): Future[Boolean] = {
+
     Logger.debug("[AMLSLandingController][hasIncompleteResponsiblePeople]: calling statusService.getDetailedStatus")
     statusService.getDetailedStatus(amlsRegistrationNumber, accountTypeId, cacheId).flatMap {
       case (SubmissionDecisionRejected |
@@ -180,7 +182,9 @@ class LandingController @Inject()(val landingService: LandingService,
     } getOrElse deleteAndRedirect()
   }
 
-  private def preFlightChecksAndRedirect(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)(implicit headerCarrier: HeaderCarrier):  Future[Result] = {
+  private def preFlightChecksAndRedirect(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)
+                                        (implicit headerCarrier: HeaderCarrier):  Future[Result] = {
+
     val loginEvent = for {
       dupe <- cacheConnector.fetch[SubscriptionResponse](cacheId, SubscriptionResponse.key).recover { case _ => None } map {
         case Some(x) => x.previouslySubmitted.contains(true)
