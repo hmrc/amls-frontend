@@ -66,8 +66,8 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
     "respond to a get request correctly" when {
       "load IsUK page" in new Fixture {
 
-        when(controller.dataConnector.fetch[BusinessDetails](meq(BusinessDetails.key))
-          (any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataConnector.fetch[BusinessDetails](any(), meq(BusinessDetails.key))
+          (any(), any())).thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -76,8 +76,8 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
 
       "load isUk result when there is already an isUK answer in BusinessDetails" in new Fixture {
 
-        when(mockDataConnector.fetch[BusinessDetails](meq(BusinessDetails.key))
-          (any(), any(), any())).thenReturn(Future.successful(Some(businessDetails)))
+        when(controller.dataConnector.fetch[BusinessDetails](any(), meq(BusinessDetails.key))
+          (any(), any())).thenReturn(Future.successful(Some(businessDetails)))
 
         val result = controller.get()(request)
  
@@ -90,8 +90,8 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
 
       "load isUk result when there is already an nonUk answer in BusinessDetails" in new Fixture {
 
-        when(mockDataConnector.fetch[BusinessDetails](meq(BusinessDetails.key))
-          (any(), any(), any())).thenReturn(Future.successful(Some(businessDetails.copy(
+        when(controller.dataConnector.fetch[BusinessDetails](any(), meq(BusinessDetails.key))
+          (any(), any())).thenReturn(Future.successful(Some(businessDetails.copy(
           correspondenceAddressIsUk = Some(CorrespondenceAddressIsUk(false)),
           correspondenceAddress = Some(correspondenceAddressNonUk)))))
 

@@ -16,24 +16,25 @@
 
 package controllers.msb
 
+import controllers.actions.SuccessfulAuthAction
 import models.Country
-import models.moneyservicebusiness.{BranchesOrAgentsHasCountries, BranchesOrAgentsWhichCountries, BranchesOrAgents, MoneyServiceBusiness}
+import models.moneyservicebusiness.{BranchesOrAgents, BranchesOrAgentsHasCountries, BranchesOrAgentsWhichCountries, MoneyServiceBusiness}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
 class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self => val request = addToken(authRequest)
 
-    val controller = new BranchesOrAgentsWhichCountriesController(mockCacheConnector, authConnector = self.authConnector, mockAutoComplete)
+    val controller = new BranchesOrAgentsWhichCountriesController(mockCacheConnector, authAction = SuccessfulAuthAction, mockAutoComplete)
   }
 
   val modelBefore = MoneyServiceBusiness(
@@ -55,7 +56,7 @@ class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec with Mockito
 
     "show a prefilled form when store contains data" in new Fixture {
 
-      when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+      when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
         .thenReturn(Future.successful(Some(modelAfter)))
 
       val result = controller.get()(request)
@@ -67,7 +68,7 @@ class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec with Mockito
     }
 
     "return a Bad request with prefilled form on invalid submission" in new Fixture {
-      when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+      when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
         .thenReturn(Future.successful(Some(modelBefore)))
 
 
@@ -87,10 +88,10 @@ class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec with Mockito
         "countries[0]" -> "GB"
       )
 
-      when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+      when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
         .thenReturn(Future.successful(Some(modelBefore)))
 
-      when(mockCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
+      when(mockCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), any())(any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(edit = false)(newRequest)
@@ -105,10 +106,10 @@ class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec with Mockito
         "countries[0]" -> "GB"
       )
 
-      when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+      when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
         .thenReturn(Future.successful(Some(modelBefore)))
 
-      when(mockCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
+      when(mockCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), any())(any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(edit = false)(newRequest)
@@ -123,10 +124,10 @@ class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec with Mockito
         "countries[0]" -> "GB"
       )
 
-      when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+      when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
         .thenReturn(Future.successful(Some(modelBefore)))
 
-      when(mockCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
+      when(mockCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), any())(any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(edit = true)(newRequest)
