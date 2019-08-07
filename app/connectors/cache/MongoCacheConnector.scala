@@ -109,6 +109,10 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
     }
   }
 
+  def fetchAllWithDefault(credId: String)(implicit hc: HeaderCarrier): Future[CacheMap] = {
+    mongoCache.fetchAllWithDefault(credId, deprecatedFilter = false).map(toCacheMap)
+  }
+
   private def fetchAllWithDefaultByOid(implicit hc: HeaderCarrier, authContext: AuthContext): Future[CacheMap] =
     mongoCache.fetchAllWithDefault(authContext.user.oid, deprecatedFilter = true).map(toCacheMap)
 

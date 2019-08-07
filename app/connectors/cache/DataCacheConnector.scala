@@ -53,8 +53,12 @@ class DataCacheConnector @Inject()(val cacheConnector: MongoCacheConnector){
   def fetchAll(credId: String)(implicit hc: HeaderCarrier): Future[Option[CacheMap]] =
     cacheConnector.fetchAll(credId)
 
+  @deprecated("To be removed when auth implementation is complete")
   def fetchAllWithDefault(implicit hc: HeaderCarrier, authContext: AuthContext): Future[CacheMap] =
     cacheConnector.fetchAllWithDefault
+
+  def fetchAllWithDefault(credId: String)(implicit hc: HeaderCarrier): Future[CacheMap] =
+    cacheConnector.fetchAllWithDefault(credId)
 
   def remove(implicit hc: HeaderCarrier, ac: AuthContext): Future[Boolean] =
     cacheConnector.remove

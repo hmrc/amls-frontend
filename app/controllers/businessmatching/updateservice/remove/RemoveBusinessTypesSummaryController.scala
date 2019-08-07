@@ -19,51 +19,48 @@ package controllers.businessmatching.updateservice.remove
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
 import forms.EmptyForm
 import javax.inject.Inject
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, RemoveBusinessTypesSummaryPageId}
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.businessmatching.updateservice.remove.remove_activities_summary
 
 import scala.concurrent.Future
 
 class RemoveBusinessTypesSummaryController @Inject()(
-                                                   val authConnector: AuthConnector,
+                                                   authAction: AuthAction,
                                                    val dataCacheConnector: DataCacheConnector,
                                                    val helper: RemoveBusinessTypeHelper,
                                                    val router: Router[RemoveBusinessTypeFlowModel]
-                                                 ) extends BaseController {
+                                                 ) extends DefaultBaseController {
 
-  def get = Authorised.async {
-    implicit authContext =>
+  def get = authAction.async {
       implicit request => {
         for {
-          flow <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel.key))
+          flow <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](request.credId, RemoveBusinessTypeFlowModel.key))
         } yield Ok(remove_activities_summary(EmptyForm, flow))
       } getOrElse InternalServerError("Unable to get the flow model")
   }
 
-  def post = Authorised.async {
-    implicit authContext =>
+  def post = authAction.async {
       implicit request => {
         for {
-          model <- updateSubscription
-          route <- OptionT.liftF(router.getRoute(RemoveBusinessTypesSummaryPageId, model))
+          model <- updateSubscription(request.credId)
+          route <- OptionT.liftF(router.getRouteNewAuth(request.credId, RemoveBusinessTypesSummaryPageId, model))
         } yield route
       } getOrElse InternalServerError("Unable to remove the business type")
   }
 
-  private def updateSubscription()
-                                (implicit ac: AuthContext, hc: HeaderCarrier): OptionT[Future, RemoveBusinessTypeFlowModel] = for {
-    model <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel.key))
-    _ <- helper.removeFitAndProper(model)
-    _ <- helper.removeBusinessMatchingBusinessTypes(model)
-    _ <- helper.removeTradingPremisesBusinessTypes(model)
-    _ <- helper.removeSectionData(model)
+  private def updateSubscription(credId: String)
+                                (implicit hc: HeaderCarrier): OptionT[Future, RemoveBusinessTypeFlowModel] = for {
+    model <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](credId, RemoveBusinessTypeFlowModel.key))
+    _ <- helper.removeFitAndProper(credId, model)
+    _ <- helper.removeBusinessMatchingBusinessTypes(credId, model)
+    _ <- helper.removeTradingPremisesBusinessTypes(credId, model)
+    _ <- helper.removeSectionData(credId, model)
   } yield model
 }
