@@ -18,7 +18,7 @@ package controllers
 
 import cats.data.OptionT
 import cats.implicits._
-import config.AMLSAuthConnector
+import config.{AMLSAuthConnector, AppConfig}
 import connectors.{AmlsConnector, AuthenticatorConnector, DataCacheConnector, _}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessActivities, BusinessMatching}
@@ -52,15 +52,16 @@ class StatusController @Inject()(val landingService: LandingService,
   def get(fromDuplicateSubmission: Boolean = false) = authAction.async {
       implicit request =>
         for {
-          statusInfo <- statusService.getDetailedStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+          refNo <- enrolmentsService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier)
+          statusInfo <- statusService.getDetailedStatus(refNo, request.accountTypeId, request.credId)
           statusResponse <- Future(statusInfo._2)
           maybeBusinessName <- getBusinessName(request.credId, statusResponse.fold(none[String])(_.safeId), request.accountTypeId).value
-          feeResponse <- getFeeResponse(request.amlsRefNumber, statusInfo._1, request.accountTypeId)
+          feeResponse <- getFeeResponse(refNo, statusInfo._1, request.accountTypeId)
           responsiblePeople <- dataCache.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key)
           bm <- dataCache.fetch[BusinessMatching](request.credId, BusinessMatching.key)
           maybeActivities <- Future(bm.activities)
           page <- getPageBasedOnStatus(
-              request.amlsRefNumber,
+              refNo,
               statusInfo,
               maybeBusinessName,
               feeResponse,

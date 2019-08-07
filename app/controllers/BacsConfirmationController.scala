@@ -18,12 +18,13 @@ package controllers
 
 import cats.data.OptionT
 import cats.implicits._
+import config.AppConfig
 import connectors.{AmlsConnector, DataCacheConnector, _}
 import javax.inject.{Inject, Singleton}
 import models.businessdetails.{BusinessDetails, PreviouslyRegisteredYes}
 import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthAction, BusinessName}
+import utils.{AuthAction, BusinessName, ControllerHelper}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -34,13 +35,13 @@ class BacsConfirmationController @Inject()(authAction: AuthAction,
                                            private[controllers] implicit val amlsConnector: AmlsConnector,
                                            private[controllers] implicit val statusService: StatusService,
                                            private[controllers] val authenticator: AuthenticatorConnector,
-                                           private[controllers] val authEnrolmentsService: AuthEnrolmentsService) extends DefaultBaseController {
+                                           private[controllers] val enrolmentService: AuthEnrolmentsService) extends DefaultBaseController {
 
   def bacsConfirmation() = authAction.async {
       implicit request =>
         val okResult = for {
           _ <- OptionT.liftF(authenticator.refreshProfile)
-          refNo <- OptionT.fromOption[Future](request.amlsRefNumber)
+          refNo <- OptionT(enrolmentService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
           status <- OptionT.liftF(statusService.getReadStatus(refNo, request.accountTypeId))
           name <- BusinessName.getName(request.credId, status.safeId, request.accountTypeId)
           businessDetails <- OptionT(dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key))

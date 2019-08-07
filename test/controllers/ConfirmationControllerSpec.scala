@@ -60,12 +60,15 @@ class ConfirmationControllerSpec extends AmlsSpec
       statusService = mock[StatusService],
       dataCacheConnector = mock[DataCacheConnector],
       amlsConnector = mock[AmlsConnector],
-      authEnrolmentsService = mock[AuthEnrolmentsService],
+      enrolmentService = mock[AuthEnrolmentsService],
       feeResponseService = mock[FeeResponseService],
       authenticator = mock[AuthenticatorConnector],
       confirmationService = mock[ConfirmationService])
 
     val amlsRegistrationNumber = "amlsRefNumber"
+
+    when(controller.enrolmentService.amlsRegistrationNumber(any(), any())(any(), any()))
+      .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
     val response = subscriptionResponseGen(hasFees = true).sample.get
 

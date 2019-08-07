@@ -73,6 +73,30 @@ class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector,
     }
   }
 
+  def amlsRegistrationNumber(amlsRegistrationNumber: Option[String], groupIdentifier: Option[String])
+                            (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Option[String]] = {
+
+    Logger.debug(s"[$prefix][amlsRegistrationNumber] - Begin...)")
+
+    val stubbedEnrolments =  if (config.enrolmentStubsEnabled) {
+      stubConnector.enrolmentsNewAuth(groupIdentifier.getOrElse(throw new Exception("Group ID is unavailable")))
+    } else {
+      Future.successful(Seq.empty)
+    }
+
+    amlsRegistrationNumber match {
+      case regNo@Some(_) => Future.successful(regNo)
+      case None => stubbedEnrolments map { enrolmentsList =>
+          for {
+            amlsEnrolment   <- enrolmentsList.find(enrolment => enrolment.key == amlsKey)
+            amlsIdentifier  <- amlsEnrolment.identifiers.find(identifier => identifier.key == amlsNumberKey)
+          } yield {
+            amlsIdentifier.value
+          }
+        }
+    }
+  }
+
   @deprecated("to be removed when new auth migration complete")
   def enrol(amlsRegistrationNumber: String, postcode: String, groupId: Option[String])
            (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
@@ -87,15 +111,6 @@ class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector,
 
     enrolmentStore.enrol(AmlsEnrolmentKey(amlsRegistrationNumber), TaxEnrolment(credId, postcode), groupId)
   }
-
-//  @deprecated("to be removed when new auth migration complete")
-//  def deEnrol(amlsRegistrationNumber: String)
-//             (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Boolean] = {
-//    for {
-//      _ <- enrolmentStore.removeKnownFacts(amlsRegistrationNumber)
-//      _ <- enrolmentStore.deEnrol(amlsRegistrationNumber)
-//    } yield true
-//  }
 
   def deEnrol(amlsRegistrationNumber: String, groupId: Option[String])
              (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] = {

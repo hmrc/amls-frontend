@@ -17,7 +17,8 @@
 package utils
 
 import cats.implicits._
-import connectors.DataCacheConnector
+import config.AppConfig
+import connectors.{DataCacheConnector, EnrolmentStubConnector}
 import models.businessactivities.{BusinessActivities => BA}
 import models.businessmatching._
 import models.businessmatching.updateservice.ServiceChangeRegister
@@ -38,6 +39,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.Success
 
 object ControllerHelper {
 

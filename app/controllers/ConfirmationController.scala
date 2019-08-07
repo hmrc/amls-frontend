@@ -18,6 +18,7 @@ package controllers
 
 import cats.data.OptionT
 import cats.implicits._
+import config.AppConfig
 import connectors.{AmlsConnector, DataCacheConnector, KeystoreConnector, _}
 import javax.inject.{Inject, Singleton}
 import models.ResponseType.AmendOrVariationResponseType
@@ -30,7 +31,7 @@ import services.{AuthEnrolmentsService, FeeResponseService, StatusService, _}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthAction, BusinessName}
+import utils.{AuthAction, BusinessName, ControllerHelper}
 import views.html.confirmation._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -44,7 +45,7 @@ class ConfirmationController @Inject()(authAction: AuthAction,
                                        private[controllers] implicit val statusService: StatusService,
                                        private[controllers] val authenticator: AuthenticatorConnector,
                                        private[controllers] val feeResponseService: FeeResponseService,
-                                       private[controllers] val authEnrolmentsService: AuthEnrolmentsService,
+                                       private[controllers] val enrolmentService: AuthEnrolmentsService,
                                        private[controllers] val confirmationService: ConfirmationService) extends DefaultBaseController {
 
   val prefix = "[ConfirmationController]"
@@ -56,7 +57,7 @@ class ConfirmationController @Inject()(authAction: AuthAction,
           _ <- authenticator.refreshProfile
           status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
           submissionRequestStatus <- dataCacheConnector.fetch[SubmissionRequestStatus](request.credId, SubmissionRequestStatus.key)
-          result <- resultFromStatus(status, submissionRequestStatus, request.amlsRefNumber, request.accountTypeId, request.credId)
+          result <- resultFromStatus(status, submissionRequestStatus, request.amlsRefNumber, request.accountTypeId, request.credId, request.groupIdentifier)
           _ <- keystoreConnector.setConfirmationStatus
         } yield result
   }
@@ -102,15 +103,12 @@ class ConfirmationController @Inject()(authAction: AuthAction,
   }
 
   private def resultFromStatus(status: SubmissionStatus, submissionRequestStatus: Option[SubmissionRequestStatus],
-                               amlsRegistrationNumber: Option[String], accountTypeId: (String, String), credId: String)
+                               amlsRegistrationNumber: Option[String], accountTypeId: (String, String), credId: String, groupIdentifier: Option[String])
                               (implicit hc: HeaderCarrier, request: Request[AnyContent], statusService: StatusService): Future[Result] = {
 
     Logger.debug(s"[$prefix][resultFromStatus] - Begin get fee response...)")
 
-    def companyName(maybeStatus: Option[ReadStatusResponse]): OptionT[Future, String] =
-      maybeStatus.fold[OptionT[Future, String]](OptionT.some("")) { r => BusinessName.getNameFromAmls(r.safeId.get, accountTypeId) }
-
-    OptionT.liftF(retrieveFeeResponse(amlsRegistrationNumber, accountTypeId)) flatMap {
+    OptionT.liftF(retrieveFeeResponse(amlsRegistrationNumber, accountTypeId, groupIdentifier)) flatMap {
       case Some(fees) if fees.paymentReference.isDefined && fees.toPay(status, submissionRequestStatus) > 0 =>
         Logger.debug(s"[$prefix][resultFromStatus] - Fee found)")
         lazy val breakdownRows = confirmationService.getBreakdownRows(credId, status, fees)
@@ -137,12 +135,12 @@ class ConfirmationController @Inject()(authAction: AuthAction,
     } getOrElse InternalServerError("Could not determine a response")
   }
 
-  private def retrieveFeeResponse(amlsRegistrationNumber: Option[String], accountTypeId: (String, String))
+  private def retrieveFeeResponse(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), groupIdentifier: Option[String])
                                  (implicit hc: HeaderCarrier): Future[Option[FeeResponse]] = {
 
     Logger.debug(s"[$prefix][retrieveFeeResponse] - Begin...)")
     (for {
-      amlsRegNo <- OptionT.fromOption[Future](amlsRegistrationNumber)
+      amlsRegNo <- OptionT(enrolmentService.amlsRegistrationNumber(amlsRegistrationNumber, groupIdentifier))
       fees <- OptionT(feeResponseService.getFeeResponse(amlsRegNo, accountTypeId))
     } yield fees).value
   }

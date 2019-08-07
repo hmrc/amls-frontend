@@ -57,8 +57,11 @@ class BacsConfirmationControllerSpec extends AmlsSpec
       statusService = mock[StatusService],
       dataCacheConnector = mock[DataCacheConnector],
       amlsConnector = mock[AmlsConnector],
-      authEnrolmentsService = mock[AuthEnrolmentsService],
-      authenticator = mock[AuthenticatorConnector])
+      authenticator = mock[AuthenticatorConnector],
+      enrolmentService = mock[AuthEnrolmentsService])
+
+    when(controller.enrolmentService.amlsRegistrationNumber(any(), any())(any(), any()))
+      .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
     val amlsRegistrationNumber = "amlsRefNumber"
 

@@ -109,6 +109,12 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
     val responsiblePeople = Seq(rp1, rp2)
     val amlsRegistrationNumber = "amlsRefNumber"
 
+    when(controller.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
+      .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
+
+    when(controllerNoAmlsNumber.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
+      .thenReturn(Future.successful(None))
+
     when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
       .thenReturn(Future.successful((NotCompleted, None)))
 
@@ -187,7 +193,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
         controller.amlsConnector.registrationDetails(any(), any())(any(), any())
       } thenReturn Future.successful(RegistrationDetails("Test Company", isIndividual = false))
 
-      when(controller.landingService.cacheMap(any(), any(), any()))
+      when(controller.landingService.cacheMap(any[String])(any(), any()))
         .thenReturn(Future.successful(Some(cacheMap)))
 
       val statusResponse = mock[ReadStatusResponse]
@@ -207,7 +213,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
      "application status is NotCompleted" in new Fixture {
 
-        when(controllerNoAmlsNumber.landingService.cacheMap(any(), any(), any()))
+        when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
@@ -227,7 +233,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
           val paymentRef = paymentRefGen.sample.get
           val payment = paymentGen.sample.get.copy(isBacs = Some(true))
 
-          when(controller.landingService.cacheMap(any(), any(), any()))
+          when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any()))
             .thenReturn(Future.successful(Some(cacheMap)))
 
           when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
@@ -243,7 +249,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
         }
 
         "there is no ReadStatusResponse" in new Fixture {
-          when(controllerNoAmlsNumber.landingService.cacheMap(any(), any(), any()))
+          when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any()))
             .thenReturn(Future.successful(Some(cacheMap)))
 
           when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
@@ -261,7 +267,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
       "application status is SubmissionDecisionApproved" in new Fixture {
 
-        when(controller.landingService.cacheMap(any(), any(), any()))
+        when(controller.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
@@ -288,7 +294,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
       "application status is SubmissionDecisionRejected" in new Fixture {
 
-        when(controller.landingService.cacheMap(any(), any(), any()))
+        when(controller.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
@@ -314,7 +320,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
       "application status is SubmissionDecisionRevoked and the submit button is allowed" in new Fixture {
 
-        when(controller.landingService.cacheMap(any(), any(), any()))
+        when(controller.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
@@ -341,7 +347,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
       "application status is SubmissionDecisionExpired" in new Fixture {
 
-        when(controller.landingService.cacheMap(any(), any(), any()))
+        when(controller.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
@@ -364,7 +370,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
       "application status is SubmissionWithdrawn" in new Fixture {
 
-        when(controller.landingService.cacheMap(any(), any(), any()))
+        when(controller.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
@@ -387,7 +393,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
       "application status is DeRegistered" in new Fixture {
 
-        when(controller.landingService.cacheMap(any(), any(), any()))
+        when(controller.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
@@ -410,7 +416,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
       "application status is RenewalSubmitted" in new Fixture {
 
-        when(controller.landingService.cacheMap(any(), any(), any()))
+        when(controller.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
@@ -439,7 +445,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
       "application status is ReadyForRenewal, and the renewal has not been started" in new Fixture {
 
-        when(controller.landingService.cacheMap(any(), any(), any()))
+        when(controller.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
@@ -471,7 +477,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
       "application status is ReadyForRenewal, and the renewal has been started but is incomplete" in new Fixture {
 
-        when(controller.landingService.cacheMap(any(), any(), any()))
+        when(controller.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
@@ -506,7 +512,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
       "application status is ReadyForRenewal, and the renewal is complete but not submitted" in new Fixture {
 
-        when(controller.landingService.cacheMap(any(), any(), any()))
+        when(controller.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(cacheMap.getEntry[BusinessMatching](any())(any()))
@@ -586,7 +592,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
           .thenReturn(
             Some(BusinessMatching(Some(reviewDetails), None)))
 
-        when(controllerNoAmlsNumber.landingService.cacheMap(any(), any(), any()))
+        when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(controllerNoAmlsNumber.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
@@ -612,7 +618,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
           .thenReturn(
             Some(BusinessMatching(Some(reviewDetails), None)))
 
-        when(controllerNoAmlsNumber.landingService.cacheMap(any(), any(), any()))
+        when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(controllerNoAmlsNumber.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
@@ -628,7 +634,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
     "show the change officer link" when {
       "application status is SubmissionDecisionApproved" in new Fixture {
 
-        when(controller.landingService.cacheMap(any(), any(), any()))
+        when(controller.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
@@ -662,7 +668,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
       "application status is ReadyForRenewal" in new Fixture {
 
-        when(controller.landingService.cacheMap(any(), any(), any()))
+        when(controller.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))

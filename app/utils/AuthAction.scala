@@ -18,7 +18,8 @@ package utils
 
 import java.net.URLEncoder
 
-import config.ApplicationConfig
+import config.{AppConfig, ApplicationConfig}
+import connectors.EnrolmentStubConnector
 import javax.inject.Inject
 import models.ReturnLocation
 import play.api.mvc._
@@ -28,9 +29,10 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.HeaderCarrierConverter
-import play.api.{Logger}
+import play.api.Logger
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 final case class AuthorisedRequest[A](request: Request[A],
                                       amlsRefNumber: Option[String],
@@ -43,9 +45,8 @@ final case class AuthorisedRequest[A](request: Request[A],
 
 final case class enrolmentNotFound(msg: String = "enrolmentNotFound") extends AuthorisationException(msg)
 
-class DefaultAuthAction @Inject() (
-                                    val authConnector: AuthConnector
-                                  )(implicit ec: ExecutionContext) extends AuthAction with AuthorisedFunctions {
+class DefaultAuthAction @Inject() (val authConnector: AuthConnector)
+                                  (implicit ec: ExecutionContext) extends AuthAction with AuthorisedFunctions {
 
   private val amlsKey = "HMRC-MLR-ORG"
   private val amlsNumberKey = "MLRRefNumber"
@@ -115,7 +116,7 @@ class DefaultAuthAction @Inject() (
     }
   }
 
-  private def amlsRefNo(enrolments: Enrolments):Option[String] = {
+  private def amlsRefNo(enrolments: Enrolments): Option[String] = {
     val amlsRefNumber = for {
       enrolment      <- enrolments.getEnrolment(amlsKey)
       amlsIdentifier <- enrolment.getIdentifier(amlsNumberKey)

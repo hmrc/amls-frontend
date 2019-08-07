@@ -43,7 +43,7 @@ class PaymentConfirmationController @Inject()(authAction: AuthAction,
                                               private[controllers] implicit val amlsConnector: AmlsConnector,
                                               private[controllers] implicit val statusService: StatusService,
                                               private[controllers] val feeResponseService: FeeResponseService,
-                                              private[controllers] val authEnrolmentsService: AuthEnrolmentsService,
+                                              private[controllers] val enrolmentService: AuthEnrolmentsService,
                                               private[controllers] val auditConnector: AuditConnector) extends DefaultBaseController {
 
   val prefix = "[PaymentConfirmationController]"
@@ -70,7 +70,7 @@ class PaymentConfirmationController @Inject()(authAction: AuthAction,
           paymentStatus <- OptionT.liftF(amlsConnector.refreshPaymentStatus(reference, request.accountTypeId))
           payment <- OptionT(amlsConnector.getPaymentByPaymentReference(reference, request.accountTypeId))
           businessDetails <- OptionT(dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key))
-          _ <- doAudit(paymentStatus.currentStatus, request.amlsRefNumber, request.accountTypeId)
+          _ <- doAudit(paymentStatus.currentStatus, request.amlsRefNumber, request.accountTypeId, request.groupIdentifier)
         } yield if (isPaymentSuccessful) {
           (status, businessDetails.previouslyRegistered) match {
             case (ReadyForRenewal(_), _) if renewalData.isDefined =>
@@ -90,21 +90,21 @@ class PaymentConfirmationController @Inject()(authAction: AuthAction,
         result getOrElse InternalServerError("There was a problem trying to show the confirmation page")
   }
 
-  private def doAudit(paymentStatus: PaymentStatus, amlsRegistrationNumber: Option[String], accountTypeId: (String, String))
+  private def doAudit(paymentStatus: PaymentStatus, amlsRegistrationNumber: Option[String], accountTypeId: (String, String), groupIdentifier: Option[String])
                      (implicit hc: HeaderCarrier) = {
     for {
-      fees <- OptionT(retrieveFeeResponse(amlsRegistrationNumber, accountTypeId))
+      fees <- OptionT(retrieveFeeResponse(amlsRegistrationNumber, accountTypeId, groupIdentifier))
       payRef <- OptionT.fromOption[Future](fees.paymentReference)
       result <- OptionT.liftF(auditConnector.sendEvent(PaymentConfirmationEvent(fees.amlsReferenceNumber, payRef, paymentStatus)))
     } yield result
   }
 
-  private def retrieveFeeResponse(amlsRegistrationNumber: Option[String], accountTypeId: (String, String))
+  private def retrieveFeeResponse(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), groupIdentifier: Option[String])
                                  (implicit hc: HeaderCarrier): Future[Option[FeeResponse]] = {
 
     Logger.debug(s"[$prefix][retrieveFeeResponse] - Begin...)")
     (for {
-      amlsRegNo <- OptionT.fromOption[Future](amlsRegistrationNumber)
+      amlsRegNo <- OptionT(enrolmentService.amlsRegistrationNumber(amlsRegistrationNumber, groupIdentifier))
       fees <- OptionT(feeResponseService.getFeeResponse(amlsRegNo, accountTypeId))
     } yield fees).value
   }
