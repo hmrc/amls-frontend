@@ -23,10 +23,8 @@ import models.registrationprogress.{Completed, Section}
 import models.status._
 import org.joda.time.LocalDate
 import play.api.{Logger, Mode, Play}
-import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolments}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.AuthAction
 
 import scala.concurrent.{ExecutionContext, Future}
 

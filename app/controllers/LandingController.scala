@@ -41,11 +41,11 @@ import models.tradingpremises.TradingPremises
 import play.api.Logger
 import play.api.mvc.{Action, Call, Request, Result}
 import services.{AuthEnrolmentsService, AuthService, LandingService, StatusService}
+import uk.gov.hmrc.auth.core.User
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, ControllerHelper}
-import uk.gov.hmrc.auth.core.User
 
 import scala.concurrent.Future
 

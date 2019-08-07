@@ -18,7 +18,7 @@ package controllers.actions
 
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{Call, Request, Result}
-import uk.gov.hmrc.auth.core.{AffinityGroup, Assistant, CredentialRole, Enrolment, Enrolments, User}
+import uk.gov.hmrc.auth.core._
 import utils.{AuthAction, AuthorisedRequest}
 
 import scala.concurrent.Future

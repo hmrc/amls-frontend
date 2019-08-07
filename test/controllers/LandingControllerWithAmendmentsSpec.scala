@@ -16,17 +16,14 @@
 
 package controllers
 
-import java.net.URLEncoder
-
-import config.ApplicationConfig
-import connectors.{DataCacheConnector, KeystoreConnector}
-import controllers.actions.{SuccessfulAuthAction, SuccessfulAuthActionNoAmlsRefNo, SuccessfulAuthActionNoUserRole}
+import connectors.DataCacheConnector
+import controllers.actions.{SuccessfulAuthAction, SuccessfulAuthActionNoAmlsRefNo}
 import generators.StatusGenerator
-import models.businessdetails.BusinessDetails
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businesscustomer.{Address, ReviewDetails}
+import models.businessdetails.BusinessDetails
 import models.businessmatching._
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
@@ -43,21 +40,16 @@ import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito
 import org.mockito.Mockito._
-import org.mockito.invocation.InvocationOnMock
-import org.mockito.stubbing.Answer
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.JsResultException
 import play.api.mvc.{Request, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, AuthService, LandingService, StatusService}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AmlsSpec, AuthorisedFixture}
 
@@ -116,16 +108,6 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
     val completeATB = mock[BusinessDetails]
 
     val emptyCacheMap = CacheMap("test", Map.empty)
-
-    def setUpMocksForNoEnrolment(controller: LandingController) = {
-      when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-        .thenReturn(Future.successful(None))
-    }
-
-    def setUpMocksForAnEnrolmentExists(controller: LandingController) = {
-      when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-        .thenReturn(Future.successful(Some("TESTREGNO")))
-    }
 
     def setUpMocksForNoDataInSaveForLater(controller: LandingController) = {
       when(controller.landingService.cacheMap(any[String])(any(), any()))
