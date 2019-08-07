@@ -16,14 +16,14 @@
 
 package controllers.businessmatching.updateservice.remove
 
-import models.DateOfChange
 import models.businessmatching.HighValueDealing
-import models.flowmanagement.{AddBusinessTypeFlowModel, NeedMoreInformationPageId, NeedToUpdatePageId, RemoveBusinessTypeFlowModel}
+import models.flowmanagement.{NeedToUpdatePageId, RemoveBusinessTypeFlowModel}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import play.api.i18n.Messages
 import play.api.test.Helpers.{OK, contentAsString, status, _}
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import org.mockito.Matchers._
 
 class NeedMoreInformationControllerSpec extends AmlsSpec {
 
@@ -61,7 +61,7 @@ class NeedMoreInformationControllerSpec extends AmlsSpec {
         val result = controller.post()(request)
 
         status(result) mustBe SEE_OTHER
-        controller.router.verify(NeedToUpdatePageId, new RemoveBusinessTypeFlowModel())
+        controller.router.verify(any(), NeedToUpdatePageId, new RemoveBusinessTypeFlowModel())
       }
     }
   }

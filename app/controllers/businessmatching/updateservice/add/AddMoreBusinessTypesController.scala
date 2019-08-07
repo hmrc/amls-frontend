@@ -18,17 +18,16 @@ package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
+
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
-import models.flowmanagement.{AddMoreBusinessTypesPageId, AddBusinessTypeFlowModel}
+import models.flowmanagement.{AddBusinessTypeFlowModel, AddMoreBusinessTypesPageId}
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.BooleanFormReadWrite
+import utils.{AuthAction, BooleanFormReadWrite}
 import views.html.businessmatching.updateservice.add.add_more_activities
 
 import scala.collection.immutable.SortedSet
@@ -36,45 +35,43 @@ import scala.concurrent.Future
 
 @Singleton
 class AddMoreBusinessTypesController @Inject()(
-                                             val authConnector: AuthConnector,
-                                             implicit val dataCacheConnector: DataCacheConnector,
-                                             val router: Router[AddBusinessTypeFlowModel]
-                                           ) extends BaseController {
+                                                authAction: AuthAction,
+                                                implicit val dataCacheConnector: DataCacheConnector,
+                                                val router: Router[AddBusinessTypeFlowModel]
+                                           ) extends DefaultBaseController {
 
   val fieldName = "addmoreactivities"
 
   implicit val boolWrite = BooleanFormReadWrite.formWrites(fieldName)
   implicit val boolRead = BooleanFormReadWrite.formRule(fieldName, "error.businessmatching.updateservice.addmoreactivities")
 
-  def get() = Authorised.async {
-    implicit authContext =>
+  def get() = authAction.async {
       implicit request =>
         (for {
-          activities <- OptionT(getActivities)
+          activities <- OptionT(getActivities(request.credId))
         } yield Ok(add_more_activities(EmptyForm, activities))) getOrElse InternalServerError("Get :Unable to show add more activities page")
   }
 
-  def post() = Authorised.async {
-    implicit authContext =>
+  def post() = authAction.async {
       implicit request =>
         Form2[Boolean](request.body) match {
           case f: InvalidForm =>
-            OptionT(getActivities) map { activities =>
+            OptionT(getActivities(request.credId)) map { activities =>
               BadRequest(add_more_activities(f, activities))
             } getOrElse InternalServerError("Post: Unable to show add more activities page")
 
           case ValidForm(_, data) =>
-            dataCacheConnector.update[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key) {
+            dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key) {
               case Some(model) => model.copy(addMoreActivities = Some(data))
             } flatMap {
-              case Some(model) => router.getRoute(AddMoreBusinessTypesPageId, model)
+              case Some(model) => router.getRouteNewAuth(request.credId, AddMoreBusinessTypesPageId, model)
               case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: AddMoreActivitiesController"))
             }
         }
   }
 
-  private def getActivities(implicit dataCacheConnector: DataCacheConnector, hc: HeaderCarrier, ac: AuthContext): Future[Option[Set[String]]] = {
-    dataCacheConnector.fetchAll map {
+  private def getActivities(credId: String)(implicit dataCacheConnector: DataCacheConnector, hc: HeaderCarrier): Future[Option[Set[String]]] = {
+    dataCacheConnector.fetchAll(credId) map {
       optionalCache =>
         for {
           cache <- optionalCache

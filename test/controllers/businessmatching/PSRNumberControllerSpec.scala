@@ -135,7 +135,7 @@ class PSRNumberControllerSpec extends AmlsSpec
 
         status(result) mustBe SEE_OTHER
 
-        controller.router.verify(PsrNumberPageId, ChangeSubSectorFlowModel(
+        controller.router.verify(any(), PsrNumberPageId, ChangeSubSectorFlowModel(
             Some(Set(TransmittingMoney)),
             Some(BusinessAppliedForPSRNumberYes("123789"))))
       }
@@ -156,7 +156,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         val result = controller.post(true)(newRequest)
 
         status(result) mustBe SEE_OTHER
-        controller.router.verify(PsrNumberPageId, ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberNo)), edit = true)
+        controller.router.verify(any(), PsrNumberPageId, ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberNo)), edit = true)
       }
 
       "respond with BAD_REQUEST when given invalid data" in new Fixture {

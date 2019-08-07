@@ -22,6 +22,7 @@ import models.businessmatching._
 import models.businessmatching.updateservice.{TradingPremisesActivities, UpdateService}
 import models.flowmanagement.{AddBusinessTypeFlowModel, WhichTradingPremisesPageId}
 import models.tradingpremises.TradingPremises
+import org.mockito.Matchers._
 import org.scalacheck.Gen
 import org.scalatest.PrivateMethodTester
 import play.api.i18n.Messages
@@ -98,7 +99,7 @@ class WhichTradingPremisesControllerSpec extends AmlsSpec
 
             status(result) must be(SEE_OTHER)
 
-            controller.router.verify(WhichTradingPremisesPageId,
+            controller.router.verify(any(), WhichTradingPremisesPageId,
               AddBusinessTypeFlowModel(tradingPremisesActivities = Some(TradingPremisesActivities(Set(1))), hasChanged = true))
           }
         }

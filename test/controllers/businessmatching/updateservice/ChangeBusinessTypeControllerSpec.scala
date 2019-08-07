@@ -101,7 +101,7 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
           val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "add"))
 
           status(result) must be(SEE_OTHER)
-          controller.router.verify(ChangeBusinessTypesPageId, Add)
+          controller.router.verify(any(), ChangeBusinessTypesPageId, Add)
         }
       }
 
@@ -111,7 +111,7 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
           val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "remove"))
 
           status(result) must be(SEE_OTHER)
-          controller.router.verify(ChangeBusinessTypesPageId, Remove)
+          controller.router.verify(any(), ChangeBusinessTypesPageId, Remove)
         }
       }
 

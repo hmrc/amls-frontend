@@ -24,6 +24,8 @@ import models.status.SubmissionDecisionApproved
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
+import org.mockito.Matchers._
+
 import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 
 class TradingPremisesControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
@@ -77,7 +79,7 @@ class TradingPremisesControllerSpec extends AmlsSpec with BusinessMatchingGenera
 
             status(result) mustBe SEE_OTHER
 
-            controller.router.verify(TradingPremisesPageId,
+            controller.router.verify(any(), TradingPremisesPageId,
               AddBusinessTypeFlowModel(areNewActivitiesAtTradingPremises = Some(true), hasChanged = true))
           }
         }
@@ -93,7 +95,7 @@ class TradingPremisesControllerSpec extends AmlsSpec with BusinessMatchingGenera
 
               status(result) mustBe SEE_OTHER
 
-              controller.router.verify(TradingPremisesPageId,
+              controller.router.verify(any(), TradingPremisesPageId,
                 AddBusinessTypeFlowModel(Some(HighValueDealing), areNewActivitiesAtTradingPremises = Some(false), hasChanged = true))
             }
           }

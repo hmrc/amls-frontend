@@ -18,6 +18,7 @@ package controllers.businessmatching.updateservice.remove
 
 import models.DateOfChange
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, WhatDateRemovedPageId}
+import org.mockito.Matchers._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import play.api.i18n.Messages
@@ -101,7 +102,7 @@ class WhatDateRemovedControllerSpec extends AmlsSpec {
           ))
         }
 
-        controller.router.verify(WhatDateRemovedPageId, RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(today))))
+        controller.router.verify(any(), WhatDateRemovedPageId, RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(today))))
       }
 
 

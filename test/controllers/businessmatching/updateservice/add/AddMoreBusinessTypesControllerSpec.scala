@@ -80,7 +80,7 @@ class AddMoreBusinessTypesControllerSpec extends AmlsSpec with BusinessMatchingG
             ))
 
             status(result) mustBe SEE_OTHER
-            controller.router.verify(AddMoreBusinessTypesPageId, AddBusinessTypeFlowModel(addMoreActivities = Some(true)))
+            controller.router.verify(any(), AddMoreBusinessTypesPageId, AddBusinessTypeFlowModel(addMoreActivities = Some(true)))
           }
         }
 
@@ -95,7 +95,7 @@ class AddMoreBusinessTypesControllerSpec extends AmlsSpec with BusinessMatchingG
               ))
 
               status(result) mustBe SEE_OTHER
-              controller.router.verify(AddMoreBusinessTypesPageId, flowModel.copy(addMoreActivities = Some(false)))
+              controller.router.verify(any(), AddMoreBusinessTypesPageId, flowModel.copy(addMoreActivities = Some(false)))
             }
           }
 
@@ -109,7 +109,7 @@ class AddMoreBusinessTypesControllerSpec extends AmlsSpec with BusinessMatchingG
               ))
 
               status(result) mustBe SEE_OTHER
-              controller.router.verify(AddMoreBusinessTypesPageId, flowModel.copy(addMoreActivities = Some(false)))
+              controller.router.verify(any(), AddMoreBusinessTypesPageId, flowModel.copy(addMoreActivities = Some(false)))
             }
           }
         }

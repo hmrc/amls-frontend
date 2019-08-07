@@ -19,7 +19,6 @@ package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
-import config.ApplicationConfig
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
@@ -27,6 +26,7 @@ import models.businessmatching._
 import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
 import models.flowmanagement.{AddBusinessTypeFlowModel, WhichFitAndProperPageId}
 import models.responsiblepeople.{ApprovalFlags, DateOfBirth, PersonName, ResponsiblePerson}
+import org.mockito.Matchers._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -125,7 +125,7 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
         val result = controller.post()(request.withFormUrlEncodedBody("responsiblePeople[]" -> "1"))
 
         status(result) must be(SEE_OTHER)
-        controller.router.verify(WhichFitAndProperPageId,
+        controller.router.verify(any(), WhichFitAndProperPageId,
           AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices),
             areNewActivitiesAtTradingPremises = Some(false),
             tradingPremisesActivities = None,
@@ -142,7 +142,7 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
 
       val result = controller.post(true)(request.withFormUrlEncodedBody("responsiblePeople[]" -> "1"))
       status(result) must be(SEE_OTHER)
-      controller.router.verify(WhichFitAndProperPageId,
+      controller.router.verify(any(), WhichFitAndProperPageId,
         AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices),
           areNewActivitiesAtTradingPremises = Some(false),
           tradingPremisesActivities = None,

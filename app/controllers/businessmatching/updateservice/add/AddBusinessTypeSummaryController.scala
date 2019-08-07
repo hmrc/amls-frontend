@@ -19,7 +19,7 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
@@ -27,46 +27,43 @@ import models.flowmanagement.{AddBusinessTypeFlowModel, AddBusinessTypeSummaryPa
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import services.{StatusService, TradingPremisesService}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
+import utils.{AuthAction, RepeatingSection}
 import views.html.businessmatching.updateservice.add.update_services_summary
 
 import scala.concurrent.Future
 
 @Singleton
 class AddBusinessTypeSummaryController @Inject()(
-                                                 val authConnector: AuthConnector,
-                                                 implicit val dataCacheConnector: DataCacheConnector,
-                                                 val statusService: StatusService,
-                                                 val businessMatchingService: BusinessMatchingService,
-                                                 val helper: AddBusinessTypeHelper,
-                                                 val router: Router[AddBusinessTypeFlowModel],
-                                                 val tradingPremisesService: TradingPremisesService
-                                               ) extends BaseController with RepeatingSection {
+                                                  authAction: AuthAction,
+                                                  implicit val dataCacheConnector: DataCacheConnector,
+                                                  val statusService: StatusService,
+                                                  val businessMatchingService: BusinessMatchingService,
+                                                  val helper: AddBusinessTypeHelper,
+                                                  val router: Router[AddBusinessTypeFlowModel],
+                                                  val tradingPremisesService: TradingPremisesService
+                                               ) extends DefaultBaseController with RepeatingSection {
 
-  def get() = Authorised.async {
-    implicit authContext =>
+  def get() = authAction.async {
       implicit request =>
-        OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key)) collect {
+        OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key)) collect {
           case model if model != AddBusinessTypeFlowModel() => Ok(update_services_summary(EmptyForm, model))
         } getOrElse Redirect(controllers.businessmatching.routes.SummaryController.get())
   }
 
-  def post() = Authorised.async {
-    implicit authContext =>
+  def post() = authAction.async {
       implicit request =>
         (for {
-          model <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key))
+          model <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key))
           activity <- OptionT.fromOption[Future](model.activity)
-                  _ <- helper.updateTradingPremises(model)
-                  _ <- helper.updateResponsiblePeople(model)
-                  _ <- helper.updateSupervision
-                  _ <- helper.updateBusinessMatching(model)
-                  _ <- helper.updateServicesRegister(model)
-                  _ <- helper.updateBusinessActivities(model)
-                  _ <- helper.updateHasAcceptedFlag(model)
-                  _ <- helper.clearFlowModel()
-          route <- OptionT.liftF(router.getRoute(AddBusinessTypeSummaryPageId, model))
+                  _ <- helper.updateTradingPremises(request.credId, model)
+                  _ <- helper.updateResponsiblePeople(request.credId, model)
+                  _ <- helper.updateSupervision(request.credId)
+                  _ <- helper.updateBusinessMatching(request.credId, model)
+                  _ <- helper.updateServicesRegister(request.credId, model)
+                  _ <- helper.updateBusinessActivities(request.credId, model)
+                  _ <- helper.updateHasAcceptedFlag(request.credId, model)
+                  _ <- helper.clearFlowModel(request.credId)
+          route <- OptionT.liftF(router.getRouteNewAuth(request.credId, AddBusinessTypeSummaryPageId, model))
         } yield {
           route
         }) getOrElse InternalServerError("Could not fetch the flow model")

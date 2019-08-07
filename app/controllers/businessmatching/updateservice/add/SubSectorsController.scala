@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import config.AppConfig
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.{BaseController, DefaultBaseController}
 import forms.{Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching._
@@ -28,6 +28,7 @@ import models.flowmanagement.{AddBusinessTypeFlowModel, SubSectorsPageId}
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.businessmatching.updateservice.add.msb_subservices
 
 import scala.concurrent.Future
@@ -35,18 +36,17 @@ import scala.concurrent.Future
 
 @Singleton
 class SubSectorsController @Inject()(
-                                       val authConnector: AuthConnector,
+                                       authAction: AuthAction,
                                        implicit val dataCacheConnector: DataCacheConnector,
                                        val businessMatchingService: BusinessMatchingService,
                                        val router: Router[AddBusinessTypeFlowModel],
                                        val config:AppConfig
-                                     ) extends BaseController {
+                                     ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
         (for {
-          model <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key)) orElse OptionT.some(AddBusinessTypeFlowModel())
+          model <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key)) orElse OptionT.some(AddBusinessTypeFlowModel())
         } yield {
           val flowSubServices: Set[BusinessMatchingMsbService] = model.subSectors.getOrElse(BusinessMatchingMsbServices(Set())).msbServices
           val form: Form2[BusinessMatchingMsbServices] = Form2(BusinessMatchingMsbServices(flowSubServices))
@@ -55,20 +55,19 @@ class SubSectorsController @Inject()(
         }) getOrElse InternalServerError("Get: Unable to show Sub-Services page. Failed to retrieve data")
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
+  def post(edit: Boolean = false) = authAction.async {
     import jto.validation.forms.Rules._
-    implicit authContext =>
       implicit request =>
         Form2[BusinessMatchingMsbServices](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.businessmatching.updateservice.add.msb_subservices(f, edit, config.fxEnabledToggle)))
           case ValidForm(_, data) => {
-            dataCacheConnector.update[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key) {
+            dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key) {
               case Some(model) => {
                 model.msbServices(data)
               }
             } flatMap {
-              case Some(model) => router.getRoute(SubSectorsPageId, model, edit)
+              case Some(model) => router.getRouteNewAuth(request.credId, SubSectorsPageId, model, edit)
               case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: SubServicesController"))
             }
           }

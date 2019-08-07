@@ -22,6 +22,7 @@ import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.flowmanagement.{AddBusinessTypeFlowModel, FitAndProperPageId}
 import models.status.SubmissionDecisionApproved
+import org.mockito.Matchers._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
@@ -77,7 +78,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Respons
 
             status(result) mustBe SEE_OTHER
 
-            controller.router.verify(FitAndProperPageId,
+            controller.router.verify(any(), FitAndProperPageId,
               AddBusinessTypeFlowModel(fitAndProper = Some(true), hasChanged = true))
           }
 
@@ -92,7 +93,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Respons
 
                 status(result) mustBe SEE_OTHER
 
-                controller.router.verify(FitAndProperPageId,
+                controller.router.verify(any(), FitAndProperPageId,
                   AddBusinessTypeFlowModel(Some(TrustAndCompanyServices), fitAndProper = Some(false), hasChanged = true))
               }
             }

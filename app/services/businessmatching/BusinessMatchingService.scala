@@ -52,8 +52,8 @@ class BusinessMatchingService @Inject()(
   def getModel(implicit ac:AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, BusinessMatching] =
     OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
 
-  def getModel(cacheId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, BusinessMatching] =
-    OptionT(dataCacheConnector.fetch[BusinessMatching](cacheId, BusinessMatching.key))
+  def getModel(credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, BusinessMatching] =
+    OptionT(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
 @deprecated("To be removed when auth implementation is completed")
   def updateModel(model: BusinessMatching)
                  (implicit ac:AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, CacheMap] =

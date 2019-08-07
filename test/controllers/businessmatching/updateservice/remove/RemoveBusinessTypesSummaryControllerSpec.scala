@@ -20,12 +20,13 @@ import cats.data.OptionT
 import cats.implicits._
 import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
 import models.DateOfChange
-import models.businessmatching.{BusinessMatching, HighValueDealing, MoneyServiceBusiness}
+import models.businessmatching.{BusinessMatching, MoneyServiceBusiness}
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, RemoveBusinessTypesSummaryPageId}
 import models.responsiblepeople.ResponsiblePerson
 import models.tradingpremises.TradingPremises
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
+import org.mockito.Matchers._
 import org.mockito.Mockito.when
 import org.mockito.Matchers.{any, eq => eqTo}
 import play.api.i18n.Messages
@@ -101,7 +102,7 @@ class RemoveBusinessTypesSummaryControllerSpec extends AmlsSpec with TitleValida
 
         status(result) mustBe SEE_OTHER
 
-        router.verify(RemoveBusinessTypesSummaryPageId, flowModel)
+        router.verify(any(), RemoveBusinessTypesSummaryPageId, flowModel)
       }
     }
   }

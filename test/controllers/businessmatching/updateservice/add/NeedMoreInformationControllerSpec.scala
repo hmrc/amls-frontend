@@ -20,6 +20,7 @@ import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import models.businessmatching._
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.{AddBusinessTypeFlowModel, NeedMoreInformationPageId}
+import org.mockito.Matchers._
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
@@ -27,9 +28,6 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import utils.{AuthorisedFixture, DependencyMocks, FutureAssertions, AmlsSpec}
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 class NeedMoreInformationControllerSpec extends AmlsSpec with MockitoSugar with FutureAssertions with ScalaFutures {
 
@@ -70,7 +68,7 @@ class NeedMoreInformationControllerSpec extends AmlsSpec with MockitoSugar with 
       val result = controller.post()(request)
 
       status(result) mustBe SEE_OTHER
-      controller.router.verify(NeedMoreInformationPageId, new AddBusinessTypeFlowModel())
+      controller.router.verify(any(), NeedMoreInformationPageId, new AddBusinessTypeFlowModel())
     }
   }
 }

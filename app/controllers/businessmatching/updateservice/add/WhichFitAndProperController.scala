@@ -19,7 +19,7 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.{BaseController, DefaultBaseController}
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
@@ -30,7 +30,7 @@ import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import services.{ResponsiblePeopleService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
+import utils.{AuthAction, RepeatingSection}
 import views.html.businessmatching.updateservice.add.which_fit_and_proper
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -38,21 +38,20 @@ import scala.concurrent.Future
 
 @Singleton
 class WhichFitAndProperController @Inject()(
-                                             val authConnector: AuthConnector,
+                                             authAction: AuthAction,
                                              implicit val dataCacheConnector: DataCacheConnector,
                                              val statusService: StatusService,
                                              val businessMatchingService: BusinessMatchingService,
                                              val responsiblePeopleService: ResponsiblePeopleService,
                                              val helper: AddBusinessTypeHelper,
                                              val router: Router[AddBusinessTypeFlowModel]
-                                           ) extends BaseController with RepeatingSection {
+                                           ) extends DefaultBaseController with RepeatingSection {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
         (for {
-          rp <- OptionT.liftF(responsiblePeopleService.getAll)
-          flowModel <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key))
+          rp <- OptionT.liftF(responsiblePeopleService.getAll(request.credId))
+          flowModel <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key))
         } yield {
           val indexedRp = rp.zipWithIndex.exceptDeleted
           val form = flowModel.responsiblePeople.fold[Form2[ResponsiblePeopleFitAndProper]](EmptyForm)(Form2[ResponsiblePeopleFitAndProper])
@@ -61,18 +60,17 @@ class WhichFitAndProperController @Inject()(
   }
 
   //hasAlreadyPassedFitAndProper
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request =>
         Form2[ResponsiblePeopleFitAndProper](request.body) match {
-          case f: InvalidForm => responsiblePeopleService.getAll map { rp =>
+          case f: InvalidForm => responsiblePeopleService.getAll(request.credId) map { rp =>
             BadRequest(which_fit_and_proper(f, edit, rp.zipWithIndex.exceptInactive))
           }
           case ValidForm(_, data) => {
-            dataCacheConnector.update[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key) {
+            dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key) {
               case Some(model) => model.responsiblePeople(Some(data))
             } flatMap {
-              case Some(model) => router.getRoute(WhichFitAndProperPageId, model, edit)
+              case Some(model) => router.getRouteNewAuth(request.credId, WhichFitAndProperPageId, model, edit)
               case _ => Future.successful(InternalServerError("Cannot retrieve data"))
             }
           }

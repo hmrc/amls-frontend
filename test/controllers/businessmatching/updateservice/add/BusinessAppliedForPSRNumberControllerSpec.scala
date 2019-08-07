@@ -58,7 +58,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
 
     mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel())
     mockCacheFetch(Some(AddBusinessTypeFlowModel(Some(HighValueDealing))))
-    mockApplicationStatus(SubmissionDecisionApproved)
+    mockApplicationStatusNewAuth(SubmissionDecisionApproved)
 
     val businessMatching = businessMatchingGen.sample.get
     mockCacheSave[BusinessMatching]
@@ -110,7 +110,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
             val result = controller.post(false)(newRequest)
 
             status(result) must be(SEE_OTHER)
-            controller.router.verify(PsrNumberPageId, flowModel)
+            controller.router.verify(any(), PsrNumberPageId, flowModel)
 
           }
         }
@@ -128,7 +128,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
             val result = controller.post(false)(newRequest)
 
             status(result) must be(SEE_OTHER)
-            controller.router.verify(PsrNumberPageId,
+            controller.router.verify(any(), PsrNumberPageId,
               AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789"))))
 
           }
@@ -148,7 +148,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
             val result = controller.post(true)(newRequest)
 
             status(result) must be(SEE_OTHER)
-            controller.router.verify(PsrNumberPageId,
+            controller.router.verify(any(), PsrNumberPageId,
               AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo)), true)
 
           }
@@ -167,7 +167,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
             val result = controller.post(true)(newRequest)
 
             status(result) must be(SEE_OTHER)
-            controller.router.verify(PsrNumberPageId,
+            controller.router.verify(any(), PsrNumberPageId,
               AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789"))), true)
 
           }
