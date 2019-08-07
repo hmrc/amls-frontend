@@ -25,7 +25,6 @@ import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawSubscriptionRespo
 import models.{AmendVariationRenewalResponse, _}
 import play.api.Logger
 import play.api.libs.json.{Json, Writes}
-import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolments}
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
@@ -281,6 +280,14 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     httpPut.PUT[RefreshPaymentStatusRequest, PaymentStatusResult](putUrl, RefreshPaymentStatusRequest(paymentReference))
   }
 
+  def registrationDetails(accountTypeId: (String, String), safeId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[RegistrationDetails] = {
+    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
+    val getUrl = s"$registrationUrl/${accountTypeId._1}/${accountTypeId._2}/details/$safeId"
+
+    httpGet.GET[RegistrationDetails](getUrl)
+  }
+
+  @deprecated("To be removed when auth implementation is complete")
   def registrationDetails(safeId: String)(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[RegistrationDetails] = {
     //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
