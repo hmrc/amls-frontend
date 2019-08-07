@@ -18,11 +18,11 @@ package controllers.tradingpremises
 
 import java.util.UUID
 
-import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
-import play.api.test.Helpers.{OK, contentAsString, status}
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.{AccountancyServices, BillPaymentServices, BusinessMatching, EstateAgentBusinessService, BusinessActivities => BusinessMatchingActivities, _}
 import models.status.SubmissionDecisionApproved
+import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -30,12 +30,11 @@ import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.{OK, contentAsString, status, _}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
@@ -48,13 +47,13 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
   val mockCacheMap = mock[CacheMap]
   val statusService = mock[StatusService]
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
     val request = addToken(authRequest)
 
-    val controller = new DetailedAnswersController(self.authConnector, mockDataCacheConnector)
+    val controller = new DetailedAnswersController(SuccessfulAuthAction, mockDataCacheConnector)
 
-    when(statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
+    when(statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
 
     val model = TradingPremises()
   }
@@ -63,7 +62,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
 
     "get is called" must {
       "respond with OK and show the detailed answers page" in new Fixture {
-        when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        when(mockDataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val businessMatchingActivitiesAll = BusinessMatchingActivities(
@@ -98,10 +97,10 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
 
           val newRequest = request.withFormUrlEncodedBody( "hasAccepted" -> "true")
 
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises =  Some(ytpModel), hasAccepted = true)))))
 
-          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(1)(newRequest)

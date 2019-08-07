@@ -17,39 +17,37 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.TradingPremisesSection
 import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices, CurrencyExchange, TransmittingMoney}
-import models.tradingpremises.{ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, TradingPremises, TradingPremisesMsbService, CurrencyExchange => TPCurrencyExchange, TradingPremisesMsbServices => TPMsbServices, TransmittingMoney => TPTransmittingMoney}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
+import models.tradingpremises.{ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, TradingPremises, TradingPremisesMsbService, CurrencyExchange => TPCurrencyExchange, TradingPremisesMsbServices => TPMsbServices, TransmittingMoney => TPTransmittingMoney}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.StatusService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self => val request = addToken(authRequest)
 
     val cache: DataCacheConnector = mock[DataCacheConnector]
 
     val controller = new MSBServicesController (
       dataCacheConnector = cache,
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       statusService = mock[StatusService]
     )
-    val mockCacheMap = mock[CacheMap]
+    override val mockCacheMap = mock[CacheMap]
     val emptyCache = CacheMap("", Map.empty)
     val model = TradingPremises()
 
@@ -60,7 +58,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
       ))
     )
 
-    when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionDecisionRejected))
+    when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())).thenReturn(Future.successful(SubmissionDecisionRejected))
 
   }
 
@@ -68,7 +66,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
 
     "show an empty form on get with no data in store" in new Fixture {
 
-      when(cache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(cache.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
@@ -86,7 +84,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
 
     "show a prefilled form when there is data in the store" in new Fixture {
 
-      when(cache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(cache.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
@@ -116,10 +114,10 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
           "msbServices[0]" -> "01"
         )
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
         val result = controller.post(50)(newRequest)
@@ -127,7 +125,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
       }
 
       "there is no data at all at that index" in new Fixture {
-        when(cache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        when(cache.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
@@ -149,7 +147,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
         "msbServices[0]" -> "invalid"
       )
 
-      when (controller.dataCacheConnector.fetch[BusinessMatching](any())(any(),any(),any())) thenReturn(Future.successful(None))
+      when (controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(),any())) thenReturn(Future.successful(None))
 
       val result = controller.post(1)(newRequest)
       val document = Jsoup.parse(contentAsString(result))
@@ -166,13 +164,13 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
           "msbServices[0]" -> "01"
         )
 
-        when(cache.fetch[Seq[TradingPremises]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises(
+        when(cache.fetch[Seq[TradingPremises]](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises(
           msbServices = Some(TPMsbServices(Set(TPTransmittingMoney, TPCurrencyExchange)))
         )))))
 
-        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())
+          (any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
         val result = controller.post(1, edit = false)(newRequest)
 
@@ -205,11 +203,11 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
           "msbServices[3]" -> "04"
         )
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises()))))
 
-        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())
+          (any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
         val result = controller.post(1, edit = true)(newRequest)
 
@@ -237,11 +235,11 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
           "msbServices[3]" -> "04"
         )
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises()))))
 
-        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())
+          (any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
         val result = controller.post(1, edit = true)(newRequest)
 
@@ -269,11 +267,11 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
               "msbServices[3]" -> id
             )
 
-            when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
-              (any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises(msbServices = None)))))
+            when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())
+              (any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises(msbServices = None)))))
 
-            when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
-              (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+            when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())
+              (any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
             val result = controller.post(1, edit = true)(newRequest)
 
@@ -293,13 +291,13 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
           "msbServices[1]" -> "02"
         )
 
-        when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
 
-        when(cache.fetch[Seq[TradingPremises]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tp))))
+        when(cache.fetch[Seq[TradingPremises]](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(Seq(tp))))
 
-        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())
+          (any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
         val result = controller.post(1, edit = true)(newRequest)
 
@@ -314,13 +312,13 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
           "msbServices[1]" -> "02"
         )
 
-        when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(ReadyForRenewal(None))
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())) thenReturn Future.successful(ReadyForRenewal(None))
 
-        when(cache.fetch[Seq[TradingPremises]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tp))))
+        when(cache.fetch[Seq[TradingPremises]](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(Seq(tp))))
 
-        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())
+          (any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
         val result = controller.post(1, edit = true)(newRequest)
 
@@ -334,13 +332,13 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
           "msbServices[0]" -> "01"
         )
 
-        when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
 
-        when(cache.fetch[Seq[TradingPremises]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tp))))
+        when(cache.fetch[Seq[TradingPremises]](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(Seq(tp))))
 
-        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())
+          (any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
         val result = controller.post(1, edit = true, changed = true)(newRequest)
 
@@ -365,13 +363,13 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
           "msbServices[1]" -> "02"
         )
 
-        when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
 
-        when(cache.fetch[Seq[TradingPremises]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tpNone))))
+        when(cache.fetch[Seq[TradingPremises]](any(), any())
+          (any(),  any())).thenReturn(Future.successful(Some(Seq(tpNone))))
 
-        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())
+          (any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
         val result = controller.post(1, edit = true)(newRequest)
 
@@ -388,10 +386,10 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
         "msbServices[3]" -> "03"
       )
 
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse))))
 
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+      when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(1)(newRequest)
@@ -401,10 +399,11 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
 
       verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
         any(),
+        any(),
         meq(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse.copy(
           hasChanged = true,
           msbServices = Some(TPMsbServices(Set(TPTransmittingMoney, TPCurrencyExchange, ChequeCashingNotScrapMetal)))
-        ))))(any(), any(), any())
+        ))))(any(), any())
     }
 
   }

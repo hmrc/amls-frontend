@@ -17,13 +17,14 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
@@ -31,19 +32,19 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self => val request = addToken(authRequest)
 
     val controller = new WhatYouNeedController (
       mockDataCacheConnector,
-      authConnector = self.authConnector
+      authAction = SuccessfulAuthAction
     )
   }
 
   "WhatYouNeedController" must {
 
     "load the what you need page" in new Fixture {
-      when (controller.dataCacheConnector.fetch[BusinessMatching](any())(any(),any(),any())) thenReturn(Future.successful(None))
+      when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any(),any())) thenReturn(Future.successful(None))
         val result = controller.get(1)(request)
       status(result) mustBe OK
     }
@@ -52,7 +53,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
       val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
       val bm = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
 
-      when (controller.dataCacheConnector.fetch[BusinessMatching](any())(any(),any(),any())) thenReturn(Future.successful(bm))
+      when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any(),any())) thenReturn(Future.successful(bm))
       val result = controller.get(1)(request)
       status(result) must be(OK)
       contentAsString(result) must include(Messages("tradingpremises.whatyouneed.agents.sub.heading"))

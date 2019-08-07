@@ -17,27 +17,26 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
+import generators.tradingpremises.TradingPremisesGenerator
 import models.businessmatching._
 import models.tradingpremises.TradingPremises
-import org.scalatest.prop.PropertyChecks
-import utils.AmlsSpec
-import utils.AuthorisedFixture
-import org.mockito.Matchers.{any, eq => meq}
+import org.mockito.Matchers.any
 import org.mockito.Mockito._
+import org.scalatest.prop.PropertyChecks
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import generators.tradingpremises.TradingPremisesGenerator
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
 
 class TradingPremisesAddControllerSpec extends AmlsSpec with PropertyChecks with TradingPremisesGenerator{
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self => val request = addToken(authRequest)
 
-    val controller = new TradingPremisesAddController (mock[DataCacheConnector], self.authConnector)
+    val controller = new TradingPremisesAddController (mock[DataCacheConnector], SuccessfulAuthAction)
   }
 
   "TradingPremisesAddController" should {
@@ -46,18 +45,18 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with PropertyChecks with
     "load What You Need successfully when displayGuidance is true" in new Fixture {
 
       val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
-      val mockCacheMap = mock[CacheMap]
+      override val mockCacheMap = mock[CacheMap]
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(None, Some(BusinessActivitiesModel))))
 
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
         .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
+      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(),any(), any())( any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.get(true)(request)
@@ -68,7 +67,7 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with PropertyChecks with
     "load Where Are Trading Premises page successfully when user selects option other then MSB in business matching page" in new Fixture {
 
       val BusinessActivitiesModel = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
-      val mockCacheMap = mock[CacheMap]
+      override val mockCacheMap = mock[CacheMap]
 
 
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
@@ -77,13 +76,13 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with PropertyChecks with
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(None, Some(BusinessActivitiesModel))))
 
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.fetch[TradingPremises](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[TradingPremises](any(), any())(any(), any()))
         .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
+      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.get(false)(request)
@@ -94,7 +93,7 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with PropertyChecks with
     "load confirm trading premises address page successfully when user selects option other then MSB in business matching page" in new Fixture {
 
       val BusinessActivitiesModel = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
-      val mockCacheMap = mock[CacheMap]
+      override val mockCacheMap = mock[CacheMap]
 
 
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
@@ -103,13 +102,13 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with PropertyChecks with
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(None, Some(BusinessActivitiesModel))))
 
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.fetch[TradingPremises](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[TradingPremises](any(), any())(any(), any()))
         .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
+      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.get(false)(request)
@@ -120,18 +119,18 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with PropertyChecks with
     "load Registering Agent Premises page successfully when user selects MSB in business matching page" in new Fixture {
 
       val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
-      val mockCacheMap = mock[CacheMap]
+      override val mockCacheMap = mock[CacheMap]
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(None, Some(BusinessActivitiesModel))))
 
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.fetch[TradingPremises](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[TradingPremises](any(), any())(any(), any()))
         .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
+      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.get(false)(request)

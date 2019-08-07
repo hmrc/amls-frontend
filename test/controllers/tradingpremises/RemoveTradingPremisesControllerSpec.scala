@@ -17,12 +17,12 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
 import models.status._
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -30,20 +30,19 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthorisedFixture, StatusConstants}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth, StatusConstants}
 
 import scala.concurrent.Future
 
 class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self => val request = addToken(authRequest)
 
     val controller = new RemoveTradingPremisesController (
       dataCacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService],
-      authConnector = self.authConnector
+      authAction = SuccessfulAuthAction
     )
   }
 
@@ -122,10 +121,10 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
 
       "application status is approved" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(None, Some(ytp), lineId = Some(1234))))))
 
-        when(controller.statusService.getStatus(any(), any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
         val result = controller.get(1, false)(request)
@@ -136,10 +135,10 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
 
       "application status is ready for renewal" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(None, Some(ytp), lineId = Some(1234))))))
 
-        when(controller.statusService.getStatus(any(), any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
           .thenReturn(Future.successful(ReadyForRenewal(None)))
 
         val result = controller.get(1, false)(request)
@@ -151,10 +150,10 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
 
       "application status is ready for renewal amendment" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(None, Some(ytp), lineId = Some(1234))))))
 
-        when(controller.statusService.getStatus(any(), any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
           .thenReturn(Future.successful(RenewalSubmitted(None)))
 
         val result = controller.get(1, false)(request)
@@ -166,10 +165,10 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
 
       "application status is NotCompleted" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(None, Some(ytp))))))
 
-        when(controller.statusService.getStatus(any(), any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
           .thenReturn(Future.successful(NotCompleted))
 
         val result = controller.get(1, false)(request)
@@ -182,10 +181,10 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
 
     "successfully load remove trading premises page with no trading name" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(Seq(TradingPremises(None, None)))))
 
-      when(controller.statusService.getStatus(any(), any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
         .thenReturn(Future.successful(SubmissionDecisionApproved))
 
       val result = controller.get(1, false)(request)
@@ -194,9 +193,9 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
 
     "respond with NOT_FOUND" when {
       "there is no data at all at that index" in new Fixture {
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
-        when(controller.statusService.getStatus(any(), any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
           .thenReturn(Future.successful(NotCompleted))
 
         val result = controller.get(1, false)(request)
@@ -209,10 +208,10 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
 
       val tradingPremises = TradingPremises(lineId = None, yourTradingPremises = Some(ytp))
 
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any())).
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any())).
         thenReturn(Future.successful(Some(Seq(tradingPremises))))
 
-      when(controller.statusService.getStatus(any(), any(), any())).
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())).
         thenReturn(Future.successful(SubmissionDecisionApproved))
 
       val result = controller.get(1)(request)
@@ -228,52 +227,52 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
 
           val emptyCache = CacheMap("", Map.empty)
 
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(tradingPremisesList)))
-          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(controller.statusService.getStatus(any(), any(), any()))
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
             .thenReturn(Future.successful(NotCompleted))
 
           val result = controller.remove(1, false)(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.tradingpremises.routes.YourTradingPremisesController.get().url))
 
-          verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(), meq(Seq(
+          verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(), any(), meq(Seq(
             completeTradingPremises2,
             completeTradingPremises3
-          )))(any(), any(), any())
+          )))(any(), any())
         }
         "removing a trading premises from an application with status SubmissionReady" in new Fixture {
 
           val emptyCache = CacheMap("", Map.empty)
 
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(tradingPremisesList)))
-          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(controller.statusService.getStatus(any(), any(), any()))
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
 
           val result = controller.remove(1, false)(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.tradingpremises.routes.YourTradingPremisesController.get().url))
 
-          verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(), meq(Seq(
+          verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(), any(), meq(Seq(
             completeTradingPremises2,
             completeTradingPremises3
-          )))(any(), any(), any())
+          )))(any(), any())
         }
 
         "removing a trading premises from an application with status SubmissionReadyForReview" in new Fixture {
 
           val emptyCache = CacheMap("", Map.empty)
 
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(tradingPremisesList)))
-          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(controller.statusService.getStatus(any(), any(), any()))
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
 
@@ -281,11 +280,11 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.tradingpremises.routes.YourTradingPremisesController.get().url))
 
-          verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(), meq(Seq(
+          verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(), any(), meq(Seq(
             completeTradingPremises1.copy(status = Some(StatusConstants.Deleted), hasChanged = true),
             completeTradingPremises2,
             completeTradingPremises3
-          )))(any(), any(), any())
+          )))(any(), any())
         }
 
         "removing a trading premises from an application with status SubmissionDecisionApproved" in new Fixture {
@@ -297,11 +296,11 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
             "endDate.year" -> "2001"
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(tradingPremisesList)))
-          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(controller.statusService.getStatus(any(), any(), any()))
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
 
@@ -309,26 +308,26 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.tradingpremises.routes.YourTradingPremisesController.get().url))
 
-          verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(), meq(Seq(
+          verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(), any(), meq(Seq(
             completeTradingPremises1.copy(
               status = Some(StatusConstants.Deleted),
               hasChanged = true,
               endDate = Some(ActivityEndDate(new LocalDate(2001, 1, 1)))),
             completeTradingPremises2,
             completeTradingPremises3
-          )))(any(), any(), any())
+          )))(any(), any())
         }
 
         "removing a new trading premises (no line id) in an amendment or variation" in new Fixture {
           val emptyCache = CacheMap("", Map.empty)
 
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(TradingPremises(lineId = None)))))
 
-          when(controller.statusService.getStatus(any(), any(), any()))
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save(any(), any(), any())(any(),  any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.remove(1, false)(request)
@@ -348,11 +347,11 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
             "endDate.year" -> ""
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(tradingPremisesList)))
-          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(controller.statusService.getStatus(any(), any(), any()))
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           val result = controller.remove(1, true)(newRequest)
@@ -368,11 +367,11 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
             "endDate.year" -> "123456789"
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(tradingPremisesList)))
-          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(controller.statusService.getStatus(any(), any(), any()))
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           val result = controller.remove(1, true)(newRequest)
@@ -389,11 +388,11 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
             "endDate.year" -> "2020"
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(tradingPremisesList)))
-          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(controller.statusService.getStatus(any(), any(), any()))
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           val result = controller.remove(1, true)(newRequest)
@@ -413,11 +412,11 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
             "endDate.year" -> "1989"
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(tradingPremisesEndDateList)))
-          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(controller.statusService.getStatus(any(), any(), any()))
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           val result = controller.remove(1, true)(newRequest)

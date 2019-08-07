@@ -16,6 +16,7 @@
 
 package controllers.tradingpremises
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -26,7 +27,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
@@ -35,12 +36,14 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
 
   val address = Address("1", "2", None, None, "AA1 1BB", None)
 
-  trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+    self =>
+    val request = addToken(authRequest)
 
     val cache: DataCacheConnector = mock[DataCacheConnector]
+    val authAction: AuthAction = SuccessfulAuthAction
 
-    val controller = new ActivityStartDateController(messagesApi, self.authConnector, self.cache)
+    val controller = new ActivityStartDateController(messagesApi, authAction, self.cache)
   }
 
   "ActivityStartDateController" must {
@@ -52,7 +55,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
 
       "successfully load activity start page with empty form" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises =  Some(ytpModel.copy(startDate = None)))))))
 
         val result = controller.get(1, false)(request)
@@ -61,7 +64,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
 
       "redirect  to not found page when YourTradingPremises is None" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get(1, false)(request)
@@ -69,7 +72,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
       }
 
       "successfully load activity start page with pre - populated data form" in new Fixture {
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = ytp)))))
 
         val result = controller.get(1, false)(request)
@@ -89,10 +92,10 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
           "startDate.month" -> "5",
           "startDate.year" -> "2014"
         )
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = ytp)))))
 
-        when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(1, false)(postRequest)
@@ -112,10 +115,10 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
         val updatedTp = TradingPremises(yourTradingPremises = updatedYtp)
         val tp = TradingPremises(yourTradingPremises = ytp)
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = ytp)))))
 
-        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), meq(Seq(updatedTp)))(any(), any(), any()))
+        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), meq(Seq(updatedTp)))(any(),  any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(1, true)(postRequest)
@@ -131,7 +134,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
           "startDate.year" -> "2014"
         )
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = ytp)))))
 
         val result = controller.post(1, false)(postRequest)
