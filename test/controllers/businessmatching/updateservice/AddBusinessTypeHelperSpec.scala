@@ -33,7 +33,7 @@ import org.mockito.Mockito.{never, verify, when}
 import org.scalacheck.Gen
 import play.api.test.Helpers._
 import services.{ResponsiblePeopleService, TradingPremisesService}
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, FutureAssertions}
+import utils._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -43,7 +43,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
   with ResponsiblePersonGenerator
   with FutureAssertions {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
 
     val tradingPremisesService = mock[TradingPremisesService]
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]

@@ -33,7 +33,7 @@ import scala.concurrent.Future
 class NeedMoreInformationController @Inject()(authAction: AuthAction,
                                               implicit val dataCacheConnector: DataCacheConnector,
                                               val router: Router[RemoveBusinessTypeFlowModel]
-                                               ) extends DefaultBaseController {
+                                             ) extends DefaultBaseController {
 
   def get() = authAction.async {
       implicit request =>

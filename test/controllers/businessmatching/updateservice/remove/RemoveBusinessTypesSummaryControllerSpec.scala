@@ -33,7 +33,7 @@ import org.mockito.Matchers.{any, eq => eqTo}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DateHelper, DependencyMocks}
+import utils._
 import views.TitleValidator
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -41,7 +41,7 @@ import scala.concurrent.Future
 
 class RemoveBusinessTypesSummaryControllerSpec extends AmlsSpec with TitleValidator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
 
     val request = addToken(authRequest)
