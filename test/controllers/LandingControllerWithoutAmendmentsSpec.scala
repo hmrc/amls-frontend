@@ -1,0 +1,274 @@
+/*
+ * Copyright 2019 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package controllers
+
+import java.net.URLEncoder
+
+import config.ApplicationConfig
+import connectors.DataCacheConnector
+import controllers.actions.{SuccessfulAuthActionNoAmlsRefNo, SuccessfulAuthActionNoUserRole}
+import generators.StatusGenerator
+import models.businesscustomer.{Address, ReviewDetails}
+import models.businessdetails.BusinessDetails
+import models.businessmatching._
+import models.responsiblepeople.TimeAtAddress.OneToThreeYears
+import models.responsiblepeople._
+import models.status._
+import models.{status => _, _}
+import org.joda.time.LocalDate
+import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.Mockito._
+import play.api.mvc.Result
+import play.api.test.Helpers._
+import services.{AuthEnrolmentsService, AuthService, LandingService, StatusService}
+import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
+import utils.{AmlsSpec, AuthorisedFixture}
+
+import scala.concurrent.Future
+
+class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerator {
+
+  trait Fixture extends AuthorisedFixture {
+    self =>
+
+    val request = addToken(authRequest)
+
+    val controllerNoAmlsNumber = new LandingController(
+      enrolmentsService = mock[AuthEnrolmentsService],
+      landingService = mock[LandingService],
+      authAction = SuccessfulAuthActionNoAmlsRefNo,
+      auditConnector = mock[AuditConnector],
+      authService = mock[AuthService],
+      cacheConnector = mock[DataCacheConnector],
+      statusService = mock[StatusService])
+
+    val controllerNoUserRole = new LandingController(
+      enrolmentsService = mock[AuthEnrolmentsService],
+      landingService = mock[LandingService],
+      authAction = SuccessfulAuthActionNoUserRole,
+      auditConnector = mock[AuditConnector],
+      authService = mock[AuthService],
+      cacheConnector = mock[DataCacheConnector],
+      statusService = mock[StatusService])
+
+    when {
+      controllerNoAmlsNumber.landingService.setAltCorrespondenceAddress(any(), any[String])(any(), any())
+    } thenReturn Future.successful(mock[CacheMap])
+
+    val completeATB = mock[BusinessDetails]
+    val completeResponsiblePerson: ResponsiblePerson = ResponsiblePerson(
+      personName = Some(PersonName("ANSTY", Some("EMIDLLE"), "DAVID")),
+      legalName = Some(PreviousName(Some(false), None, None, None)),
+      legalNameChangeDate = None,
+      knownBy = Some(KnownBy(Some(false), None)),
+      personResidenceType = Some(PersonResidenceType(NonUKResidence, Some(Country("Antigua and Barbuda", "bb")), Some(Country("United Kingdom", "GB")))),
+      ukPassport = Some(UKPassportNo),
+      nonUKPassport = Some(NoPassport),
+      dateOfBirth = Some(DateOfBirth(LocalDate.parse("2000-01-01"))),
+      contactDetails = Some(ContactDetails("0912345678", "TEST@EMAIL.COM")),
+      addressHistory = Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(PersonAddressUK("add1", "add2", Some("add3"), Some("add4"), "de4 5tg"), Some(OneToThreeYears), None)), None, None)),
+      positions = Some(Positions(Set(NominatedOfficer, SoleProprietor), Some(PositionStartDate(new LocalDate(2002, 2, 2))))),
+      saRegistered = Some(SaRegisteredNo),
+      vatRegistered = Some(VATRegisteredNo),
+      experienceTraining = Some(ExperienceTrainingNo),
+      training = Some(TrainingNo),
+      approvalFlags = ApprovalFlags(Some(true), Some(true)),
+      hasChanged = false,
+      hasAccepted = true,
+      lineId = Some(2),
+      status = None,
+      endDate = None,
+      soleProprietorOfAnotherBusiness = None
+    )
+  }
+
+  "LandingController" must {
+
+    "redirect to status page" when {
+      "submission status is DeRegistered and responsible person is not complete" in new Fixture {
+        val inCompleteResponsiblePeople: ResponsiblePerson = completeResponsiblePerson.copy(
+          dateOfBirth = None
+        )
+        val cacheMap: CacheMap = mock[CacheMap]
+        val complete: BusinessMatching = mock[BusinessMatching]
+
+        when(complete.isComplete) thenReturn true
+        when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+        when(cacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(completeATB))
+        when(cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(Seq(inCompleteResponsiblePeople)))
+        when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
+          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0)))))
+
+        when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(Some(cacheMap))
+        when(controllerNoAmlsNumber.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
+          .thenReturn(Future.successful(rejectedStatusGen.sample.get, None))
+
+        val result: Future[Result] = controllerNoAmlsNumber.get()(request)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(controllers.routes.StatusController.get().url)
+      }
+    }
+
+    "redirect to login event page" when {
+      "responsible persons is not complete" in new Fixture {
+        val inCompleteResponsiblePeople: ResponsiblePerson = completeResponsiblePerson.copy(
+          dateOfBirth = None
+        )
+        val cacheMap: CacheMap = mock[CacheMap]
+
+        val complete: BusinessMatching = mock[BusinessMatching]
+
+        when(complete.isComplete) thenReturn true
+        when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+        when(cacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(completeATB))
+        when(cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(Seq(inCompleteResponsiblePeople)))
+        when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
+          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0)))))
+
+        when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(Some(cacheMap))
+        when(controllerNoAmlsNumber.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
+          .thenReturn(Future.successful(activeStatusGen.sample.get, None))
+
+        val result: Future[Result] = controllerNoAmlsNumber.get()(request)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(controllers.routes.LoginEventController.get().url)
+      }
+    }
+
+    "load the correct view after calling get" when {
+
+      "the landing service has a saved form and " when {
+        "the form has not been submitted" in new Fixture {
+          when(controllerNoAmlsNumber.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
+            .thenReturn(Future.successful(NotCompleted, None))
+
+          val complete = mock[BusinessMatching]
+          val emptyCacheMap = mock[CacheMap]
+
+          when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(Some(emptyCacheMap))
+          when(complete.isComplete) thenReturn true
+          when(emptyCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+          when(emptyCacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(completeATB))
+          when(emptyCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(None)
+
+          val result = controllerNoAmlsNumber.get()(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) mustBe Some(controllers.routes.StatusController.get().url)
+        }
+
+        "the form has been submitted" in new Fixture {
+          val cacheMap = mock[CacheMap]
+
+          val complete = mock[BusinessMatching]
+
+          when(complete.isComplete) thenReturn true
+          when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+          when(cacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(completeATB))
+          when(cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(None)
+          when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
+            .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0)))))
+          when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(Some(cacheMap))
+          when(controllerNoAmlsNumber.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
+            .thenReturn(Future.successful(SubmissionReady, None))
+
+          val result = controllerNoAmlsNumber.get()(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) mustBe Some(controllers.routes.StatusController.get().url)
+        }
+      }
+
+      "redirect to the sign-out page when the user role is not USER" in new Fixture {
+        val expectedLocation = s"${ApplicationConfig.logoutUrl}?continue=${
+          URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role).absoluteUrl, "utf-8")}"
+
+        val result = controllerNoUserRole.get()(request)
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(expectedLocation)
+      }
+
+
+      "the landing service has no saved form and " when {
+
+        "the landing service has valid review details" in new Fixture {
+
+          val details = Some(ReviewDetails(businessName = "Test",
+            businessType = None,
+            businessAddress = Address("Line 1", "Line 2", None, None, Some("AA11AA"), Country("United Kingdom", "GB")),
+            safeId = ""))
+
+          when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(None)
+          when(controllerNoAmlsNumber.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(details))
+          when(controllerNoAmlsNumber.landingService.updateReviewDetails(any(), any[String]())(any(), any())).thenReturn(Future.successful(mock[CacheMap]))
+
+          val result = controllerNoAmlsNumber.get()(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) mustBe Some(controllers.businessmatching.routes.BusinessTypeController.get().url)
+
+          verify(controllerNoAmlsNumber.auditConnector).sendExtendedEvent(any[ExtendedDataEvent])(any(), any())
+        }
+
+        "the landing service has review details with invalid postcode" in new Fixture {
+
+          val details = Some(ReviewDetails(businessName = "Test",
+            businessType = None,
+            businessAddress = Address("Line 1", "Line 2", None, None, Some("aa1 $ aa156"), Country("United Kingdom", "GB")),
+            safeId = ""))
+
+          when(controllerNoAmlsNumber.landingService.cacheMap(any[String]())(any(), any())) thenReturn Future.successful(None)
+          when(controllerNoAmlsNumber.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(details))
+          when(controllerNoAmlsNumber.landingService.updateReviewDetails(any(), any[String]())(any(), any())).thenReturn(Future.successful(mock[CacheMap]))
+
+          val result = controllerNoAmlsNumber.get()(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) mustBe Some(controllers.businessmatching.routes.ConfirmPostCodeController.get().url)
+        }
+
+        "the landing service has no valid review details" in new Fixture {
+          when(controllerNoAmlsNumber.landingService.cacheMap(any[String]())(any(), any())) thenReturn Future.successful(None)
+          when(controllerNoAmlsNumber.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(None))
+
+          val result = controllerNoAmlsNumber.get()(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) mustBe Some(ApplicationConfig.businessCustomerUrl)
+        }
+      }
+
+      "pre application must throw an exception" when {
+        "the business matching is incomplete" in new Fixture {
+          val cachmap = mock[CacheMap]
+          val httpResponse = mock[HttpResponse]
+
+          val complete = mock[BusinessMatching]
+
+          when(httpResponse.status) thenReturn (BAD_REQUEST)
+          when(controllerNoAmlsNumber.landingService.cacheMap(any[String]())(any(), any())) thenReturn Future.successful(Some(cachmap))
+          when(complete.isComplete) thenReturn false
+          when(cachmap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+
+          a[Exception] must be thrownBy {
+            await(controllerNoAmlsNumber.get()(request))
+          }
+        }
+      }
+    }
+  }
+}
