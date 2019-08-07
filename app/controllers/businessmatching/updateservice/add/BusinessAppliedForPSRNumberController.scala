@@ -20,12 +20,11 @@ import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.{BaseController, DefaultBaseController}
+import controllers.DefaultBaseController
 import javax.inject.{Inject, Singleton}
 import models.businessmatching._
 import models.flowmanagement.{AddBusinessTypeFlowModel, PsrNumberPageId}
 import services.flowmanagement.Router
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthAction
 import views.html.businessmatching.updateservice.add.business_applied_for_psr_number
 

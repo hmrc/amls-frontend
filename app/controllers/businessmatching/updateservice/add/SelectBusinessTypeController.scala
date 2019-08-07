@@ -19,7 +19,7 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.{BaseController, DefaultBaseController}
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import jto.validation.forms.UrlFormEncoded
@@ -31,7 +31,6 @@ import models.responsiblepeople.ResponsiblePerson
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AuthAction, RepeatingSection}
 import views.html.businessmatching.updateservice.add.select_activities
 import services.ResponsiblePeopleService.ResponsiblePeopleListHelpers
