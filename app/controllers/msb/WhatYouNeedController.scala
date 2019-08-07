@@ -17,24 +17,22 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import javax.inject.Inject
-import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{BusinessMatching, MoneyServiceBusiness => MsbActivity}
+import models.businessmatching.BusinessMatching
 import services.StatusService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.msb.what_you_need
 
 import scala.concurrent.Future
 
-class WhatYouNeedController @Inject()(val authConnector: AuthConnector,
+class WhatYouNeedController @Inject()(authAction: AuthAction,
                                       val statusService: StatusService,
-                                      val dataCacheConnector: DataCacheConnector) extends BaseController {
+                                      val dataCacheConnector: DataCacheConnector) extends DefaultBaseController {
 
-  def get = Authorised.async {
-    implicit authContext =>
+  def get = authAction.async {
       implicit request =>
-        dataCacheConnector.fetchAll flatMap {
+        dataCacheConnector.fetchAll(request.credId) flatMap {
           optionalCache =>
             (for {
               cache <- optionalCache
@@ -46,8 +44,7 @@ class WhatYouNeedController @Inject()(val authConnector: AuthConnector,
         }
   }
 
-  def post = Authorised.async {
-    implicit authContext =>
+  def post = authAction.async {
       implicit request =>
         Future.successful(Redirect(routes.ExpectedThroughputController.get()))
   }

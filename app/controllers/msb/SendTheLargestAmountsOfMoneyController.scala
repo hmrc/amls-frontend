@@ -16,29 +16,28 @@
 
 package controllers.msb
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.moneyservicebusiness.{MoneyServiceBusiness, SendTheLargestAmountsOfMoney}
 import services.businessmatching.ServiceFlow
 import services.{AutoCompleteService, StatusService}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.msb.send_largest_amounts_of_money
 
 import scala.concurrent.Future
 
-class SendTheLargestAmountsOfMoneyController @Inject()(val authConnector: AuthConnector,
+class SendTheLargestAmountsOfMoneyController @Inject()(authAction: AuthAction,
                                                        implicit val cacheConnector: DataCacheConnector,
                                                        implicit val statusService: StatusService,
                                                        implicit val serviceFlow: ServiceFlow,
                                                        val autoCompleteService: AutoCompleteService
-                                                      ) extends BaseController {
+                                                      ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      cacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      cacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
         response =>
           val form: Form2[SendTheLargestAmountsOfMoney] = (for {
             msb <- response
@@ -48,16 +47,16 @@ class SendTheLargestAmountsOfMoneyController @Inject()(val authConnector: AuthCo
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request =>
       Form2[SendTheLargestAmountsOfMoney](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(send_largest_amounts_of_money(f, edit, autoCompleteService.getCountries)))
         case ValidForm(_, data) =>
           for {
             msb <-
-            cacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
-            _ <- cacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
+            cacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
+            _ <- cacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
               msb.sendTheLargestAmountsOfMoney(Some(data))
             )
           } yield {

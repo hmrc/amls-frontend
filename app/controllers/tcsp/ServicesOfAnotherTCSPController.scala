@@ -17,27 +17,27 @@
 package controllers.tcsp
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.tcsp.Tcsp
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.tcsp._
 
 import scala.concurrent.Future
 
 class ServicesOfAnotherTCSPController @Inject()(
-                                                 val authConnector: AuthConnector,
-                                                 val dataCacheConnector: DataCacheConnector
-                                               ) extends BaseController {
+                                                 val authAction: AuthAction,
+                                                 val dataCacheConnector: DataCacheConnector) extends DefaultBaseController {
 
   val NAME = "servicesOfAnotherTCSP"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(NAME)
   implicit val boolRead = utils.BooleanFormReadWrite.formRule(NAME, "error.required.hvd.receive.cash.payments")
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[Tcsp](Tcsp.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+
+      dataCacheConnector.fetch[Tcsp](request.credId, Tcsp.key) map {
         response =>
           val form: Form2[Boolean] = (for {
             tcsp <- response
@@ -47,15 +47,16 @@ class ServicesOfAnotherTCSPController @Inject()(
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request =>
+
       Form2[Boolean](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(services_of_another_tcsp(f, edit)))
         case ValidForm(_, data) =>
           for {
-            tcsp <- dataCacheConnector.fetch[Tcsp](Tcsp.key)
-            _ <- dataCacheConnector.save[Tcsp](Tcsp.key, {
+            tcsp <- dataCacheConnector.fetch[Tcsp](request.credId, Tcsp.key)
+            _ <- dataCacheConnector.save[Tcsp](request.credId, Tcsp.key, {
               (data, tcsp.flatMap(t => t.doesServicesOfAnotherTCSP).contains(true)) match {
                 case (false, true) => tcsp.doesServicesOfAnotherTCSP(data).copy(servicesOfAnotherTCSP = None)
                 case _ => tcsp.doesServicesOfAnotherTCSP(data)
