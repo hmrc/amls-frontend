@@ -17,20 +17,36 @@
 package models.tradingpremises
 
 import cats.data.Validated.{Invalid, Valid}
-import jto.validation.{ValidationError, _}
 import jto.validation.forms.UrlFormEncoded
+import jto.validation.{Rule, ValidationError, _}
 import models.DateOfChange
-import models.businessmatching.{ChequeCashingNotScrapMetal => BMChequeCashingNotScrapMetal, ChequeCashingScrapMetal => BMChequeCashingScrapMetal, CurrencyExchange => BMCurrencyExchange, TransmittingMoney => BMTransmittingMoney, ForeignExchange => BMForeignExchange}
-import play.api.libs.json._
+import models.businessmatching.{ChequeCashingNotScrapMetal => BMChequeCashingNotScrapMetal, ChequeCashingScrapMetal => BMChequeCashingScrapMetal, CurrencyExchange => BMCurrencyExchange, ForeignExchange => BMForeignExchange, TransmittingMoney => BMTransmittingMoney}
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
+import play.api.i18n.{Lang, Messages}
+import play.api.libs.json.{Reads, Writes, _}
 import utils.TraversableValidators
 
-sealed trait TradingPremisesMsbService
+sealed trait TradingPremisesMsbService{
+  val message = "msb.services.list.lbl."
+  def getMessage(implicit lang: Lang): String =
+    this match {
+      case TransmittingMoney => Messages(s"${message}01")
+      case CurrencyExchange => Messages(s"${message}02")
+      case ChequeCashingNotScrapMetal => Messages(s"${message}03")
+      case ChequeCashingScrapMetal => Messages(s"${message}04")
+      case ForeignExchange => Messages(s"${message}05")
+    }
+}
 
 case object TransmittingMoney extends TradingPremisesMsbService
 case object CurrencyExchange extends TradingPremisesMsbService
 case object ChequeCashingNotScrapMetal extends TradingPremisesMsbService
 case object ChequeCashingScrapMetal extends TradingPremisesMsbService
 case object ForeignExchange extends TradingPremisesMsbService
+
+
+
 
 case class TradingPremisesMsbServices(services : Set[TradingPremisesMsbService])
 

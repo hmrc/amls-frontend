@@ -154,9 +154,9 @@
                 editUrl = if(!hasOneService){controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(index, true).toString} else ""
             ) {
                 <ul class="list">
-                @ba.activities.toList.sortBy(_.toString).map { a =>
-                    <li>@a.getMessage()</li>
-                }
+                @ba.activities.toList.sortBy(_.getMessage()) map {
+                    _.getMessage()
+                    }
                 </ul>
             }
         }
@@ -169,16 +169,7 @@
             ) {
 
                 <ul class="list">
-                    @msb.services.toList.sortBy(_.toString).map { line =>
-                    <li>@line match {
-                        case TransmittingMoney => {@Messages("msb.services.list.lbl.01")}
-                        case CurrencyExchange => {@Messages("msb.services.list.lbl.02")}
-                        case ChequeCashingNotScrapMetal => {@Messages("msb.services.list.lbl.03")}
-                        case ChequeCashingScrapMetal => {@Messages("msb.services.list.lbl.04")}
-                        case ForeignExchange => {@Messages("msb.services.list.lbl.05")}
-                        }
-                    </li>
-                    }
+                    @msb.services.toList.sortBy(_.getMessage)
                 </ul>
             }
         }

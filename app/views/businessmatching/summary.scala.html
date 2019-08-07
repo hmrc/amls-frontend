@@ -112,16 +112,7 @@
                     editLinkTag="msbservices-edit"
                 ) {
                     <ul class="list">
-                    @services.msbServices.toList.sortBy(_.toString).map { svc =>
-                        <li>@svc match {
-                            case ChequeCashingNotScrapMetal => {@Messages("businessmatching.services.list.lbl.03")}
-                            case ChequeCashingScrapMetal => {@Messages("businessmatching.services.list.lbl.04")}
-                            case CurrencyExchange => {@Messages("businessmatching.services.list.lbl.02")}
-                            case ForeignExchange => {@Messages("businessmatching.services.list.lbl.05")}
-                            case TransmittingMoney => {@Messages("businessmatching.services.list.lbl.01")}
-                        }</li>
-                    }
-                    </ul>
+                        @services.msbServices.toList.sortBy(_.getMessage) </ul>
                 }
 
                 @if(services.msbServices.contains(TransmittingMoney)) {
