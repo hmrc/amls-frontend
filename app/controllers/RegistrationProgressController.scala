@@ -44,8 +44,7 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
                                                protected[controllers] val progressService: ProgressService,
                                                protected[controllers] val sectionsProvider: SectionsProvider,
                                                protected[controllers] val businessMatchingService: BusinessMatchingService,
-                                               protected[controllers] val serviceFlow: ServiceFlow
-                                              ) extends DefaultBaseController {
+                                               protected[controllers] val serviceFlow: ServiceFlow) extends DefaultBaseController {
 
   def get() = authAction.async {
       implicit request =>

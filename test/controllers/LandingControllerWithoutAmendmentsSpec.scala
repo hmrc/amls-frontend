@@ -34,7 +34,7 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import play.api.mvc.Result
 import play.api.test.Helpers._
-import services.{AuthEnrolmentsService, AuthService, LandingService, StatusService}
+import services.{AuthEnrolmentsService, LandingService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -55,7 +55,6 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       landingService = mock[LandingService],
       authAction = SuccessfulAuthActionNoAmlsRefNo,
       auditConnector = mock[AuditConnector],
-      authService = mock[AuthService],
       cacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService])
 
@@ -64,7 +63,6 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       landingService = mock[LandingService],
       authAction = SuccessfulAuthActionNoUserRole,
       auditConnector = mock[AuditConnector],
-      authService = mock[AuthService],
       cacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService])
 

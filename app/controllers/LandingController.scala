@@ -40,7 +40,7 @@ import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import play.api.Logger
 import play.api.mvc.{Action, Call, Request, Result}
-import services.{AuthEnrolmentsService, AuthService, LandingService, StatusService}
+import services.{AuthEnrolmentsService, LandingService, StatusService}
 import uk.gov.hmrc.auth.core.User
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -53,11 +53,12 @@ import scala.concurrent.Future
 class LandingController @Inject()(val landingService: LandingService,
                                   val enrolmentsService: AuthEnrolmentsService,
                                   val auditConnector: AuditConnector,
-                                  val authService: AuthService,
                                   val cacheConnector: DataCacheConnector,
                                   authAction: AuthAction,
-                                  val statusService: StatusService) extends DefaultBaseController{
+                                  val statusService: StatusService) extends DefaultBaseController {
 
+  private lazy val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role()).absoluteUrl, "utf-8")
+  def signoutUrl = s"${ApplicationConfig.logoutUrl}?continue=$unauthorisedUrl"
 
   private def isAuthorised(implicit headerCarrier: HeaderCarrier) =
     headerCarrier.authorization.isDefined
@@ -74,9 +75,6 @@ class LandingController @Inject()(val landingService: LandingService,
         Future.successful(Ok(views.html.start()))
       }
   }
-
-  private lazy val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role()).absoluteUrl, "utf-8")
-  def signoutUrl = s"${ApplicationConfig.logoutUrl}?continue=$unauthorisedUrl"
 
   def get() = authAction.async {
       implicit request =>

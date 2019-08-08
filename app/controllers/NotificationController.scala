@@ -43,21 +43,22 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
                                        authAction: AuthAction,
                                        val amlsNotificationService: NotificationService,
                                        implicit val amlsConnector: AmlsConnector,
-                                       implicit val dataCacheConnector: DataCacheConnector
-                                      ) extends DefaultBaseController {
+                                       implicit val dataCacheConnector: DataCacheConnector) extends DefaultBaseController {
 
   def getMessages = authAction.async {
       implicit request =>
         request.amlsRefNumber match {
           case Some(mlrRegNumber) => {
               statusService.getReadStatus(mlrRegNumber, request.accountTypeId) flatMap {
-                case readStatus if readStatus.safeId.isDefined => generateNotificationView(request.credId, readStatus.safeId.get, Some(mlrRegNumber), request.accountTypeId)
+                case readStatus if readStatus.safeId.isDefined =>
+                  generateNotificationView(request.credId, readStatus.safeId.get, Some(mlrRegNumber), request.accountTypeId)
                 case _ => throw new Exception("Unable to retrieve SafeID")
               }
             }
           case _ => {
               businessMatchingService.getModel(request.credId).value flatMap {
-                case Some(model) if model.reviewDetails.isDefined => generateNotificationView(request.credId, model.reviewDetails.get.safeId, None, request.accountTypeId)
+                case Some(model) if model.reviewDetails.isDefined =>
+                  generateNotificationView(request.credId, model.reviewDetails.get.safeId, None, request.accountTypeId)
                 case _ => throw new Exception("Unable to retrieve SafeID from reviewDetails")
               }
             }

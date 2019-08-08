@@ -46,11 +46,10 @@ import play.api.libs.json.JsResultException
 import play.api.mvc.{Request, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import services.{AuthEnrolmentsService, AuthService, LandingService, StatusService}
+import services.{AuthEnrolmentsService, LandingService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -93,7 +92,6 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       landingService = mock[LandingService],
       authAction = SuccessfulAuthAction,
       auditConnector = mock[AuditConnector],
-      authService = mock[AuthService],
       cacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService]
     )
@@ -251,7 +249,6 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       landingService = mock[LandingService],
       authAction = SuccessfulAuthActionNoAmlsRefNo,
       auditConnector = mock[AuditConnector],
-      authService = mock[AuthService],
       cacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService]
     )
