@@ -41,7 +41,8 @@ object BusinessName {
       rd.businessName
     }
 
-  def getNameFromCache(credId: String)(implicit hc: HeaderCarrier, cache: DataCacheConnector, ec: ExecutionContext): OptionT[Future, String] =
+
+  def getNameFromCache(credId: String)(implicit hc: HeaderCarrier,  cache: DataCacheConnector, ec: ExecutionContext): OptionT[Future, String] =
     for {
       bm <- OptionT(cache.fetch[BusinessMatching](credId, BusinessMatching.key))
       rd <- OptionT.fromOption[Future](bm.reviewDetails)
@@ -62,9 +63,9 @@ object BusinessName {
     })
   }
 
-  def getNameFromAmls(safeId: String, accountTypeId: (String, String))
-                     (implicit hc: HeaderCarrier, amls: AmlsConnector, ec: ExecutionContext, dc: DataCacheConnector) = {
-    OptionT(amls.registrationDetails(safeId, accountTypeId) map { r =>
+  def getNameFromAmls(accountTypeId: (String, String), safeId: String)
+                     (implicit hc: HeaderCarrier,  amls: AmlsConnector, ec: ExecutionContext, dc: DataCacheConnector) = {
+    OptionT(amls.registrationDetails(accountTypeId, safeId) map { r =>
       Option(r.companyName)
     } recover {
       case ex =>
@@ -72,6 +73,10 @@ object BusinessName {
         None
     })
   }
+
+  def getName(credId: String, accountTypeId:(String, String), safeId: Option[String])
+             (implicit hc: HeaderCarrier,  ec: ExecutionContext, cache: DataCacheConnector, amls: AmlsConnector) =
+    safeId.fold(getNameFromCache(credId))(v => getNameFromAmls(accountTypeId, v) orElse getNameFromCache(credId))
 
   @deprecated("To be removed when auth implementation is complete")
   def getName(safeId: Option[String])
@@ -82,6 +87,7 @@ object BusinessName {
              (implicit hc: HeaderCarrier, ec: ExecutionContext, cache: DataCacheConnector, amls: AmlsConnector) =
     safeId.fold(getNameFromCache(credId))(v => getNameFromAmls(v, accountTypeId: (String, String)) orElse getNameFromCache(credId))
 
+  @deprecated("To be removed when auth implementation is complete")
   def getBusinessNameFromAmls()(implicit hc: HeaderCarrier, context: AuthContext, amls: AmlsConnector,
                                 ec: ExecutionContext, dc: DataCacheConnector, statusService: StatusService) = {
     for {

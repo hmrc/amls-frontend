@@ -77,6 +77,15 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     }
   }
 
+  def getSafeIdFromReadStatus(mlrRegNumber: String, accountTypeId: (String, String))(implicit hc: HeaderCarrier,  ec: ExecutionContext) = {
+    amlsConnector.status(mlrRegNumber, accountTypeId) map {
+      response =>
+        Logger.debug("StatusService:etmpStatusInformation:response:" + response)
+        Option(response.safeId.getOrElse(""))
+    }
+  }
+
+  @deprecated("To be removed when auth implementation is complete")
   private def etmpStatusInformation(mlrRegNumber: String, accountTypeId: (String, String))
                                    (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[(SubmissionStatus, Option[ReadStatusResponse])] = {
 
@@ -138,7 +147,7 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     }
   }
 
-  def getStatus(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)
+  def getStatus(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)
                (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[SubmissionStatus] = {
     amlsRegistrationNo match {
         case Some(mlrRegNumber) =>
@@ -146,7 +155,7 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
           etmpStatus(mlrRegNumber, accountTypeId)(hc, ec)
         case None =>
           Logger.debug("StatusService:getStatus: No mlrRegNumber")
-          notYetSubmitted(cacheId)(hc, ec)
+          notYetSubmitted(credId)(hc, ec)
       }
   }
 

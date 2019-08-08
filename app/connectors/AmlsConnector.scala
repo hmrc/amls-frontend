@@ -276,18 +276,17 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     httpPut.PUT[RefreshPaymentStatusRequest, PaymentStatusResult](putUrl, RefreshPaymentStatusRequest(paymentReference))
   }
 
-  @deprecated("to be removed after new auth changes implemented")
-  def registrationDetails(safeId: String)(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[RegistrationDetails] = {
+  def registrationDetails(accountTypeId: (String, String), safeId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[RegistrationDetails] = {
     //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
-    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
-    val getUrl = s"$registrationUrl/$accountType/$accountId/details/$safeId"
+    val getUrl = s"$registrationUrl/${accountTypeId._1}/${accountTypeId._2}/details/$safeId"
 
     httpGet.GET[RegistrationDetails](getUrl)
   }
 
-  def registrationDetails(safeId: String, accountTypeId: (String, String))(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[RegistrationDetails] = {
-
-    val (accountType, accountId) = accountTypeId
+  @deprecated("To be removed when auth implementation is complete")
+  def registrationDetails(safeId: String)(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[RegistrationDetails] = {
+    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
+    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
     val getUrl = s"$registrationUrl/$accountType/$accountId/details/$safeId"
 
     httpGet.GET[RegistrationDetails](getUrl)

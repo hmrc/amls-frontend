@@ -18,7 +18,6 @@ package controllers.businessdetails
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
-import models.businessdetails.BusinessDetails
 import models.Country
 import models.businessdetails._
 import org.jsoup.Jsoup
@@ -36,7 +35,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.collection.JavaConversions._
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 
 class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
