@@ -85,7 +85,7 @@ object BusinessName {
 
   def getName(credId: String, safeId: Option[String], accountTypeId: (String, String))
              (implicit hc: HeaderCarrier, ec: ExecutionContext, cache: DataCacheConnector, amls: AmlsConnector) =
-    safeId.fold(getNameFromCache(credId))(v => getNameFromAmls(v, accountTypeId: (String, String)) orElse getNameFromCache(credId))
+    safeId.fold(getNameFromCache(credId))(v => getNameFromAmls(accountTypeId, v) orElse getNameFromCache(credId))
 
   @deprecated("To be removed when auth implementation is complete")
   def getBusinessNameFromAmls()(implicit hc: HeaderCarrier, context: AuthContext, amls: AmlsConnector,

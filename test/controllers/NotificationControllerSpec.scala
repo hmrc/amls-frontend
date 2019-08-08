@@ -146,7 +146,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       .thenReturn(OptionT.some[Future, BusinessMatching](testBusinessMatch))
 
     when {
-      mockAmlsConnector.registrationDetails(any(), any[(String, String)]())(any(), any())
+      mockAmlsConnector.registrationDetails(any[(String, String)], any())(any(), any())
     } thenReturn Future.successful(RegistrationDetails(testBusinessName, isIndividual = false))
   }
 

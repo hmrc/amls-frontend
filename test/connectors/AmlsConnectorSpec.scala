@@ -401,7 +401,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         amlsConnector.httpGet.GET[RegistrationDetails](eqTo(url))(any(), any(), any())
       } thenReturn Future.successful(RegistrationDetails("Test Company", isIndividual = false))
 
-      whenReady(amlsConnector.registrationDetails(safeId, accountTypeId)) { result =>
+      whenReady(amlsConnector.registrationDetails(accountTypeId, safeId)) { result =>
         result.companyName mustBe "Test Company"
       }
     }
