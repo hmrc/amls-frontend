@@ -62,6 +62,8 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar with GeneratorD
       _id = IDType("132456")
     )
 
+    val accountTypeId = ("org","id")
+
     val dateTime = new DateTime(1479730062573L, DateTimeZone.UTC)
 
     val testList = Seq(
@@ -115,17 +117,17 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar with GeneratorD
   "The Notification Service" must {
     "get all notifications in order" in new Fixture {
 
-      when(amlsNotificationConnector.fetchAllBySafeId(any())(any(), any(), any()))
+      when(amlsNotificationConnector.fetchAllBySafeId(any(), any())(any(), any()))
         .thenReturn(Future.successful(testList))
 
-      val result = await(service.getNotifications("testNo"))
+      val result = await(service.getNotifications("testNo", accountTypeId))
       result.head.receivedAt mustBe new DateTime(2017, 12, 3, 1, 3, DateTimeZone.UTC)
     }
 
     "return content of the notification for every type of notification" in new Fixture {
 
       for(cType <- contactTypes) {
-        when(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(any(), any())(any(), any(), any()))
+        when(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(NotificationDetails(
             messageText = cType._2,
             contactType = Some(ApplicationApproval),
@@ -133,7 +135,7 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar with GeneratorD
             variation = false,
             receivedAt = new DateTime(2017, 12, 3, 1, 3, DateTimeZone.UTC)))))
 
-        val result = await(service.getMessageDetails("", "", cType._1,"v1m0"))
+        val result = await(service.getMessageDetails("", "", cType._1,"v1m0", accountTypeId))
         result mustBe defined
         result.value.messageText mustBe defined
       }
