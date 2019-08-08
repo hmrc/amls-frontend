@@ -25,12 +25,11 @@ import models.status.SubmissionDecisionApproved
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import play.api.libs.json.Format
-import play.api.mvc.AnyContent
 import services.StatusService
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthAction, AuthorisedRequest, DateOfChangeHelper, RepeatingSection}
+import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
@@ -100,15 +99,10 @@ class AgentNameController @Inject()(
 
   }
 
-  def getTradingPremises(result: Option[CacheMap], index: Int)(implicit
-                                                               request: AuthorisedRequest[AnyContent],
-                                                               hc: HeaderCarrier,
+  def getTradingPremises(result: Option[CacheMap], index: Int)(implicit hc: HeaderCarrier,
                                                                formats: Format[TradingPremises],
-                                                               key: MongoKey[TradingPremises] ) = {
-    result flatMap { cache =>
-      getData(cache, index)
-    }
-  }
+                                                               key: MongoKey[TradingPremises]) =
+    result flatMap { cache => getData(cache, index) }
 
   def dateOfChange(index: Int) = authAction.async {
     implicit request =>

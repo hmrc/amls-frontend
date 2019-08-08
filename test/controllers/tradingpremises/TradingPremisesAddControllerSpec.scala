@@ -33,7 +33,7 @@ import scala.concurrent.Future
 
 class TradingPremisesAddControllerSpec extends AmlsSpec with PropertyChecks with TradingPremisesGenerator{
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
     val controller = new TradingPremisesAddController (mock[DataCacheConnector], SuccessfulAuthAction)
@@ -45,7 +45,7 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with PropertyChecks with
     "load What You Need successfully when displayGuidance is true" in new Fixture {
 
       val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
-      override val mockCacheMap = mock[CacheMap]
+      val mockCacheMap = mock[CacheMap]
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(None, Some(BusinessActivitiesModel))))
@@ -67,7 +67,7 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with PropertyChecks with
     "load Where Are Trading Premises page successfully when user selects option other then MSB in business matching page" in new Fixture {
 
       val BusinessActivitiesModel = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
-      override val mockCacheMap = mock[CacheMap]
+      val mockCacheMap = mock[CacheMap]
 
 
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
@@ -93,7 +93,7 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with PropertyChecks with
     "load confirm trading premises address page successfully when user selects option other then MSB in business matching page" in new Fixture {
 
       val BusinessActivitiesModel = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
-      override val mockCacheMap = mock[CacheMap]
+      val mockCacheMap = mock[CacheMap]
 
 
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
@@ -119,7 +119,7 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with PropertyChecks with
     "load Registering Agent Premises page successfully when user selects MSB in business matching page" in new Fixture {
 
       val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
-      override val mockCacheMap = mock[CacheMap]
+      val mockCacheMap = mock[CacheMap]
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(None, Some(BusinessActivitiesModel))))

@@ -26,7 +26,7 @@ import org.scalatest.mock.MockitoSugar
 import play.api.libs.json.JsValue
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -34,7 +34,7 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
 
   import models.tradingpremises.RemovalReasonConstants._
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture {
     self =>
     implicit val request = addToken(authRequest)
 

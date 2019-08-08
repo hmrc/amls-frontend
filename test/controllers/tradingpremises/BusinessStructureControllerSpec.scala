@@ -34,7 +34,7 @@ import scala.concurrent.Future
 
 class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture  {
     self => val request = addToken(authRequest)
 
     val cache: DataCacheConnector = mock[DataCacheConnector]

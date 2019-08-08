@@ -33,11 +33,11 @@ import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, CacheMocks, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
-class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with CacheMocks with generators.tradingpremises.TradingPremisesGenerator {
+class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with generators.tradingpremises.TradingPremisesGenerator {
 
   implicit val request = FakeRequest
   val userId = s"user-${UUID.randomUUID()}"

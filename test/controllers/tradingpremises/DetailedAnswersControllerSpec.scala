@@ -47,7 +47,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
   val mockCacheMap = mock[CacheMap]
   val statusService = mock[StatusService]
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture  {
     self =>
     val request = addToken(authRequest)
 

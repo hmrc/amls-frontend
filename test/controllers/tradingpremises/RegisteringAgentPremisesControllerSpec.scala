@@ -34,7 +34,7 @@ import scala.concurrent.Future
 
 class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture  {
     self => val request = addToken(authRequest)
     val controller = new RegisteringAgentPremisesController (
       mock[DataCacheConnector],

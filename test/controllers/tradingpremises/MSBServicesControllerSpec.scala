@@ -37,7 +37,7 @@ import scala.concurrent.Future
 
 class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
     val cache: DataCacheConnector = mock[DataCacheConnector]
@@ -47,7 +47,8 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
       authAction = SuccessfulAuthAction,
       statusService = mock[StatusService]
     )
-    override val mockCacheMap = mock[CacheMap]
+
+    val mockCacheMap = mock[CacheMap]
     val emptyCache = CacheMap("", Map.empty)
     val model = TradingPremises()
 

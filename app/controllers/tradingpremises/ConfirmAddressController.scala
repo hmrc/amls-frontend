@@ -100,7 +100,7 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
   def post(index: Int) = authAction.async {
       implicit request =>
         val name: OptionT[Future, String] = for {
-          amlsRegNumber <- OptionT(Future(request.amlsRefNumber))
+          amlsRegNumber <- OptionT.fromOption[Future](request.amlsRefNumber)
           id <- OptionT(statusService.getSafeIdFromReadStatus(amlsRegNumber, request.accountTypeId))
           bName <- BusinessName.getName(request.credId, request.accountTypeId, Some(id))
         } yield bName

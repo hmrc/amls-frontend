@@ -46,7 +46,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
 
   private val mockDataCacheConnector = mock[DataCacheConnector]
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture  {
     self => val request = addToken(authRequest)
 
     val controller = new WhereAreTradingPremisesController (

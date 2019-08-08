@@ -32,13 +32,13 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
 class AgentCompanyDetailsControllerSpec extends AmlsSpec with OneAppPerSuite with MockitoSugar with ScalaFutures with TradingPremisesGenerator{
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
     val controller = new AgentCompanyDetailsController (mock[DataCacheConnector], SuccessfulAuthAction , messagesApi)

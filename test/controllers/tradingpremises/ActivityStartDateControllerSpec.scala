@@ -27,7 +27,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
@@ -36,7 +36,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
 
   val address = Address("1", "2", None, None, "AA1 1BB", None)
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture  {
     self =>
     val request = addToken(authRequest)
 

@@ -53,7 +53,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
     reset(mockDataCacheConnector)
   }
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
     val whatDoesYourBusinessDoController = new WhatDoesYourBusinessDoController (
