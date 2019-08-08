@@ -88,6 +88,7 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     }
   }
 
+  @deprecated("To be removed when auth implementation is complete")
   def getSafeIdFromReadStatus(mlrRegNumber: String)(implicit hc: HeaderCarrier,
                                                           auth: AuthContext, ec: ExecutionContext) = {
     amlsConnector.status(mlrRegNumber) map {
