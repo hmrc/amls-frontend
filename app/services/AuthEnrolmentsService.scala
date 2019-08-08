@@ -17,11 +17,10 @@
 package services
 
 import config.AppConfig
+import connectors.{AuthConnector, EnrolmentStubConnector, TaxEnrolmentsConnector}
 import javax.inject.Inject
 import models.enrolment.{AmlsEnrolmentKey, TaxEnrolment}
-import connectors.{AuthConnector, EnrolmentStubConnector, TaxEnrolmentsConnector}
 import play.api.Logger
-import uk.gov.hmrc.auth.core.AuthorisationException
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 

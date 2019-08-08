@@ -18,21 +18,19 @@ package utils
 
 import java.net.URLEncoder
 
-import config.{AppConfig, ApplicationConfig}
-import connectors.EnrolmentStubConnector
+import config.ApplicationConfig
 import javax.inject.Inject
 import models.ReturnLocation
-import play.api.mvc._
+import play.api.Logger
 import play.api.mvc.Results.Redirect
+import play.api.mvc._
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.HeaderCarrierConverter
-import play.api.Logger
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 
 final case class AuthorisedRequest[A](request: Request[A],
                                       amlsRefNumber: Option[String],
