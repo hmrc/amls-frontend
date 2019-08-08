@@ -40,7 +40,7 @@ import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocks}
+import utils._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -61,7 +61,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
     TelephonePaymentService
   )
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
 
     val request = addToken(authRequest)
 
@@ -831,9 +831,10 @@ class RegisterServicesControllerSpec extends AmlsSpec
         status(result) must be(SEE_OTHER)
 
         verify(mockCacheConnector).save[Seq[ResponsiblePerson]](
+          any(),
           eqTo(ResponsiblePerson.key),
           eqTo(Seq(responsiblePersonNotAccepted, responsiblePersonNotAccepted))
-        )(any(),any(),any())
+        )(any(),any())
 
       }
     }

@@ -31,14 +31,14 @@ import org.mockito.Mockito._
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, DependencyMocksNewAuth}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
     val request = addToken(authRequest)
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
@@ -57,7 +57,7 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
       mockStatusService.isPending(any())
     } thenReturn false
 
-    mockApplicationStatus(NotCompleted)
+    mockApplicationStatusNewAuth(NotCompleted)
 
     def mockGetModel(model: Option[BusinessMatching]) = when {
       controller.businessMatchingService.getModel(any())(any(), any())
