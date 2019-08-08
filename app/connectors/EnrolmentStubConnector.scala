@@ -38,5 +38,4 @@ class EnrolmentStubConnector @Inject()(http: HttpGet, config: AppConfig) {
     val requestUrl = s"$baseUrl/auth/oid/$groupId/enrolments"
     http.GET[Seq[GovernmentGatewayEnrolment]](requestUrl)
   }
-
 }

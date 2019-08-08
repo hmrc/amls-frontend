@@ -43,22 +43,6 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
 
   private[connectors] val paymentUrl: String= s"${appConfig.amlsUrl}/amls/payment"
 
-  @deprecated("to be removed when new auth completely implemented")
-  def subscribe(subscriptionRequest: SubscriptionRequest, safeId: String)
-  (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, reqW: Writes[SubscriptionRequest], resW: Writes[SubscriptionResponse], ac: AuthContext): Future[SubscriptionResponse] = {
-
-    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
-
-    val postUrl = s"$url/$accountType/$accountId/$safeId"
-    val prefix = "[AmlsConnector][subscribe]"
-    Logger.debug(s"$prefix - Request Body: ${Json.toJson(subscriptionRequest)}")
-    httpPost.POST[SubscriptionRequest, SubscriptionResponse](postUrl, subscriptionRequest) map {
-      response =>
-        Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
-        response
-    }
-  }
-
   def subscribe(subscriptionRequest: SubscriptionRequest, safeId: String, accountTypeId: (String, String))
                (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, reqW: Writes[SubscriptionRequest], resW: Writes[SubscriptionResponse]): Future[SubscriptionResponse] = {
 
@@ -112,30 +96,6 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     }
   }
 
-  @deprecated("to be removed when new auth completely implemented")
-  def view(amlsRegistrationNumber: String)
-          (implicit
-           headerCarrier: HeaderCarrier,
-           ec: ExecutionContext,
-           reqW: Writes[ViewResponse],
-           ac: AuthContext
-          ): Future[ViewResponse] = {
-
-    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
-    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
-
-    val getUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber"
-    val prefix = "[AmlsConnector][view]"
-    Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
-
-    httpGet.GET[ViewResponse](getUrl) map {
-      response =>
-        Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
-        response
-    }
-
-  }
-
   def view(amlsRegistrationNumber: String, accountTypeId: (String, String))
           (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, reqW: Writes[ViewResponse]): Future[ViewResponse] = {
 
@@ -153,28 +113,6 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
 
   }
 
-  @deprecated("to be removed when new auth completely implemented")
-  def update(updateRequest: SubscriptionRequest,amlsRegistrationNumber: String)
-            (implicit
-             headerCarrier: HeaderCarrier,
-             ec: ExecutionContext,
-             reqW: Writes[SubscriptionRequest],
-             resW: Writes[AmendVariationRenewalResponse],
-             ac: AuthContext): Future[AmendVariationRenewalResponse] = {
-
-    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
-    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
-
-    val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/update"
-    val prefix = "[AmlsConnector][update]"
-    Logger.debug(s"$prefix - Request Body: ${Json.toJson(updateRequest)}")
-    httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, updateRequest) map {
-      response =>
-        Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
-        response
-    }
-  }
-
   def update(updateRequest: SubscriptionRequest, amlsRegistrationNumber: String, accountTypeId: (String, String))
             (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, reqW: Writes[SubscriptionRequest], resW: Writes[AmendVariationRenewalResponse]): Future[AmendVariationRenewalResponse] = {
 
@@ -182,28 +120,6 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
 
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/update"
     val prefix = "[AmlsConnector][update]"
-    Logger.debug(s"$prefix - Request Body: ${Json.toJson(updateRequest)}")
-    httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, updateRequest) map {
-      response =>
-        Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
-        response
-    }
-  }
-
-  @deprecated("to be removed when new auth completely implemented")
-  def variation(updateRequest: SubscriptionRequest, amlsRegistrationNumber: String)
-               (implicit
-                headerCarrier: HeaderCarrier,
-                ec: ExecutionContext,
-                reqW: Writes[SubscriptionRequest],
-                resW: Writes[AmendVariationRenewalResponse],
-                ac: AuthContext): Future[AmendVariationRenewalResponse] = {
-
-    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
-    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
-
-    val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/variation"
-    val prefix = "[AmlsConnector][variation]"
     Logger.debug(s"$prefix - Request Body: ${Json.toJson(updateRequest)}")
     httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, updateRequest) map {
       response =>
@@ -227,27 +143,6 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     }
   }
 
-  @deprecated("to be removed when new auth completely implemented")
-  def renewal(subscriptionRequest: SubscriptionRequest, amlsRegistrationNumber: String)
-             (implicit headerCarrier: HeaderCarrier,
-             ec: ExecutionContext,
-             authContext: AuthContext
-             ): Future[AmendVariationRenewalResponse] = {
-
-    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
-    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
-
-    val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/renewal"
-    val log = (msg: String) => Logger.debug(s"[AmlsConnector][renewal] $msg")
-
-    log(s"Request body: ${Json.toJson(subscriptionRequest)}")
-
-    httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, subscriptionRequest) map { response =>
-      log(s"Response body: ${Json.toJson(response)}")
-      response
-    }
-  }
-
   def renewal(subscriptionRequest: SubscriptionRequest, amlsRegistrationNumber: String, accountTypeId: (String, String))
              (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[AmendVariationRenewalResponse] = {
 
@@ -255,27 +150,6 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
 
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/renewal"
     val log = (msg: String) => Logger.debug(s"[AmlsConnector][renewal] $msg")
-
-    log(s"Request body: ${Json.toJson(subscriptionRequest)}")
-
-    httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, subscriptionRequest) map { response =>
-      log(s"Response body: ${Json.toJson(response)}")
-      response
-    }
-  }
-
-  @deprecated("to be removed when auth migration complete")
-  def renewalAmendment(subscriptionRequest: SubscriptionRequest, amlsRegistrationNumber: String)
-             (implicit headerCarrier: HeaderCarrier,
-              ec: ExecutionContext,
-              authContext: AuthContext
-             ): Future[AmendVariationRenewalResponse] = {
-
-    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
-    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
-
-    val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/renewalAmendment"
-    val log = (msg: String) => Logger.debug(s"[AmlsConnector][renewalAmendment] $msg")
 
     log(s"Request body: ${Json.toJson(subscriptionRequest)}")
 
@@ -375,22 +249,6 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     }
   }
 
-  @deprecated("to be removed after new auth changes implemented")
-  def getPaymentByAmlsReference(amlsRef: String)
-                                  (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[Option[Payment]] = {
-    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
-    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
-    val getUrl = s"$paymentUrl/$accountType/$accountId/amlsref/$amlsRef"
-
-    Logger.debug(s"[AmlsConnector][getPaymentByAmlsReference]: Request to $getUrl with $amlsRef")
-
-    httpGet.GET[Payment](getUrl) map { result =>
-      Some(result)
-    } recover {
-      case _: NotFoundException => None
-    }
-  }
-
   def getPaymentByAmlsReference(amlsRef: String, accountTypeId: (String, String))
                                (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Payment]] = {
 
@@ -404,17 +262,6 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     } recover {
       case _: NotFoundException => None
     }
-  }
-
-  @deprecated("to be removed after new auth changes implemented")
-  def refreshPaymentStatus(paymentReference: String)(implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[PaymentStatusResult] = {
-    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
-    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
-    val putUrl = s"$paymentUrl/$accountType/$accountId/refreshstatus"
-
-    Logger.debug(s"[AmlsConnector][refreshPaymentStatus]: Request to $putUrl with $paymentReference")
-
-    httpPut.PUT[RefreshPaymentStatusRequest, PaymentStatusResult](putUrl, RefreshPaymentStatusRequest(paymentReference))
   }
 
   def refreshPaymentStatus(paymentReference: String, accountTypeId: (String, String))

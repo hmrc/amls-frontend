@@ -67,7 +67,7 @@ class RetryPaymentControllerSpec extends AmlsSpec
     setupBusinessMatching(companyNameFromCache)
 
     when {
-      controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
+      controller.amlsConnector.refreshPaymentStatus(any(), any())(any(), any())
     } thenReturn Future.successful(paymentStatusResultGen.sample.get.copy(currentStatus = PaymentStatuses.Successful))
 
     when {

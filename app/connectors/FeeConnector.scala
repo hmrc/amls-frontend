@@ -29,8 +29,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class FeeConnector @Inject()(
                               private[connectors] val http: CoreGet,
-                              appConfig: AppConfig
-                            ) {
+                              appConfig: AppConfig) {
 
   val feePaymentUrl = appConfig.feePaymentUrl
 
