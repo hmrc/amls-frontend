@@ -18,27 +18,26 @@ package controllers.tradingpremises
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{Form2, _}
 import models.businessmatching.BusinessMatching
 import models.status.SubmissionStatus
 import models.tradingpremises.TradingPremisesMsbServices._
 import models.tradingpremises.{TradingPremises, TradingPremisesMsbServices}
 import services.StatusService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{DateOfChangeHelper, RepeatingSection}
+import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
 class MSBServicesController @Inject () (
                                        val dataCacheConnector: DataCacheConnector,
-                                       val authConnector: AuthConnector,
+                                       val authAction: AuthAction,
                                        val statusService: StatusService
-                                       ) extends RepeatingSection with BaseController with DateOfChangeHelper with FormHelpers {
+                                       ) extends RepeatingSection with DefaultBaseController with DateOfChangeHelper with FormHelpers {
 
-  def get(index: Int, edit: Boolean = false, changed: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetchAll map {
+  def get(index: Int, edit: Boolean = false, changed: Boolean = false) = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetchAll(request.credId).map {
         optionalCache =>
           (for {
             cache <- optionalCache
@@ -54,7 +53,7 @@ class MSBServicesController @Inject () (
               tp <- getData[TradingPremises](cache, index)
             } yield {
                 if (msbServices.size == 1) {
-                  updateDataStrict[TradingPremises](index) { utp =>
+                  updateDataStrict[TradingPremises](request.credId, index) { utp =>
                     Some(utp.msbServices(Some(TradingPremisesMsbServices(msbServices))))
                   }
                   Redirect(routes.DetailedAnswersController.get(index))
@@ -87,12 +86,12 @@ class MSBServicesController @Inject () (
     }
   }
 
-  def post(index: Int, edit: Boolean = false, changed: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+  def post(index: Int, edit: Boolean = false, changed: Boolean = false) = authAction.async {
+    implicit request =>
       Form2[TradingPremisesMsbServices](request.body) match {
         case f: InvalidForm => {
           for {
-            businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
+            businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
           } yield {
             BadRequest(views.html.tradingpremises.msb_services(f, index, edit, changed, businessMatching))
           }
@@ -102,11 +101,11 @@ class MSBServicesController @Inject () (
 
         case ValidForm(_, data) => {
           for {
-            tradingPremises <- getData[TradingPremises](index)
-            _ <- updateDataStrict[TradingPremises](index) { tp =>
+            tradingPremises <- getData[TradingPremises](request.credId, index)
+            _ <- updateDataStrict[TradingPremises](request.credId, index) { tp =>
               tp.msbServices(Some(data))
             }
-            status <- statusService.getStatus
+            status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
           } yield redirectBasedOnStatus(status, tradingPremises, data, edit, changed, index)
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

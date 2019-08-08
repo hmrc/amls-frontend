@@ -22,7 +22,7 @@ import cats.data._
 import cats.implicits._
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.status.SubmissionStatus
@@ -32,8 +32,7 @@ import play.api.mvc.Request
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{DateOfChangeHelper, RepeatingSection}
+import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 import views.html.tradingpremises._
 
 import scala.concurrent.Future
@@ -42,14 +41,14 @@ class WhereAreTradingPremisesController @Inject () (
                                                      val dataCacheConnector: DataCacheConnector,
                                                      val statusService: StatusService,
                                                      val auditConnector: AuditConnector,
-                                                     val authConnector: AuthConnector
-                                                   )extends RepeatingSection with BaseController with DateOfChangeHelper with FormHelpers {
+                                                     val authAction: AuthAction
+                                                   )extends RepeatingSection with DefaultBaseController with DateOfChangeHelper with FormHelpers {
 
 
 
-  def get(index: Int, edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      getData[TradingPremises](index) map {
+  def get(index: Int, edit: Boolean = false) = authAction.async {
+    implicit request =>
+      getData[TradingPremises](request.credId, index) map {
         case Some(TradingPremises(_, Some(data), _, _, _, _, _, _, _, _, _, _, _, _, _)) =>
           Ok(where_are_trading_premises(Form2[YourTradingPremises](data), edit, index))
         case Some(_) =>
@@ -59,16 +58,16 @@ class WhereAreTradingPremisesController @Inject () (
       }
   }
 
-  def post(index: Int, edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+  def post(index: Int, edit: Boolean = false) = authAction.async {
+    implicit request =>
       Form2[YourTradingPremises](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(where_are_trading_premises(f, edit, index)))
         case ValidForm(_, ytp) =>
           val block = for {
-            tradingPremises <- OptionT(getData[TradingPremises](index))
-            _ <- OptionT.liftF(updateDataStrict[TradingPremises](index)(updateTradingPremises(ytp, _)))
-            status <- OptionT.liftF(statusService.getStatus)
+            tradingPremises <- OptionT(getData[TradingPremises](request.credId, index))
+            _ <- OptionT.liftF(updateDataStrict[TradingPremises](request.credId, index)(updateTradingPremises(ytp, _)))
+            status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
             _ <- OptionT.liftF(
               sendAudits(ytp.tradingPremisesAddress, tradingPremises.yourTradingPremises.fold[Option[Address]](None)(_.tradingPremisesAddress.some), edit)
             )
@@ -113,17 +112,15 @@ class WhereAreTradingPremisesController @Inject () (
     }
   }
 
-  def dateOfChange(index: Int) = {
-    Authorised {
-      implicit authContext => implicit request =>
-        Ok(views.html.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)),
-          "summary.tradingpremises", controllers.tradingpremises.routes.WhereAreTradingPremisesController.saveDateOfChange(index)))
-    }
+  def dateOfChange(index: Int) = authAction.async {
+    implicit request =>
+        Future(Ok(views.html.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)),
+          "summary.tradingpremises", controllers.tradingpremises.routes.WhereAreTradingPremisesController.saveDateOfChange(index))))
   }
 
-  def saveDateOfChange(index: Int) = Authorised.async {
-    implicit authContext => implicit request =>
-      getData[TradingPremises](index) flatMap { tradingPremises =>
+  def saveDateOfChange(index: Int) = authAction.async {
+    implicit request =>
+      getData[TradingPremises](request.credId, index) flatMap { tradingPremises =>
         Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDateFormFields(tradingPremises.startDate)) match {
           case form: InvalidForm =>
             Future.successful(BadRequest(
@@ -131,7 +128,7 @@ class WhereAreTradingPremisesController @Inject () (
                 form.withMessageFor(DateOfChange.errorPath, tradingPremises.startDateValidationMessage),
                 "summary.tradingpremises", routes.WhereAreTradingPremisesController.saveDateOfChange(index))))
           case ValidForm(_, dateOfChange) =>
-            updateDataStrict[TradingPremises](index) { tp =>
+            updateDataStrict[TradingPremises](request.credId, index) { tp =>
               tp.yourTradingPremises.fold(tp) { ytp =>
                 tp.copy(
                   yourTradingPremises = Some(ytp.copy(

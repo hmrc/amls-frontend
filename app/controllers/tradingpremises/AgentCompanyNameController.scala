@@ -17,27 +17,23 @@
 package controllers.tradingpremises
 
 import javax.inject.{Inject, Singleton}
-
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms._
 import models.tradingpremises._
 import play.api.i18n.MessagesApi
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
+import utils.{AuthAction, RepeatingSection}
 
 import scala.concurrent.Future
 
 @Singleton
 class AgentCompanyNameController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                           val authConnector: AuthConnector,
-                                           override val messagesApi: MessagesApi)extends RepeatingSection with BaseController {
+                                           val authAction: AuthAction,
+                                           override val messagesApi: MessagesApi) extends RepeatingSection with DefaultBaseController {
 
-  def get(index: Int, edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-
-      getData[TradingPremises](index) map {
-
+  def get(index: Int, edit: Boolean = false) = authAction.async {
+    implicit request =>
+      getData[TradingPremises](request.credId, index) map {
         case Some(tp) => {
           val form = tp.agentCompanyDetails match {
             case Some(data) => Form2[AgentCompanyDetails](data)
@@ -49,14 +45,14 @@ class AgentCompanyNameController @Inject()(val dataCacheConnector: DataCacheConn
       }
   }
 
-  def post(index: Int ,edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+  def post(index: Int ,edit: Boolean = false) = authAction.async {
+    implicit request => {
       Form2[AgentCompanyName](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.tradingpremises.agent_company_name(f, index,edit)))
         case ValidForm(_, data) => {
           for {
-            result <- fetchAllAndUpdateStrict[TradingPremises](index) { (_, tp) =>
+            result <- fetchAllAndUpdateStrict[TradingPremises](request.credId, index) { (_, tp) =>
               TradingPremises(tp.registeringAgentPremises,
                 tp.yourTradingPremises,
                 tp.businessStructure, None, Some(data) , None, tp.whatDoesYourBusinessDoAtThisAddress,
