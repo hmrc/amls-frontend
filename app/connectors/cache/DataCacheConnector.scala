@@ -47,7 +47,7 @@ class DataCacheConnector @Inject()(val cacheConnector: MongoCacheConnector){
                (implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): CacheMap =
     cacheConnector.upsert(targetCache, cacheId, data)
 
-  @deprecated("To be removed when auth implementation is complete")
+  @deprecated("To be removed when auth implementation is completed")
   def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =
     cacheConnector.fetchAll
 
