@@ -16,6 +16,7 @@
 
 package controllers.tcsp
 
+import controllers.actions.SuccessfulAuthAction
 import generators.AmlsReferenceNumberGenerator
 import models.tcsp.{ServicesOfAnotherTCSPYes, Tcsp}
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -23,15 +24,15 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with AmlsReferenceNumberGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self => val request = addToken(authRequest)
 
     val controller = new ServicesOfAnotherTCSPController (
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       dataCacheConnector = mockCacheConnector
     )
   }
@@ -173,7 +174,8 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.SummaryController.get().url))
 
-        verify(controller.dataCacheConnector).save(any(),eqTo(Tcsp(doesServicesOfAnotherTCSP = Some(false), hasChanged = true)))(any(),any(),any())
+        verify(controller.dataCacheConnector).save(any(), any(),eqTo(Tcsp(doesServicesOfAnotherTCSP = Some(false), hasChanged = true)))(any(),any())
+
 
       }
     }

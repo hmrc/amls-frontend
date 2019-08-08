@@ -17,41 +17,38 @@
 package controllers.changeofficer
 
 import javax.inject.Inject
-
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import controllers.changeofficer.Helpers._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.changeofficer._
 import models.responsiblepeople.{ResponsiblePerson, ResponsiblePersonEndDate}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{RepeatingSection, StatusConstants}
+import utils.{AuthAction, RepeatingSection, StatusConstants}
 
-class RemoveResponsiblePersonController @Inject()(
-                                                   val authConnector: AuthConnector,
+class RemoveResponsiblePersonController @Inject()(authAction: AuthAction,
                                                    implicit val dataCacheConnector: DataCacheConnector
-                                                 ) extends BaseController with RepeatingSection {
+                                                 ) extends DefaultBaseController with RepeatingSection {
 
-  def get() = Authorised.async {
-    implicit authContext => implicit request => {
-      (getNominatedOfficerName map (name =>
+  def get() = authAction.async {
+     implicit request => {
+      (getNominatedOfficerName(request.credId) map (name =>
         Ok(views.html.changeofficer.remove_responsible_person(EmptyForm, name))
         )) getOrElse InternalServerError("No responsible people found")
     }
   }
 
-  def post() = Authorised.async {
-    implicit authContext => implicit request =>
+  def post() = authAction.async {
+     implicit request =>
         Form2[RemovalDate](request.body) match {
-          case f: InvalidForm => (getNominatedOfficerName map { name =>
+          case f: InvalidForm => (getNominatedOfficerName(request.credId) map { name =>
             BadRequest(views.html.changeofficer.remove_responsible_person(f, name))
           }) getOrElse InternalServerError("No responsible people found")
           case ValidForm(_, data) => {
             (for {
-              (_, index) <- getNominatedOfficerWithIndex
-              _ <- OptionT.liftF(updateDataStrict[ResponsiblePerson](index){ responsiblePerson =>
+              (_, index) <- getNominatedOfficerWithIndex(request.credId)
+              _ <- OptionT.liftF(updateDataStrict[ResponsiblePerson](request.credId, index){ responsiblePerson =>
                 responsiblePerson.status(StatusConstants.Deleted).copy(endDate = Some(ResponsiblePersonEndDate(data.date)))
               })
             } yield Redirect(routes.NewOfficerController.get())) getOrElse InternalServerError("Cannot update responsible person")

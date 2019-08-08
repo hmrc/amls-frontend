@@ -19,29 +19,27 @@ package controllers.changeofficer
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import controllers.changeofficer.Helpers.getOfficer
 import forms.{Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.changeofficer.{ChangeOfficer, NewOfficer, RoleInBusiness}
-import models.responsiblepeople.{NominatedOfficer, Positions, ResponsiblePerson}
 import models.responsiblepeople.ResponsiblePerson.flowChangeOfficer
+import models.responsiblepeople.{NominatedOfficer, Positions, ResponsiblePerson}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{RepeatingSection, StatusConstants}
+import utils.{AuthAction, RepeatingSection, StatusConstants}
 
 import scala.concurrent.Future
 
-class NewOfficerController @Inject()(val authConnector: AuthConnector,
-                                     val cacheConnector: DataCacheConnector) extends BaseController with RepeatingSection {
+class NewOfficerController @Inject()(authAction: AuthAction,
+                                     val cacheConnector: DataCacheConnector) extends DefaultBaseController with RepeatingSection {
 
   override def dataCacheConnector: DataCacheConnector = cacheConnector
 
-  def get = Authorised.async {
-    implicit authContext => implicit request =>
+  def get = authAction.async {
+    implicit request =>
 
-      val result = getPeopleAndSelectedOfficer() map { t =>
+      val result = getPeopleAndSelectedOfficer(request.credId) map { t =>
         Ok(views.html.changeofficer.new_nominated_officer(Form2[NewOfficer](t._1), t._2))
       }
 
@@ -50,11 +48,11 @@ class NewOfficerController @Inject()(val authConnector: AuthConnector,
       }
   }
 
-  def post = Authorised.async {
-    implicit authContext => implicit request =>
+  def post = authAction.async {
+     implicit request =>
       Form2[NewOfficer](request.body) match {
         case f: InvalidForm =>
-          val result = getPeopleAndSelectedOfficer() map { t =>
+          val result = getPeopleAndSelectedOfficer(request.credId) map { t =>
             BadRequest(views.html.changeofficer.new_nominated_officer(f, t._2))
           }
 
@@ -67,19 +65,19 @@ class NewOfficerController @Inject()(val authConnector: AuthConnector,
               Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false, Some(flowChangeOfficer))))
             case _ =>
               val result = for {
-                changeOfficer <- OptionT(cacheConnector.fetch[ChangeOfficer](ChangeOfficer.key)) orElse OptionT.pure(ChangeOfficer(RoleInBusiness(Set.empty)))
-                _ <- OptionT.liftF(cacheConnector.save(ChangeOfficer.key, changeOfficer.copy(newOfficer = Some(data))))
-                cache <- OptionT(cacheConnector.fetchAll)
+                changeOfficer <- OptionT(cacheConnector.fetch[ChangeOfficer](request.credId, ChangeOfficer.key)) orElse OptionT.pure(ChangeOfficer(RoleInBusiness(Set.empty)))
+                _ <- OptionT.liftF(cacheConnector.save(request.credId,ChangeOfficer.key, changeOfficer.copy(newOfficer = Some(data))))
+                cache <- OptionT(cacheConnector.fetchAll(request.credId))
                 responsiblePeople <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key))
                 changeOfficer2 <- OptionT.fromOption[Future](cache.getEntry[ChangeOfficer](ChangeOfficer.key))
                 oldOfficer <- OptionT.fromOption[Future](getOfficer(responsiblePeople.zipWithIndex))
                 newOfficer <- OptionT.fromOption[Future](changeOfficer2.newOfficer)
                 (_, index) <- OptionT.fromOption[Future](ResponsiblePerson.findResponsiblePersonByName(newOfficer.name, responsiblePeople))
-                _ <- OptionT.liftF(cacheConnector.save[Seq[ResponsiblePerson]](ResponsiblePerson.key, {
+                _ <- OptionT.liftF(cacheConnector.save[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key, {
                   updateNominatedOfficers(oldOfficer, changeOfficer.roleInBusiness, responsiblePeople, index)
                 }))
               } yield {
-                deleteOldOfficer(oldOfficer._1, oldOfficer._2)
+                deleteOldOfficer(request.credId, oldOfficer._1, oldOfficer._2)
 
                 Redirect(controllers.routes.RegistrationProgressController.get())
               }
@@ -89,10 +87,10 @@ class NewOfficerController @Inject()(val authConnector: AuthConnector,
       }
   }
 
-  def getPeopleAndSelectedOfficer()(implicit headerCarrier: HeaderCarrier, authContext: AuthContext) = {
+  def getPeopleAndSelectedOfficer(cacheId: String)(implicit headerCarrier: HeaderCarrier) = {
     for {
-      people <- OptionT(cacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key))
-      changeOfficer <- OptionT(cacheConnector.fetch[ChangeOfficer](ChangeOfficer.key)) orElse OptionT.pure(ChangeOfficer(RoleInBusiness(Set.empty)))
+      people <- OptionT(cacheConnector.fetch[Seq[ResponsiblePerson]](cacheId, ResponsiblePerson.key))
+      changeOfficer <- OptionT(cacheConnector.fetch[ChangeOfficer](cacheId, ChangeOfficer.key)) orElse OptionT.pure(ChangeOfficer(RoleInBusiness(Set.empty)))
       selectedOfficer <- OptionT.fromOption[Future](changeOfficer.newOfficer) orElse OptionT.some(NewOfficer(""))
     } yield (selectedOfficer, people.filter(p => p.personName.isDefined & p.isComplete & !p.status.contains(StatusConstants.Deleted)))
   }
@@ -126,11 +124,9 @@ class NewOfficerController @Inject()(val authConnector: AuthConnector,
     }
   }
 
-  private def deleteOldOfficer(rp: ResponsiblePerson, index: Int)(implicit ac: AuthContext, hc: HeaderCarrier) = {
+  private def deleteOldOfficer(cacheId: String, rp: ResponsiblePerson, index: Int)(implicit hc: HeaderCarrier) = {
     for {
-      maybeUpdatedCache <- if (rp.lineId.isEmpty & rp.endDate.isDefined & rp.status.contains(StatusConstants.Deleted)) {
-        removeDataStrict[ResponsiblePerson](index)
-      } else {
+      maybeUpdatedCache <- if (rp.lineId.isEmpty & rp.endDate.isDefined & rp.status.contains(StatusConstants.Deleted)) (removeDataStrict[ResponsiblePerson](cacheId, index))  else {
         Future.successful(None)
       }
     } yield maybeUpdatedCache

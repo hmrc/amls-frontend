@@ -16,6 +16,7 @@
 
 package controllers.tcsp
 
+import controllers.actions.SuccessfulAuthAction
 import models.tcsp.{Other, ProvidedServices, Tcsp}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -25,16 +26,16 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
 class ProvidedServicesControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture  with DependencyMocks{
+  trait Fixture extends AuthorisedFixture  with DependencyMocksNewAuth{
     self => val request = addToken(authRequest)
 
-    val controller = new ProvidedServicesController(mockCacheConnector, authConnector = self.authConnector)
+    val controller = new ProvidedServicesController(mockCacheConnector, authAction = SuccessfulAuthAction)
   }
 
   "ProvidedServicesController" must {
@@ -43,7 +44,7 @@ class ProvidedServicesControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
       "load the provided services page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Tcsp](any())(any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any(), any())).thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -52,7 +53,7 @@ class ProvidedServicesControllerSpec extends AmlsSpec with MockitoSugar with Sca
       "load the provided services page with existing data" in new Fixture {
 
         val tcsp = Tcsp(providedServices = Some(ProvidedServices(Set(Other("some other service")))))
-        when(controller.dataCacheConnector.fetch[Tcsp](any())(any(), any(), any())) thenReturn Future.successful(Some(tcsp))
+        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any(), any())) thenReturn Future.successful(Some(tcsp))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -74,8 +75,8 @@ class ProvidedServicesControllerSpec extends AmlsSpec with MockitoSugar with Sca
           "services[]" -> "01"
         )
 
-        when(controller.dataCacheConnector.fetch[Tcsp](any())(any(), any(), any())).thenReturn(Future.successful(None))
-        when(controller.dataCacheConnector.save[Tcsp](any(), any())(any(), any(), any())).thenReturn(Future.successful(cacheMap))
+        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.save[Tcsp](any(), any(), any())(any(), any())).thenReturn(Future.successful(cacheMap))
 
         val result = controller.post()(newRequest)
 
@@ -90,8 +91,8 @@ class ProvidedServicesControllerSpec extends AmlsSpec with MockitoSugar with Sca
           "services[]" -> "01"
         )
 
-        when(controller.dataCacheConnector.fetch[Tcsp](any())(any(), any(), any())).thenReturn(Future.successful(None))
-        when(controller.dataCacheConnector.save[Tcsp](any(), any())(any(), any(), any())).thenReturn(Future.successful(cacheMap))
+        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.save[Tcsp](any(), any(), any())(any(), any())).thenReturn(Future.successful(cacheMap))
 
         val result = controller.post(true)(newRequest)
 

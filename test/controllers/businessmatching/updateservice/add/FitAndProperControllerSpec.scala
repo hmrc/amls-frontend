@@ -27,7 +27,7 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import utils.{AmlsSpec, AuthorisedFixture,, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePersonGenerator with BusinessMatchingGenerator {
 

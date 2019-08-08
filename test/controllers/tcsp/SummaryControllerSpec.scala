@@ -16,18 +16,19 @@
 
 package controllers.tcsp
 
+import controllers.actions.SuccessfulAuthAction
 import models.tcsp._
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.test.Helpers._
 import services.businessmatching.ServiceFlow
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
 class SummaryControllerSpec extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
 
     val request = addToken(authRequest)
 
@@ -48,7 +49,7 @@ class SummaryControllerSpec extends AmlsSpec {
 
     val controller = new SummaryController(
       mockCacheConnector,
-      self.authConnector,
+      authAction = SuccessfulAuthAction,
       mock[ServiceFlow],
       mockStatusService
     )
@@ -171,7 +172,7 @@ class SummaryControllerSpec extends AmlsSpec {
 
         redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
 
-        verify(controller.dataCache).save[Tcsp](any(), eqTo(model.copy(hasAccepted = true)))(any(),any(),any())
+        verify(controller.dataCache).save[Tcsp](any(), any(), eqTo(model.copy(hasAccepted = true)))(any(),any())
 
       }
     }

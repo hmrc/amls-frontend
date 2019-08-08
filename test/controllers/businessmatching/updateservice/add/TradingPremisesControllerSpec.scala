@@ -25,7 +25,7 @@ import models.status.SubmissionDecisionApproved
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import utils.{AmlsSpec, AuthorisedFixture,, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 class TradingPremisesControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
 

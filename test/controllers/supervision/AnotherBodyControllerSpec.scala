@@ -16,6 +16,7 @@
 
 package controllers.supervision
 
+import controllers.actions.SuccessfulAuthAction
 import models.supervision._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -23,15 +24,15 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
     val request = addToken(authRequest)
 
-    val controller = new AnotherBodyController(mockCacheConnector, authConnector = self.authConnector)
+    val controller = new AnotherBodyController(mockCacheConnector, authAction = SuccessfulAuthAction)
   }
 
   "AnotherBodyControllerController" must {
