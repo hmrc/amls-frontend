@@ -119,4 +119,39 @@ class AuthEnrolmentsServiceSpec extends AmlsSpec
       }
     }
   }
+
+  "AuthEnrolmentsService for new auth" must {
+
+    "return an AMLS registration number from stubs" in new Fixture {
+      when(config.enrolmentStubsEnabled) thenReturn true
+
+      when {
+        enrolmentStubConnector.enrolmentsNewAuth(eqTo(groupId))(any(), any())
+      } thenReturn Future.successful(enrolmentsList)
+
+      whenReady(service.amlsRegistrationNumber(None, Some(groupId))) { result =>
+        result mustBe Some(amlsRegistrationNumber)
+      }
+    }
+
+    "return None from stubs if no amls number from request and stubs disabled" in new Fixture {
+      when(config.enrolmentStubsEnabled) thenReturn false
+
+      when {
+        enrolmentStubConnector.enrolmentsNewAuth(eqTo(groupId))(any(), any())
+      } thenReturn Future.successful(enrolmentsList)
+
+      whenReady(service.amlsRegistrationNumber(None, Some(groupId))) { result =>
+        result mustBe None
+      }
+    }
+
+    "return an AMLS registration number from request even if stubs are enabled" in new Fixture {
+      when(config.enrolmentStubsEnabled) thenReturn true
+
+      whenReady(service.amlsRegistrationNumber(Some(amlsRegistrationNumber), Some(groupId))) { result =>
+        result mustBe Some(amlsRegistrationNumber)
+      }
+    }
+  }
 }

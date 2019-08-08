@@ -21,6 +21,7 @@ import javax.inject.Inject
 import models.enrolment.{AmlsEnrolmentKey, TaxEnrolment}
 import connectors.{AuthConnector, EnrolmentStubConnector, TaxEnrolmentsConnector}
 import play.api.Logger
+import uk.gov.hmrc.auth.core.AuthorisationException
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
@@ -35,6 +36,7 @@ class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector,
   private val amlsNumberKey = "MLRRefNumber"
   private val prefix = "AuthEnrolmentsService"
 
+  @deprecated("to be removed when new auth completely implemented")
   def amlsRegistrationNumber(implicit authContext: AuthContext,
                              headerCarrier: HeaderCarrier,
                              ec: ExecutionContext): Future[Option[String]] = {
@@ -77,20 +79,25 @@ class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector,
                             (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Option[String]] = {
 
     Logger.debug(s"[$prefix][amlsRegistrationNumber] - Begin...)")
+    Logger.debug(s"[$prefix][amlsRegistrationNumber] - config.enrolmentStubsEnabled: ${config.enrolmentStubsEnabled})")
 
     val stubbedEnrolments =  if (config.enrolmentStubsEnabled) {
       stubConnector.enrolmentsNewAuth(groupIdentifier.getOrElse(throw new Exception("Group ID is unavailable")))
     } else {
+      Logger.debug(s"[$prefix][amlsRegistrationNumber] - Returning empty sequence...)")
       Future.successful(Seq.empty)
     }
 
     amlsRegistrationNumber match {
       case regNo@Some(_) => Future.successful(regNo)
       case None => stubbedEnrolments map { enrolmentsList =>
+        Logger.debug(s"[$prefix][amlsRegistrationNumber] - enrolmentsList: $enrolmentsList)")
           for {
             amlsEnrolment   <- enrolmentsList.find(enrolment => enrolment.key == amlsKey)
             amlsIdentifier  <- amlsEnrolment.identifiers.find(identifier => identifier.key == amlsNumberKey)
           } yield {
+            Logger.debug(s"[$prefix][amlsRegistrationNumber] - amlsEnrolment: $amlsEnrolment)")
+            Logger.debug(s"[$prefix][amlsRegistrationNumber] : ${amlsIdentifier.value}")
             amlsIdentifier.value
           }
         }
