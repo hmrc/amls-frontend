@@ -103,7 +103,7 @@ class WhatDateRemovedControllerSpec extends AmlsSpec {
           ))
         }
 
-        controller.router.verify(any(), WhatDateRemovedPageId, RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(today))))
+        controller.router.verify("internalId", WhatDateRemovedPageId, RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(today))))
       }
 
 

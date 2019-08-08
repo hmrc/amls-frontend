@@ -49,6 +49,6 @@ trait RouterMocks extends MockitoSugar {
       when(router.getRouteNewAuth(any(), any(), any(), any())(any(), any())) thenReturn defaultResult
 
     def verify(credId: String, pageId: PageId, model: T, edit: Boolean = false) =
-      org.mockito.Mockito.verify(router).getRouteNewAuth(credId, eqTo(pageId), eqTo(model), eqTo(edit))(any(), any())
+      org.mockito.Mockito.verify(router).getRouteNewAuth(eqTo(credId), eqTo(pageId), eqTo(model), eqTo(edit))(any(), any())
   }
 }

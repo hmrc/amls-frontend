@@ -108,7 +108,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
             val result = controller.post(false)(newRequest)
 
             status(result) must be(SEE_OTHER)
-            controller.router.verify(any(), PsrNumberPageId, flowModel)
+            controller.router.verify("internalId", PsrNumberPageId, flowModel)
 
           }
         }
@@ -126,7 +126,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
             val result = controller.post(false)(newRequest)
 
             status(result) must be(SEE_OTHER)
-            controller.router.verify(any(), PsrNumberPageId,
+            controller.router.verify("internalId", PsrNumberPageId,
               AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789"))))
 
           }
@@ -146,7 +146,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
             val result = controller.post(true)(newRequest)
 
             status(result) must be(SEE_OTHER)
-            controller.router.verify(any(), PsrNumberPageId,
+            controller.router.verify("internalId", PsrNumberPageId,
               AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo)), true)
 
           }
@@ -165,7 +165,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
             val result = controller.post(true)(newRequest)
 
             status(result) must be(SEE_OTHER)
-            controller.router.verify(any(), PsrNumberPageId,
+            controller.router.verify("internalId", PsrNumberPageId,
               AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789"))), true)
 
           }

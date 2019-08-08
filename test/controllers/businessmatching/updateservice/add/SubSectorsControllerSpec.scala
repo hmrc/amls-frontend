@@ -159,7 +159,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
           ))
 
           status(result) mustBe SEE_OTHER
-          controller.router.verify(any(), SubSectorsPageId,
+          controller.router.verify("internalId", SubSectorsPageId,
             AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
               tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
@@ -179,7 +179,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
           ))
 
           status(result) mustBe SEE_OTHER
-          controller.router.verify(any(), SubSectorsPageId,
+          controller.router.verify("internalId", SubSectorsPageId,
             AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
               tradingPremisesMsbServices = None,
@@ -201,7 +201,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
           ))
 
           status(result) mustBe SEE_OTHER
-          controller.router.verify(any(), SubSectorsPageId,
+          controller.router.verify("internalId", SubSectorsPageId,
             AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
               tradingPremisesMsbServices = None,
@@ -223,7 +223,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
           ))
 
           status(result) mustBe SEE_OTHER
-          controller.router.verify(any(), SubSectorsPageId,
+          controller.router.verify("internalId", SubSectorsPageId,
             AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
               tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))),
@@ -245,7 +245,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
           ))
 
           status(result) mustBe SEE_OTHER
-          controller.router.verify(any(), SubSectorsPageId,
+          controller.router.verify("internalId", SubSectorsPageId,
             AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
               tradingPremisesMsbServices = None,

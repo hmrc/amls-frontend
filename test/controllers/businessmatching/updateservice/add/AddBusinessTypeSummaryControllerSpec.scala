@@ -152,7 +152,7 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
 
         status(result) must be(SEE_OTHER)
 
-        controller.router.verify(any(), AddBusinessTypeSummaryPageId, flowModel)
+        controller.router.verify("internalId", AddBusinessTypeSummaryPageId, flowModel)
       }
     }
   }

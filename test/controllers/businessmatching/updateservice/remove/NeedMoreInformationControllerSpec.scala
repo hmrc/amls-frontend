@@ -62,7 +62,7 @@ class NeedMoreInformationControllerSpec extends AmlsSpec {
         val result = controller.post()(request)
 
         status(result) mustBe SEE_OTHER
-        controller.router.verify(any(), NeedToUpdatePageId, new RemoveBusinessTypeFlowModel())
+        controller.router.verify("internalId", NeedToUpdatePageId, new RemoveBusinessTypeFlowModel())
       }
     }
   }

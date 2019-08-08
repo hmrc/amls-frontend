@@ -79,7 +79,7 @@ class TradingPremisesControllerSpec extends AmlsSpec with BusinessMatchingGenera
 
             status(result) mustBe SEE_OTHER
 
-            controller.router.verify(any(), TradingPremisesPageId,
+            controller.router.verify("internalId", TradingPremisesPageId,
               AddBusinessTypeFlowModel(areNewActivitiesAtTradingPremises = Some(true), hasChanged = true))
           }
         }
@@ -95,7 +95,7 @@ class TradingPremisesControllerSpec extends AmlsSpec with BusinessMatchingGenera
 
               status(result) mustBe SEE_OTHER
 
-              controller.router.verify(any(), TradingPremisesPageId,
+              controller.router.verify("internalId", TradingPremisesPageId,
                 AddBusinessTypeFlowModel(Some(HighValueDealing), areNewActivitiesAtTradingPremises = Some(false), hasChanged = true))
             }
           }

@@ -69,7 +69,7 @@ class NeedMoreInformationControllerSpec extends AmlsSpec with MockitoSugar with 
       val result = controller.post()(request)
 
       status(result) mustBe SEE_OTHER
-      controller.router.verify(any(), NeedMoreInformationPageId, new AddBusinessTypeFlowModel())
+      controller.router.verify("internalId", NeedMoreInformationPageId, new AddBusinessTypeFlowModel())
     }
   }
 }

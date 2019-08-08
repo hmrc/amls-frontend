@@ -36,7 +36,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, DependencyMocksNewAuth}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -46,7 +46,7 @@ class PSRNumberControllerSpec extends AmlsSpec
   with ScalaFutures
   with BusinessMatchingGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
 
     val request = addToken(authRequest)
 
@@ -60,8 +60,8 @@ class PSRNumberControllerSpec extends AmlsSpec
     )
 
     when {
-      mockStatusService.isPreSubmission(any())
-    } thenReturn true
+      mockStatusService.isPreSubmission(Some(any()), any(), any())(any(), any())
+    } thenReturn Future.successful(true)
 
     when {
       mockStatusService.isPending(any())
@@ -135,7 +135,7 @@ class PSRNumberControllerSpec extends AmlsSpec
 
         status(result) mustBe SEE_OTHER
 
-        controller.router.verify(any(), PsrNumberPageId, ChangeSubSectorFlowModel(
+        controller.router.verify("internalId", PsrNumberPageId, ChangeSubSectorFlowModel(
             Some(Set(TransmittingMoney)),
             Some(BusinessAppliedForPSRNumberYes("123789"))))
       }
@@ -156,7 +156,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         val result = controller.post(true)(newRequest)
 
         status(result) mustBe SEE_OTHER
-        controller.router.verify(any(), PsrNumberPageId, ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberNo)), edit = true)
+        controller.router.verify("internalId", PsrNumberPageId, ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberNo)), edit = true)
       }
 
       "respond with BAD_REQUEST when given invalid data" in new Fixture {

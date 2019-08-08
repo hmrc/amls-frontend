@@ -100,7 +100,7 @@ class WhichTradingPremisesControllerSpec extends AmlsSpec
 
             status(result) must be(SEE_OTHER)
 
-            controller.router.verify(any(), WhichTradingPremisesPageId,
+            controller.router.verify("internalId", WhichTradingPremisesPageId,
               AddBusinessTypeFlowModel(tradingPremisesActivities = Some(TradingPremisesActivities(Set(1))), hasChanged = true))
           }
         }

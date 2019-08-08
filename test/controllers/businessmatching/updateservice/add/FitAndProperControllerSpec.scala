@@ -79,7 +79,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Respons
 
             status(result) mustBe SEE_OTHER
 
-            controller.router.verify(any(), FitAndProperPageId,
+            controller.router.verify("internalId", FitAndProperPageId,
               AddBusinessTypeFlowModel(fitAndProper = Some(true), hasChanged = true))
           }
 
@@ -94,7 +94,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Respons
 
                 status(result) mustBe SEE_OTHER
 
-                controller.router.verify(any(), FitAndProperPageId,
+                controller.router.verify("internalId", FitAndProperPageId,
                   AddBusinessTypeFlowModel(Some(TrustAndCompanyServices), fitAndProper = Some(false), hasChanged = true))
               }
             }

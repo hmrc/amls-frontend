@@ -131,7 +131,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
           "businessActivities[]" -> "04"
         )))
 
-        controller.router.verify(any(), WhatBusinessTypesToRemovePageId, flowModel.copy(dateOfChange = None, activitiesToRemove = Some(Set(HighValueDealing))))
+        controller.router.verify("internalId", WhatBusinessTypesToRemovePageId, flowModel.copy(dateOfChange = None, activitiesToRemove = Some(Set(HighValueDealing))))
       }
 
       "wipe the date of change if its not required" in new Fixture {
@@ -151,7 +151,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
           "businessActivities[]" -> "04"
         )))
 
-        controller.router.verify(any(), WhatBusinessTypesToRemovePageId, RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing))))
+        controller.router.verify("internalId", WhatBusinessTypesToRemovePageId, RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing))))
       }
 
       "wipe the date of change if the services to remove have been edited and changed" in new Fixture {
@@ -171,7 +171,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
           "businessActivities[]" -> "04"
         )))
 
-        controller.router.verify(any(), WhatBusinessTypesToRemovePageId, RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing))))
+        controller.router.verify("internalId", WhatBusinessTypesToRemovePageId, RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing))))
       }
 
       "leave the date of change if the services to remove have not been changed" in new Fixture {
@@ -191,7 +191,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
           "businessActivities[]" -> "04"
         )))
 
-        controller.router.verify(any(), WhatBusinessTypesToRemovePageId, RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing)), dateOfChange = Some(DateOfChange(LocalDate.now))))
+        controller.router.verify("internalId", WhatBusinessTypesToRemovePageId, RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing)), dateOfChange = Some(DateOfChange(LocalDate.now))))
       }
 
       "throw an error message when trying to select all business types the users has" in new Fixture {

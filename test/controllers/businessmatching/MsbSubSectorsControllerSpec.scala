@@ -173,7 +173,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
 
       status(result) mustBe SEE_OTHER
 
-      controller.router.verify(any(), SubSectorsPageId, ChangeSubSectorFlowModel(Some(Set(TransmittingMoney))))
+      controller.router.verify("internalId", SubSectorsPageId, ChangeSubSectorFlowModel(Some(Set(TransmittingMoney))))
     }
 
     "redirect to the summary page when adding anything other than TransmittingMoney as a service" in new Fixture {
@@ -191,7 +191,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
 
       status(result) mustBe SEE_OTHER
 
-      controller.router.verify(any(), SubSectorsPageId, ChangeSubSectorFlowModel(Some(Set(CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal, ForeignExchange))))
+      controller.router.verify("internalId", SubSectorsPageId, ChangeSubSectorFlowModel(Some(Set(CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal, ForeignExchange))))
 
     }
   }

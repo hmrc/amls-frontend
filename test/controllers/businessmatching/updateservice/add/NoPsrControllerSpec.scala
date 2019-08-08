@@ -70,7 +70,7 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
       val result = controller.post()(request.withFormUrlEncodedBody())
 
       status(result) mustBe SEE_OTHER
-      controller.router.verify(any(), NoPSRPageId, AddBusinessTypeFlowModel())
+      controller.router.verify("internalId", NoPSRPageId, AddBusinessTypeFlowModel())
     }
   }
 }

@@ -126,7 +126,7 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
         val result = controller.post()(request.withFormUrlEncodedBody("responsiblePeople[]" -> "1"))
 
         status(result) must be(SEE_OTHER)
-        controller.router.verify(any(), WhichFitAndProperPageId,
+        controller.router.verify("internalId", WhichFitAndProperPageId,
           AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices),
             areNewActivitiesAtTradingPremises = Some(false),
             tradingPremisesActivities = None,
@@ -143,7 +143,7 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
 
       val result = controller.post(true)(request.withFormUrlEncodedBody("responsiblePeople[]" -> "1"))
       status(result) must be(SEE_OTHER)
-      controller.router.verify(any(), WhichFitAndProperPageId,
+      controller.router.verify("internalId", WhichFitAndProperPageId,
         AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices),
           areNewActivitiesAtTradingPremises = Some(false),
           tradingPremisesActivities = None,

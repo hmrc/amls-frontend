@@ -103,7 +103,7 @@ class WhatDoYouDoHereControllerSpec extends AmlsSpec with MoneyServiceBusinessTe
         ))
 
         status(result) mustBe SEE_OTHER
-        controller.router.verify(any(), WhatDoYouDoHerePageId,
+        controller.router.verify("internalId", WhatDoYouDoHerePageId,
           AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
             subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
             tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
@@ -122,7 +122,7 @@ class WhatDoYouDoHereControllerSpec extends AmlsSpec with MoneyServiceBusinessTe
         ))
 
         status(result) mustBe SEE_OTHER
-        controller.router.verify(any(), WhatDoYouDoHerePageId,
+        controller.router.verify("internalId", WhatDoYouDoHerePageId,
           AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
             subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
             tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
