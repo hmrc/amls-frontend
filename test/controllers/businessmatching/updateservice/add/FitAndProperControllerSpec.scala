@@ -23,12 +23,11 @@ import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.flowmanagement.{AddBusinessTypeFlowModel, FitAndProperPageId}
 import models.status.SubmissionDecisionApproved
-import org.mockito.Matchers._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture,, DependencyMocksNewAuth}
 
 class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePersonGenerator with BusinessMatchingGenerator {
 

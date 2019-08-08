@@ -27,7 +27,6 @@ import models.businessmatching._
 import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
 import models.flowmanagement.{AddBusinessTypeFlowModel, WhichFitAndProperPageId}
 import models.responsiblepeople.{ApprovalFlags, DateOfBirth, PersonName, ResponsiblePerson}
-import org.mockito.Matchers._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._

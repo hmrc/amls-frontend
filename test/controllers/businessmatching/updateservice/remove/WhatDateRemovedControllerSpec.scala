@@ -19,12 +19,11 @@ package controllers.businessmatching.updateservice.remove
 import controllers.actions.SuccessfulAuthAction
 import models.DateOfChange
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, WhatDateRemovedPageId}
-import org.mockito.Matchers._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 class WhatDateRemovedControllerSpec extends AmlsSpec {
 

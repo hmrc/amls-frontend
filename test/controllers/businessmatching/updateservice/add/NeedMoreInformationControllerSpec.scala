@@ -21,7 +21,6 @@ import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import models.businessmatching._
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.{AddBusinessTypeFlowModel, NeedMoreInformationPageId}
-import org.mockito.Matchers._
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar

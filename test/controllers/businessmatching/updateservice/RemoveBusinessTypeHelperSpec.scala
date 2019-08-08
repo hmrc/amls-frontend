@@ -23,7 +23,6 @@ import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import utils._
-import org.mockito.Matchers.any
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -42,7 +41,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
   "removing Responsible People types" when {
     "there is more than one business type" when {
-      "the buisness is TCSP and they answered yes to F&P then do not remove the responsible people approval" in new Fixture {
+      "the business is TCSP and they answered yes to F&P then do not remove the responsible people approval" in new Fixture {
 
         val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
 
@@ -72,9 +71,9 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
         mockCacheUpdate(Some(ResponsiblePerson.key), expectedResultRP)
 
-        helper.removeFitAndProper(any(), model).returnsSome(expectedResultRP)
+        helper.removeFitAndProper("internalId", model).returnsSome(expectedResultRP)
       }
-      "the buisness is TCSP and they answered no to F&P then do remove the responsible people approval" in new Fixture {
+      "the business is TCSP and they answered no to F&P then do remove the responsible people approval" in new Fixture {
 
         val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
 
@@ -103,7 +102,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
         mockCacheUpdate(Some(ResponsiblePerson.key), expectedResultRP)
 
-        helper.removeFitAndProper(any(), model).returnsSome(expectedResultRP)
+        helper.removeFitAndProper("internalId", model).returnsSome(expectedResultRP)
       }
     }
   }

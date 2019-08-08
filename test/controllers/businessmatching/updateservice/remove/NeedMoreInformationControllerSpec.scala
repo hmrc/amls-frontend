@@ -23,8 +23,7 @@ import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import play.api.i18n.Messages
 import play.api.test.Helpers.{OK, contentAsString, status, _}
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, DependencyMocksNewAuth}
-import org.mockito.Matchers._
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 class NeedMoreInformationControllerSpec extends AmlsSpec {
 

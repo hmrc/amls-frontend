@@ -27,7 +27,6 @@ import models.responsiblepeople.ResponsiblePerson
 import models.tradingpremises.TradingPremises
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
 import org.mockito.Mockito.when
 import org.mockito.Matchers.{any, eq => eqTo}
 import play.api.i18n.Messages
@@ -103,7 +102,7 @@ class RemoveBusinessTypesSummaryControllerSpec extends AmlsSpec with TitleValida
 
         status(result) mustBe SEE_OTHER
 
-        router.verify(any(), RemoveBusinessTypesSummaryPageId, flowModel)
+        router.verify("internalId", RemoveBusinessTypesSummaryPageId, flowModel)
       }
     }
   }

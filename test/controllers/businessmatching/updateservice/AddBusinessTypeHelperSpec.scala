@@ -73,7 +73,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
 
       val model = AddBusinessTypeFlowModel(activity = Some(AccountancyServices))
       for {
-        result <- SUT.updateBusinessActivities(any(), model)
+        result <- SUT.updateBusinessActivities("internalId", model)
       } yield {
         result.involvedInOther mustBe Some(InvolvedInOtherNo)
         result.whoIsYourAccountant must not be defined
@@ -89,7 +89,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
       val model = AddBusinessTypeFlowModel(activity = Some(HighValueDealing))
 
       for {
-        result <- SUT.updateBusinessActivities(any(), model)
+        result <- SUT.updateBusinessActivities("internalId", model)
       } yield {
         result.whoIsYourAccountant mustBe defined
         result.accountantForAMLSRegulations mustBe Some(AccountantForAMLSRegulations(true))
@@ -112,7 +112,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
 
         mockCacheSave(Supervision(hasAccepted = true), Some(Supervision.key))
 
-        SUT.updateSupervision(any()).returnsSome(Supervision(hasAccepted = true))
+        SUT.updateSupervision("internalId").returnsSome(Supervision(hasAccepted = true))
 
         verify(mockCacheConnector).save(any(), eqTo(Supervision.key), eqTo(Supervision(hasAccepted = true)))(any(), any())
       }
@@ -131,7 +131,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
           Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(AccountancyServices))))),
           Some(BusinessMatching.key))
 
-        SUT.updateSupervision(any()).returnsSome(supervisionModel)
+        SUT.updateSupervision("internalId").returnsSome(supervisionModel)
 
         verify(mockCacheConnector, never).save(any(),any(), any())(any(), any())
       }
@@ -149,7 +149,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
         Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))))),
         Some(BusinessMatching.key))
 
-      SUT.updateSupervision(any()).returnsSome(supervisionModel)
+      SUT.updateSupervision("internalId").returnsSome(supervisionModel)
 
       verify(mockCacheConnector, never).save(any(),any(), any())(any(), any())
     }
@@ -169,7 +169,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
           Some(BusinessMatching.key))
 
         mockCacheUpdate(Some(BusinessMatching.key), startResultMatching )
-        SUT.updateBusinessMatching(any(), model).returnsSome(endResultMatching)
+        SUT.updateBusinessMatching("internalId", model).returnsSome(endResultMatching)
       }
 
       "there are no msb services and the new activity is not MSB and there are no existing activities" in new Fixture {
@@ -185,7 +185,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
           Some(BusinessMatching.key))
 
         mockCacheUpdate(Some(BusinessMatching.key), startResultMatching )
-        SUT.updateBusinessMatching(any(), model).returnsSome(endResultMatching)
+        SUT.updateBusinessMatching("internalId", model).returnsSome(endResultMatching)
       }
 
 
@@ -212,7 +212,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
           Some(BusinessMatching.key))
 
         mockCacheUpdate(Some(BusinessMatching.key),  startResultMatching )
-        SUT.updateBusinessMatching(any(), model).returnsSome(endResultMatching)
+        SUT.updateBusinessMatching("internalId", model).returnsSome(endResultMatching)
       }
 
       "there are msb services and the new activity is MSB and there are no existing activities" in new Fixture {
@@ -236,7 +236,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
           Some(BusinessMatching.key))
 
         mockCacheUpdate(Some(BusinessMatching.key),  startResultMatching )
-        SUT.updateBusinessMatching(any(), model).returnsSome(endResultMatching)
+        SUT.updateBusinessMatching("internalId", model).returnsSome(endResultMatching)
       }
     }
   }
@@ -262,7 +262,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
           responsiblePeopleService.updateFitAndProperFlag(any(), any(), any())
         } thenReturn updatedPeople
 
-        SUT.updateResponsiblePeople(any(), model).returnsSome(updatedPeople)
+        SUT.updateResponsiblePeople("internalId", model).returnsSome(updatedPeople)
       }
     }
   }
@@ -271,7 +271,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
     "set an empty model back into the cache" in new Fixture {
       mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel(Some(HighValueDealing), fitAndProper = Some(true)))
 
-      SUT.clearFlowModel(any()).returnsSome(AddBusinessTypeFlowModel())
+      SUT.clearFlowModel("internalId").returnsSome(AddBusinessTypeFlowModel())
     }
   }
 
@@ -279,7 +279,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
     "save the flow model with 'hasAccepted' = true" in new Fixture {
       mockCacheSave[AddBusinessTypeFlowModel]
 
-      await(SUT.updateHasAcceptedFlag(any(), AddBusinessTypeFlowModel()).value)
+      await(SUT.updateHasAcceptedFlag("internalId", AddBusinessTypeFlowModel()).value)
 
       verify(mockCacheConnector).save[AddBusinessTypeFlowModel](any(), eqTo(AddBusinessTypeFlowModel.key), eqTo(AddBusinessTypeFlowModel(hasAccepted = true)))(any(), any())
     }
@@ -290,14 +290,14 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
       "a ServicesRegister model is already available with pre-existing activities" in new Fixture {
         mockCacheUpdate(Some(ServiceChangeRegister.key), ServiceChangeRegister(Some(Set(MoneyServiceBusiness))))
 
-        SUT.updateServicesRegister(any(), AddBusinessTypeFlowModel(Some(BillPaymentServices)))
+        SUT.updateServicesRegister("internalId", AddBusinessTypeFlowModel(Some(BillPaymentServices)))
           .returnsSome(ServiceChangeRegister(Some(Set(MoneyServiceBusiness, BillPaymentServices))))
       }
 
       "a ServiceChangeRegister does not exist or has no pre-existing activities" in new Fixture {
         mockCacheUpdate(Some(ServiceChangeRegister.key), ServiceChangeRegister())
 
-        SUT.updateServicesRegister(any(), AddBusinessTypeFlowModel(Some(MoneyServiceBusiness)))
+        SUT.updateServicesRegister("internalId", AddBusinessTypeFlowModel(Some(MoneyServiceBusiness)))
           .returnsSome(ServiceChangeRegister(Some(Set(MoneyServiceBusiness))))
       }
     }

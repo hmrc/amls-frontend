@@ -20,17 +20,17 @@ import cats.data.OptionT
 import cats.implicits._
 import controllers.actions.SuccessfulAuthAction
 import models.businessmatching._
-import models.businessmatching.updateservice.{Add, ChangeBusinessType, Remove}
+import models.businessmatching.updateservice.Remove
 import models.businessmatching.updateservice.{Add, ChangeBusinessType}
 import models.flowmanagement.{ChangeBusinessTypesPageId, RemoveBusinessTypeFlowModel}
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global

@@ -23,13 +23,12 @@ import models.businessmatching._
 import models.businessmatching.updateservice.{TradingPremisesActivities, UpdateService}
 import models.flowmanagement.{AddBusinessTypeFlowModel, WhichTradingPremisesPageId}
 import models.tradingpremises.TradingPremises
-import org.mockito.Matchers._
 import org.scalacheck.Gen
 import org.scalatest.PrivateMethodTester
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 class WhichTradingPremisesControllerSpec extends AmlsSpec
   with PrivateMethodTester
