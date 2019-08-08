@@ -30,7 +30,7 @@
     case Some(fee) => {
         <p>@Messages("status.submissionreadyforreview.description")
         <a id="submission-ready-pay-the-fee" href="@controllers.routes.ConfirmationController.get()"> @Messages("status.submissionreadyforreview.description.link")</a>@Messages("full.stop")</p>
-        <p>@Messages("status.submissionreadyforreview.description.2")</p>
+        <p id="submission-ready-for-review-description">@Messages("status.submissionreadyforreview.description.2")</p>
                 <ul class="list list-bullet">
                     <li>@Messages("status.submissionreadyforreview.description.2.listline1")</li>
                     <li>@Messages("status.submissionreadyforreview.description.2.listline2")</li>
@@ -51,7 +51,7 @@
                 </div>
             </div>
         }
-        <p>@Messages("status.submissionreadyforreview.description.2")</p>
+        <p id="submission-ready-for-review-description">@Messages("status.submissionreadyforreview.description.2")</p>
                 <ul class="list list-bullet">
             <li>@Messages("status.submissionreadyforreview.description.2.listline1")</li>
             <li>@Messages("status.submissionreadyforreview.description.2.listline2")</li>
