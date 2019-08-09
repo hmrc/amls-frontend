@@ -17,14 +17,22 @@
 package controllers.businessmatching.updateservice
 
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
+import models.asp.Asp
+import models.businessmatching.{BillPaymentServices, BusinessActivities => BMBusinessActivities, _}
+import models.estateagentbusiness.EstateAgentBusiness
 import models.flowmanagement.RemoveBusinessTypeFlowModel
+import models.hvd.Hvd
+import models.moneyservicebusiness.{MoneyServiceBusiness => MSBSection}
 import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
+import models.tcsp.Tcsp
+import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
+import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import utils._
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with MockitoSugar with ScalaFutures {
 
@@ -37,6 +45,134 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
       SuccessfulAuthAction,
       mockCacheConnector
     )
+  }
+
+  "RemoveBusinessTypeHelper" must {
+    "have removeSectionData method which" when {
+      "called with business types to remove" must {
+        "return seq of updated cache maps" in new Fixture {
+          val activitiesToRemove = RemoveBusinessTypeFlowModel(
+            activitiesToRemove = Some(Set(
+              HighValueDealing,
+              AccountancyServices,
+              EstateAgentBusinessService,
+              MoneyServiceBusiness,
+              TrustAndCompanyServices
+            )))
+
+          mockCacheRemoveByKey[MSBSection]
+          mockCacheRemoveByKey[Hvd]
+          mockCacheRemoveByKey[Tcsp]
+          mockCacheRemoveByKey[Asp]
+          mockCacheRemoveByKey[EstateAgentBusiness]
+
+          val result = helper.removeSectionData("internalId", activitiesToRemove).value
+
+          whenReady(result) {
+            case Some(seqOfCache) => seqOfCache.size mustBe 5
+          }
+        }
+      }
+
+      "called with BPS" must {
+        "return cache map" in new Fixture {
+          val activitiesToRemove = RemoveBusinessTypeFlowModel(
+            activitiesToRemove = Some(Set(
+              BillPaymentServices
+            )))
+
+          when(mockCacheConnector.fetchAllWithDefault("internalId")).thenReturn(Future.successful(mockCacheMap))
+
+          val result = helper.removeSectionData("internalId", activitiesToRemove).value
+
+          whenReady(result) {
+            case Some(seqOfCache) => seqOfCache.size mustBe 1
+          }
+        }
+      }
+    }
+
+    "must have removeBusinessMatchingBusinessTypes method which" when {
+      "called with activities to remove" must {
+        "return updated business matching" in new Fixture {
+          val activitiesToRemove = RemoveBusinessTypeFlowModel(
+            activitiesToRemove = Some(Set(
+              HighValueDealing,
+              AccountancyServices,
+              EstateAgentBusinessService,
+              MoneyServiceBusiness,
+              TrustAndCompanyServices
+            )))
+
+          val businessMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(
+            HighValueDealing,
+            AccountancyServices,
+            EstateAgentBusinessService,
+            MoneyServiceBusiness,
+            TrustAndCompanyServices,
+            BillPaymentServices))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          val newBusinessMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(
+            BillPaymentServices))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          mockCacheFetch[BusinessMatching](Some(businessMatching))
+
+          mockCacheUpdate[BusinessMatching](Some(BusinessMatching.key), newBusinessMatching)
+
+          helper.removeBusinessMatchingBusinessTypes("internalId", activitiesToRemove).returnsSome(newBusinessMatching)
+        }
+      }
+    }
+
+    "must have removeTradingPremisesBusinessTypes method which" when {
+      "called with activities to remove" must {
+        "return updated trading premises" in new Fixture {
+          val businessMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(
+            HighValueDealing,
+            AccountancyServices,
+            EstateAgentBusinessService,
+            MoneyServiceBusiness,
+            TrustAndCompanyServices,
+            BillPaymentServices))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
+
+          val activitiesToRemove = RemoveBusinessTypeFlowModel(
+            activitiesToRemove = Some(Set(
+              HighValueDealing,
+              AccountancyServices,
+              EstateAgentBusinessService,
+              MoneyServiceBusiness,
+              TrustAndCompanyServices
+            )))
+
+          val testTradingPremises = Seq(TradingPremises(
+            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(
+            activities = Set(
+            HighValueDealing,
+            AccountancyServices,
+            EstateAgentBusinessService,
+            MoneyServiceBusiness,
+            TrustAndCompanyServices,
+            BillPaymentServices)))))
+
+          val newTradingPremises = Seq(TradingPremises(
+            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(
+              activities = Set(BillPaymentServices))),
+            hasAccepted = true))
+
+          mockCacheUpdate[Seq[TradingPremises]](Some(TradingPremises.key), newTradingPremises)
+
+          helper.removeTradingPremisesBusinessTypes("internalId", activitiesToRemove).returnsSome(newTradingPremises)
+        }
+      }
+    }
   }
 
   "removing Responsible People types" when {
