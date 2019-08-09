@@ -16,6 +16,7 @@
 
 package controllers.businessmatching.updateservice.add
 
+import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
@@ -26,11 +27,11 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePersonGenerator with BusinessMatchingGenerator {
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
 
     val request = addToken(authRequest)
@@ -39,13 +40,13 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Respons
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
     val controller = new FitAndProperController(
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[AddBusinessTypeFlowModel]
     )
 
     mockCacheFetch(Some(AddBusinessTypeFlowModel(Some(HighValueDealing))))
-    mockApplicationStatus(SubmissionDecisionApproved)
+    mockApplicationStatusNewAuth(SubmissionDecisionApproved)
 
   }
 
@@ -77,7 +78,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Respons
 
             status(result) mustBe SEE_OTHER
 
-            controller.router.verify(FitAndProperPageId,
+            controller.router.verify("internalId", FitAndProperPageId,
               AddBusinessTypeFlowModel(fitAndProper = Some(true), hasChanged = true))
           }
 
@@ -92,7 +93,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Respons
 
                 status(result) mustBe SEE_OTHER
 
-                controller.router.verify(FitAndProperPageId,
+                controller.router.verify("internalId", FitAndProperPageId,
                   AddBusinessTypeFlowModel(Some(TrustAndCompanyServices), fitAndProper = Some(false), hasChanged = true))
               }
             }

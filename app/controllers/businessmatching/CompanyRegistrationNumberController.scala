@@ -19,28 +19,27 @@ package controllers.businessmatching
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching.{BusinessMatching, CompanyRegistrationNumber}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching.company_registration_number
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
+import utils.AuthAction
 
 import scala.concurrent.Future
 
-class CompanyRegistrationNumberController@Inject()(val authConnector: AuthConnector,
+class CompanyRegistrationNumberController@Inject()(authAction: AuthAction,
                                                    val dataCacheConnector: DataCacheConnector,
                                                    val statusService: StatusService,
-                                                   val businessMatchingService:BusinessMatchingService) extends BaseController {
+                                                   val businessMatchingService:BusinessMatchingService) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
         (for {
-          bm <- businessMatchingService.getModel
-          status <- OptionT.liftF(statusService.getStatus)
+          bm <- businessMatchingService.getModel(request.credId)
+          status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId,request.credId))
         } yield {
           val form: Form2[CompanyRegistrationNumber] = bm.companyRegistrationNumber map
             Form2[CompanyRegistrationNumber] getOrElse EmptyForm
@@ -49,15 +48,15 @@ class CompanyRegistrationNumberController@Inject()(val authConnector: AuthConnec
     }
 
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request => {
       Form2[CompanyRegistrationNumber](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(company_registration_number(f, edit)))
         case ValidForm(_, data) =>
           for {
-            businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
-            _ <- dataCacheConnector.save[BusinessMatching](BusinessMatching.key,
+            businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
+            _ <- dataCacheConnector.save[BusinessMatching](request.credId, BusinessMatching.key,
               businessMatching.companyRegistrationNumber(data)
             )
           } yield edit match {

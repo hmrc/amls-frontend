@@ -19,7 +19,7 @@ package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
-import config.ApplicationConfig
+import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
@@ -36,14 +36,14 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.ResponsiblePeopleService
 import services.businessmatching.BusinessMatchingService
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
+import utils._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePersonGenerator with BusinessMatchingGenerator {
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
 
     val request = addToken(authRequest)
@@ -52,7 +52,7 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
     val mockRPService = mock[ResponsiblePeopleService]
 
     val controller = new WhichFitAndProperController(
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       dataCacheConnector = mockCacheConnector,
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,
@@ -94,13 +94,13 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
         hasAccepted = false)), Some(AddBusinessTypeFlowModel.key))
 
     when {
-      controller.businessMatchingService.getModel(any(), any(), any())
+      controller.businessMatchingService.getModel(any())(any(), any())
     } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
       activities = Some(BusinessActivities(Set(MoneyServiceBusiness)))
     ))
 
     when {
-      mockRPService.getAll(any(), any(), any())
+      mockRPService.getAll(any())(any(), any())
     } thenReturn Future.successful(responsiblePeople)
   }
 
@@ -125,7 +125,7 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
         val result = controller.post()(request.withFormUrlEncodedBody("responsiblePeople[]" -> "1"))
 
         status(result) must be(SEE_OTHER)
-        controller.router.verify(WhichFitAndProperPageId,
+        controller.router.verify("internalId", WhichFitAndProperPageId,
           AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices),
             areNewActivitiesAtTradingPremises = Some(false),
             tradingPremisesActivities = None,
@@ -142,7 +142,7 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
 
       val result = controller.post(true)(request.withFormUrlEncodedBody("responsiblePeople[]" -> "1"))
       status(result) must be(SEE_OTHER)
-      controller.router.verify(WhichFitAndProperPageId,
+      controller.router.verify("internalId", WhichFitAndProperPageId,
         AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices),
           areNewActivitiesAtTradingPremises = Some(false),
           tradingPremisesActivities = None,
@@ -171,7 +171,7 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
     "be hidden from the selection list" when {
       "showing the page on a GET request" in new Fixture {
         when {
-          mockRPService.getAll(any(), any(), any())
+          mockRPService.getAll(any())(any(), any())
         } thenReturn Future.successful(peopleMixedWithInactive)
 
         val result = controller.get()(request)
@@ -185,7 +185,7 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
 
       "showing the page having POSTed with validation errors" in new Fixture {
         when {
-          mockRPService.getAll(any(), any(), any())
+          mockRPService.getAll(any())(any(), any())
         } thenReturn Future.successful(peopleMixedWithInactive)
 
         val result = controller.post()(request)

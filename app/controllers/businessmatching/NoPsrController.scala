@@ -16,16 +16,17 @@
 
 package controllers.businessmatching
 
-import controllers.BaseController
+import controllers.DefaultBaseController
 import javax.inject.Inject
 import models.status.{NotCompleted, SubmissionReady}
 import services.StatusService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 
-class NoPsrController @Inject()(val authConnector: AuthConnector, statusService: StatusService) extends BaseController {
-  def get = Authorised.async {
-    implicit authContext => implicit request =>
-      statusService.getStatus map {
+class NoPsrController @Inject()(val authAction: AuthAction, statusService: StatusService) extends DefaultBaseController {
+
+  def get = authAction.async {
+    implicit request =>
+      statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) map {
         case NotCompleted | SubmissionReady => Ok(views.html.businessmatching.cannot_continue_with_the_application())
         case _ => Ok(views.html.businessmatching.cannot_add_services())
       }

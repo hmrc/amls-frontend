@@ -28,8 +28,9 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.{ExecutionContext, Future}
 
 class MsbSubSectorsPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
-  override def getPageRoute(model: ChangeSubSectorFlowModel, edit: Boolean)
-                           (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+
+  override def getRoute(credId: String, model: ChangeSubSectorFlowModel, edit: Boolean)
+                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
     val result = model.subSectors map {
       case sectors if sectors.contains(TransmittingMoney) =>
         routes.PSRNumberController.get(edit)

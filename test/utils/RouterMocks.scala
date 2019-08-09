@@ -36,19 +36,19 @@ trait RouterMocks extends MockitoSugar {
   val defaultResult = Future.successful(Redirect("/"))
 
   implicit class RouterMocking[T](router: Router[T]) {
-    def mockRoute(pageId: PageId, model: T, edit: Boolean = false, returnValue: Future[Result] = defaultResult) =
-      when(router.getRoute(eqTo(pageId), eqTo(model), eqTo(edit))(any(), any(), any())) thenReturn returnValue
+    def mockRoute(credId: String, pageId: PageId, model: T, edit: Boolean = false, returnValue: Future[Result] = defaultResult) =
+      when(router.getRoute(credId, eqTo(pageId), eqTo(model), eqTo(edit))(any(), any())) thenReturn returnValue
 
     def mockRoute(returnValue: Future[Result]) =
-      when(router.getRoute(any(), any(), any())(any(), any(), any())) thenReturn returnValue
+      when(router.getRoute(any(), any(), any(), any())(any(), any())) thenReturn returnValue
 
     def mockRoute(url: Call) =
-      when(router.getRoute(any(), any(), any())(any(), any(), any())) thenReturn Future.successful(Redirect(url))
+      when(router.getRoute(any(), any(), any(), any())(any(), any())) thenReturn Future.successful(Redirect(url))
 
     def mockRoute =
-      when(router.getRoute(any(), any(), any())(any(), any(), any())) thenReturn defaultResult
+      when(router.getRoute(any(), any(), any(), any())(any(), any())) thenReturn defaultResult
 
-    def verify(pageId: PageId, model: T, edit: Boolean = false) =
-      org.mockito.Mockito.verify(router).getRoute(eqTo(pageId), eqTo(model), eqTo(edit))(any(), any(), any())
+    def verify(credId: String, pageId: PageId, model: T, edit: Boolean = false) =
+      org.mockito.Mockito.verify(router).getRoute(eqTo(credId), eqTo(pageId), eqTo(model), eqTo(edit))(any(), any())
   }
 }

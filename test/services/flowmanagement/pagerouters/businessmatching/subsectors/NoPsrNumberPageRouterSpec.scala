@@ -31,7 +31,7 @@ class NoPsrNumberPageRouterSpec extends AmlsSpec {
   "Getting the next route" must {
     "route to the 'Check your answers' page" in new Fixture {
       val model = ChangeSubSectorFlowModel()
-      val result = router.getPageRoute(model)
+      val result = router.getRoute("internalId", model)
 
       redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
     }

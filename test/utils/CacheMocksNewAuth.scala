@@ -58,7 +58,7 @@ trait CacheMocksNewAuth extends MockitoSugar {
   } thenReturn Future.successful(mockCacheMap)
 
   def mockCacheRemoveByKey[T](implicit cache: DataCacheConnector) = when {
-    cache.removeByKey[T](any())(any(), any(), any())
+    cache.removeByKey[T](any(), any())(any(), any())
   } thenReturn Future.successful(mockCacheMap)
 
   def mockCacheSave[T](item: T, key: Option[String] = None)(implicit cache: DataCacheConnector) = key match {
