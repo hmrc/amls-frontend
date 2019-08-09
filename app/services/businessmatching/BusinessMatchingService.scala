@@ -41,6 +41,7 @@ class BusinessMatchingService @Inject()(
                                          dataCacheConnector: DataCacheConnector,
                                          appConfig: AppConfig
                                        ) {
+  
 @deprecated("To be removed when auth implementation is done")
   def preApplicationComplete(implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext): Future[Boolean] = {
     for {
