@@ -10,7 +10,7 @@ POST        /previously-registered                                 @controllers.
 GET         /vat                                                   @controllers.businessdetails.VATRegisteredController.get(edit: Boolean ?= false)
 POST        /vat                                                   @controllers.businessdetails.VATRegisteredController.post(edit: Boolean ?= false)
 
-GET         /corporation-tax                                       @controllers.businessdetails.CorporationTaxRegisteredController.get(edit: Boolean ?= false)
+GET         /corporation-tax                                       @controllers.businessdetails.CorporationTaxRegisteredController.get()
 
 GET         /registered-office-address                             @controllers.businessdetails.ConfirmRegisteredOfficeController.get(edit: Boolean ?= false)
 POST        /registered-office-address                             @controllers.businessdetails.ConfirmRegisteredOfficeController.post(edit: Boolean ?= false)

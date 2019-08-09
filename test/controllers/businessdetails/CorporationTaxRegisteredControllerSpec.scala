@@ -62,19 +62,6 @@ class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar 
 
     "get is called" must {
 
-      "redirect to SummaryController" when {
-        "edit is true" in new Fixture {
-
-          val data = BusinessDetails(corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1111111111")))
-
-          mockCacheGetEntry[BusinessDetails](Some(data), BusinessDetails.key)
-
-          val result = controller.get(true)(request)
-          status(result) must be(SEE_OTHER)
-
-          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
-        }
-      }
       "redirect to ConfirmRegisteredOfficeController" when {
         "edit is false" in new Fixture {
 

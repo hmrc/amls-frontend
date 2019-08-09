@@ -47,7 +47,7 @@ class CorporationTaxRegisteredController @Inject () (
 
   val failedResult = InternalServerError("Failed to update the business corporation tax number")
 
-  def get(edit: Boolean = false) = Authorised.async {
+  def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
         filterByBusinessType { cache =>
@@ -64,7 +64,8 @@ class CorporationTaxRegisteredController @Inject () (
                 } else {
                   OptionT.fromOption[Future](Some(cache))
                 }
-              } yield getRedirectLocation(edit)) getOrElse InternalServerError("Could not route from CorporationTaxRegisteredController")
+              } yield Redirect(routes.ConfirmRegisteredOfficeController.get())) getOrElse
+                InternalServerError("[CorporationTaxRegisteredController][get]: Could not route from CorporationTaxRegisteredController")
           }
         }
   }
@@ -82,10 +83,4 @@ class CorporationTaxRegisteredController @Inject () (
     businessDetails <- OptionT.fromOption[Future](cache.getEntry[BusinessDetails](BusinessDetails.key))
     cacheMap <- OptionT.liftF(dataCacheConnector.save[BusinessDetails](BusinessDetails.key, businessDetails.corporationTaxRegistered(data)))
   } yield cacheMap
-
-  private def getRedirectLocation(edit: Boolean) = if (edit) {
-    Redirect(routes.SummaryController.get())
-  } else {
-    Redirect(routes.ConfirmRegisteredOfficeController.get())
-  }
 }
