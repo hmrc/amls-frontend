@@ -21,10 +21,10 @@
 @import models.businessmatching.MoneyServiceBusiness
 @import utils._
 
-@(model: TradingPremises, isMsb: Boolean, index: Int, hasOneService: Boolean, hasOneMsbService: Boolean = None)(implicit request: Request[_],m:Messages, lang: Lang)
+@(model: TradingPremises, isMsb: Boolean, index: Int, hasOneService: Boolean, hasOneMsbService: Boolean = None)(implicit request: Request[_], m: Messages, lang: Lang)
 
 @header = {
-    @heading("summary.checkyouranswers.title", "summary.tradingpremises")
+@heading("summary.checkyouranswers.title", "summary.tradingpremises")
 }
 @main(
     title = Messages("summary.checkyouranswers.title") + " - " + Messages("summary.tradingpremises"),
@@ -32,88 +32,89 @@
 ) {
     @model.yourTradingPremises.map { yta =>
 
-    @if(isMsb) {
-        @model.registeringAgentPremises.map { agentPremises =>
-            @checkYourAnswers(
-                question = Messages("tradingpremises.agent.premises.title"),
-                editLinkTag = "tradingpremisessummarywho-edit",
-                editUrl = controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(index, true).toString
-            ) {
-                @if(agentPremises.agentPremises) {
-                    <p>@Messages("lbl.yes")</p>
-                } else {
-                    <p>@Messages("lbl.no")</p>
+        @if(isMsb) {
+            @model.registeringAgentPremises.map { agentPremises =>
+                @checkYourAnswers(
+                    question = Messages("tradingpremises.agent.premises.title"),
+                    editLinkTag = "tradingpremisessummarywho-edit",
+                    editUrl = controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(index, true).toString
+                ) {
+                    @if(agentPremises.agentPremises) {
+                        <p>@Messages("lbl.yes")</p>
+                    } else {
+                        <p>@Messages("lbl.no")</p>
+                    }
                 }
             }
         }
-    }
 
-    @model.businessStructure.map { x =>
-        @checkYourAnswers(
-            question = Messages("tradingpremises.businessStructure.title"),
-            editLinkTag = "tradingpremisesbusinessstructure-edit",
-            editUrl = controllers.tradingpremises.routes.BusinessStructureController.get(index, true).toString
-        ) {
-            <p>@Messages(x.message)</p>
-        }
-    }
-
-    @model.agentCompanyDetails.map { x =>
-        @checkYourAnswers(
-            question = Messages("tradingpremises.youragent.company.name"),
-            editLinkTag = "tradingpremisesagentcompanyname-edit",
-            editUrl = controllers.tradingpremises.routes.AgentCompanyDetailsController.get(index, true).toString
-        ) {
-            <p>@x.agentCompanyName</p>
-        }
-    }
-
-    @model.agentName.map { x =>
-        @checkYourAnswers(
-            question = Messages("tradingpremises.agentname.title"),
-            editLinkTag = "tradingpremisesagentnametitle-edit",
-            editUrl = controllers.tradingpremises.routes.AgentNameController.get(index, true).toString
-        ) {
-
-            <p>@x.agentName,
-                @x.agentDateOfBirth match {
-                    case Some(y) => {born @DateHelper.formatDate(y)}
-            case None => {}
-            }
-            </p>
-
-        }
-    }
-
-    @model.agentPartnership.map { x =>
-        @checkYourAnswers(
-            question = Messages("tradingpremises.agentpartnership.title"),
-            editLinkTag = "tradingpremisesagentpartnershiptitle-edit",
-            editUrl = controllers.tradingpremises.routes.AgentPartnershipController.get(index, true).toString
-        ) {
-            <p>@x.agentPartnership</p>
-        }
-    }
-
-    @model.agentCompanyDetails.map { x =>
-        @x.companyRegistrationNumber.map { crn =>
+        @model.businessStructure.map { x =>
             @checkYourAnswers(
-                question = Messages("tradingpremises.youragent.crn"),
-                editLinkTag = "tradingpremisesyouragentcrn-edit",
+                question = Messages("tradingpremises.businessStructure.title"),
+                editLinkTag = "tradingpremisesbusinessstructure-edit",
+                editUrl = controllers.tradingpremises.routes.BusinessStructureController.get(index, true).toString
+            ) {
+                <p>@Messages(x.message)</p>
+            }
+        }
+
+        @model.agentCompanyDetails.map { x =>
+            @checkYourAnswers(
+                question = Messages("tradingpremises.youragent.company.name"),
+                editLinkTag = "tradingpremisesagentcompanyname-edit",
                 editUrl = controllers.tradingpremises.routes.AgentCompanyDetailsController.get(index, true).toString
             ) {
-                <p>@crn</p>
+                <p>@x.agentCompanyName</p>
             }
         }
-    }
 
-    @checkYourAnswers(
-        question = Messages("tradingpremises.summary.tradingname"),
-        editLinkTag = "tradingpremisedsummaryaddress-edit",
-        editUrl = controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, true).toString
-    ) {
-        <p>@yta.tradingName</p>
-    }
+        @model.agentName.map { x =>
+            @checkYourAnswers(
+                question = Messages("tradingpremises.agentname.title"),
+                editLinkTag = "tradingpremisesagentnametitle-edit",
+                editUrl = controllers.tradingpremises.routes.AgentNameController.get(index, true).toString
+            ) {
+
+                <p>@x.agentName,
+                    @x.agentDateOfBirth match {
+                        case Some(y) => {born @DateHelper.formatDate(y)
+                }
+                case None => {}
+                }
+                </p>
+
+            }
+        }
+
+        @model.agentPartnership.map { x =>
+            @checkYourAnswers(
+                question = Messages("tradingpremises.agentpartnership.title"),
+                editLinkTag = "tradingpremisesagentpartnershiptitle-edit",
+                editUrl = controllers.tradingpremises.routes.AgentPartnershipController.get(index, true).toString
+            ) {
+                <p>@x.agentPartnership</p>
+            }
+        }
+
+        @model.agentCompanyDetails.map { x =>
+            @x.companyRegistrationNumber.map { crn =>
+                @checkYourAnswers(
+                    question = Messages("tradingpremises.youragent.crn"),
+                    editLinkTag = "tradingpremisesyouragentcrn-edit",
+                    editUrl = controllers.tradingpremises.routes.AgentCompanyDetailsController.get(index, true).toString
+                ) {
+                    <p>@crn</p>
+                }
+            }
+        }
+
+        @checkYourAnswers(
+            question = Messages("tradingpremises.summary.tradingname"),
+            editLinkTag = "tradingpremisedsummaryaddress-edit",
+            editUrl = controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, true).toString
+        ) {
+            <p>@yta.tradingName</p>
+        }
 
         @checkYourAnswers(
             question = Messages("tradingpremises.summary.address"),
@@ -121,11 +122,11 @@
             editUrl = controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, true).toString
         ) {
             <p>@yta.tradingPremisesAddress.toLines.map { l =>
-                @l<br />
+                @l <br />
             }</p>
         }
 
-        @yta.startDate.map {startDate =>
+        @yta.startDate.map { startDate =>
             @checkYourAnswers(
                 question = Messages("tradingpremises.startDate.title"),
                 editLinkTag = "tradingprmisedsummarystartdate-edit",
@@ -134,15 +135,19 @@
                 <p>@DateHelper.formatDate(startDate)</p>
             }
         }
-        @yta.isResidential.map {residential =>
+        @yta.isResidential.map { residential =>
             @checkYourAnswers(
                 question = Messages("tradingpremises.isResidential.title"),
                 editLinkTag = "tradingpremisessummaryresidential-edit",
                 editUrl = controllers.tradingpremises.routes.IsResidentialController.get(index, true).toString
             ) {
                 <p>@residential match {
-                    case true => { @Messages("lbl.yes") }
-                    case false => { @Messages("lbl.no") }
+                    case true => {
+                        @Messages("lbl.yes")
+                    }
+                    case false => {
+                        @Messages("lbl.no")
+                    }
                 }</p>
             }
         }
@@ -151,12 +156,12 @@
             @checkYourAnswers(
                 question = Messages("tradingpremises.whatdoesyourbusinessdo.title"),
                 editLinkTag = "tradingpremisedsummaryservices-edit",
-                editUrl = if(!hasOneService){controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(index, true).toString} else ""
+                editUrl = if(!hasOneService) {
+                    controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(index, true).toString
+                } else ""
             ) {
                 <ul class="list">
-                @ba.activities.toList.sortBy(_.getMessage()) map {
-                    _.getMessage()
-                    }
+                    @ba.activities.toList.sortBy(_.getMessage()).map(_.getMessage())
                 </ul>
             }
         }
@@ -165,15 +170,33 @@
             @checkYourAnswers(
                 question = Messages("tradingpremises.msb.services.title"),
                 editLinkTag = "tradingpremisesmsbservices-edit",
-                editUrl = if(!hasOneMsbService){controllers.tradingpremises.routes.MSBServicesController.get(index, true).toString} else ""
+                editUrl = if(!hasOneMsbService) {
+                    controllers.tradingpremises.routes.MSBServicesController.get(index, true).toString
+                } else ""
             ) {
 
                 <ul class="list">
-                    @msb.services.toList.sortBy(_.getMessage)
-                </ul>
+                    @msb.services.toList.sortBy(_.getMessage).map { line =>
+                    <li>@line match {
+                        case TransmittingMoney => {
+                            @Messages("msb.services.list.lbl.01")
+                        }
+                        case CurrencyExchange => {
+                            @Messages("msb.services.list.lbl.02")
+                        }
+                        case ChequeCashingNotScrapMetal => {
+                            @Messages("msb.services.list.lbl.03")
+                        }
+                        case ChequeCashingScrapMetal => {
+                            @Messages("msb.services.list.lbl.04")
+                        }
+                        case ForeignExchange => {
+                            @Messages("msb.services.list.lbl.05")
+                        }
+                    }</li>
+                }</ul>
             }
         }
-
     }
 
     @form(EmptyForm, controllers.tradingpremises.routes.DetailedAnswersController.post(index)) {

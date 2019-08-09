@@ -22,7 +22,7 @@
 @(f: forms.Form2[_],model: Asp)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
-    @heading("title.cya", "summary.asp")
+@heading("title.cya", "summary.asp")
 }
 
 @main(
@@ -36,8 +36,17 @@
             editUrl = controllers.asp.routes.ServicesOfBusinessController.get(true).toString,
             editLinkTag = "aspservices-edit"
         ) {
-
-           <li> @a.services.toList.sortBy(_.getMessage)</li>
+            <ul class="list list--comma">
+            @a.services.toList.sortBy(_.getMessage).map { line =>
+                <li>@line match {
+                    case Accountancy => {@Messages("asp.service.lbl.01")}
+                    case PayrollServices => {@Messages("asp.service.lbl.02")}
+                    case BookKeeping => {@Messages("asp.service.lbl.03")}
+                    case Auditing => {@Messages("asp.service.lbl.04")}
+                    case FinancialOrTaxAdvice => {@Messages("asp.service.lbl.05")}
+                }</li>
+            }
+            </ul>
         }
     }
 
@@ -51,7 +60,7 @@
             case OtherBusinessTaxMattersYes => { @Messages("lbl.yes") }
         }</p>
     }
-        @form(f, controllers.asp.routes.SummaryController.post()) {
+    @form(f, controllers.asp.routes.SummaryController.post()) {
         @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
     }
 }

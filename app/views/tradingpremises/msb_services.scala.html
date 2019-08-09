@@ -41,7 +41,15 @@
             panel = false
         ) {
             @model.msbServices.map { services =>
-                @services.msbServices.toList.sortBy(_.getMessage)
+                @services.msbServices.toList.sortBy(_.getMessage).map { svc =>
+                    @svc match {
+                        case ChequeCashingNotScrapMetal => {@checkbox(f("msbServices[]"), "msb.services.list.lbl.03", "03")}
+                        case ChequeCashingScrapMetal => {@checkbox(f("msbServices[]"), "msb.services.list.lbl.04", "04")}
+                        case CurrencyExchange => {@checkbox(f("msbServices[]"), "msb.services.list.lbl.02", "02")}
+                        case ForeignExchange => {@checkbox(f("msbServices[]"), "msb.services.list.lbl.05", "05")}
+                        case TransmittingMoney => {@checkbox(f("msbServices[]"), "msb.services.list.lbl.01", "01")}
+                    }
+                }
             }
         }
 

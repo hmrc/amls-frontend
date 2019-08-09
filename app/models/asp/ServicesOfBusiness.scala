@@ -38,7 +38,8 @@ sealed trait Service {
       case BookKeeping => Messages(s"${message}03")
       case Auditing => Messages(s"${message}04")
       case FinancialOrTaxAdvice => Messages(s"${message}05")
-    }}
+    }
+}
 
 case object Accountancy extends Service
 
