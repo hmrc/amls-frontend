@@ -35,6 +35,26 @@ class CashPaymentSpec extends PlaySpec with MockitoSugar {
       None)
     val cashPaymentNoJson = Json.obj("acceptedAnyPayment" -> false)
 
+    "have isCashPaymentsComplete function which" must {
+      "return true if CashPayments is complete" in {
+        val completeCashPayment = CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(new LocalDate(1999, 1, 1))))
+
+        completeCashPayment.isCashPaymentsComplete mustBe(true)
+      }
+
+      "return true if CashPaymentOverTenThousandEuros is false" in {
+        val completeCashPayment = CashPayment(CashPaymentOverTenThousandEuros(false), None)
+
+        completeCashPayment.isCashPaymentsComplete mustBe(true)
+      }
+
+      "return true if CashPaymentOverTenThousandEuros is true and no date" in {
+        val inCompleteCashPayment = CashPayment(CashPaymentOverTenThousandEuros(true), None)
+
+        inCompleteCashPayment.isCashPaymentsComplete mustBe(false)
+      }
+    }
+
     "on calling Update" must {
 
       "return CashPayment with acceptedPayment:false and paymentDate:None when passed acceptedPayment:false" in {

@@ -30,7 +30,7 @@ import utils.{AmlsSpec, AuthorisedFixture}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class FeeResponseServiceSpec extends AmlsSpec with ScalaFutures{
+class FeeResponseServiceSpec extends AmlsSpec with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self =>

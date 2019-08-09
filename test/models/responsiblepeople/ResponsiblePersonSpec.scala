@@ -16,10 +16,13 @@
 
 package models.responsiblepeople
 
+import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
+import uk.gov.hmrc.http.cache.client.CacheMap
 
 class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsiblePeopleValues with OneAppPerSuite {
 
@@ -27,7 +30,6 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
     .build()
 
   "ResponsiblePeople" must {
-
     "calling updateFitAndProperAndApproval" must {
 
       val inputRp = ResponsiblePerson()
@@ -162,6 +164,47 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
       "the model is not complete" in {
         val initial = ResponsiblePerson(Some(DefaultValues.personName))
         initial.isComplete must be(false)
+      }
+    }
+
+    "have section function which" when {
+
+      "called" must {
+        "return NotStarted Section section if model is empty" in {
+          val mockCacheMap = mock[CacheMap]
+
+          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
+            .thenReturn(Some(Seq(ResponsiblePerson())))
+
+          ResponsiblePerson.section(mockCacheMap).status must be(models.registrationprogress.NotStarted)
+        }
+
+        "return Started Section section if model is not empty" in {
+          val mockCacheMap = mock[CacheMap]
+
+          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
+            .thenReturn(Some(Seq(incompleteResponsiblePeople)))
+
+          ResponsiblePerson.section(mockCacheMap).status must be(models.registrationprogress.Started)
+        }
+
+        "return Completed Section section if model is not empty and has complete rp" in {
+          val mockCacheMap = mock[CacheMap]
+
+          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
+            .thenReturn(Some(Seq(completeResponsiblePerson)))
+
+          ResponsiblePerson.section(mockCacheMap).status must be(models.registrationprogress.Completed)
+        }
+
+        "return Started Section section if model is not empty and has complete and incomplete rps" in {
+          val mockCacheMap = mock[CacheMap]
+
+          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
+            .thenReturn(Some(Seq(completeResponsiblePerson, incompleteResponsiblePeople)))
+
+          ResponsiblePerson.section(mockCacheMap).status must be(models.registrationprogress.Started)
+        }
       }
     }
   }
