@@ -24,7 +24,7 @@
 @(model: TradingPremises, isMsb: Boolean, index: Int, hasOneService: Boolean, hasOneMsbService: Boolean = None)(implicit request: Request[_], m: Messages, lang: Lang)
 
 @header = {
-@heading("summary.checkyouranswers.title", "summary.tradingpremises")
+    @heading("summary.checkyouranswers.title", "summary.tradingpremises")
 }
 @main(
     title = Messages("summary.checkyouranswers.title") + " - " + Messages("summary.tradingpremises"),
@@ -122,7 +122,7 @@
             editUrl = controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, true).toString
         ) {
             <p>@yta.tradingPremisesAddress.toLines.map { l =>
-                @l <br />
+                @l<br />
             }</p>
         }
 

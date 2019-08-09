@@ -45,9 +45,6 @@ case object ChequeCashingNotScrapMetal extends TradingPremisesMsbService
 case object ChequeCashingScrapMetal extends TradingPremisesMsbService
 case object ForeignExchange extends TradingPremisesMsbService
 
-
-
-
 case class TradingPremisesMsbServices(services : Set[TradingPremisesMsbService])
 
 object TradingPremisesMsbService {
