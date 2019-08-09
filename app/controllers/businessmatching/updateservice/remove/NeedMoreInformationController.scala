@@ -49,7 +49,7 @@ class NeedMoreInformationController @Inject()(authAction: AuthAction,
   def post() = authAction.async {
       implicit request =>
         (for {
-            route <- OptionT.liftF(router.getRouteNewAuth(request.credId, NeedToUpdatePageId, new RemoveBusinessTypeFlowModel()))
+            route <- OptionT.liftF(router.getRoute(request.credId, NeedToUpdatePageId, new RemoveBusinessTypeFlowModel()))
         } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: Remove : NewServiceInformationController")
   }
 }

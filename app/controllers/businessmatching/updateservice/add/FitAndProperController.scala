@@ -62,7 +62,7 @@ class FitAndProperController @Inject()(
             dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key) {
               case Some(model) => model.isfitAndProper(Some(data)).responsiblePeople(if (data) model.responsiblePeople else None)
             } flatMap {
-              case Some(model) => router.getRouteNewAuth(request.credId, FitAndProperPageId, model, edit)
+              case Some(model) => router.getRoute(request.credId, FitAndProperPageId, model, edit)
               case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: FitAndProperController"))
             }
         }

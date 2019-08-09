@@ -31,10 +31,10 @@ import views.html.businessmatching.updateservice.add.new_service_information
 import scala.concurrent.Future
 
 @Singleton
-class NeedMoreInformationController @Inject()( authAction: AuthAction,
-                                               implicit val dataCacheConnector: DataCacheConnector,
-                                               val router: Router[AddBusinessTypeFlowModel]
-                                               ) extends DefaultBaseController {
+class NeedMoreInformationController @Inject()(authAction: AuthAction,
+                                              implicit val dataCacheConnector: DataCacheConnector,
+                                              val router: Router[AddBusinessTypeFlowModel]
+                                             ) extends DefaultBaseController {
 
   def get() = authAction.async {
       implicit request =>
@@ -56,7 +56,7 @@ class NeedMoreInformationController @Inject()( authAction: AuthAction,
   def post() = authAction.async {
       implicit request =>
         (for {
-          route <- OptionT.liftF(router.getRouteNewAuth(request.credId, NeedMoreInformationPageId, new AddBusinessTypeFlowModel))
+          route <- OptionT.liftF(router.getRoute(request.credId, NeedMoreInformationPageId, new AddBusinessTypeFlowModel))
         } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: Add : NewServiceInformationController")
   }
 }

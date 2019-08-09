@@ -47,7 +47,7 @@ class NoPsrController @Inject()(
       implicit request =>
         (for {
           _ <- helper.clearFlowModel(request.credId)
-          route <- OptionT.liftF(router.getRouteNewAuth(request.credId, NoPSRPageId, AddBusinessTypeFlowModel()))
+          route <- OptionT.liftF(router.getRoute(request.credId, NoPSRPageId, AddBusinessTypeFlowModel()))
         } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: NoPsrController")
   }
 }

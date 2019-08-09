@@ -87,7 +87,7 @@ class SelectBusinessTypeController @Inject()(
                   case m => m.activity(data)
                 }
             } flatMap {
-              case Some(model) => router.getRouteNewAuth(request.credId, SelectBusinessTypesPageId, model, edit)
+              case Some(model) => router.getRoute(request.credId, SelectBusinessTypesPageId, model, edit)
               case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: SelectActivitiesController"))
             }
         }

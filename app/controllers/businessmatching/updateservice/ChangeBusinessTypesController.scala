@@ -34,13 +34,12 @@ import views.html.businessmatching.updateservice._
 import scala.collection.immutable.SortedSet
 import scala.concurrent.Future
 
-class ChangeBusinessTypesController @Inject()(
-                                          authAction: AuthAction,
-                                          implicit val dataCacheConnector: DataCacheConnector,
-                                          val businessMatchingService: BusinessMatchingService,
-                                          val router: Router[ChangeBusinessType],
-                                          val helper: RemoveBusinessTypeHelper
-                                        ) extends DefaultBaseController with RepeatingSection {
+class ChangeBusinessTypesController @Inject()(authAction: AuthAction,
+                                              implicit val dataCacheConnector: DataCacheConnector,
+                                              val businessMatchingService: BusinessMatchingService,
+                                              val router: Router[ChangeBusinessType],
+                                              val helper: RemoveBusinessTypeHelper
+                                            ) extends DefaultBaseController with RepeatingSection {
 
   def get() = authAction.async {
       implicit request =>
@@ -60,7 +59,7 @@ class ChangeBusinessTypesController @Inject()(
           case ValidForm(_, data) => {
             for {
               _ <- helper.removeFlowData(request.credId)
-              route <- OptionT.liftF(router.getRouteNewAuth(request.credId, ChangeBusinessTypesPageId, data))
+              route <- OptionT.liftF(router.getRoute(request.credId, ChangeBusinessTypesPageId, data))
             } yield route
           } getOrElse InternalServerError("Could not remove the flow data")
         }

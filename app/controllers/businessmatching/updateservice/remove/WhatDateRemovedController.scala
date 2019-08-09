@@ -66,7 +66,7 @@ class WhatDateRemovedController @Inject()(
            case ValidForm(_, data) => dataCacheConnector.update[RemoveBusinessTypeFlowModel](request.credId, RemoveBusinessTypeFlowModel.key) {
               case Some(model) => model.copy(dateOfChange = Some(data))
             } flatMap {
-              case Some(model) => router.getRouteNewAuth(request.credId, WhatDateRemovedPageId, model, edit)
+              case Some(model) => router.getRoute(request.credId, WhatDateRemovedPageId, model, edit)
               case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: UpdateServiceDateofChangeController"))
             }
         }

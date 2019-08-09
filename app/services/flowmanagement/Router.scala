@@ -24,11 +24,8 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.{ExecutionContext, Future}
 
 trait Router[A] {
-  @deprecated("To be removed when new auth implementation")
-  def getRoute(pageId: PageId, model: A, edit: Boolean = false)
-              (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result]
 
-  def getRouteNewAuth(credId: String, pageId: PageId, model: A, edit: Boolean = false)
+  def getRoute(credId: String, pageId: PageId, model: A, edit: Boolean = false)
               (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result]
 }
 

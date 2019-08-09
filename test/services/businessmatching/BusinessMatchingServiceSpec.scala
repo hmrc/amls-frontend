@@ -37,7 +37,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.test.Helpers._
-import utils.{AmlsSpec, DependencyMocks, FutureAssertions}
+import utils.{AmlsSpec, DependencyMocksNewAuth, FutureAssertions}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -49,7 +49,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
   with TradingPremisesGenerator
   with BusinessMatchingGenerator {
 
-  trait Fixture extends DependencyMocks {
+  trait Fixture extends DependencyMocksNewAuth {
     val mockAppConfig = mock[AppConfig]
     val service = new BusinessMatchingService(mockStatusService, mockCacheConnector, mockAppConfig)
 
@@ -64,7 +64,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
       "return the model" in new Fixture {
         mockCacheFetch(Some(businessMatchingModel), Some(BusinessMatching.key))
 
-        service.getModel returnsSome businessMatchingModel
+        service.getModel("internalId") returnsSome businessMatchingModel
       }
     }
   }
@@ -74,8 +74,8 @@ class BusinessMatchingServiceSpec extends PlaySpec
       "update the model" in new Fixture {
         mockCacheSave(businessMatchingModel)
 
-        service.updateModel(businessMatchingModel) returnsSome mockCacheMap
-        verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any())
+        service.updateModel("internalId", businessMatchingModel) returnsSome mockCacheMap
+        verify(mockCacheConnector).save[BusinessMatching](any(), eqTo(BusinessMatching.key), any())(any(), any())
       }
     }
   }
@@ -114,7 +114,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
       mockCacheFetch(Some(newBusinessMatching), Some(BusinessMatching.key))
       mockCacheFetch[ViewResponse](Some(viewResponse), Some(ViewResponse.key))
 
-      whenReady(service.getAdditionalBusinessActivities.value) { result =>
+      whenReady(service.getAdditionalBusinessActivities("internalId").value) { result =>
         result must be(Some(Set(HighValueDealing)))
       }
     }
@@ -150,7 +150,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
       mockCacheFetch(Some(businessMatching), Some(BusinessMatching.key))
       mockCacheFetch[ViewResponse](Some(viewResponse), Some(ViewResponse.key))
 
-      whenReady(service.getAdditionalBusinessActivities.value) { result =>
+      whenReady(service.getAdditionalBusinessActivities("internalId").value) { result =>
         result must be(Some(Set.empty))
       }
 
@@ -170,7 +170,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
       mockCacheFetch(Some(businessMatching), Some(BusinessMatching.variationKey))
       mockCacheFetch[ViewResponse](None, Some(ViewResponse.key))
 
-      whenReady(service.getAdditionalBusinessActivities.value) { result =>
+      whenReady(service.getAdditionalBusinessActivities("internalId").value) { result =>
         result must be(None)
       }
 
@@ -187,7 +187,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
 
       mockCacheFetch(Some(businessMatching), Some(BusinessMatching.key))
 
-      whenReady(service.getRemainingBusinessActivities.value) { result =>
+      whenReady(service.getRemainingBusinessActivities("internalId").value) { result =>
         result mustBe Some(Set(TelephonePaymentService, EstateAgentBusinessService,TrustAndCompanyServices, MoneyServiceBusiness))
       }
     }
@@ -201,7 +201,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
 
       mockCacheFetch(Some(businessMatching), Some(BusinessMatching.key))
 
-      whenReady(service.getRemainingBusinessActivities.value) { result =>
+      whenReady(service.getRemainingBusinessActivities("internalId").value) { result =>
         result mustBe Some(Set.empty)
       }
     }
@@ -248,7 +248,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
       mockCacheFetch(Some(current), Some(BusinessMatching.variationKey))
       mockCacheFetch[ViewResponse](Some(viewResponse), Some(ViewResponse.key))
 
-      whenReady(service.getSubmittedBusinessActivities.value) { result =>
+      whenReady(service.getSubmittedBusinessActivities("internalId").value) { result =>
         result must be(Some(Set(BillPaymentServices)))
       }
     }
@@ -267,7 +267,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
       mockCacheFetch(Some(businessMatching), Some(BusinessMatching.variationKey))
       mockCacheFetch[ViewResponse](None, Some(ViewResponse.key))
 
-      whenReady(service.getSubmittedBusinessActivities.value) { result =>
+      whenReady(service.getSubmittedBusinessActivities("internalId").value) { result =>
         result must be(None)
       }
     }
@@ -275,57 +275,57 @@ class BusinessMatchingServiceSpec extends PlaySpec
 
   "clear section" must {
     "clear data of Asp given AccountancyServices" in new Fixture {
-      val result = service.clearSection(AccountancyServices)
+      val result = service.clearSection("internalId", AccountancyServices)
 
       await(result)
 
       verify(mockCacheConnector).removeByKey[Asp](
-        eqTo(Asp.key)
-      )(any(), any(), any())
+        eqTo("internalId"), eqTo(Asp.key)
+      )(any(), any())
 
     }
     "clear data of Hvd given HighValueDealing" in new Fixture {
 
-      val result = service.clearSection(HighValueDealing)
+      val result = service.clearSection("internalId", HighValueDealing)
 
       await(result)
 
       verify(mockCacheConnector).removeByKey[Hvd](
-        eqTo(Hvd.key)
-      )(any(), any(), any())
+        eqTo("internalId"), eqTo(Hvd.key)
+      )(any(), any())
 
     }
     "clear data of Msb given MoneyServiceBusiness" in new Fixture {
 
-      val result = service.clearSection(MoneyServiceBusiness)
+      val result = service.clearSection("internalId", MoneyServiceBusiness)
 
       await(result)
 
       verify(mockCacheConnector).removeByKey[Msb](
-        eqTo(Msb.key)
-      )(any(), any(), any())
+        eqTo("internalId"), eqTo(Msb.key)
+      )(any(), any())
 
     }
     "clear data of Tcsp given TrustAndCompanyServices" in new Fixture {
 
-      val result = service.clearSection(TrustAndCompanyServices)
+      val result = service.clearSection("internalId", TrustAndCompanyServices)
 
       await(result)
 
       verify(mockCacheConnector).removeByKey[Tcsp](
-        eqTo(Tcsp.key)
-      )(any(), any(), any())
+        eqTo("internalId"), eqTo(Tcsp.key)
+      )(any(), any())
 
     }
     "clear data of Eab given EstateAgentBusinessService" in new Fixture {
 
-      val result = service.clearSection(EstateAgentBusinessService)
+      val result = service.clearSection("internalId", EstateAgentBusinessService)
 
       await(result)
 
       verify(mockCacheConnector).removeByKey[Eab](
-        eqTo(Eab.key)
-      )(any(), any(), any())
+        eqTo("internalId"), eqTo(Eab.key)
+      )(any(), any())
 
     }
 
@@ -337,7 +337,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
         "in the right status" in new Fixture {
           mockCacheFetch[BusinessMatching](Some(BusinessMatching(preAppComplete = true)))
 
-          val result = await(service.preApplicationComplete)
+          val result = await(service.preApplicationComplete("internalId"))
 
           result mustBe true
         }

@@ -68,7 +68,7 @@ class TradingPremisesController @Inject()(
               case Some(model) =>model.isActivityAtTradingPremises(Some(data))
                 .tradingPremisesActivities(if (data) model.tradingPremisesActivities else None)
             } flatMap {
-              case Some(model) => router.getRouteNewAuth(request.credId, TradingPremisesPageId, model, edit)
+              case Some(model) => router.getRoute(request.credId, TradingPremisesPageId, model, edit)
               case _ => Future.successful(InternalServerError("Cannot retrieve data"))
             }
         }

@@ -59,7 +59,7 @@ class ChangeBusinessTypeRouterSpec extends AmlsSpec {
       "the user is on the 'What do you want to do' page (ChangeServicesPageId) and " +
         "ChangeBusinessType is Add" in new Fixture {
 
-        val result = router.getRouteNewAuth("internalId", ChangeBusinessTypesPageId, Add)
+        val result = router.getRoute("internalId", ChangeBusinessTypesPageId, Add)
 
         redirectLocation(result) mustBe Some(addRoutes.SelectBusinessTypeController.get().url)
 
@@ -71,7 +71,7 @@ class ChangeBusinessTypeRouterSpec extends AmlsSpec {
       "the user is on the 'What do you want to do' page (ChangeServicesPageId)" +
         " and selects Remove and has more than one Business Type" in new Fixture {
 
-        val result = await(router.getRouteNewAuth("internalId", ChangeBusinessTypesPageId, Remove))
+        val result = await(router.getRoute("internalId", ChangeBusinessTypesPageId, Remove))
 
         result mustBe Redirect(removeRoutes.RemoveBusinessTypesController.get())
       }
@@ -88,7 +88,7 @@ class ChangeBusinessTypeRouterSpec extends AmlsSpec {
           activities = Some(BusinessActivities(Set(BillPaymentServices)))
         ))
 
-        val result = router.getRouteNewAuth("internalId", ChangeBusinessTypesPageId, Remove)
+        val result = router.getRoute("internalId", ChangeBusinessTypesPageId, Remove)
 
         redirectLocation(result) mustBe Some(removeRoutes.UnableToRemoveBusinessTypesController.get().url)
       }

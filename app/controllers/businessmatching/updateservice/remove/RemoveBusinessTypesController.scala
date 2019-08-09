@@ -96,7 +96,7 @@ class RemoveBusinessTypesController @Inject()(
               )
               _ <- OptionT.liftF(dataCacheConnector.save(request.credId, RemoveBusinessTypeFlowModel.key, newModel))
 
-              route <- OptionT.liftF(router.getRouteNewAuth(request.credId, WhatBusinessTypesToRemovePageId, newModel, edit))
+              route <- OptionT.liftF(router.getRoute(request.credId, WhatBusinessTypesToRemovePageId, newModel, edit))
             } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: RemoveActivitiesController")
 
         }

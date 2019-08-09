@@ -36,29 +36,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ChangeBusinessTypeRouter @Inject()(val businessMatchingService: BusinessMatchingService
                                         ) extends Router[ChangeBusinessType] {
 
-  override def getRoute(pageId: PageId, model: ChangeBusinessType, edit: Boolean = false)
-                       (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = model match {
-
-    case Add => Future.successful(Redirect(addRoutes.SelectBusinessTypeController.get()))
-    case Remove => {
-      for {
-        model <- businessMatchingService.getModel
-        activities <- OptionT.fromOption[Future](model.activities) map {
-          _.businessActivities
-        }
-
-      } yield {
-
-        if (activities.size < 2) {
-          Redirect(removeRoutes.UnableToRemoveBusinessTypesController.get())
-        } else {
-          Redirect(removeRoutes.RemoveBusinessTypesController.get())
-        }
-      }
-    } getOrElse InternalServerError("Could not do the get the route for RemoveBusinessTypesSummaryPageRouter")
-  }
-
-  override def getRouteNewAuth(credId: String, pageId: PageId, model: ChangeBusinessType, edit: Boolean = false)
+  override def getRoute(credId: String, pageId: PageId, model: ChangeBusinessType, edit: Boolean = false)
                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = model match {
 
     case Add => Future.successful(Redirect(addRoutes.SelectBusinessTypeController.get()))

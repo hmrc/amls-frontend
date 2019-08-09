@@ -110,32 +110,11 @@ class BusinessMatchingService @Inject()(
   def getSubmittedBusinessActivities(credId: String)(implicit hc: HeaderCarrier, ex: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
     getActivitySet(credId, _ intersect _)
 
-@deprecated("To be removed when wuth implementation is complete")
-  def getRemainingBusinessActivities(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
-    for {
-      model <- getModel
-      activities <- OptionT.fromOption[Future](model.activities)
-    } yield BusinessActivities.all diff activities.businessActivities
-
   def getRemainingBusinessActivities(credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
     for {
       model <- getModel(credId)
       activities <- OptionT.fromOption[Future](model.activities)
     } yield BusinessActivities.all diff activities.businessActivities
-
-  @deprecated("To be removed when new auth is implemented")
-  def clearSection(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier) = activity match {
-    case AccountancyServices =>
-      dataCacheConnector.removeByKey[Asp](Asp.key)
-    case EstateAgentBusinessService =>
-      dataCacheConnector.removeByKey[EstateAgentBusiness](EstateAgentBusiness.key)
-    case HighValueDealing =>
-      dataCacheConnector.removeByKey[Hvd](Hvd.key)
-    case MoneyServiceBusiness =>
-      dataCacheConnector.removeByKey[Msb](Msb.key)
-    case TrustAndCompanyServices =>
-      dataCacheConnector.removeByKey[Tcsp](Tcsp.key)
-  }
 
   def clearSection(credId: String, activity: BusinessActivity)(implicit hc: HeaderCarrier) = activity match {
     case AccountancyServices =>

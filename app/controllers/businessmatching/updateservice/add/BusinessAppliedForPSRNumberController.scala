@@ -55,7 +55,7 @@ class BusinessAppliedForPSRNumberController @Inject()(
             dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key) {
               case Some(model) => model.businessAppliedForPSRNumber(data)
             } flatMap {
-              case Some(model) => router.getRouteNewAuth(request.credId, PsrNumberPageId, model, edit)
+              case Some(model) => router.getRoute(request.credId, PsrNumberPageId, model, edit)
               case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: BusinessAppliedForPSRNumberController"))
             }
           }

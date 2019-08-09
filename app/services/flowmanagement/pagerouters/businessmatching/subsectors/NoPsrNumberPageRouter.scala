@@ -26,15 +26,9 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.{ExecutionContext, Future}
 
 class NoPsrNumberPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
-  override def getPageRoute(model: ChangeSubSectorFlowModel, edit: Boolean)
-                           (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
 
-    routes.SummaryController.get()
-
-  }
-
-  override def getPageRouteNewAuth(credId: String, model: ChangeSubSectorFlowModel, edit: Boolean)
-                           (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+  override def getRoute(credId: String, model: ChangeSubSectorFlowModel, edit: Boolean)
+                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
 
     routes.SummaryController.get()
 

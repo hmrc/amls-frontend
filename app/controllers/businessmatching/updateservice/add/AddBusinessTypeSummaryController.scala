@@ -63,7 +63,7 @@ class AddBusinessTypeSummaryController @Inject()(
                   _ <- helper.updateBusinessActivities(request.credId, model)
                   _ <- helper.updateHasAcceptedFlag(request.credId, model)
                   _ <- helper.clearFlowModel(request.credId)
-          route <- OptionT.liftF(router.getRouteNewAuth(request.credId, AddBusinessTypeSummaryPageId, model))
+          route <- OptionT.liftF(router.getRoute(request.credId, AddBusinessTypeSummaryPageId, model))
         } yield {
           route
         }) getOrElse InternalServerError("Could not fetch the flow model")

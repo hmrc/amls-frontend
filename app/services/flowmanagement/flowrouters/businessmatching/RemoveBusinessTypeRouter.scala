@@ -36,27 +36,14 @@ class RemoveBusinessTypeRouter @Inject()(val businessMatchingService: BusinessMa
                                          val whatDateToRemovePageRouter: WhatDateToRemovePageRouter
                                         ) extends Router[RemoveBusinessTypeFlowModel] {
 
-
-  override def getRoute(pageId: PageId, model: RemoveBusinessTypeFlowModel, edit: Boolean = false)
-                       (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
-    pageId match {
-      case WhatBusinessTypesToRemovePageId => whatServicesToRemovePageRouter.getPageRoute(model, edit)
-      case NeedToUpdatePageId => needToUpdatePageRouter.getPageRoute(model, edit)
-      case RemoveBusinessTypesSummaryPageId => removeServicesSummaryPageRouter.getPageRoute(model, edit)
-      case UnableToRemovePageId => unableToRemovePageRouter.getPageRoute(model, edit)
-      case WhatDateRemovedPageId => whatDateToRemovePageRouter.getPageRoute(model, edit)
-      case _ => throw new Exception("PagId not in remove flow")
-    }
-  }
-
-  override def getRouteNewAuth(credId: String, pageId: PageId, model: RemoveBusinessTypeFlowModel, edit: Boolean = false)
+  override def getRoute(credId: String, pageId: PageId, model: RemoveBusinessTypeFlowModel, edit: Boolean = false)
                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
     pageId match {
-      case WhatBusinessTypesToRemovePageId => whatServicesToRemovePageRouter.getPageRouteNewAuth(credId, model, edit)
-      case NeedToUpdatePageId => needToUpdatePageRouter.getPageRouteNewAuth(credId, model, edit)
-      case RemoveBusinessTypesSummaryPageId => removeServicesSummaryPageRouter.getPageRouteNewAuth(credId, model, edit)
-      case UnableToRemovePageId => unableToRemovePageRouter.getPageRouteNewAuth(credId, model, edit)
-      case WhatDateRemovedPageId => whatDateToRemovePageRouter.getPageRouteNewAuth(credId, model, edit)
+      case WhatBusinessTypesToRemovePageId => whatServicesToRemovePageRouter.getRoute(credId, model, edit)
+      case NeedToUpdatePageId => needToUpdatePageRouter.getRoute(credId, model, edit)
+      case RemoveBusinessTypesSummaryPageId => removeServicesSummaryPageRouter.getRoute(credId, model, edit)
+      case UnableToRemovePageId => unableToRemovePageRouter.getRoute(credId, model, edit)
+      case WhatDateRemovedPageId => whatDateToRemovePageRouter.getRoute(credId, model, edit)
       case _ => throw new Exception("PagId not in remove flow")
     }
   }

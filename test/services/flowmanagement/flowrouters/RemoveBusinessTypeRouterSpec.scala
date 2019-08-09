@@ -29,18 +29,19 @@ import models.tradingpremises.TradingPremises
 import org.joda.time.LocalDate
 import org.scalacheck.Gen
 import play.api.mvc.Results.Redirect
+import org.mockito.Matchers._
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.flowrouters.businessmatching.RemoveBusinessTypeRouter
 import services.flowmanagement.pagerouters.removeflow._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
 class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerator {
 
-  trait Fixture extends DependencyMocks with AuthorisedFixture {
+  trait Fixture extends DependencyMocksNewAuth with AuthorisedFixture {
     self =>
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
@@ -78,7 +79,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
             Some(justAdded),
             Some(ServiceChangeRegister.key))
 
-          val result = await(router.getRoute(WhatBusinessTypesToRemovePageId, model))
+          val result = await(router.getRoute("internalId", WhatBusinessTypesToRemovePageId, model))
 
           result mustBe Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get())
         }
@@ -97,7 +98,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
           mockCacheFetch[ServiceChangeRegister](
             Some(justAdded),
             Some(ServiceChangeRegister.key))
-          val result = await(router.getRoute(WhatBusinessTypesToRemovePageId, model))
+          val result = await(router.getRoute("internalId", WhatBusinessTypesToRemovePageId, model))
 
           result mustBe Redirect(removeRoutes.WhatDateRemovedController.get())
         }
@@ -112,7 +113,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
           mockCacheFetch[ServiceChangeRegister](
             Some(justAdded),
             Some(ServiceChangeRegister.key))
-          val result = await(router.getRoute(WhatBusinessTypesToRemovePageId, model, true))
+          val result = await(router.getRoute("internalId", WhatBusinessTypesToRemovePageId, model, true))
 
           result mustBe Redirect(removeRoutes.WhatDateRemovedController.get())
         }
@@ -128,7 +129,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
             activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness)),
             dateOfChange = Some(DateOfChange(LocalDate.now()))
           )
-          val result = await(router.getRoute(WhatDateRemovedPageId, model))
+          val result = await(router.getRoute("internalId", WhatDateRemovedPageId, model))
 
           result mustBe Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get())
         }
@@ -148,7 +149,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
             dateOfChange = Some(DateOfChange(LocalDate.now()))
           )
 
-          val result = await(router.getRoute(RemoveBusinessTypesSummaryPageId, model))
+          val result = await(router.getRoute("internalId", RemoveBusinessTypesSummaryPageId, model))
 
           result mustBe Redirect(controllers.routes.RegistrationProgressController.get())
         }
@@ -165,7 +166,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
             activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness, AccountancyServices)),
             dateOfChange = Some(DateOfChange(LocalDate.now()))
           )
-          val result = await(router.getRoute(RemoveBusinessTypesSummaryPageId, model))
+          val result = await(router.getRoute("internalId", RemoveBusinessTypesSummaryPageId, model))
 
           result mustBe Redirect(removeRoutes.NeedMoreInformationController.get())
         }
@@ -179,7 +180,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
             dateOfChange = Some(DateOfChange(LocalDate.now()))
           )
 
-          val result = await(router.getRoute(RemoveBusinessTypesSummaryPageId, model))
+          val result = await(router.getRoute("internalId", RemoveBusinessTypesSummaryPageId, model))
 
           result mustBe Redirect(removeRoutes.NeedMoreInformationController.get())
         }
@@ -195,7 +196,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
             activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness, AccountancyServices)),
             dateOfChange = Some(DateOfChange(LocalDate.now()))
           )
-          val result = await(router.getRoute(NeedToUpdatePageId, model))
+          val result = await(router.getRoute("internalId", NeedToUpdatePageId, model))
 
           result mustBe Redirect(controllers.routes.RegistrationProgressController.get())
         }
@@ -210,7 +211,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
           val model = RemoveBusinessTypeFlowModel(
             activitiesToRemove = Some(Set(HighValueDealing))
           )
-          val result = await(router.getRoute(UnableToRemovePageId, model))
+          val result = await(router.getRoute("internalId", UnableToRemovePageId, model))
 
           result mustBe Redirect(controllers.routes.StatusController.get())
         }
@@ -228,7 +229,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
           dateOfChange = Some(DateOfChange(LocalDate.now()))
         )
 
-        val result = await(router.getRoute(WhatDateRemovedPageId, model, edit = true))
+        val result = await(router.getRoute("internalId", WhatDateRemovedPageId, model, edit = true))
 
         result mustBe Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get())
       }
@@ -242,7 +243,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
           dateOfChange = Some(DateOfChange(LocalDate.now()))
         )
 
-        val result = await(router.getRoute(WhatBusinessTypesToRemovePageId, model, edit = true))
+        val result = await(router.getRoute("internalId", WhatBusinessTypesToRemovePageId, model, edit = true))
 
         result mustBe Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get())
       }

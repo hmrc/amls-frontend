@@ -35,23 +35,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class SelectBusinessTypesPageRouter @Inject()(val statusService: StatusService,
                                               val businessMatchingService: BusinessMatchingService) extends PageRouter[AddBusinessTypeFlowModel] {
 
-  override def getPageRoute(model: AddBusinessTypeFlowModel, edit: Boolean = false)
-                           (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
-
-    if (edit && model.areNewActivitiesAtTradingPremises.isDefined) {
-    Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
-
-  } else {
-      model.activity match {
-        case Some(TrustAndCompanyServices) => Future.successful(Redirect(addRoutes.FitAndProperController.get(edit)))
-        case Some(MoneyServiceBusiness) => Future.successful(Redirect(addRoutes.SubSectorsController.get()))
-        case _ => Future.successful(Redirect(addRoutes.TradingPremisesController.get(edit)))
-      }
-    }
-  }
-
-  override def getPageRouteNewAuth(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)
-                           (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+  override def getRoute(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)
+                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
 
     if (edit && model.areNewActivitiesAtTradingPremises.isDefined) {
       Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))

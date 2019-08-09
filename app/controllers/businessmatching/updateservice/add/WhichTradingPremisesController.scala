@@ -68,7 +68,7 @@ class WhichTradingPremisesController @Inject()(
             dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key) {
               case Some(model) => model.tradingPremisesActivities(Some(data))
           } flatMap {
-            case Some(model) => router.getRouteNewAuth(request.credId, WhichTradingPremisesPageId, model)
+            case Some(model) => router.getRoute(request.credId, WhichTradingPremisesPageId, model)
             case _ => Future.successful(InternalServerError("Cannot retrieve form data"))
           }
         }

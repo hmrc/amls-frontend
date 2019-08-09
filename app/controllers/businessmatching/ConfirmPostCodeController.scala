@@ -18,11 +18,10 @@ package controllers.businessmatching
 
 import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
-import controllers.{BaseController, DefaultBaseController}
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.{BusinessMatching, ConfirmPostcode}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthAction
 import views.html.businessmatching.confirm_postcode
 

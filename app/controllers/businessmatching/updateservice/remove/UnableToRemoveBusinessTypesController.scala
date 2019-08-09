@@ -29,10 +29,9 @@ import views.html.businessmatching.updateservice.remove.unable_to_remove_activit
 import scala.concurrent.Future
 
 @Singleton
-class UnableToRemoveBusinessTypesController @Inject()(
-                                          authAction: AuthAction,
-                                          val dataCacheConnector: DataCacheConnector
-                                          ) extends DefaultBaseController {
+class UnableToRemoveBusinessTypesController @Inject()(authAction: AuthAction,
+                                                      val dataCacheConnector: DataCacheConnector
+                                                     ) extends DefaultBaseController {
 
   def get = authAction.async {
       implicit request =>

@@ -36,24 +36,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class AddBusinessTypeSummaryPageRouter @Inject()(val statusService: StatusService,
                                                  val businessMatchingService: BusinessMatchingService) extends PageRouter[AddBusinessTypeFlowModel] {
 
-  override def getPageRoute(model: AddBusinessTypeFlowModel, edit: Boolean = false)
-                           (implicit ac: AuthContext,
-                            hc: HeaderCarrier,
-                            ec: ExecutionContext
-
-                           ): Future[Result] = {
-
-    businessMatchingService.getRemainingBusinessActivities flatMap {
-      case set if set.nonEmpty =>
-        OptionT.some(Redirect(addRoutes.AddMoreBusinessTypesController.get()))
-      case _ =>
-        newServiceInformationRedirect
-    } getOrElse error(AddBusinessTypeSummaryPageId)
-
-  }
-
-  override def getPageRouteNewAuth(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)
-                           (implicit hc: HeaderCarrier,
+  override def getRoute(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)
+                       (implicit hc: HeaderCarrier,
                             ec: ExecutionContext
                            ): Future[Result] = {
 

@@ -19,14 +19,13 @@ package services.flowmanagement.pagerouters.addflow
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes}
-import models.flowmanagement.{AddBusinessTypeFlowModel, PsrNumberPageId, PageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, PsrNumberPageId}
 import play.api.mvc.Result
-import play.api.mvc.Results.{InternalServerError, Redirect}
+import play.api.mvc.Results.Redirect
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.PageRouter
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -34,24 +33,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class BusinessAppliedForPsrNumberPageRouter @Inject()(val statusService: StatusService,
                                                       val businessMatchingService: BusinessMatchingService) extends PageRouter[AddBusinessTypeFlowModel] {
 
-  override def getPageRoute(model: AddBusinessTypeFlowModel, edit: Boolean = false)
-                           (implicit ac: AuthContext,
-                            hc: HeaderCarrier,
-                            ec: ExecutionContext
-
-                           ): Future[Result] = {
-    (edit, model.businessAppliedForPSRNumber) match {
-      case (true, Some(BusinessAppliedForPSRNumberYes(_))) => Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
-      case (false, Some(BusinessAppliedForPSRNumberYes(_))) => Future.successful(Redirect(addRoutes.FitAndProperController.get()))
-      case (_, Some(BusinessAppliedForPSRNumberNo)) => Future.successful(Redirect(addRoutes.NoPsrController.get()))
-      case (_, None) => Future.successful(error(PsrNumberPageId))
-    }
-  }
-
-  override def getPageRouteNewAuth(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)
-                           (implicit hc: HeaderCarrier,
-                            ec: ExecutionContext
-                           ): Future[Result] = {
+  override def getRoute(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)
+                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
     (edit, model.businessAppliedForPSRNumber) match {
       case (true, Some(BusinessAppliedForPSRNumberYes(_))) => Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
       case (false, Some(BusinessAppliedForPSRNumberYes(_))) => Future.successful(Redirect(addRoutes.FitAndProperController.get()))

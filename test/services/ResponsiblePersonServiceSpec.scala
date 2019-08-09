@@ -17,15 +17,11 @@
 package services
 
 import generators.ResponsiblePersonGenerator
-import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
 import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import org.scalacheck.Gen
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.play.PlaySpec
 import play.api.test.Helpers._
-import utils.{AmlsSpec, DependencyMocks, DependencyMocksNewAuth, StatusConstants}
-import org.mockito.Mockito.verify
-import org.mockito.Matchers.{any, eq => eqTo}
+import utils.{AmlsSpec, DependencyMocksNewAuth, StatusConstants}
 import ResponsiblePeopleService._
 
 import scala.concurrent.ExecutionContext.Implicits.global

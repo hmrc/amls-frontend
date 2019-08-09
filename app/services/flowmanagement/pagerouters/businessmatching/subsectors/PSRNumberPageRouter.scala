@@ -27,18 +27,9 @@ import play.api.mvc.Results.Redirect
 import scala.concurrent.{ExecutionContext, Future}
 
 class PSRNumberPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
-  override def getPageRoute(model: ChangeSubSectorFlowModel, edit: Boolean)
-                           (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
-    val call = model.psrNumber map {
-      case BusinessAppliedForPSRNumberYes(_) => routes.SummaryController.get()
-      case _ => routes.NoPsrController.get()
-    }
 
-    call.fold(error(PsrNumberPageId))(Redirect)
-  }
-
-  override def getPageRouteNewAuth(credId: String, model: ChangeSubSectorFlowModel, edit: Boolean)
-                           (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+  override def getRoute(credId: String, model: ChangeSubSectorFlowModel, edit: Boolean)
+                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
     val call = model.psrNumber map {
       case BusinessAppliedForPSRNumberYes(_) => routes.SummaryController.get()
       case _ => routes.NoPsrController.get()

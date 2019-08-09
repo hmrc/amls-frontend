@@ -34,13 +34,12 @@ import scala.concurrent.Future
 
 
 @Singleton
-class SubSectorsController @Inject()(
-                                       authAction: AuthAction,
-                                       implicit val dataCacheConnector: DataCacheConnector,
-                                       val businessMatchingService: BusinessMatchingService,
-                                       val router: Router[AddBusinessTypeFlowModel],
-                                       val config:AppConfig
-                                     ) extends DefaultBaseController {
+class SubSectorsController @Inject()(authAction: AuthAction,
+                                     implicit val dataCacheConnector: DataCacheConnector,
+                                     val businessMatchingService: BusinessMatchingService,
+                                     val router: Router[AddBusinessTypeFlowModel],
+                                     val config:AppConfig
+                                    ) extends DefaultBaseController {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>
@@ -66,7 +65,7 @@ class SubSectorsController @Inject()(
                 model.msbServices(data)
               }
             } flatMap {
-              case Some(model) => router.getRouteNewAuth(request.credId, SubSectorsPageId, model, edit)
+              case Some(model) => router.getRoute(request.credId, SubSectorsPageId, model, edit)
               case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: SubServicesController"))
             }
           }

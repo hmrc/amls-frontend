@@ -44,39 +44,21 @@ class AddBusinessTypeRouter @Inject()(val businessMatchingService: BusinessMatch
                                      ) extends Router[AddBusinessTypeFlowModel] {
 
 
-  override def getRoute(pageId: PageId, model: AddBusinessTypeFlowModel, edit: Boolean = false)
-                       (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
-    pageId match {
-      case AddMoreBusinessTypesPageId => addMoreActivitiesPageRouter.getPageRoute(model, edit)
-      case PsrNumberPageId => businessAppliedForPSRNumberPageRouter.getPageRoute(model, edit)
-      case FitAndProperPageId => fitAndProperPageRouter.getPageRoute(model, edit)
-      case NeedMoreInformationPageId => newServicesInformationPageRouter.getPageRoute(model, edit)
-      case NoPSRPageId => noPSRPageRouter.getPageRoute(model, edit)
-      case SelectBusinessTypesPageId => selectActivitiesPageRouter.getPageRoute(model, edit)
-      case SubSectorsPageId => subServicesPageRouter.getPageRoute(model, edit)
-      case TradingPremisesPageId => tradingPremisesPageRouter.getPageRoute(model, edit)
-      case AddBusinessTypeSummaryPageId => updateServicesSummaryPageRouter.getPageRoute(model, edit)
-      case WhatDoYouDoHerePageId => whatDoYouDoHerePageRouter.getPageRoute(model, edit)
-      case WhichFitAndProperPageId => whichFitAndProperPageRouter.getPageRoute(model, edit)
-      case WhichTradingPremisesPageId => whichTradingPremisesPageRouter.getPageRoute(model, edit)
-    }
-  }
-
-  override def getRouteNewAuth(credId: String, pageId: PageId, model: AddBusinessTypeFlowModel, edit: Boolean = false)
+  override def getRoute(credId: String, pageId: PageId, model: AddBusinessTypeFlowModel, edit: Boolean = false)
                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
     pageId match {
-      case AddMoreBusinessTypesPageId => addMoreActivitiesPageRouter.getPageRouteNewAuth(credId, model, edit)
-      case PsrNumberPageId => businessAppliedForPSRNumberPageRouter.getPageRouteNewAuth(credId, model, edit)
-      case FitAndProperPageId => fitAndProperPageRouter.getPageRouteNewAuth(credId, model, edit)
-      case NeedMoreInformationPageId => newServicesInformationPageRouter.getPageRouteNewAuth(credId, model, edit)
-      case NoPSRPageId => noPSRPageRouter.getPageRouteNewAuth(credId, model, edit)
-      case SelectBusinessTypesPageId => selectActivitiesPageRouter.getPageRouteNewAuth(credId, model, edit)
-      case SubSectorsPageId => subServicesPageRouter.getPageRouteNewAuth(credId, model, edit)
-      case TradingPremisesPageId => tradingPremisesPageRouter.getPageRouteNewAuth(credId, model, edit)
-      case AddBusinessTypeSummaryPageId => updateServicesSummaryPageRouter.getPageRouteNewAuth(credId, model, edit)
-      case WhatDoYouDoHerePageId => whatDoYouDoHerePageRouter.getPageRouteNewAuth(credId, model, edit)
-      case WhichFitAndProperPageId => whichFitAndProperPageRouter.getPageRouteNewAuth(credId, model, edit)
-      case WhichTradingPremisesPageId => whichTradingPremisesPageRouter.getPageRouteNewAuth(credId, model, edit)
+      case AddMoreBusinessTypesPageId => addMoreActivitiesPageRouter.getRoute(credId, model, edit)
+      case PsrNumberPageId => businessAppliedForPSRNumberPageRouter.getRoute(credId, model, edit)
+      case FitAndProperPageId => fitAndProperPageRouter.getRoute(credId, model, edit)
+      case NeedMoreInformationPageId => newServicesInformationPageRouter.getRoute(credId, model, edit)
+      case NoPSRPageId => noPSRPageRouter.getRoute(credId, model, edit)
+      case SelectBusinessTypesPageId => selectActivitiesPageRouter.getRoute(credId, model, edit)
+      case SubSectorsPageId => subServicesPageRouter.getRoute(credId, model, edit)
+      case TradingPremisesPageId => tradingPremisesPageRouter.getRoute(credId, model, edit)
+      case AddBusinessTypeSummaryPageId => updateServicesSummaryPageRouter.getRoute(credId, model, edit)
+      case WhatDoYouDoHerePageId => whatDoYouDoHerePageRouter.getRoute(credId, model, edit)
+      case WhichFitAndProperPageId => whichFitAndProperPageRouter.getRoute(credId, model, edit)
+      case WhichTradingPremisesPageId => whichTradingPremisesPageRouter.getRoute(credId, model, edit)
     }
   }
 }

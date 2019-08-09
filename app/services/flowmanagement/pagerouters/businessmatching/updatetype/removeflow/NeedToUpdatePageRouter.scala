@@ -29,15 +29,9 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class NeedToUpdatePageRouter extends PageRouter[RemoveBusinessTypeFlowModel] {
 
-  override def getPageRoute(model: RemoveBusinessTypeFlowModel  = new RemoveBusinessTypeFlowModel(), edit: Boolean = false)
-                           (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext ): Future[Result] = {
 
-    Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
-
-  }
-
-  override def getPageRouteNewAuth(credId: String, model: RemoveBusinessTypeFlowModel  = new RemoveBusinessTypeFlowModel(), edit: Boolean = false)
-                           (implicit hc: HeaderCarrier, ec: ExecutionContext ): Future[Result] = {
+  override def getRoute(credId: String, model: RemoveBusinessTypeFlowModel  = new RemoveBusinessTypeFlowModel(), edit: Boolean = false)
+                       (implicit hc: HeaderCarrier, ec: ExecutionContext ): Future[Result] = {
 
     Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
 

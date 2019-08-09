@@ -64,7 +64,7 @@ class AddMoreBusinessTypesController @Inject()(
             dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key) {
               case Some(model) => model.copy(addMoreActivities = Some(data))
             } flatMap {
-              case Some(model) => router.getRouteNewAuth(request.credId, AddMoreBusinessTypesPageId, model)
+              case Some(model) => router.getRoute(request.credId, AddMoreBusinessTypesPageId, model)
               case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: AddMoreActivitiesController"))
             }
         }

@@ -37,18 +37,18 @@ trait RouterMocks extends MockitoSugar {
 
   implicit class RouterMocking[T](router: Router[T]) {
     def mockRoute(credId: String, pageId: PageId, model: T, edit: Boolean = false, returnValue: Future[Result] = defaultResult) =
-      when(router.getRouteNewAuth(credId, eqTo(pageId), eqTo(model), eqTo(edit))(any(), any())) thenReturn returnValue
+      when(router.getRoute(credId, eqTo(pageId), eqTo(model), eqTo(edit))(any(), any())) thenReturn returnValue
 
     def mockRoute(returnValue: Future[Result]) =
-      when(router.getRouteNewAuth(any(), any(), any(), any())(any(), any())) thenReturn returnValue
+      when(router.getRoute(any(), any(), any(), any())(any(), any())) thenReturn returnValue
 
     def mockRoute(url: Call) =
-      when(router.getRouteNewAuth(any(), any(), any(), any())(any(), any())) thenReturn Future.successful(Redirect(url))
+      when(router.getRoute(any(), any(), any(), any())(any(), any())) thenReturn Future.successful(Redirect(url))
 
     def mockRoute =
-      when(router.getRouteNewAuth(any(), any(), any(), any())(any(), any())) thenReturn defaultResult
+      when(router.getRoute(any(), any(), any(), any())(any(), any())) thenReturn defaultResult
 
     def verify(credId: String, pageId: PageId, model: T, edit: Boolean = false) =
-      org.mockito.Mockito.verify(router).getRouteNewAuth(eqTo(credId), eqTo(pageId), eqTo(model), eqTo(edit))(any(), any())
+      org.mockito.Mockito.verify(router).getRoute(eqTo(credId), eqTo(pageId), eqTo(model), eqTo(edit))(any(), any())
   }
 }

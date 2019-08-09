@@ -31,12 +31,11 @@ import views.html.businessmatching.updateservice.remove.remove_activities_summar
 
 import scala.concurrent.Future
 
-class RemoveBusinessTypesSummaryController @Inject()(
-                                                   authAction: AuthAction,
-                                                   val dataCacheConnector: DataCacheConnector,
-                                                   val helper: RemoveBusinessTypeHelper,
-                                                   val router: Router[RemoveBusinessTypeFlowModel]
-                                                 ) extends DefaultBaseController {
+class RemoveBusinessTypesSummaryController @Inject()(authAction: AuthAction,
+                                                     val dataCacheConnector: DataCacheConnector,
+                                                     val helper: RemoveBusinessTypeHelper,
+                                                     val router: Router[RemoveBusinessTypeFlowModel]
+                                                    ) extends DefaultBaseController {
 
   def get = authAction.async {
       implicit request => {
@@ -50,7 +49,7 @@ class RemoveBusinessTypesSummaryController @Inject()(
       implicit request => {
         for {
           model <- updateSubscription(request.credId)
-          route <- OptionT.liftF(router.getRouteNewAuth(request.credId, RemoveBusinessTypesSummaryPageId, model))
+          route <- OptionT.liftF(router.getRoute(request.credId, RemoveBusinessTypesSummaryPageId, model))
         } yield route
       } getOrElse InternalServerError("Unable to remove the business type")
   }

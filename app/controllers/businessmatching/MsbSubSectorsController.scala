@@ -65,9 +65,9 @@ class MsbSubSectorsController @Inject()(authAction: AuthAction,
               _.getOrElse(ChangeSubSectorFlowModel()).copy(subSectors = Some(data.msbServices))
             } flatMap {
               case Some(m@ChangeSubSectorFlowModel(Some(set), _)) if !(set contains TransmittingMoney) =>
-                helper.updateSubSectors(request.credId, m) flatMap { _ => router.getRouteNewAuth(request.credId, SubSectorsPageId, m) }
+                helper.updateSubSectors(request.credId, m) flatMap { _ => router.getRoute(request.credId, SubSectorsPageId, m) }
               case Some(updatedModel) =>
-                router.getRouteNewAuth(request.credId, SubSectorsPageId, updatedModel)
+                router.getRoute(request.credId, SubSectorsPageId, updatedModel)
             }
         }
   }

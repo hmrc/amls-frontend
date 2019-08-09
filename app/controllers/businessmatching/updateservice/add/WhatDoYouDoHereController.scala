@@ -68,7 +68,7 @@ class WhatDoYouDoHereController @Inject()(
             dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key) {
               case Some(model) =>  model.tradingPremisesMsbServices(data)
             } flatMap {
-              case Some(model) => router.getRouteNewAuth(request.credId, WhatDoYouDoHerePageId, model, edit)
+              case Some(model) => router.getRoute(request.credId, WhatDoYouDoHerePageId, model, edit)
               case _ => Future.successful(InternalServerError("Cannot retrieve data"))
             }
           }

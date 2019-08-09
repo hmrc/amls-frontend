@@ -34,27 +34,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class FitAndProperPageRouter @Inject()(val statusService: StatusService,
                                        val businessMatchingService: BusinessMatchingService) extends PageRouter[AddBusinessTypeFlowModel] {
 
-  override def getPageRoute(model: AddBusinessTypeFlowModel, edit: Boolean = false)
-                           (implicit ac: AuthContext,
-                            hc: HeaderCarrier,
-                            ec: ExecutionContext
-
-                           ): Future[Result] = {
-
-    if (edit && model.responsiblePeople.isDefined) {
-      Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
-    } else {
-      (model.fitAndProper, edit) match {
-        case (Some(true), _) => Future.successful(Redirect(addRoutes.WhichFitAndProperController.get(edit)))
-        case (Some(false), true) => Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
-        case (Some(false), false) => Future.successful(Redirect(addRoutes.TradingPremisesController.get(edit)))
-        case (None,_) => Future.successful(error(FitAndProperPageId))
-      }
-    }
-  }
-
-  override def getPageRouteNewAuth(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)
-                           (implicit hc: HeaderCarrier,
+  override def getRoute(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)
+                       (implicit hc: HeaderCarrier,
                             ec: ExecutionContext
 
                            ): Future[Result] = {

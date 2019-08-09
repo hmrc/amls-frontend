@@ -26,7 +26,6 @@ import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.PageRouter
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -34,25 +33,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class WhatDoYouDoHerePageRouter @Inject()(val statusService: StatusService,
                                           val businessMatchingService: BusinessMatchingService) extends PageRouter[AddBusinessTypeFlowModel] {
 
-  override def getPageRoute(model: AddBusinessTypeFlowModel, edit: Boolean = false)
-                           (implicit ac: AuthContext,
-                            hc: HeaderCarrier,
-                            ec: ExecutionContext
-
-                           ): Future[Result] = {
-    (model.subSectors.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.contains(TransmittingMoney),
-      model.businessAppliedForPSRNumber.isDefined) match {
-      case (true, false) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))
-      case (_, _) => Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
-    }
-
-  }
-
-  override def getPageRouteNewAuth(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)
-                           (implicit hc: HeaderCarrier,
-                            ec: ExecutionContext
-
-                           ): Future[Result] = {
+  override def getRoute(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)
+                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
     (model.subSectors.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.contains(TransmittingMoney),
       model.businessAppliedForPSRNumber.isDefined) match {
       case (true, false) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))
