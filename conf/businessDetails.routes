@@ -11,7 +11,6 @@ GET         /vat                                                   @controllers.
 POST        /vat                                                   @controllers.businessdetails.VATRegisteredController.post(edit: Boolean ?= false)
 
 GET         /corporation-tax                                       @controllers.businessdetails.CorporationTaxRegisteredController.get(edit: Boolean ?= false)
-POST        /corporation-tax                                       @controllers.businessdetails.CorporationTaxRegisteredController.post(edit: Boolean ?= false)
 
 GET         /registered-office-address                             @controllers.businessdetails.ConfirmRegisteredOfficeController.get(edit: Boolean ?= false)
 POST        /registered-office-address                             @controllers.businessdetails.ConfirmRegisteredOfficeController.post(edit: Boolean ?= false)
