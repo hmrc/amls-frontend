@@ -66,6 +66,7 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     }
   }
 
+  @deprecated("To be removed when auth implementation is complete")
   private def etmpStatusInformation(mlrRegNumber: String)(implicit hc: HeaderCarrier,
                                                           auth: AuthContext, ec: ExecutionContext): Future[(SubmissionStatus, Option[ReadStatusResponse])] = {
     amlsConnector.status(mlrRegNumber) map {
@@ -85,6 +86,18 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
   }
 
   @deprecated("To be removed when auth implementation is complete")
+  private def etmpStatusInformation(mlrRegNumber: String, accountTypeId: (String, String))
+                                   (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[(SubmissionStatus, Option[ReadStatusResponse])] = {
+
+    amlsConnector.status(mlrRegNumber, accountTypeId) map {
+      response =>
+        val status = getETMPStatus(response)
+        Logger.debug("StatusService:etmpStatusInformation:status:" + status)
+        (status, Some(response))
+    }
+  }
+
+  @deprecated("To be removed when auth implementation is complete")
   def getSafeIdFromReadStatus(mlrRegNumber: String)(implicit hc: HeaderCarrier,
                                                           auth: AuthContext, ec: ExecutionContext) = {
     amlsConnector.status(mlrRegNumber) map {
@@ -94,6 +107,7 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     }
   }
 
+  @deprecated("To be removed when auth implementation is complete")
   def getDetailedStatus(implicit hc: HeaderCarrier, authContext: AuthContext, ec: ExecutionContext): Future[(SubmissionStatus, Option[ReadStatusResponse])] = {
     enrolmentsService.amlsRegistrationNumber flatMap {
       case Some(mlrRegNumber) =>
@@ -106,6 +120,21 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
         }
     }
   }
+
+  def getDetailedStatus(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)
+                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[(SubmissionStatus, Option[ReadStatusResponse])] = {
+    amlsRegistrationNumber match {
+      case Some(mlrRegNumber) =>
+        Logger.debug("StatusService:getDetailedStatus:mlrRegNumber:" + mlrRegNumber)
+        etmpStatusInformation(mlrRegNumber, accountTypeId)(hc, ec)
+      case None =>
+        Logger.debug("StatusService:getDetailedStatus: No mlrRegNumber")
+        notYetSubmitted(cacheId)(hc, ec) map { status =>
+          (status, None)
+        }
+    }
+  }
+
   @deprecated("To be removed when auth implementation is complete")
   def getStatus(implicit hc: HeaderCarrier, authContext: AuthContext, ec: ExecutionContext): Future[SubmissionStatus] = {
     enrolmentsService.amlsRegistrationNumber flatMap {
@@ -130,13 +159,19 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
       }
   }
 
+  @deprecated("To be removed when auth implementation is complete")
   def getStatus(mlrRegNumber: String)(implicit hc: HeaderCarrier, authContext: AuthContext, ec: ExecutionContext): Future[SubmissionStatus] = {
         etmpStatus(mlrRegNumber)(hc, authContext, ec)
+  }
+
+  def getStatus(mlrRegNumber: String, accountTypeId: (String, String))(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[SubmissionStatus] = {
+    etmpStatus(mlrRegNumber, accountTypeId)(hc, ec)
   }
 
   def getDetailedStatus(mlrRegNumber: String)
                        (implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext) = etmpStatusInformation(mlrRegNumber)
 
+  @deprecated("To be removed when auth implementation is complete")
   def getReadStatus(implicit hc: HeaderCarrier, authContext: AuthContext, ec: ExecutionContext): Future[ReadStatusResponse] = {
     enrolmentsService.amlsRegistrationNumber flatMap {
       case Some(mlrRegNumber) =>
@@ -146,8 +181,22 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     }
   }
 
+  def getReadStatus(amlsRegistrationNumber: Option[String], accountTypeId: (String, String))
+                   (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ReadStatusResponse] = {
+    amlsRegistrationNumber match {
+      case Some(mlrRegNumber) =>
+        Logger.debug("StatusService:getReadStatus:mlrRegNumber:" + mlrRegNumber)
+        etmpReadStatus(mlrRegNumber, accountTypeId)(hc, ec)
+      case _ => throw new RuntimeException("ETMP returned no read status")
+    }
+  }
+
+  @deprecated("To be removed when auth implementation is complete")
   def getReadStatus(mlrRefNo: String)
                    (implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext) = etmpReadStatus(mlrRefNo)
+
+  def getReadStatus(amlsRegistrationNumber: String, accountTypeId: (String, String))
+                   (implicit hc: HeaderCarrier, ec: ExecutionContext) = etmpReadStatus(amlsRegistrationNumber, accountTypeId)
 
   private def notYetSubmitted(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext) = {
 
@@ -187,6 +236,7 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     }
   }
 
+  @deprecated("To be removed when auth implementation is complete")
   private def etmpStatus(amlsRefNumber: String)(implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext): Future[SubmissionStatus] = {
     {
       amlsConnector.status(amlsRefNumber) map {
@@ -204,9 +254,19 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     }
   }
 
+  @deprecated("To be removed when auth implementation is complete")
   private def etmpReadStatus(amlsRefNumber: String)(implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext): Future[ReadStatusResponse] = {
     {
       val status = amlsConnector.status(amlsRefNumber)
+      Logger.debug("StatusService:etmpReadStatus:status:" + status)
+      status
+    }
+  }
+
+  private def etmpReadStatus(amlsRefNumber: String, accountTypeId: (String, String))
+                            (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ReadStatusResponse] = {
+    {
+      val status = amlsConnector.status(amlsRefNumber, accountTypeId)
       Logger.debug("StatusService:etmpReadStatus:status:" + status)
       status
     }

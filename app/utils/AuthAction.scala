@@ -21,14 +21,14 @@ import java.net.URLEncoder
 import config.ApplicationConfig
 import javax.inject.Inject
 import models.ReturnLocation
-import play.api.mvc._
+import play.api.Logger
 import play.api.mvc.Results.Redirect
+import play.api.mvc._
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.HeaderCarrierConverter
-import play.api.{Logger}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -38,13 +38,13 @@ final case class AuthorisedRequest[A](request: Request[A],
                                       affinityGroup: AffinityGroup,
                                       enrolments: Enrolments,
                                       accountTypeId: (String, String),
-                                      groupIdentifier: Option[String]) extends WrappedRequest[A](request)
+                                      groupIdentifier: Option[String],
+                                      credentialRole: Option[CredentialRole]) extends WrappedRequest[A](request)
 
 final case class enrolmentNotFound(msg: String = "enrolmentNotFound") extends AuthorisationException(msg)
 
-class DefaultAuthAction @Inject() (
-                                    val authConnector: AuthConnector
-                                  )(implicit ec: ExecutionContext) extends AuthAction with AuthorisedFunctions {
+class DefaultAuthAction @Inject() (val authConnector: AuthConnector)
+                                  (implicit ec: ExecutionContext) extends AuthAction with AuthorisedFunctions {
 
   private val amlsKey = "HMRC-MLR-ORG"
   private val amlsNumberKey = "MLRRefNumber"
@@ -63,9 +63,10 @@ class DefaultAuthAction @Inject() (
       Retrievals.allEnrolments and
         Retrievals.credentials and
         Retrievals.affinityGroup and
-        Retrievals.groupIdentifier
+        Retrievals.groupIdentifier and
+        Retrievals.credentialRole
     ) {
-      case enrolments ~ Some(credentials) ~ Some(affinityGroup) ~ groupIdentifier =>
+      case enrolments ~ Some(credentials) ~ Some(affinityGroup) ~ groupIdentifier ~ credentialRole =>
         Logger.debug("DefaultAuthAction:Refine - Enrolments:" + enrolments)
 
         Future.successful(
@@ -77,7 +78,8 @@ class DefaultAuthAction @Inject() (
               affinityGroup,
               enrolments,
               accountTypeAndId(affinityGroup, enrolments, credentials.providerId),
-              groupIdentifier
+              groupIdentifier,
+              credentialRole
             )
           )
         )
@@ -112,7 +114,7 @@ class DefaultAuthAction @Inject() (
     }
   }
 
-  private def amlsRefNo(enrolments: Enrolments):Option[String] = {
+  private def amlsRefNo(enrolments: Enrolments): Option[String] = {
     val amlsRefNumber = for {
       enrolment      <- enrolments.getEnrolment(amlsKey)
       amlsIdentifier <- enrolment.getIdentifier(amlsNumberKey)

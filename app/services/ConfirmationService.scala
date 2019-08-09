@@ -37,10 +37,9 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ConfirmationService @Inject()(
-                                     val cacheConnector: DataCacheConnector
-                                   ) extends DataCacheService {
+class ConfirmationService @Inject()(val cacheConnector: DataCacheConnector) extends DataCacheService {
 
+  @deprecated("to be removed after new auth completely implemented")
   def getSubscription
   (implicit
    ec: ExecutionContext,
@@ -69,6 +68,31 @@ class ConfirmationService @Inject()(
     }
   }
 
+  def getSubscription(credId: String)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Seq[BreakdownRow]] = {
+
+    cacheConnector.fetchAll(credId) flatMap {
+      maybeCache =>
+        (for {
+          cache <- maybeCache
+          subscription <- cache.getEntry[SubscriptionResponse](SubscriptionResponse.key)
+          premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
+          people <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
+          businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+          businessActivities <- businessMatching.activities
+        } yield {
+          Future.successful(
+            BreakdownRows.generateBreakdownRows[SubmissionResponse](
+              subscription,
+              Some(businessActivities),
+              Some(premises),
+              Some(people)
+            )
+          )
+        }) getOrElse Future.failed(new Exception("Cannot get subscription response"))
+    }
+  }
+
+  @deprecated("to be removed after new auth completely implemented")
   def getAmendment
   (implicit
    ec: ExecutionContext,
@@ -100,6 +124,34 @@ class ConfirmationService @Inject()(
     }
   }
 
+  def getAmendment(credId: String)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Option[Seq[BreakdownRow]]] = {
+
+    cacheConnector.fetchAll(credId) flatMap {
+      maybeCache =>
+        (for {
+          cache <- maybeCache
+          amendmentResponse <- cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
+          premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
+          people <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
+          businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+          businessActivities <- businessMatching.activities
+        } yield {
+          val filteredPremises = TradingPremises.filter(premises)
+          Future.successful(
+            Some(
+              BreakdownRows.generateBreakdownRows[SubmissionResponse](
+                amendmentResponse,
+                Some(businessActivities),
+                Some(filteredPremises),
+                Some(people)
+              )
+            )
+          )
+        }) getOrElse OptionT.liftF(getSubscription(credId)).value
+    }
+  }
+
+  @deprecated("to be removed after new auth completely implemented")
   def getVariation
   (implicit
    ec: ExecutionContext,
@@ -128,6 +180,30 @@ class ConfirmationService @Inject()(
     }
   }
 
+  def getVariation(credId: String)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Option[Seq[BreakdownRow]]] = {
+    cacheConnector.fetchAll(credId) flatMap {
+      maybeCache =>
+        (for {
+          cache <- maybeCache
+          variationResponse <- cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
+          businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+          businessActivities <- businessMatching.activities
+        } yield {
+          Future.successful(
+            Some(
+              BreakdownRows.generateBreakdownRows[AmendVariationRenewalResponse](
+                variationResponse,
+                Some(businessActivities),
+                None,
+                None
+              )
+            )
+          )
+        }) getOrElse Future.failed(new Exception("Cannot get subscription response"))
+    }
+  }
+
+  @deprecated("to be removed after new auth completely implemented")
   def getRenewal
   (implicit
    ec: ExecutionContext,
@@ -156,9 +232,38 @@ class ConfirmationService @Inject()(
     }
   }
 
+  def getRenewal(credId: String)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Option[Seq[BreakdownRow]]] = {
+
+    cacheConnector.fetchAll(credId) flatMap {
+      maybeCache =>
+        (for {
+          cache <- maybeCache
+          renewal <- cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
+          businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+          businessActivities <- businessMatching.activities
+        } yield {
+          Future.successful(
+            Some(
+              BreakdownRows.generateBreakdownRows[AmendVariationRenewalResponse](
+                renewal,
+                Some(businessActivities),
+                None,
+                None
+              )
+            )
+          )
+        }) getOrElse Future.failed(new Exception("Cannot get amendment response"))
+    }
+  }
+
+  @deprecated("to be removed after new auth completely implemented")
   def isRenewalDefined(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Boolean] =
     cacheConnector.fetch[Renewal](Renewal.key).map(_.isDefined)
 
+  def isRenewalDefined(credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =
+    cacheConnector.fetch[Renewal](credId, Renewal.key).map(_.isDefined)
+
+  @deprecated("to be removed after new auth completely implemented")
   def getBreakdownRows(status: SubmissionStatus, feeResponse: FeeResponse)
                       (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Option[Seq[BreakdownRow]]] =
     (status match {
@@ -169,6 +274,20 @@ class ConfirmationService @Inject()(
         case false => getVariation
       }
       case _ => getSubscription map (Some(_))
+    }).recover({
+      case _ => None
+    })
+
+  def getBreakdownRows(credId: String, status: SubmissionStatus, feeResponse: FeeResponse)
+                      (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Seq[BreakdownRow]]] =
+    (status match {
+      case SubmissionReadyForReview if feeResponse.responseType equals AmendOrVariationResponseType => getAmendment(credId)
+      case SubmissionDecisionApproved => getVariation(credId)
+      case ReadyForRenewal(_) | RenewalSubmitted(_) => isRenewalDefined(credId) flatMap {
+        case true => getRenewal(credId)
+        case false => getVariation(credId)
+      }
+      case _ => getSubscription(credId) map (Some(_))
     }).recover({
       case _ => None
     })

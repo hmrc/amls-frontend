@@ -35,7 +35,7 @@ import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.auth.core.AffinityGroup.Individual
-import uk.gov.hmrc.auth.core.Enrolments
+import uk.gov.hmrc.auth.core.{Enrolments, User}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, AuthorisedRequest, DependencyMocksNewAuth}
@@ -426,7 +426,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
     "the dateOfChange action is called" must {
 
       "show the correct view" in new Fixture {
-        val authorisedRequest = AuthorisedRequest(request, Some("REF"), "CREDID", Individual, Enrolments(Set()), ("TYPE", "ID"), Some("GROUPID"))
+        val authorisedRequest = AuthorisedRequest(request, Some("REF"), "CREDID", Individual, Enrolments(Set()), ("TYPE", "ID"), Some("GROUPID"), Some(User))
         implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
         val result = whatDoesYourBusinessDoController.dateOfChange(1)(authorisedRequest)
         status(result) must be(OK)
@@ -446,7 +446,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
           "dateOfChange.day" -> "01"
         )
 
-        val authorisedRequest = AuthorisedRequest(postRequest, Some("REF"), "CREDID", Individual, Enrolments(Set()), ("TYPE", "ID"), Some("GROUPID"))
+        val authorisedRequest = AuthorisedRequest(postRequest, Some("REF"), "CREDID", Individual, Enrolments(Set()), ("TYPE", "ID"), Some("GROUPID"), Some(User))
 
         val data = WhatDoesYourBusinessDo(Set(AccountancyServices))
         val expectedData = WhatDoesYourBusinessDo(data.activities, dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))

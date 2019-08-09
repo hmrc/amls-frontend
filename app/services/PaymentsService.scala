@@ -46,6 +46,7 @@ class PaymentsService @Inject()(val amlsConnector: AmlsConnector,
     }
 
   //noinspection ScalaStyle
+  @deprecated("to be removed when new auth implemented")
   def paymentsUrlOrDefault(paymentReference: String, amount: Double, returnUrl: String, amlsRefNo: String, safeId: String)
                           (implicit hc: HeaderCarrier, ec: ExecutionContext, authContext: AuthContext, request: Request[_]): Future[NextUrl] = {
 
@@ -54,6 +55,22 @@ class PaymentsService @Inject()(val amlsConnector: AmlsConnector,
     paymentsConnector.createPayment(CreatePaymentRequest("other", paymentReference, "AMLS Payment", amountInPence, ReturnLocation(returnUrl))) flatMap {
       case Some(response) =>
         savePaymentBeforeResponse(response, amlsRefNo, safeId).map(_ => response.nextUrl)
+      case _ =>
+        // $COVERAGE-OFF$
+        Logger.warn("[ConfirmationController.requestPaymentUrl] Did not get a redirect url from the payments service; using configured default")
+        // $COVERAGE-ON$
+        Future.successful(NextUrl(ApplicationConfig.paymentsUrl))
+    }
+  }
+
+  def paymentsUrlOrDefault(paymentReference: String, amount: Double, returnUrl: String, amlsRefNo: String, safeId: String, accountTypeId: (String, String))
+                          (implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[NextUrl] = {
+
+    val amountInPence = (amount * 100).toInt
+
+    paymentsConnector.createPayment(CreatePaymentRequest("other", paymentReference, "AMLS Payment", amountInPence, ReturnLocation(returnUrl))) flatMap {
+      case Some(response) =>
+        savePaymentBeforeResponse(response, amlsRefNo, safeId, accountTypeId).map(_ => response.nextUrl)
       case _ =>
         // $COVERAGE-OFF$
         Logger.warn("[ConfirmationController.requestPaymentUrl] Did not get a redirect url from the payments service; using configured default")
@@ -80,6 +97,15 @@ class PaymentsService @Inject()(val amlsConnector: AmlsConnector,
                                        (implicit hc: HeaderCarrier, authContext: AuthContext): Future[Unit] = {
       amlsConnector
         .savePayment(response.journeyId, amlsRefNo, safeId)
+        .recover {
+          case e => throw new Exception(s"Payment details failed to save. [paymentId:${response.journeyId}]", e)
+        }.map(_ =>())
+  }
+
+  private def savePaymentBeforeResponse(response: CreatePaymentResponse, amlsRefNo: String, safeId: String, accountTypeId: (String, String))
+                                       (implicit hc: HeaderCarrier): Future[Unit] = {
+      amlsConnector
+        .savePayment(response.journeyId, amlsRefNo, safeId, accountTypeId)
         .recover {
           case e => throw new Exception(s"Payment details failed to save. [paymentId:${response.journeyId}]", e)
         }.map(_ =>())

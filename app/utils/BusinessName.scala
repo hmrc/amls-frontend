@@ -31,7 +31,6 @@ object BusinessName {
 
   private val warn: String => Unit = msg => Logger.warn(s"[BusinessName] $msg")
 
-
   @deprecated("To be removed when auth implementation is complete")
   def getNameFromCache(implicit hc: HeaderCarrier, ac: AuthContext, cache: DataCacheConnector, ec: ExecutionContext): OptionT[Future, String] =
     for {
@@ -84,16 +83,28 @@ object BusinessName {
              (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext, cache: DataCacheConnector, amls: AmlsConnector) =
     safeId.fold(getNameFromCache)(v => getNameFromAmls(v) orElse getNameFromCache)
 
-  def getBusinessNameFromAmls()(implicit hc: HeaderCarrier,
-                                context: AuthContext,
-                                amls: AmlsConnector,
-                                ec: ExecutionContext,
-                                dc: DataCacheConnector,
-                                statusService: StatusService) = {
+  def getName(credId: String, safeId: Option[String], accountTypeId: (String, String))
+             (implicit hc: HeaderCarrier, ec: ExecutionContext, cache: DataCacheConnector, amls: AmlsConnector) =
+    safeId.fold(getNameFromCache(credId))(v => getNameFromAmls(accountTypeId, v) orElse getNameFromCache(credId))
+
+  @deprecated("To be removed when auth implementation is complete")
+  def getBusinessNameFromAmls()(implicit hc: HeaderCarrier, context: AuthContext, amls: AmlsConnector,
+                                ec: ExecutionContext, dc: DataCacheConnector, statusService: StatusService) = {
     for {
       (_, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus)
       businessName <- detailedStatus.fold[OptionT[Future, String]](OptionT.some("")) { r =>
         BusinessName.getName(r.safeId)
+      } orElse OptionT.some("")
+    } yield businessName
+  }
+
+  def getBusinessNameFromAmls(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)
+                             (implicit hc: HeaderCarrier, amls: AmlsConnector, ec: ExecutionContext,
+                              dc: DataCacheConnector, statusService: StatusService) = {
+    for {
+      (_, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus(amlsRegistrationNumber, accountTypeId, cacheId))
+      businessName <- detailedStatus.fold[OptionT[Future, String]](OptionT.some("")) { r =>
+        BusinessName.getName(cacheId, r.safeId, accountTypeId)
       } orElse OptionT.some("")
     } yield businessName
   }

@@ -18,7 +18,7 @@ package controllers.actions
 
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{Call, Request, Result}
-import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolment, Enrolments}
+import uk.gov.hmrc.auth.core._
 import utils.{AuthAction, AuthorisedRequest}
 
 import scala.concurrent.Future
@@ -29,7 +29,25 @@ object SuccessfulAuthAction extends AuthAction {
   val enrolments = Enrolments(Set(Enrolment("HMRC-MLR-ORG")))
 
   override protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] =
-    Future.successful(Right(AuthorisedRequest(request, Some("amlsRefNumber"), "internalId", affinityGroup, enrolments, ("accType", "id"), Some("GROUP_ID"))))
+    Future.successful(Right(AuthorisedRequest(request, Some("amlsRefNumber"), "internalId", affinityGroup, enrolments, ("accType", "id"), Some("GROUP_ID"), Some(User))))
+}
+
+object SuccessfulAuthActionNoAmlsRefNo extends AuthAction {
+
+  val affinityGroup = AffinityGroup.Organisation
+  val enrolments = Enrolments(Set(Enrolment("HMRC-MLR-ORG")))
+
+  override protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] =
+    Future.successful(Right(AuthorisedRequest(request, None, "internalId", affinityGroup, enrolments, ("accType", "id"), Some("GROUP_ID"), Some(User))))
+}
+
+object SuccessfulAuthActionNoUserRole extends AuthAction {
+
+  val affinityGroup = AffinityGroup.Organisation
+  val enrolments = Enrolments(Set(Enrolment("HMRC-MLR-ORG")))
+
+  override protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] =
+    Future.successful(Right(AuthorisedRequest(request, Some("amlsRefNumber"), "internalId", affinityGroup, enrolments, ("accType", "id"), Some("GROUP_ID"), Some(Assistant))))
 }
 
 object FailedAuthAction extends AuthAction {

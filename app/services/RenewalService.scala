@@ -53,7 +53,8 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
       case _ => Future.successful(notStarted)
     }
   }
-@deprecated("To be removed when auth upgrade is implemented")
+
+  @deprecated("To be removed when auth upgrade is implemented")
   def getRenewal(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, ec: ExecutionContext) =
     dataCache.fetch[Renewal](Renewal.key)
 
@@ -63,10 +64,36 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
   def updateRenewal(renewal: Renewal)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, ec: ExecutionContext) =
     dataCache.save[Renewal](Renewal.key, renewal)
 
+  @deprecated("To be removed when auth upgrade is implemented")
   def isRenewalComplete(renewal: Renewal)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, ec: ExecutionContext) = {
 
     val isComplete = for {
       cache <- OptionT(dataCache.fetchAll)
+      businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
+      activities <- OptionT.fromOption[Future](businessMatching.activities)
+    } yield {
+
+      activities.businessActivities collect {
+        case MoneyServiceBusiness => checkCompletionOfMsb(renewal, businessMatching.msbServices)
+        case HighValueDealing => checkCompletionOfHvd(renewal)
+        case AccountancyServices => checkCompletionOfAsp(renewal)
+      } match {
+        case s if s.nonEmpty => s.forall(identity)
+
+        case _ => standardRule.validate(renewal) match {
+          case Valid(_) => true
+          case _ => false
+        }
+      }
+    }
+
+    isComplete.getOrElse(false)
+  }
+
+  def isRenewalComplete(renewal: Renewal, cacheId: String)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext) = {
+
+    val isComplete = for {
+      cache <- OptionT(dataCache.fetchAll(cacheId))
       businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
       activities <- OptionT.fromOption[Future](businessMatching.activities)
     } yield {

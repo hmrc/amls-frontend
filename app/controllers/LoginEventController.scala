@@ -18,14 +18,14 @@ package controllers
 
 import javax.inject.{Inject, Singleton}
 import play.api.mvc.{Action, AnyContent}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.login_event
 import scala.concurrent.Future
 
 @Singleton
-class LoginEventController @Inject()(val authConnector: AuthConnector) extends BaseController {
+class LoginEventController @Inject()(authAction: AuthAction) extends DefaultBaseController {
 
-  def get: Action[AnyContent] = Authorised.async {
-    implicit authContext => implicit request => Future(Ok(login_event()))
+  def get: Action[AnyContent] = authAction.async {
+    implicit request => Future(Ok(login_event()))
   }
 }

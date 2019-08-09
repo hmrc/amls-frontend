@@ -41,7 +41,7 @@ class ProgressService @Inject()(
 
 
 
-@deprecated("Remove once auth upgarde is in place")
+  @deprecated("Remove once auth upgarde is in place")
   def getSubmitRedirect (implicit auth: AuthContext,  ec: ExecutionContext, hc: HeaderCarrier) : Future[Option[Call]] = {
 
     val result: OptionT[Future, Option[Call]] = for {
@@ -59,7 +59,8 @@ class ProgressService @Inject()(
     result getOrElse none[Call]
   }
 
-  def getSubmitRedirect (amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)(implicit ec: ExecutionContext, hc: HeaderCarrier) : Future[Option[Call]] = {
+  def getSubmitRedirect (amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)
+                        (implicit ec: ExecutionContext, hc: HeaderCarrier) : Future[Option[Call]] = {
 
     val result: OptionT[Future, Option[Call]] = for {
       status <- OptionT.liftF(statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId))

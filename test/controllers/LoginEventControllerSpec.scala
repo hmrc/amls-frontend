@@ -17,6 +17,7 @@
 package controllers
 
 import connectors.{DataCacheConnector, KeystoreConnector}
+import controllers.actions.SuccessfulAuthAction
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.Application
@@ -24,8 +25,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Result
 import play.api.test.Helpers.{OK, status, _}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
@@ -37,7 +37,7 @@ class LoginEventControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
     lazy val defaultBuilder: GuiceApplicationBuilder = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
 
     val builder: GuiceApplicationBuilder = defaultBuilder
