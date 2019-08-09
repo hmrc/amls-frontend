@@ -16,24 +16,24 @@
 
 package controllers.businessmatching.updateservice.remove
 
-import models.DateOfChange
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.HighValueDealing
-import models.flowmanagement.{AddBusinessTypeFlowModel, NeedMoreInformationPageId, NeedToUpdatePageId, RemoveBusinessTypeFlowModel}
+import models.flowmanagement.{NeedToUpdatePageId, RemoveBusinessTypeFlowModel}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import play.api.i18n.Messages
 import play.api.test.Helpers.{OK, contentAsString, status, _}
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 class NeedMoreInformationControllerSpec extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
 
     val request = addToken(authRequest)
 
     val controller = new NeedMoreInformationController(
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[RemoveBusinessTypeFlowModel]
     )
@@ -61,7 +61,7 @@ class NeedMoreInformationControllerSpec extends AmlsSpec {
         val result = controller.post()(request)
 
         status(result) mustBe SEE_OTHER
-        controller.router.verify(NeedToUpdatePageId, new RemoveBusinessTypeFlowModel())
+        controller.router.verify("internalId", NeedToUpdatePageId, new RemoveBusinessTypeFlowModel())
       }
     }
   }

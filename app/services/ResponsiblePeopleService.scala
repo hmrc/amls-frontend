@@ -31,8 +31,8 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class ResponsiblePeopleService @Inject()(val dataCacheConnector: DataCacheConnector) extends RepeatingSection {
 
-  def getAll(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext) =
-    dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key) map {
+  def getAll(credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext) =
+    dataCacheConnector.fetch[Seq[ResponsiblePerson]](credId, ResponsiblePerson.key) map {
       _.getOrElse(Seq.empty)
     }
 

@@ -46,7 +46,7 @@ class ChangeBusinessTypeRouterSpec extends AmlsSpec {
     val router = new ChangeBusinessTypeRouter(mockBusinessMatchingService)
 
     when {
-      mockBusinessMatchingService.getModel(any(), any(), any())
+      mockBusinessMatchingService.getModel(any())(any(), any())
     } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
       activities = Some(BusinessActivities(Set(BillPaymentServices, MoneyServiceBusiness)))
     ))
@@ -59,7 +59,7 @@ class ChangeBusinessTypeRouterSpec extends AmlsSpec {
       "the user is on the 'What do you want to do' page (ChangeServicesPageId) and " +
         "ChangeBusinessType is Add" in new Fixture {
 
-        val result = router.getRoute(ChangeBusinessTypesPageId, Add)
+        val result = router.getRoute("internalId", ChangeBusinessTypesPageId, Add)
 
         redirectLocation(result) mustBe Some(addRoutes.SelectBusinessTypeController.get().url)
 
@@ -71,7 +71,7 @@ class ChangeBusinessTypeRouterSpec extends AmlsSpec {
       "the user is on the 'What do you want to do' page (ChangeServicesPageId)" +
         " and selects Remove and has more than one Business Type" in new Fixture {
 
-        val result = await(router.getRoute(ChangeBusinessTypesPageId, Remove))
+        val result = await(router.getRoute("internalId", ChangeBusinessTypesPageId, Remove))
 
         result mustBe Redirect(removeRoutes.RemoveBusinessTypesController.get())
       }
@@ -83,12 +83,12 @@ class ChangeBusinessTypeRouterSpec extends AmlsSpec {
         " and selects Remove and has only one Business Type" in new Fixture {
 
         when {
-          mockBusinessMatchingService.getModel(any(), any(), any())
+          mockBusinessMatchingService.getModel(any())(any(), any())
         } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
           activities = Some(BusinessActivities(Set(BillPaymentServices)))
         ))
 
-        val result = router.getRoute(ChangeBusinessTypesPageId, Remove)
+        val result = router.getRoute("internalId", ChangeBusinessTypesPageId, Remove)
 
         redirectLocation(result) mustBe Some(removeRoutes.UnableToRemoveBusinessTypesController.get().url)
       }

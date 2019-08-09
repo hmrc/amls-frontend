@@ -34,9 +34,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class FitAndProperPageRouter @Inject()(val statusService: StatusService,
                                        val businessMatchingService: BusinessMatchingService) extends PageRouter[AddBusinessTypeFlowModel] {
 
-  override def getPageRoute(model: AddBusinessTypeFlowModel, edit: Boolean = false)
-                           (implicit ac: AuthContext,
-                            hc: HeaderCarrier,
+  override def getRoute(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)
+                       (implicit hc: HeaderCarrier,
                             ec: ExecutionContext
 
                            ): Future[Result] = {
