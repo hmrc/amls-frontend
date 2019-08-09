@@ -104,8 +104,6 @@ object ServicesOfBusiness {
        (__ \ "services").read(minLengthR[Set[Service]](1).withMessage("error.required.asp.business.services")) .flatMap(ServicesOfBusiness(_, None))
   }
 
-
-
   implicit def formWrites
   (implicit
    w: Write[Service, String]
