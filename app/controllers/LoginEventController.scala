@@ -20,7 +20,6 @@ import javax.inject.{Inject, Singleton}
 import play.api.mvc.{Action, AnyContent}
 import utils.AuthAction
 import views.html.login_event
-
 import scala.concurrent.Future
 
 @Singleton

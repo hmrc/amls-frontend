@@ -18,16 +18,13 @@ package controllers
 
 import cats.data.OptionT
 import cats.implicits._
-import config.AppConfig
 import connectors.{AmlsConnector, DataCacheConnector, _}
 import javax.inject.{Inject, Singleton}
 import models.businessdetails.{BusinessDetails, PreviouslyRegisteredYes}
 import services.{AuthEnrolmentsService, StatusService}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthAction, BusinessName, ControllerHelper}
+import utils.{AuthAction, BusinessName}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 @Singleton
 class BacsConfirmationController @Inject()(authAction: AuthAction,

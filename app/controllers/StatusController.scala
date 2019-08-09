@@ -18,7 +18,6 @@ package controllers
 
 import cats.data.OptionT
 import cats.implicits._
-import config.{AMLSAuthConnector, AppConfig}
 import connectors.{AmlsConnector, AuthenticatorConnector, DataCacheConnector, _}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessActivities, BusinessMatching}
@@ -29,8 +28,6 @@ import org.joda.time.LocalDate
 import play.api.mvc.{AnyContent, Request, Result}
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthAction, BusinessName, ControllerHelper}
 import views.html.status._
 

@@ -18,20 +18,17 @@ package controllers
 
 import cats.data.OptionT
 import cats.implicits._
-import config.AppConfig
 import connectors.{AmlsConnector, DataCacheConnector, KeystoreConnector, _}
 import javax.inject.{Inject, Singleton}
 import models.ResponseType.AmendOrVariationResponseType
 import models.confirmation.{BreakdownRow, Currency}
 import models.status._
-import models.{FeeResponse, ReadStatusResponse, SubmissionRequestStatus}
+import models.{FeeResponse, SubmissionRequestStatus}
 import play.api.Logger
 import play.api.mvc.{AnyContent, Request, Result}
 import services.{AuthEnrolmentsService, FeeResponseService, StatusService, _}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthAction, BusinessName, ControllerHelper}
+import utils.{AuthAction, BusinessName}
 import views.html.confirmation._
 
 import scala.concurrent.ExecutionContext.Implicits.global

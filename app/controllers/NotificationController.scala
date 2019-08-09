@@ -29,8 +29,6 @@ import play.twirl.api.Template3
 import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, NotificationService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthAction, BusinessName}
 
 import scala.concurrent.ExecutionContext.Implicits.global

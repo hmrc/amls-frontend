@@ -66,7 +66,6 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
              reqW: Writes[ReadStatusResponse],
              ac: AuthContext): Future[ReadStatusResponse] = {
 
-    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
     val getUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/status"
@@ -198,7 +197,6 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
   def savePayment(paymentId: String, amlsRefNo: String, safeId: String)
                  (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[HttpResponse] = {
 
-    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
     val postUrl = s"$paymentUrl/$accountType/$accountId/$amlsRefNo/$safeId"
 
@@ -221,7 +219,7 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
   @deprecated("to be removed after new auth changes implemented")
   def getPaymentByPaymentReference(paymentReference: String)
                                   (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[Option[Payment]] = {
-    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
+
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
     val getUrl = s"$paymentUrl/$accountType/$accountId/payref/$paymentReference"
 
@@ -277,7 +275,7 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
   }
 
   def registrationDetails(accountTypeId: (String, String), safeId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[RegistrationDetails] = {
-    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
+
     val getUrl = s"$registrationUrl/${accountTypeId._1}/${accountTypeId._2}/details/$safeId"
 
     httpGet.GET[RegistrationDetails](getUrl)
@@ -285,7 +283,7 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
 
   @deprecated("To be removed when auth implementation is complete")
   def registrationDetails(safeId: String)(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[RegistrationDetails] = {
-    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
+
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
     val getUrl = s"$registrationUrl/$accountType/$accountId/details/$safeId"
 
