@@ -18,7 +18,7 @@
 @import forms2._
 @import forms.EmptyForm
 @import models.tradingpremises._
-@import models.businessmatching.MoneyServiceBusiness
+@import models.businessmatching.{MoneyServiceBusiness, BusinessActivity => BMbusinessActivities}
 @import utils._
 
 @(model: TradingPremises, isMsb: Boolean, index: Int, hasOneService: Boolean, hasOneMsbService: Boolean = None)(implicit request: Request[_], m: Messages, lang: Lang)
@@ -161,7 +161,9 @@
                 } else ""
             ) {
                 <ul class="list">
-                    @ba.activities.toList.sortBy(_.getMessage()).map(_.getMessage())
+                    @ba.activities.toList.sortBy(_.toString).map { a =>
+                        <li>@a.getMessage()</li>
+                    }
                 </ul>
             }
         }
