@@ -66,7 +66,7 @@ class VATRegisteredController @Inject () (
             }
           } yield (businessType, edit) match {
             case (_,true) => Redirect(routes.SummaryController.get())
-            case (Some(LimitedCompany | LPrLLP), _) => Redirect(routes.CorporationTaxRegisteredController.get(edit))
+            case (Some(LimitedCompany | LPrLLP), _) => Redirect(routes.CorporationTaxRegisteredController.get())
             case (_, false) => Redirect(routes.ConfirmRegisteredOfficeController.get(edit))
           }
 
