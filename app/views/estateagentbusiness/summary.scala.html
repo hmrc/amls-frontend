@@ -36,7 +36,7 @@
             editUrl = controllers.estateagentbusiness.routes.BusinessServicesController.get(true).toString
         ) {
             <ul>
-            @a.services.toList.sortBy(_.toString).map { line =>
+            @a.services.toList.sortBy(_.getMessage).map { line =>
                 <li>@line match {
                     case Residential => {@Messages("estateagentbusiness.service.lbl.01")}
                     case Commercial => {@Messages("estateagentbusiness.service.lbl.02")}
