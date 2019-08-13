@@ -204,7 +204,7 @@
 }
 
 @submitButton(linkText: String) = {
-@form(f, controllers.businessmatching.routes.SummaryController.post()) {
+  @form(f, controllers.businessmatching.routes.SummaryController.post()) {
     @submit(false, Some(Messages(linkText)), returnLink = false, buttonId = Some("submit-button"))
-}
+  }
 }
