@@ -23,7 +23,7 @@ import javax.inject.{Inject, Singleton}
 import models.ResponseType.AmendOrVariationResponseType
 import models.confirmation.{BreakdownRow, Currency}
 import models.status._
-import models.{FeeResponse, ReadStatusResponse, SubmissionRequestStatus}
+import models.{FeeResponse, SubmissionRequestStatus}
 import play.api.Logger
 import play.api.mvc.{AnyContent, Request, Result}
 import services.{AuthEnrolmentsService, FeeResponseService, StatusService, _}
@@ -114,9 +114,6 @@ class ConfirmationController @Inject()(
                               (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent], statusService: StatusService): Future[Result] = {
 
     Logger.debug(s"[$prefix][resultFromStatus] - Begin get fee response...)")
-
-    def companyName(maybeStatus: Option[ReadStatusResponse]): OptionT[Future, String] =
-      maybeStatus.fold[OptionT[Future, String]](OptionT.some("")) { r => BusinessName.getNameFromAmls(r.safeId.get) }
 
     OptionT.liftF(retrieveFeeResponse) flatMap {
       case Some(fees) if fees.paymentReference.isDefined && fees.toPay(status, submissionRequestStatus) > 0 =>

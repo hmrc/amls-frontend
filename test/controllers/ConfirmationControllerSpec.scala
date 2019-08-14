@@ -21,16 +21,14 @@ import generators.submission.SubscriptionResponseGenerator
 import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import models.businesscustomer.{Address, ReviewDetails}
-import models.businessdetails.{BusinessDetails, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
+import models.businessdetails.{BusinessDetails, PreviouslyRegisteredNo}
 import models.businessmatching.BusinessMatching
 import models.confirmation.{BreakdownRow, Currency}
-import models.payments.PaymentStatuses.{Cancelled, Created, Failed}
 import models.payments._
 import models.registrationdetails.RegistrationDetails
-import models.renewal.{InvolvedInOtherNo, Renewal}
 import models.status.{SubmissionDecisionApproved, _}
 import models.{status => _, _}
-import org.joda.time.{DateTime, LocalDate, LocalDateTime}
+import org.joda.time.DateTime
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -40,7 +38,6 @@ import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future

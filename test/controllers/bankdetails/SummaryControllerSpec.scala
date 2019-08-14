@@ -17,16 +17,13 @@
 package controllers.bankdetails
 
 import models.bankdetails._
-import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
-import org.jsoup.Jsoup
+import models.status.SubmissionReady
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
-
-import scala.collection.JavaConversions._
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
@@ -60,6 +57,16 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       contentAsString(result) mustNot include("My IBAN Account")
     }
 
+    "redirect to RegistrationProgressController when BankDetails cannot be retrieved" in new Fixture {
+
+      mockCacheFetch[Seq[BankDetails]](None)
+      mockApplicationStatus(SubmissionReady)
+
+      val result = controller.get(1)(request)
+
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
+    }
 
     "load the summary page with correct text when IBAN" in new Fixture {
 

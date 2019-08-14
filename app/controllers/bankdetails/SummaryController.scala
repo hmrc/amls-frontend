@@ -48,8 +48,4 @@ class SummaryController @Inject()(
         case _: Throwable => Future.successful(InternalServerError("Unable to save data and get redirect link"))
       }
   }
-
-  private def hasBankAccount(bankDetails: Seq[BankDetails]): Boolean = {
-    bankDetails.exists(_.bankAccount.isDefined)
-  }
 }
