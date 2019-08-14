@@ -19,33 +19,24 @@ package controllers.responsiblepeople
 import javax.inject.{Inject, Singleton}
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.{BaseController, DefaultBaseController}
 import models.Country
 import models.responsiblepeople.{CountryOfBirth, PersonResidenceType, ResponsiblePerson}
 import services.AutoCompleteService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.country_of_birth
 
 import scala.concurrent.Future
 
 @Singleton
-class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
+class CountryOfBirthController @Inject()(authAction: AuthAction,
                                          val dataCacheConnector: DataCacheConnector,
-                                         val autoCompleteService: AutoCompleteService) extends RepeatingSection with BaseController {
+                                         val autoCompleteService: AutoCompleteService) extends RepeatingSection with DefaultBaseController {
 
-  private def getCountryOfBirth(countryOfBirth: Country): CountryOfBirth = {
-     if(countryOfBirth.code != "GB") {
-        CountryOfBirth(false, Some(countryOfBirth))
-      } else {
-        CountryOfBirth(true, None)
-      }
-  }
-
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext =>
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>
-        getData[ResponsiblePerson](index) map {
+        getData[ResponsiblePerson](request.credId, index) map {
           case Some(ResponsiblePerson(Some(personName),_,_,_,Some(personResidenceType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
             personResidenceType.countryOfBirth match {
               case Some(country) =>
@@ -66,25 +57,15 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
         }
   }
 
-  private def updateCountryOfBirth(personResidenceType: Option[PersonResidenceType], data: CountryOfBirth): Option[PersonResidenceType] = {
-    val countryOfBirth = if (data.bornInUk) {
-      Some(Country("United Kingdom", "GB"))
-    } else {
-      data.country
-    }
-    personResidenceType.fold[Option[PersonResidenceType]](None)(pType => Some(pType.copy(countryOfBirth = countryOfBirth)))
-  }
-
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext =>
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>
         Form2[CountryOfBirth](request.body) match {
-          case f: InvalidForm => getData[ResponsiblePerson](index) map { rp =>
+          case f: InvalidForm => getData[ResponsiblePerson](request.credId, index) map { rp =>
             BadRequest(country_of_birth(f, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
           }
           case ValidForm(_, data) => {
             for {
-              _ <- updateDataStrict[ResponsiblePerson](index) { rp =>
+              _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
                 rp.personResidenceType(updateCountryOfBirth(rp.personResidenceType, data))
               }
             } yield edit match {
@@ -95,5 +76,22 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
         }
+  }
+
+  private def getCountryOfBirth(countryOfBirth: Country): CountryOfBirth = {
+    if(countryOfBirth.code != "GB") {
+      CountryOfBirth(false, Some(countryOfBirth))
+    } else {
+      CountryOfBirth(true, None)
+    }
+  }
+
+  private def updateCountryOfBirth(personResidenceType: Option[PersonResidenceType], data: CountryOfBirth): Option[PersonResidenceType] = {
+    val countryOfBirth = if (data.bornInUk) {
+      Some(Country("United Kingdom", "GB"))
+    } else {
+      data.country
+    }
+    personResidenceType.fold[Option[PersonResidenceType]](None)(pType => Some(pType.copy(countryOfBirth = countryOfBirth)))
   }
 }
