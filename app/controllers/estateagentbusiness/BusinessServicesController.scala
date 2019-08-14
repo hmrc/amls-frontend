@@ -36,10 +36,11 @@ class BusinessServicesController @Inject()(
                                           val authConnector: AuthConnector,
                                           val dataCacheConnector: DataCacheConnector,
                                           val statusService: StatusService,
-                                          val serviceFlow: ServiceFlow
+                                          val serviceFlow: ServiceFlow,
+                                          authAction: AuthAction
                                           ) extends BaseController with DateOfChangeHelper {
 
-  def get(edit: Boolean = false) = Authorised.async {
+  def get(edit: Boolean = false) = authAction.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[EstateAgentBusiness](EstateAgentBusiness.key) map {
         response =>
