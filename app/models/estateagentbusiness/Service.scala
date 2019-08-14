@@ -23,10 +23,27 @@ import jto.validation.ValidationError
 import play.api.libs.json._
 import cats.data.Validated.{Invalid, Valid}
 import utils.TraversableValidators._
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
+import play.api.i18n.{Lang, Messages}
 
 case class Services(services: Set[Service], dateOfChange: Option[DateOfChange] = None)
 
-sealed trait Service
+sealed trait Service {
+  val message = "estateagentbusiness.service.lbl."
+  def getMessage(implicit lang: Lang): String =
+    this match {
+      case Residential => Messages(s"${message}01")
+      case Commercial => Messages(s"${message}02")
+      case Auction => Messages(s"${message}03")
+      case Relocation => Messages(s"${message}04")
+      case BusinessTransfer => Messages(s"${message}05")
+      case AssetManagement => Messages(s"${message}06")
+      case LandManagement => Messages(s"${message}07")
+      case Development => Messages(s"${message}08")
+      case SocialHousing => Messages(s"${message}09")
+    }
+}
 
 case object Commercial extends Service
 

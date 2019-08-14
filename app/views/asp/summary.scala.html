@@ -37,7 +37,7 @@
             editLinkTag = "aspservices-edit"
         ) {
             <ul class="list list--comma">
-            @a.services.toList.sortBy(_.toString).map { line =>
+            @a.services.toList.sortBy(_.getMessage).map { line =>
                 <li>@line match {
                     case Accountancy => {@Messages("asp.service.lbl.01")}
                     case PayrollServices => {@Messages("asp.service.lbl.02")}
@@ -60,7 +60,7 @@
             case OtherBusinessTaxMattersYes => { @Messages("lbl.yes") }
         }</p>
     }
-        @form(f, controllers.asp.routes.SummaryController.post()) {
+    @form(f, controllers.asp.routes.SummaryController.post()) {
         @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
     }
 }
