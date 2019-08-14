@@ -19,20 +19,20 @@
 @import models.businessmatching._
 @import config.{ApplicationConfig => appConfig}
 
-@(f: forms.Form2[_], model: BusinessMatching, changeActivitiesUrl: String, isPreSubmission: Boolean = true, isPending: Boolean = false)(implicit request: Request[_],messages:Messages)
+@(f: forms.Form2[_], model: BusinessMatching, changeActivitiesUrl: String, isPreSubmission: Boolean = true, isPending: Boolean = false)(implicit request: Request[_], messages: Messages)
 
 @header = {
-    @if(isPreSubmission) {
-        @heading("title.cya.pre.application", "summary.businessmatching")
-    }else {
-        @heading("title.cya", "summary.updateservice")
-    }
+@if(isPreSubmission) {
+    @heading("title.cya.pre.application", "summary.businessmatching")
+} else {
+    @heading("title.cya", "summary.updateservice")
+}
 }
 
 @main(
     title = if(isPreSubmission) {
         Messages("title.cya.pre.application") + " - " + Messages("summary.businessmatching")
-    }else {
+    } else {
         Messages("title.cya") + " - " + Messages("summary.updateservice")
     },
     heading = header
@@ -89,17 +89,31 @@
             editLinkTag = "businessactivities-edit"
         ) {
             <ul class="list">
-                @activity.businessActivities.toList.sortBy(_.toString).map { line =>
-                    <li>@line match {
-                        case AccountancyServices => {@Messages("businessmatching.registerservices.servicename.lbl.01")}
-                        case BillPaymentServices => {@Messages("businessmatching.registerservices.servicename.lbl.02")}
-                        case EstateAgentBusinessService => {@Messages("businessmatching.registerservices.servicename.lbl.03")}
-                        case HighValueDealing => {@Messages("businessmatching.registerservices.servicename.lbl.04")}
-                        case MoneyServiceBusiness => {@Messages("businessmatching.registerservices.servicename.lbl.05")}
-                        case TelephonePaymentService => {@Messages("businessmatching.registerservices.servicename.lbl.07")}
-                        case TrustAndCompanyServices => {@Messages("businessmatching.registerservices.servicename.lbl.06")}
-                    }</li>
-                }
+            @activity.businessActivities.toList.sortBy(_.getMessage()).map { line =>
+                <li>@line match {
+                    case AccountancyServices => {
+                        @Messages("businessmatching.registerservices.servicename.lbl.01")
+                    }
+                    case BillPaymentServices => {
+                        @Messages("businessmatching.registerservices.servicename.lbl.02")
+                    }
+                    case EstateAgentBusinessService => {
+                        @Messages("businessmatching.registerservices.servicename.lbl.03")
+                    }
+                    case HighValueDealing => {
+                        @Messages("businessmatching.registerservices.servicename.lbl.04")
+                    }
+                    case MoneyServiceBusiness => {
+                        @Messages("businessmatching.registerservices.servicename.lbl.05")
+                    }
+                    case TelephonePaymentService => {
+                        @Messages("businessmatching.registerservices.servicename.lbl.07")
+                    }
+                    case TrustAndCompanyServices => {
+                        @Messages("businessmatching.registerservices.servicename.lbl.06")
+                    }
+                }</li>
+            }
             </ul>
         }
 
@@ -109,19 +123,29 @@
                     question = Messages("businessmatching.services.title"),
                     allowEdit = !isPending,
                     editUrl = controllers.businessmatching.routes.MsbSubSectorsController.get(true).toString,
-                    editLinkTag="msbservices-edit"
+                    editLinkTag = "msbservices-edit"
                 ) {
                     <ul class="list">
-                    @services.msbServices.toList.sortBy(_.toString).map { svc =>
-                        <li>@svc match {
-                            case ChequeCashingNotScrapMetal => {@Messages("businessmatching.services.list.lbl.03")}
-                            case ChequeCashingScrapMetal => {@Messages("businessmatching.services.list.lbl.04")}
-                            case CurrencyExchange => {@Messages("businessmatching.services.list.lbl.02")}
-                            case ForeignExchange => {@Messages("businessmatching.services.list.lbl.05")}
-                            case TransmittingMoney => {@Messages("businessmatching.services.list.lbl.01")}
+                        @services.msbServices.toList.sortBy(_.getMessage).map { svc =>
+                        <li>
+                            @svc match {
+                                case ChequeCashingNotScrapMetal => {
+                                    @Messages("businessmatching.services.list.lbl.03")
+                                }
+                                case ChequeCashingScrapMetal => {
+                                    @Messages("businessmatching.services.list.lbl.04")
+                                }
+                                case CurrencyExchange => {
+                                    @Messages("businessmatching.services.list.lbl.02")
+                                }
+                                case ForeignExchange => {
+                                    @Messages("businessmatching.services.list.lbl.05")
+                                }
+                                case TransmittingMoney => {
+                                    @Messages("businessmatching.services.list.lbl.01")
+                                }
                         }</li>
-                    }
-                    </ul>
+                    }</ul>
                 }
 
                 @if(services.msbServices.contains(TransmittingMoney)) {
@@ -132,8 +156,12 @@
                             editLinkTag = "edit-psr-number"
                         ) {
                             <p id="psr">@psr match {
-                                case BusinessAppliedForPSRNumberNo => {@Messages("lbl.no")}
-                                case BusinessAppliedForPSRNumberYes(number) => {@Messages("businessmatching.psr.number.lbl"): @number}
+                                case BusinessAppliedForPSRNumberNo => {
+                                    @Messages("lbl.no")
+                                }
+                                case BusinessAppliedForPSRNumberYes(number) => {
+                                    @Messages("businessmatching.psr.number.lbl"): @number
+                                }
                             }</p>
                         }
                     }
@@ -176,7 +204,7 @@
 }
 
 @submitButton(linkText: String) = {
-    @form(f, controllers.businessmatching.routes.SummaryController.post()) {
-        @submit(false, Some(Messages(linkText)), returnLink = false, buttonId=Some("submit-button"))
-    }
+  @form(f, controllers.businessmatching.routes.SummaryController.post()) {
+    @submit(false, Some(Messages(linkText)), returnLink = false, buttonId = Some("submit-button"))
+  }
 }
