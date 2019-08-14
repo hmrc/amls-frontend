@@ -17,48 +17,25 @@
 package controllers.responsiblepeople
 
 import javax.inject.Inject
-
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businesscustomer.{Address => BusinessCustomerAddress}
 import models.businessmatching.BusinessMatching
 import models.responsiblepeople._
 import play.api.i18n.MessagesApi
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.confirm_address
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 
 class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
                                          val dataCacheConnector: DataCacheConnector,
-                                         val authConnector: AuthConnector)
-  extends RepeatingSection with BaseController {
+                                         authAction: AuthAction) extends RepeatingSection with DefaultBaseController {
 
-  def getAddress(businessMatching: BusinessMatching): Option[BusinessCustomerAddress] = {
-      businessMatching.reviewDetails.fold[Option[BusinessCustomerAddress]](None)(r => Some(r.businessAddress))
-  }
-
-  def updateAddressFromBM(bmOpt: Option[BusinessMatching]) : Option[ResponsiblePersonAddressHistory] = {
-    bmOpt match {
-      case Some(bm) => bm.reviewDetails.fold[Option[ResponsiblePersonAddressHistory]](None)(r => {
-        val UKAddress = PersonAddressUK(r.businessAddress.line_1,
-          r.businessAddress.line_2,
-          r.businessAddress.line_3,
-          r.businessAddress.line_4,
-          r.businessAddress.postcode.getOrElse(""))
-        val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, None)
-        Some(ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress)))
-      })
-      case _ => None
-    }
-  }
-
-  def get(index: Int) = Authorised.async {
-    implicit authContext =>
+  def get(index: Int) = authAction.async {
       implicit request =>
-        dataCacheConnector.fetchAll map {
+        dataCacheConnector.fetchAll(request.credId) map {
           optionalCache =>
             (for {
               cache <- optionalCache
@@ -69,22 +46,21 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
                 case true
                   => Redirect(routes.CurrentAddressController.get(index))
                 case _
-                  => {
+                  =>
                   getAddress(bm) match {
                     case Some(addr) => Ok(confirm_address(EmptyForm, addr, index, ControllerHelper.rpTitleName(Some(rp))))
                     case _ => Redirect(routes.CurrentAddressController.get(index))
                   }
-                }
               }
             }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
         }
   }
 
-  def post(index: Int) = Authorised.async {
-    implicit authContext => implicit request =>
+  def post(index: Int) = authAction.async {
+    implicit request =>
       Form2[ConfirmAddress](request.body) match {
         case f: InvalidForm =>
-          dataCacheConnector.fetchAll map {
+          dataCacheConnector.fetchAll(request.credId) map {
             optionalCache =>
               (for {
                 cache <- optionalCache
@@ -101,17 +77,36 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
         case ValidForm(_, data) =>
           data.confirmAddress match {
             case true => {
-              fetchAllAndUpdateStrict[ResponsiblePerson](index) { (cache, rp) =>
+              fetchAllAndUpdateStrict[ResponsiblePerson](request.credId, index) { (cache, rp) =>
                 rp.copy(addressHistory = updateAddressFromBM(cache.getEntry[BusinessMatching](BusinessMatching.key)))
               } map ( _ => Redirect(routes.TimeAtCurrentAddressController.get(index)))
             }
             case false => {
-              fetchAllAndUpdateStrict[ResponsiblePerson](index) { (cache, rp) =>
+              fetchAllAndUpdateStrict[ResponsiblePerson](request.credId, index) { (cache, rp) =>
                 rp.copy(addressHistory = None)
               } map ( _ => Redirect(routes.CurrentAddressController.get(index)))
             }
           }
       }
+  }
+
+  def getAddress(businessMatching: BusinessMatching): Option[BusinessCustomerAddress] = {
+    businessMatching.reviewDetails.fold[Option[BusinessCustomerAddress]](None)(r => Some(r.businessAddress))
+  }
+
+  def updateAddressFromBM(bmOpt: Option[BusinessMatching]) : Option[ResponsiblePersonAddressHistory] = {
+    bmOpt match {
+      case Some(bm) => bm.reviewDetails.fold[Option[ResponsiblePersonAddressHistory]](None)(r => {
+        val UKAddress = PersonAddressUK(r.businessAddress.line_1,
+          r.businessAddress.line_2,
+          r.businessAddress.line_3,
+          r.businessAddress.line_4,
+          r.businessAddress.postcode.getOrElse(""))
+        val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, None)
+        Some(ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress)))
+      })
+      case _ => None
+    }
   }
 
 }
