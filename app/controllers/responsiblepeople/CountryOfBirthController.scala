@@ -19,11 +19,10 @@ package controllers.responsiblepeople
 import javax.inject.{Inject, Singleton}
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import connectors.DataCacheConnector
-import controllers.{BaseController, DefaultBaseController}
+import controllers.DefaultBaseController
 import models.Country
 import models.responsiblepeople.{CountryOfBirth, PersonResidenceType, ResponsiblePerson}
 import services.AutoCompleteService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.country_of_birth
 
