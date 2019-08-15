@@ -17,26 +17,24 @@
 package controllers.hvd
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.DateOfChange
 import models.businessdetails.BusinessDetails
 import models.hvd.Hvd
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import utils.{DateOfChangeHelper, RepeatingSection}
 import views.html.date_of_change
 
 import scala.concurrent.Future
 
 class HvdDateOfChangeController @Inject() ( val dataCacheConnector: DataCacheConnector,
-                                            val authConnector: AuthConnector
-                                          ) extends RepeatingSection with BaseController with DateOfChangeHelper {
+                                            val authAction: AuthAction) extends RepeatingSection with DefaultBaseController with DateOfChangeHelper {
 
-  def get(redirect: String) = Authorised.async {
-      implicit authContext => implicit request =>
+  def get(redirect: String) = authAction.async {
+      implicit request =>
         Future.successful(Ok(date_of_change(EmptyForm, "summary.hvd", routes.HvdDateOfChangeController.post(redirect))))
   }
 
@@ -50,16 +48,16 @@ class HvdDateOfChangeController @Inject() ( val dataCacheConnector: DataCacheCon
     }
   }
 
-  def post(redirect: String) = Authorised.async {
-    implicit authContext => implicit request =>
-    getModelWithDateMap() flatMap {
+  def post(redirect: String) = authAction.async {
+    implicit request =>
+    getModelWithDateMap()flatMap {
       case (hvd, startDate) =>
       Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDate) match {
         case f: InvalidForm =>
       Future.successful(BadRequest(date_of_change(f, "summary.hvd", routes.HvdDateOfChangeController.post(redirect))))
         case ValidForm(_, data) =>
           for {
-          _ <- dataCacheConnector.save[Hvd](Hvd.key, compareAndUpdateDate(hvd , data))
+          _ <- dataCacheConnector.save[Hvd](request.credId, Hvd.key, compareAndUpdateDate(hvd , data))
           } yield {
             Redirect(DateOfChangeRedirect(redirect).call)
           }
@@ -67,8 +65,8 @@ class HvdDateOfChangeController @Inject() ( val dataCacheConnector: DataCacheCon
     }
   }
 
-  private def getModelWithDateMap()(implicit authContext: AuthContext, hc: HeaderCarrier): Future[(Hvd, Map[_ <: String, Seq[String]])] = {
-    dataCacheConnector.fetchAll map {
+  private def getModelWithDateMap()(implicit hc: HeaderCarrier): Future[(Hvd, Map[_ <: String, Seq[String]])] = {
+    dataCacheConnector.fetchAll(credId = "") map {
       optionalCache =>
         (for {
           cache <- optionalCache
