@@ -22,17 +22,19 @@ import forms._
 import javax.inject.Inject
 import models.estateagentbusiness.{EstateAgentBusiness, PenalisedUnderEstateAgentsAct}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.estateagentbusiness._
 
 import scala.concurrent.Future
 
 class PenalisedUnderEstateAgentsActController @Inject()(
                                                          val dataCacheConnector: DataCacheConnector,
+                                                         authAction: AuthAction,
                                                          val authConnector: AuthConnector) extends BaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[EstateAgentBusiness](EstateAgentBusiness.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[EstateAgentBusiness](request.credId, EstateAgentBusiness.key) map {
         response =>
           val form = (for {
             estateAgentBusiness <- response
@@ -42,14 +44,15 @@ class PenalisedUnderEstateAgentsActController @Inject()(
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+  def post(edit: Boolean = false) = authAction.async {
+     implicit request =>
       Form2[PenalisedUnderEstateAgentsAct](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(penalised_under_estate_agents_act(f, edit)))
         case ValidForm(_, data) =>
-          for {estateAgentBusiness <- dataCacheConnector.fetch[EstateAgentBusiness](EstateAgentBusiness.key)
+          for {estateAgentBusiness <- dataCacheConnector.fetch[EstateAgentBusiness](request.credId, EstateAgentBusiness.key)
                _ <- dataCacheConnector.save[EstateAgentBusiness](
+                 request.credId,
                  EstateAgentBusiness.key,
                  estateAgentBusiness.penalisedUnderEstateAgentsAct(data))
           } yield edit match {

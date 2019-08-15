@@ -21,18 +21,18 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.estateagentbusiness.{EstateAgentBusiness, ProfessionalBody}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.estateagentbusiness._
 
 import scala.concurrent.Future
 
 class PenalisedByProfessionalController @Inject()(
-                                                  val authConnector: AuthConnector,
-                                                  val dataCacheConnector: DataCacheConnector) extends BaseController {
+                                                   val authAction: AuthAction,
+                                                   val dataCacheConnector: DataCacheConnector) extends BaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[EstateAgentBusiness](EstateAgentBusiness.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[EstateAgentBusiness](request.credId, EstateAgentBusiness.key) map {
         response =>
           val form = (for {
             estateAgentBusiness <- response
@@ -42,15 +42,15 @@ class PenalisedByProfessionalController @Inject()(
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request =>
       Form2[ProfessionalBody](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(penalised_by_professional(f, edit)))
         case ValidForm(_, data) =>
           for {
-            estateAgentBusiness <- dataCacheConnector.fetch[EstateAgentBusiness](EstateAgentBusiness.key)
-            _ <- dataCacheConnector.save[EstateAgentBusiness](EstateAgentBusiness.key,
+            estateAgentBusiness <- dataCacheConnector.fetch[EstateAgentBusiness](request.credId,EstateAgentBusiness.key)
+            _ <- dataCacheConnector.save[EstateAgentBusiness](request.credId, EstateAgentBusiness.key,
               estateAgentBusiness.professionalBody(data))
           } yield Redirect(routes.SummaryController.get())
       }

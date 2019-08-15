@@ -33,14 +33,13 @@ import scala.concurrent.Future
 
 @Singleton
 class BusinessServicesController @Inject()(
-                                          val authConnector: AuthConnector,
-                                          val dataCacheConnector: DataCacheConnector,
-                                          val statusService: StatusService,
-                                          val serviceFlow: ServiceFlow,
-                                          authAction: AuthAction
+                                            val authConnector: AuthConnector,
+                                            val dataCacheConnector: DataCacheConnector,
+                                            val statusService: StatusService,
+                                            val serviceFlow: ServiceFlow
                                           ) extends BaseController with DateOfChangeHelper {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[EstateAgentBusiness](EstateAgentBusiness.key) map {
         response =>
