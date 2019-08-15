@@ -16,30 +16,33 @@
 
 package controllers.hvd
 
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.HighValueDealing
 import models.hvd.{ExciseGoods, Hvd}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DateOfChangeHelper, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DateOfChangeHelper, DependencyMocksNewAuth}
+
+import scala.concurrent.Future
 
 class ExciseGoodsControllerSpec extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self => val request = addToken(authRequest)
 
-    val controller = new ExciseGoodsController(
-      mockCacheConnector,
-      mockStatusService,
-      self.authConnector,
-      mockServiceFlow
-    )
+    val controller = new ExciseGoodsController(mockCacheConnector,
+                                                mockStatusService,
+                                                SuccessfulAuthAction,
+                                                mockServiceFlow)
 
     mockCacheFetch[Hvd](None)
     mockCacheSave[Hvd]
-    mockIsNewActivity(false)
+    mockIsNewActivityNewAuth(true, Some(HighValueDealing))
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -47,11 +50,12 @@ class ExciseGoodsControllerSpec extends AmlsSpec {
   "ExciseGoodsController" must {
 
     "successfully load UI for the first time" in new Fixture {
+
       val result = controller.get()(request)
       status(result) must be(OK)
 
       val htmlValue = Jsoup.parse(contentAsString(result))
-      htmlValue.title mustBe Messages("hvd.excise.goods.title") + " - " + Messages("summary.hvd") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
+      htmlValue.title mustBe Messages("hvd.excise.goods.title") + " - " + Messages("summary.hvd" + " - " + Messages("title.amls") + " - " + Messages("title.gov"))
     }
 
     "successfully load UI from mongoCache" in new Fixture {
@@ -160,7 +164,7 @@ class ExciseGoodsControllerSpec extends AmlsSpec {
           val newRequest = request.withFormUrlEncodedBody("exciseGoods" -> "true")
 
           mockApplicationStatus(SubmissionDecisionApproved)
-          mockIsNewActivity(true, Some(HighValueDealing))
+          mockIsNewActivityNewAuth(true, Some(HighValueDealing))
 
           val result = controller.post()(newRequest)
 
