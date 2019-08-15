@@ -36,8 +36,7 @@ class ExciseGoodsController @Inject() (val dataCacheConnector: DataCacheConnecto
                                        val authAction: AuthAction,
                                        val serviceFlow: ServiceFlow) extends DefaultBaseController with DateOfChangeHelper {
 
-  def get(edit: Boolean = false) =
-    authAction.async {
+  def get(edit: Boolean = false) = authAction.async {
         implicit request =>
           dataCacheConnector.fetch[Hvd](request.credId, Hvd.key) map {
             response =>
