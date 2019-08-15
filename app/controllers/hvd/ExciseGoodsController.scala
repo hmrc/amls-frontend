@@ -70,9 +70,9 @@ class ExciseGoodsController @Inject() (val dataCacheConnector: DataCacheConnecto
 
   private def getNextPage(redirect: Boolean, edit:Boolean): Call = {
     (redirect,  edit) match {
-      case (true, true) =>  routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers)
-      case (true, false) => routes.HvdDateOfChangeController.get(DateOfChangeRedirect.howWillYouSellGoods)
-      case (false, true) => routes.SummaryController.get()
+      case (true, true)   => routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers)
+      case (true, false)  => routes.HvdDateOfChangeController.get(DateOfChangeRedirect.howWillYouSellGoods)
+      case (false, true)  => routes.SummaryController.get()
       case (false, false) => routes.HowWillYouSellGoodsController.get()
     }
   }

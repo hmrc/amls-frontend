@@ -21,14 +21,10 @@ import models.businessmatching.HighValueDealing
 import models.hvd.{ExciseGoods, Hvd}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DateOfChangeHelper, DependencyMocksNewAuth}
-
-import scala.concurrent.Future
 
 class ExciseGoodsControllerSpec extends AmlsSpec {
 
@@ -42,7 +38,7 @@ class ExciseGoodsControllerSpec extends AmlsSpec {
 
     mockCacheFetch[Hvd](None)
     mockCacheSave[Hvd]
-    mockIsNewActivityNewAuth(true, Some(HighValueDealing))
+    mockIsNewActivityNewAuth(false)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -55,7 +51,7 @@ class ExciseGoodsControllerSpec extends AmlsSpec {
       status(result) must be(OK)
 
       val htmlValue = Jsoup.parse(contentAsString(result))
-      htmlValue.title mustBe Messages("hvd.excise.goods.title") + " - " + Messages("summary.hvd" + " - " + Messages("title.amls") + " - " + Messages("title.gov"))
+      htmlValue.title mustBe Messages("hvd.excise.goods.title") + " - " + Messages("summary.hvd") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
     }
 
     "successfully load UI from mongoCache" in new Fixture {
@@ -75,7 +71,7 @@ class ExciseGoodsControllerSpec extends AmlsSpec {
 
       val newRequest = request.withFormUrlEncodedBody("exciseGoods" -> "true")
 
-      mockApplicationStatus(SubmissionDecisionRejected)
+      mockApplicationStatusNewAuth(SubmissionDecisionRejected)
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -86,7 +82,7 @@ class ExciseGoodsControllerSpec extends AmlsSpec {
 
       val newRequest = request.withFormUrlEncodedBody("exciseGoods" -> "false")
 
-      mockApplicationStatus(SubmissionDecisionRejected)
+      mockApplicationStatusNewAuth(SubmissionDecisionRejected)
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -108,7 +104,7 @@ class ExciseGoodsControllerSpec extends AmlsSpec {
         val hvd = Hvd(exciseGoods = Some(ExciseGoods(true)))
         val newRequest = request.withFormUrlEncodedBody("exciseGoods" -> "false")
 
-        mockApplicationStatus(SubmissionDecisionApproved)
+        mockApplicationStatusNewAuth(SubmissionDecisionApproved)
         mockCacheFetch(Some(hvd))
 
         val result = controller.post(true)(newRequest)
@@ -121,7 +117,7 @@ class ExciseGoodsControllerSpec extends AmlsSpec {
         val hvd = Hvd(exciseGoods = Some(ExciseGoods(true)))
         val newRequest = request.withFormUrlEncodedBody("exciseGoods" -> "false")
 
-        mockApplicationStatus(ReadyForRenewal(None))
+        mockApplicationStatusNewAuth(ReadyForRenewal(None))
         mockCacheFetch(Some(hvd))
 
         val result = controller.post(true)(newRequest)
@@ -134,7 +130,7 @@ class ExciseGoodsControllerSpec extends AmlsSpec {
         val hvd = Hvd(exciseGoods = Some(ExciseGoods(true)))
         val newRequest = request.withFormUrlEncodedBody("exciseGoods" -> "false")
 
-        mockApplicationStatus(SubmissionDecisionApproved)
+        mockApplicationStatusNewAuth(SubmissionDecisionApproved)
         mockCacheFetch(Some(hvd))
 
         val result = controller.post(false)(newRequest)
@@ -147,7 +143,7 @@ class ExciseGoodsControllerSpec extends AmlsSpec {
         val hvd = Hvd(exciseGoods = Some(ExciseGoods(true)))
         val newRequest = request.withFormUrlEncodedBody("exciseGoods" -> "false")
 
-        mockApplicationStatus(ReadyForRenewal(None))
+        mockApplicationStatusNewAuth(ReadyForRenewal(None))
         mockCacheFetch(Some(hvd))
 
         val result = controller.post(false)(newRequest)
@@ -163,7 +159,7 @@ class ExciseGoodsControllerSpec extends AmlsSpec {
         "progress to the next page" in new Fixture {
           val newRequest = request.withFormUrlEncodedBody("exciseGoods" -> "true")
 
-          mockApplicationStatus(SubmissionDecisionApproved)
+          mockApplicationStatusNewAuth(SubmissionDecisionApproved)
           mockIsNewActivityNewAuth(true, Some(HighValueDealing))
 
           val result = controller.post()(newRequest)

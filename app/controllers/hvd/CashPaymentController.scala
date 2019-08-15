@@ -57,7 +57,7 @@ class CashPaymentController @Inject() (val dataCacheConnector: DataCacheConnecto
               _ <- dataCacheConnector.save[Hvd](request.credId, Hvd.key, hvd.cashPayment(
                   hvd.cashPayment match {
                     case Some(cp) => CashPayment.update(cp, data)
-                    case None =>  CashPayment(data, None)
+                    case None     =>  CashPayment(data, None)
                   }
               ))
             } yield Redirect(getNextPage(edit, data))
@@ -67,9 +67,9 @@ class CashPaymentController @Inject() (val dataCacheConnector: DataCacheConnecto
 
   private def getNextPage(edit:Boolean, data: CashPaymentOverTenThousandEuros): Call = {
     (edit, data) match {
-      case (true, CashPaymentOverTenThousandEuros(false)) => routes.SummaryController.get()
+      case (true, CashPaymentOverTenThousandEuros(false))  => routes.SummaryController.get()
       case (false, CashPaymentOverTenThousandEuros(false)) => routes.LinkedCashPaymentsController.get()
-      case (_, CashPaymentOverTenThousandEuros(true)) => routes.CashPaymentFirstDateController.get(edit)
+      case (_, CashPaymentOverTenThousandEuros(true))      => routes.CashPaymentFirstDateController.get(edit)
     }
   }
 }
