@@ -19,40 +19,35 @@ package controllers.hvd
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.EmptyForm
 import javax.inject.Inject
-import models.businessmatching.HighValueDealing
 import models.hvd.Hvd
 import services.StatusService
 import services.businessmatching.ServiceFlow
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
+import utils.AuthAction
 import views.html.hvd.summary
 
-class SummaryController @Inject() (val authConnector: AuthConnector,
+class SummaryController @Inject() (val authAction: AuthAction,
                                    implicit val dataCache: DataCacheConnector,
                                    implicit val statusService: StatusService,
-                                   implicit val serviceFlow: ServiceFlow
-                                  ) extends BaseController {
+                                   implicit val serviceFlow: ServiceFlow) extends DefaultBaseController {
 
-  def get = Authorised.async {
-    implicit authContext =>
+  def get = authAction.async {
       implicit request =>
         for {
-          hvd <- dataCache.fetch[Hvd](Hvd.key)
+          hvd <- dataCache.fetch[Hvd](request.credId, Hvd.key)
         } yield hvd match {
-          case Some(data) => Ok(summary(EmptyForm, data))
-          case _ => Redirect(controllers.routes.RegistrationProgressController.get())
+          case Some (data) => Ok (summary (EmptyForm, data))
+          case _ => Redirect (controllers.routes.RegistrationProgressController.get ())
         }
   }
 
-  def post = Authorised.async {
-    implicit authContext =>
+  def post = authAction.async {
       implicit request =>
         (for {
-          hvd <- OptionT(dataCache.fetch[Hvd](Hvd.key))
-          _ <- OptionT.liftF(dataCache.save[Hvd](Hvd.key, hvd.copy(hasAccepted = true)))
+          hvd <- OptionT(dataCache.fetch[Hvd](request.credId, Hvd.key))
+          _ <- OptionT.liftF(dataCache.save[Hvd](request.credId, Hvd.key, hvd.copy(hasAccepted = true)))
         } yield Redirect(controllers.routes.RegistrationProgressController.get)) getOrElse InternalServerError("Could not update HVD")
   }
 }
