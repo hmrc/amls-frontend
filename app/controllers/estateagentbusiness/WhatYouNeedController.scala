@@ -16,7 +16,7 @@
 
 package controllers.estateagentbusiness
 
-import controllers.BaseController
+import controllers.{BaseController, DefaultBaseController}
 import javax.inject.Inject
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthAction
@@ -24,9 +24,7 @@ import views.html.estateagentbusiness._
 
 import scala.concurrent.Future
 
-class WhatYouNeedController  @Inject()(
-                                        val authConnector: AuthConnector,
-                                        authAction: AuthAction) extends BaseController {
+class WhatYouNeedController  @Inject()(authAction: AuthAction) extends DefaultBaseController {
 
   def get = authAction.async { implicit request =>
       Future.successful(Ok(what_you_need()))

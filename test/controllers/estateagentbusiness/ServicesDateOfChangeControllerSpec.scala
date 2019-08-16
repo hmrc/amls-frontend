@@ -17,30 +17,30 @@
 package controllers.estateagentbusiness
 
 import connectors.DataCacheConnector
-import models.businessdetails.{BusinessDetails, ActivityStartDate}
+import controllers.actions.SuccessfulAuthAction
+import models.businessdetails.{ActivityStartDate, BusinessDetails}
 import models.estateagentbusiness.EstateAgentBusiness
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
+class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with DependencyMocksNewAuth {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
     val controller = new ServicesDateOfChangeController (
       dataCacheConnector = mock[DataCacheConnector],
-      authConnector = self.authConnector
+      SuccessfulAuthAction
     )
   }
 
@@ -69,11 +69,11 @@ class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
       when(mockCacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key))
         .thenReturn(None)
 
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(controller.dataCacheConnector.fetchAll(any())( any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any(), any())
+        ( any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -95,11 +95,11 @@ class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
       when(mockCacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key))
         .thenReturn(None)
 
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(controller.dataCacheConnector.fetchAll(any())( any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(),any(), any())
+        ( any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -121,11 +121,11 @@ class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
       when(mockCacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key))
         .thenReturn(Some(EstateAgentBusiness()))
 
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(controller.dataCacheConnector.fetchAll(any())( any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)

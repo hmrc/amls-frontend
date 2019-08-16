@@ -17,7 +17,7 @@
 package controllers.estateagentbusiness
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.{BaseController, DefaultBaseController}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.estateagentbusiness._
@@ -29,7 +29,7 @@ import scala.concurrent.Future
 
 class ResidentialRedressSchemeController  @Inject()(
                                                     val dataCacheConnector: DataCacheConnector,
-                                                    authAction: AuthAction) extends BaseController {
+                                                    authAction: AuthAction) extends DefaultBaseController {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

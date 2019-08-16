@@ -17,31 +17,29 @@
 package controllers.estateagentbusiness
 
 import javax.inject.{Inject, Singleton}
-
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.{BaseController, DefaultBaseController}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.{EstateAgentBusinessService => EAB}
 import models.estateagentbusiness.{EstateAgentBusiness, Residential, Services}
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.DateOfChangeHelper
+import utils.{AuthAction, DateOfChangeHelper}
 import views.html.estateagentbusiness.business_servicess
 
 import scala.concurrent.Future
 
 @Singleton
-class BusinessServicesController @Inject()(
-                                            val authConnector: AuthConnector,
-                                            val dataCacheConnector: DataCacheConnector,
+class BusinessServicesController @Inject()(val dataCacheConnector: DataCacheConnector,
                                             val statusService: StatusService,
-                                            val serviceFlow: ServiceFlow
-                                          ) extends BaseController with DateOfChangeHelper {
+                                            val serviceFlow: ServiceFlow,
+                                            authAction: AuthAction
+                                          ) extends DefaultBaseController with DateOfChangeHelper {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[EstateAgentBusiness](EstateAgentBusiness.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[EstateAgentBusiness](request.credId, EstateAgentBusiness.key) map {
         response =>
           val form = (for {
             estateAgentBusiness <- response
@@ -71,19 +69,18 @@ class BusinessServicesController @Inject()(
     }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request =>
     import jto.validation.forms.Rules._
-    implicit authContext => implicit request =>
       Form2[Services](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(business_servicess(f, edit)))
         case ValidForm(_, data) =>
           for {
-            estateAgentBusiness <- dataCacheConnector.fetch[EstateAgentBusiness](EstateAgentBusiness.key)
-            _ <- dataCacheConnector.save[EstateAgentBusiness](EstateAgentBusiness.key,
-              updateData(estateAgentBusiness.services(data), data))
-            status <- statusService.getStatus
-            isNewActivity <- serviceFlow.isNewActivity(EAB)
+            estateAgentBusiness <- dataCacheConnector.fetch[EstateAgentBusiness](request.credId, EstateAgentBusiness.key)
+            _ <- dataCacheConnector.save[EstateAgentBusiness](request.credId, EstateAgentBusiness.key, updateData(estateAgentBusiness.services(data), data))
+            status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+            isNewActivity <- serviceFlow.isNewActivity(request.credId, EAB)
           } yield {
             if (!isNewActivity & redirectToDateOfChange[Services](status, estateAgentBusiness.services, data)) {
               Redirect(routes.ServicesDateOfChangeController.get())

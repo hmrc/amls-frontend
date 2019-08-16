@@ -17,7 +17,7 @@
 package controllers.estateagentbusiness
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.{BaseController, DefaultBaseController}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.DateOfChange
@@ -31,10 +31,8 @@ import views.html.date_of_change
 
 import scala.concurrent.Future
 
-class ServicesDateOfChangeController  @Inject()(
-                                                 val dataCacheConnector: DataCacheConnector,
-                                                 val authConnector: AuthConnector,
-                                                 authAction: AuthAction) extends BaseController {
+class ServicesDateOfChangeController  @Inject()( val dataCacheConnector: DataCacheConnector,
+                                                 val authAction: AuthAction) extends DefaultBaseController {
 
   def get = authAction.async {
       implicit request =>

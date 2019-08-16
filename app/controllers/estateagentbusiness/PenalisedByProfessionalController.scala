@@ -17,10 +17,11 @@
 package controllers.estateagentbusiness
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.{BaseController, Default, DefaultBaseController}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.estateagentbusiness.{EstateAgentBusiness, ProfessionalBody}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthAction
 import views.html.estateagentbusiness._
 
@@ -28,7 +29,7 @@ import scala.concurrent.Future
 
 class PenalisedByProfessionalController @Inject()(
                                                    val authAction: AuthAction,
-                                                   val dataCacheConnector: DataCacheConnector) extends BaseController {
+                                                   val dataCacheConnector: DataCacheConnector) extends DefaultBaseController {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
