@@ -17,7 +17,7 @@
 package controllers.hvd
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching.HighValueDealing
@@ -25,7 +25,7 @@ import models.hvd.{Alcohol, Hvd, Products, Tobacco}
 import play.api.mvc.Call
 import services.StatusService
 import services.businessmatching.ServiceFlow
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import utils.DateOfChangeHelper
 import views.html.hvd.products
 
@@ -33,14 +33,12 @@ import scala.concurrent.Future
 
 class ProductsController @Inject() (val dataCacheConnector: DataCacheConnector,
                                     val statusService: StatusService,
-                                    val authConnector: AuthConnector,
-                                    val serviceFlow: ServiceFlow
-                                  ) extends BaseController with DateOfChangeHelper {
+                                    val authAction: AuthAction,
+                                    val serviceFlow: ServiceFlow) extends DefaultBaseController with DateOfChangeHelper {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        dataCacheConnector.fetch[Hvd](Hvd.key) map {
+        dataCacheConnector.fetch[Hvd](request.credId, Hvd.key) map {
           response =>
             val form: Form2[Products] = (for {
               hvd <- response
@@ -51,19 +49,17 @@ class ProductsController @Inject() (val dataCacheConnector: DataCacheConnector,
   }
 
 
-  def post(edit: Boolean = false) =
-    Authorised.async {
-      implicit authContext =>
-        implicit request =>
+  def post(edit: Boolean = false) = authAction.async {
+      implicit request =>
           Form2[Products](request.body) match {
             case f: InvalidForm =>
               Future.successful(BadRequest(products(f, edit)))
             case ValidForm(_, data) => {
               for {
-                hvd <- dataCacheConnector.fetch[Hvd](Hvd.key)
-                status <- statusService.getStatus
-                _ <- dataCacheConnector.save[Hvd](Hvd.key, hvd.products(data))
-                isNewActivity <- serviceFlow.isNewActivity(HighValueDealing)
+                hvd <- dataCacheConnector.fetch[Hvd](request.credId, Hvd.key)
+                status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+                _ <- dataCacheConnector.save[Hvd](request.credId, Hvd.key, hvd.products(data))
+                isNewActivity <- serviceFlow.isNewActivity(request.credId, HighValueDealing)
               } yield {
                 val redirect = !isNewActivity && redirectToDateOfChange[Products](status, hvd.products, data)
                 val exciseGoods = data.items.contains(Alcohol) | data.items.contains(Tobacco)
@@ -75,12 +71,12 @@ class ProductsController @Inject() (val dataCacheConnector: DataCacheConnector,
 
   private def getNextPage(redirect: Boolean, exciseGoods: Boolean, edit:Boolean): Call = {
     (redirect, exciseGoods, edit) match {
-      case (true, true, true) => routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoodsEdit)
-      case (true, true, false) => routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoods)
-      case (true, false, true) => routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers)
-      case (true, false, false) => routes.HvdDateOfChangeController.get(DateOfChangeRedirect.howWillYouSellGoods)
-      case (false, true, _) => routes.ExciseGoodsController.get(edit)
-      case (false, false, true) => routes.SummaryController.get()
+      case (true, true, true)    => routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoodsEdit)
+      case (true, true, false)   => routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoods)
+      case (true, false, true)   => routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers)
+      case (true, false, false)  => routes.HvdDateOfChangeController.get(DateOfChangeRedirect.howWillYouSellGoods)
+      case (false, true, _)      => routes.ExciseGoodsController.get(edit)
+      case (false, false, true)  => routes.SummaryController.get()
       case (false, false, false) => routes.HowWillYouSellGoodsController.get()
     }
   }
