@@ -53,7 +53,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
   "PercentageOfCashPaymentOver15000Controller" must {
 
     "on get display the Percentage Of CashPayment Over 15000 page" in new Fixture {
-      when(controller.statusService.getStatus(any(), any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
       when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
@@ -65,7 +65,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
     }
 
     "on get display the Percentage Of CashPayment Over 15000 page with pre populated data" in new Fixture {
-      when(controller.statusService.getStatus(any(), any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
       when(controller.dataCacheConnector.fetch[Hvd](any(), any())
@@ -80,8 +80,8 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
 
     "continue to show the correct view" when {
       "application is in variation mode but the service has just been added" in new Fixture {
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved))
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+          .thenReturn(Future.successful(NotCompleted))
 
         when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
