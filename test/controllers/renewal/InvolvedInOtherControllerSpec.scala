@@ -17,6 +17,7 @@
 package controllers.renewal
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.{BusinessActivities => BMActivities, _}
 import models.renewal.{InvolvedInOtherYes, Renewal}
 import org.jsoup.Jsoup
@@ -28,12 +29,11 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{RenewalService, StatusService}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with PrivateMethodTester {
 
@@ -51,7 +51,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
     val controller = new InvolvedInOtherController(
       dataCacheConnector = mockDataCacheConnector,
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       renewalService = mockRenewalService
     )
   }
@@ -70,7 +70,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
           )))
         )
 
-        when(mockDataCacheConnector.fetchAll(any(), any()))
+        when(mockDataCacheConnector.fetchAll(any())(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(mockCacheMap.getEntry[Renewal](Renewal.key))
@@ -103,7 +103,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(None)
 
-        when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        when(mockDataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get()(request)
@@ -119,7 +119,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(BusinessMatching()))
 
-        when(mockDataCacheConnector.fetchAll(any(), any()))
+        when(mockDataCacheConnector.fetchAll(any())(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get()(request)
@@ -138,10 +138,10 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
             "details" -> "test"
           )
 
-          when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+          when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(mockRenewalService.getRenewal(any(),any(),any()))
+          when(mockRenewalService.getRenewal(any())(any(), any()))
             .thenReturn(Future.successful(Some(Renewal())))
 
           val result = controller.post()(newRequest)
@@ -155,10 +155,10 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
             "involvedInOther" -> "false"
           )
 
-          when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+          when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(mockRenewalService.getRenewal(any(),any(),any()))
+          when(mockRenewalService.getRenewal(any())(any(), any()))
             .thenReturn(Future.successful(Some(Renewal())))
 
           val result = controller.post()(newRequest)
@@ -174,10 +174,10 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
             "details" -> "test"
           )
 
-          when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+          when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(mockRenewalService.getRenewal(any(),any(),any()))
+          when(mockRenewalService.getRenewal(any())(any(), any()))
             .thenReturn(Future.successful(Some(Renewal())))
 
           val result = controller.post()(newRequest)
@@ -191,10 +191,10 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
             "involvedInOther" -> "false"
           )
 
-          when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+          when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(mockRenewalService.getRenewal(any(),any(),any()))
+          when(mockRenewalService.getRenewal(any())(any(), any()))
             .thenReturn(Future.successful(Some(Renewal())))
 
           val result = controller.post()(newRequest)
@@ -208,10 +208,10 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
             "involvedInOther" -> "false"
           )
 
-          when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+          when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(mockRenewalService.getRenewal(any(),any(),any()))
+          when(mockRenewalService.getRenewal(any())(any(), any()))
             .thenReturn(Future.successful(Some(Renewal())))
 
           val result = controller.post(true)(newRequest)
@@ -226,10 +226,10 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
             "details" -> "test"
           )
 
-          when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+          when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(mockRenewalService.getRenewal(any(),any(),any()))
+          when(mockRenewalService.getRenewal(any())(any(), any()))
             .thenReturn(Future.successful(Some(Renewal())))
 
           val result = controller.post(true)(newRequest)
@@ -246,7 +246,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
             activities = Some(BMActivities(Set(AccountancyServices)))
           )
 
-          when(mockDataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
+          when(mockDataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(businessMatching)))
 
           val newRequest = request.withFormUrlEncodedBody(
@@ -263,7 +263,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
         "with invalid data without business activities" in new Fixture {
 
-          when(mockDataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
+          when(mockDataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
             .thenReturn(Future.successful(None))
 
           val newRequest = request.withFormUrlEncodedBody(
@@ -283,7 +283,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
             activities = Some(BMActivities(Set(AccountancyServices)))
           )
 
-          when(mockDataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any()))
+          when(mockDataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(businessMatching)))
 
           val newRequest = request.withFormUrlEncodedBody(

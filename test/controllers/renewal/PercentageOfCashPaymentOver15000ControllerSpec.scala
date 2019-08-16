@@ -17,6 +17,7 @@
 package controllers.renewal
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.renewal.{PercentageOfCashPaymentOver15000, Renewal}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -46,7 +47,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
 
     val controller = new PercentageOfCashPaymentOver15000Controller(
       dataCacheConnector = mockDataCacheConnector,
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       renewalService = mockRenewalService
     )
   }
@@ -59,7 +60,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
 
       "display the Percentage Of CashPayment Over 15000 page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Renewal](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -69,8 +70,8 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
 
       "display the Percentage Of CashPayment Over 15000 page with pre populated data" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Renewal](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Renewal(percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First)))))
+        when(controller.dataCacheConnector.fetch[Renewal](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(Renewal(percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First)))))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -99,10 +100,10 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
             "percentage" -> "01"
           )
 
-          when(mockRenewalService.getRenewal(any(), any(), any()))
+          when(mockRenewalService.getRenewal(any())(any(), any()))
             .thenReturn(Future.successful(None))
 
-          when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+          when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post()(newRequest)
@@ -118,10 +119,10 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
             "percentage" -> "01"
           )
 
-          when(mockRenewalService.getRenewal(any(), any(), any()))
+          when(mockRenewalService.getRenewal(any())(any(), any()))
             .thenReturn(Future.successful(None))
 
-          when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+          when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(true)(newRequest)
