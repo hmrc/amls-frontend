@@ -17,16 +17,12 @@
 package controllers.responsiblepeople
 
 import javax.inject.Inject
-
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businesscustomer.{Address => BusinessCustomerAddress}
-import models.businessmatching.BusinessMatching
 import models.responsiblepeople._
 import play.api.i18n.MessagesApi
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.moved_address
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -35,13 +31,12 @@ import scala.concurrent.Future
 
 class MovedAddressController @Inject()(override val messagesApi: MessagesApi,
                                        val dataCacheConnector: DataCacheConnector,
-                                       val authConnector: AuthConnector) extends RepeatingSection with BaseController {
+                                       authAction: AuthAction) extends RepeatingSection with DefaultBaseController {
 
 
-  def get(index: Int) = Authorised.async {
-    implicit authContext =>
+  def get(index: Int) = authAction.async {
       implicit request =>
-        dataCacheConnector.fetchAll map {
+        dataCacheConnector.fetchAll(request.credId) map {
           optionalCache =>
             (for {
               cache <- optionalCache
@@ -56,11 +51,11 @@ class MovedAddressController @Inject()(override val messagesApi: MessagesApi,
         }
   }
 
-  def post(index: Int) = Authorised.async {
-    implicit authContext => implicit request =>
+  def post(index: Int) = authAction.async {
+    implicit request =>
       Form2[MovedAddress](request.body) match {
         case f: InvalidForm =>
-          dataCacheConnector.fetchAll map {
+          dataCacheConnector.fetchAll(request.credId) map {
             optionalCache =>
               (for {
                 cache <- optionalCache
