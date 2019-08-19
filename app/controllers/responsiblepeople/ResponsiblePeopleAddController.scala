@@ -17,21 +17,19 @@
 package controllers.responsiblepeople
 
 import com.google.inject.Inject
-
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import models.responsiblepeople.ResponsiblePerson
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
+import utils.{AuthAction, RepeatingSection}
 
 class ResponsiblePeopleAddController @Inject () (
                                                 val dataCacheConnector: DataCacheConnector,
-                                                val authConnector: AuthConnector
-                                                ) extends BaseController with RepeatingSection {
+                                                authAction: AuthAction
+                                                ) extends DefaultBaseController with RepeatingSection {
 
-  def get(displayGuidance: Boolean = true, flow: Option[String] = None) = Authorised.async {
-    implicit authContext => implicit request => {
-      addData[ResponsiblePerson](ResponsiblePerson.default(None)).map { idx =>
+  def get(displayGuidance: Boolean = true, flow: Option[String] = None) = authAction.async {
+    implicit request => {
+      addData[ResponsiblePerson](request.credId, ResponsiblePerson.default(None)).map { idx =>
         Redirect {
           flow match {
             case Some(_) => controllers.responsiblepeople.routes.WhatYouNeedController.get(idx, flow)
