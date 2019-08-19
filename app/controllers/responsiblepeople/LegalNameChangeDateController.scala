@@ -17,26 +17,24 @@
 package controllers.responsiblepeople
 
 import javax.inject.{Inject, Singleton}
-
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.{LegalNameChangeDate, PreviousName, ResponsiblePerson}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, RepeatingSection}
+import models.responsiblepeople.{LegalNameChangeDate, ResponsiblePerson}
+import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.legal_name_change_date
 
 import scala.concurrent.Future
 
 @Singleton
 class LegalNameChangeDateController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                              val authConnector: AuthConnector) extends RepeatingSection with BaseController {
+                                              authAction: AuthAction
+                                             )extends RepeatingSection with DefaultBaseController {
 
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext =>
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>
-        getData[ResponsiblePerson](index) map {
+        getData[ResponsiblePerson](request.credId, index) map {
           case Some(ResponsiblePerson(Some(personName),_,Some(changeDate),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(legal_name_change_date(Form2[LegalNameChangeDate](LegalNameChangeDate(changeDate)), edit, index, flow, personName.titleName ))
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
@@ -46,17 +44,16 @@ class LegalNameChangeDateController @Inject()(val dataCacheConnector: DataCacheC
         }
   }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext =>
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request => {
         Form2[LegalNameChangeDate](request.body) match {
           case f: InvalidForm =>
-            getData[ResponsiblePerson](index) map { rp =>
+            getData[ResponsiblePerson](request.credId, index) map { rp =>
               BadRequest(views.html.responsiblepeople.legal_name_change_date(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
             for {
-              _ <- updateDataStrict[ResponsiblePerson](index) { rp =>
+              _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
                 rp.legalNameChangeDate(data.date)
               }
             } yield edit match {
