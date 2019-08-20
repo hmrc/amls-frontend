@@ -18,13 +18,12 @@ package controllers.responsiblepeople
 
 import config.AppConfig
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.responsiblepeople.{DateOfBirth, ResponsiblePerson}
 import play.api.i18n.MessagesApi
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.date_of_birth
 
 import scala.concurrent.Future
@@ -32,14 +31,13 @@ import scala.concurrent.Future
 class DateOfBirthController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        val dataCacheConnector: DataCacheConnector,
-                                       val authConnector: AuthConnector,
+                                       authAction: AuthAction,
                                        val appConfig: AppConfig
-                                     ) extends RepeatingSection with BaseController {
+                                     ) extends RepeatingSection with DefaultBaseController {
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext =>
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>
-        getData[ResponsiblePerson](index) map {
+        getData[ResponsiblePerson](request.credId, index) map {
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,Some(dateOfBirth),_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
             Ok(date_of_birth(Form2[DateOfBirth](dateOfBirth), edit, index, flow, personName.titleName))
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
@@ -48,16 +46,15 @@ class DateOfBirthController @Inject()(
         }
   }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext =>
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>
         Form2[DateOfBirth](request.body) match {
-          case f: InvalidForm => getData[ResponsiblePerson](index) map { rp =>
+          case f: InvalidForm => getData[ResponsiblePerson](request.credId, index) map { rp =>
             BadRequest(date_of_birth(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
           }
           case ValidForm(_, data) => {
             for {
-              _ <- updateDataStrict[ResponsiblePerson](index) { rp =>
+              _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
                 rp.dateOfBirth(data)
               }
             } yield edit match {

@@ -17,6 +17,7 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching._
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{ApprovalFlags, PersonName, ResponsiblePerson}
@@ -27,20 +28,19 @@ import org.scalatest.mock.MockitoSugar
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils._
 
 import scala.concurrent.Future
 
 class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
     val request = addToken(authRequest)
 
     lazy val defaultBuilder = new GuiceApplicationBuilder()
       .configure("microservice.services.feature-toggle.show-fees" -> true)
       .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
 
     val builder = defaultBuilder
@@ -76,10 +76,10 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
           msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
         )))
 
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+      when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(mockCacheMap))
     }
 

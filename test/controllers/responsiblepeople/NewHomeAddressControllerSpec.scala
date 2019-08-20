@@ -16,7 +16,8 @@
 
 package controllers.responsiblepeople
 
-import connectors.{DataCacheConnector, KeystoreConnector}
+import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.autocomplete.{CountryDataProvider, NameValuePair}
 import models.{Country, DateOfChange}
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ThreeYearsPlus, ZeroToFiveMonths}
@@ -29,8 +30,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -46,7 +46,7 @@ class NewHomeAddressControllerSpec extends AmlsSpec with MockitoSugar {
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
-      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[CountryDataProvider].to(new CountryDataProvider {
         override def fetch: Option[Seq[NameValuePair]] = Some(Seq(
           NameValuePair("Spain", "ES")
@@ -68,8 +68,8 @@ class NewHomeAddressControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with NOT_FOUND when called with an index that is out of bounds" in new Fixture {
         val responsiblePeople = ResponsiblePerson()
 
-        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = controllers.get(40)(request)
         status(result) must be(NOT_FOUND)
@@ -79,8 +79,8 @@ class NewHomeAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         val responsiblePeople = ResponsiblePerson(personName)
 
-        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = controllers.get(RecordId)(request)
         status(result) must be(OK)
@@ -104,22 +104,22 @@ class NewHomeAddressControllerSpec extends AmlsSpec with MockitoSugar {
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
 
-          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any(), any(), any()))
+          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), meq(ResponsiblePerson.key))(any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-          when(controllers.dataCacheConnector.fetch[NewHomeDateOfChange](meq(NewHomeDateOfChange.key))(any(), any(), any()))
+          when(controllers.dataCacheConnector.fetch[NewHomeDateOfChange](any(), meq(NewHomeDateOfChange.key))(any(), any()))
             .thenReturn(Future.successful(Some(NewHomeDateOfChange(Some(LocalDate.now().minusMonths(13))))))
 
-          when(controllers.dataCacheConnector.save[ResponsiblePerson](meq(ResponsiblePerson.key), any())(any(), any(), any()))
+          when(controllers.dataCacheConnector.save[ResponsiblePerson](any(), meq(ResponsiblePerson.key), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(controllers.dataCacheConnector.save[NewHomeDateOfChange](meq(NewHomeDateOfChange.key), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(controllers.dataCacheConnector.save[NewHomeDateOfChange](any(), meq(NewHomeDateOfChange.key), any())
+            (any(), any())).thenReturn(Future.successful(emptyCache))
 
           val result = controllers.post(RecordId)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
-          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), meq(Seq(responsiblePeople)))(any(), any(), any())
+          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(), meq(Seq(responsiblePeople)))(any(), any())
         }
 
         "all the mandatory UK parameters are supplied and date of move is more then 6 months" in new Fixture {
@@ -152,21 +152,21 @@ class NewHomeAddressControllerSpec extends AmlsSpec with MockitoSugar {
           val nResponsiblePeople = ResponsiblePerson(addressHistory = Some(upDatedHistory), hasChanged = true)
 
 
-          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any(), any(), any()))
+          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), meq(ResponsiblePerson.key))(any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-          when(controllers.dataCacheConnector.fetch[NewHomeDateOfChange](meq(NewHomeDateOfChange.key))(any(), any(), any()))
+          when(controllers.dataCacheConnector.fetch[NewHomeDateOfChange](any(), meq(NewHomeDateOfChange.key))(any(), any()))
             .thenReturn(Future.successful(Some(NewHomeDateOfChange(Some(LocalDate.now().minusMonths(7))))))
 
-          when(controllers.dataCacheConnector.save[ResponsiblePerson](meq(ResponsiblePerson.key), any())(any(), any(), any()))
+          when(controllers.dataCacheConnector.save[ResponsiblePerson](any(), meq(ResponsiblePerson.key), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(controllers.dataCacheConnector.save[NewHomeDateOfChange](meq(NewHomeDateOfChange.key), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(controllers.dataCacheConnector.save[NewHomeDateOfChange](any(), meq(NewHomeDateOfChange.key), any())
+            (any(), any())).thenReturn(Future.successful(emptyCache))
           val result = controllers.post(RecordId)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
-          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), meq(Seq(nResponsiblePeople)))(any(), any(), any())
+          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(), meq(Seq(nResponsiblePeople)))(any(), any())
         }
 
         "all the mandatory UK parameters are supplied and date of move is more then 3 years" in new Fixture {
@@ -188,23 +188,23 @@ class NewHomeAddressControllerSpec extends AmlsSpec with MockitoSugar {
           val responsiblePeople1 = ResponsiblePerson(addressHistory = Some(history))
           val updatedHistory = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress), additionalAddress = None, additionalExtraAddress = None)
 
-          when(controllers.dataCacheConnector.fetch[NewHomeDateOfChange](meq(NewHomeDateOfChange.key))(any(), any(), any()))
+          when(controllers.dataCacheConnector.fetch[NewHomeDateOfChange](any(), meq(NewHomeDateOfChange.key))(any(), any()))
             .thenReturn(Future.successful(Some(NewHomeDateOfChange(Some(LocalDate.now().minusMonths(37))))))
 
-          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any(), any(), any()))
+          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), meq(ResponsiblePerson.key))(any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople1))))
 
-          when(controllers.dataCacheConnector.save[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key),
-            any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(controllers.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), meq(ResponsiblePerson.key),
+            any())(any(), any())).thenReturn(Future.successful(emptyCache))
 
-          when(controllers.dataCacheConnector.save[NewHomeDateOfChange](meq(NewHomeDateOfChange.key), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(controllers.dataCacheConnector.save[NewHomeDateOfChange](any(), meq(NewHomeDateOfChange.key), any())
+            (any(), any())).thenReturn(Future.successful(emptyCache))
           val result = controllers.post(RecordId)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
-          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePerson]](any(),
-            meq(Seq(responsiblePeople1.copy(addressHistory = Some(updatedHistory), hasChanged = true))))(any(), any(), any())
+          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(),
+            meq(Seq(responsiblePeople1.copy(addressHistory = Some(updatedHistory), hasChanged = true))))(any(), any())
         }
 
         "all the mandatory non-UK parameters are supplied" in new Fixture {
@@ -234,13 +234,13 @@ class NewHomeAddressControllerSpec extends AmlsSpec with MockitoSugar {
             additionalExtraAddress = Some(pushCurrentToExtraAdditional))
           val nResponsiblePeople = ResponsiblePerson(addressHistory = Some(upDatedHistory), hasChanged = true)
 
-          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-          when(controllers.dataCacheConnector.fetch[NewHomeDateOfChange](meq(NewHomeDateOfChange.key))(any(), any(), any()))
+          when(controllers.dataCacheConnector.fetch[NewHomeDateOfChange](any(), meq(NewHomeDateOfChange.key))(any(), any()))
             .thenReturn(Future.successful(Some(NewHomeDateOfChange(Some(LocalDate.now())))))
 
-          when(controllers.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
+          when(controllers.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controllers.post(RecordId)(requestWithParams)
@@ -248,8 +248,8 @@ class NewHomeAddressControllerSpec extends AmlsSpec with MockitoSugar {
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
 
-          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePerson]](any(),
-            meq(Seq(nResponsiblePeople)))(any(),any(), any())
+          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(),
+            meq(Seq(nResponsiblePeople)))(any(),any())
         }
 
       }
@@ -264,7 +264,7 @@ class NewHomeAddressControllerSpec extends AmlsSpec with MockitoSugar {
             "addressLine2" -> "Line *2",
             "postCode" -> "AA1 1AA"
           )
-          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
           val result = controllers.post(RecordId)(requestWithParams)
@@ -275,10 +275,10 @@ class NewHomeAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
           val line1MissingRequest = request.withFormUrlEncodedBody()
 
-          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
-          when(controllers.dataCacheConnector.save[ResponsiblePerson](any(), any())(any(), any(), any()))
+          when(controllers.dataCacheConnector.save[ResponsiblePerson](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
           val result = controllers.post(RecordId)(line1MissingRequest)
           status(result) must be(BAD_REQUEST)
@@ -292,7 +292,7 @@ class NewHomeAddressControllerSpec extends AmlsSpec with MockitoSugar {
             "addressLine2" -> "",
             "postCode" -> ""
           )
-          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
           val result = controllers.post(RecordId)(requestWithMissingParams)
@@ -307,7 +307,7 @@ class NewHomeAddressControllerSpec extends AmlsSpec with MockitoSugar {
             "addressLineNonUK2" -> "",
             "country" -> ""
           )
-          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
             val result = controllers.post(RecordId)(requestWithMissingParams)
           status(result) must be(BAD_REQUEST)
@@ -328,9 +328,9 @@ class NewHomeAddressControllerSpec extends AmlsSpec with MockitoSugar {
             val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
             val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
 
-            when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
               .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-            when(controllers.dataCacheConnector.save[ResponsiblePerson](any(), any())(any(), any(), any()))
+            when(controllers.dataCacheConnector.save[ResponsiblePerson](any(), any(), any())(any(), any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = controllers.post(outOfBounds)(requestWithParams)

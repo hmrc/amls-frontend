@@ -17,6 +17,7 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businesscustomer.{ReviewDetails, Address => BusinessCustomerAddress}
 import models.businessmatching.{BusinessMatching, BusinessType}
@@ -28,8 +29,7 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
@@ -40,7 +40,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar {
     self =>
     val request = addToken(authRequest)
     val dataCache: DataCacheConnector = mock[DataCacheConnector]
-    val controller = new ConfirmAddressController(messagesApi, self.dataCache, self.authConnector)
+    val controller = new ConfirmAddressController(messagesApi, self.dataCache, SuccessfulAuthAction)
 
     def setupCacheMap(cachedResponsiblePerson: Option[Seq[ResponsiblePerson]],
                       cachedBusinessMatching: Option[BusinessMatching] = None
@@ -54,10 +54,10 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar {
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(cachedBusinessMatching)
 
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+      when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(mockCacheMap))
     }
   }
@@ -160,10 +160,10 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
           status(result) must be (SEE_OTHER)
           redirectLocation(result) must be(Some(routes.TimeAtCurrentAddressController.get(1).url))
-          verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](
+          verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(),
             any(),
             meq(Seq(rp))
-          )(any(), any(), any())
+          )(any(), any())
         }
 
         "option is 'No' is selected confirming the mentioned address is the address" in new Fixture {
@@ -181,10 +181,10 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar {
           status(result) must be (SEE_OTHER)
           redirectLocation(result) must be(Some(routes.CurrentAddressController.get(1).url))
 
-          verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](
+          verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(),
             any(),
             meq(Seq(ResponsiblePerson(addressHistory = None)))
-          )(any(), any(), any())
+          )(any(), any())
         }
       }
 

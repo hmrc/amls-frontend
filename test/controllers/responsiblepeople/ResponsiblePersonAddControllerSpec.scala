@@ -17,6 +17,7 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito._
@@ -30,7 +31,6 @@ import play.api.test.Helpers._
 import org.scalacheck.Gen
 import uk.gov.hmrc.http.cache.client.CacheMap
 import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
-import play.api.inject.guice.GuiceApplicationBuilder
 
 import scala.annotation.tailrec
 import scala.concurrent.Future
@@ -43,7 +43,7 @@ class ResponsiblePersonAddControllerSpec extends AmlsSpec
 
     val controller = new ResponsiblePeopleAddController (
       dataCacheConnector = mock[DataCacheConnector],
-      authConnector = self.authConnector
+      authAction = SuccessfulAuthAction
     )
 
     @tailrec
@@ -81,10 +81,10 @@ class ResponsiblePersonAddControllerSpec extends AmlsSpec
           forAll(guidanceOptions(currentCount)) { (guidanceRequested: Boolean, fromDeclaration: Option[String], expectedRedirect: Call) =>
             val testSeq  = buildTestSequence(currentCount)
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
               .thenReturn(Future.successful(Some(testSeq)))
 
-            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any()))
               .thenReturn(Future.successful(emptyCache))
 
             val resultF = controller.get(guidanceRequested, fromDeclaration)(request)
@@ -93,7 +93,7 @@ class ResponsiblePersonAddControllerSpec extends AmlsSpec
             redirectLocation(resultF) must be(Some(expectedRedirect.url))
 
             verify(controller.dataCacheConnector)
-              .save[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key), meq(testSeq :+ ResponsiblePerson()))(any(), any(), any())
+              .save[Seq[ResponsiblePerson]](any(), meq(ResponsiblePerson.key), meq(testSeq :+ ResponsiblePerson()))(any(), any())
 
             reset(controller.dataCacheConnector)
           }
