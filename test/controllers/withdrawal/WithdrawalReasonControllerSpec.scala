@@ -28,13 +28,13 @@ import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
 class WithdrawalReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
 
-  trait TestFixture extends AuthorisedFixture with DependencyMocks {
+  trait TestFixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
 
     val request = addToken(authRequest)
