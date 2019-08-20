@@ -73,5 +73,4 @@ class DeregistrationReasonController @Inject()(authAction: AuthAction,
         }
       }
   }
-
 }
