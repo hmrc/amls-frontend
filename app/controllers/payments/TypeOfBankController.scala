@@ -57,8 +57,6 @@ class TypeOfBankController @Inject()(
   }
 
   private def doAudit(ukBank: Boolean, amlsRefNumber: Option[String], accountTypeId: (String, String))(implicit hc: HeaderCarrier) = {
-    val x = feeResponseService.getFeeResponse(amlsRefNumber.get, accountTypeId)
-    println()
     (for {
       ref <- OptionT(Future(amlsRefNumber))
       fees <- OptionT(feeResponseService.getFeeResponse(ref, accountTypeId))

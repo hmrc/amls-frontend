@@ -157,11 +157,6 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
               "waysToPay" -> WaysToPay.Card.entryName
             )
 
-//            when {
-//              controller.paymentsService.requestPaymentsUrl(any(), any(), any(), any(), any())(any(), any(), any())
-//            } thenReturn Future.successful(NextUrl("/payments-next-url"))
-
-
             when {
               controller.authEnrolmentsService.amlsRegistrationNumber(any(), any())(any(), any())
             } thenReturn Future.successful(None)
