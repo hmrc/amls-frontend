@@ -316,10 +316,15 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     httpPut.PUT[UpdateBacsRequest, HttpResponse](putUrl, request)
   }
 
+  @deprecated("To be removed when auth implementation is complete")
   def createBacsPayment(request: CreateBacsPaymentRequest)(implicit ec: ExecutionContext, hc: HeaderCarrier, ac: AuthContext): Future[Payment] = {
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
     val postUrl = s"$paymentUrl/$accountType/$accountId/bacs"
+    httpPost.POST[CreateBacsPaymentRequest, Payment](postUrl, request)
+  }
 
+  def createBacsPayment(request: CreateBacsPaymentRequest, accountTypeId: (String, String))(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Payment] = {
+    val postUrl = s"$paymentUrl/${accountTypeId._1}/${accountTypeId._2}/bacs"
     httpPost.POST[CreateBacsPaymentRequest, Payment](postUrl, request)
   }
 }

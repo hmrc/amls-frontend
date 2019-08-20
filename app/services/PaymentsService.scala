@@ -35,13 +35,24 @@ class PaymentsService @Inject()(val amlsConnector: AmlsConnector,
                                 val paymentsConnector: PayApiConnector,
                                 val statusService: StatusService) {
 
+  @deprecated("Remove when auth work is complete")
   def requestPaymentsUrl(fees: FeeResponse, returnUrl: String, amlsRefNo: String, safeId: String)
-                        (implicit hc: HeaderCarrier, ec: ExecutionContext, authContext: AuthContext, request: Request[_]): Future[NextUrl] =
+                         (implicit hc: HeaderCarrier, ec: ExecutionContext, authContext: AuthContext, request: Request[_]): Future[NextUrl] =
     fees match {
       case f: FeeResponse if f.difference.isDefined & f.paymentReference.isDefined =>
         paymentsUrlOrDefault(f.paymentReference.get, f.difference.get.toDouble, returnUrl, amlsRefNo, safeId)
       case f: FeeResponse if f.paymentReference.isDefined =>
         paymentsUrlOrDefault(f.paymentReference.get, f.totalFees.toDouble, returnUrl, amlsRefNo, safeId)
+      case _ => Future.successful(NextUrl(ApplicationConfig.paymentsUrl))
+    }
+
+  def requestPaymentsUrl(fees: FeeResponse, returnUrl: String, amlsRefNo: String, safeId: String, accountTypeId: (String, String))
+                        (implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[NextUrl] =
+    fees match {
+      case f: FeeResponse if f.difference.isDefined & f.paymentReference.isDefined =>
+        paymentsUrlOrDefault(f.paymentReference.get, f.difference.get.toDouble, returnUrl, amlsRefNo, safeId, accountTypeId)
+      case f: FeeResponse if f.paymentReference.isDefined =>
+        paymentsUrlOrDefault(f.paymentReference.get, f.totalFees.toDouble, returnUrl, amlsRefNo, safeId, accountTypeId)
       case _ => Future.successful(NextUrl(ApplicationConfig.paymentsUrl))
     }
 
@@ -83,9 +94,14 @@ class PaymentsService @Inject()(val amlsConnector: AmlsConnector,
                       (implicit ec: ExecutionContext, hc: HeaderCarrier, ac: AuthContext): Future[HttpResponse] =
     amlsConnector.updateBacsStatus(paymentReference, request)
 
+  @deprecated("to be removed when new auth implemented")
   def createBacsPayment(request: CreateBacsPaymentRequest)
                        (implicit ec: ExecutionContext, hc: HeaderCarrier, ac: AuthContext): Future[Payment] =
     amlsConnector.createBacsPayment(request)
+
+  def createBacsPayment(request: CreateBacsPaymentRequest, accountTypeId: (String, String))
+                       (implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Payment] =
+    amlsConnector.createBacsPayment(request, accountTypeId)
 
   def amountFromSubmissionData(fees: FeeResponse): Option[Currency] = if(fees.difference.isDefined){
     fees.difference
