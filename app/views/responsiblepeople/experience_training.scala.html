@@ -43,6 +43,15 @@
     }
 }
 
+@headingFunction = { @businessTypes.map { types =>
+    @if(types.size > 1) {
+        @Messages("responsiblepeople.experiencetraining.heading.multiple", personName)
+    } else {
+        @Messages("responsiblepeople.experiencetraining.heading", personName, types.head)
+    }
+  }
+}
+
 @main(
     title = Messages("responsiblepeople.experiencetraining.title", personName) + " - " + Messages("summary.responsiblepeople"),
     heading = header
@@ -52,8 +61,8 @@
 
         @fieldsetWithErrorGroup(
             f = f("experienceTraining"),
-            heading = Messages("responsiblepeople.experiencetraining.heading", personName),
             section = "summary.responsiblepeople",
+            heading = headingFunction.toString(),
             supportingContent = supportingContent,
             panel = false
         ) {
