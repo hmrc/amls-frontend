@@ -23,7 +23,6 @@ import controllers.DefaultBaseController
 import javax.inject.Inject
 import models.SubmissionRequestStatus
 import services.{AuthEnrolmentsService, FeeResponseService, StatusService}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthAction
 
 import scala.concurrent.ExecutionContext.Implicits.global

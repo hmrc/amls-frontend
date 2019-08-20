@@ -27,7 +27,6 @@ import models.payments.{CreateBacsPaymentRequest, WaysToPay}
 import play.api.mvc.Result
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthAction, AuthorisedRequest}
 
 import scala.concurrent.Future
