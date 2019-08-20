@@ -17,35 +17,30 @@
 package controllers.deregister
 
 import javax.inject.Inject
-
 import cats.implicits._
 import cats.data.OptionT
-import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector}
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.{BusinessMatching, HighValueDealing}
 import models.deregister.{DeRegisterSubscriptionRequest, DeregistrationReason}
 import org.joda.time.LocalDate
 import services.{AuthEnrolmentsService, StatusService}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.FeatureToggle
+import utils.{AckRefGenerator, AuthAction}
 import views.html.deregister.deregistration_reason
-import utils.AckRefGenerator
 
 import scala.concurrent.Future
 
-class DeregistrationReasonController @Inject()(val authConnector: AuthConnector,
+class DeregistrationReasonController @Inject()(authAction: AuthAction,
                                                val dataCacheConnector: DataCacheConnector,
                                                amls: AmlsConnector,
                                                enrolments: AuthEnrolmentsService,
-                                               statusService: StatusService) extends BaseController {
+                                               statusService: StatusService) extends DefaultBaseController {
 
   def get = {
-    Authorised.async {
-      implicit authContext =>
+    authAction.async {
         implicit request =>
-          dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map { businessMatching =>
+          dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map { businessMatching =>
             (for {
               bm <- businessMatching
               at <- bm.activities
@@ -56,8 +51,8 @@ class DeregistrationReasonController @Inject()(val authConnector: AuthConnector,
     }
   }
 
-  def post = Authorised.async {
-    implicit authContext => implicit request =>
+  def post = authAction.async {
+    implicit request =>
       Form2[DeregistrationReason](request.body) match {
         case f:InvalidForm => Future.successful(BadRequest(deregistration_reason(f)))
         case ValidForm(_, data) => {
@@ -72,8 +67,8 @@ class DeregistrationReasonController @Inject()(val authConnector: AuthConnector,
             deregistrationReasonOthers
           )
           (for {
-            regNumber <- OptionT(enrolments.amlsRegistrationNumber)
-            _ <- OptionT.liftF(amls.deregister(regNumber, deregistration))
+            regNumber <- OptionT(enrolments.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
+            _ <- OptionT.liftF(amls.deregister(regNumber, deregistration, request.accountTypeId))
           } yield Redirect(controllers.routes.LandingController.get())) getOrElse InternalServerError("Unable to deregister the application")
         }
       }
