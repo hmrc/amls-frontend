@@ -16,28 +16,26 @@
 
 package controllers.renewal
 
-import javax.inject.{Inject, Singleton}
-
 import connectors.DataCacheConnector
-import controllers.BaseController
-import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
+import controllers.DefaultBaseController
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.{Inject, Singleton}
 import models.businessmatching._
-import models.renewal.{Renewal, InvolvedInOther, InvolvedInOtherYes, InvolvedInOtherNo}
-import play.api.i18n.Messages
-import services.{RenewalService, StatusService}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import models.renewal.{InvolvedInOther, InvolvedInOtherNo, InvolvedInOtherYes, Renewal}
+import services.RenewalService
+import utils.AuthAction
 import views.html.renewal.involved_in_other
 
 @Singleton
 class InvolvedInOtherController @Inject()(
                                            val dataCacheConnector: DataCacheConnector,
-                                           val authConnector: AuthConnector,
+                                           val authAction: AuthAction,
                                            val renewalService: RenewalService
-                                         ) extends BaseController {
+                                         ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-        dataCacheConnector.fetchAll map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+        dataCacheConnector.fetchAll(request.credId).map {
           optionalCache =>
             (for {
               cache <- optionalCache
@@ -53,20 +51,20 @@ class InvolvedInOtherController @Inject()(
         }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request => {
         Form2[InvolvedInOther](request.body) match {
           case f: InvalidForm =>
             for {
-              businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
+              businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
             } yield businessMatching match {
               case Some(_) => BadRequest(involved_in_other(f, edit, businessMatching.prefixedAlphabeticalBusinessTypes))
               case None => BadRequest(involved_in_other(f, edit, None))
             }
           case ValidForm(_, data) =>
             for {
-              renewal <- renewalService.getRenewal
-              _ <- renewalService.updateRenewal(getUpdatedRenewal(renewal, data))
+              renewal <- renewalService.getRenewal(request.credId)
+              _ <- renewalService.updateRenewal(request.credId, getUpdatedRenewal(renewal, data))
             } yield data match {
               case models.renewal.InvolvedInOtherYes(_) => Redirect(routes.BusinessTurnoverController.get(edit))
               case models.renewal.InvolvedInOtherNo => redirectDependingOnEdit(edit)

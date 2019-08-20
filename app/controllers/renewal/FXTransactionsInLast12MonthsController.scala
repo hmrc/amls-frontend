@@ -17,28 +17,27 @@
 package controllers.renewal
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching._
 import models.renewal.{FXTransactionsInLast12Months, Renewal}
 import play.api.mvc.Result
 import services.RenewalService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.renewal.fx_transaction_in_last_12_months
 
 import scala.concurrent.Future
 
 class FXTransactionsInLast12MonthsController @Inject()(
                                                         val dataCacheConnector: DataCacheConnector,
-                                                        val authConnector: AuthConnector,
+                                                        val authAction: AuthAction,
                                                         val renewalService: RenewalService
-                                                      ) extends BaseController {
+                                                      ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        dataCacheConnector.fetch[Renewal](Renewal.key) map {
+        dataCacheConnector.fetch[Renewal](request.credId, Renewal.key) map {
           response =>
             val form: Form2[FXTransactionsInLast12Months] = (for {
               renewal <- response
@@ -48,14 +47,13 @@ class FXTransactionsInLast12MonthsController @Inject()(
         }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request => {
         Form2[FXTransactionsInLast12Months](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(fx_transaction_in_last_12_months(f, edit)))
           case ValidForm(_, data) =>
-            dataCacheConnector.fetchAll flatMap {
+            dataCacheConnector.fetchAll(request.credId) flatMap {
               optMap =>
                 val result = for {
                   cacheMap <- optMap
@@ -63,7 +61,7 @@ class FXTransactionsInLast12MonthsController @Inject()(
                   bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
                   activities <- bm.activities
                 } yield {
-                  renewalService.updateRenewal(renewal.fxTransactionsInLast12Months(data)) map { _ =>
+                  renewalService.updateRenewal(request.credId, renewal.fxTransactionsInLast12Months(data)) map { _ =>
                     standardRouting(activities.businessActivities, edit)
                   }
                 }

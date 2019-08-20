@@ -18,6 +18,7 @@ package controllers.renewal
 
 import cats.implicits._
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.renewal.{CustomersOutsideUK, Renewal, SendTheLargestAmountsOfMoney}
 import org.jsoup.Jsoup
@@ -50,7 +51,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
 
     val controller = new SendTheLargestAmountsOfMoneyController(
       dataCacheConnector = mockDataCacheConnector,
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       renewalService = mockRenewalService,
       autoCompleteService = mockAutoComplete
     )
@@ -60,10 +61,10 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
     def formData(valid: Boolean) = if (valid) "largestAmountsOfMoney[0]" -> "GB" else "largestAmountsOfMoney[0]" -> ""
     def formRequest(valid: Boolean) = request.withFormUrlEncodedBody(formData(valid))
 
-    when(mockRenewalService.getRenewal(any(), any(), any()))
+    when(mockRenewalService.getRenewal(any())(any(), any()))
       .thenReturn(Future.successful(None))
 
-    when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+    when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
       .thenReturn(Future.successful(emptyCache))
 
     def post(edit: Boolean = false, valid: Boolean = true)(block: Result => Unit) =
@@ -77,7 +78,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
     "get is called" must {
       "load the 'Where to Send The Largest Amounts Of Money' page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Renewal](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -89,7 +90,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
 
       "pre-populate the 'Where to Send The Largest Amounts Of Money' Page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Renewal](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Renewal](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(
             Renewal(sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))))
           )))
@@ -123,7 +124,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
           "CustomersOutsideUK is contains countries" when {
             "MostTransactions is None" in new FormSubmissionFixture {
 
-              when(mockRenewalService.getRenewal(any(), any(), any()))
+              when(mockRenewalService.getRenewal(any())(any(), any()))
                 .thenReturn(Future.successful(Some(Renewal(
                   customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("GB","GB"))))),
                   mostTransactions = None

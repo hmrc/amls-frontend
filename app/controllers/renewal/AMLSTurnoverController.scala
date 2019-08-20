@@ -16,28 +16,26 @@
 
 package controllers.renewal
 
-import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms._
+import javax.inject.{Inject, Singleton}
 import models.businessmatching._
 import models.renewal.{AMLSTurnover, Renewal}
 import services.RenewalService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
+import utils.{AuthAction, ControllerHelper}
 import views.html.renewal.amls_turnover
 
 @Singleton
 class AMLSTurnoverController @Inject()(
                                         val dataCacheConnector: DataCacheConnector,
-                                        val authConnector: AuthConnector,
+                                        val authAction: AuthAction,
                                         val renewalService: RenewalService
-                                      ) extends BaseController {
+                                      ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        dataCacheConnector.fetchAll map {
+        dataCacheConnector.fetchAll(request.credId) map {
           optionalCache =>
             (for {
               cache <- optionalCache
@@ -59,19 +57,18 @@ class AMLSTurnoverController @Inject()(
         }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request => {
         Form2[AMLSTurnover](request.body) match {
           case f: InvalidForm =>
             for {
-              businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
+              businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
             } yield BadRequest(amls_turnover(f, edit, businessMatching.alphabeticalBusinessTypes))
           case ValidForm(_, data) =>
             for {
-              renewal <- renewalService.getRenewal
-              _ <- renewalService.updateRenewal(renewal.turnover(data))
-              businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
+              renewal <- renewalService.getRenewal(request.credId)
+              _ <- renewalService.updateRenewal(request.credId, renewal.turnover(data))
+              businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
             } yield {
               if (edit) {
                 Redirect(routes.SummaryController.get())

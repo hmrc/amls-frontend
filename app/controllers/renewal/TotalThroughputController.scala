@@ -16,31 +16,29 @@
 
 package controllers.renewal
 
-import javax.inject.Inject
-
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.businessmatching._
 import models.renewal.{Renewal, TotalThroughput}
 import play.api.mvc.Result
 import services.RenewalService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.renewal.total_throughput
 
 import scala.concurrent.Future
 
-class TotalThroughputController @Inject()(val authConnector: AuthConnector,
+class TotalThroughputController @Inject()(val authAction: AuthAction,
                                           renewals: RenewalService,
-                                          dataCacheConnector: DataCacheConnector) extends BaseController {
+                                          dataCacheConnector: DataCacheConnector) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
         val maybeResult = for {
-          renewal <- OptionT(renewals.getRenewal)
+          renewal <- OptionT(renewals.getRenewal(request.credId))
           throughput <- OptionT.fromOption[Future](renewal.totalThroughput)
         } yield {
           Ok(total_throughput(Form2[TotalThroughput](throughput), edit))
@@ -49,13 +47,12 @@ class TotalThroughputController @Inject()(val authConnector: AuthConnector,
         maybeResult getOrElse Ok(total_throughput(EmptyForm, edit))
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request =>
         Form2[TotalThroughput](request.body) match {
           case form: InvalidForm => Future.successful(BadRequest(total_throughput(form, edit)))
           case ValidForm(_, model) =>
-            dataCacheConnector.fetchAll flatMap {
+            dataCacheConnector.fetchAll(request.credId) flatMap {
               optMap =>
                 val result = for {
                   cacheMap <- optMap
@@ -64,7 +61,7 @@ class TotalThroughputController @Inject()(val authConnector: AuthConnector,
                   services <- bm.msbServices
                   activities <- bm.activities
                 } yield {
-                  renewals.updateRenewal(renewal.totalThroughput(model)) map { _ =>
+                  renewals.updateRenewal(request.credId, renewal.totalThroughput(model)) map { _ =>
                     if (!edit) {
                       standardRouting(services.msbServices, activities.businessActivities)
                     } else {
@@ -78,12 +75,13 @@ class TotalThroughputController @Inject()(val authConnector: AuthConnector,
   }
 
   private def standardRouting(services: Set[BusinessMatchingMsbService], businessActivities: Set[BusinessActivity]): Result = {
-    (services, businessActivities) match {
-      case (x, _) if x.contains(TransmittingMoney) => Redirect(routes.TransactionsInLast12MonthsController.get())
-      case (x, _) if x.contains(CurrencyExchange) => Redirect(routes.CETransactionsInLast12MonthsController.get())
-      case (x, _) if x.contains(ForeignExchange) => Redirect(routes.FXTransactionsInLast12MonthsController.get())
-      case (_, x) if x.contains(HighValueDealing) || x.contains(AccountancyServices)=> Redirect(routes.CustomersOutsideIsUKController.get())
-      case _ => Redirect(routes.SummaryController.get())
-    }
+      if(services.contains(TransmittingMoney)) { Redirect(routes.TransactionsInLast12MonthsController.get()) }
+      else if(services.contains(CurrencyExchange)) { Redirect(routes.CETransactionsInLast12MonthsController.get()) }
+      else if(services.contains(ForeignExchange)) { Redirect(routes.FXTransactionsInLast12MonthsController.get()) }
+      else if(businessActivities.contains(HighValueDealing) || businessActivities.contains(AccountancyServices)) {
+        Redirect(routes.CustomersOutsideIsUKController.get())
+      } else {
+        Redirect(routes.SummaryController.get())
+      }
   }
 }
