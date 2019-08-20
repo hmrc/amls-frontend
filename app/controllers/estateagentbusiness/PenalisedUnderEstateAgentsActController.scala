@@ -17,11 +17,10 @@
 package controllers.estateagentbusiness
 
 import connectors.DataCacheConnector
-import controllers.{BaseController, DefaultBaseController}
+import controllers.DefaultBaseController
 import forms._
 import javax.inject.Inject
 import models.estateagentbusiness.{EstateAgentBusiness, PenalisedUnderEstateAgentsAct}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthAction
 import views.html.estateagentbusiness._
 

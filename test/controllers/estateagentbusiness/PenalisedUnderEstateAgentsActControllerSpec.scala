@@ -25,16 +25,16 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
-class PenalisedUnderEstateAgentsActControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures  with DependencyMocksNewAuth{
+class PenalisedUnderEstateAgentsActControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture  {
     self => val request = addToken(authRequest)
 
     val controller = new PenalisedUnderEstateAgentsActController (

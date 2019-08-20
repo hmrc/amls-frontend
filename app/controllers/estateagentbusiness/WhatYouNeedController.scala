@@ -16,9 +16,8 @@
 
 package controllers.estateagentbusiness
 
-import controllers.{BaseController, DefaultBaseController}
+import controllers.DefaultBaseController
 import javax.inject.Inject
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthAction
 import views.html.estateagentbusiness._
 

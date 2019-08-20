@@ -20,18 +20,18 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.estateagentbusiness._
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{any, _}
+import org.mockito.Matchers.any
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
-class ResidentialRedressSchemeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with DependencyMocksNewAuth {
+class ResidentialRedressSchemeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures{
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)

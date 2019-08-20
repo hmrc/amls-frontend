@@ -16,15 +16,14 @@
 
 package controllers.estateagentbusiness
 
-import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
-import controllers.{BaseController, DefaultBaseController}
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.{Inject, Singleton}
 import models.businessmatching.{EstateAgentBusinessService => EAB}
 import models.estateagentbusiness.{EstateAgentBusiness, Residential, Services}
 import services.StatusService
 import services.businessmatching.ServiceFlow
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthAction, DateOfChangeHelper}
 import views.html.estateagentbusiness.business_servicess
 

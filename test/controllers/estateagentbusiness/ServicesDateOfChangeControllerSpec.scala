@@ -24,16 +24,14 @@ import org.joda.time.LocalDate
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
-class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with DependencyMocksNewAuth {
+class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar  {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
