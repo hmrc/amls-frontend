@@ -195,7 +195,6 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
 
   def deregister(amlsRegistrationNumber: String, request: DeRegisterSubscriptionRequest, accountTypeId: (String, String))
                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[DeRegisterSubscriptionResponse] = {
-    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
     val (accountType, accountId) = accountTypeId
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/deregistration"
 
