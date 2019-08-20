@@ -173,12 +173,21 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
       response
     }
   }
-
+@deprecated("To be removed with auth implementation")
   def withdraw(amlsRegistrationNumber: String, request: WithdrawSubscriptionRequest)
               (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[WithdrawSubscriptionResponse] = {
 
     //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+    val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/withdrawal"
+
+    httpPost.POST[WithdrawSubscriptionRequest, WithdrawSubscriptionResponse](postUrl, request)
+  }
+
+  def withdraw(amlsRegistrationNumber: String, request: WithdrawSubscriptionRequest, accountTypeId: (String, String))
+              (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[WithdrawSubscriptionResponse] = {
+    
+    val (accountType, accountId) = accountTypeId
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/withdrawal"
 
     httpPost.POST[WithdrawSubscriptionRequest, WithdrawSubscriptionResponse](postUrl, request)
