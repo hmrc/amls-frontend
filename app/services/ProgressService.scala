@@ -59,14 +59,14 @@ class ProgressService @Inject()(
     result getOrElse none[Call]
   }
 
-  def getSubmitRedirect (amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)
+  def getSubmitRedirect (amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)
                         (implicit ec: ExecutionContext, hc: HeaderCarrier) : Future[Option[Call]] = {
 
     val result: OptionT[Future, Option[Call]] = for {
-      status <- OptionT.liftF(statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId))
-      responsiblePeople <- OptionT(cacheConnector.fetch[Seq[ResponsiblePerson]](cacheId, ResponsiblePerson.key))
+      status <- OptionT.liftF(statusService.getStatus(amlsRegistrationNo, accountTypeId, credId))
+      responsiblePeople <- OptionT(cacheConnector.fetch[Seq[ResponsiblePerson]](credId, ResponsiblePerson.key))
       hasNominatedOfficer <- OptionT.liftF(ControllerHelper.hasNominatedOfficer(Future.successful(Some(responsiblePeople))))
-      businessmatching <- OptionT(cacheConnector.fetch[BusinessMatching](cacheId, BusinessMatching.key))
+      businessmatching <- OptionT(cacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
       reviewDetails <- OptionT.fromOption[Future](businessmatching.reviewDetails)
       businessType <- OptionT.fromOption[Future](reviewDetails.businessType)
     } yield businessType match {

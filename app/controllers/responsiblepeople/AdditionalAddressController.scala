@@ -22,7 +22,7 @@ import cats.data.OptionT
 import cats.implicits._
 import com.google.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ThreeYearsPlus}
 import models.responsiblepeople._
@@ -31,9 +31,7 @@ import services.AutoCompleteService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.additional_address
 
 import scala.concurrent.Future
@@ -41,17 +39,16 @@ import scala.concurrent.Future
 @Singleton
 class AdditionalAddressController @Inject() (
                                               override val dataCacheConnector: DataCacheConnector,
-                                              override val authConnector: AuthConnector,
+                                              authAction: AuthAction,
                                               auditConnector: AuditConnector,
                                               val autoCompleteService: AutoCompleteService
-                                            ) extends RepeatingSection with BaseController {
+                                            ) extends RepeatingSection with DefaultBaseController {
 
   final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None)
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext =>
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>
-        getData[ResponsiblePerson](index) map {
+        getData[ResponsiblePerson](request.credId, index) map {
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_, Some(ResponsiblePersonAddressHistory(_, Some(additionalAddress), _)),_,_,_,_,_,_,_,_,_,_,_, _)) =>
             Ok(additional_address(Form2[ResponsiblePersonAddress](additionalAddress), edit, index, flow, personName.titleName, autoCompleteService.getCountries))
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
@@ -60,24 +57,23 @@ class AdditionalAddressController @Inject() (
         }
   }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext =>
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request => {
         (Form2[ResponsiblePersonAddress](request.body) match {
           case f: InvalidForm =>
-            getData[ResponsiblePerson](index) map { rp =>
+            getData[ResponsiblePerson](request.credId, index) map { rp =>
               BadRequest(additional_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
             }
           case ValidForm(_, data) => {
-            getData[ResponsiblePerson](index) flatMap { responsiblePerson =>
+            getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>
               (for {
                 rp <- responsiblePerson
                 addressHistory <- rp.addressHistory
                 additionalAddress <- addressHistory.additionalAddress
               } yield {
                 val additionalAddressWithTime = data.copy(timeAtAddress = additionalAddress.timeAtAddress)
-                updateAndRedirect(additionalAddressWithTime, index, edit, flow)
-              }) getOrElse updateAndRedirect(data, index, edit, flow)
+                updateAndRedirect(request.credId, additionalAddressWithTime, index, edit, flow)
+              }) getOrElse updateAndRedirect(request.credId, data, index, edit, flow)
             }
           }
         }).recoverWith {
@@ -86,9 +82,9 @@ class AdditionalAddressController @Inject() (
       }
   }
 
-  private def updateAndRedirect(data: ResponsiblePersonAddress, index: Int, edit: Boolean, flow: Option[String])
-                               (implicit authContext: AuthContext, request: Request[AnyContent]) = {
-    val doUpdate = () => updateDataStrict[ResponsiblePerson](index) { res =>
+  private def updateAndRedirect(credId: String, data: ResponsiblePersonAddress, index: Int, edit: Boolean, flow: Option[String])
+                               (implicit request: Request[AnyContent]) = {
+    val doUpdate = () => updateDataStrict[ResponsiblePerson](credId, index) { res =>
       res.addressHistory(
         res.addressHistory match {
           case Some(a) if data.timeAtAddress.contains(ThreeYearsPlus) | data.timeAtAddress.contains(OneToThreeYears) =>
@@ -104,7 +100,7 @@ class AdditionalAddressController @Inject() (
     }
 
     (for {
-      rp <- OptionT(getData[ResponsiblePerson](index))
+      rp <- OptionT(getData[ResponsiblePerson](credId, index))
       _ <- OptionT.liftF(auditAddressChange(data.personAddress, rp, edit)) orElse OptionT.some[Future, AuditResult](Success)
       result <- OptionT.liftF(doUpdate())
     } yield result) getOrElse NotFound(notFoundView)

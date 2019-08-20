@@ -17,22 +17,20 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms._
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
+import utils.{AuthAction, RepeatingSection}
 
 import scala.concurrent.Future
 
 @Singleton
-class FitAndProperNoticeController @Inject()(
-                                        val dataCacheConnector: DataCacheConnector,
-                                        val authConnector: AuthConnector
-                                      ) extends RepeatingSection with BaseController {
+class FitAndProperNoticeController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                             authAction: AuthAction
+                                            ) extends RepeatingSection with DefaultBaseController {
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext => implicit request =>
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
+    implicit request =>
         Future(Ok(views.html.responsiblepeople.fit_and_proper_notice(EmptyForm, edit, index, flow, "")))
   }
 }

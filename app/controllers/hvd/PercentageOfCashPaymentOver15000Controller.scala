@@ -17,26 +17,25 @@
 package controllers.hvd
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms._
 import javax.inject.Inject
 import models.hvd.{Hvd, PercentageOfCashPaymentOver15000}
 import services.StatusService
 import services.businessmatching.ServiceFlow
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.hvd.percentage
 
 import scala.concurrent.Future
 
-class PercentageOfCashPaymentOver15000Controller @Inject() (val authConnector: AuthConnector,
+class PercentageOfCashPaymentOver15000Controller @Inject() (val authAction: AuthAction,
                                                             implicit val dataCacheConnector: DataCacheConnector,
                                                             implicit val serviceFlow: ServiceFlow,
-                                                            implicit val statusService: StatusService
-                                                          ) extends BaseController {
+                                                            implicit val statusService: StatusService) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[Hvd](Hvd.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[Hvd](request.credId, Hvd.key) map {
       response =>
         val form: Form2[PercentageOfCashPaymentOver15000] = (for {
           hvd <- response
@@ -46,14 +45,14 @@ class PercentageOfCashPaymentOver15000Controller @Inject() (val authConnector: A
     }
   }
 
-    def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+    def post(edit: Boolean = false) = authAction.async {
+    implicit request => {
       Form2[PercentageOfCashPaymentOver15000](request.body) match {
         case f: InvalidForm => Future.successful(BadRequest(percentage(f, edit)))
         case ValidForm(_, data) =>
           for {
-            hvd <- dataCacheConnector.fetch[Hvd](Hvd.key)
-            _ <- dataCacheConnector.save[Hvd](Hvd.key,
+            hvd <- dataCacheConnector.fetch[Hvd](request.credId, Hvd.key)
+            _ <- dataCacheConnector.save[Hvd](request.credId, Hvd.key,
               hvd.percentageOfCashPaymentOver15000(data)
             )
           } yield Redirect(routes.SummaryController.get())

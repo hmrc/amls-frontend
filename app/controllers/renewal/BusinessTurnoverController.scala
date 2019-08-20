@@ -16,14 +16,13 @@
 
 package controllers.renewal
 
-import javax.inject.{Inject, Singleton}
-
 import connectors.DataCacheConnector
-import controllers.BaseController
-import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
-import models.renewal.{Renewal, BusinessTurnover}
+import controllers.DefaultBaseController
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.{Inject, Singleton}
+import models.renewal.{BusinessTurnover, Renewal}
 import services.RenewalService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.renewal.business_turnover
 
 import scala.concurrent.Future
@@ -31,13 +30,13 @@ import scala.concurrent.Future
 @Singleton
 class BusinessTurnoverController @Inject()(
                                         val dataCacheConnector: DataCacheConnector,
-                                        val authConnector: AuthConnector,
+                                        val authAction: AuthAction,
                                         val renewalService: RenewalService
-                                      ) extends BaseController {
+                                      ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      renewalService.getRenewal map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      renewalService.getRenewal(request.credId).map {
         response =>
           val form: Form2[BusinessTurnover] = (for {
             renewal <- response
@@ -47,15 +46,15 @@ class BusinessTurnoverController @Inject()(
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request => {
       Form2[BusinessTurnover](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(business_turnover(f, edit)))
         case ValidForm(_, data) =>
           for {
-            renewal <- dataCacheConnector.fetch[Renewal](Renewal.key)
-            _ <- renewalService.updateRenewal(renewal.businessTurnover(data))
+            renewal <- dataCacheConnector.fetch[Renewal](request.credId, Renewal.key)
+            _ <- renewalService.updateRenewal(request.credId, renewal.businessTurnover(data))
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())
             case false => Redirect(routes.AMLSTurnoverController.get())

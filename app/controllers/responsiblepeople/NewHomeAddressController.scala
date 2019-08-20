@@ -17,7 +17,7 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.DateOfChange
@@ -25,24 +25,22 @@ import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonth
 import models.responsiblepeople._
 import org.joda.time.{LocalDate, Months}
 import services.AutoCompleteService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople
-
 
 import scala.concurrent.Future
 
 @Singleton
-class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
+class NewHomeAddressController @Inject()(authAction: AuthAction,
                                          val dataCacheConnector: DataCacheConnector,
-                                         val autoCompleteService: AutoCompleteService) extends RepeatingSection with BaseController {
+                                         val autoCompleteService: AutoCompleteService
+                                        ) extends RepeatingSection with DefaultBaseController {
 
   final val DefaultAddressHistory = NewHomeAddress(PersonAddressUK("", "", None, None, ""))
 
-  def get(index: Int) = Authorised.async {
-      implicit authContext =>
+  def get(index: Int) = authAction.async {
         implicit request =>
-          getData[ResponsiblePerson](index) map {
+          getData[ResponsiblePerson](request.credId, index) map {
             case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
             => Ok(responsiblepeople.new_home_address(Form2(DefaultAddressHistory), index, personName.titleName, autoCompleteService.getCountries))
             case _
@@ -51,21 +49,20 @@ class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
     }
 
   def post(index: Int) =
-    Authorised.async {
-      implicit authContext =>
+    authAction.async {
         implicit request =>
           (Form2[NewHomeAddress](request.body) match {
             case f: InvalidForm =>
-              getData[ResponsiblePerson](index) map { rp =>
+              getData[ResponsiblePerson](request.credId, index) map { rp =>
                 BadRequest(responsiblepeople.new_home_address(f, index, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
               }
             case ValidForm(_, data) => {
               for {
-                moveDate <- dataCacheConnector.fetch[NewHomeDateOfChange](NewHomeDateOfChange.key)
-                _ <- updateDataStrict[ResponsiblePerson](index) { rp =>
+                moveDate <- dataCacheConnector.fetch[NewHomeDateOfChange](request.credId, NewHomeDateOfChange.key)
+                _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
                   rp.addressHistory(convertToCurrentAddress(data, moveDate, rp))
                 }
-                _ <- dataCacheConnector.save[NewHomeDateOfChange](NewHomeDateOfChange.key, NewHomeDateOfChange(None))
+                _ <- dataCacheConnector.save[NewHomeDateOfChange](request.credId, NewHomeDateOfChange.key, NewHomeDateOfChange(None))
               } yield {
                 Redirect(routes.DetailedAnswersController.get(index))
               }

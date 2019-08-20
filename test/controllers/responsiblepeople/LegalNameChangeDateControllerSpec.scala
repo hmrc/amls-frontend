@@ -17,29 +17,25 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople.{LegalNameChangeDate, PersonName, ResponsiblePerson}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo, _}
-import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
-
-import scala.concurrent.Future
+import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocksNewAuth}
 
 
 class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures {
 
-  trait TestFixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait TestFixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
     val request = addToken(self.authRequest)
     val RecordId = 1
 
     val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
       .build()
 

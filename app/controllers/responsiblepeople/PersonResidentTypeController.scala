@@ -20,27 +20,25 @@ import cats.data.OptionT
 import cats.implicits._
 import config.AppConfig
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.Country
 import models.responsiblepeople._
 import play.api.i18n.MessagesApi
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.person_residence_type
 
 import scala.concurrent.Future
 
 class PersonResidentTypeController @Inject()(override val messagesApi: MessagesApi,
                                              val dataCacheConnector: DataCacheConnector,
-                                             val authConnector: AuthConnector,
-                                             val appConfig:AppConfig) extends RepeatingSection with BaseController {
+                                             authAction: AuthAction,
+                                             val appConfig:AppConfig) extends RepeatingSection with DefaultBaseController {
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext =>
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>
-        getData[ResponsiblePerson](index) map {
+        getData[ResponsiblePerson](request.credId, index) map {
           case Some(ResponsiblePerson(Some(personName),_,_,_,Some(residencyType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(person_residence_type(Form2[PersonResidenceType](residencyType), edit, index, flow, personName.titleName))
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
@@ -49,18 +47,17 @@ class PersonResidentTypeController @Inject()(override val messagesApi: MessagesA
         }
   }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext =>
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>
         Form2[PersonResidenceType](request.body) match {
           case f: InvalidForm =>
-            getData[ResponsiblePerson](index) map { rp =>
+            getData[ResponsiblePerson](request.credId, index) map { rp =>
               BadRequest(person_residence_type(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
             val residency = data.isUKResidence
             (for {
-              cache <- OptionT(fetchAllAndUpdateStrict[ResponsiblePerson](index) { (_, rp) =>
+              cache <- OptionT(fetchAllAndUpdateStrict[ResponsiblePerson](request.credId, index) { (_, rp) =>
                 val nationality = rp.personResidenceType.fold[Option[Country]](None)(x => x.nationality)
                 val countryOfBirth = rp.personResidenceType.fold[Option[Country]](None)(x => x.countryOfBirth)
                 val updatedData = data.copy(countryOfBirth = countryOfBirth, nationality = nationality)

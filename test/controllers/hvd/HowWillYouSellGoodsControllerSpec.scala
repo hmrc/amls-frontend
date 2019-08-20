@@ -16,32 +16,32 @@
 
 package controllers.hvd
 
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.HighValueDealing
 import models.hvd.{HowWillYouSellGoods, Hvd, Retail, Wholesale}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import play.api.i18n.Messages
-import play.api.test.FakeRequest
 import play.api.test.Helpers.{BAD_REQUEST, OK, SEE_OTHER, contentAsString, redirectLocation, status, _}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DateOfChangeHelper, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DateOfChangeHelper, DependencyMocksNewAuth}
 
 class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
     val request = addToken(authRequest)
 
     val controller = new HowWillYouSellGoodsController(
       mockCacheConnector,
       mockStatusService,
-      self.authConnector,
+      SuccessfulAuthAction,
       mockServiceFlow
     )
 
     mockCacheFetch[Hvd](None)
     mockCacheSave[Hvd]
-    mockIsNewActivity(false)
+    mockIsNewActivityNewAuth(false)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -54,9 +54,12 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
   }
 
   "load UI from mongoCache" in new Fixture {
+
     mockCacheFetch(Some(Hvd(howWillYouSellGoods = Some(HowWillYouSellGoods(Set(Retail))))))
+
     val result = controller.get()(request)
     status(result) must be(OK)
+
     val htmlValue = Jsoup.parse(contentAsString(result))
     htmlValue.title mustBe Messages("hvd.how-will-you-sell-goods.title") + " - " + Messages("summary.hvd") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
     htmlValue.getElementById("salesChannels-Retail").`val`() mustBe "Retail"
@@ -67,7 +70,7 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
 
       val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
 
-      mockApplicationStatus(SubmissionDecisionRejected)
+      mockApplicationStatusNewAuth(SubmissionDecisionRejected)
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -78,7 +81,7 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
 
       val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
 
-      mockApplicationStatus(SubmissionDecisionRejected)
+      mockApplicationStatusNewAuth(SubmissionDecisionRejected)
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -102,7 +105,7 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
 
       "application is approved" in new Fixture with DateOfChangeHelper {
         val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
-        mockApplicationStatus(SubmissionDecisionApproved)
+        mockApplicationStatusNewAuth(SubmissionDecisionApproved)
         mockCacheFetch(Some(hvd))
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
@@ -111,7 +114,7 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
 
       "application is approved and in edit mode" in new Fixture with DateOfChangeHelper {
         val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
-        mockApplicationStatus(ReadyForRenewal(None))
+        mockApplicationStatusNewAuth(ReadyForRenewal(None))
         mockCacheFetch(Some(hvd))
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
@@ -120,7 +123,7 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
 
       "application is ready for renewal" in new Fixture with DateOfChangeHelper {
         val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
-        mockApplicationStatus(ReadyForRenewal(None))
+        mockApplicationStatusNewAuth(ReadyForRenewal(None))
         mockCacheFetch(Some(hvd))
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
@@ -129,7 +132,7 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
 
       "application is ready for renewal and in edit mode" in new Fixture with DateOfChangeHelper {
         val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
-        mockApplicationStatus(ReadyForRenewal(None))
+        mockApplicationStatusNewAuth(ReadyForRenewal(None))
         mockCacheFetch(Some(hvd))
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
@@ -144,8 +147,8 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
         "redirect to the next page in the flow" in new Fixture {
           val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
 
-          mockApplicationStatus(SubmissionDecisionApproved)
-          mockIsNewActivity(true, Some(HighValueDealing))
+          mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+          mockIsNewActivityNewAuth(true, Some(HighValueDealing))
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)

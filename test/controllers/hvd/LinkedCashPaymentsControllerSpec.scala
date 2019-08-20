@@ -16,6 +16,7 @@
 
 package controllers.hvd
 
+import controllers.actions.SuccessfulAuthAction
 import models.hvd.{Hvd, LinkedCashPayments}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -23,16 +24,16 @@ import org.mockito.Mockito._
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
 class LinkedCashPaymentsControllerSpec extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture  with DependencyMocks{
+  trait Fixture extends AuthorisedFixture  with DependencyMocksNewAuth{
     self => val request = addToken(authRequest)
 
-    val controller = new LinkedCashPaymentsController (mockCacheConnector, authConnector = self.authConnector)
+    val controller = new LinkedCashPaymentsController (mockCacheConnector, authAction = SuccessfulAuthAction)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -40,7 +41,7 @@ class LinkedCashPaymentsControllerSpec extends AmlsSpec {
   "LinkedCashPaymentsController" must {
 
     "successfully load UI for the first time" in new Fixture {
-      when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
         .thenReturn(Future.successful(None))
 
       val title = Messages("hvd.identify.linked.cash.payment.title") + " - " +
@@ -55,7 +56,7 @@ class LinkedCashPaymentsControllerSpec extends AmlsSpec {
 
     "successfully load UI from mongoCache" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(Hvd(linkedCashPayment = Some(LinkedCashPayments(true))))))
 
       val title = Messages("hvd.identify.linked.cash.payment.title") + " - " +
@@ -74,10 +75,10 @@ class LinkedCashPaymentsControllerSpec extends AmlsSpec {
 
       val newRequest = request.withFormUrlEncodedBody("linkedCashPayments" -> "true")
 
-      when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
         .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
+      when(controller.dataCacheConnector.save[Hvd](any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
@@ -89,10 +90,10 @@ class LinkedCashPaymentsControllerSpec extends AmlsSpec {
 
       val newRequest = request.withFormUrlEncodedBody("linkedCashPayments" -> "false")
 
-      when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
         .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
+      when(controller.dataCacheConnector.save[Hvd](any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
@@ -104,7 +105,7 @@ class LinkedCashPaymentsControllerSpec extends AmlsSpec {
       val newRequest = request.withFormUrlEncodedBody(
 
       )
-      when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
         .thenReturn(Future.successful(None))
 
       val result = controller.post()(newRequest)

@@ -16,7 +16,8 @@
 
 package controllers.responsiblepeople
 
-import connectors.{DataCacheConnector, KeystoreConnector}
+import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople._
 import models.Country
 import models.autocomplete.{CountryDataProvider, NameValuePair}
@@ -30,8 +31,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -47,7 +47,7 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
-      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[CountryDataProvider].to(new CountryDataProvider {
         override def fetch: Option[Seq[NameValuePair]] = Some(Seq(
           NameValuePair("Spain", "ES")
@@ -74,8 +74,8 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
       "respond with NOT_FOUND when called with an index that is out of bounds" in new Fixture {
         val responsiblePeople = ResponsiblePerson()
 
-        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = controllers.get(40)(request)
         status(result) must be(NOT_FOUND)
@@ -85,8 +85,8 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
 
         val responsiblePeople = ResponsiblePerson(personName)
 
-        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = controllers.get(RecordId)(request)
         status(result) must be(OK)
@@ -95,8 +95,8 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
 
       "display the country of birth page successfully with data from mongoCache" in new Fixture {
 
-        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = controllers.get(RecordId)(request)
         status(result) must be(OK)
@@ -108,8 +108,8 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
 
       "display the country of birth page successfully with data from mongoCache for the option 'Yes'" in new Fixture {
 
-        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople.copy(personResidenceType = Some(updtdPersonResidenceTypeYes))))))
+        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople.copy(personResidenceType = Some(updtdPersonResidenceTypeYes))))))
 
         val result = controllers.get(RecordId)(request)
         status(result) must be(OK)
@@ -126,18 +126,18 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
             "bornInUk" -> "false",
             "country" -> "FR"
           )
-          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any(), any(), any()))
+          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), meq(ResponsiblePerson.key))(any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-          when(controllers.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(controllers.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())
+            (any(), any())).thenReturn(Future.successful(emptyCache))
 
           val result = controllers.post(RecordId)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.NationalityController.get(RecordId).url))
-          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePerson]](any(),
-            meq(Seq(responsiblePeople.copy(personResidenceType = Some(updtdPersonResidenceType), hasChanged = true))))(any(), any(), any())
+          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(),
+            meq(Seq(responsiblePeople.copy(personResidenceType = Some(updtdPersonResidenceType), hasChanged = true))))(any(), any())
         }
       }
 
@@ -147,25 +147,25 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
           val requestWithParams = request.withFormUrlEncodedBody(
             "bornInUk" -> "true"
           )
-          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any(), any(), any()))
+          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), meq(ResponsiblePerson.key))(any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-          when(controllers.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(controllers.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())
+            (any(), any())).thenReturn(Future.successful(emptyCache))
 
           val result = controllers.post(RecordId, edit = true, Some(flowFromDeclaration))(requestWithParams)
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, Some(flowFromDeclaration)).url))
-          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePerson]](any(),
-            meq(Seq(responsiblePeople.copy(personResidenceType = Some(updtdPersonResidenceTypeYes), hasChanged = true))))(any(), any(), any())
+          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(),
+            meq(Seq(responsiblePeople.copy(personResidenceType = Some(updtdPersonResidenceTypeYes), hasChanged = true))))(any(), any())
         }
       }
 
       "respond with BAD_REQUEST" when {
 
         "bornInUk field is not supplied" in new Fixture {
-          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any(), any(), any()))
+          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), meq(ResponsiblePerson.key))(any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
           val line1MissingRequest = request.withFormUrlEncodedBody()

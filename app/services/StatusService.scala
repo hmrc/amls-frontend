@@ -168,6 +168,7 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     etmpStatus(mlrRegNumber, accountTypeId)(hc, ec)
   }
 
+  @deprecated("To be removed when auth implementation is complete")
   def getDetailedStatus(mlrRegNumber: String)
                        (implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext) = etmpStatusInformation(mlrRegNumber)
 
