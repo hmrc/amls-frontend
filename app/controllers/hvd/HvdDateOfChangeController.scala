@@ -50,7 +50,7 @@ class HvdDateOfChangeController @Inject() ( val dataCacheConnector: DataCacheCon
 
   def post(redirect: String) = authAction.async {
     implicit request =>
-    getModelWithDateMap()flatMap {
+    getModelWithDateMap(request.credId) flatMap {
       case (hvd, startDate) =>
       Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDate) match {
         case f: InvalidForm =>
@@ -65,8 +65,8 @@ class HvdDateOfChangeController @Inject() ( val dataCacheConnector: DataCacheCon
     }
   }
 
-  private def getModelWithDateMap()(implicit hc: HeaderCarrier): Future[(Hvd, Map[_ <: String, Seq[String]])] = {
-    dataCacheConnector.fetchAll(credId = "") map {
+  private def getModelWithDateMap(credId: String)(implicit hc: HeaderCarrier): Future[(Hvd, Map[_ <: String, Seq[String]])] = {
+    dataCacheConnector.fetchAll(credId) map {
       optionalCache =>
         (for {
           cache <- optionalCache
