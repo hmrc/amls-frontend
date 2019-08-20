@@ -19,35 +19,29 @@ package controllers.deregister
 import cats.data.OptionT
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
-import controllers.BaseController
+import controllers.DefaultBaseController
 import javax.inject.Inject
 import models.businessmatching.BusinessMatching
 import services.{AuthEnrolmentsService, StatusService}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.BusinessName
+import utils.{AuthAction, BusinessName}
 import views.html.deregister.deregister_application
 
 import scala.concurrent.Future
 
-class DeRegisterApplicationController @Inject()
-(
-  val authConnector: AuthConnector,
-  implicit val cache: DataCacheConnector,
-  implicit val statusService: StatusService,
-  enrolments: AuthEnrolmentsService,
-  implicit val amls: AmlsConnector
-) extends BaseController {
+class DeRegisterApplicationController @Inject() (authAction: AuthAction,
+                                                 implicit val cache: DataCacheConnector,
+                                                 implicit val statusService: StatusService,
+                                                 enrolments: AuthEnrolmentsService,
+                                                 implicit val amls: AmlsConnector) extends DefaultBaseController {
 
-  def get() = {
-    Authorised.async {
-      implicit authContext =>
+  def get() = authAction.async {
         implicit request =>
           (for {
-            bm <- OptionT(cache.fetch[BusinessMatching](BusinessMatching.key))
-            amlsRegNumber <- OptionT(enrolments.amlsRegistrationNumber)
+            bm <- OptionT(cache.fetch[BusinessMatching](request.credId, BusinessMatching.key))
+            amlsRegNumber <- OptionT(enrolments.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
             ba <- OptionT.fromOption[Future](bm.activities)
-            id <- OptionT(statusService.getSafeIdFromReadStatus(amlsRegNumber))
-            name <- BusinessName.getName(Some(id))
+            id <- OptionT(statusService.getSafeIdFromReadStatus(amlsRegNumber, request.accountTypeId))
+            name <- BusinessName.getName(request.credId, Some(id), request.accountTypeId)
           } yield {
             val activities = ba.businessActivities map {
               _.getMessage()
@@ -55,10 +49,8 @@ class DeRegisterApplicationController @Inject()
             Ok(deregister_application(name, activities, amlsRegNumber))
           }) getOrElse InternalServerError("Could not show the de-register page")
     }
-  }
 
-  def post() = Authorised.async {
-    implicit authContext =>
+  def post() = authAction.async {
       implicit request =>
         Future.successful(Redirect(routes.DeregistrationReasonController.get()))
   }

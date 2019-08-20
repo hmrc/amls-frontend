@@ -173,11 +173,11 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
       response
     }
   }
-@deprecated("To be removed with auth implementation")
+
+  @deprecated("To be removed with auth implementation")
   def withdraw(amlsRegistrationNumber: String, request: WithdrawSubscriptionRequest)
               (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[WithdrawSubscriptionResponse] = {
 
-    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/withdrawal"
 
@@ -193,10 +193,19 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     httpPost.POST[WithdrawSubscriptionRequest, WithdrawSubscriptionResponse](postUrl, request)
   }
 
+  @deprecated("To be removed when new auth is implemented")
   def deregister(amlsRegistrationNumber: String, request: DeRegisterSubscriptionRequest)
                 (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[DeRegisterSubscriptionResponse] = {
-    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+    val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/deregistration"
+
+    httpPost.POST[DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse](postUrl, request)
+  }
+
+  def deregister(amlsRegistrationNumber: String, request: DeRegisterSubscriptionRequest, accountTypeId: (String, String))
+                (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[DeRegisterSubscriptionResponse] = {
+    
+    val (accountType, accountId) = accountTypeId
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/deregistration"
 
     httpPost.POST[DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse](postUrl, request)
