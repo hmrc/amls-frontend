@@ -27,7 +27,8 @@
     showHide: Boolean = false,
     rpName: String = "",
     flow: Option[String] = None,
-    showApprovalSection: Boolean = false
+    showApprovalSection: Boolean = false,
+    businessTypes : Option[List[String]]
 )(implicit request: Request[_],m:Messages, lang: Lang)
 
 @detailedAnswers[T](
@@ -68,6 +69,15 @@
 
 @header = {
     @heading("title.cya", "summary.responsiblepeople")
+}
+
+@headingFunction = { @businessTypes.map { types =>
+    @if(types.size > 1) {
+        @Messages("responsiblepeople.experiencetraining.heading.multiple", personName)
+    } else {
+        @Messages("responsiblepeople.experiencetraining.heading", personName, types.head)
+    }
+}
 }
 
 @main(
@@ -375,7 +385,7 @@
         }
 
         @detailedAnswers(
-            question = Messages("responsiblepeople.detailed_answers.previous_experience"),
+            question = headingFunction.toString(),
             editUrl = controllers.responsiblepeople.routes.ExperienceTrainingController.get(idx, true, flow).toString(),
             dataItem = person.experienceTraining
         ) { ex =>
