@@ -71,9 +71,8 @@ class TimeAtAdditionalExtraAddressController @Inject () (
     }
   }
 
-  private def updateAndRedirect
-  (credId: String, data: ResponsiblePersonAddress, index: Int, edit: Boolean, flow: Option[String])
-  (implicit request: Request[AnyContent]) = {
+  private def updateAndRedirect(credId: String, data: ResponsiblePersonAddress, index: Int, edit: Boolean, flow: Option[String])
+                               (implicit request: Request[AnyContent]) = {
     updateDataStrict[ResponsiblePerson](credId, index) { res =>
       res.addressHistory(
         res.addressHistory match {

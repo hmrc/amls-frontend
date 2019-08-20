@@ -27,13 +27,13 @@ import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocksNewAuth}
 
 class FitAndProperNoticeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   val recordId = 1
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
     val request = addToken(authRequest)
     lazy val mockAppConfig = mock[AppConfig]
     lazy val defaultBuilder = new GuiceApplicationBuilder()

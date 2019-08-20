@@ -30,12 +30,11 @@ import views.html.responsiblepeople.person_non_uk_passport
 
 import scala.concurrent.Future
 
-class PersonNonUKPassportController @Inject()(
-                                            override val messagesApi: MessagesApi,
-                                            val dataCacheConnector: DataCacheConnector,
-                                            authAction: AuthAction,
-                                            val appConfig:AppConfig
-                                          ) extends RepeatingSection with DefaultBaseController {
+class PersonNonUKPassportController @Inject()(override val messagesApi: MessagesApi,
+                                              val dataCacheConnector: DataCacheConnector,
+                                              authAction: AuthAction,
+                                              val appConfig:AppConfig
+                                             ) extends RepeatingSection with DefaultBaseController {
 
 
   def get(index:Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
@@ -69,8 +68,8 @@ class PersonNonUKPassportController @Inject()(
         }
   }
 
-  private def redirectToNextPage(result: Option[CacheMap], index: Int,
-                                 edit: Boolean, flow: Option[String] )(implicit request: Request[AnyContent]) = {
+  private def redirectToNextPage(result: Option[CacheMap], index: Int, edit: Boolean, flow: Option[String])
+                                (implicit request: Request[AnyContent]) = {
     (for {
       cache <- result
       rp <- getData[ResponsiblePerson](cache, index)

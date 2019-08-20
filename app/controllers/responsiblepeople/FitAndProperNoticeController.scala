@@ -25,10 +25,9 @@ import utils.{AuthAction, RepeatingSection}
 import scala.concurrent.Future
 
 @Singleton
-class FitAndProperNoticeController @Inject()(
-                                        val dataCacheConnector: DataCacheConnector,
-                                        authAction: AuthAction
-                                      ) extends RepeatingSection with DefaultBaseController {
+class FitAndProperNoticeController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                             authAction: AuthAction
+                                            ) extends RepeatingSection with DefaultBaseController {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request =>

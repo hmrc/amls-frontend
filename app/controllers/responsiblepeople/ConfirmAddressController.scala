@@ -27,8 +27,6 @@ import play.api.i18n.MessagesApi
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.confirm_address
 
-
-
 class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
                                          val dataCacheConnector: DataCacheConnector,
                                          authAction: AuthAction) extends RepeatingSection with DefaultBaseController {
@@ -43,11 +41,8 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
               bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
             } yield {
               rp.addressHistory.isDefined match {
-                case true
-                  => Redirect(routes.CurrentAddressController.get(index))
-                case _
-                  =>
-                  getAddress(bm) match {
+                case true => Redirect(routes.CurrentAddressController.get(index))
+                case _    => getAddress(bm) match {
                     case Some(addr) => Ok(confirm_address(EmptyForm, addr, index, ControllerHelper.rpTitleName(Some(rp))))
                     case _ => Redirect(routes.CurrentAddressController.get(index))
                   }
@@ -70,7 +65,7 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
                 getAddress(bm) match {
                   case Some(addr) => BadRequest(views.html.responsiblepeople.confirm_address(f, addr,
                     index, ControllerHelper.rpTitleName(Some(rp))))
-                  case _ => Redirect(routes.CurrentAddressController.get(index))
+                  case _          => Redirect(routes.CurrentAddressController.get(index))
                 }
               }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
           }
@@ -108,5 +103,4 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
       case _ => None
     }
   }
-
 }

@@ -99,10 +99,7 @@ class CurrentAddressDateOfChangeController @Inject () (
       }
   }
 
-  private def doUpdate
-  (credId: String, index: Int, date: DateOfChange)
-  (implicit request: Request[AnyContent]) =
-
+  private def doUpdate(credId: String, index: Int, date: DateOfChange)(implicit request: Request[AnyContent]) =
     updateDataStrict[ResponsiblePerson](credId, index) { res =>
       (for {
         addressHist <- res.addressHistory
