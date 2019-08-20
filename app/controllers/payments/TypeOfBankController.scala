@@ -16,43 +16,40 @@
 
 package controllers.payments
 
-import javax.inject.Inject
-
 import audit.BacsPaymentEvent
 import cats.data.OptionT
 import cats.implicits._
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.payments.TypeOfBank
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 
 import scala.concurrent.Future
 
 class TypeOfBankController @Inject()(
-                                      val authConnector: AuthConnector,
+                                      val authAction: AuthAction,
                                       val auditConnector: AuditConnector,
                                       val authEnrolmentsService: AuthEnrolmentsService,
                                       val feeResponseService: FeeResponseService,
                                       val paymentsService: PaymentsService
-                                    ) extends BaseController {
+                                    ) extends DefaultBaseController {
 
-  def get() = Authorised.async {
-    implicit authContext =>
+  def get() = authAction.async {
       implicit request =>
         Future.successful(Ok(views.html.payments.type_of_bank(EmptyForm)))
   }
 
-  def post() = Authorised.async {
-    implicit authContext =>
+  def post() = authAction.async {
       implicit request =>
         Form2[TypeOfBank](request.body) match {
           case ValidForm(_, data) =>
 
-            doAudit(data.isUK) map { _ =>
+            doAudit(data.isUK, request.amlsRefNumber, request.accountTypeId).map { _ =>
               Redirect(controllers.payments.routes.BankDetailsController.get(data.isUK).url)
             }
 
@@ -60,13 +57,15 @@ class TypeOfBankController @Inject()(
         }
   }
 
-  private def doAudit(ukBank: Boolean)(implicit hc: HeaderCarrier, ac: AuthContext) = {
+  private def doAudit(ukBank: Boolean, amlsRefNumber: Option[String], accountTypeId: (String, String))(implicit hc: HeaderCarrier) = {
+    val x = feeResponseService.getFeeResponse(amlsRefNumber.get, accountTypeId)
+    println()
     (for {
-      amlsRegistrationNumber <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
-      fees <- OptionT(feeResponseService.getFeeResponse(amlsRegistrationNumber))
+      ref <- OptionT(Future(amlsRefNumber))
+      fees <- OptionT(feeResponseService.getFeeResponse(ref, accountTypeId))
       payRef <- OptionT.fromOption[Future](fees.paymentReference)
       amount <- OptionT.fromOption[Future](paymentsService.amountFromSubmissionData(fees))
-      result <- OptionT.liftF(auditConnector.sendEvent(BacsPaymentEvent(ukBank, amlsRegistrationNumber, payRef, amount)))
+      result <- OptionT.liftF(auditConnector.sendEvent(BacsPaymentEvent(ukBank, ref, payRef, amount)))
     } yield result).value
   }
 
