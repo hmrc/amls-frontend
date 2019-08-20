@@ -17,9 +17,10 @@
 package controllers.estateagentbusiness
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.estateagentbusiness._
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.Matchers.any
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
@@ -30,15 +31,14 @@ import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
-
-class ResidentialRedressSchemeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class ResidentialRedressSchemeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures{
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
     val controller = new ResidentialRedressSchemeController (
       dataCacheConnector = mock[DataCacheConnector],
-      authConnector = self.authConnector
+      authAction = SuccessfulAuthAction
     )
   }
 
@@ -47,8 +47,8 @@ class ResidentialRedressSchemeControllerSpec extends AmlsSpec with MockitoSugar 
   "ResidentialRedressSchemeController" must {
 
     "on get load Residential Redress Scheme page" in new Fixture {
-      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any(), any())
+        ( any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
       contentAsString(result) must include(Messages("estateagentbusiness.registered.redress.title"))
@@ -57,8 +57,8 @@ class ResidentialRedressSchemeControllerSpec extends AmlsSpec with MockitoSugar 
 
   "on get load redress scheme page with pre populated data" in new Fixture {
 
-    when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
-      (any(), any(), any())).thenReturn(Future.successful(Some(EstateAgentBusiness(None, Some(Other("test")),None, None))))
+    when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any(), any())
+      (any(), any())).thenReturn(Future.successful(Some(EstateAgentBusiness(None, Some(Other("test")),None, None))))
 
     val result = controller.get()(request)
     status(result) must be(OK)
@@ -74,11 +74,11 @@ class ResidentialRedressSchemeControllerSpec extends AmlsSpec with MockitoSugar 
       "other" -> "test"
     )
 
-    when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
-      (any(), any(), any())).thenReturn(Future.successful(None))
+    when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any(), any())
+      (any(), any())).thenReturn(Future.successful(None))
 
-    when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
-      (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+    when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any(), any())
+      (any(), any())).thenReturn(Future.successful(emptyCache))
 
     val result = controller.post()(newRequest)
     status(result) must be(SEE_OTHER)
@@ -106,11 +106,11 @@ class ResidentialRedressSchemeControllerSpec extends AmlsSpec with MockitoSugar 
        "propertyRedressScheme" -> "01"
      )
 
-     when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
-       (any(), any(), any())).thenReturn(Future.successful(None))
+     when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any(), any())
+       (any(), any())).thenReturn(Future.successful(None))
 
-     when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
-       (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+     when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any(), any())
+       (any(), any())).thenReturn(Future.successful(emptyCache))
 
      val result = controller.post(true)(newRequest)
      status(result) must be(SEE_OTHER)

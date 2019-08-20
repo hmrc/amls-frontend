@@ -16,32 +16,29 @@
 
 package controllers.estateagentbusiness
 
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.{EstateAgentBusinessService => EAB}
 import models.estateagentbusiness._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected, SubmissionReadyForReview}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.mockito.Matchers.{eq => meq}
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 class BusinessServicesControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
 
     val request = addToken(authRequest)
 
     val controller = new BusinessServicesController(
-      self.authConnector,
       mockCacheConnector,
       mockStatusService,
-      mockServiceFlow
+      mockServiceFlow,
+      SuccessfulAuthAction
     )
-
-    mockIsNewActivity(false, Some(EAB))
-
   }
 
   "BusinessServicesController" when {
@@ -86,7 +83,8 @@ class BusinessServicesControllerSpec extends AmlsSpec with MockitoSugar {
 
           val eabWithoutRedress = EstateAgentBusiness(Some(Services(Set(Commercial, Development), None)), None, None, None, true)
 
-          mockApplicationStatus(SubmissionDecisionRejected)
+          mockApplicationStatusNewAuth(SubmissionDecisionRejected)
+          mockIsNewActivityNewAuth(true, Some(EAB))
 
           mockCacheFetch[EstateAgentBusiness](Some(eab))
           mockCacheSave[EstateAgentBusiness](eabWithoutRedress, Some(EstateAgentBusiness.key))
@@ -110,7 +108,8 @@ class BusinessServicesControllerSpec extends AmlsSpec with MockitoSugar {
               )
               val eab = EstateAgentBusiness(Some(Services(Set(Auction, Commercial, Residential))), None, None, None)
 
-              mockApplicationStatus(SubmissionReadyForReview)
+              mockApplicationStatusNewAuth(SubmissionReadyForReview)
+              mockIsNewActivityNewAuth(true, Some(EAB))
 
               mockCacheFetch[EstateAgentBusiness](Some(eab), Some(EstateAgentBusiness.key))
               mockCacheSave[EstateAgentBusiness](eab, Some(EstateAgentBusiness.key))
@@ -131,7 +130,8 @@ class BusinessServicesControllerSpec extends AmlsSpec with MockitoSugar {
 
               val eab = EstateAgentBusiness(Some(Services(Set(Auction, Commercial, Residential))), Some(ThePropertyOmbudsman), None, None)
 
-              mockApplicationStatus(SubmissionReadyForReview)
+              mockApplicationStatusNewAuth(SubmissionReadyForReview)
+              mockIsNewActivityNewAuth(true, Some(EAB))
 
               mockCacheFetch[EstateAgentBusiness](Some(eab), Some(EstateAgentBusiness.key))
               mockCacheSave[EstateAgentBusiness](eab, Some(EstateAgentBusiness.key))
@@ -149,6 +149,7 @@ class BusinessServicesControllerSpec extends AmlsSpec with MockitoSugar {
         "redirect to dateOfChange page" when {
           "EstateAgentBusiness is not newly added" when {
             "edit is true" when {
+
               "status is approved" in new Fixture {
 
                 val newRequest = request.withFormUrlEncodedBody(
@@ -157,7 +158,8 @@ class BusinessServicesControllerSpec extends AmlsSpec with MockitoSugar {
                   "services[2]" -> "07"
                 )
 
-                mockApplicationStatus(SubmissionDecisionApproved)
+                mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+                mockIsNewActivityNewAuth(false)
 
                 mockCacheFetch[EstateAgentBusiness](Some(EstateAgentBusiness(
                   services = Some(Services(Set(Residential, Commercial, Auction)))
@@ -177,7 +179,8 @@ class BusinessServicesControllerSpec extends AmlsSpec with MockitoSugar {
                   "services[2]" -> "07"
                 )
 
-                mockApplicationStatus(ReadyForRenewal(None))
+                mockApplicationStatusNewAuth(ReadyForRenewal(None))
+                mockIsNewActivityNewAuth(false)
 
                 mockCacheFetch[EstateAgentBusiness](Some(EstateAgentBusiness(
                   services = Some(Services(Set(Residential, Commercial, Auction)))
@@ -202,7 +205,8 @@ class BusinessServicesControllerSpec extends AmlsSpec with MockitoSugar {
                 "services[2]" -> "07"
               )
 
-              mockApplicationStatus(SubmissionReadyForReview)
+              mockApplicationStatusNewAuth(SubmissionReadyForReview)
+              mockIsNewActivityNewAuth(true, Some(EAB))
 
               mockCacheFetch[EstateAgentBusiness](Some(EstateAgentBusiness(
                 services = Some(Services(Set(Commercial, Auction)))
