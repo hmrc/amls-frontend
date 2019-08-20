@@ -28,13 +28,11 @@ import views.html.deregister.deregister_application
 
 import scala.concurrent.Future
 
-class DeRegisterApplicationController @Inject() (
-                                                  authAction: AuthAction,
-                                                  implicit val cache: DataCacheConnector,
-                                                  implicit val statusService: StatusService,
-                                                  enrolments: AuthEnrolmentsService,
-                                                  implicit val amls: AmlsConnector
-                                                ) extends DefaultBaseController {
+class DeRegisterApplicationController @Inject() (authAction: AuthAction,
+                                                 implicit val cache: DataCacheConnector,
+                                                 implicit val statusService: StatusService,
+                                                 enrolments: AuthEnrolmentsService,
+                                                 implicit val amls: AmlsConnector) extends DefaultBaseController {
 
   def get() = authAction.async {
         implicit request =>
