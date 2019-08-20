@@ -71,6 +71,8 @@ object FormTypes {
   def maxDateWithMsg(maxDate: LocalDate, msg: String) = max(maxDate).withMessage(msg)
   def minDateWithMsg (minDate: LocalDate, msg: String) = min(minDate).withMessage(msg)
 
+  def trimNotEmpty = validateWith[String]("error.required") { !_.trim.isEmpty }
+
   val notEmptyStrip = Rule.zero[String] map {
     _.trim
   }
