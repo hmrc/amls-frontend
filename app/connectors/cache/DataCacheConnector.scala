@@ -29,16 +29,8 @@ import scala.concurrent.Future
 // Coverage has been turned off for these types until we remove the deprecated methods
 class DataCacheConnector @Inject()(val cacheConnector: MongoCacheConnector){
 
-  @deprecated("To be removed when auth implementation is complete")
-  def fetch[T](key: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
-    cacheConnector.fetch(key)
-
   def fetch[T](credId: String, key: String)(implicit hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
     cacheConnector.fetch(credId, key)
-
-  @deprecated("To be removed when auth implementation is complete")
-  def save[T](key: String, data: T)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
-    cacheConnector.save(key, data)
 
   def save[T](credId: String, key: String, data: T)(implicit hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
     cacheConnector.save(credId, key, data)
@@ -51,16 +43,8 @@ class DataCacheConnector @Inject()(val cacheConnector: MongoCacheConnector){
                (implicit hc: HeaderCarrier, format: Format[T]): CacheMap =
     cacheConnector.upsertNewAuth(targetCache, cacheId, data)
 
-  @deprecated("To be removed when auth implementation is completed")
-  def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =
-    cacheConnector.fetchAll
-
   def fetchAll(credId: String)(implicit hc: HeaderCarrier): Future[Option[CacheMap]] =
     cacheConnector.fetchAll(credId)
-
-  @deprecated("To be removed when auth implementation is complete")
-  def fetchAllWithDefault(implicit hc: HeaderCarrier, authContext: AuthContext): Future[CacheMap] =
-    cacheConnector.fetchAllWithDefault
 
   def fetchAllWithDefault(credId: String)(implicit hc: HeaderCarrier): Future[CacheMap] =
     cacheConnector.fetchAllWithDefault(credId)
@@ -71,25 +55,12 @@ class DataCacheConnector @Inject()(val cacheConnector: MongoCacheConnector){
   def remove(credId: String)(implicit hc: HeaderCarrier): Future[Boolean] =
     cacheConnector.remove(credId)
 
-  @deprecated("To be removed when auth implementation is complete")
-  def removeByKey[T](key: String)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] = {
-    cacheConnector.removeByKey(key)
-  }
-
   def removeByKey[T](credId: String, key: String)(implicit hc: HeaderCarrier, format: Format[T]): Future[CacheMap] = {
     cacheConnector.removeByKey(credId, key)
   }
 
-  @deprecated("To be removed when auth implementation is complete")
-  def update[T](key: String)(f: Option[T] => T)(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
-    cacheConnector.update(key)(f)
-
   def update[T](credId: String, key: String)(f: Option[T] => T)(implicit hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
     cacheConnector.update(credId, key)(f)
-
-  @deprecated("To be removed when auth implementation is complete")
-  def saveAll(cacheMap: Future[CacheMap])(implicit hc: HeaderCarrier, ac: AuthContext): Future[CacheMap] =
-    cacheConnector.saveAll(cacheMap)
 
   def saveAll(credId: String, cacheMap: Future[CacheMap])(implicit hc: HeaderCarrier): Future[CacheMap] =
     cacheConnector.saveAll(credId, cacheMap)

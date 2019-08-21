@@ -105,34 +105,6 @@ class RegisterPartnersController @Inject()(authAction: AuthAction,
         throw new Exception("Incorrect status - Page not permitted for this status")
     }
   }
-  @deprecated("To be removed when auth upgrade is in place")
-  def businessPartnersView(status: Status, form: Form2[BusinessPartners], rp: Seq[ResponsiblePerson])
-                          (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] = {
-    statusService.getStatus map {
-      case SubmissionReady =>
-        status(register_partners("submit.registration", form, getNonPartners(rp), currentPartnersNames(rp)))
-      case SubmissionReadyForReview | SubmissionDecisionApproved =>
-        status(register_partners("submit.amendment.application", form, getNonPartners(rp), currentPartnersNames(rp)))
-      case ReadyForRenewal(_) | RenewalSubmitted(_) =>
-        status(register_partners("submit.renewal.application", form, getNonPartners(rp), currentPartnersNames(rp)))
-      case _ =>
-        throw new Exception("Incorrect status - Page not permitted for this status")
-    }
-  }
-  @deprecated("To be removed when auth upgardes are done")
-  private def saveAndRedirect(data : BusinessPartners) (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] = {
-    (for {
-      responsiblePeople <- dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key)
-      rp <- updatePartners(responsiblePeople, data)
-      _ <- dataCacheConnector.save(ResponsiblePerson.key, rp)
-      url <- progressService.getSubmitRedirect
-    } yield url match {
-      case Some(x) => Redirect(x)
-      case _ => InternalServerError("Unable to get redirect url")
-    }) recoverWith {
-      case _ : Throwable => Future.successful(InternalServerError("Unable to save data and get redirect link"))
-    }
-  }
 
   private def saveAndRedirect(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String, data : BusinessPartners) (implicit request: Request[AnyContent]): Future[Result] = {
     (for {

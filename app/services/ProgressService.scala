@@ -39,26 +39,6 @@ class ProgressService @Inject()(
                                  config: AppConfig
                                ){
 
-
-
-  @deprecated("Remove once auth upgarde is in place")
-  def getSubmitRedirect (implicit auth: AuthContext,  ec: ExecutionContext, hc: HeaderCarrier) : Future[Option[Call]] = {
-
-    val result: OptionT[Future, Option[Call]] = for {
-      status <- OptionT.liftF(statusService.getStatus)
-      responsiblePeople <- OptionT(cacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key))
-      hasNominatedOfficer <- OptionT.liftF(ControllerHelper.hasNominatedOfficer(Future.successful(Some(responsiblePeople))))
-      businessmatching <- OptionT(cacheConnector.fetch[BusinessMatching](BusinessMatching.key))
-      reviewDetails <- OptionT.fromOption[Future](businessmatching.reviewDetails)
-      businessType <- OptionT.fromOption[Future](reviewDetails.businessType)
-    } yield businessType match {
-      case Partnership if DeclarationHelper.numberOfPartners(responsiblePeople) < 2 =>
-        Some(controllers.declaration.routes.RegisterPartnersController.get())
-      case _ => Some(DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status))
-    }
-    result getOrElse none[Call]
-  }
-
   def getSubmitRedirect (amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)
                         (implicit ec: ExecutionContext, hc: HeaderCarrier) : Future[Option[Call]] = {
 

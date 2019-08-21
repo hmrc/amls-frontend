@@ -50,9 +50,6 @@ class LandingService @Inject() (val cacheConnector: DataCacheConnector,
                                 val statusService: StatusService,
                                 val businessMatchingConnector: BusinessMatchingConnector){
 
-  @deprecated("to be removed when new auth completely implemented")
-  def cacheMap(implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[Option[CacheMap]] = cacheConnector.fetchAll
-
   def cacheMap(credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CacheMap]] = cacheConnector.fetchAll(credId)
 
   def setAltCorrespondenceAddress(amlsRefNumber: String, maybeCacheMap: Option[CacheMap], accountTypeId: (String, String), credId: String)

@@ -27,11 +27,6 @@ import scala.concurrent.Future
 trait ServiceFlowMocks extends MockitoSugar {
 
   implicit val mockServiceFlow = mock[ServiceFlow]
-@deprecated("To be removed when new auth is implemented")
-  def mockIsNewActivity(value: Boolean, activity: Option[BusinessActivity] = None) =
-    activity map { a =>
-      when(mockServiceFlow.isNewActivity(eqTo(a))(any(), any(), any())) thenReturn Future.successful(value)
-    } getOrElse when(mockServiceFlow.isNewActivity(any())(any(), any(), any())) thenReturn Future.successful(value)
 
   def mockIsNewActivityNewAuth(value: Boolean, activity: Option[BusinessActivity] = None) =
     activity map { a =>

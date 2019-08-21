@@ -39,17 +39,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnector) {
 
-  @deprecated("to be removed when migration to new auth completed")
-  def sections(implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[Seq[Section]] =
-
-    cacheConnector.fetchAll map {
-      optionCache =>
-        optionCache map {
-          cache =>
-            sections(cache)
-        } getOrElse Seq.empty
-    }
-
   def sections(cacheId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[Section]] =
 
     cacheConnector.fetchAll(cacheId) map {

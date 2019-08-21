@@ -27,7 +27,6 @@ import models.declaration.release7._
 import models.status._
 import play.api.mvc.{AnyContent, Request, Result}
 import services.StatusService
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AuthAction, ControllerHelper}
 
 import scala.concurrent.Future
@@ -94,25 +93,6 @@ class AddPersonController @Inject () (val dataCacheConnector: DataCacheConnector
     roleList.contains(DesignatedMember) ||
     roleList.contains(NominatedOfficer)
   }
-@deprecated("Remove once auth is fully implemented")
-  private def addPersonView(status: Status, form: Form2[AddPerson])
-                           (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] = {
-
-    dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) flatMap { bm =>
-      val businessType = ControllerHelper.getBusinessType(bm)
-
-        statusService.getStatus map {
-          case SubmissionReady =>
-            status(views.html.declaration.add_person("declaration.addperson.title", "submit.registration", businessType, form))
-          case SubmissionReadyForReview | SubmissionDecisionApproved =>
-            status(views.html.declaration.add_person("declaration.addperson.amendment.title", "submit.amendment.application", businessType, form))
-          case RenewalSubmitted(_) => status(views.html.declaration.add_person("declaration.addperson.title", "submit.amendment.application", businessType, form))
-          case ReadyForRenewal(_) => status(views.html.declaration.add_person("declaration.addperson.title", "submit.renewal.application", businessType, form))
-          case _ => throw new Exception("Incorrect status - Page not permitted for this status")
-
-        }
-      }
-    }
 
   private def addPersonView(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String, status: Status, form: Form2[AddPerson])
                            (implicit request: Request[AnyContent]): Future[Result] = {

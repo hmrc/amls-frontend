@@ -86,25 +86,6 @@ class WhoIsRegisteringController @Inject () (
       }
     }
   }
-@deprecated("To be removed when new auth is implemented")
-  def whoIsRegisteringViewWithError(status: Status, form: InvalidForm, rp: Seq[ResponsiblePerson])
-                                  (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] =
-    statusService.getStatus flatMap {
-      case a@(SubmissionReadyForReview | SubmissionDecisionApproved | ReadyForRenewal(_)) =>
-        renewalService.getRenewal map {
-          case Some(_) =>
-            val updatedForm = updateFormErrors(form, a, renewal = true)
-            status(who_is_registering_this_renewal(updatedForm, rp))
-          case _ =>
-            val updatedForm = updateFormErrors(form, a, renewal = false)
-            status(who_is_registering_this_update(updatedForm, rp))
-        }
-      case b@RenewalSubmitted(_) =>
-        val updatedForm = updateFormErrors(form, b, renewal = true)
-        Future.successful(status(who_is_registering_this_update(updatedForm, rp)))
-      case _ =>
-        Future.successful(status(who_is_registering_this_registration(form, rp)))
-    }
 
   def whoIsRegisteringViewWithError(amlsRegistrationNo: Option[String],
                                     accountTypeId: (String, String),
@@ -145,22 +126,6 @@ class WhoIsRegisteringController @Inject () (
         f.copy(errors = Seq((Path("person"), Seq(ValidationError(Seq(Messages("error.required.declaration.who.is.registering")))))))
     }
   }
-@deprecated("To be removed alongside auth upgrades")
-  private def whoIsRegisteringView(status: Status, form: Form2[WhoIsRegistering], rp: Seq[ResponsiblePerson])
-                                  (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] =
-    statusService.getStatus flatMap {
-      case SubmissionReadyForReview | SubmissionDecisionApproved | ReadyForRenewal(_) =>
-        renewalService.getRenewal map {
-          case Some(_) =>
-            status(who_is_registering_this_renewal(form, rp))
-          case _ =>
-            status(who_is_registering_this_update(form, rp))
-        }
-      case RenewalSubmitted(_) =>
-        Future.successful(status(who_is_registering_this_update(form, rp)))
-      case _ =>
-        Future.successful(status(who_is_registering_this_registration(form, rp)))
-    }
 
   private def whoIsRegisteringView (amlsRegistrationNo: Option[String],
                                     accountTypeId: (String, String),
@@ -182,12 +147,6 @@ class WhoIsRegisteringController @Inject () (
       case _ =>
         Future.successful(status(who_is_registering_this_registration(form, rp)))
     }
-@deprecated("To be removed when new auth is implemented")
-  private def redirectToDeclarationPage(implicit hc: HeaderCarrier, auth: AuthContext): Future[Result] =
-    statusService.getStatus map {
-      case SubmissionReadyForReview | SubmissionDecisionApproved => Redirect(routes.DeclarationController.getWithAmendment())
-      case _ => Redirect(routes.DeclarationController.get())
-    }
 
   private def redirectToDeclarationPage(amlsRegistrationNo: Option[String],
                                         accountTypeId: (String, String),
@@ -195,12 +154,6 @@ class WhoIsRegisteringController @Inject () (
     statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) map {
       case SubmissionReadyForReview | SubmissionDecisionApproved => Redirect(routes.DeclarationController.getWithAmendment())
       case _ => Redirect(routes.DeclarationController.get())
-    }
-  @deprecated("To be removed when new auth is implemented")
-  private def redirectToAddPersonPage(implicit hc: HeaderCarrier, auth: AuthContext): Future[Result] =
-    statusService.getStatus map {
-      case SubmissionReadyForReview | SubmissionDecisionApproved => Redirect(routes.AddPersonController.getWithAmendment())
-      case _ => Redirect(routes.AddPersonController.get())
     }
 
   private def redirectToAddPersonPage(amlsRegistrationNo: Option[String],

@@ -180,16 +180,6 @@ class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
       }
     } yield newResponsiblePeople
   }
-@deprecated("To be removed when new auth implemented")
-  def dateOfChangeApplicable(activitiesToRemove: Set[BMBusinessActivity])
-                            (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Boolean] = {
-    for {
-      recentlyAdded <- OptionT(dataCacheConnector.fetch[ServiceChangeRegister](ServiceChangeRegister.key)) orElse OptionT.some(ServiceChangeRegister())
-      addedActivities <- OptionT.fromOption[Future](recentlyAdded.addedActivities) orElse OptionT.some(Set.empty)
-    } yield {
-      (activitiesToRemove -- addedActivities).nonEmpty
-    }
-  }
 
   def dateOfChangeApplicable(credId: String, activitiesToRemove: Set[BMBusinessActivity])
                           (implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Boolean] = {
