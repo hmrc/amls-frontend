@@ -67,8 +67,8 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
   }
 
   @deprecated("To be removed when auth implementation is complete")
-  private def etmpStatusInformation(mlrRegNumber: String)(implicit hc: HeaderCarrier,
-                                                          auth: AuthContext, ec: ExecutionContext): Future[(SubmissionStatus, Option[ReadStatusResponse])] = {
+  private def etmpStatusInformation(mlrRegNumber: String)
+                                   (implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext): Future[(SubmissionStatus, Option[ReadStatusResponse])] = {
     amlsConnector.status(mlrRegNumber) map {
       response =>
         val status = getETMPStatus(response)
@@ -85,7 +85,6 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     }
   }
 
-  @deprecated("To be removed when auth implementation is complete")
   private def etmpStatusInformation(mlrRegNumber: String, accountTypeId: (String, String))
                                    (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[(SubmissionStatus, Option[ReadStatusResponse])] = {
 
@@ -171,6 +170,9 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
   @deprecated("To be removed when auth implementation is complete")
   def getDetailedStatus(mlrRegNumber: String)
                        (implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext) = etmpStatusInformation(mlrRegNumber)
+
+  def getDetailedStatus(mlrRegNumber: String, accountTypeId: (String, String))
+                       (implicit hc: HeaderCarrier, ec: ExecutionContext) = etmpStatusInformation(mlrRegNumber, accountTypeId)
 
   @deprecated("To be removed when auth implementation is complete")
   def getReadStatus(implicit hc: HeaderCarrier, authContext: AuthContext, ec: ExecutionContext): Future[ReadStatusResponse] = {

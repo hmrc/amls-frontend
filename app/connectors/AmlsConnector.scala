@@ -60,11 +60,7 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
 
   @deprecated("to be removed when new auth completely implemented")
   def status(amlsRegistrationNumber: String)
-            (implicit
-             headerCarrier: HeaderCarrier,
-             ec: ExecutionContext,
-             reqW: Writes[ReadStatusResponse],
-             ac: AuthContext): Future[ReadStatusResponse] = {
+            (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, reqW: Writes[ReadStatusResponse], ac: AuthContext): Future[ReadStatusResponse] = {
 
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
