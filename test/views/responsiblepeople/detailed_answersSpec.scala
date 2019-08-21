@@ -57,7 +57,7 @@ class detailed_answersSpec extends AmlsSpec
       (Messages("responsiblepeople.detailed_answers.soleproprietor_for_other_business"), checkElementTextIncludes(_, "Yes")),
       (Messages("responsiblepeople.detailed_answers.registered_for_vat"), checkElementTextIncludes(_, "No")),
       (Messages("responsiblepeople.detailed_answers.registered_for_sa"), checkElementTextIncludes(_, "Registered for Self Assessment")),
-      (Messages("responsiblepeople.experiencetraining.heading"), checkElementTextIncludes(_, "experience")),
+      (Messages("responsiblepeople.experiencetraining.heading", "firstName middleName lastName", "Money service business"), checkElementTextIncludes(_, "experience")),
       (Messages("responsiblepeople.detailed_answers.training_in_anti_money_laundering"), checkElementTextIncludes(_, "training")),
       (Messages("responsiblepeople.detailed_answers.already_passed_fit_and_proper"), checkElementTextIncludes(_, "Yes"))
     )
@@ -90,6 +90,26 @@ class detailed_answersSpec extends AmlsSpec
         element.hasAttr("href") must be(true)
         element.attr("href") must be("/anti-money-laundering/responsible-people/date-change-moved/1/")
 
+
+        forAll(sectionChecks) { (key, check) => {
+          val headers = doc.select("section.check-your-answers h2")
+          val header = headers.toList.find(e => e.text() == key)
+          header must not be None
+          val section = header.get.parents().select("section").first()
+          check(section) must be(true)
+        }
+        }
+      }
+
+      "seperate experience heading test" in new ViewFixture {
+        def view = {
+          views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModel), 1, true, personName.fullName, businessTypes = Some(List("Money service business", "Accountancy service provider")))
+        }
+
+        override val sectionChecks = Table[String, Element => Boolean](
+          ("title key", "check"),
+          (Messages("responsiblepeople.experiencetraining.heading.multiple", "firstName middleName lastName"), checkElementTextIncludes(_, "experience"))
+        )
 
         forAll(sectionChecks) { (key, check) => {
           val headers = doc.select("section.check-your-answers h2")
