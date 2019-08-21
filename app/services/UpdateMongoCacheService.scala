@@ -19,10 +19,11 @@ package services
 import config.ApplicationConfig
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
-import models.businessdetails.BusinessDetails
+import models._
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
+import models.businessdetails.BusinessDetails
 import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
 import models.estateagentbusiness.EstateAgentBusiness
@@ -32,9 +33,7 @@ import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import models._
 import play.api.libs.json.{Format, Json}
-import play.api.mvc.Results.Ok
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.http.{HeaderCarrier, HttpGet, NotFoundException}
 
@@ -43,36 +42,36 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class UpdateMongoCacheService @Inject()(http: HttpGet, val cacheConnector: DataCacheConnector) {
 
-  def update(response: UpdateMongoCacheResponse)
-            (implicit hc: HeaderCarrier, authContext: AuthContext, ex: ExecutionContext): Future[Any] = {
+  def update(credId: String, response: UpdateMongoCacheResponse)
+            (implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Any] = {
 
     for {
-      _ <- fn(ViewResponse.key, response.view)
-      _ <- fn(BusinessMatching.key, response.businessMatching)
-      _ <- fn(TradingPremises.key, response.tradingPremises)
-      _ <- fn(BusinessActivities.key, response.businessActivities)
-      _ <- fn(Tcsp.key, response.tcsp)
-      _ <- fn(BankDetails.key, response.bankDetails)
-      _ <- fn(AddPerson.key, response.addPerson)
-      _ <- fn(ResponsiblePerson.key, response.responsiblePeople)
-      _ <- fn(Asp.key, response.asp)
-      _ <- fn(MoneyServiceBusiness.key, response.msb)
-      _ <- fn(Hvd.key, response.hvd)
-      _ <- fn(Supervision.key, response.supervision)
-      _ <- fn(BusinessDetails.key, response.businessDetails)
-      _ <- fn(EstateAgentBusiness.key, response.estateAgencyBusiness)
-      _ <- fn(SubscriptionResponse.key, response.Subscription)
-      _ <- fn(AmendVariationRenewalResponse.key, response.amendVariationResponse)
-      _ <- fn(DataImport.key, response.dataImport)
+      _ <- fn(credId, ViewResponse.key, response.view)
+      _ <- fn(credId, BusinessMatching.key, response.businessMatching)
+      _ <- fn(credId, TradingPremises.key, response.tradingPremises)
+      _ <- fn(credId, BusinessActivities.key, response.businessActivities)
+      _ <- fn(credId, Tcsp.key, response.tcsp)
+      _ <- fn(credId, BankDetails.key, response.bankDetails)
+      _ <- fn(credId, AddPerson.key, response.addPerson)
+      _ <- fn(credId, ResponsiblePerson.key, response.responsiblePeople)
+      _ <- fn(credId, Asp.key, response.asp)
+      _ <- fn(credId, MoneyServiceBusiness.key, response.msb)
+      _ <- fn(credId, Hvd.key, response.hvd)
+      _ <- fn(credId, Supervision.key, response.supervision)
+      _ <- fn(credId, BusinessDetails.key, response.businessDetails)
+      _ <- fn(credId, EstateAgentBusiness.key, response.estateAgencyBusiness)
+      _ <- fn(credId, SubscriptionResponse.key, response.Subscription)
+      _ <- fn(credId, AmendVariationRenewalResponse.key, response.amendVariationResponse)
+      _ <- fn(credId, DataImport.key, response.dataImport)
     } yield true
   }
 
-  def fn[T](key: String, m: Option[T])(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[CacheMap] = m match {
-    case Some(model) => cacheConnector.save[T](key, model)
+  def fn[T](credId: String, key: String, m: Option[T])(implicit hc: HeaderCarrier, fmt: Format[T]): Future[CacheMap] = m match {
+    case Some(model) => cacheConnector.save[T](credId, key, model)
     case _ => Future.successful(CacheMap("", Map.empty))
   }
 
-  def getMongoCacheData(fileName: String)(implicit hc: HeaderCarrier, ac: AuthContext, ex: ExecutionContext): Future[Option[UpdateMongoCacheResponse]] = {
+  def getMongoCacheData(fileName: String)(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Option[UpdateMongoCacheResponse]] = {
     val requestUrl = s"${ApplicationConfig.mongoCacheUpdateUrl}$fileName"
 
     http.GET[UpdateMongoCacheResponse](requestUrl)

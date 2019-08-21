@@ -33,10 +33,6 @@ class DataCacheConnector @Inject()(val cacheConnector: MongoCacheConnector){
   def save[T](credId: String, key: String, data: T)(implicit hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
     cacheConnector.save(credId, key, data)
 
-  def upsert[T](targetCache: CacheMap, cacheId: String, data: T)
-               (implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): CacheMap =
-    cacheConnector.upsert(targetCache, cacheId, data)
-
   def upsertNewAuth[T](targetCache: CacheMap, cacheId: String, data: T)
                (implicit hc: HeaderCarrier, format: Format[T]): CacheMap =
     cacheConnector.upsertNewAuth(targetCache, cacheId, data)
@@ -46,9 +42,6 @@ class DataCacheConnector @Inject()(val cacheConnector: MongoCacheConnector){
 
   def fetchAllWithDefault(credId: String)(implicit hc: HeaderCarrier): Future[CacheMap] =
     cacheConnector.fetchAllWithDefault(credId)
-
-  def remove(implicit hc: HeaderCarrier, ac: AuthContext): Future[Boolean] =
-    cacheConnector.remove
 
   def remove(credId: String)(implicit hc: HeaderCarrier): Future[Boolean] =
     cacheConnector.remove(credId)

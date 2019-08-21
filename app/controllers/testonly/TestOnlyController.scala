@@ -16,18 +16,19 @@
 
 package controllers.testonly
 
-import config.{BusinessCustomerSessionCache}
+import config.BusinessCustomerSessionCache
 import connectors.cache.MongoCacheConnector
 import connectors.{AmlsConnector, DataCacheConnector, TestOnlyStubConnector}
 import controllers.BaseController
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.{HighValueDealing}
+import models.businessmatching.HighValueDealing
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import play.api.libs.json.Json
 import services.UpdateMongoCacheService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.submission.duplicate_submission
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -40,30 +41,29 @@ class TestOnlyController @Inject()(val authConnector: AuthConnector,
                                    implicit val testOnlyStubConnector: TestOnlyStubConnector,
                                    val stubsService: UpdateMongoCacheService,
                                    val amlsConnector: AmlsConnector,
+                                   val authAction: AuthAction,
                                     val customerCache: BusinessCustomerSessionCache) extends BaseController {
 
 
-  def dropMongoCache = Authorised.async {
-    implicit user =>
+  def dropMongoCache = authAction.async {
       implicit request =>
-        removeCacheData map { _ =>
+        removeCacheData(request.credId) map { _ =>
           Ok("Cache successfully cleared")
         }
   }
 
-  def removeCacheData(implicit ac: AuthContext,  hc: HeaderCarrier) = for {
+  def removeCacheData(credId: String)(implicit hc: HeaderCarrier) = for {
     _ <- customerCache.remove()
-    _ <- mongoCacheConnector.remove
+    _ <- mongoCacheConnector.remove(credId)
     response <- testOnlyStubConnector.clearState()
   } yield response
 
-  def updateMongo(fileName:String)  = Authorised.async {
-    implicit user =>
+  def updateMongo(fileName:String)  = authAction.async {
       implicit request =>
         stubsService.getMongoCacheData(fileName) flatMap {
           case Some(data) =>
-            removeCacheData flatMap { _ =>
-              stubsService.update(data) map { _ =>
+            removeCacheData(request.credId) flatMap { _ =>
+              stubsService.update(request.credId, data) map { _ =>
                 Redirect(controllers.routes.LandingController.get())
               }
             }
@@ -72,65 +72,65 @@ class TestOnlyController @Inject()(val authConnector: AuthConnector,
   }
 
 
-  def duplicateEnrolment = Authorised.async {
-    implicit user => implicit request =>
+  def duplicateEnrolment = authAction.async {
+    implicit request =>
       Future.successful(Ok(views.html.submission.duplicate_enrolment()))
   }
 
-  def duplicateSubmission = Authorised.async {
-    implicit authContext => implicit request =>
+  def duplicateSubmission = authAction.async {
+    implicit request =>
       Future.successful(Ok(duplicate_submission("There's an error")))
   }
 
-  def wrongCredentials = Authorised.async {
-    implicit authContext => implicit request =>
+  def wrongCredentials = authAction.async {
+    implicit request =>
       Future.successful(Ok(views.html.submission.wrong_credential_type()))
   }
 
-  def getPayment(ref: String) = Authorised.async {
-    implicit authContext => implicit request =>
-      amlsConnector.getPaymentByPaymentReference(ref) map {
+  def getPayment(ref: String) = authAction.async {
+    implicit request =>
+      amlsConnector.getPaymentByPaymentReference(ref, request.accountTypeId) map {
         case Some(p) => Ok(Json.toJson(p))
         case _ => Ok(s"The payment for $ref was not found")
       }
   }
 
-  def companyName = Authorised.async {
-    implicit authContext => implicit request =>
-      amlsConnector.registrationDetails("XJ0000100093742") map { details =>
+  def companyName = authAction.async {
+    implicit request =>
+      amlsConnector.registrationDetails(request.accountTypeId, "XJ0000100093742") map { details =>
         Ok(details.companyName)
       } recover {
         case _ => Ok("Failed to fetch registration details")
       }
   }
 
-  def paymentFailure = Authorised.async {
-    implicit authContext => implicit request =>
+  def paymentFailure = authAction.async {
+    implicit request =>
       Future.successful(Ok(views.html.confirmation.payment_failure("confirmation.payment.failed.reason.failure", 100, "X123456789")))
   }
 
-  def paymentSuccessful = Authorised.async {
-    implicit authContext => implicit request =>
+  def paymentSuccessful = authAction.async {
+    implicit request =>
       Future.successful(Ok(views.html.confirmation.payment_confirmation("Company Name", "X123456789")))
   }
 
-  def paymentSuccessfulTransitionalRenewal = Authorised.async {
-    implicit authContext => implicit request =>
+  def paymentSuccessfulTransitionalRenewal = authAction.async {
+    implicit request =>
       Future.successful(Ok(views.html.confirmation.payment_confirmation_transitional_renewal("Company Name", "X123456789")))
   }
 
-  def confirmationBacs = Authorised.async {
-    implicit authContext => implicit request =>
+  def confirmationBacs = authAction.async {
+    implicit request =>
       Future.successful(Ok(views.html.confirmation.confirmation_bacs("Company Name")))
   }
 
-  def confirmationBacsTransitionalRenewal = Authorised.async {
-    implicit authContext => implicit request =>
+  def confirmationBacsTransitionalRenewal = authAction.async {
+    implicit request =>
       Future.successful(Ok(views.html.confirmation.confirmation_bacs_transitional_renewal("Company Name")))
   }
 
-  def populateTP = Authorised.async {
-    implicit authContext => implicit request =>
+  def populateTP = authAction.async {
+    implicit request =>
       val c = (1 until 1625) map { i =>
           TradingPremises(
             Some(RegisteringAgentPremises(false)),
@@ -142,7 +142,7 @@ class TestOnlyController @Inject()(val authConnector: AuthConnector,
           )
       }
 
-      dataCacheConnector.save(TradingPremises.key, c) map { _ => Redirect(controllers.routes.StatusController.get())}
+      dataCacheConnector.save(request.credId, TradingPremises.key, c) map { _ => Redirect(controllers.routes.StatusController.get())}
   }
 
 }

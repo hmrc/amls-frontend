@@ -102,18 +102,20 @@ object ControllerHelper {
   //For repeating section
 
 
-  def allowedToEdit(implicit statusService: StatusService, hc: HeaderCarrier, auth: AuthContext): Future[Boolean] = {
-    statusService.getStatus map {
+  def allowedToEdit(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)
+                   (implicit statusService: StatusService, hc: HeaderCarrier): Future[Boolean] = {
+    statusService.getStatus(amlsRegistrationNo, accountTypeId, credId) map {
       case SubmissionReady | NotCompleted | SubmissionReadyForReview  => true
       case _ => false
     }
   }
 
-  def allowedToEdit(activity: BusinessActivity, msbSubSector: Option[BusinessMatchingMsbService] = None)
-                   (implicit statusService: StatusService, cacheConnector: DataCacheConnector, hc: HeaderCarrier, auth: AuthContext, serviceFlow: ServiceFlow): Future[Boolean] = for {
-    status <- statusService.getStatus
-    isNewActivity <- serviceFlow.isNewActivity(activity)
-    changeRegister <- cacheConnector.fetch[ServiceChangeRegister](ServiceChangeRegister.key)
+  def allowedToEdit(activity: BusinessActivity, msbSubSector: Option[BusinessMatchingMsbService] = None,
+                    amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)
+                   (implicit statusService: StatusService, cacheConnector: DataCacheConnector, hc: HeaderCarrier, serviceFlow: ServiceFlow): Future[Boolean] = for {
+    status <- statusService.getStatus(amlsRegistrationNo, accountTypeId, credId)
+    isNewActivity <- serviceFlow.isNewActivity(credId, activity)
+    changeRegister <- cacheConnector.fetch[ServiceChangeRegister](credId, ServiceChangeRegister.key)
   } yield (status, isNewActivity, changeRegister, msbSubSector) match {
     case (SubmissionDecisionApproved | ReadyForRenewal(_), _, Some(c), Some(m)) if c.addedSubSectors.fold(false)(_.contains(m)) => true
     case (_, true, _, _) => true
