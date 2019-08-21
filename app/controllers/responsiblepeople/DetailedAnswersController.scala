@@ -27,9 +27,10 @@ import models.businessmatching.BusinessType.Partnership
 import models.responsiblepeople.ResponsiblePerson
 import models.responsiblepeople.ResponsiblePerson.{flowChangeOfficer, flowFromDeclaration}
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved}
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, Request}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, DeclarationHelper, RepeatingSection}
@@ -50,36 +51,35 @@ class DetailedAnswersController @Inject () (
     }
   }
 
-  def get(index: Int, flow: Option[String] = None): Action[AnyContent] =
-    Authorised.async {
-      implicit authContext => implicit request =>
-        fetchModel flatMap {
-          case Some(data) => {
-            data.lift(index - 1) match {
-              case Some(x) => showHideAddressMove(x.lineId) flatMap { showHide =>
-
-                isMsbOrTcsp().map {
-                  (msbOrTcsp: Option[Boolean]) =>
-
-                    val shouldShowApprovalSection = !(msbOrTcsp.contains(true)) && x.approvalFlags.hasAlreadyPassedFitAndProper.contains(false)
-                    Ok(
-                      views.html.responsiblepeople.detailed_answers(
-                        Some(x),
-                        index,
-                        showHide,
-                        ControllerHelper.rpTitleName(Some(x)),
-                        flow,
-                        shouldShowApprovalSection
-                      )
-                    )
-                }
-              }
-              case _ => Future.successful(NotFound(notFoundView))
-            }
-          }
-          case _ => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+  def get(index: Int, flow: Option[String] = None) = Authorised.async {
+    implicit authContext =>
+      implicit request =>
+        dataCacheConnector.fetchAll flatMap {
+          optionalCache =>
+            (for {
+              cache: CacheMap <- optionalCache
+              businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+            } yield {
+              redirect(cache, index, flow, businessMatching.prefixedAlphabeticalBusinessTypes())
+            }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
         }
-    }
+  }
+
+  private def redirect(cache: CacheMap, index: Int, flow: Option[String] = None, businessTypes: Option[List[String]])
+                      (implicit authContext: AuthContext, request: Request[_]) =
+    (for {
+      responsiblePeople <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
+    } yield responsiblePeople.lift(index - 1) match {
+      case Some(x) => showHideAddressMove(x.lineId) flatMap { showHide =>
+        isMsbOrTcsp().map {
+          msbOrTcsp: Option[Boolean] =>
+
+            val shouldShowApprovalSection = !(msbOrTcsp.contains(true)) && x.approvalFlags.hasAlreadyPassedFitAndProper.contains(false)
+            Ok(views.html.responsiblepeople.detailed_answers(Some(x), index, showHide, ControllerHelper.rpTitleName(Some(x)), flow, shouldShowApprovalSection, businessTypes))
+        }
+      }
+      case _ => Future.successful(NotFound(notFoundView))
+    }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
 
   def post(index: Int, flow: Option[String] = None) = Authorised.async{
     implicit authContext => implicit request =>
