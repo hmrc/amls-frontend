@@ -23,11 +23,10 @@ import models.declaration.AddPerson
 import models.status.{ReadyForRenewal, SubmissionReadyForReview}
 import play.api.mvc.Result
 import services.StatusService
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
-import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
+
+import scala.concurrent.Future
 
 class DeclarationController @Inject () (
                                        val dataCacheConnector: DataCacheConnector,
@@ -69,12 +68,6 @@ class DeclarationController @Inject () (
         case _ => redirectToAddPersonPage(request.amlsRefNumber, request.accountTypeId, request.credId)
       }
   }
-
-  private def redirectToAddPersonPage(implicit hc: HeaderCarrier, auth: AuthContext): Future[Result] =
-    statusService.getStatus map {
-      case SubmissionReadyForReview => Redirect(routes.AddPersonController.getWithAmendment())
-      case _ => Redirect(routes.AddPersonController.get())
-    }
 
   private def redirectToAddPersonPage(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)(implicit hc: HeaderCarrier): Future[Result] =
     statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) map {

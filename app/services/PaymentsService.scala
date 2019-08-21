@@ -24,8 +24,7 @@ import models.payments._
 import models.{FeeResponse, ReturnLocation}
 import play.api.Logger
 import play.api.mvc.Request
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
@@ -61,10 +60,6 @@ class PaymentsService @Inject()(val amlsConnector: AmlsConnector,
     }
   }
 
-  def updateBacsStatus(paymentReference: String, request: UpdateBacsRequest)
-                      (implicit ec: ExecutionContext, hc: HeaderCarrier, ac: AuthContext): Future[HttpResponse] =
-    amlsConnector.updateBacsStatus(paymentReference, request)
-
   def createBacsPayment(request: CreateBacsPaymentRequest, accountTypeId: (String, String))
                        (implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Payment] =
     amlsConnector.createBacsPayment(request, accountTypeId)
@@ -73,15 +68,6 @@ class PaymentsService @Inject()(val amlsConnector: AmlsConnector,
     fees.difference
   } else {
     Some(fees.totalFees)
-  }
-
-  private def savePaymentBeforeResponse(response: CreatePaymentResponse, amlsRefNo: String, safeId: String)
-                                       (implicit hc: HeaderCarrier, authContext: AuthContext): Future[Unit] = {
-      amlsConnector
-        .savePayment(response.journeyId, amlsRefNo, safeId)
-        .recover {
-          case e => throw new Exception(s"Payment details failed to save. [paymentId:${response.journeyId}]", e)
-        }.map(_ =>())
   }
 
   private def savePaymentBeforeResponse(response: CreatePaymentResponse, amlsRefNo: String, safeId: String, accountTypeId: (String, String))

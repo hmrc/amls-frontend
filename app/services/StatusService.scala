@@ -73,6 +73,17 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     }
   }
 
+  private def etmpStatusInformation(mlrRegNumber: String, accountTypeId: (String, String))
+                                   (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[(SubmissionStatus, Option[ReadStatusResponse])] = {
+
+    amlsConnector.status(mlrRegNumber, accountTypeId) map {
+      response =>
+        val status = getETMPStatus(response)
+        Logger.debug("StatusService:etmpStatusInformation:status:" + status)
+        (status, Some(response))
+    }
+  }
+
   def getDetailedStatus(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)
                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[(SubmissionStatus, Option[ReadStatusResponse])] = {
     amlsRegistrationNumber match {
