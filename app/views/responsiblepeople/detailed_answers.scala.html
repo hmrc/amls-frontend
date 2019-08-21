@@ -389,8 +389,19 @@
             editUrl = controllers.responsiblepeople.routes.ExperienceTrainingController.get(idx, true, flow).toString(),
             dataItem = person.experienceTraining
         ) { ex =>
+            @businessTypes.map { types =>
+                @if(types.size > 1) {
+                    <p>@Messages("responsiblepeople.experiencetraining.cya")</p>
+
+                    <ul class="list list-bullet">
+                    @types.map { businessType =>
+                        <li>@businessType</li>
+                    }
+                    </ul>
+                }
+            }
             <p>@ex match {
-                case ExperienceTrainingYes(info) => {@info}
+            case ExperienceTrainingYes(info) => {<p>@Messages("lbl.yes")</p> @info}
                 case ExperienceTrainingNo => {@Messages("lbl.no")}
             }</p>
         }

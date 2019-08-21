@@ -27,7 +27,7 @@ import models.businessmatching.BusinessType.Partnership
 import models.responsiblepeople.ResponsiblePerson
 import models.responsiblepeople.ResponsiblePerson.{flowChangeOfficer, flowFromDeclaration}
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved}
-import play.api.mvc.{Action, AnyContent, Request}
+import play.api.mvc.Request
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -58,7 +58,7 @@ class DetailedAnswersController @Inject () (
           optionalCache =>
             (for {
               cache: CacheMap <- optionalCache
-              businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+              businessMatching: BusinessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
             } yield {
               redirect(cache, index, flow, businessMatching.prefixedAlphabeticalBusinessTypes())
             }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))

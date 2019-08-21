@@ -122,7 +122,8 @@ case class BusinessMatching(
     }
   }
 
-  def prefixedAlphabeticalBusinessTypes()(implicit message: Messages): Option[List[String]] = {
+  def
+  prefixedAlphabeticalBusinessTypes()(implicit message: Messages): Option[List[String]] = {
     val vowels = List("a", "e", "i", "o", "u")
 
     alphabeticalBusinessTypes.map {
