@@ -23,8 +23,6 @@ import org.scalatestplus.play.PlaySpec
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits._
 import uk.gov.hmrc.http.{ HeaderCarrier, NotFoundException }

@@ -22,8 +22,6 @@ import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import services.flowmanagement.PageRouter
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

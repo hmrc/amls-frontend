@@ -32,8 +32,6 @@ import models.tradingpremises.TradingPremises
 import typeclasses.confirmation.BreakdownRowInstances._
 import typeclasses.confirmation.{BreakdownRows, ResponsiblePeopleRowsInstances}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

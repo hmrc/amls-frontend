@@ -26,7 +26,6 @@ import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.renewal.Renewal.ValidationRules._
 import models.renewal._
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.MappingUtils._
 
 import scala.concurrent.{ExecutionContext, Future}

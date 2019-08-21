@@ -23,8 +23,6 @@ import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseTy
 import models.status.RenewalSubmitted
 import play.api.Logger
 import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.{ExecutionContext, Future}
 
 class FeeResponseService @Inject()(val feeConnector: FeeConnector) {

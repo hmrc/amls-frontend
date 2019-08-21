@@ -33,8 +33,6 @@ import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.{ExecutionContext, Future}
 
 class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnector) {

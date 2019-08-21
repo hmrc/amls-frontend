@@ -19,8 +19,6 @@ package connectors
 import config.{AppConfig, ApplicationConfig, WSHttp}
 import javax.inject.Inject
 import uk.gov.hmrc.http.{HeaderCarrier, HttpDelete, HttpGet}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.ExecutionContext
 
 class TestOnlyStubConnector @Inject()(http: HttpDelete) {

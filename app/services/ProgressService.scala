@@ -26,7 +26,6 @@ import models.businessmatching.{BusinessActivities => _, _}
 import models.responsiblepeople.ResponsiblePerson
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{ControllerHelper, DeclarationHelper}
 
 import scala.concurrent.{ExecutionContext, Future}

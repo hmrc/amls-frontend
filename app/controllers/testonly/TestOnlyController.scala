@@ -27,7 +27,6 @@ import org.joda.time.LocalDate
 import play.api.libs.json.Json
 import services.UpdateMongoCacheService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.submission.duplicate_submission
 

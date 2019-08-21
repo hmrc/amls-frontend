@@ -22,8 +22,6 @@ import javax.inject.Inject
 import models.enrolment.{AmlsEnrolmentKey, TaxEnrolment}
 import play.api.Logger
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector,

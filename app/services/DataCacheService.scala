@@ -18,8 +18,6 @@ package services
 
 import connectors.DataCacheConnector
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.{Future, ExecutionContext}
 import uk.gov.hmrc.http.{ HeaderCarrier, NotFoundException }
 

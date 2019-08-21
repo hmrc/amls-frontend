@@ -37,8 +37,6 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 

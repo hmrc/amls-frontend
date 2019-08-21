@@ -25,7 +25,6 @@ import models.moneyservicebusiness.MoneyServiceBusiness
 import models.tradingpremises.TradingPremisesMsbServices.{convertServices, convertSingleService}
 import models.tradingpremises.{TradingPremises, TradingPremisesMsbServices}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthAction
 

@@ -31,7 +31,6 @@ import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.ExecutionContext.Implicits.global

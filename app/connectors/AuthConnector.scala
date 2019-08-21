@@ -24,7 +24,6 @@ import org.apache.http.HttpStatus
 import play.api.libs.json.Json
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.controllers.RestFormats
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
 
 import scala.concurrent.{ExecutionContext, Future}

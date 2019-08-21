@@ -22,8 +22,6 @@ import play.api.mvc.Result
 import services.flowmanagement.Router
 import services.flowmanagement.pagerouters.businessmatching.subsectors.{MsbSubSectorsPageRouter, NoPsrNumberPageRouter, PSRNumberPageRouter}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.{ExecutionContext, Future}
 
 // $COVERAGE_OFF$

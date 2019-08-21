@@ -20,7 +20,6 @@ import cats.data.OptionT
 import connectors.DataCacheConnector
 import models.changeofficer.NewOfficer
 import models.responsiblepeople.{NominatedOfficer, ResponsiblePerson}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.StatusConstants
 
 import scala.concurrent.Future

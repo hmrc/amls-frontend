@@ -36,7 +36,6 @@ import models._
 import play.api.libs.json.{Format, Json}
 import play.api.mvc.Results.Ok
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.http.{HeaderCarrier, HttpGet, NotFoundException}
 
 import scala.concurrent.{ExecutionContext, Future}

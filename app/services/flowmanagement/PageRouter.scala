@@ -20,7 +20,6 @@ import models.flowmanagement.PageId
 import play.api.mvc.{Call, Result}
 import play.api.mvc.Results.InternalServerError
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import play.api.mvc.Results.Redirect
 import scala.concurrent.{ExecutionContext, Future}
 

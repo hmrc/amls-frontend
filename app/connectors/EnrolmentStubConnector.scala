@@ -20,8 +20,6 @@ import config.AppConfig
 import javax.inject.Inject
 import models.enrolment.GovernmentGatewayEnrolment
 import uk.gov.hmrc.http.{HeaderCarrier, HttpGet}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.ExecutionContext
 
 class EnrolmentStubConnector @Inject()(http: HttpGet, config: AppConfig) {

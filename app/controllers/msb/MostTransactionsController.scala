@@ -26,7 +26,6 @@ import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions}
 import services.businessmatching.ServiceFlow
 import services.{AutoCompleteService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.AuthAction
 
 import scala.concurrent.Future

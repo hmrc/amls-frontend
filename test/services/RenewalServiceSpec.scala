@@ -28,7 +28,6 @@ import play.api.mvc.Call
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.ExecutionContext.Implicits.global

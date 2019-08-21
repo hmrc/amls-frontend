@@ -27,7 +27,7 @@ import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.domain.Org
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.frontend.auth.connectors.domain._
-import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser, Principal}
+import uk.gov.hmrc.play.frontend.auth.{LoggedInUser, Principal}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

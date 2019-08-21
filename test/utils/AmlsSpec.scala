@@ -28,8 +28,6 @@ import play.api.{Application, Mode}
 import play.filters.csrf.CSRF.Token
 import play.filters.csrf.{CSRFConfigProvider, CSRFFilter}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 trait AmlsSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with MustMatchers {
 
   protected val bindModules: Seq[GuiceableModule] = Seq(bind[KeystoreConnector].to(mock[KeystoreConnector]))

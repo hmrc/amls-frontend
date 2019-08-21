@@ -23,7 +23,6 @@ import javax.inject.{Inject, Singleton}
 import models.notifications.{ContactType, NotificationDetails, NotificationRow}
 import play.api.i18n._
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

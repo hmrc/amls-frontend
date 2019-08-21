@@ -19,8 +19,6 @@ package connectors.cache
 import play.api.libs.json.Format
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.Future
 
 trait CacheConnector {

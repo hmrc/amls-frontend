@@ -33,7 +33,6 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import services.businessmatching.{BusinessMatchingService, ServiceFlow}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{DependencyMocks, FutureAssertions}
 
 import scala.concurrent.ExecutionContext.Implicits.global

@@ -29,7 +29,6 @@ import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, Request, Result}
 import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.AuthAction
 import views.html.declaration.{who_is_registering_this_registration, who_is_registering_this_renewal, who_is_registering_this_update}
 

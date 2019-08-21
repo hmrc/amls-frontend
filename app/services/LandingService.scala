@@ -40,8 +40,6 @@ import models.tradingpremises.TradingPremises
 import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.{ExecutionContext, Future}
 
 class LandingService @Inject() (val cacheConnector: DataCacheConnector,

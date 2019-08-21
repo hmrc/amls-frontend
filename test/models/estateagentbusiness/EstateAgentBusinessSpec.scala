@@ -21,7 +21,6 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.AmlsSpec
 
 class EstateAgentBusinessSpec extends AmlsSpec {

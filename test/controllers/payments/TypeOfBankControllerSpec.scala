@@ -30,7 +30,6 @@ import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.{ExecutionContext, Future}

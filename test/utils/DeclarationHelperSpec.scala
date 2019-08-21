@@ -24,7 +24,6 @@ import org.scalatestplus.play.PlaySpec
 import services.StatusService
 import org.mockito.Mockito.when
 import org.mockito.Matchers.any
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.DeclarationHelper._
 import play.api.test.Helpers._
 

@@ -28,7 +28,6 @@ import models.status._
 import play.api.mvc.{AnyContent, Request, Result}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.AuthAction
 import views.html.declaration.select_business_nominated_officer
 

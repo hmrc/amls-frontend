@@ -28,7 +28,6 @@ import models.responsiblepeople.{Partner, Positions, ResponsiblePerson}
 import models.status.{RenewalSubmitted, _}
 import play.api.mvc.{AnyContent, Request, Result}
 import services.{ProgressService, StatusService}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.DeclarationHelper._
 import utils.AuthAction
 import views.html.declaration.register_partners

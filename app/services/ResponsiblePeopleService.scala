@@ -23,7 +23,6 @@ import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
 import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{RepeatingSection, StatusConstants}
 
 import scala.concurrent.{ExecutionContext, Future}

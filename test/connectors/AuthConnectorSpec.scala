@@ -30,8 +30,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 class AuthConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
   trait Fixture {

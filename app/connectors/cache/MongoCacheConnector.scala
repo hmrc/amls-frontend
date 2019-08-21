@@ -23,8 +23,6 @@ import play.api.libs.json.Format
 import services.cache.{Cache, MongoCacheClient, MongoCacheClientFactory}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.Future
 
 class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory, authConnector: AuthConnector) extends Conversions {
