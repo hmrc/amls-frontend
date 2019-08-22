@@ -20,15 +20,14 @@ import audit.AddressConversions._
 import audit.{AddressCreatedEvent, AddressModifiedEvent}
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms._
 import models.businessdetails.{BusinessDetails, RegisteredOffice}
 import play.api.mvc.Request
 import services.{AutoCompleteService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.DateOfChangeHelper
+import utils.{AuthAction, DateOfChangeHelper}
 import views.html.businessdetails._
 
 import scala.concurrent.Future
@@ -37,14 +36,13 @@ class RegisteredOfficeNonUKController @Inject ()(
                                             val dataCacheConnector: DataCacheConnector,
                                             val statusService: StatusService,
                                             val auditConnector: AuditConnector,
-                                            val authConnector: AuthConnector,
-                                            val autoCompleteService: AutoCompleteService
-                                            ) extends BaseController with DateOfChangeHelper {
+                                            val autoCompleteService: AutoCompleteService,
+                                            val authAction: AuthAction
+                                            ) extends DefaultBaseController with DateOfChangeHelper {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key) map {
+        dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
           response =>
             val form: Form2[RegisteredOffice] = (for {
               businessDetails <- response
@@ -54,16 +52,16 @@ class RegisteredOfficeNonUKController @Inject ()(
         }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request =>
         Form2[RegisteredOffice](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(registered_office_non_uk(f, edit, autoCompleteService.getCountries)))
           case ValidForm(_, data) =>
             for {
-              businessDetails <- dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key)
-              _ <- dataCacheConnector.save[BusinessDetails](BusinessDetails.key, businessDetails.registeredOffice(data))
-              status <- statusService.getStatus
+              businessDetails <- dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key)
+              _ <- dataCacheConnector.save[BusinessDetails](request.credId, BusinessDetails.key, businessDetails.registeredOffice(data))
+              status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
               _ <- auditAddressChange(data, businessDetails flatMap { _.registeredOffice }, edit)
             } yield {
               if (redirectToDateOfChange[RegisteredOffice](status, businessDetails.registeredOffice, data)) {

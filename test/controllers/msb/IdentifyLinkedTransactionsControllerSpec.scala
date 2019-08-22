@@ -16,6 +16,7 @@
 
 package controllers.msb
 
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching._
 import models.moneyservicebusiness.{MoneyServiceBusiness, _}
 import org.jsoup.Jsoup
@@ -26,15 +27,15 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
 class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSugar  {
 
-    trait Fixture extends AuthorisedFixture with DependencyMocks{
+    trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
       self => val request = addToken(authRequest)
-      val controller = new IdentifyLinkedTransactionsController(mockCacheConnector, authConnector = self.authConnector)
+      val controller = new IdentifyLinkedTransactionsController(mockCacheConnector, authAction = SuccessfulAuthAction)
     }
 
   val cacheMap = mock[CacheMap]
@@ -49,8 +50,8 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
     "load the page systems identify linked transactions" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
+        (any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -59,8 +60,8 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
     "load the page systems identify linked transactions with pre populated data" in new Fixture  {
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(MoneyServiceBusiness(
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(MoneyServiceBusiness(
         identifyLinkedTransactions = Some(IdentifyLinkedTransactions(true))))))
 
       val result = controller.get()(request)
@@ -78,11 +79,11 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
       val newRequest = request.withFormUrlEncodedBody(
       )
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
+        (any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -113,7 +114,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
         ), hasChanged = true
       )
 
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(cacheMap)))
 
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -122,8 +123,8 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
       when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(incomingModel))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -153,7 +154,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
         ), hasChanged = true
       )
 
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(cacheMap)))
 
       when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
@@ -162,8 +163,8 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -193,7 +194,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
         ), hasChanged = true
       )
 
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(cacheMap)))
 
       when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
@@ -202,8 +203,8 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -215,15 +216,15 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
         "linkedTxn" -> "false"
       )
       val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
               .thenReturn(Future.successful(Some(cacheMap)))
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
               .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
       when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
               .thenReturn(Some(MoneyServiceBusiness()))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
-              (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())
+              (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -253,7 +254,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
         ), hasChanged = true
       )
 
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(cacheMap)))
 
       when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
@@ -262,8 +263,8 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -293,7 +294,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
         ), hasChanged = true
       )
 
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(cacheMap)))
 
       when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
@@ -302,8 +303,8 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -330,7 +331,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
         ceTransactionsInNext12Months = completedCE
       )
 
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(cacheMap)))
 
       when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
@@ -339,8 +340,8 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -365,7 +366,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
         ceTransactionsInNext12Months = completedCE
       )
 
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(cacheMap)))
 
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -374,8 +375,8 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
       when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(incomingModel))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -400,7 +401,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
         fxTransactionsInNext12Months = completedFX
       )
 
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
               .thenReturn(Future.successful(Some(cacheMap)))
 
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -409,8 +410,8 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
       when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
               .thenReturn(Some(incomingModel))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
-              (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())
+              (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -436,15 +437,15 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
         ceTransactionsInNext12Months = completedCE
       )
 
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(cacheMap)))
 
       when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(incomingModel))
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -470,15 +471,15 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
         businessUseAnIPSP = completedMT
       )
 
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(cacheMap)))
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
       when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(incomingModel))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -504,15 +505,15 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
         businessUseAnIPSP = completedMT
       )
 
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
               .thenReturn(Future.successful(Some(cacheMap)))
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
               .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
       when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
               .thenReturn(Some(incomingModel))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
-              (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())
+              (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -532,7 +533,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
         hasChanged = true
       )
 
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(cacheMap)))
 
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -541,8 +542,8 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
       when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(incomingModel))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
 
       a[Exception] must be thrownBy {

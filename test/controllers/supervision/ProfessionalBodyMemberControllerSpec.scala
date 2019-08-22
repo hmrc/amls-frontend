@@ -16,6 +16,7 @@
 
 package controllers.supervision
 
+import controllers.actions.SuccessfulAuthAction
 import models.supervision._
 import org.jsoup.Jsoup
 import org.scalatest.mock.MockitoSugar
@@ -24,7 +25,7 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import play.api.i18n.Messages
 import play.api.mvc.Result
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -32,12 +33,12 @@ import scala.concurrent.duration._
 
 class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {self =>
     val request = addToken(authRequest)
 
     val controller = new ProfessionalBodyMemberController (
       dataCacheConnector = mockCacheConnector,
-      authConnector = self.authConnector
+      authAction = SuccessfulAuthAction
     )
 
     mockCacheSave[Supervision]
@@ -269,10 +270,10 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
 
-        verify(controller.dataCacheConnector).save[Supervision](any(),eqTo(Supervision(
+        verify(controller.dataCacheConnector).save[Supervision](any(), any(), eqTo(Supervision(
           professionalBodyMember = Some(ProfessionalBodyMemberNo),
           hasChanged = true
-        )))(any(),any(),any())
+        )))(any(),any())
 
       }
       "ProfessionalBodyMemberNo and professionalBodies is defined" in new Fixture {
@@ -290,10 +291,10 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
 
-        verify(controller.dataCacheConnector).save[Supervision](any(),eqTo(Supervision(
+        verify(controller.dataCacheConnector).save[Supervision](any(), any(), eqTo(Supervision(
           professionalBodyMember = Some(ProfessionalBodyMemberNo),
           hasChanged = true
-        )))(any(),any(),any())
+        )))(any(),any())
 
       }
     }

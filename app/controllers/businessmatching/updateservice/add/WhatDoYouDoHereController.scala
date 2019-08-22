@@ -19,7 +19,7 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import forms.{Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
@@ -28,28 +28,27 @@ import models.flowmanagement._
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.businessmatching.updateservice.add.what_do_you_do_here
 
 import scala.concurrent.Future
 
 @Singleton
 class WhatDoYouDoHereController @Inject()(
-                                           val authConnector: AuthConnector,
+                                           authAction: AuthAction,
                                            implicit val dataCacheConnector: DataCacheConnector,
                                            val statusService: StatusService,
                                            val businessMatchingService: BusinessMatchingService,
                                            val helper: AddBusinessTypeHelper,
                                            val router: Router[AddBusinessTypeFlowModel]
-                                         ) extends BaseController {
+                                         ) extends DefaultBaseController {
 
   var msbServiceValues: Set[String] = Set()
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
         (for {
-          model <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key)) orElse OptionT.some(AddBusinessTypeFlowModel())
+          model <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key)) orElse OptionT.some(AddBusinessTypeFlowModel())
         } yield {
           val form: Form2[BusinessMatchingMsbServices] = Form2(BusinessMatchingMsbServices(model.tradingPremisesMsbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices))
           val flowMsbServices: Set[BusinessMatchingMsbService] = model.subSectors.getOrElse(BusinessMatchingMsbServices(Set())).msbServices
@@ -58,19 +57,18 @@ class WhatDoYouDoHereController @Inject()(
         }) getOrElse InternalServerError("Failed to get subservices")
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    import jto.validation.forms.Rules._
-    implicit authContext =>
-      implicit request =>
+  def post(edit: Boolean = false) = authAction.async {
+     implicit request =>
+       import jto.validation.forms.Rules._
         Form2[BusinessMatchingMsbServices](request.body) match {
           case f: InvalidForm => {
             Future.successful(BadRequest(what_do_you_do_here(f, edit, msbServiceValues)))
           }
           case ValidForm(_, data) => {
-            dataCacheConnector.update[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key) {
+            dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key) {
               case Some(model) =>  model.tradingPremisesMsbServices(data)
             } flatMap {
-              case Some(model) => router.getRoute(WhatDoYouDoHerePageId, model, edit)
+              case Some(model) => router.getRoute(request.credId, WhatDoYouDoHerePageId, model, edit)
               case _ => Future.successful(InternalServerError("Cannot retrieve data"))
             }
           }

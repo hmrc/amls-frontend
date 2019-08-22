@@ -19,6 +19,7 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import config.AppConfig
+import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
@@ -31,14 +32,14 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestData with BusinessMatchingGenerator {
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
 
     val request = addToken(authRequest)
@@ -49,7 +50,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
     val controller = new SubSectorsController(
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       dataCacheConnector = mockCacheConnector,
       businessMatchingService = mockBusinessMatchingService,
       router = createRouter[AddBusinessTypeFlowModel],
@@ -60,13 +61,13 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
     val cacheMapT = OptionT.some[Future, CacheMap](mockCacheMap)
 
     when {
-      controller.businessMatchingService.getModel(any(), any(), any())
+      controller.businessMatchingService.getModel(any())(any(), any())
     } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
       activities = Some(BusinessActivities(Set(AccountancyServices)))
     ))
 
     when {
-      controller.businessMatchingService.updateModel(any())(any(), any(), any())
+      controller.businessMatchingService.updateModel(any(), any())(any(), any())
     } thenReturn cacheMapT
   }
 
@@ -158,7 +159,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
           ))
 
           status(result) mustBe SEE_OTHER
-          controller.router.verify(SubSectorsPageId,
+          controller.router.verify("internalId", SubSectorsPageId,
             AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
               tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
@@ -178,7 +179,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
           ))
 
           status(result) mustBe SEE_OTHER
-          controller.router.verify(SubSectorsPageId,
+          controller.router.verify("internalId", SubSectorsPageId,
             AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
               tradingPremisesMsbServices = None,
@@ -200,7 +201,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
           ))
 
           status(result) mustBe SEE_OTHER
-          controller.router.verify(SubSectorsPageId,
+          controller.router.verify("internalId", SubSectorsPageId,
             AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
               tradingPremisesMsbServices = None,
@@ -222,7 +223,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
           ))
 
           status(result) mustBe SEE_OTHER
-          controller.router.verify(SubSectorsPageId,
+          controller.router.verify("internalId", SubSectorsPageId,
             AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
               tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))),
@@ -244,7 +245,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
           ))
 
           status(result) mustBe SEE_OTHER
-          controller.router.verify(SubSectorsPageId,
+          controller.router.verify("internalId", SubSectorsPageId,
             AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
               tradingPremisesMsbServices = None,

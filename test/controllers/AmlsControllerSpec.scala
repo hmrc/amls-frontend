@@ -16,11 +16,11 @@
 
 package controllers
 
+import controllers.actions.SuccessfulAuthAction
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AmlsSpec
 
 class AmlsControllerSpec extends AmlsSpec {
@@ -30,9 +30,8 @@ class AmlsControllerSpec extends AmlsSpec {
 
       implicit val unauthenticatedRequest = FakeRequest()
       val request = addToken(unauthenticatedRequest)
-      val mockAuthConnector = mock[AuthConnector]
 
-      val controller = new AmlsController(mockAuthConnector)
+      val controller = new AmlsController(SuccessfulAuthAction)
     }
 
     "AmlsController" must {

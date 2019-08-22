@@ -18,7 +18,7 @@ package controllers.responsiblepeople
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{Form2, FormHelpers, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.responsiblepeople.ResponsiblePerson
@@ -27,20 +27,18 @@ import org.joda.time.LocalDate
 import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, Request}
 import services.StatusService
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{DateOfChangeHelper, RepeatingSection}
+import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
 class CurrentAddressDateOfChangeController @Inject () (
                                                       val dataCacheConnector: DataCacheConnector,
-                                                      val authConnector: AuthConnector,
+                                                      authAction: AuthAction,
                                                       statusService: StatusService
-                                                      ) extends RepeatingSection with BaseController with DateOfChangeHelper with FormHelpers {
+                                                      ) extends RepeatingSection with DefaultBaseController with DateOfChangeHelper with FormHelpers {
 
-  def get(index: Int, edit: Boolean) = Authorised {
-    implicit authContext => implicit request =>
+  def get(index: Int, edit: Boolean) = authAction {
+    implicit request =>
       Ok(views.html.date_of_change(
         Form2[DateOfChange](DateOfChange(LocalDate.now)),
         "summary.responsiblepeople",
@@ -48,10 +46,9 @@ class CurrentAddressDateOfChangeController @Inject () (
       ))
   }
 
-  def post(index: Int, edit: Boolean) = Authorised.async {
-    implicit authContext => implicit request =>
-
-      val extraInfo = getData[ResponsiblePerson](index) map { rpO =>
+  def post(index: Int, edit: Boolean) = authAction.async {
+    implicit request =>
+      val extraInfo = getData[ResponsiblePerson](request.credId, index) map { rpO =>
         for {
           rp <- rpO
           name <- rp.personName
@@ -87,7 +84,7 @@ class CurrentAddressDateOfChangeController @Inject () (
                 } yield timeAtAddress
               }
 
-              doUpdate(index, dateOfChange).map { _ =>
+              doUpdate(request.credId, index, dateOfChange).map { _ =>
                 timeAtCurrentO match {
                   case (Some(ZeroToFiveMonths) | Some(SixToElevenMonths)) if !edit =>
                     Redirect(routes.TimeAtCurrentAddressController.get(index, edit))
@@ -102,11 +99,8 @@ class CurrentAddressDateOfChangeController @Inject () (
       }
   }
 
-  private def doUpdate
-  (index: Int, date: DateOfChange)
-  (implicit authContext: AuthContext, request: Request[AnyContent]) =
-
-    updateDataStrict[ResponsiblePerson](index) { res =>
+  private def doUpdate(credId: String, index: Int, date: DateOfChange)(implicit request: Request[AnyContent]) =
+    updateDataStrict[ResponsiblePerson](credId, index) { res =>
       (for {
         addressHist <- res.addressHistory
         rpCurrentAdd <- addressHist.currentAddress

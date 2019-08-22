@@ -19,6 +19,7 @@ package controllers.tradingpremises
 import java.util.UUID
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.{AccountancyServices, BillPaymentServices, BusinessMatching, EstateAgentBusinessService, BusinessActivities => BusinessMatchingActivities, _}
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import models.tradingpremises._
@@ -32,12 +33,11 @@ import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AmlsSpec, AuthorisedFixture, CacheMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
-class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with CacheMocks with generators.tradingpremises.TradingPremisesGenerator {
+class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with generators.tradingpremises.TradingPremisesGenerator {
 
   implicit val request = FakeRequest
   val userId = s"user-${UUID.randomUUID()}"
@@ -46,19 +46,18 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
   //val mockCacheMap = mock[CacheMap]
   val mockYtp = mock[TradingPremises]
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self => val request = addToken(authRequest)
 
     val ytpController = new YourTradingPremisesController(
       mockDataCacheConnector,
       mockStatusService,
-      self.authConnector
+      SuccessfulAuthAction
     )
 
-    when(ytpController.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
+    when(ytpController.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
 
     val model = TradingPremises()
-
     val models = Seq(TradingPremises())
   }
 
@@ -68,7 +67,7 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
       val businessMatchingActivitiesAll = BusinessMatchingActivities(
         Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
 
-      when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(mockDataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
         .thenReturn(Some(Seq(model)))
@@ -84,7 +83,7 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
       val businessMatchingActivitiesAll = BusinessMatchingActivities(
         Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
 
-      when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(mockDataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
         .thenReturn(None)
@@ -98,14 +97,19 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
 
     "for a complete individual display the trading premises check your answers page" in new Fixture {
 
-      when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(mockDataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      val businessMatchingActivities = BusinessMatchingActivities(
+        Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
 
       val ytp = tradingPremisesGen.sample.get.copy(whatDoesYourBusinessDoAtThisAddress =
         Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing, TelephonePaymentService),None)))
 
       when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))
        (any())).thenReturn(Some(Seq(ytp)))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
       val result = ytpController.getIndividual(1, true)(request)
 
@@ -115,17 +119,33 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
 
 
     "for an individual redirect to the trading premises summary summary if data is not present" in new Fixture {
+
+      when(mockDataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+
       when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))
         (any())).thenReturn(None)
+
+
+
+      val businessMatchingActivities = BusinessMatchingActivities(
+        Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
+
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
+
       val result = ytpController.getIndividual(1)(request)
+      val json = contentAsString(result)
+
       status(result) must be(NOT_FOUND)
+
     }
 
     "direct to your answers when the model is present" in new Fixture {
       val businessMatchingActivitiesAll = BusinessMatchingActivities(
         Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
 
-      when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(mockDataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
         .thenReturn(Some(Seq(model)))
@@ -151,10 +171,10 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
 
         val newRequest = request.withFormUrlEncodedBody( "hasAccepted" -> "true")
 
-        when(ytpController.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        when(ytpController.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises =  Some(ytpModel), hasAccepted = true)))))
 
-        when(ytpController.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
+        when(ytpController.dataCacheConnector.save[Seq[TradingPremises]](any(),any(), any())(any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = ytpController.post()(newRequest)
@@ -215,10 +235,7 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
         tradingPremises.removeUrl(1, status = SubmissionDecisionApproved) must be(
           controllers.tradingpremises.routes.RemoveTradingPremisesController.get(1).url
         )
-
       }
-
     }
-
   }
 }

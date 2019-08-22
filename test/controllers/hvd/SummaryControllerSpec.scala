@@ -16,6 +16,7 @@
 
 package controllers.hvd
 
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.HighValueDealing
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.hvd._
@@ -23,7 +24,7 @@ import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Matchers.{any, eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
@@ -32,24 +33,23 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
     val request = addToken(authRequest)
 
     implicit val authContext = mock[AuthContext]
     implicit val headerCarrier = HeaderCarrier()
 
-    lazy val controller = new SummaryController(
-      self.authConnector,
-      mockCacheConnector,
-      mockStatusService,
-      mockServiceFlow)
+    lazy val controller = new SummaryController(authAction = SuccessfulAuthAction,
+                                                mockCacheConnector,
+                                                mockStatusService,
+                                                mockServiceFlow)
 
     val day = 15
     val month = 2
@@ -65,11 +65,11 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
       Some(LinkedCashPayments(true))
     )
 
-    mockIsNewActivity(false)
+    mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, Some(ServiceChangeRegister.key))
 
     when {
-      controller.statusService.isPreSubmission(any(), any(), any())
+      controller.statusService.isPreSubmission(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())
     } thenReturn Future.successful(true)
   }
 
@@ -79,10 +79,10 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
 
       val model = Hvd(None)
 
-      when(controller.statusService.getStatus(any(), any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
         .thenReturn(Future.successful(NotCompleted))
-      when(controller.dataCache.fetch[Hvd](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(model)))
+      when(controller.dataCache.fetch[Hvd](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(model)))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -91,11 +91,11 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
 
-      when(controller.statusService.getStatus(any(), any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
-      when(controller.dataCache.fetch[Hvd](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCache.fetch[Hvd](any(), any())( any(), any()))
+        .thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
@@ -104,10 +104,10 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
     "show edit link for involved in other, turnover expected from activities and amls turnover expected page" when {
       "application in variation mode" in new Fixture {
 
-        when(controller.dataCache.fetch[Hvd](eqTo(Hvd.key))
-          (any(), any(), any())).thenReturn(Future.successful(Some(completeModel)))
+        when(controller.dataCache.fetch[Hvd](any(), eqTo(Hvd.key))
+          (any(), any())).thenReturn(Future.successful(Some(completeModel)))
 
-        when(controller.statusService.getStatus(any(), any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
         val result = controller.get()(request)
@@ -128,10 +128,10 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
 
     "show edit link" when {
       "application not in variation mode" in new Fixture {
-        when(controller.dataCache.fetch[Hvd](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(completeModel)))
+        when(controller.dataCache.fetch[Hvd](any(), any())(any(), any()))
+          .thenReturn(Future.successful(Some(completeModel)))
 
-        when(controller.statusService.getStatus(any(), any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
           .thenReturn(Future.successful(NotCompleted))
 
         val result = controller.get()(request)
@@ -144,13 +144,13 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
       }
 
       "in variation mode and also in the new service flow" in new Fixture {
-        when(controller.dataCache.fetch[Hvd](eqTo(Hvd.key))
-          (any(), any(), any())).thenReturn(Future.successful(Some(completeModel)))
+        when(controller.dataCache.fetch[Hvd]( any(), eqTo(Hvd.key))
+          (any(), any())).thenReturn(Future.successful(Some(completeModel)))
 
-        when(controller.statusService.getStatus(any(), any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-        mockIsNewActivity(true, Some(HighValueDealing))
+        mockIsNewActivityNewAuth(true, Some(HighValueDealing))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -170,11 +170,11 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
       val cache = mock[CacheMap]
 
       when {
-        controller.dataCache.fetch[Hvd](any())(any(), any(), any())
+        (controller.dataCache.fetch[Hvd](any(), any())(any(), any()))
       } thenReturn Future.successful(Some(completeModel.copy(hasAccepted = false)))
 
       when {
-        controller.dataCache.save[Hvd](eqTo(Hvd.key), any())(any(), any(), any())
+        controller.dataCache.save[Hvd](any(), any(), any())(any(), any())
       } thenReturn Future.successful(cache)
 
       val result = controller.post()(request)
@@ -183,7 +183,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
       redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
 
       val captor = ArgumentCaptor.forClass(classOf[Hvd])
-      verify(controller.dataCache).save[Hvd](eqTo(Hvd.key), captor.capture())(any(), any(), any())
+      verify(controller.dataCache).save[Hvd](any(), eqTo(Hvd.key), captor.capture())(any(), any())
       captor.getValue.hasAccepted mustBe true
     }
   }

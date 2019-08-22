@@ -18,28 +18,27 @@ package controllers.responsiblepeople
 
 import config.AppConfig
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{Form2, _}
 import javax.inject.Inject
 import models.responsiblepeople.ResponsiblePerson
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
 class ApprovalCheckController @Inject()(
                                          val dataCacheConnector: DataCacheConnector,
-                                         val authConnector: AuthConnector,
+                                         authAction: AuthAction,
                                          appConfig: AppConfig
-                                       ) extends RepeatingSection with BaseController {
+                                       ) extends RepeatingSection with DefaultBaseController {
 
   val FIELD_NAME = "hasAlreadyPaidApprovalCheck"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(FIELD_NAME)
   implicit val boolRead = utils.BooleanFormReadWrite.formRule(FIELD_NAME, "error.required.rp.approval_check")
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext => implicit request =>
-      getData[ResponsiblePerson](index) map {
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
+    implicit request =>
+      getData[ResponsiblePerson](request.credId, index) map {
         case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,alreadyPassed,_,_,_,_,_,_)) if (alreadyPassed.hasAlreadyPaidApprovalCheck.isDefined) =>
           Ok(views.html.responsiblepeople.approval_check(Form2[Boolean](alreadyPassed.hasAlreadyPaidApprovalCheck.get), edit, index, flow, personName.titleName))
         case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) => {
@@ -50,16 +49,16 @@ class ApprovalCheckController @Inject()(
   }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
-    Authorised.async {
-      implicit authContext => implicit request =>
+    authAction.async {
+      implicit request =>
         Form2[Boolean](request.body) match {
           case f: InvalidForm =>
-            getData[ResponsiblePerson](index) map { rp =>
+            getData[ResponsiblePerson](request.credId, index) map { rp =>
               BadRequest(views.html.responsiblepeople.approval_check(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
             for {
-              _ <- updateDataStrict[ResponsiblePerson](index) { rp =>
+              _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
                 rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPaidApprovalCheck = Some(data)))
               }
             } yield

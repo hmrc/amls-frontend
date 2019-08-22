@@ -15,7 +15,8 @@
  */
 
  package controllers.responsiblepeople
- import connectors.{DataCacheConnector, KeystoreConnector}
+ import connectors.DataCacheConnector
+ import controllers.actions.SuccessfulAuthAction
  import models.responsiblepeople.ResponsiblePerson._
  import models.responsiblepeople.{ApprovalFlags, PersonName, ResponsiblePerson}
  import org.jsoup.Jsoup
@@ -25,15 +26,14 @@
  import play.api.inject.bind
  import play.api.inject.guice.GuiceApplicationBuilder
  import play.api.test.Helpers._
- import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
- import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+ import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocksNewAuth}
 
  class ApprovalCheckControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
-   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+   trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
     val request = addToken(authRequest)
      lazy val defaultBuilder = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
      val builder = defaultBuilder
     lazy val app = builder.build()

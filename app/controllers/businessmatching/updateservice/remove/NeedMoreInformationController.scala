@@ -19,27 +19,26 @@ package controllers.businessmatching.updateservice.remove
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessActivity
 import models.flowmanagement.{NeedToUpdatePageId, RemoveBusinessTypeFlowModel}
 import services.flowmanagement.Router
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.businessmatching.updateservice.remove.need_more_information
 
 import scala.concurrent.Future
 
 @Singleton
-class NeedMoreInformationController @Inject()(val authConnector: AuthConnector,
+class NeedMoreInformationController @Inject()(authAction: AuthAction,
                                               implicit val dataCacheConnector: DataCacheConnector,
                                               val router: Router[RemoveBusinessTypeFlowModel]
-                                               ) extends BaseController {
+                                             ) extends DefaultBaseController {
 
-  def get() = Authorised.async {
-    implicit authContext =>
+  def get() = authAction.async {
       implicit request =>
         (for {
-          model <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel.key))
+          model <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](request.credId, RemoveBusinessTypeFlowModel.key))
           activities <- OptionT.fromOption[Future](model.activitiesToRemove) orElse OptionT.some[Future, Set[BusinessActivity]](Set.empty)
         } yield {
           val activityNames = activities map { _.getMessage() }
@@ -47,11 +46,10 @@ class NeedMoreInformationController @Inject()(val authConnector: AuthConnector,
          })getOrElse(InternalServerError("Cannot retrieve information from cache"))
   }
 
-  def post() = Authorised.async {
-    implicit authContext =>
+  def post() = authAction.async {
       implicit request =>
         (for {
-            route <- OptionT.liftF(router.getRoute(NeedToUpdatePageId, new RemoveBusinessTypeFlowModel()))
+            route <- OptionT.liftF(router.getRoute(request.credId, NeedToUpdatePageId, new RemoveBusinessTypeFlowModel()))
         } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: Remove : NewServiceInformationController")
   }
 }

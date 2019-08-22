@@ -16,6 +16,7 @@
 
 package controllers.hvd
 
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.HighValueDealing
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.hvd.Hvd
@@ -24,25 +25,23 @@ import org.jsoup.Jsoup
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
     val request = addToken(authRequest)
 
-    val controller = new ExpectToReceiveCashPaymentsController(
-      self.authConnector,
-      mockCacheConnector,
-      mockStatusService,
-      mockServiceFlow
-    )
+    val controller = new ExpectToReceiveCashPaymentsController(SuccessfulAuthAction,
+                                                               mockCacheConnector,
+                                                               mockStatusService,
+                                                               mockServiceFlow)
 
     mockCacheFetch[Hvd](None, Some(Hvd.key))
     mockCacheSave[Hvd]
     mockApplicationStatus(SubmissionReady)
-    mockIsNewActivity(false)
+    mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, Some(ServiceChangeRegister.key))
   }
 
@@ -63,7 +62,7 @@ class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSug
       "display the view when supervised, but in the new service flow" in new Fixture {
 
         mockApplicationStatus(SubmissionDecisionApproved)
-        mockIsNewActivity(true, Some(HighValueDealing))
+        mockIsNewActivityNewAuth(true, Some(HighValueDealing))
 
         val result = controller.get()(request)
 

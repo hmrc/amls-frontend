@@ -16,40 +16,37 @@
 
 package controllers.payments
 
-import javax.inject.{Inject, Singleton}
-
 import cats.data.OptionT
 import cats.implicits._
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.{Inject, Singleton}
 import models.FeeResponse
 import models.payments.WaysToPay._
 import models.payments.{CreateBacsPaymentRequest, WaysToPay}
 import play.api.mvc.Result
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{AuthAction, AuthorisedRequest}
 
 import scala.concurrent.Future
 
 @Singleton
 class WaysToPayController @Inject()(
-                                     val authConnector: AuthConnector,
+                                     val authAction: AuthAction,
                                      val statusService: StatusService,
                                      val paymentsService: PaymentsService,
                                      val authEnrolmentsService: AuthEnrolmentsService,
                                      val feeResponseService: FeeResponseService
-                                   ) extends BaseController {
+                                   ) extends DefaultBaseController {
 
-  def get() = Authorised.async {
-    implicit authContext =>
+  def get() = authAction.async {
       implicit request =>
         Future.successful(Ok(views.html.payments.ways_to_pay(EmptyForm)))
   }
 
-  def post() = Authorised.async {
-    implicit authContext => implicit request =>
+  def post() = authAction.async {
+    implicit request =>
         Form2[WaysToPay](request.body) match {
           case ValidForm(_, data) =>
             data match {
@@ -59,8 +56,9 @@ class WaysToPayController @Inject()(
                     fees,
                     controllers.routes.PaymentConfirmationController.paymentConfirmation(paymentReference).url,
                     fees.amlsReferenceNumber,
-                    safeId
-                  ) map { nextUrl =>
+                    safeId,
+                    request.accountTypeId
+                  ).map { nextUrl =>
                     Redirect(nextUrl.value)
                   }
                 }("Cannot retrieve payment information")
@@ -71,8 +69,9 @@ class WaysToPayController @Inject()(
                       fees.amlsReferenceNumber,
                       paymentReference,
                       safeId,
-                      paymentsService.amountFromSubmissionData(fees).fold(0)(_.map(_ * 100).value.toInt))
-                  ) map { _ =>
+                      paymentsService.amountFromSubmissionData(fees).fold(0)(_.map(_ * 100).value.toInt)),
+                    request.accountTypeId
+                  ).map { _ =>
                     Redirect(controllers.payments.routes.TypeOfBankController.get())
                   }
                 }("Unable to save BACS info")
@@ -83,12 +82,12 @@ class WaysToPayController @Inject()(
 
   def progressToPayment(fn: (FeeResponse, String, String) => Future[Result])
                        (errorMessage: String)
-                       (implicit ac: AuthContext, hc: HeaderCarrier): Future[Result] = {
+                       (implicit hc: HeaderCarrier, request:AuthorisedRequest[_]): Future[Result] = {
 
     val submissionDetails = for {
-      amlsRefNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
-      (_, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus(amlsRefNo))
-      fees <- OptionT(feeResponseService.getFeeResponse(amlsRefNo))
+      amlsRefNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
+      (_, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus(amlsRefNo, request.accountTypeId))
+      fees <- OptionT(feeResponseService.getFeeResponse(amlsRefNo, request.accountTypeId))
     } yield (fees, detailedStatus)
 
     submissionDetails.value flatMap {

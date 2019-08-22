@@ -17,19 +17,19 @@
 package controllers.responsiblepeople
 
 import com.google.inject.Inject
-import controllers.BaseController
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import controllers.DefaultBaseController
+import utils.AuthAction
 import views.html.responsiblepeople._
 
 import scala.concurrent.Future
 
 class WhatYouNeedController @Inject () (
-                                       val authConnector:AuthConnector
-                                       ) extends BaseController {
+                                       authAction: AuthAction
+                                       ) extends DefaultBaseController {
 
   def get(index: Int, flow: Option[String] = None) =
-    Authorised.async {
-      implicit authContext => implicit request =>
+    authAction.async {
+      implicit request =>
         Future.successful(Ok(what_you_need(index, flow)))
     }
 }

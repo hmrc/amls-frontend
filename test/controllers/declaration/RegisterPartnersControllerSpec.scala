@@ -17,6 +17,7 @@
 package controllers.declaration
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople._
 import models.status._
 import org.joda.time.LocalDate
@@ -30,23 +31,23 @@ import play.api.test.Helpers._
 import services.{ProgressService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthorisedFixture, StatusConstants}
+import utils._
 
 import scala.concurrent.Future
 
 
 class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
-    val statusService = mock[StatusService]
+    val statusService = mockStatusService
     val progressService = mock[ProgressService]
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[AuthConnector].to(authConnector))
+      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .overrides(bind[StatusService].to(statusService))
       .overrides(bind[ProgressService].to(progressService))
@@ -83,12 +84,10 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with OK" in new Fixture {
 
         when {
-          dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(),any(),any())
+          dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(),any())
         } thenReturn Future.successful(Some(Seq(ResponsiblePerson())))
 
-        when {
-          statusService.getStatus(any(),any(),any())
-        } thenReturn Future.successful(SubmissionDecisionApproved)
+        mockApplicationStatusNewAuth(SubmissionDecisionApproved)
 
         val result = controller.get()(request)
 
@@ -103,19 +102,18 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
 
           val newRequest = request.withFormUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
-          when(controller.statusService.getStatus(any(),any(),any()))
-            .thenReturn(Future.successful(SubmissionReady))
+          mockApplicationStatusNewAuth(SubmissionReady)
 
           val updatedList = Seq(rp.copy(positions = Some(positions.copy(positions
             = Set(BeneficialOwner, InternalAccountant, Partner)))), rp2)
 
-          when(controller.dataCacheConnector.save[Option[Seq[ResponsiblePerson]]](any(), meq(Some(updatedList)))(any(), any(), any()))
+          when(controller.dataCacheConnector.save[Option[Seq[ResponsiblePerson]]](any(), any(), meq(Some(updatedList)))(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(controller.progressService.getSubmitRedirect(any(), any(), any()))
+          when(controller.progressService.getSubmitRedirect(Some(any()), any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(controllers.declaration.routes.WhoIsRegisteringController.get())))
 
           val result = controller.post()(newRequest)
@@ -127,11 +125,10 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
       "fail validation" when {
         "no option is selected on the UI and status is submissionready" in new Fixture {
           val newRequest = request.withFormUrlEncodedBody()
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
-          when(controller.statusService.getStatus(any(),any(),any()))
-            .thenReturn(Future.successful(SubmissionReady))
+          mockApplicationStatusNewAuth(SubmissionReady)
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -141,11 +138,10 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
 
         "no option is selected on the UI and status is SubmissionReadyForReview" in new Fixture {
           val newRequest = request.withFormUrlEncodedBody()
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
-          when(controller.statusService.getStatus(any(),any(),any()))
-            .thenReturn(Future.successful(SubmissionReadyForReview))
+          mockApplicationStatusNewAuth(SubmissionReadyForReview)
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -155,11 +151,10 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
 
         "no option is selected on the UI and status is ReadyForRenewal" in new Fixture {
           val newRequest = request.withFormUrlEncodedBody()
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
-          when(controller.statusService.getStatus(any(),any(),any()))
-            .thenReturn(Future.successful(ReadyForRenewal(Some(new LocalDate()))))
+          mockApplicationStatusNewAuth(ReadyForRenewal(Some(new LocalDate())))
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -169,11 +164,10 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
 
         "no option is selected on the UI and no responsible people returned" in new Fixture {
           val newRequest = request.withFormUrlEncodedBody()
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(None))
 
-          when(controller.statusService.getStatus(any(),any(),any()))
-            .thenReturn(Future.successful(SubmissionReady))
+          mockApplicationStatusNewAuth(SubmissionReadyForReview)
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)

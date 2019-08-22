@@ -18,20 +18,19 @@ package controllers.tradingpremises
 
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
+import utils.{AuthAction, ControllerHelper}
 import views.html.tradingpremises._
 
 @Singleton
 class WhatYouNeedController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                      val authConnector: AuthConnector) extends BaseController {
+                                      val authAction: AuthAction) extends DefaultBaseController {
 
-  def get(index: Int) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {
+  def get(index: Int) = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map {
         response =>
         Ok(what_you_need(index, ControllerHelper.isMSBSelected(response)))
       }

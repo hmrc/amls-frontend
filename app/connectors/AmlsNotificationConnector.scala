@@ -32,13 +32,10 @@ class AmlsNotificationConnector @Inject()(val http: WSHttp,
 
   private[connectors] def baseUrl : String = appConfig.allNotificationsUrl
 
-  def fetchAllByAmlsRegNo(amlsRegistrationNumber: String)(implicit
-                                                          headerCarrier: HeaderCarrier,
-                                                          reqW: Writes[Seq[NotificationRow]],
-                                                          ac: AuthContext
-  ): Future[Seq[NotificationRow]] = {
+  def fetchAllByAmlsRegNo(amlsRegistrationNumber: String, accountTypeId: (String, String))
+                         (implicit headerCarrier: HeaderCarrier, reqW: Writes[Seq[NotificationRow]]): Future[Seq[NotificationRow]] = {
 
-    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+    val (accountType, accountId) = accountTypeId
 
     val getUrl = s"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber"
     val prefix = "[AmlsNotificationConnector][fetchAllByAmlsRegNo]"
@@ -50,13 +47,10 @@ class AmlsNotificationConnector @Inject()(val http: WSHttp,
     }
   }
 
-  def fetchAllBySafeId(safeId: String)(implicit
-                                        headerCarrier: HeaderCarrier,
-                                        reqW: Writes[Seq[NotificationRow]],
-                                        ac: AuthContext
-  ): Future[Seq[NotificationRow]] = {
+  def fetchAllBySafeId(safeId: String, accountTypeId: (String, String))
+                      (implicit headerCarrier: HeaderCarrier, reqW: Writes[Seq[NotificationRow]]): Future[Seq[NotificationRow]] = {
 
-    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+    val (accountType, accountId) = accountTypeId
 
     val getUrl = s"$baseUrl/$accountType/$accountId/safeId/$safeId"
     val prefix = "[AmlsNotificationConnector][fetchAllBySafeId]"
@@ -68,10 +62,10 @@ class AmlsNotificationConnector @Inject()(val http: WSHttp,
     }
   }
 
-  def getMessageDetailsByAmlsRegNo(amlsRegistrationNumber: String, contactNumber: String)
-                       (implicit hc : HeaderCarrier, ec : ExecutionContext, ac: AuthContext): Future[Option[NotificationDetails]]= {
+  def getMessageDetailsByAmlsRegNo(amlsRegistrationNumber: String, contactNumber: String, accountTypeId: (String, String))
+                                  (implicit hc : HeaderCarrier, ec : ExecutionContext): Future[Option[NotificationDetails]]= {
 
-    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+    val (accountType, accountId) = accountTypeId
 
     val url = s"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber/$contactNumber"
     http.GET[NotificationDetails](url)

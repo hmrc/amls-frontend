@@ -19,43 +19,40 @@ package controllers.withdrawal
 import cats.data.OptionT
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
-import controllers.BaseController
+import controllers.DefaultBaseController
 import javax.inject.Inject
 import models.businessmatching.BusinessMatching
 import services.{AuthEnrolmentsService, StatusService}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.BusinessName
+import utils.{AuthAction, BusinessName}
 import views.html.withdrawal.withdraw_application
 
 import scala.concurrent.Future
 
 class WithdrawApplicationController @Inject()(
-                                               val authConnector: AuthConnector,
+                                               authAction: AuthAction,
                                                implicit val amls: AmlsConnector,
                                                implicit val dc: DataCacheConnector,
                                                enrolments: AuthEnrolmentsService,
-                                               implicit val statusService: StatusService) extends BaseController {
+                                               implicit val statusService: StatusService) extends DefaultBaseController {
 
-  def get = Authorised.async {
-    implicit authContext =>
+  def get = authAction.async {
       implicit request =>
         val maybeProcessingDate = for {
-          status <- OptionT.liftF(statusService.getDetailedStatus)
+          status <- OptionT.liftF(statusService.getDetailedStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
           response <- OptionT.fromOption[Future](status._2)
         } yield response.processingDate
 
         (for {
-          cache <- OptionT(dc.fetch[BusinessMatching](BusinessMatching.key))
+          cache <- OptionT(dc.fetch[BusinessMatching](request.credId, BusinessMatching.key))
           details <- OptionT.fromOption[Future](cache.reviewDetails)
           processingDate <- maybeProcessingDate
-          amlsRegNumber <- OptionT(enrolments.amlsRegistrationNumber)
-          id <- OptionT(statusService.getSafeIdFromReadStatus(amlsRegNumber))
-          name <- BusinessName.getName(Some(id))
+          amlsRegNumber <- OptionT(enrolments.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
+          id <- OptionT(statusService.getSafeIdFromReadStatus(amlsRegNumber, request.accountTypeId))
+          name <- BusinessName.getName(request.credId, Some(id), request.accountTypeId)
         } yield Ok(withdraw_application(name, processingDate))) getOrElse InternalServerError("Unable to show the withdrawal page")
   }
 
-  def post = Authorised.async {
-    implicit authContext =>
+  def post = authAction.async {
       implicit request =>
         Future.successful(Redirect(routes.WithdrawalReasonController.get()))
   }

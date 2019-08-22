@@ -18,21 +18,20 @@ package controllers.responsiblepeople
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import models.responsiblepeople.ResponsiblePerson
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
+import utils.{AuthAction, RepeatingSection}
 import views.html.responsiblepeople.your_responsible_people
 
 class YourResponsiblePeopleController @Inject () (
                                                  val dataCacheConnector: DataCacheConnector,
-                                                 val authConnector: AuthConnector
-                                                 ) extends RepeatingSection with BaseController {
+                                                 authAction: AuthAction
+                                                 ) extends RepeatingSection with DefaultBaseController {
 
   def get() =
-      Authorised.async {
-        implicit authContext => implicit request =>
-          dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key) map {
+      authAction.async {
+        implicit request =>
+          dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key) map {
             case Some(data) => {
               val (completeRP, incompleteRP) = ResponsiblePerson.filterWithIndex(data)
                 .partition(_._1.isComplete)

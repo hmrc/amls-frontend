@@ -16,44 +16,41 @@
 
 package controllers.renewal
 
-import javax.inject.Inject
-
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.businessmatching._
 import models.renewal.{Renewal, SendMoneyToOtherCountry}
 import services.RenewalService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.renewal.send_money_to_other_country
 
 import scala.concurrent.Future
 
 class SendMoneyToOtherCountryController @Inject()(
-                                                   val authConnector: AuthConnector,
+                                                   val authAction: AuthAction,
                                                    val dataCacheConnector: DataCacheConnector,
-                                                   renewalService: RenewalService) extends BaseController {
+                                                   renewalService: RenewalService) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
         (for {
-          renewal <- OptionT(renewalService.getRenewal)
+          renewal <- OptionT(renewalService.getRenewal(request.credId))
           otherCountry <- OptionT.fromOption[Future](renewal.sendMoneyToOtherCountry)
         } yield {
           Ok(send_money_to_other_country(Form2[SendMoneyToOtherCountry](otherCountry), edit))
         }) getOrElse Ok(send_money_to_other_country(EmptyForm, edit))
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request =>
         Form2[SendMoneyToOtherCountry](request.body) match {
           case f: InvalidForm => Future.successful(BadRequest(send_money_to_other_country(f, edit)))
           case ValidForm(_, model) =>
-            dataCacheConnector.fetchAll flatMap {
+            dataCacheConnector.fetchAll(request.credId) flatMap {
               optMap =>
                 (for {
                   cacheMap <- optMap
@@ -63,7 +60,7 @@ class SendMoneyToOtherCountryController @Inject()(
                   activities <- bm.activities
                 } yield {
 
-                  renewalService.updateRenewal(model.money match {
+                  renewalService.updateRenewal(request.credId, model.money match {
                     case false => renewal.sendMoneyToOtherCountry(model).copy(
                       mostTransactions = None, sendTheLargestAmountsOfMoney = None)
                     case true => renewal.sendMoneyToOtherCountry(model)

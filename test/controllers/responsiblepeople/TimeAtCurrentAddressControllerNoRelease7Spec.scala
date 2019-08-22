@@ -17,6 +17,7 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ZeroToFiveMonths}
 import models.responsiblepeople._
 import models.status.SubmissionDecisionApproved
@@ -40,7 +41,7 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with Mockito
 
     val timeAtAddressController = new TimeAtCurrentAddressController (
       dataCacheConnector = mockDataCacheConnector,
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       statusService = mock[StatusService]
     )
   }
@@ -60,12 +61,12 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with Mockito
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
 
-          when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+          when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(timeAtAddressController.statusService.getStatus(any(), any(), any()))
+          when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           val result = timeAtAddressController.post(recordId, true)(requestWithParams)
@@ -86,12 +87,12 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with Mockito
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
 
 
-          when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+          when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(timeAtAddressController.statusService.getStatus(any(), any(), any()))
+          when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           val result = timeAtAddressController.post(recordId, true)(requestWithParams)
