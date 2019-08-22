@@ -24,6 +24,7 @@ import models.moneyservicebusiness._
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.ControllerHelper
 
 import scala.concurrent.Future
 
@@ -50,7 +51,8 @@ class WhichCurrenciesController @Inject() (val authConnector: AuthConnector,
     implicit authContext => implicit request => {
       Form2[WhichCurrencies](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.msb.which_currencies(removeEmptyFields(f), edit)))
+          Future.successful(BadRequest(views.html.msb.which_currencies(
+            alignFormDataWithValidationErrors(f), edit)))
         case ValidForm(_, data: WhichCurrencies) =>
               for {
                 msb <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
@@ -64,16 +66,8 @@ class WhichCurrenciesController @Inject() (val authConnector: AuthConnector,
     }
   }
 
-  // Validation removes empty fields. This removes them from the form data, so the errors align correctly with the fields.
-  def removeEmptyFields(f: InvalidForm): InvalidForm = {
-    val csrfToken = f.data.head
-    val fieldsWithData:Map[String, Seq[String]] = f.data
-      .filter(field => field._1.contains("currencies"))
-      .filter(field => field._2.exists(s => s.nonEmpty))
-      .zipWithIndex
-      .map((tuple: ((String, Seq[String]), Int)) => (tuple._1._1.replaceFirst("[\\d]", s"${tuple._2}"), tuple._1._2))
-    f.copy(data = fieldsWithData + csrfToken)
-  }
+  def alignFormDataWithValidationErrors(form: InvalidForm): InvalidForm =
+    ControllerHelper.stripEmptyValuesFromFormWithArray(form, "currencies")
 
   def updateCurrencies(oldMsb: Option[MoneyServiceBusiness], newWhichCurrencies: WhichCurrencies): Option[MoneyServiceBusiness] = {
     oldMsb match {
