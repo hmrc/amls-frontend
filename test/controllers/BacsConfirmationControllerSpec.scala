@@ -17,30 +17,26 @@
 package controllers
 
 import connectors._
+import controllers.actions.SuccessfulAuthAction
 import generators.submission.SubscriptionResponseGenerator
 import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
-import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessdetails.{BusinessDetails, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
 import models.businessmatching.BusinessMatching
-import models.confirmation.{BreakdownRow, Currency}
-import models.payments.PaymentStatuses.{Cancelled, Created, Failed}
+import models.confirmation.BreakdownRow
 import models.payments._
 import models.registrationdetails.RegistrationDetails
-import models.renewal.{InvolvedInOtherNo, Renewal}
-import models.status.{SubmissionDecisionApproved, _}
+import models.status._
 import models.{status => _, _}
-import org.joda.time.{DateTime, LocalDate, LocalDateTime}
+import org.joda.time.{DateTime, LocalDateTime}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalacheck.Gen
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
@@ -57,13 +53,17 @@ class BacsConfirmationControllerSpec extends AmlsSpec
     val request = addToken(authRequest).copyFakeRequest(uri = baseUrl)
 
     val controller = new BacsConfirmationController(
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       statusService = mock[StatusService],
       dataCacheConnector = mock[DataCacheConnector],
       amlsConnector = mock[AmlsConnector],
-      authEnrolmentsService = mock[AuthEnrolmentsService],
-      authenticator = mock[AuthenticatorConnector]
-    )
+      authenticator = mock[AuthenticatorConnector],
+      enrolmentService = mock[AuthEnrolmentsService])
+
+    when(controller.enrolmentService.amlsRegistrationNumber(any(), any())(any(), any()))
+      .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
+
+    val amlsRegistrationNumber = "amlsRefNumber"
 
     val response = subscriptionResponseGen(hasFees = true).sample.get
 
@@ -78,47 +78,44 @@ class BacsConfirmationControllerSpec extends AmlsSpec
     } thenReturn Future.successful(HttpResponse(OK))
 
     when {
-      controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
-    } thenReturn Future.successful(Some(amlsRegistrationNumber))
-
-    when {
-      controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
+      controller.amlsConnector.refreshPaymentStatus(any(), any())(any(), any())
     } thenReturn Future.successful(paymentStatusResultGen.sample.get.copy(currentStatus = PaymentStatuses.Successful))
 
     when {
-      controller.amlsConnector.getPaymentByPaymentReference(any())(any(), any(), any())
+      controller.amlsConnector.getPaymentByPaymentReference(any(), any())(any(), any())
     } thenReturn Future.successful(paymentGen.sample)
 
     when {
-      controller.amlsConnector.savePayment(any(), any(), any())(any(), any(), any())
+      controller.amlsConnector.savePayment(any(), any(), any(), any())(any(), any())
     } thenReturn Future.successful(HttpResponse(CREATED))
 
     when {
-      controller.amlsConnector.registrationDetails(any())(any(), any(), any())
+      controller.amlsConnector.registrationDetails(any(), any())(any(), any())
     } thenReturn Future.successful(RegistrationDetails(companyNameFromRegistration, isIndividual = false))
 
     when {
-      controller.dataCacheConnector.fetch[SubmissionRequestStatus](eqTo(SubmissionRequestStatus.key))(any(),any(),any())
+      controller.dataCacheConnector.fetch[SubmissionRequestStatus](any(), eqTo(SubmissionRequestStatus.key))(any(), any())
     } thenReturn Future.successful(Some(SubmissionRequestStatus(true)))
 
     def feeResponse(responseType: ResponseType) = FeeResponse(
-      responseType,
-      amlsRegistrationNumber,
-      100,
-      None,
-      None,
-      0,
-      200,
-      Some(paymentReferenceNumber),
-      Some(115),
-      DateTime.now
+      responseType = responseType,
+      amlsReferenceNumber = amlsRegistrationNumber,
+      registrationFee = 100,
+      fpFee = None,
+      approvalCheckFee = None,
+      premiseFee = 0,
+      totalFees = 200,
+      paymentReference = Some(paymentReferenceNumber),
+      difference = Some(115),
+      createdAt = DateTime.now
     )
 
     val breakdownRows = Seq.empty[BreakdownRow]
 
     val businessDetails = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredNo))
+
     when {
-      controller.dataCacheConnector.fetch[BusinessDetails](eqTo(BusinessDetails.key))(any(), any(), any())
+      controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any(), any())
     } thenReturn Future.successful(Some(businessDetails))
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))
@@ -130,7 +127,7 @@ class BacsConfirmationControllerSpec extends AmlsSpec
       )
 
       when {
-        controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+        controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any())
       } thenReturn Future.successful(Some(model))
 
     }
@@ -138,14 +135,14 @@ class BacsConfirmationControllerSpec extends AmlsSpec
     def setupStatus(status: SubmissionStatus): Unit = {
 
       when {
-        controller.statusService.getStatus(any(), any(), any())
+        controller.statusService.getStatus(any[Option[String]](), any(), any())(any(), any())
       } thenReturn Future.successful(status)
 
       val statusResponse = mock[ReadStatusResponse]
       when(statusResponse.safeId) thenReturn safeIdGen.sample
 
       when {
-        controller.statusService.getDetailedStatus(any(), any(), any())
+        controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any())
       } thenReturn Future.successful((status, Some(statusResponse)))
     }
   }
@@ -157,7 +154,7 @@ class BacsConfirmationControllerSpec extends AmlsSpec
       "bacs confirmation is requested" in new Fixture {
 
         when {
-          controller.statusService.getReadStatus(any())(any(), any(), any())
+          controller.statusService.getReadStatus(any[String](), any[(String, String)]())(any(), any())
         } thenReturn Future.successful(ReadStatusResponse(LocalDateTime.now(), "", None, None, None, None, false))
 
         val result = controller.bacsConfirmation()(request)
@@ -173,11 +170,11 @@ class BacsConfirmationControllerSpec extends AmlsSpec
         val businessDetailsYes = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredYes("123456")))
 
         when {
-          controller.statusService.getReadStatus(any())(any(), any(), any())
+          controller.statusService.getReadStatus(any[String](), any[(String, String)]())(any(), any())
         } thenReturn Future.successful(ReadStatusResponse(LocalDateTime.now(), "", None, None, None, None, false))
 
         when {
-          controller.dataCacheConnector.fetch[BusinessDetails](eqTo(BusinessDetails.key))(any(), any(), any())
+          controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any(), any())
         } thenReturn Future.successful(Some(businessDetailsYes))
 
         val result = controller.bacsConfirmation()(request)

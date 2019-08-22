@@ -36,19 +36,19 @@ import scala.concurrent.{ExecutionContext, Future}
 class AddMoreBusinessTypesPageRouter @Inject()(val statusService: StatusService,
                                                val businessMatchingService: BusinessMatchingService) extends PageRouter[AddBusinessTypeFlowModel] {
 
-  override def getPageRoute(model: AddBusinessTypeFlowModel, edit: Boolean = false)
-                           (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+  override def getRoute(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)
+                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
 
     model.addMoreActivities match {
       case Some(true) =>
         Future.successful(Redirect(addRoutes.SelectBusinessTypeController.get(edit)))
       case _ =>
-        newServiceInformationRedirect getOrElse error(AddMoreBusinessTypesPageId)
+        newServiceInformationRedirect(credId) getOrElse error(AddMoreBusinessTypesPageId)
     }
   }
 
-  private def newServiceInformationRedirect(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext) =
-    businessMatchingService.getAdditionalBusinessActivities map { activities =>
+  private def newServiceInformationRedirect(credId:String)(implicit hc: HeaderCarrier, ec: ExecutionContext) =
+    businessMatchingService.getAdditionalBusinessActivities(credId) map { activities =>
       if (!activities.forall {
         case BillPaymentServices | TelephonePaymentService => true
         case _ => false
@@ -58,6 +58,7 @@ class AddMoreBusinessTypesPageRouter @Inject()(val statusService: StatusService,
         Redirect(controllers.routes.RegistrationProgressController.get())
       }
     }
+
 }
 
 

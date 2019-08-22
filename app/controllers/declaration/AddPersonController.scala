@@ -18,51 +18,48 @@ package controllers.declaration
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.declaration.AddPerson
 import models.declaration.release7._
 import models.status._
-import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, Request, Result}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
+import utils.{AuthAction, ControllerHelper}
 
 import scala.concurrent.Future
 
-class AddPersonController @Inject () (
-                                       val dataCacheConnector: DataCacheConnector,
+class AddPersonController @Inject () (val dataCacheConnector: DataCacheConnector,
                                        val statusService: StatusService,
-                                       val authConnector: AuthConnector
-                                     ) extends BaseController {
+                                       authAction: AuthAction
+                                     ) extends DefaultBaseController {
 
 
-  def get() = Authorised.async {
-    implicit authContext => implicit request => {
-          addPersonView(Ok,EmptyForm)
+  def get() = authAction.async {
+    implicit request => {
+          addPersonView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok,EmptyForm)
       }
   }
 
   def getWithAmendment() = get()
 
-  def post() = Authorised.async {
-    implicit authContext => implicit request => {
+  def post() = authAction.async {
+    implicit request => {
       Form2[AddPerson](request.body) match {
         case f: InvalidForm =>
 
-          dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) flatMap { bm =>
+          dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) flatMap { bm =>
             val businessType = ControllerHelper.getBusinessType(bm)
             val updatedForm = updateFormErrors(f, businessType)
-            addPersonView(BadRequest, updatedForm)
+            addPersonView(request.amlsRefNumber, request.accountTypeId, request.credId, BadRequest, updatedForm)
           }
 
         case ValidForm(_, data) =>
-          dataCacheConnector.save[AddPerson](AddPerson.key, data) flatMap { _ =>
-            statusService.getStatus map {
+          dataCacheConnector.save[AddPerson](request.credId, AddPerson.key, data) flatMap { _ =>
+            statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) map {
               case _ if isResponsiblePerson(data) => {
                 Redirect(routes.RegisterResponsiblePersonController.get())
               }
@@ -97,7 +94,7 @@ class AddPersonController @Inject () (
     roleList.contains(DesignatedMember) ||
     roleList.contains(NominatedOfficer)
   }
-
+@deprecated("Remove once auth is fully implemented")
   private def addPersonView(status: Status, form: Form2[AddPerson])
                            (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] = {
 
@@ -116,4 +113,23 @@ class AddPersonController @Inject () (
         }
       }
     }
+
+  private def addPersonView(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String, status: Status, form: Form2[AddPerson])
+                           (implicit request: Request[AnyContent]): Future[Result] = {
+
+    dataCacheConnector.fetch[BusinessMatching](cacheId, BusinessMatching.key) flatMap { bm =>
+      val businessType = ControllerHelper.getBusinessType(bm)
+
+      statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) map {
+        case SubmissionReady =>
+          status(views.html.declaration.add_person("declaration.addperson.title", "submit.registration", businessType, form))
+        case SubmissionReadyForReview | SubmissionDecisionApproved =>
+          status(views.html.declaration.add_person("declaration.addperson.amendment.title", "submit.amendment.application", businessType, form))
+        case RenewalSubmitted(_) => status(views.html.declaration.add_person("declaration.addperson.title", "submit.amendment.application", businessType, form))
+        case ReadyForRenewal(_) => status(views.html.declaration.add_person("declaration.addperson.title", "submit.renewal.application", businessType, form))
+        case _ => throw new Exception("Incorrect status - Page not permitted for this status")
+
+      }
+    }
+  }
 }

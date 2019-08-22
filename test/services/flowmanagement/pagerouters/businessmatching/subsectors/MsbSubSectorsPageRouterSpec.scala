@@ -36,7 +36,7 @@ class MsbSubSectorsPageRouterSpec extends AmlsSpec with ScalaFutures {
       Set(CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal) foreach { s =>
         s"$s has been chosen" in new Fixture {
           val model = ChangeSubSectorFlowModel(Some(Set(s)))
-          val result = router.getPageRoute(model)
+          val result = router.getRoute("internalId", model)
 
           redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
         }
@@ -46,7 +46,7 @@ class MsbSubSectorsPageRouterSpec extends AmlsSpec with ScalaFutures {
     "route to the 'PSR number' page" when {
       "TransmittingMoney has been chosen" in new Fixture {
         val model = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
-        val result = router.getPageRoute(model)
+        val result = router.getRoute("internalId", model)
 
         redirectLocation(result) mustBe Some(routes.PSRNumberController.get().url)
       }
@@ -54,7 +54,7 @@ class MsbSubSectorsPageRouterSpec extends AmlsSpec with ScalaFutures {
 
     "return a InternalServerError" when {
       "there is no data in the flow model" in new Fixture {
-        val result = router.getPageRoute(ChangeSubSectorFlowModel())
+        val result = router.getRoute("internalId", ChangeSubSectorFlowModel())
 
         status(result) mustBe INTERNAL_SERVER_ERROR
       }

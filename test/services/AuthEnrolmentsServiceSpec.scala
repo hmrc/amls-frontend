@@ -91,31 +91,66 @@ class AuthEnrolmentsServiceSpec extends AmlsSpec
       } thenReturn Future.successful(Authority("", Accounts(), "/user-details", "/ids", "12345678"))
 
       when {
-        service.enrolmentStore.enrol(any(), any())(any(), any(), any())
+        service.enrolmentStore.enrol(any(), any(), any())(any(), any())
       } thenReturn Future.successful(HttpResponse(OK))
 
       val postcode = postcodeGen.sample.get
 
-      whenReady(service.enrol(amlsRegistrationNumber, postcode)) { _ =>
+      whenReady(service.enrol(amlsRegistrationNumber, postcode, Some(groupId), "12345678")) { _ =>
         val enrolment = TaxEnrolment("12345678", postcode)
-        verify(enrolmentStore).enrol(eqTo(AmlsEnrolmentKey(amlsRegistrationNumber)), eqTo(enrolment))(any(), any(), any())
+        verify(enrolmentStore).enrol(eqTo(AmlsEnrolmentKey(amlsRegistrationNumber)), eqTo(enrolment), any())(any(), any())
       }
     }
 
     "de-enrol the user and return true" in new Fixture {
 
       when {
-        enrolmentStore.deEnrol(eqTo(amlsRegistrationNumber))(any(), any(), any())
+        enrolmentStore.deEnrol(eqTo(amlsRegistrationNumber), any())(any(), any())
       } thenReturn Future.successful(HttpResponse(NO_CONTENT))
 
       when {
-        enrolmentStore.removeKnownFacts(eqTo(amlsRegistrationNumber))(any(), any(), any())
+        enrolmentStore.removeKnownFacts(eqTo(amlsRegistrationNumber))(any(), any())
       } thenReturn Future.successful(HttpResponse(NO_CONTENT))
 
-      whenReady(service.deEnrol(amlsRegistrationNumber)) { result =>
+      whenReady(service.deEnrol(amlsRegistrationNumber, Some("GROUP_ID"))) { result =>
         result mustBe true
-        verify(enrolmentStore).removeKnownFacts(eqTo(amlsRegistrationNumber))(any(), any(), any())
-        verify(enrolmentStore).deEnrol(eqTo(amlsRegistrationNumber))(any(), any(), any())
+        verify(enrolmentStore).removeKnownFacts(eqTo(amlsRegistrationNumber))(any(), any())
+        verify(enrolmentStore).deEnrol(eqTo(amlsRegistrationNumber), any())(any(), any())
+      }
+    }
+  }
+
+  "AuthEnrolmentsService for new auth" must {
+
+    "return an AMLS registration number from stubs" in new Fixture {
+      when(config.enrolmentStubsEnabled) thenReturn true
+
+      when {
+        enrolmentStubConnector.enrolmentsNewAuth(eqTo(groupId))(any(), any())
+      } thenReturn Future.successful(enrolmentsList)
+
+      whenReady(service.amlsRegistrationNumber(None, Some(groupId))) { result =>
+        result mustBe Some(amlsRegistrationNumber)
+      }
+    }
+
+    "return None from stubs if no amls number from request and stubs disabled" in new Fixture {
+      when(config.enrolmentStubsEnabled) thenReturn false
+
+      when {
+        enrolmentStubConnector.enrolmentsNewAuth(eqTo(groupId))(any(), any())
+      } thenReturn Future.successful(enrolmentsList)
+
+      whenReady(service.amlsRegistrationNumber(None, Some(groupId))) { result =>
+        result mustBe None
+      }
+    }
+
+    "return an AMLS registration number from request even if stubs are enabled" in new Fixture {
+      when(config.enrolmentStubsEnabled) thenReturn true
+
+      whenReady(service.amlsRegistrationNumber(Some(amlsRegistrationNumber), Some(groupId))) { result =>
+        result mustBe Some(amlsRegistrationNumber)
       }
     }
   }

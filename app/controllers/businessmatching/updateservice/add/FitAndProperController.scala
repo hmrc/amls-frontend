@@ -19,15 +19,13 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement.{AddBusinessTypeFlowModel, FitAndProperPageId}
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{BooleanFormReadWrite, RepeatingSection}
+import utils.{AuthAction, BooleanFormReadWrite, RepeatingSection}
 import views.html.businessmatching.updateservice.add.fit_and_proper
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -35,44 +33,42 @@ import scala.concurrent.Future
 
 @Singleton
 class FitAndProperController @Inject()(
-                                        val authConnector: AuthConnector,
+                                        authAction: AuthAction,
                                         implicit val dataCacheConnector: DataCacheConnector,
                                         val router: Router[AddBusinessTypeFlowModel]
-                                      ) extends BaseController with RepeatingSection {
+                                      ) extends DefaultBaseController with RepeatingSection {
 
   val NAME = "passedFitAndProper"
 
   implicit val boolWrite = BooleanFormReadWrite.formWrites(NAME)
   implicit val boolRead = BooleanFormReadWrite.formRule(NAME, "error.businessmatching.updateservice.fitandproper")
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        getFormData map { case (model) =>
+        getFormData(request.credId) map { case (model) =>
           val form = model.fitAndProper map { v => Form2(v) } getOrElse EmptyForm
           Ok(fit_and_proper(form, edit))
         } getOrElse InternalServerError("Get: Unable to show Fit And Proper page")
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request =>
         Form2[Boolean](request.body) match {
-          case form: InvalidForm => getFormData map { case (_) =>
+          case form: InvalidForm => getFormData(request.credId) map { case (_) =>
             BadRequest(fit_and_proper(form, edit))
           } getOrElse InternalServerError("Post: Invalid form on Fit And Proper page")
 
           case ValidForm(_, data) =>
-            dataCacheConnector.update[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key) {
+            dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key) {
               case Some(model) => model.isfitAndProper(Some(data)).responsiblePeople(if (data) model.responsiblePeople else None)
             } flatMap {
-              case Some(model) => router.getRoute(FitAndProperPageId, model, edit)
+              case Some(model) => router.getRoute(request.credId, FitAndProperPageId, model, edit)
               case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: FitAndProperController"))
             }
         }
   }
 
-  private def getFormData(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, (AddBusinessTypeFlowModel)] = for {
-    model <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key))
+  private def getFormData(credId: String)(implicit hc: HeaderCarrier): OptionT[Future, (AddBusinessTypeFlowModel)] = for {
+    model <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](credId, AddBusinessTypeFlowModel.key))
   } yield (model)
 }

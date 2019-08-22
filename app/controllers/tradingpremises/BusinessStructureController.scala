@@ -16,28 +16,26 @@
 
 package controllers.tradingpremises
 
-import config.ApplicationConfig
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms._
 import javax.inject.{Inject, Singleton}
 import models.tradingpremises._
 import play.api.i18n.MessagesApi
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
+import utils.{AuthAction, RepeatingSection}
 
 import scala.concurrent.Future
 
 @Singleton
 class BusinessStructureController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                            val authConnector: AuthConnector,
-                                            override val messagesApi: MessagesApi) extends RepeatingSection with BaseController {
+                                            val authAction: AuthAction,
+                                            override val messagesApi: MessagesApi) extends RepeatingSection with DefaultBaseController {
 
-  def get(index: Int, edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      getData[TradingPremises](index) map {
+  def get(index: Int, edit: Boolean = false) = authAction.async {
+    implicit request =>
+      getData[TradingPremises](request.credId, index) map {
         response =>
           val form = (for {
             tp <- response
@@ -61,14 +59,14 @@ class BusinessStructureController @Inject()(val dataCacheConnector: DataCacheCon
     }
   }
 
-  def post(index: Int, edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+  def post(index: Int, edit: Boolean = false) = authAction.async {
+    implicit request =>
       Form2[BusinessStructure](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.tradingpremises.business_structure(f, index, edit)))
         case ValidForm(_, data) =>
           for {
-            result <- fetchAllAndUpdateStrict[TradingPremises](index) { (_, tp) =>
+            result <- fetchAllAndUpdateStrict[TradingPremises](request.credId, index) { (_, tp) =>
               resetAgentValues(tp.businessStructure(data), data)
             }
           } yield redirectToPage(data, edit, index, result)

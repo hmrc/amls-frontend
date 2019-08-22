@@ -16,19 +16,20 @@
 
 package controllers.tcsp
 
-import controllers.BaseController
+import controllers.DefaultBaseController
 import javax.inject.Inject
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.tcsp.what_you_need
 
 import scala.concurrent.Future
 
-class WhatYouNeedController @Inject() (val authConnector: AuthConnector
-                                      ) extends BaseController {
+class WhatYouNeedController @Inject() (val authAction: AuthAction
+                                      ) extends DefaultBaseController {
 
   def get() =
-    Authorised.async {
-      implicit authContext => implicit request =>
+    authAction.async {
+      implicit request =>
         Future.successful(Ok(what_you_need()))
     }
 }

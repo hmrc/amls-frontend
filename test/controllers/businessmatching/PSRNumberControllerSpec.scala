@@ -18,6 +18,7 @@ package controllers.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._
+import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
@@ -35,7 +36,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -45,12 +46,12 @@ class PSRNumberControllerSpec extends AmlsSpec
   with ScalaFutures
   with BusinessMatchingGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
 
     val request = addToken(authRequest)
 
     val controller = new PSRNumberController(
-      self.authConnector,
+      SuccessfulAuthAction,
       mockCacheConnector,
       mockStatusService,
       mock[BusinessMatchingService],
@@ -59,14 +60,14 @@ class PSRNumberControllerSpec extends AmlsSpec
     )
 
     when {
-      mockStatusService.isPreSubmission(any())
-    } thenReturn true
+      mockStatusService.isPreSubmission(Some(any()), any(), any())(any(), any())
+    } thenReturn Future.successful(true)
 
     when {
       mockStatusService.isPending(any())
     } thenReturn false
 
-    mockApplicationStatus(NotCompleted)
+    mockApplicationStatusNewAuth(NotCompleted)
 
     val businessMatching = businessMatchingGen.sample.get
 
@@ -83,7 +84,7 @@ class PSRNumberControllerSpec extends AmlsSpec
           businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("1"))
         )
         when {
-          controller.businessMatchingService.getModel(any(), any(), any())
+          controller.businessMatchingService.getModel(any())(any(), any())
         } thenReturn OptionT.some[Future, BusinessMatching](model)
 
         val result = controller.get()(request)
@@ -99,7 +100,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         }
 
         when {
-          controller.businessMatchingService.getModel(any(), any(), any())
+          controller.businessMatchingService.getModel(any())(any(), any())
         } thenReturn OptionT.some[Future, BusinessMatching](businessMatching)
 
         val result = controller.get()(request)
@@ -116,11 +117,11 @@ class PSRNumberControllerSpec extends AmlsSpec
         val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
 
         when {
-          controller.helper.getOrCreateFlowModel(any(), any(), any())
+          controller.helper.getOrCreateFlowModel(any())(any(), any())
         } thenReturn Future.successful(flowModel)
 
         when {
-          controller.helper.updateSubSectors(any())(any(), any(), any())
+          controller.helper.updateSubSectors(any(), any())(any(), any())
         } thenReturn Future.successful((mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty))
 
         val newRequest = request.withFormUrlEncodedBody(
@@ -134,7 +135,7 @@ class PSRNumberControllerSpec extends AmlsSpec
 
         status(result) mustBe SEE_OTHER
 
-        controller.router.verify(PsrNumberPageId, ChangeSubSectorFlowModel(
+        controller.router.verify("internalId", PsrNumberPageId, ChangeSubSectorFlowModel(
             Some(Set(TransmittingMoney)),
             Some(BusinessAppliedForPSRNumberYes("123789"))))
       }
@@ -143,7 +144,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
 
         when {
-          controller.helper.getOrCreateFlowModel(any(), any(), any())
+          controller.helper.getOrCreateFlowModel(any())(any(), any())
         } thenReturn Future.successful(flowModel)
 
         mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel.empty)
@@ -155,7 +156,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         val result = controller.post(true)(newRequest)
 
         status(result) mustBe SEE_OTHER
-        controller.router.verify(PsrNumberPageId, ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberNo)), edit = true)
+        controller.router.verify("internalId", PsrNumberPageId, ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberNo)), edit = true)
       }
 
       "respond with BAD_REQUEST when given invalid data" in new Fixture {
@@ -165,7 +166,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         )
 
         when {
-          controller.businessMatchingService.getModel(any(), any(), any())
+          controller.businessMatchingService.getModel(any())(any(), any())
         } thenReturn OptionT.some[Future, BusinessMatching](businessMatching)
 
         val result = controller.post()(newRequest)

@@ -17,7 +17,7 @@
 package controllers.hvd
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.{DefaultBaseController}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching.HighValueDealing
@@ -25,7 +25,7 @@ import models.hvd.{HowWillYouSellGoods, Hvd}
 import play.api.mvc.Call
 import services.StatusService
 import services.businessmatching.ServiceFlow
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import utils.DateOfChangeHelper
 import views.html.hvd.how_will_you_sell_goods
 
@@ -33,14 +33,12 @@ import scala.concurrent.Future
 
 class HowWillYouSellGoodsController @Inject()( val dataCacheConnector: DataCacheConnector,
                                                val statusService: StatusService,
-                                               val authConnector: AuthConnector,
-                                               val serviceFlow: ServiceFlow
-                                             ) extends BaseController with DateOfChangeHelper {
+                                               val authAction: AuthAction,
+                                               val serviceFlow: ServiceFlow) extends DefaultBaseController with DateOfChangeHelper {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        dataCacheConnector.fetch[Hvd](Hvd.key) map {
+        dataCacheConnector.fetch[Hvd](request.credId, Hvd.key) map {
           response =>
             val form: Form2[HowWillYouSellGoods] = (for {
               hvd <- response
@@ -50,18 +48,17 @@ class HowWillYouSellGoodsController @Inject()( val dataCacheConnector: DataCache
         }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request => {
         Form2[HowWillYouSellGoods](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(how_will_you_sell_goods(f, edit)))
           case ValidForm(_, model) =>
             for {
-              hvd <- dataCacheConnector.fetch[Hvd](Hvd.key)
-              status <- statusService.getStatus
-              _ <- dataCacheConnector.save[Hvd](Hvd.key, hvd.howWillYouSellGoods(model))
-              isNewActivity <- serviceFlow.isNewActivity(HighValueDealing)
+              hvd <- dataCacheConnector.fetch[Hvd](request.credId, Hvd.key)
+              status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+              _ <- dataCacheConnector.save[Hvd](request.credId, Hvd.key, hvd.howWillYouSellGoods(model))
+              isNewActivity <- serviceFlow.isNewActivity(request.credId, HighValueDealing)
             } yield {
               val redirect = !isNewActivity && redirectToDateOfChange[HowWillYouSellGoods](status, hvd.howWillYouSellGoods, model)
               Redirect(getNextPage(redirect, edit))
@@ -72,8 +69,8 @@ class HowWillYouSellGoodsController @Inject()( val dataCacheConnector: DataCache
 
   private def getNextPage(redirect: Boolean, edit:Boolean): Call = {
     (redirect,  edit) match {
-      case (true, true) => routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers)
-      case (true, false) => routes.HvdDateOfChangeController.get(DateOfChangeRedirect.cashPayment)
+      case (true, true)   => routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers)
+      case (true, false)  => routes.HvdDateOfChangeController.get(DateOfChangeRedirect.cashPayment)
       case (false, true)  => routes.SummaryController.get()
       case (false, false) => routes.CashPaymentController.get()
     }

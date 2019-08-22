@@ -16,6 +16,7 @@
 
 package controllers.hvd
 
+import controllers.actions.SuccessfulAuthAction
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
@@ -27,7 +28,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new WhatYouNeedController (authConnector = self.authConnector) {
+    val controller = new WhatYouNeedController (authAction = SuccessfulAuthAction) {
 
     }
   }

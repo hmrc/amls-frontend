@@ -17,26 +17,26 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.moneyservicebusiness._
 import services.StatusService
 import services.businessmatching.ServiceFlow
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
+import utils.AuthAction
 
 import scala.concurrent.Future
 
-class WhichCurrenciesController @Inject() (val authConnector: AuthConnector,
+class WhichCurrenciesController @Inject() (authAction: AuthAction,
                                            implicit val dataCacheConnector: DataCacheConnector,
                                            implicit val statusService: StatusService,
                                            implicit val serviceFlow: ServiceFlow
-                                          ) extends BaseController {
+                                          ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
-      dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request => {
+      dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
         response =>
           val form = (for {
             msb <- response
@@ -47,16 +47,16 @@ class WhichCurrenciesController @Inject() (val authConnector: AuthConnector,
       }
     }
   }
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request => {
       Form2[WhichCurrencies](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.msb.which_currencies(
             alignFormDataWithValidationErrors(f), edit)))
         case ValidForm(_, data: WhichCurrencies) =>
               for {
-                msb <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
-                _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
+                msb <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
+                _ <- dataCacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
                   updateCurrencies(msb, data))
               } yield edit match {
                 case true => Redirect(routes.SummaryController.get())

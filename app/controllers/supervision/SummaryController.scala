@@ -19,21 +19,20 @@ package controllers.supervision
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.EmptyForm
 import javax.inject.Inject
 import models.supervision.Supervision
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import utils.ControllerHelper
 import views.html.supervision.summary
 
 class SummaryController  @Inject() (val dataCacheConnector: DataCacheConnector,
-                                    val authConnector: AuthConnector
-                                   ) extends BaseController {
+                                    val authAction: AuthAction) extends DefaultBaseController {
 
-  def get() = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[Supervision](Supervision.key) map {
+  def get() = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map {
         case Some(data@Supervision(Some(anotherBody), Some(_), _, Some(_), _, _)) if ControllerHelper.isAbComplete(anotherBody) =>
           Ok(summary(EmptyForm, data))
         case _ =>
@@ -41,10 +40,10 @@ class SummaryController  @Inject() (val dataCacheConnector: DataCacheConnector,
       }
   }
 
-  def post = Authorised.async {
-    implicit authContext => implicit request => (for {
-      supervision <- OptionT(dataCacheConnector.fetch[Supervision](Supervision.key))
-      _ <- OptionT.liftF(dataCacheConnector.save[Supervision](Supervision.key, supervision.copy(hasAccepted = true)))
+  def post = authAction.async {
+    implicit request => (for {
+      supervision <- OptionT(dataCacheConnector.fetch[Supervision](request.credId, Supervision.key))
+      _ <- OptionT.liftF(dataCacheConnector.save[Supervision](request.credId, Supervision.key, supervision.copy(hasAccepted = true)))
     } yield Redirect(controllers.routes.RegistrationProgressController.get)) getOrElse InternalServerError("Could not update supervision")
   }
 }

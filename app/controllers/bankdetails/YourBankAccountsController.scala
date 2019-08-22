@@ -22,16 +22,16 @@ import javax.inject.Inject
 import models.bankdetails.BankDetails
 import models.bankdetails.BankDetails.Filters._
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 
 class YourBankAccountsController @Inject()(
                                             val dataCacheConnector: DataCacheConnector,
-                                            val authConnector: AuthConnector
+                                            val authAction: AuthAction
                                           ) extends BankDetailsController {
-  def get(complete: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(complete: Boolean = false) = authAction.async {
       implicit request =>
         for {
-          bankDetails <- dataCacheConnector.fetch[Seq[BankDetails]](BankDetails.key)
+          bankDetails <- dataCacheConnector.fetch[Seq[BankDetails]](request.credId, BankDetails.key)
         } yield bankDetails match {
           case Some(data) =>
             val filteredBankDetails = data.zipWithIndex.visibleAccounts

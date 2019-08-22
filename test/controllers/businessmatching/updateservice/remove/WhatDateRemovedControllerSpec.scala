@@ -16,23 +16,24 @@
 
 package controllers.businessmatching.updateservice.remove
 
+import controllers.actions.SuccessfulAuthAction
 import models.DateOfChange
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, WhatDateRemovedPageId}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 class WhatDateRemovedControllerSpec extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
 
     val request = addToken(authRequest)
 
     val controller = new WhatDateRemovedController(
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[RemoveBusinessTypeFlowModel]
     )
@@ -101,7 +102,7 @@ class WhatDateRemovedControllerSpec extends AmlsSpec {
           ))
         }
 
-        controller.router.verify(WhatDateRemovedPageId, RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(today))))
+        controller.router.verify("internalId", WhatDateRemovedPageId, RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(today))))
       }
 
 

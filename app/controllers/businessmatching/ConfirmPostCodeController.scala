@@ -17,24 +17,22 @@
 package controllers.businessmatching
 
 import javax.inject.{Inject, Singleton}
-
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.{BusinessMatching, ConfirmPostcode}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.businessmatching.confirm_postcode
 
 import scala.concurrent.Future
 
 @Singleton
-class ConfirmPostCodeController @Inject()(val authConnector: AuthConnector,
-                                          val dataCacheConnector: DataCacheConnector)() extends BaseController {
+class ConfirmPostCodeController @Inject()(authAction: AuthAction,
+                                          val dataCacheConnector: DataCacheConnector)() extends DefaultBaseController {
 
 
-  def get() = Authorised.async {
-    implicit authContext =>
+  def get() = authAction.async {
       implicit request =>
         Future.successful(Ok(confirm_postcode(EmptyForm)))
   }
@@ -46,16 +44,15 @@ class ConfirmPostCodeController @Inject()(val authConnector: AuthConnector,
     }
   }
 
-  def post() = Authorised.async {
-    implicit authContext =>
+  def post() = authAction.async {
       implicit request => {
         Form2[ConfirmPostcode](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(confirm_postcode(f)))
           case ValidForm(_, data) =>
             for {
-              bm <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
-              _ <- dataCacheConnector.save[BusinessMatching](BusinessMatching.key, bm.copy(reviewDetails = updateReviewDetails(bm.reviewDetails, data)))
+              bm <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
+              _ <- dataCacheConnector.save[BusinessMatching](request.credId, BusinessMatching.key, bm.copy(reviewDetails = updateReviewDetails(bm.reviewDetails, data)))
             } yield {
               Redirect(routes.BusinessTypeController.get())
             }

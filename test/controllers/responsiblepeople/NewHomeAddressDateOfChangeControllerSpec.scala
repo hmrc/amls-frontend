@@ -17,6 +17,7 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
@@ -25,8 +26,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -40,7 +40,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
-      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .build()
 
     val controller = app.injector.instanceOf[NewHomeAddressDateOfChangeController]
@@ -61,7 +61,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
           when(cacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(responsiblePeople)))
           when(cacheMap.getEntry[NewHomeDateOfChange](NewHomeDateOfChange.key)).thenReturn(Some(NewHomeDateOfChange(Some(LocalDate.now()))))
-          when(controller.dataCacheConnector.fetchAll(any(), any())).thenReturn(Future.successful(Some(cacheMap)))
+          when(controller.dataCacheConnector.fetchAll(any())(any())).thenReturn(Future.successful(Some(cacheMap)))
 
           val result = controller.get(1)(request)
           status(result) must be(OK)
@@ -73,7 +73,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
           when(cacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(responsiblePeople)))
           when(cacheMap.getEntry[NewHomeDateOfChange](NewHomeDateOfChange.key)).thenReturn(None)
-          when(controller.dataCacheConnector.fetchAll(any(), any())).thenReturn(Future.successful(Some(cacheMap)))
+          when(controller.dataCacheConnector.fetchAll(any())(any())).thenReturn(Future.successful(Some(cacheMap)))
 
           val result = controller.get(1)(request)
           status(result) must be(OK)
@@ -83,7 +83,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
           when(cacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(None)
           when(cacheMap.getEntry[NewHomeDateOfChange](NewHomeDateOfChange.key)).thenReturn(None)
-          when(controller.dataCacheConnector.fetchAll(any(), any())).thenReturn(Future.successful(Some(cacheMap)))
+          when(controller.dataCacheConnector.fetchAll(any())(any())).thenReturn(Future.successful(Some(cacheMap)))
 
           val result = controller.get(1)(request)
           status(result) must be(NOT_FOUND)
@@ -98,11 +98,11 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
           "dateOfChange.month" -> "5",
           "dateOfChange.year" -> "2014"
         )
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-        when(controller.dataCacheConnector.save[NewHomeDateOfChange](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(cacheMap))
+        when(controller.dataCacheConnector.save[NewHomeDateOfChange](any(), any(), any())
+          (any(), any())).thenReturn(Future.successful(cacheMap))
         val result = controller.post(1)(postRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.NewHomeAddressController.get(1).url))
@@ -114,9 +114,9 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
           "dateOfChange.day" -> "01"
         )
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(controller.dataCacheConnector.save[NewHomeDateOfChange](any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save[NewHomeDateOfChange](any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(cacheMap))
 
         val result = controller.post(1)(postRequest)
@@ -133,9 +133,9 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
         )
 
         val position = Some(Positions(Set(BeneficialOwner),Some(PositionStartDate(new LocalDate(2011,1,1)))))
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(responsiblePeople.copy(positions = position)))))
-        when(controller.dataCacheConnector.save[NewHomeDateOfChange](any(), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save[NewHomeDateOfChange](any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(cacheMap))
 
         val result = controller.post(1)(postRequest)
@@ -151,9 +151,9 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
         )
 
         val position = Some(Positions(Set(BeneficialOwner),Some(PositionStartDate(new LocalDate(2011,1,1)))))
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
-        when(controller.dataCacheConnector.save[NewHomeDateOfChange](any(), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save[NewHomeDateOfChange](any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(cacheMap))
 
         val result = controller.post(1)(postRequest)

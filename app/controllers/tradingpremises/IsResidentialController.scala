@@ -16,17 +16,15 @@
 
 package controllers.tradingpremises
 
-import javax.inject.{Inject, Singleton}
-
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms._
+import javax.inject.{Inject, Singleton}
 import models.businesscustomer.Address
 import models.businessmatching.BusinessMatching
 import models.tradingpremises._
 import play.api.i18n.MessagesApi
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{RepeatingSection, StatusConstants}
+import utils.{AuthAction, RepeatingSection, StatusConstants}
 import views.html.tradingpremises.is_residential
 
 import scala.concurrent.Future
@@ -34,13 +32,12 @@ import scala.concurrent.Future
 @Singleton
 class  IsResidentialController @Inject()(
                                           override val messagesApi: MessagesApi,
-                                          val authConnector: AuthConnector,
-                                          val dataCacheConnector: DataCacheConnector) extends RepeatingSection with BaseController {
+                                          val authAction: AuthAction,
+                                          val dataCacheConnector: DataCacheConnector) extends RepeatingSection with DefaultBaseController {
 
-  def get(index: Int, edit: Boolean = false) = Authorised.async{
-    implicit authContext =>
+  def get(index: Int, edit: Boolean = false) = authAction.async{
       implicit request =>
-        dataCacheConnector.fetchAll map { cacheO =>
+        dataCacheConnector.fetchAll(request.credId).map { cacheO =>
           (for {
             cache <- cacheO
             tradingPremises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
@@ -57,10 +54,9 @@ class  IsResidentialController @Inject()(
         }
   }
 
-  def post(index: Int, edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(index: Int, edit: Boolean = false) = authAction.async {
       implicit request =>
-        dataCacheConnector.fetchAll flatMap { cacheO =>
+        dataCacheConnector.fetchAll(request.credId).flatMap { cacheO =>
           Form2[IsResidential](request.body) match {
             case f: InvalidForm =>
               val address = for {
@@ -73,7 +69,7 @@ class  IsResidentialController @Inject()(
               Future.successful(BadRequest(is_residential(f, address, index, edit)))
             case ValidForm(_, data) =>
               for {
-                result <- fetchAllAndUpdateStrict[TradingPremises](index) { (_, tp) =>
+                result <- fetchAllAndUpdateStrict[TradingPremises](request.credId, index) { (_, tp) =>
                   val ytp = tp.yourTradingPremises.fold[Option[YourTradingPremises]](None) { yourTradingPremises =>
                     Some(yourTradingPremises.copy(isResidential = Some(data.isResidential)))
                   }

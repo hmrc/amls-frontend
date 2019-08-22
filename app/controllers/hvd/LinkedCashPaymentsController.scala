@@ -16,25 +16,23 @@
 
 package controllers.hvd
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.hvd.{Hvd, LinkedCashPayments}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.hvd.linked_cash_payments
 
 import scala.concurrent.Future
 
 class LinkedCashPaymentsController @Inject() ( val dataCacheConnector: DataCacheConnector,
-                                               val authConnector: AuthConnector
-                                             ) extends BaseController {
+                                               val authAction: AuthAction) extends DefaultBaseController {
 
   def get(edit: Boolean = false) =
-    Authorised.async {
-      implicit authContext => implicit request =>
-        dataCacheConnector.fetch[Hvd](Hvd.key) map {
+    authAction.async {
+      implicit request =>
+        dataCacheConnector.fetch[Hvd](request.credId, Hvd.key) map {
           response =>
             val form: Form2[LinkedCashPayments] = (for {
               hvd <- response
@@ -45,19 +43,19 @@ class LinkedCashPaymentsController @Inject() ( val dataCacheConnector: DataCache
     }
 
   def post(edit: Boolean = false) =
-    Authorised.async {
-      implicit authContext => implicit request => {
+    authAction.async {
+      implicit request => {
         Form2[LinkedCashPayments](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(linked_cash_payments(f, edit)))
           case ValidForm(_, data) =>
             for {
-              hvd <- dataCacheConnector.fetch[Hvd](Hvd.key)
-              _ <- dataCacheConnector.save[Hvd](Hvd.key,
+              hvd <- dataCacheConnector.fetch[Hvd](request.credId, Hvd.key)
+              _ <- dataCacheConnector.save[Hvd](request.credId, Hvd.key,
                 hvd.linkedCashPayment(data)
               )
             } yield edit match {
-              case true => Redirect(routes.SummaryController.get())
+              case true  => Redirect(routes.SummaryController.get())
               case false => Redirect(routes.ReceiveCashPaymentsController.get())
             }
         }

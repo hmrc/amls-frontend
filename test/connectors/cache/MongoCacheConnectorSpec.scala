@@ -112,7 +112,7 @@ class MongoCacheConnectorSpec extends FreeSpec
       val cache = Cache(credId, referenceMap())
 
       when {
-        client.fetchAll(credId, deprecatedFilter = false)
+        client.fetchAll(Some(credId), deprecatedFilter = false)
       } thenReturn Future.successful(Some(cache))
 
       whenReady(connector.fetchAll) { _ mustBe Some(toCacheMap(cache)) }
@@ -122,11 +122,11 @@ class MongoCacheConnectorSpec extends FreeSpec
       val cache = Cache(oId, referenceMap())
 
       when {
-        client.fetchAll(credId, deprecatedFilter = false)
+        client.fetchAll(Some(credId), deprecatedFilter = false)
       } thenReturn Future.successful(None)
 
       when {
-        client.fetchAll(oId, deprecatedFilter = true)
+        client.fetchAll(Some(oId), deprecatedFilter = true)
       } thenReturn Future.successful(Some(cache))
 
       whenReady(connector.fetchAll) { _ mustBe Some(toCacheMap(cache)) }
@@ -139,7 +139,7 @@ class MongoCacheConnectorSpec extends FreeSpec
       val cache = Cache(credId, referenceMap())
 
       when {
-        client.createOrUpdate(credId, oId, model, key)
+        client.createOrUpdate(credId, Some(oId), model, key)
       } thenReturn Future.successful(cache)
 
       whenReady(connector.save(key, model)) { result =>
@@ -153,7 +153,7 @@ class MongoCacheConnectorSpec extends FreeSpec
       val cache = Cache(oId, referenceMap())
 
       when {
-        client.createOrUpdate(credId, oId, model, key)
+        client.createOrUpdate(credId, Some(oId), model, key)
       } thenReturn Future.successful(cache)
 
       whenReady(connector.save(key, model)) { result =>

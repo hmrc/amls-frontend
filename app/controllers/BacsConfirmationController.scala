@@ -22,30 +22,26 @@ import connectors.{AmlsConnector, DataCacheConnector, _}
 import javax.inject.{Inject, Singleton}
 import models.businessdetails.{BusinessDetails, PreviouslyRegisteredYes}
 import services.{AuthEnrolmentsService, StatusService}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.BusinessName
+import utils.{AuthAction, BusinessName}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
-class BacsConfirmationController @Inject()(
-                                               val authConnector: AuthConnector,
-                                               private[controllers] implicit val dataCacheConnector: DataCacheConnector,
-                                               private[controllers] implicit val amlsConnector: AmlsConnector,
-                                               private[controllers] implicit val statusService: StatusService,
-                                               private[controllers] val authenticator: AuthenticatorConnector,
-                                               private[controllers] val authEnrolmentsService: AuthEnrolmentsService
-                                             ) extends BaseController {
+class BacsConfirmationController @Inject()(authAction: AuthAction,
+                                           private[controllers] implicit val dataCacheConnector: DataCacheConnector,
+                                           private[controllers] implicit val amlsConnector: AmlsConnector,
+                                           private[controllers] implicit val statusService: StatusService,
+                                           private[controllers] val authenticator: AuthenticatorConnector,
+                                           private[controllers] val enrolmentService: AuthEnrolmentsService) extends DefaultBaseController {
 
-  def bacsConfirmation() = Authorised.async {
-    implicit request =>
-      implicit authContext =>
+  def bacsConfirmation() = authAction.async {
+      implicit request =>
         val okResult = for {
           _ <- OptionT.liftF(authenticator.refreshProfile)
-          refNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
-          status <- OptionT.liftF(statusService.getReadStatus(refNo))
-          name <- BusinessName.getName(status.safeId)
-          businessDetails <- OptionT(dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key))
+          refNo <- OptionT(enrolmentService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
+          status <- OptionT.liftF(statusService.getReadStatus(refNo, request.accountTypeId))
+          name <- BusinessName.getName(request.credId, status.safeId, request.accountTypeId)
+          businessDetails <- OptionT(dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key))
         } yield businessDetails.previouslyRegistered match {
           case Some(PreviouslyRegisteredYes(_)) => Ok(views.html.confirmation.confirmation_bacs_transitional_renewal(name))
           case _ => Ok(views.html.confirmation.confirmation_bacs(name))

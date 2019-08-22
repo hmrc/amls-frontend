@@ -17,6 +17,7 @@
 package controllers.businessdetails
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businessdetails._
 import org.jsoup.Jsoup
@@ -34,7 +35,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.collection.JavaConversions._
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 
 class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
@@ -44,9 +45,9 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
     val mockDataConnector = mock[DataCacheConnector]
 
     val controller = new CorrespondenceAddressIsUkController (
-      mockDataConnector,
-      authConnector = self.authConnector,
-      auditConnector = mock[AuditConnector]
+      dataConnector = mock[DataCacheConnector],
+      auditConnector = mock[AuditConnector],
+      authAction = SuccessfulAuthAction
     )
 
     when {
@@ -65,8 +66,8 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
     "respond to a get request correctly" when {
       "load IsUK page" in new Fixture {
 
-        when(controller.dataConnector.fetch[BusinessDetails](meq(BusinessDetails.key))
-          (any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataConnector.fetch[BusinessDetails](any(), meq(BusinessDetails.key))
+          (any(), any())).thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -75,8 +76,8 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
 
       "load isUk result when there is already an isUK answer in BusinessDetails" in new Fixture {
 
-        when(mockDataConnector.fetch[BusinessDetails](meq(BusinessDetails.key))
-          (any(), any(), any())).thenReturn(Future.successful(Some(businessDetails)))
+        when(controller.dataConnector.fetch[BusinessDetails](any(), meq(BusinessDetails.key))
+          (any(), any())).thenReturn(Future.successful(Some(businessDetails)))
 
         val result = controller.get()(request)
  
@@ -89,8 +90,8 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
 
       "load isUk result when there is already an nonUk answer in BusinessDetails" in new Fixture {
 
-        when(mockDataConnector.fetch[BusinessDetails](meq(BusinessDetails.key))
-          (any(), any(), any())).thenReturn(Future.successful(Some(businessDetails.copy(
+        when(controller.dataConnector.fetch[BusinessDetails](any(), meq(BusinessDetails.key))
+          (any(), any())).thenReturn(Future.successful(Some(businessDetails.copy(
           correspondenceAddressIsUk = Some(CorrespondenceAddressIsUk(false)),
           correspondenceAddress = Some(correspondenceAddressNonUk)))))
 
@@ -114,10 +115,10 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
 
         val newRequest = request.withFormUrlEncodedBody("isUK" -> "true")
 
-        when(controller.dataConnector.fetch[BusinessDetails](any())(any(), any(), any()))
+        when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any(), any()))
           .thenReturn(fetchResult)
 
-        when(controller.dataConnector.save[BusinessDetails](any(), any())(any(), any(), any()))
+        when(controller.dataConnector.save[BusinessDetails](any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(false)(newRequest)
@@ -131,10 +132,10 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
 
         val newRequest = request.withFormUrlEncodedBody("isUK" -> "false")
 
-        when(controller.dataConnector.fetch[BusinessDetails](any())(any(), any(), any()))
+        when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any(), any()))
           .thenReturn(fetchResult)
 
-        when(controller.dataConnector.save[BusinessDetails](any(), any())(any(), any(), any()))
+        when(controller.dataConnector.save[BusinessDetails](any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(false)(newRequest)
@@ -148,9 +149,9 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
 
         val newRequest = request.withFormUrlEncodedBody( )
 
-        when(controller.dataConnector.fetch[BusinessDetails](any()) (any(), any(), any())).thenReturn(fetchResult)
+        when(controller.dataConnector.fetch[BusinessDetails](any(), any()) (any(), any())).thenReturn(fetchResult)
 
-        when(controller.dataConnector.save[BusinessDetails](any(), any()) (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataConnector.save[BusinessDetails](any(), any(), any()) (any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(false)(newRequest)
         status(result) must be(BAD_REQUEST)

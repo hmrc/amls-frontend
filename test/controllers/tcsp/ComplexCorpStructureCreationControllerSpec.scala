@@ -17,6 +17,7 @@
 package controllers.tcsp
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.tcsp._
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
@@ -26,20 +27,20 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers.{BAD_REQUEST, OK, SEE_OTHER, contentAsString, redirectLocation, status, _}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
 
 import scala.concurrent.Future
 
 
 class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(self.authRequest)
 
     val cache = mock[DataCacheConnector]
 
     val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[DataCacheConnector].to(self.cache))
       .build()
 
@@ -57,10 +58,10 @@ class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSu
       hasAccepted = true
     )
 
-    when(cache.fetch[Tcsp](any())(any(), any(), any()))
+    when(cache.fetch[Tcsp](any(), any())(any(), any()))
       .thenReturn(Future.successful(Some(tcsp)))
 
-    when(cache.save[Tcsp](any(), any())(any(), any(), any()))
+    when(cache.save[Tcsp](any(), any(), any())(any(), any()))
       .thenReturn(Future.successful(new CacheMap("", Map.empty)))
   }
 
@@ -114,7 +115,7 @@ class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSu
             val result = controller.post(true)(request.withFormUrlEncodedBody("complexCorpStructureCreation" -> "true"))
 
             status(result) mustBe SEE_OTHER
-            verify(controller.dataCacheConnector).save[Tcsp](any(), eqTo(expected))(any(), any(), any())
+            verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any(), any())
             redirectLocation(result) mustBe Some(controllers.tcsp.routes.SummaryController.get().url)
           }
         }
@@ -135,7 +136,7 @@ class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSu
                 hasAccepted = true
               )
 
-              when(cache.fetch[Tcsp](any())(any(), any(), any()))
+              when(cache.fetch[Tcsp](any(), any())(any(), any()))
                 .thenReturn(Future.successful(Some(regOfficeTcsp)))
 
               val expected = Tcsp(
@@ -153,7 +154,7 @@ class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSu
 
               val result = controller.post(false)(request.withFormUrlEncodedBody("complexCorpStructureCreation" -> "false"))
               status(result) mustBe SEE_OTHER
-              verify(controller.dataCacheConnector).save[Tcsp](any(), eqTo(expected))(any(), any(), any())
+              verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any(), any())
               redirectLocation(result) mustBe Some(controllers.tcsp.routes.ProvidedServicesController.get().url)
             }
           }
@@ -176,7 +177,7 @@ class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSu
 
               val result = controller.post(false)(request.withFormUrlEncodedBody("complexCorpStructureCreation" -> "false"))
               status(result) mustBe SEE_OTHER
-              verify(controller.dataCacheConnector).save[Tcsp](any(), eqTo(expected))(any(), any(), any())
+              verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any(), any())
               redirectLocation(result) mustBe Some(controllers.tcsp.routes.ServicesOfAnotherTCSPController.get().url)
             }
           }

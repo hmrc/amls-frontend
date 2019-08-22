@@ -19,25 +19,24 @@ package controllers.businessdetails
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import models.businessdetails._
-import models.businessmatching.{BusinessMatching, BusinessType}
 import models.businessmatching.BusinessType._
+import models.businessmatching.{BusinessMatching, BusinessType}
 import play.api.mvc.Result
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
+import utils.{AuthAction, ControllerHelper}
 import views.html.businessdetails._
 
 import scala.concurrent.Future
 
 class PreviouslyRegisteredController @Inject () (
                                                   val dataCacheConnector: DataCacheConnector,
-                                                  val authConnector: AuthConnector
-                                                ) extends BaseController {
+                                                  val authAction: AuthAction
+                                                ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
         response =>
           val form: Form2[PreviouslyRegistered] = (for {
             businessDetails <- response
@@ -47,19 +46,19 @@ class PreviouslyRegisteredController @Inject () (
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request => {
       Form2[PreviouslyRegistered](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(previously_registered(f, edit)))
         case ValidForm(_, data) =>
-          dataCacheConnector.fetchAll map {
+          dataCacheConnector.fetchAll(request.credId) map {
             optionalCache =>
               (for {
                 cache <- optionalCache
                 businessType <- ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
               } yield {
-                dataCacheConnector.save[BusinessDetails](BusinessDetails.key,
+                dataCacheConnector.save[BusinessDetails](request.credId, BusinessDetails.key,
                   getUpdatedModel(businessType,  cache.getEntry[BusinessDetails](BusinessDetails.key), data))
                 getRouting(businessType, edit, data)
               }).getOrElse(Redirect(routes.ConfirmRegisteredOfficeController.get(edit)))

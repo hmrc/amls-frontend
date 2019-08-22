@@ -49,6 +49,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
                                         appConfig = mock[AppConfig])
 
   val safeId = "SAFEID"
+  val accountTypeId = ("org", "id")
 
   val subscriptionRequest = SubscriptionRequest(
     businessMatchingSection = None,
@@ -152,10 +153,10 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
     "successfully subscribe" in {
 
       when {
-        amlsConnector.httpPost.POST[SubscriptionRequest, SubscriptionResponse](eqTo(s"${amlsConnector.url}/org/TestOrgRef/$safeId"), eqTo(subscriptionRequest), any())(any(), any(), any(), any())
+        amlsConnector.httpPost.POST[SubscriptionRequest, SubscriptionResponse](eqTo(s"${amlsConnector.url}/org/id/$safeId"), eqTo(subscriptionRequest), any())(any(), any(), any(), any())
       } thenReturn Future.successful(subscriptionResponse)
 
-      whenReady(amlsConnector.subscribe(subscriptionRequest, safeId)) {
+      whenReady(amlsConnector.subscribe(subscriptionRequest, safeId, accountTypeId)) {
         _ mustBe subscriptionResponse
       }
     }
@@ -178,10 +179,10 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
 
     "a view response" in {
       when {
-        amlsConnector.httpGet.GET[ViewResponse](eqTo(s"${amlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber"))(any(), any(), any())
+        amlsConnector.httpGet.GET[ViewResponse](eqTo(s"${amlsConnector.url}/org/id/$amlsRegistrationNumber"))(any(), any(), any())
       } thenReturn Future.successful(viewResponse)
 
-      whenReady(amlsConnector.view(amlsRegistrationNumber)) {
+      whenReady(amlsConnector.view(amlsRegistrationNumber, accountTypeId)) {
         _ mustBe viewResponse
       }
     }
@@ -191,11 +192,11 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
 
     "successfully submit amendment" in {
       when {
-        amlsConnector.httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](eqTo(s"${amlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber/update")
+        amlsConnector.httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](eqTo(s"${amlsConnector.url}/org/id/$amlsRegistrationNumber/update")
           , eqTo(subscriptionRequest), any())(any(), any(), any(), any())
       }.thenReturn(Future.successful(amendmentResponse))
 
-      whenReady(amlsConnector.update(subscriptionRequest, amlsRegistrationNumber)) {
+      whenReady(amlsConnector.update(subscriptionRequest, amlsRegistrationNumber, accountTypeId)) {
         _ mustBe amendmentResponse
       }
     }
@@ -204,11 +205,11 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
   "variation" must {
     "successfully submit variation" in {
       when {
-        amlsConnector.httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](eqTo(s"${amlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber/variation")
+        amlsConnector.httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](eqTo(s"${amlsConnector.url}/org/id/$amlsRegistrationNumber/variation")
           , eqTo(subscriptionRequest), any())(any(), any(), any(), any())
       }.thenReturn(Future.successful(amendmentResponse))
 
-      whenReady(amlsConnector.variation(subscriptionRequest, amlsRegistrationNumber)) {
+      whenReady(amlsConnector.variation(subscriptionRequest, amlsRegistrationNumber, accountTypeId)) {
         _ mustBe amendmentResponse
       }
     }
@@ -218,10 +219,10 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
     "successfully submit renewal" in {
       when {
         amlsConnector.httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](
-          eqTo(s"${amlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber/renewal"), eqTo(subscriptionRequest), any())(any(), any(), any(), any())
+          eqTo(s"${amlsConnector.url}/org/id/$amlsRegistrationNumber/renewal"), eqTo(subscriptionRequest), any())(any(), any(), any(), any())
       } thenReturn Future.successful(renewalResponse)
 
-      whenReady(amlsConnector.renewal(subscriptionRequest, amlsRegistrationNumber)) {
+      whenReady(amlsConnector.renewal(subscriptionRequest, amlsRegistrationNumber, accountTypeId)) {
         _ mustBe renewalResponse
       }
     }
@@ -229,10 +230,10 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
     "successfully submit renewalAmendment" in {
       when {
         amlsConnector.httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](
-          eqTo(s"${amlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber/renewalAmendment"), eqTo(subscriptionRequest), any())(any(), any(), any(), any())
+          eqTo(s"${amlsConnector.url}/org/id/$amlsRegistrationNumber/renewalAmendment"), eqTo(subscriptionRequest), any())(any(), any(), any(), any())
       } thenReturn Future.successful(renewalResponse)
 
-      whenReady(amlsConnector.renewalAmendment(subscriptionRequest, amlsRegistrationNumber)) {
+      whenReady(amlsConnector.renewalAmendment(subscriptionRequest, amlsRegistrationNumber, accountTypeId)) {
         _ mustBe renewalResponse
       }
     }
@@ -279,7 +280,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         amlsConnector.httpPost.POSTString[HttpResponse](Matchers.any(), eqTo(id), Matchers.any())(Matchers.any(), Matchers.any(), Matchers.any())
       } thenReturn Future.successful(HttpResponse(CREATED))
 
-      whenReady(amlsConnector.savePayment(id, amlsRegistrationNumber, safeId)) {
+      whenReady(amlsConnector.savePayment(id, amlsRegistrationNumber, safeId, accountTypeId)) {
         _.status mustBe CREATED
       }
 
@@ -307,13 +308,13 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
     "retrieve a payment given the payment reference" in {
       val paymentRef = paymentRefGen.sample.get
       val payment = paymentGen.sample.get.copy(reference = paymentRef)
-      val getUrl = s"${amlsConnector.paymentUrl}/org/TestOrgRef/payref/$paymentRef"
+      val getUrl = s"${amlsConnector.paymentUrl}/org/id/payref/$paymentRef"
 
       when {
         amlsConnector.httpGet.GET[Payment](eqTo(getUrl))(any(), any(), any())
       } thenReturn Future.successful(payment)
 
-      whenReady(amlsConnector.getPaymentByPaymentReference(paymentRef)) {
+      whenReady(amlsConnector.getPaymentByPaymentReference(paymentRef, accountTypeId)) {
         case Some(result) => result mustBe payment
         case _ => fail("Payment was not found")
       }
@@ -326,7 +327,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         amlsConnector.httpGet.GET[Payment](any())(any(), any(), any())
       } thenReturn Future.failed(new NotFoundException("Payment was not found"))
 
-      whenReady(amlsConnector.getPaymentByPaymentReference(paymentRef)) {
+      whenReady(amlsConnector.getPaymentByPaymentReference(paymentRef, accountTypeId)) {
         case Some(_) => fail("None should be returned")
         case _ =>
       }
@@ -337,13 +338,13 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
     "retrieve a payment given an AMLS reference number" in {
       val amlsRef = amlsRefNoGen.sample.get
       val payment = paymentGen.sample.get.copy(amlsRefNo = amlsRef)
-      val getUrl = s"${amlsConnector.paymentUrl}/org/TestOrgRef/amlsref/$amlsRef"
+      val getUrl = s"${amlsConnector.paymentUrl}/org/id/amlsref/$amlsRef"
 
       when {
         amlsConnector.httpGet.GET[Payment](eqTo(getUrl))(any(), any(), any())
       } thenReturn Future.successful(payment)
 
-      whenReady(amlsConnector.getPaymentByAmlsReference(amlsRef)) {
+      whenReady(amlsConnector.getPaymentByAmlsReference(amlsRef, accountTypeId)) {
         case Some(result) => result mustBe payment
         case _ => fail("Payment was not found")
       }
@@ -356,7 +357,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         amlsConnector.httpGet.GET[Payment](any())(any(), any(), any())
       } thenReturn Future.failed(new NotFoundException("Payment was not found"))
 
-      whenReady(amlsConnector.getPaymentByAmlsReference(amlsRef)) {
+      whenReady(amlsConnector.getPaymentByAmlsReference(amlsRef, accountTypeId)) {
         case Some(_) => fail("None should be returned")
         case _ =>
       }
@@ -387,20 +388,20 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         amlsConnector.httpPut.PUT[RefreshPaymentStatusRequest, PaymentStatusResult](any(), any())(any(), any(), any(), any())
       } thenReturn Future.successful(result)
 
-      whenReady(amlsConnector.refreshPaymentStatus(result.amlsRef)) { r => r mustBe result }
+      whenReady(amlsConnector.refreshPaymentStatus(result.amlsRef, accountTypeId)) { r => r mustBe result }
     }
   }
 
   "registrationDetails" must {
     "retrieve the registration details given a safe ID" in {
       val safeId = "SAFE_ID"
-      val url = s"${amlsConnector.registrationUrl}/org/TestOrgRef/details/$safeId"
+      val url = s"${amlsConnector.registrationUrl}/org/id/details/$safeId"
 
       when {
         amlsConnector.httpGet.GET[RegistrationDetails](eqTo(url))(any(), any(), any())
       } thenReturn Future.successful(RegistrationDetails("Test Company", isIndividual = false))
 
-      whenReady(amlsConnector.registrationDetails(safeId)) { result =>
+      whenReady(amlsConnector.registrationDetails(accountTypeId, safeId)) { result =>
         result.companyName mustBe "Test Company"
       }
     }

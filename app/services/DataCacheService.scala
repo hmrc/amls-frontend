@@ -27,6 +27,7 @@ private[services] trait DataCacheService {
 
   private[services] def cacheConnector: DataCacheConnector
 
+  @deprecated("to be removed when auth migration complete")
   def getCache
   (implicit
    ec: ExecutionContext,
@@ -34,6 +35,17 @@ private[services] trait DataCacheService {
    ac: AuthContext
   ): Future[CacheMap] =
     cacheConnector.fetchAll flatMap {
+      case Some(cache) =>
+        Future.successful(cache)
+      case None =>
+        Future.failed {
+          new NotFoundException("No CacheMap found for user")
+        }
+    }
+
+  def getCache(credId: String)
+              (implicit ec: ExecutionContext, hc: HeaderCarrier): Future[CacheMap] =
+    cacheConnector.fetchAll(credId) flatMap {
       case Some(cache) =>
         Future.successful(cache)
       case None =>

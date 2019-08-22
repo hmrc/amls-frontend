@@ -16,30 +16,29 @@
 
 package controllers.renewal
 
-import javax.inject.Inject
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.businessmatching._
-import models.renewal.{MoneySources, Renewal, WhichCurrencies}
+import models.renewal.{MoneySources, Renewal}
 import play.api.mvc.Result
 import services.RenewalService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.renewal.money_sources
 
 import scala.concurrent.Future
 
-class MoneySourcesController @Inject()(val authConnector: AuthConnector,
+class MoneySourcesController @Inject()(val authAction: AuthAction,
                                                 renewalService: RenewalService,
-                                                dataCacheConnector: DataCacheConnector) extends BaseController {
+                                                dataCacheConnector: DataCacheConnector) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
         val block = for {
-          renewal <- OptionT(renewalService.getRenewal)
+          renewal <- OptionT(renewalService.getRenewal(request.credId))
           whichCurrencies <- OptionT.fromOption[Future](renewal.whichCurrencies)
           ms <- OptionT.fromOption[Future](whichCurrencies.moneySources)
         } yield {
@@ -50,13 +49,12 @@ class MoneySourcesController @Inject()(val authConnector: AuthConnector,
 
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request =>
         Form2[MoneySources](request.body) match {
           case f: InvalidForm => Future.successful(BadRequest(money_sources(f, edit)))
           case ValidForm(_, model) =>
-            dataCacheConnector.fetchAll flatMap {
+            dataCacheConnector.fetchAll(request.credId) flatMap {
               optMap =>
                 val result = for {
                   cacheMap <- optMap
@@ -65,7 +63,7 @@ class MoneySourcesController @Inject()(val authConnector: AuthConnector,
                   services <- bm.msbServices
                   activities <- bm.activities
                 } yield {
-                  renewalService.updateRenewal(updateMoneySources(renewal, model)) map { _ =>
+                  renewalService.updateRenewal(request.credId, updateMoneySources(renewal, model)) map { _ =>
                     standardRouting(services.msbServices, activities.businessActivities, edit)
                   }
                 }

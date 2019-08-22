@@ -18,8 +18,9 @@ package controllers.renewal
 
 import cats.implicits._
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching._
-import models.renewal.{MoneySources, Renewal, UsesForeignCurrenciesYes, WhichCurrencies, BankMoneySource, WholesalerMoneySource}
+import models.renewal.{BankMoneySource, MoneySources, Renewal, UsesForeignCurrenciesYes, WhichCurrencies, WholesalerMoneySource}
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -42,13 +43,13 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
     val dataCacheConnector = mock[DataCacheConnector]
     val cacheMap = mock[CacheMap]
 
-    lazy val controller = new WhichCurrenciesController(self.authConnector, renewalService, dataCacheConnector)
+    lazy val controller = new WhichCurrenciesController(SuccessfulAuthAction, renewalService, dataCacheConnector)
 
     when {
-      renewalService.getRenewal(any(), any(), any())
+      renewalService.getRenewal(any())(any(), any())
     } thenReturn Future.successful(Renewal().some)
 
-    when(dataCacheConnector.fetchAll(any(), any()))
+    when(dataCacheConnector.fetchAll(any())(any()))
       .thenReturn(Future.successful(Some(cacheMap)))
   }
 
@@ -66,7 +67,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
     )
 
     when {
-      renewalService.updateRenewal(any())(any(), any(), any())
+      renewalService.updateRenewal(any(),any())(any(), any())
     } thenReturn Future.successful(mock[CacheMap])
   }
 
@@ -103,7 +104,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
     when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
       .thenReturn(Some(BusinessMatching(msbServices = msbServices, activities = businessActivities)))
 
-    when(dataCacheConnector.save[Renewal](eqTo(Renewal.key), eqTo(expectedRenewal))(any(), any(), any()))
+    when(dataCacheConnector.save[Renewal](any(), eqTo(Renewal.key), eqTo(expectedRenewal))(any(), any()))
       .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
     def setupBusinessMatching(activities: Set[BusinessActivity], msbServices: Set[BusinessMatchingMsbService]) = when {
@@ -133,7 +134,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
 
       "reads the current value from the renewals model" in new Fixture {
         when {
-          renewalService.getRenewal(any(), any(), any())
+          renewalService.getRenewal(any())(any(), any())
         } thenReturn Future.successful(Renewal(whichCurrencies = WhichCurrencies(Seq("EUR"), None, MoneySources(None, None, None).some).some).some)
 
         val result = controller.get(true)(request)
@@ -141,7 +142,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
 
         doc.select("select[name=currencies[0]] option[selected]").attr("value") mustBe "EUR"
 
-        verify(renewalService).getRenewal(any(), any(), any())
+        verify(renewalService).getRenewal(any())(any(), any())
       }
     }
   }
@@ -171,7 +172,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
         val result = await(controller.post()(validFormRequest))
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
 
-        verify(renewalService).updateRenewal(captor.capture())(any(), any(), any())
+        verify(renewalService).updateRenewal(any(), captor.capture())(any(), any())
 
         captor.getValue.whichCurrencies mustBe Some(WhichCurrencies(
           Seq("USD", "GBP", "BOB")))
@@ -183,7 +184,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
         val result = controller.post()(request)
 
         status(result) mustBe BAD_REQUEST
-        verify(renewalService, never()).updateRenewal(any())(any(), any(), any())
+        verify(renewalService, never()).updateRenewal(any(),any())(any(), any())
       }
     }
   }

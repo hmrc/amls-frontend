@@ -16,28 +16,27 @@
 
 package controllers.renewal
 
-import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.{Inject, Singleton}
 import models.businessmatching._
 import models.renewal.{MostTransactions, Renewal}
 import play.api.mvc.Result
 import services.{AutoCompleteService, RenewalService}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 
 import scala.concurrent.Future
 
 @Singleton
-class MostTransactionsController @Inject()(val authConnector: AuthConnector,
+class MostTransactionsController @Inject()(val authAction: AuthAction,
                                            val cache: DataCacheConnector,
                                            val renewalService: RenewalService,
-                                           val autoCompleteService: AutoCompleteService) extends BaseController {
+                                           val autoCompleteService: AutoCompleteService) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        cache.fetch[Renewal](Renewal.key) map {
+        cache.fetch[Renewal](request.credId, Renewal.key) map {
           response =>
             val form = (for {
               msb <- response
@@ -48,14 +47,13 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector,
   }
 
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request =>
         Form2[MostTransactions](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.renewal.most_transactions(f, edit, autoCompleteService.getCountries)))
           case ValidForm(_, data) =>
-            cache.fetchAll flatMap {
+            cache.fetchAll(request.credId).flatMap {
               optMap =>
                 val result = for {
                   cacheMap <- optMap
@@ -63,7 +61,7 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector,
                   bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
                   ba <- bm.activities
                   services <- bm.msbServices
-                } yield renewalService.updateRenewal(renewal.mostTransactions(data)) map { _ =>
+                } yield renewalService.updateRenewal(request.credId, renewal.mostTransactions(data)) map { _ =>
                   if (!edit) {
                     redirectTo(services.msbServices, ba.businessActivities)
                   } else {

@@ -19,6 +19,7 @@ package controllers.responsiblepeople
 import java.util.UUID
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople._
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -42,7 +43,7 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
 
     val personNameController = new PersonNameController (
       dataCacheConnector = mockDataCacheConnector ,
-      authConnector = self.authConnector
+      authAction = SuccessfulAuthAction
     )
   }
 
@@ -54,7 +55,7 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
 
       "display the persons page with blank fields" in new Fixture {
 
-        when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+        when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
         val result = personNameController.get(RecordId)(request)
@@ -76,8 +77,8 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
 
         val responsiblePeople = ResponsiblePerson(Some(addPerson))
 
-        when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = personNameController.get(RecordId)(request)
         status(result) must be(OK)
@@ -91,7 +92,7 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
 
       "display Not Found" when {
         "ResponsiblePeople model cannot be found" in new Fixture {
-          when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(None))
 
           val result = personNameController.get(RecordId)(request)
@@ -112,10 +113,10 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
               "lastName" -> "last"
             )
 
-            when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
               .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
-            when(personNameController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+            when(personNameController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = personNameController.post(RecordId)(requestWithParams)
@@ -132,10 +133,10 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
               "lastName" -> "last"
             )
 
-            when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
               .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
-            when(personNameController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+            when(personNameController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = personNameController.post(RecordId, true)(requestWithParams)
@@ -151,7 +152,7 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
             "lastName" -> "last"
           )
 
-          when(personNameController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+          when(personNameController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = personNameController.post(RecordId)(firstNameMissingInRequest)
@@ -169,10 +170,10 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
             "lastName" -> "last"
           )
 
-          when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
-          when(personNameController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+          when(personNameController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = personNameController.post(2)(requestWithParams)

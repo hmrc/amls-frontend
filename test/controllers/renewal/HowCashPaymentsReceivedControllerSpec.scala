@@ -17,6 +17,7 @@
 package controllers.renewal
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.renewal.{CashPayments, CashPaymentsCustomerNotMet, HowCashPaymentsReceived, PaymentMethods, Renewal}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -42,21 +43,21 @@ class HowCashPaymentsReceivedControllerSpec extends AmlsSpec {
 
     val controller = new HowCashPaymentsReceivedController (
       dataCacheConnector = mockDataCacheConnector,
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       renewalService = mockRenewalService
     )
 
-    when(mockRenewalService.getRenewal(any(),any(),any()))
+    when(mockRenewalService.getRenewal(any())(any(), any()))
       .thenReturn(Future.successful(None))
 
-    when(mockRenewalService.updateRenewal(any())(any(),any(),any()))
+    when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
       .thenReturn(Future.successful(new CacheMap("", Map.empty)))
   }
 
   "HowCashPaymentsReceived controller" when {
     "get is called" must {
       "load the page if renewal data is found" in new Fixture {
-          when(mockRenewalService.getRenewal(any(),any(),any()))
+          when(mockRenewalService.getRenewal(any())(any(), any()))
             .thenReturn(Future.successful(Some(Renewal(receiveCashPayments = Some(receiveCashPayments)))))
 
           val result = controller.get()(request)

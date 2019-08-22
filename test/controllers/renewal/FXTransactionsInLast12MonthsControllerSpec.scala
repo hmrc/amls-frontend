@@ -17,9 +17,10 @@
 package controllers.renewal
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching._
 import models.renewal.{FXTransactionsInLast12Months, Renewal}
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
@@ -40,12 +41,12 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
     val controller = new FXTransactionsInLast12MonthsController (
       dataCacheConnector = mockDataCacheConnector,
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       renewalService = mockRenewalService
     )
 
     val cacheMap = mock[CacheMap]
-    when(mockDataCacheConnector.fetchAll(any(), any()))
+    when(mockDataCacheConnector.fetchAll(any())(any()))
             .thenReturn(Future.successful(Some(cacheMap)))
 
     def setupBusinessMatching(activities: Set[BusinessActivity]) = when {
@@ -59,8 +60,8 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
     "load the page 'How many foreign exchange transactions'" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[Renewal](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[Renewal](any(), any())
+        (any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -69,8 +70,8 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
     "load the page 'How many foreign exchange transactions' with pre populated data" in new Fixture  {
 
-      when(controller.dataCacheConnector.fetch[Renewal](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Renewal(
+      when(controller.dataCacheConnector.fetch[Renewal](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(Renewal(
         fxTransactionsInLast12Months = Some(FXTransactionsInLast12Months("12345678963"))))))
 
       val result = controller.get()(request)
@@ -89,7 +90,7 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
         cacheMap.getEntry[Renewal](Renewal.key)
       } thenReturn Some(Renewal())
 
-      when(mockRenewalService.updateRenewal(any())(any(),any(), any()))
+      when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
@@ -107,7 +108,7 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
         cacheMap.getEntry[Renewal](Renewal.key)
       } thenReturn Some(Renewal())
 
-      when(mockRenewalService.updateRenewal(any())(any(),any(), any()))
+      when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
               .thenReturn(Future.successful(mock[CacheMap]))
     }
 

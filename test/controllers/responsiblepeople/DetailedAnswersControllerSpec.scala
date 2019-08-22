@@ -16,8 +16,9 @@
 
 package controllers.responsiblepeople
 
-import config.{AMLSAuthConnector, AppConfig}
+import config.AppConfig
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.BusinessMatching
 import models.responsiblepeople._
 import models.status._
@@ -27,7 +28,6 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -42,7 +42,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
 
     val controller = new DetailedAnswersController (
       dataCacheConnector = mock[DataCacheConnector],
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       statusService = mock[StatusService],
       config = mock[AppConfig]
       )
@@ -53,13 +53,13 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
 
     def setupMocksFor(model: ResponsiblePerson, status: SubmissionStatus = SubmissionReady) = {
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any(), any()))
         .thenReturn(Future.successful(Some(Seq(model))))
 
-      when(controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
         .thenReturn(Future.successful(Some(BusinessMatching())))
 
-      when(controller.statusService.getStatus(any(), any(), any()))
+      when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any()))
         .thenReturn(Future.successful(status))
     }
 
@@ -179,8 +179,8 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
 
       "respond with SEE_OTHER and show the registration progress page" when {
         "section data is unavailable" in new Fixture {
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-            (any(), any(), any())).thenReturn(Future.successful(None))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+            (any(), any())).thenReturn(Future.successful(None))
           val result = controller.get(1)(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
@@ -197,14 +197,14 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
             setupMocksFor(ResponsiblePerson(None, None))
 
             when {
-              controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(),any())(any(),any(),any())
+              controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(),any())(any(),any())
             } thenReturn Future.successful(CacheMap("", Map.empty))
 
             val result = controller.post(1, None)(request)
 
             redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
 
-            verify(controller.dataCacheConnector).save(any(),eqTo(Seq(ResponsiblePerson(hasAccepted = true))))(any(),any(),any())
+            verify(controller.dataCacheConnector).save(any(), any(),eqTo(Seq(ResponsiblePerson(hasAccepted = true))))(any(),any())
           }
         }
       }
@@ -217,14 +217,14 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
             setupMocksFor(ResponsiblePerson(None, None))
 
             when {
-              controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(),any())(any(),any(),any())
+              controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(),any())(any(),any())
             } thenReturn Future.successful(CacheMap("", Map.empty))
 
             val result = controller.post(1, flow)(request)
 
             redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
 
-            verify(controller.dataCacheConnector).save(any(),eqTo(Seq(ResponsiblePerson(hasAccepted = true))))(any(),any(),any())
+            verify(controller.dataCacheConnector).save(any(), any(),eqTo(Seq(ResponsiblePerson(hasAccepted = true))))(any(),any())
 
           }
         }
