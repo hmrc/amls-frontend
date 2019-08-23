@@ -28,11 +28,11 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSugar with PatienceConfiguration with IntegrationPatience {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
     val controller = new SendTheLargestAmountsOfMoneyController(
@@ -51,7 +51,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
   "SendTheLargestAmountsOfMoneyController" must {
     "load the 'Where to Send The Largest Amounts Of Money' page" in new Fixture  {
       mockIsNewActivityNewAuth(false)
-      mockApplicationStatusNewAuth(NotCompleted)
+      mockApplicationStatus(NotCompleted)
       mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
 
       val result = controller.get()(request)
@@ -68,7 +68,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
         sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB"))))))
 
       mockIsNewActivityNewAuth(false)
-      mockApplicationStatusNewAuth(NotCompleted)
+      mockApplicationStatus(NotCompleted)
       mockCacheFetch[MoneyServiceBusiness](msb, Some(MoneyServiceBusiness.key))
 
       val result = controller.get()(request)
@@ -81,7 +81,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
 
     "render the SendTheLargestAmountOfMoney view" when {
       "application is in variation mode and a service has just been added" in new Fixture {
-        mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+        mockApplicationStatus(SubmissionDecisionApproved)
         mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
         mockIsNewActivityNewAuth(true, Some(MoneyServiceBusinessActivity))
 
@@ -91,7 +91,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
       }
 
       "application is in variation mode and no service has been added" in new Fixture {
-        mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+        mockApplicationStatus(SubmissionDecisionApproved)
         mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
         mockIsNewActivityNewAuth(false)
 

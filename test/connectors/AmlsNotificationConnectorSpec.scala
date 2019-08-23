@@ -24,10 +24,7 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import uk.gov.hmrc.domain.Org
 import uk.gov.hmrc.http._
-import uk.gov.hmrc.play.frontend.auth.connectors.domain._
-import uk.gov.hmrc.play.frontend.auth.{LoggedInUser, Principal}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -40,20 +37,6 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
   val dateTime = new DateTime(1479730062573L, DateTimeZone.UTC)
 
   implicit val hc = HeaderCarrier()
-  implicit val ac = AuthContext(
-    LoggedInUser(
-      "UserName",
-      None,
-      None,
-      None,
-      CredentialStrength.Weak,
-      ConfidenceLevel.L50, ""),
-    Principal(
-      None,
-      Accounts(org = Some(OrgAccount("Link", Org("TestOrgRef"))))),
-    None,
-    None,
-    None, None)
 
   private trait Fixture {
     val connector = new AmlsNotificationConnector (mock[WSHttp], mock[AppConfig])

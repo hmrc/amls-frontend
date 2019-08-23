@@ -49,7 +49,6 @@ class ResponsiblePeopleRowsSpec extends PlaySpec
       mock[DataCacheConnector]
     )
   }
-    implicit val authContext = mock[AuthContext]
     implicit val headerCarrier = HeaderCarrier()
     val subscriptionResponse = SubscriptionResponse(
       etmpFormBundleNumber = "",

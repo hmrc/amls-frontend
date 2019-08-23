@@ -30,14 +30,14 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
 
     val request = addToken(authRequest)

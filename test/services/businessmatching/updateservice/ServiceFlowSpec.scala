@@ -43,19 +43,16 @@ class ServiceFlowSpec extends PlaySpec with MustMatchers with MockitoSugar with 
   trait Fixture extends DependencyMocks {
 
     implicit val hc = HeaderCarrier()
-    implicit val ac = mock[AuthContext]
 
     val businessMatchingService = mock[BusinessMatchingService]
-
     val service = new ServiceFlow(businessMatchingService, mockCacheConnector)
-
     val businessMatching = mock[BusinessMatching]
+    mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
+
 
     when(businessMatching.msbServices) thenReturn Some(
       BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange))
     )
-
-    mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
 
     val msbModel = mock[MsbModel]
     when(msbModel.isComplete(any(), any(), any())) thenReturn false
@@ -78,7 +75,7 @@ class ServiceFlowSpec extends PlaySpec with MustMatchers with MockitoSugar with 
     mockCacheGetEntry[Asp](Some(aspModel), Asp.key)
 
     def setUpActivities(activities: Set[BusinessActivity]) = when {
-      businessMatchingService.getAdditionalBusinessActivities(any(), any(), any())
+      businessMatchingService.getAdditionalBusinessActivities(any())(any(), any())
     } thenReturn OptionT.some[Future, Set[BusinessActivity]](activities)
 
     mockCacheFetch(Some(UpdateService(inNewServiceFlow = true)), Some(UpdateService.key))
@@ -88,14 +85,12 @@ class ServiceFlowSpec extends PlaySpec with MustMatchers with MockitoSugar with 
     "called" must {
       "return true if the service appears in the additionalBusinessActivities collection" in new Fixture {
         setUpActivities(Set(AccountancyServices))
-
-        whenReady(service.isNewActivity(AccountancyServices))(_ mustBe true)
+        whenReady(service.isNewActivity("credId", AccountancyServices))(_ mustBe true)
       }
 
       "return false if the service does not appear in the additionaBusinessActivities collection" in new Fixture {
         setUpActivities(Set(AccountancyServices))
-
-        whenReady(service.isNewActivity(HighValueDealing))(_ mustBe false)
+        whenReady(service.isNewActivity("credId", HighValueDealing))(_ mustBe false)
       }
     }
   }

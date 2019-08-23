@@ -43,7 +43,7 @@ import scala.concurrent.Future
 
 class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePersonGenerator with BusinessMatchingGenerator {
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
 
     val request = addToken(authRequest)

@@ -41,7 +41,6 @@ trait AmlsSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with MustM
   implicit lazy val messages = messagesApi.preferred(FakeRequest())
 
   implicit val headerCarrier = HeaderCarrier()
-  implicit val authContext = mock[AuthContext]
 
   def addToken[T](fakeRequest: FakeRequest[T]) = {
     val csrfConfig     = app.injector.instanceOf[CSRFConfigProvider].get

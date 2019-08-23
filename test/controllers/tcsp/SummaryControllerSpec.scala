@@ -22,15 +22,16 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.test.Helpers._
 import services.businessmatching.ServiceFlow
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class SummaryControllerSpec extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
     val request = addToken(authRequest)
+    implicit val ec = app.injector.instanceOf[ExecutionContext]
 
     val defaultProvidedServices = ProvidedServices(Set(PhonecallHandling, Other("other service")))
     val defaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes("12345678")
@@ -55,7 +56,7 @@ class SummaryControllerSpec extends AmlsSpec {
     )
 
     when {
-      controller.statusService.isPreSubmission(any(), any(), any())
+      controller.statusService.isPreSubmission(any(), any(), any())(any(), any())
     } thenReturn Future.successful(false)
   }
 

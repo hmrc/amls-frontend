@@ -29,13 +29,13 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, FeeResponseService}
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
@@ -59,7 +59,7 @@ class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
     "get is called" must {
       "return OK with view" in new Fixture {
 
-        mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+        mockApplicationStatus(SubmissionDecisionApproved)
 
         when {
           controller.authEnrolmentsService.amlsRegistrationNumber(any(),any())(any(), any())

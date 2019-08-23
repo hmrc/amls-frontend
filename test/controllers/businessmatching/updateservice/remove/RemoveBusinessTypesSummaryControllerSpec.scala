@@ -40,7 +40,7 @@ import scala.concurrent.Future
 
 class RemoveBusinessTypesSummaryControllerSpec extends AmlsSpec with TitleValidator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
 
     val request = addToken(authRequest)

@@ -26,10 +26,7 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import uk.gov.hmrc.domain.Org
 import uk.gov.hmrc.http.{HeaderCarrier, HttpGet}
-import uk.gov.hmrc.play.frontend.auth.connectors.domain._
-import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser, Principal}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -45,20 +42,6 @@ class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with
     val accountTypeId = ("org", "id")
 
     implicit val hc = HeaderCarrier()
-    implicit val ac = AuthContext(
-      LoggedInUser(
-        "UserName",
-        None,
-        None,
-        None,
-        CredentialStrength.Weak,
-        ConfidenceLevel.L50, ""),
-      Principal(
-        None,
-        Accounts(org = Some(OrgAccount("Link", Org("TestOrgRef"))))),
-      None,
-      None,
-      None, None)
 
     when {
       connector.feePaymentUrl
@@ -81,17 +64,6 @@ class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with
       createdAt = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC))
 
     "successfully receive feeResponse" in new Fixture {
-
-      when {
-        connector.http.GET[FeeResponse](eqTo(s"${connector.feePaymentUrl}/org/TestOrgRef/$amlsRegistrationNumber"))(any(),any(), any())
-      } thenReturn Future.successful(feeResponse)
-
-      whenReady(connector.feeResponse(amlsRegistrationNumber)){
-        _ mustBe feeResponse
-      }
-    }
-
-    "successfully receive feeResponse new auth" in new Fixture {
 
       when {
         connector.http.GET[FeeResponse](eqTo(s"${connector.feePaymentUrl}/org/id/$amlsRegistrationNumber"))(any(),any(), any())

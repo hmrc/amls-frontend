@@ -25,11 +25,11 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth, StatusConstants}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
 
 class RemoveBankDetailsControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(authRequest)
 
     val controller = new RemoveBankDetailsController (

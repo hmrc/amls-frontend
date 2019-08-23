@@ -67,7 +67,7 @@ class DeRegisterApplicationControllerSpec extends AmlsSpec with MustMatchers wit
     } thenReturn Future.successful(applicationReference.some)
 
     when {
-      amlsConnector.deregister(any(), any())(any(), any(), any())
+      amlsConnector.deregister(any(), any(), any())(any(), any())
     } thenReturn Future.successful(DeRegisterSubscriptionResponse("Some date"))
 
     when {

@@ -33,14 +33,14 @@ import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyServiceBusinessTestData with BusinessMatchingGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
@@ -73,7 +73,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
       case _ => OptionT.none[Future, BusinessMatching]
     })
 
-    mockApplicationStatusNewAuth(NotCompleted)
+    mockApplicationStatus(NotCompleted)
   }
 
   "ServicesController" must {

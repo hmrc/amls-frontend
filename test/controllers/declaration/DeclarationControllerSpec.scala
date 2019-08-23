@@ -28,7 +28,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
@@ -39,7 +39,7 @@ import scala.concurrent.Future
 
 class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
@@ -77,7 +77,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
         (any(), any())).thenReturn(Future.successful(None))
 
-      mockApplicationStatusNewAuth(NotCompleted)
+      mockApplicationStatus(NotCompleted)
 
       val result = declarationController.get()(request)
       status(result) must be(SEE_OTHER)
@@ -90,7 +90,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
         (any(), any())).thenReturn(Future.successful(Some(addPerson)))
 
-      mockApplicationStatusNewAuth(NotCompleted)
+      mockApplicationStatus(NotCompleted)
 
       val result = declarationController.get()(request)
       status(result) must be(OK)
@@ -106,7 +106,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
         (any(), any())).thenReturn(Future.successful(Some(addPerson)))
 
-      mockApplicationStatusNewAuth(ReadyForRenewal(Some(new LocalDate())))
+      mockApplicationStatus(ReadyForRenewal(Some(new LocalDate())))
 
       val result = declarationController.get()(request)
       status(result) must be(OK)
@@ -122,7 +122,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
         (any(), any())).thenReturn(Future.successful(Some(addPerson)))
 
-      mockApplicationStatusNewAuth(SubmissionReadyForReview)
+      mockApplicationStatus(SubmissionReadyForReview)
 
       val result = declarationController.get()(request)
       status(result) must be(OK)
@@ -137,7 +137,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
         (any(), any())).thenReturn(Future.successful(Some(addPerson)))
 
-      mockApplicationStatusNewAuth(NotCompleted)
+      mockApplicationStatus(NotCompleted)
 
       val result = declarationController.get()(request)
       status(result) must be(OK)
@@ -172,7 +172,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
         (any(), any())).thenReturn(Future.successful(None))
 
-      mockApplicationStatusNewAuth(NotCompleted)
+      mockApplicationStatus(NotCompleted)
 
       val result = declarationController.getWithAmendment()(request)
       status(result) must be(SEE_OTHER)
@@ -185,7 +185,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
         (any(), any())).thenReturn(Future.successful(None))
 
-      mockApplicationStatusNewAuth(SubmissionReadyForReview)
+      mockApplicationStatus(SubmissionReadyForReview)
 
       val result = declarationController.getWithAmendment()(request)
       status(result) must be(SEE_OTHER)

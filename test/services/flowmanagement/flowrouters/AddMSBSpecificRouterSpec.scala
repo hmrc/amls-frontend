@@ -27,7 +27,7 @@ import services.flowmanagement.flowrouters.businessmatching.AddBusinessTypeRoute
 import services.flowmanagement.pagerouters._
 import services.flowmanagement.pagerouters.addflow._
 import services.flowmanagement.pagerouters.removeflow._
-import utils.{AmlsSpec, DependencyMocksNewAuth}
+import utils.{AmlsSpec, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -35,7 +35,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
 
   val model = AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness))
 
-  trait Fixture extends DependencyMocksNewAuth {
+  trait Fixture extends DependencyMocks {
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 

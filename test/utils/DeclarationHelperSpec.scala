@@ -35,7 +35,10 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
 
   implicit val statusService = mock[StatusService]
   implicit val headerCarrier = mock[HeaderCarrier]
-  implicit val authContext = mock[AuthContext]
+
+  val amlsRegNo = Some("regNo")
+  val accountTypeId = ("accountType", "accountId")
+  val credId = "12341234"
 
   "currentPartnersNames" must {
     "return a sequence of full names of only undeleted partners" in {
@@ -105,59 +108,59 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
     }
   }
 
-  "statusSubtitle" must {
+  "statusSubtitle(amlsRegNo, accountTypeId, credId" must {
     "return the correct message string given a SubmissionReady status" in {
 
       when{
-        statusService.getStatus(any(),any(),any())
+        statusService.getStatus(any(),any(), any())(any(),any())
       } thenReturn Future.successful(SubmissionReady)
 
-      await(statusSubtitle) mustBe "submit.registration"
+      await(statusSubtitle(amlsRegNo, accountTypeId, credId)) mustBe "submit.registration"
     }
 
     "return the correct message string given a SubmissionReadyForReview status" in {
 
       when{
-        statusService.getStatus(any(),any(),any())
+        statusService.getStatus(any(),any(), any())(any(),any())
       } thenReturn Future.successful(SubmissionReadyForReview)
 
-      await(statusSubtitle) mustBe "submit.amendment.application"
+      await(statusSubtitle(amlsRegNo, accountTypeId, credId)) mustBe "submit.amendment.application"
     }
 
     "return the correct message string given a SubmissionDecisionApproved status" in {
 
       when{
-        statusService.getStatus(any(),any(),any())
+        statusService.getStatus(any(),any(), any())(any(),any())
       } thenReturn Future.successful(SubmissionDecisionApproved)
 
-      await(statusSubtitle) mustBe "submit.amendment.application"
+      await(statusSubtitle(amlsRegNo, accountTypeId, credId)) mustBe "submit.amendment.application"
     }
 
     "return the correct message string given a ReadyForRenewal status" in {
 
       when{
-        statusService.getStatus(any(),any(),any())
+        statusService.getStatus(any(),any(), any())(any(),any())
       } thenReturn Future.successful(ReadyForRenewal(None))
 
-      await(statusSubtitle) mustBe "submit.renewal.application"
+      await(statusSubtitle(amlsRegNo, accountTypeId, credId)) mustBe "submit.renewal.application"
     }
 
     "return the correct message string given a RenewalSubmitted status" in {
 
       when{
-        statusService.getStatus(any(),any(),any())
+        statusService.getStatus(any(),any(), any())(any(),any())
       } thenReturn Future.successful(RenewalSubmitted(None))
 
-      await(statusSubtitle) mustBe "submit.renewal.application"
+      await(statusSubtitle(amlsRegNo, accountTypeId, credId)) mustBe "submit.renewal.application"
     }
 
     "return an exception when any other status is given" in {
 
       when{
-        statusService.getStatus(any(),any(),any())
+        statusService.getStatus(any(),any(), any())(any(),any())
       } thenReturn Future.successful(SubmissionWithdrawn)
 
-      a[Exception] mustBe thrownBy(await(statusSubtitle))
+      a[Exception] mustBe thrownBy(await(statusSubtitle(amlsRegNo, accountTypeId, credId)))
     }
   }
 

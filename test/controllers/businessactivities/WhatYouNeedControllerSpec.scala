@@ -41,7 +41,7 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
     "get" must {
       "redirect to InvolvedInOtherController" when {
         "creating a new submission" in new Fixture {
-          mockApplicationStatusNewAuth(SubmissionReadyForReview)
+          mockApplicationStatus(SubmissionReadyForReview)
 
           val result = controller.get(request)
           status(result) must be(OK)
@@ -52,7 +52,7 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
         }
 
         "performing a variation" in new Fixture {
-          mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+          mockApplicationStatus(SubmissionDecisionApproved)
 
           val result = controller.get(request)
           status(result) must be(OK)
@@ -63,7 +63,7 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
         }
 
         "in a renewal pending status" in new Fixture {
-          mockApplicationStatusNewAuth(ReadyForRenewal(None))
+          mockApplicationStatus(ReadyForRenewal(None))
 
           val result = controller.get(request)
           status(result) must be(OK)
@@ -74,7 +74,7 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
         }
 
         "in a renewal submitted status" in new Fixture {
-          mockApplicationStatusNewAuth(RenewalSubmitted(None))
+          mockApplicationStatus(RenewalSubmitted(None))
 
           val result = controller.get(request)
           status(result) must be(OK)

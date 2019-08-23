@@ -38,7 +38,7 @@ import uk.gov.hmrc.auth.core.AffinityGroup.Individual
 import uk.gov.hmrc.auth.core.{Enrolments, User}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, AuthorisedRequest, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, AuthorisedRequest, DependencyMocks}
 
 import scala.concurrent.{ExecutionContext, Future}
 

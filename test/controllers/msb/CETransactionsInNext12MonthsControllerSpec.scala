@@ -27,13 +27,13 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
 class CETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
@@ -61,7 +61,7 @@ class CETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
     "load the page 'How many currency exchange transactions do you expect in the next 12 months?'" in new Fixture {
 
-      mockApplicationStatusNewAuth(NotCompleted)
+      mockApplicationStatus(NotCompleted)
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
         (any(), any())).thenReturn(Future.successful(None))
@@ -73,7 +73,7 @@ class CETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
     "load the page 'How many currency exchange transactions do you expect in the next 12 months?' with pre populated data" in new Fixture {
 
-      mockApplicationStatusNewAuth(NotCompleted)
+      mockApplicationStatus(NotCompleted)
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
         (any(), any())).thenReturn(Future.successful(Some(MoneyServiceBusiness(
@@ -85,7 +85,7 @@ class CETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
     }
 
     "load the page when the application status is approved and the service has just been added" in new Fixture {
-      mockApplicationStatusNewAuth(NotCompleted)
+      mockApplicationStatus(NotCompleted)
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
         (any(), any())).thenReturn(Future.successful(None))

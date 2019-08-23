@@ -20,29 +20,29 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.businessactivities.{BusinessActivities, InvolvedInOtherYes}
 import models.businessmatching.{BusinessActivities => BMActivities, _}
-import models.status.{NotCompleted, SubmissionDecisionApproved}
+import models.status.NotCompleted
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
-import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
-
-import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.{AmlsSpec, AuthorisedFixture}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with PrivateMethodTester{
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
+    implicit val ec = app.injector.instanceOf[ExecutionContext]
 
-     val controller = new InvolvedInOtherController (
+    val controller = new InvolvedInOtherController (
        dataCacheConnector = mock[DataCacheConnector],
        authAction = SuccessfulAuthAction,
        statusService = mock[StatusService]
@@ -63,7 +63,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
             HighValueDealing, MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService)))
         )
 
-        when(controller.statusService.getStatus(any(), any(), any()))
+        when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(NotCompleted))
 
         when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
@@ -102,7 +102,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
             HighValueDealing, MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService)))
         )
 
-        when(controller.statusService.getStatus(any(), any(), any()))
+        when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(NotCompleted))
 
         when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
@@ -118,7 +118,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
         when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
           .thenReturn(Some(BusinessActivities(involvedInOther = Some(InvolvedInOtherYes("test")))))
 
-        when(controller.statusService.getStatus(any(), any(), any()))
+        when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(NotCompleted))
 
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))

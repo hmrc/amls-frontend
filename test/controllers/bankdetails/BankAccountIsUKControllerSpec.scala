@@ -29,13 +29,13 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
 class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
@@ -57,7 +57,7 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None))), Some(BankDetails.key))
 
-          mockApplicationStatusNewAuth(SubmissionReady)
+          mockApplicationStatus(SubmissionReady)
 
           val result = controller.get(1, false)(request)
           val document: Document = Jsoup.parse(contentAsString(result))
@@ -73,7 +73,7 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None, Some(ukBankAccount)))), Some(BankDetails.key))
 
-          mockApplicationStatusNewAuth(SubmissionReady)
+          mockApplicationStatus(SubmissionReady)
 
           val result = controller.get(1, true)(request)
           status(result) must be(OK)
@@ -83,7 +83,7 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
           "hasn't been accepted and completed yet" in new Fixture {
             mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None))), Some(BankDetails.key))
 
-            mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+            mockApplicationStatus(SubmissionDecisionApproved)
 
             val result = controller.get(1, edit = true)(request)
             val document: Document = Jsoup.parse(contentAsString(result))
@@ -101,7 +101,7 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
 
           mockCacheFetch[Seq[BankDetails]](None, Some(BankDetails.key))
 
-          mockApplicationStatusNewAuth(SubmissionReady)
+          mockApplicationStatus(SubmissionReady)
 
           val result = controller.get(1)(request)
 
@@ -115,7 +115,7 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
           mockCacheFetch[Seq[BankDetails]](Some(Seq(
             BankDetails(None, None, Some(ukBankAccount), hasAccepted = true))), Some(BankDetails.key))
 
-          mockApplicationStatusNewAuth(SubmissionReadyForReview)
+          mockApplicationStatus(SubmissionReadyForReview)
 
           val result = controller.get(1, true)(request)
 
@@ -130,7 +130,7 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
           mockCacheFetch[Seq[BankDetails]](Some(Seq(
             BankDetails(None, None, Some(ukBankAccount), hasAccepted = true))), Some(BankDetails.key))
 
-          mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+          mockApplicationStatus(SubmissionDecisionApproved)
 
           val result = controller.get(1, true)(request)
 

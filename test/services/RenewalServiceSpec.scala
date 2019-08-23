@@ -41,13 +41,14 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends AuthorisedFixture {
 
     val dataCache = mock[DataCacheConnector]
-    implicit val authContext = mock[AuthContext]
 
     val service = new RenewalService(dataCache)
 
+    val credId = "12345678"
+    
     val mockCacheMap = mock[CacheMap]
 
-    when(dataCache.fetchAll(any(),any()))
+    when(dataCache.fetchAll(any())(any()))
             .thenReturn(Future.successful(Some(mockCacheMap)))
     when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
             .thenReturn(Some(BusinessMatching()))
@@ -57,7 +58,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
     } thenReturn Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(msbServices)), activities = Some(BusinessActivities(activities))))
 
     def setUpRenewal(renewalModel: Renewal) = when {
-      dataCache.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
+      dataCache.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any())
     } thenReturn Future.successful(Some(renewalModel))
 
     def standardCompleteInvolvedInOtherActivities(): Renewal = {
@@ -77,10 +78,10 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
       "the renewal hasn't been started" in new Fixture {
         when {
-          dataCache.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
+          dataCache.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any())
         } thenReturn Future.successful(None)
 
-        val section = await(service.getSection)
+        val section = await(service.getSection(credId))
         section mustBe Section(Renewal.sectionKey, NotStarted, hasChanged = false, controllers.renewal.routes.WhatYouNeedController.get())
 
       }
@@ -109,8 +110,8 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
         setUpRenewal(completeModel)
 
-        val section = await(service.getSection)
-        await(service.isRenewalComplete(completeModel)) mustBe true
+        val section = await(service.getSection(credId))
+        await(service.isRenewalComplete(completeModel, credId)) mustBe true
         section mustBe Section(Renewal.sectionKey, Completed, hasChanged = true, controllers.renewal.routes.SummaryController.get())
       }
 
@@ -120,7 +121,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
         setUpRenewal(renewal)
 
-        val section = await(service.getSection)
+        val section = await(service.getSection(credId))
         section mustBe Section(Renewal.sectionKey, Started, hasChanged = true, controllers.renewal.routes.WhatYouNeedController.get())
       }
 
@@ -128,7 +129,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
         val renewal = Renewal(None)
         setUpRenewal(renewal)
 
-        val section = await(service.getSection)
+        val section = await(service.getSection(credId))
         section mustBe Section(Renewal.sectionKey, NotStarted, hasChanged = false, controllers.renewal.routes.WhatYouNeedController.get())
       }
     }
@@ -190,7 +191,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             businessTurnover = Some(BusinessTurnover.First),
             hasAccepted = true
           )
-          await(service.isRenewalComplete(model)) mustBe true
+          await(service.isRenewalComplete(model, credId)) mustBe true
         }
 
         "involvedInOtherActivites is false" in new StandardFixture {
@@ -200,7 +201,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             businessTurnover = None,
             hasAccepted = true
           )
-          await(service.isRenewalComplete(model)) mustBe true
+          await(service.isRenewalComplete(model, credId)) mustBe true
         }
       }
 
@@ -209,7 +210,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           customersOutsideIsUK = Some(CustomersOutsideIsUK(true)),
           customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB")))))
         )
-        await(service.isRenewalComplete(model)) mustBe true
+        await(service.isRenewalComplete(model, credId)) mustBe true
       }
 
       "HVD is selected business activity and section is complete along with standard renewal flow questions" in new HVDFixture {
@@ -220,7 +221,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           receiveCashPayments = Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other"))))))
 
         )
-        await(service.isRenewalComplete(model)) mustBe true
+        await(service.isRenewalComplete(model, credId)) mustBe true
       }
 
       "ASP and HVD are selected business activities and section is complete along with standard renewal flow questions" in new ASPHVDFixture {
@@ -230,14 +231,14 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
           receiveCashPayments = Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other"))))))
         )
-        await(service.isRenewalComplete(model)) mustBe true
+        await(service.isRenewalComplete(model, credId)) mustBe true
       }
 
       "MSB is selected business activity w/o MT, CE, FX subsectors and section is complete along with standard renewal flow questions" in new MSBFixture {
         val model = preFilledModel.copy(
           totalThroughput = Some(TotalThroughput("01"))
         )
-        await(service.isRenewalComplete(model)) mustBe true
+        await(service.isRenewalComplete(model, credId)) mustBe true
       }
 
       "MSB is selected business activity with MT subsector and w/o CE, FX subsectors and section is complete along with standard renewal flow questions" when {
@@ -249,7 +250,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(Country("us", "US")))),
             mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB"))))
           )
-          await(service.isRenewalComplete(model)) mustBe true
+          await(service.isRenewalComplete(model, credId)) mustBe true
         }
 
         "sendMoneyToOtherCountries is false" in new MTFixture {
@@ -259,7 +260,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
             mostTransactions = None
           )
-          await(service.isRenewalComplete(model)) mustBe true
+          await(service.isRenewalComplete(model, credId)) mustBe true
         }
 
         "sendMoneyToOtherCountries is None" in new MTFixture {
@@ -269,7 +270,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
             mostTransactions = None
           )
-          await(service.isRenewalComplete(model)) mustBe true
+          await(service.isRenewalComplete(model, credId)) mustBe true
         }
       }
 
@@ -279,7 +280,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
           ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("123"))
         )
-        await(service.isRenewalComplete(model)) mustBe true
+        await(service.isRenewalComplete(model, credId)) mustBe true
       }
 
       "MSB is selected business activity with FX subsector and w/o MT, CE subsectors and section is complete along with standard renewal flow questions" in new FXFixture {
@@ -287,7 +288,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           totalThroughput = Some(TotalThroughput("01")),
           fxTransactionsInLast12Months = Some(FXTransactionsInLast12Months("456"))
         )
-        await(service.isRenewalComplete(model)) mustBe true
+        await(service.isRenewalComplete(model, credId)) mustBe true
       }
 
       "MSB is selected business activity with MT, CE, FX subsectors and section is complete along with standard renewal flow questions" when {
@@ -302,7 +303,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("123")),
             fxTransactionsInLast12Months = Some(FXTransactionsInLast12Months("456"))
           )
-          await(service.isRenewalComplete(model)) mustBe true
+          await(service.isRenewalComplete(model, credId)) mustBe true
         }
 
         "sendMoneyToOtherCountries is False" in new AllFixture {
@@ -315,7 +316,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("123")),
             fxTransactionsInLast12Months = Some(FXTransactionsInLast12Months("456"))
           )
-          await(service.isRenewalComplete(model)) mustBe true
+          await(service.isRenewalComplete(model, credId)) mustBe true
         }
 
         "sendMoneyToOtherCountries is None" in new AllFixture {
@@ -328,7 +329,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("123")),
             fxTransactionsInLast12Months = Some(FXTransactionsInLast12Months("456"))
           )
-          await(service.isRenewalComplete(model)) mustBe true
+          await(service.isRenewalComplete(model, credId)) mustBe true
         }
       }
     }
@@ -342,7 +343,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             involvedInOtherActivities = None,
             hasAccepted = true
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "turnover is not defined" in new StandardFixture {
@@ -351,7 +352,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             turnover = None,
             hasAccepted = true
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "if involvedInOtherActivities and businessTurnover is not defined" in new StandardFixture {
@@ -361,7 +362,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             businessTurnover = None,
             hasAccepted = true
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "if not involvedInOtherActivities and businessTurnover is defined" in new StandardFixture {
@@ -371,7 +372,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             businessTurnover = Some(BusinessTurnover.First),
             hasAccepted = true
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "hasAccepted is false" in new StandardFixture {
@@ -381,7 +382,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             businessTurnover = Some(BusinessTurnover.First),
             hasAccepted = false
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
       }
@@ -392,7 +393,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           val model = preFilledModel.copy(
             customersOutsideUK = None
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
       }
@@ -403,7 +404,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           val model = preFilledModel.copy(
             customersOutsideUK = None
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "customersOutsideUk is defined and percentageOfCashPaymentsOver15000 is not defined" in new HVDFixture {
@@ -411,7 +412,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
             percentageOfCashPaymentOver15000 = None
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "customersOutsideUk is defined and percentageOfCashPaymentsOver15000 is defined and receivedCashPayments is not defined" in new HVDFixture {
@@ -420,7 +421,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
             receiveCashPayments = None
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "customersOutsideUk is defined and percentageOfCashPaymentsOver15000 is defined and receivedCashPayments is defined" when {
@@ -430,7 +431,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
               percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
               receiveCashPayments = Some(CashPayments(CashPaymentsCustomerNotMet(true), None))
             )
-            await(service.isRenewalComplete(model)) mustBe false
+            await(service.isRenewalComplete(model, credId)) mustBe false
           }
         }
       }
@@ -441,7 +442,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           val model = preFilledModel.copy(
             customersOutsideUK = None
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "customersOutsideUk is defined and percentageOfCashPaymentsOver15000 is not defined" in new ASPHVDFixture {
@@ -449,7 +450,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
             percentageOfCashPaymentOver15000 = None
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "customersOutsideUk is defined and percentageOfCashPaymentsOver15000 is defined and receivedCashPayments is not defined" in new ASPHVDFixture {
@@ -458,7 +459,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
             receiveCashPayments = None
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
       }
@@ -468,7 +469,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           val model = preFilledModel.copy(
             totalThroughput = None
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
       }
 
@@ -478,7 +479,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           val model = preFilledModel.copy(
             totalThroughput = None
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "sendMoneyToOtherCountries is None and transactionsInLast12Months is not defined" in new MTFixture {
@@ -487,7 +488,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             sendMoneyToOtherCountry = None,
             transactionsInLast12Months = None
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "sendMoneyToOtherCountries is None and transactionsInLast12Months is defined and mostTransactions is defined" in new MTFixture {
@@ -497,7 +498,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
             mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB"))))
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "sendMoneyToOtherCountries is false and transactionsInLast12Months is not defined" in new MTFixture {
@@ -506,7 +507,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
             transactionsInLast12Months = None
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "sendMoneyToOtherCountries is false and transactionsInLast12Months is defined and mostTransactions is defined" in new MTFixture {
@@ -516,7 +517,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
             mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB"))))
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "sendMoneyToOtherCountries is true and transactionsInLast12Months is not defined" in new MTFixture {
@@ -525,7 +526,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
             transactionsInLast12Months = None
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "sendMoneyToOtherCountries is true and transactionsInLast12Months and mostTransactions is not defined" in new MTFixture {
@@ -535,7 +536,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
             mostTransactions = None
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "sendMoneyToOtherCountries is true and transactionsInLast12Months and mostTransactions is defined and sendTheLargestAmountsOfMoney is not defined" in new MTFixture {
@@ -546,7 +547,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
             sendTheLargestAmountsOfMoney = None
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
       }
 
@@ -557,7 +558,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
             ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("123"))
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "whichCurrencies is not defined" in new CEFixture {
@@ -566,7 +567,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             whichCurrencies = None,
             ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("123"))
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "ceTransactionsInLast12Months is not defined" in new CEFixture {
@@ -575,7 +576,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
             ceTransactionsInLast12Months = None
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
       }
 
@@ -585,7 +586,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             totalThroughput = None,
             fxTransactionsInLast12Months = Some(FXTransactionsInLast12Months("456"))
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "fxTransactionsInLast12Months is not defined" in new FXFixture {
@@ -593,7 +594,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             totalThroughput = Some(TotalThroughput("01")),
             fxTransactionsInLast12Months = None
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
       }
 
@@ -602,7 +603,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           val model = preFilledModel.copy(
             totalThroughput = None
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "sendMoneyToOtherCountries is None and transactionsInLast12Months is not defined" in new AllFixture {
@@ -611,7 +612,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             sendMoneyToOtherCountry = None,
             transactionsInLast12Months = None
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "sendMoneyToOtherCountries is None and transactionsInLast12Months is defined and mostTransactions is defined" in new AllFixture {
@@ -621,7 +622,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
             mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB"))))
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "sendMoneyToOtherCountries is false and transactionsInLast12Months is not defined" in new AllFixture {
@@ -630,7 +631,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
             transactionsInLast12Months = None
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "sendMoneyToOtherCountries is false and transactionsInLast12Months is defined and mostTransactions is defined" in new AllFixture {
@@ -640,7 +641,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
             mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB"))))
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "sendMoneyToOtherCountries is true and transactionsInLast12Months is not defined" in new AllFixture {
@@ -649,7 +650,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
             transactionsInLast12Months = None
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "sendMoneyToOtherCountries is true and transactionsInLast12Months and mostTransactions is not defined" in new AllFixture {
@@ -659,7 +660,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
             mostTransactions = None
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "sendMoneyToOtherCountries is true and transactionsInLast12Months and mostTransactions is defined and sendTheLargestAmountsOfMoney is not defined" in new AllFixture {
@@ -670,7 +671,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
             sendTheLargestAmountsOfMoney = None
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "whichCurrencies is not defined" in new AllFixture {
@@ -683,7 +684,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             whichCurrencies = None,
             ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("123"))
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "ceTransactionsInLast12Months is not defined" in new AllFixture {
@@ -696,7 +697,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
             ceTransactionsInLast12Months = None
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
 
         "fxTransactionsInLast12Months is not defined" in new AllFixture {
@@ -710,7 +711,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("123")),
             fxTransactionsInLast12Months = None
           )
-          await(service.isRenewalComplete(model)) mustBe false
+          await(service.isRenewalComplete(model, credId)) mustBe false
         }
       }
     }

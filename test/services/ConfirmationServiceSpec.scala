@@ -53,7 +53,7 @@ import uk.gov.hmrc.domain.Org
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, OrgAccount}
-import uk.gov.hmrc.play.frontend.auth.{AuthContext, Principal}
+import uk.gov.hmrc.play.frontend.auth.{Principal}
 import utils.StatusConstants
 
 import scala.concurrent.ExecutionContext.Implicits._
@@ -85,7 +85,6 @@ class ConfirmationServiceSpec extends PlaySpec
     val paymentRefNo = "XA000000000000"
     val credId = "credId"
 
-    implicit val authContext = mock[AuthContext]
     implicit val headerCarrier = HeaderCarrier()
 
     val subscriptionResponse = SubscriptionResponse(
@@ -151,10 +150,6 @@ class ConfirmationServiceSpec extends PlaySpec
     val businessMatching = mock[BusinessMatching]
     val cache = mock[CacheMap]
     val principle = Principal(None, Accounts(org = Some(OrgAccount("", Org("TestOrgRef")))))
-
-    when {
-      authContext.principal
-    } thenReturn principle
 
     when {
       businessMatching.activities

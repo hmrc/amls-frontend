@@ -35,8 +35,8 @@ class TransactionTypesControllerSpec extends AmlsSpec
     val request = addToken(authRequest)
     val controller = new TransactionTypesController(SuccessfulAuthAction, mockCacheConnector)
 
-    mockCacheSaveNewAuth[BusinessActivities]
-    mockCacheFetchNewAuth(Some(BusinessActivities()))
+    mockCacheSave[BusinessActivities]
+    mockCacheFetch(Some(BusinessActivities()))
   }
 
   "get" when {
@@ -50,7 +50,7 @@ class TransactionTypesControllerSpec extends AmlsSpec
 
       "return OK status with a populated form" in new Fixture {
         val model = BusinessActivities(transactionRecordTypes = Some(TransactionTypes(Set(Paper))))
-        mockCacheFetchNewAuth(Some(model))
+        mockCacheFetch(Some(model))
 
         val result = controller.get()(request)
         status(result) mustBe OK

@@ -28,14 +28,15 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
+    implicit val ec = app.injector.instanceOf[ExecutionContext]
 
     val controller = new SummaryController(SuccessfulAuthAction, mockCacheConnector, mockStatusService, mockServiceFlow)
 
@@ -55,7 +56,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
     )
 
     when {
-      mockStatusService.isPreSubmission(any(), any(), any())
+      mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
     } thenReturn Future.successful(true)
 
     mockCacheFetch[ServiceChangeRegister](None, None)
@@ -83,7 +84,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       mockCacheFetchAll
       mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
       mockCacheGetEntry[MoneyServiceBusiness]((Some(model)), MoneyServiceBusiness.key)
-      mockApplicationStatusNewAuth(NotCompleted)
+      mockApplicationStatus(NotCompleted)
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -105,7 +106,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
         )
       )
 
-      mockApplicationStatusNewAuth(NotCompleted)
+      mockApplicationStatus(NotCompleted)
       mockCacheGetEntry[BusinessMatching]((Some(BusinessMatching(msbServices = msbServices))), BusinessMatching.key)
       mockCacheGetEntry[MoneyServiceBusiness](None, MoneyServiceBusiness.key)
 
@@ -125,7 +126,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
         mockCacheFetchAll
         mockCacheGetEntry[BusinessMatching](bm, BusinessMatching.key)
         mockCacheGetEntry[MoneyServiceBusiness](Some(completeModel), MoneyServiceBusiness.key)
-        mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+        mockApplicationStatus(SubmissionDecisionApproved)
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -157,7 +158,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
         mockCacheFetchAll
         mockCacheGetEntry[BusinessMatching](bm, BusinessMatching.key)
         mockCacheGetEntry[MoneyServiceBusiness](Some(completeModel), MoneyServiceBusiness.key)
-        mockApplicationStatusNewAuth(NotCompleted)
+        mockApplicationStatus(NotCompleted)
 
         val result = controller.get()(request)
         status(result) must be(OK)

@@ -28,11 +28,11 @@ import org.mockito.Mockito.{verify}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
-import utils.DependencyMocksNewAuth
+import utils.DependencyMocks
 import utils.{AmlsSpec, AuthorisedFixture}
 import org.mockito.Matchers.{eq => eqTo}
 
-class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with DependencyMocksNewAuth {
+class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with DependencyMocks {
 
   trait Fixture extends AuthorisedFixture {
     self =>

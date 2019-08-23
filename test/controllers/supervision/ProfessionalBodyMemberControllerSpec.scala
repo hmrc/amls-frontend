@@ -25,7 +25,7 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import play.api.i18n.Messages
 import play.api.mvc.Result
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -33,7 +33,7 @@ import scala.concurrent.duration._
 
 class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks {self =>
     val request = addToken(authRequest)
 
     val controller = new ProfessionalBodyMemberController (

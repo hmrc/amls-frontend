@@ -41,6 +41,8 @@ class FeeResponseServiceSpec extends AmlsSpec with ScalaFutures {
 
     val testAmlsReference: String = "XAML0000000001"
 
+    val accountTypeId = ("accountType", "accountId")
+
     val testFeeResponseSubscription = FeeResponse(
       SubscriptionResponseType,
       "XAML0000000001",
@@ -69,9 +71,9 @@ class FeeResponseServiceSpec extends AmlsSpec with ScalaFutures {
 
     def setupMockFeeConnector(amlsReference: String, feeResponse: Option[FeeResponse] = None, exception: Option[Throwable] = None) =
       (feeResponse, exception) match {
-      case (Some(fees), _) => when(mockFeeConnector.feeResponse(eqTo(amlsReference))(any(), any(), any(), any()))
+      case (Some(fees), _) => when(mockFeeConnector.feeResponse(eqTo(amlsReference), any())(any(), any(), any()))
         .thenReturn(Future.successful(fees))
-      case (_ , Some(e)) => when(mockFeeConnector.feeResponse(any())(any(), any(), any(), any())).
+      case (_ , Some(e)) => when(mockFeeConnector.feeResponse(any(), any())(any(), any(), any())).
         thenReturn(Future.failed(e))
     }
   }
@@ -82,7 +84,7 @@ class FeeResponseServiceSpec extends AmlsSpec with ScalaFutures {
 
         setupMockFeeConnector(testAmlsReference, testFeeResponseSubscription.some)
 
-        whenReady(testFeeResponseService.getFeeResponse(testAmlsReference)) { result =>
+        whenReady(testFeeResponseService.getFeeResponse(testAmlsReference, accountTypeId)) { result =>
           result mustBe testFeeResponseSubscription.some
         }
       }
@@ -91,7 +93,7 @@ class FeeResponseServiceSpec extends AmlsSpec with ScalaFutures {
 
         setupMockFeeConnector(testAmlsReference, testFeeResponseAmendVariation.some)
 
-        whenReady(testFeeResponseService.getFeeResponse(testAmlsReference)) { result =>
+        whenReady(testFeeResponseService.getFeeResponse(testAmlsReference, accountTypeId)) { result =>
           result mustBe testFeeResponseAmendVariation.some
         }
       }
@@ -100,9 +102,9 @@ class FeeResponseServiceSpec extends AmlsSpec with ScalaFutures {
 
         setupMockFeeConnector(testAmlsReference, None, new NotFoundException("not found").some)
 
-        when(mockFeeConnector.feeResponse(any())(any(), any(), any(), any())).thenReturn(Future.failed(new NotFoundException("not found")))
+        when(mockFeeConnector.feeResponse(any(), any())(any(), any(), any())).thenReturn(Future.failed(new NotFoundException("not found")))
 
-        whenReady(testFeeResponseService.getFeeResponse(testAmlsReference)) { result =>
+        whenReady(testFeeResponseService.getFeeResponse(testAmlsReference, accountTypeId)) { result =>
           result mustBe None
         }
       }

@@ -41,7 +41,7 @@ import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
@@ -50,7 +50,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
   val cacheMap = mock[CacheMap]
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
     val controller = new StatusController (

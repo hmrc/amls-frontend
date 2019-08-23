@@ -33,13 +33,14 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, CacheMocks, StatusMocks}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 
 class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with StatusMocks with CacheMocks {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
+    implicit val ec = app.injector.instanceOf[ExecutionContext]
 
 
     val controller = new CompanyRegistrationNumberController(
@@ -55,7 +56,7 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
       mockStatusService.isPreSubmission(any())
     } thenReturn true
 
-    mockApplicationStatusNewAuth(NotCompleted)
+    mockApplicationStatus(NotCompleted)
 
     when {
       controller.businessMatchingService.getModel(any())(any(), any())

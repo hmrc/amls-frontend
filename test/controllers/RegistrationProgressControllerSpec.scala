@@ -35,7 +35,7 @@ import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, ProgressService, SectionsProvider}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -44,7 +44,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
   with ReviewDetailsGenerator
   with AmlsReferenceNumberGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(authRequest)
 
     val mockBusinessMatching = mock[BusinessMatching]
@@ -60,7 +60,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
       businessMatchingService = mockBusinessMatchingService,
       serviceFlow = mockServiceFlow)
 
-    mockApplicationStatusNewAuth(SubmissionReady)
+    mockApplicationStatus(SubmissionReady)
     mockCacheFetch[Renewal](None)
 
     when(mockBusinessMatching.isComplete) thenReturn true
@@ -83,7 +83,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
       "the user is enrolled into the AMLS Account" must {
         "show the update your information page" in new Fixture {
 
-          mockApplicationStatusNewAuth(SubmissionReadyForReview)
+          mockApplicationStatus(SubmissionReadyForReview)
 
           when(controller.sectionsProvider.sections(mockCacheMap))
             .thenReturn(Seq.empty[Section])
@@ -103,7 +103,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
             mockCacheFetch[Renewal](Some(Renewal(Some(InvolvedInOtherNo))))
 
-            mockApplicationStatusNewAuth(ReadyForRenewal(None))
+            mockApplicationStatus(ReadyForRenewal(None))
 
             val responseF = controller.get()(request)
             status(responseF) must be(SEE_OTHER)
@@ -121,7 +121,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
             mockCacheFetch[Renewal](Some(Renewal(Some(InvolvedInOtherNo))))
 
-            mockApplicationStatusNewAuth(RenewalSubmitted(None))
+            mockApplicationStatus(RenewalSubmitted(None))
 
             val responseF = controller.get()(request)
             status(responseF) must be(OK)
@@ -137,7 +137,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
         "status is ready for renewal and" must {
           "redirectWithNominatedOfficer" in new Fixture {
 
-            mockApplicationStatusNewAuth(ReadyForRenewal(None))
+            mockApplicationStatus(ReadyForRenewal(None))
 
             when(controller.sectionsProvider.sections(mockCacheMap))
               .thenReturn(Seq.empty[Section])
@@ -178,7 +178,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           "application is post-submission" must {
             "show Submit Updates form" in new Fixture {
 
-              mockApplicationStatusNewAuth(SubmissionReadyForReview)
+              mockApplicationStatus(SubmissionReadyForReview)
 
               when(controller.sectionsProvider.sections(mockCacheMap))
                 .thenReturn(Seq(
@@ -221,7 +221,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           "application is post-submission" must {
             "show View Status button" in new Fixture {
 
-              mockApplicationStatusNewAuth(SubmissionReadyForReview)
+              mockApplicationStatus(SubmissionReadyForReview)
 
               when(controller.sectionsProvider.sections(mockCacheMap))
                 .thenReturn(Seq(
@@ -266,7 +266,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           "application is post-submission" must {
             "show View Status button" in new Fixture {
 
-              mockApplicationStatusNewAuth(SubmissionReadyForReview)
+              mockApplicationStatus(SubmissionReadyForReview)
 
               when(controller.sectionsProvider.sections(mockCacheMap))
                 .thenReturn(Seq(
@@ -310,7 +310,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
         "show the business activities and hide the business matching section" in new Fixture {
           Seq(SubmissionReady, SubmissionReadyForReview, SubmissionDecisionApproved).foreach { subStatus =>
 
-            mockApplicationStatusNewAuth(subStatus)
+            mockApplicationStatus(subStatus)
 
             val sections = Seq(
               Section(BusinessMatching.messageKey, Completed, false, mock[Call]),
@@ -339,7 +339,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
       "in the approved status" must {
         "show the correct text on the screen" in new Fixture {
 
-          mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+          mockApplicationStatus(SubmissionDecisionApproved)
 
           val sections = Seq(
             Section(BusinessMatching.messageKey, Completed, false, mock[Call]),
@@ -395,7 +395,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           when(mockBusinessMatching.isComplete) thenReturn false
           when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(mockBusinessMatching))
 
-          mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+          mockApplicationStatus(SubmissionDecisionApproved)
 
           val completeSection = Section(BusinessMatching.messageKey, Started, true, controllers.routes.LandingController.get())
           when(controller.sectionsProvider.sections(mockCacheMap)) thenReturn Seq(completeSection)
@@ -434,7 +434,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
             controller.sectionsProvider.sectionsFromBusinessActivities(any(), any())(any())
           } thenReturn newSections
 
-          mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+          mockApplicationStatus(SubmissionDecisionApproved)
 
           val result = controller.get()(request)
           status(result) mustBe OK

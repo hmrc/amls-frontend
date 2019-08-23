@@ -41,7 +41,6 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
     val request = addToken(authRequest)
 
     implicit val hc: HeaderCarrier = new HeaderCarrier()
-    implicit val ac: AuthContext = mock[AuthContext]
     implicit val ec: ExecutionContext = mock[ExecutionContext]
 
     val controller = new TypeOfBankController(

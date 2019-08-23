@@ -32,7 +32,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth, StatusConstants}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{RenewalService, StatusService}
@@ -42,7 +42,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePersonGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val request = addToken(authRequest)
     val controller = new WhoIsRegisteringController (

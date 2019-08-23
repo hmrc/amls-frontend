@@ -18,20 +18,15 @@ package controllers.bankdetails
 
 import controllers.actions.SuccessfulAuthAction
 import models.bankdetails._
-import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
-import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => meq, _}
-import org.mockito.Mockito._
+import models.status.SubmissionReady
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, DependencyMocksNewAuth, StatusConstants}
-
-import scala.collection.JavaConversions._
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
 
 class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
@@ -98,7 +93,7 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
       mockCacheFetch[Seq[BankDetails]](Some(Seq(completeModel1, completeModel2, completeModel3, deletedCompleteModel4,
         inCompleteModel1, inCompleteModel2, inCompleteModel3, deletedInCompleteModel4)))
 
-      mockApplicationStatusNewAuth(SubmissionReady)
+      mockApplicationStatus(SubmissionReady)
 
       val result = controller.get()(request)
 
@@ -121,7 +116,7 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
     "load the 'your bank accounts' screen with a list of incomplete items only" in new Fixture {
       mockCacheFetch[Seq[BankDetails]](Some(Seq(inCompleteModel1, inCompleteModel2, inCompleteModel3, deletedInCompleteModel4)))
 
-      mockApplicationStatusNewAuth(SubmissionReady)
+      mockApplicationStatus(SubmissionReady)
 
       val result = controller.get()(request)
 
@@ -143,7 +138,7 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
     "load the 'your bank accounts screen with a list of complete items only" in new Fixture {
       mockCacheFetch[Seq[BankDetails]](Some(Seq(completeModel1, completeModel2, completeModel3, deletedCompleteModel4)))
 
-      mockApplicationStatusNewAuth(SubmissionReady)
+      mockApplicationStatus(SubmissionReady)
 
       val result = controller.get()(request)
 
@@ -165,7 +160,7 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
     "load the 'your bank accounts screen with empty lists" in new Fixture {
       mockCacheFetch[Seq[BankDetails]](Some(Seq.empty))
 
-      mockApplicationStatusNewAuth(SubmissionReady)
+      mockApplicationStatus(SubmissionReady)
 
       val result = controller.get()(request)
 
@@ -181,7 +176,7 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
         BankDetails()
       )))
 
-      mockApplicationStatusNewAuth(SubmissionReady)
+      mockApplicationStatus(SubmissionReady)
 
       val result = controller.get()(request)
 
@@ -195,7 +190,7 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
         BankDetails(hasAccepted = true)
       )))
 
-      mockApplicationStatusNewAuth(SubmissionReady)
+      mockApplicationStatus(SubmissionReady)
 
       val result = controller.get()(request)
 
@@ -209,7 +204,7 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
         BankDetails()
       )))
 
-      mockApplicationStatusNewAuth(SubmissionReady)
+      mockApplicationStatus(SubmissionReady)
 
       val result = controller.get()(request)
 

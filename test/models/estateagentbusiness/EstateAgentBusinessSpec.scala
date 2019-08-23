@@ -171,7 +171,6 @@ class EstateAgentBusinessSpec extends AmlsSpec {
 
     "return `Started` section when there is a section which isn't completed" in {
       implicit val cache = mock[CacheMap]
-      implicit val ac = mock[AuthContext]
       when {
         cache.getEntry[EstateAgentBusiness](eqTo(EstateAgentBusiness.key))(any())
       } thenReturn Some(incompleteModel)
@@ -180,7 +179,6 @@ class EstateAgentBusinessSpec extends AmlsSpec {
 
     "return `Completed` section when there is a section which is completed" in {
       implicit val cache = mock[CacheMap]
-      implicit val ac = mock[AuthContext]
       when {
         cache.getEntry[EstateAgentBusiness](eqTo(EstateAgentBusiness.key))(any())
       } thenReturn Some(completeModel)

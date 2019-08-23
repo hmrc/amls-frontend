@@ -25,11 +25,11 @@ import org.jsoup.nodes.Document
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class BusinessServicesControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
@@ -83,7 +83,7 @@ class BusinessServicesControllerSpec extends AmlsSpec with MockitoSugar {
 
           val eabWithoutRedress = EstateAgentBusiness(Some(Services(Set(Commercial, Development), None)), None, None, None, true)
 
-          mockApplicationStatusNewAuth(SubmissionDecisionRejected)
+          mockApplicationStatus(SubmissionDecisionRejected)
           mockIsNewActivityNewAuth(true, Some(EAB))
 
           mockCacheFetch[EstateAgentBusiness](Some(eab))
@@ -108,7 +108,7 @@ class BusinessServicesControllerSpec extends AmlsSpec with MockitoSugar {
               )
               val eab = EstateAgentBusiness(Some(Services(Set(Auction, Commercial, Residential))), None, None, None)
 
-              mockApplicationStatusNewAuth(SubmissionReadyForReview)
+              mockApplicationStatus(SubmissionReadyForReview)
               mockIsNewActivityNewAuth(true, Some(EAB))
 
               mockCacheFetch[EstateAgentBusiness](Some(eab), Some(EstateAgentBusiness.key))
@@ -130,7 +130,7 @@ class BusinessServicesControllerSpec extends AmlsSpec with MockitoSugar {
 
               val eab = EstateAgentBusiness(Some(Services(Set(Auction, Commercial, Residential))), Some(ThePropertyOmbudsman), None, None)
 
-              mockApplicationStatusNewAuth(SubmissionReadyForReview)
+              mockApplicationStatus(SubmissionReadyForReview)
               mockIsNewActivityNewAuth(true, Some(EAB))
 
               mockCacheFetch[EstateAgentBusiness](Some(eab), Some(EstateAgentBusiness.key))
@@ -158,7 +158,7 @@ class BusinessServicesControllerSpec extends AmlsSpec with MockitoSugar {
                   "services[2]" -> "07"
                 )
 
-                mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+                mockApplicationStatus(SubmissionDecisionApproved)
                 mockIsNewActivityNewAuth(false)
 
                 mockCacheFetch[EstateAgentBusiness](Some(EstateAgentBusiness(
@@ -179,7 +179,7 @@ class BusinessServicesControllerSpec extends AmlsSpec with MockitoSugar {
                   "services[2]" -> "07"
                 )
 
-                mockApplicationStatusNewAuth(ReadyForRenewal(None))
+                mockApplicationStatus(ReadyForRenewal(None))
                 mockIsNewActivityNewAuth(false)
 
                 mockCacheFetch[EstateAgentBusiness](Some(EstateAgentBusiness(
@@ -205,7 +205,7 @@ class BusinessServicesControllerSpec extends AmlsSpec with MockitoSugar {
                 "services[2]" -> "07"
               )
 
-              mockApplicationStatusNewAuth(SubmissionReadyForReview)
+              mockApplicationStatus(SubmissionReadyForReview)
               mockIsNewActivityNewAuth(true, Some(EAB))
 
               mockCacheFetch[EstateAgentBusiness](Some(EstateAgentBusiness(

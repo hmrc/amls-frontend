@@ -23,11 +23,11 @@ import org.jsoup.Jsoup
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth, StatusConstants}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
 
 class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
@@ -47,7 +47,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
               BankDetails(None, None, status = Some(StatusConstants.Deleted)),
               BankDetails(Some(NoBankAccountUsed), None, status = Some(StatusConstants.Added))
             )))
-          mockApplicationStatusNewAuth(SubmissionReady)
+          mockApplicationStatus(SubmissionReady)
 
           val result = controller.get(1, false)(request)
   
@@ -64,7 +64,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
         "there is already a bank account type" in new Fixture {
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount), None))))
-          mockApplicationStatusNewAuth(SubmissionReady)
+          mockApplicationStatus(SubmissionReady)
 
           val result = controller.get(1)(request)
           val document = Jsoup.parse(contentAsString(result)).select("input[value=01]").hasAttr("checked")
@@ -76,7 +76,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
         "editing a bank account" which {
           "hasn't been accepted or completed yet" in new Fixture {
             mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount), None))))
-            mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+            mockApplicationStatus(SubmissionDecisionApproved)
 
             val result = controller.get(1, edit = true)(request)
             val document = Jsoup.parse(contentAsString(result)).select("input[value=01]").hasAttr("checked")
@@ -91,7 +91,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
         "there is no bank account information at all" in new Fixture {
 
           mockCacheFetch[Seq[BankDetails]](None)
-          mockApplicationStatusNewAuth(SubmissionReady)
+          mockApplicationStatus(SubmissionReady)
 
           val result = controller.get(1, false)(request)
 
@@ -103,7 +103,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
             BankDetails(Some(PersonalAccount), hasAccepted = true),
             BankDetails(Some(PersonalAccount), hasAccepted = true)
           )))
-          mockApplicationStatusNewAuth(SubmissionReadyForReview)
+          mockApplicationStatus(SubmissionReadyForReview)
 
           val result = controller.get(1, true)(request)
 
@@ -116,7 +116,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
             BankDetails(Some(PersonalAccount), hasAccepted = true),
             BankDetails(Some(PersonalAccount), hasAccepted = true)
           )))
-          mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+          mockApplicationStatus(SubmissionDecisionApproved)
 
           val result = controller.get(1, true)(request)
 
@@ -214,7 +214,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
             "bankAccountType" -> "04"
           )
 
-          mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+          mockApplicationStatus(SubmissionDecisionApproved)
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None))), Some(BankDetails.key))
           mockCacheSave[Seq[BankDetails]]

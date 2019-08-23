@@ -24,13 +24,13 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
 class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture  with DependencyMocksNewAuth{
+  trait Fixture extends AuthorisedFixture  with DependencyMocks{
     self => val request = addToken(authRequest)
 
     val controller = new TcspTypesController(mockCacheConnector, authAction = SuccessfulAuthAction)

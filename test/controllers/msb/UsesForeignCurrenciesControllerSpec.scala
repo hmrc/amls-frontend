@@ -30,9 +30,9 @@ import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration, Sca
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class UsesForeignCurrenciesControllerSpec extends AmlsSpec
                                     with MockitoSugar
@@ -41,9 +41,10 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
                                     with IntegrationPatience
                                     with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val request = addToken(authRequest)
+    implicit val ec = app.injector.instanceOf[ExecutionContext]
 
     when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
       .thenReturn(Future.successful(None))
@@ -70,13 +71,14 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
       .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
   }
 
-  trait Fixture2 extends AuthorisedFixture with DependencyMocksNewAuth with MoneyServiceBusinessTestData {
+  trait Fixture2 extends AuthorisedFixture with DependencyMocks with MoneyServiceBusinessTestData {
     self =>
     val request = addToken(authRequest)
     val controller = new UsesForeignCurrenciesController(SuccessfulAuthAction, mockCacheConnector, mockStatusService, mockServiceFlow)
+    implicit val ec = app.injector.instanceOf[ExecutionContext]
 
     when {
-      mockStatusService.isPreSubmission(any(), any(), any())
+      mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
     } thenReturn Future.successful(true)
 
     val emptyCache = CacheMap("", Map.empty)
@@ -116,14 +118,14 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
     "get is called" should {
       "succeed" when {
         "status is pre-submission" in new Fixture {
-          mockApplicationStatusNewAuth(NotCompleted)
+          mockApplicationStatus(NotCompleted)
 
           val resp = controller.get(false).apply(request)
           status(resp) must be(200)
         }
 
         "status is approved but the service has just been added" in new Fixture {
-          mockApplicationStatusNewAuth(NotCompleted)
+          mockApplicationStatus(NotCompleted)
 
           mockIsNewActivityNewAuth(true, Some(MoneyServiceBusinessActivity))
 
@@ -141,7 +143,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
             None,
             Some(true))))
 
-        mockApplicationStatusNewAuth(NotCompleted)
+        mockApplicationStatus(NotCompleted)
 
         when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
           .thenReturn(Future.successful(Some(MoneyServiceBusiness(whichCurrencies = Some(currentModel)))))

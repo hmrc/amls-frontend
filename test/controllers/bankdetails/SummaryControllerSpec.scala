@@ -24,11 +24,11 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
@@ -46,7 +46,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       val model2 = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(NonUKIBANNumber("DE89370400440532013000")))
 
       mockCacheFetch[Seq[BankDetails]](Some(Seq(model1, model2)))
-      mockApplicationStatusNewAuth(SubmissionReady)
+      mockApplicationStatus(SubmissionReady)
 
       val result = controller.get(1)(request)
 
@@ -65,7 +65,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       val model2 = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(NonUKIBANNumber("DE89370400440532013000")))
 
       mockCacheFetch[Seq[BankDetails]](Some(Seq(model1, model2)))
-      mockApplicationStatusNewAuth(SubmissionReady)
+      mockApplicationStatus(SubmissionReady)
 
       val result = controller.get(2)(request)
 

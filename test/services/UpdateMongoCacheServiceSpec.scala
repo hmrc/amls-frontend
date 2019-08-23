@@ -58,6 +58,8 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
     val http = mock[WSHttp]
     val updateMongoCacheService = new UpdateMongoCacheService(http, mockCacheConnector)
 
+    val credId = "12341234"
+
     val viewResponse = ViewResponse(
       etmpFormBundleNumber = "FORMBUNDLENUMBER",
       businessMatchingSection = BusinessMatching(),
@@ -255,25 +257,25 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
         mockCacheSave[AmendVariationRenewalResponse]
         mockCacheSave[DataImport]
 
-        await(updateMongoCacheService.update(updateMongoCacheResponse))
+        await(updateMongoCacheService.update(credId, updateMongoCacheResponse))
 
-        verify(mockCacheConnector).save[ViewResponse](eqTo(ViewResponse.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[Seq[TradingPremises]](eqTo(TradingPremises.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[Seq[BankDetails]](eqTo(BankDetails.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[AddPerson](eqTo(AddPerson.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[BusinessActivities](eqTo(BusinessActivities.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[Tcsp](eqTo(Tcsp.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[Asp](eqTo(Asp.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[Hvd](eqTo(Hvd.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[Supervision](eqTo(Supervision.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[BusinessDetails](eqTo(BusinessDetails.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[EstateAgentBusiness](eqTo(EstateAgentBusiness.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[SubscriptionResponse](eqTo(SubscriptionResponse.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[DataImport](eqTo(DataImport.key), eqTo(dataImport))(any(), any(), any())
+        verify(mockCacheConnector).save[ViewResponse](any(), eqTo(ViewResponse.key), any())(any(), any())
+        verify(mockCacheConnector).save[BusinessMatching](any(), eqTo(BusinessMatching.key), any())(any(), any())
+        verify(mockCacheConnector).save[Seq[TradingPremises]](any(), eqTo(TradingPremises.key), any())(any(), any())
+        verify(mockCacheConnector).save[Seq[BankDetails]](any(), eqTo(BankDetails.key), any())(any(), any())
+        verify(mockCacheConnector).save[AddPerson](any(), eqTo(AddPerson.key), any())(any(), any())
+        verify(mockCacheConnector).save[BusinessActivities](any(), eqTo(BusinessActivities.key), any())(any(), any())
+        verify(mockCacheConnector).save[Tcsp](any(), eqTo(Tcsp.key), any())(any(), any())
+        verify(mockCacheConnector).save[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key), any())(any(), any())
+        verify(mockCacheConnector).save[Asp](any(), eqTo(Asp.key), any())(any(), any())
+        verify(mockCacheConnector).save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), any())(any(), any())
+        verify(mockCacheConnector).save[Hvd](any(), eqTo(Hvd.key), any())(any(), any())
+        verify(mockCacheConnector).save[Supervision](any(), eqTo(Supervision.key), any())(any(), any())
+        verify(mockCacheConnector).save[BusinessDetails](any(), eqTo(BusinessDetails.key), any())(any(), any())
+        verify(mockCacheConnector).save[EstateAgentBusiness](any(), eqTo(EstateAgentBusiness.key), any())(any(), any())
+        verify(mockCacheConnector).save[SubscriptionResponse](any(), eqTo(SubscriptionResponse.key), any())(any(), any())
+        verify(mockCacheConnector).save[AmendVariationRenewalResponse](any(), eqTo(AmendVariationRenewalResponse.key), any())(any(), any())
+        verify(mockCacheConnector).save[DataImport](any(), eqTo(DataImport.key), eqTo(dataImport))(any(), any())
       }
     }
   }

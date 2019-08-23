@@ -39,8 +39,6 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar with GeneratorD
 
   trait Fixture extends AuthorisedFixture {
 
-    implicit val authContext = mock[AuthContext]
-
     val amlsNotificationConnector = mock[AmlsNotificationConnector]
 
     val injector = new GuiceInjectorBuilder()

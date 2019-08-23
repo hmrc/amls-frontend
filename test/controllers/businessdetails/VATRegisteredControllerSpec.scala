@@ -30,13 +30,13 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
 class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(authRequest)
 
     val controller = new VATRegisteredController (
@@ -167,7 +167,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
             "registeredForVATYes" -> "1234567890"
           )
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post()(newRequest)

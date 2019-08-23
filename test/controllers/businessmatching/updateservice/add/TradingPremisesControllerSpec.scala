@@ -25,11 +25,11 @@ import models.status.SubmissionDecisionApproved
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class TradingPremisesControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
@@ -46,7 +46,7 @@ class TradingPremisesControllerSpec extends AmlsSpec with BusinessMatchingGenera
     )
 
     mockCacheFetch(Some(AddBusinessTypeFlowModel(Some(HighValueDealing))))
-    mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+    mockApplicationStatus(SubmissionDecisionApproved)
   }
 
   "TradingPremisesController" when {

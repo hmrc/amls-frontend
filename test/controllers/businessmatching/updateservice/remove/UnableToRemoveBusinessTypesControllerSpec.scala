@@ -20,12 +20,12 @@ import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.{BusinessActivities, BusinessMatching, MoneyServiceBusiness}
 import play.api.i18n.Messages
 import play.api.test.Helpers.{contentAsString, status}
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import play.api.test.Helpers._
 
 class UnableToRemoveBusinessTypesControllerSpec extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
 
     val request = addToken(authRequest)

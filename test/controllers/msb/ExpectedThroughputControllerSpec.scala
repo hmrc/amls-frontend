@@ -29,13 +29,13 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
 class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
@@ -58,7 +58,7 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
         (any(), any())).thenReturn(Future.successful(None))
 
-      mockApplicationStatusNewAuth(NotCompleted)
+      mockApplicationStatus(NotCompleted)
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -67,7 +67,7 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
 
     "on get display the Expected throughput page with pre populated data" in new Fixture {
 
-      mockApplicationStatusNewAuth(NotCompleted)
+      mockApplicationStatus(NotCompleted)
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
         (any(), any())).thenReturn(Future.successful(Some(MoneyServiceBusiness(Some(ExpectedThroughput.First)))))
@@ -83,7 +83,7 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
         (any(), any())).thenReturn(Future.successful(None))
 
-      mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+      mockApplicationStatus(SubmissionDecisionApproved)
 
       mockIsNewActivityNewAuth(true, Some(MoneyServiceBusinessActivity))
 

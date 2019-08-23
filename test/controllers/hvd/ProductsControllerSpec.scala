@@ -27,7 +27,7 @@ import play.api.mvc.AnyContentAsFormUrlEncoded
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DateOfChangeHelper, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DateOfChangeHelper, DependencyMocks}
 
 class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
 
@@ -56,7 +56,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
       "alcohol is selected" in new Fixture with RequestModifiers {
         val newRequest = requestWithAlcohol(request)
         mockCacheFetch[Hvd](None)
-        mockApplicationStatusNewAuth(SubmissionDecisionRejected)
+        mockApplicationStatus(SubmissionDecisionRejected)
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.ExciseGoodsController.get().url))
@@ -65,7 +65,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
       "alcohol is selected in edit mode" in new Fixture with RequestModifiers {
         val newRequest = requestWithAlcohol(request)
         mockCacheFetch[Hvd](None)
-        mockApplicationStatusNewAuth(SubmissionDecisionRejected)
+        mockApplicationStatus(SubmissionDecisionRejected)
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.ExciseGoodsController.get(true).url))
@@ -74,7 +74,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
       "alcohol and tobacco are not selected" in new Fixture with RequestModifiers {
         val newRequest = requestWithoutAlcohol(request)
         mockCacheFetch[Hvd](None)
-        mockApplicationStatusNewAuth(SubmissionDecisionRejected)
+        mockApplicationStatus(SubmissionDecisionRejected)
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.HowWillYouSellGoodsController.get().url))
@@ -83,7 +83,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
       "alcohol and tobacco are not selected in edit mode" in new Fixture with RequestModifiers {
         val newRequest = requestWithoutAlcohol(request)
         mockCacheFetch[Hvd](None)
-        mockApplicationStatusNewAuth(SubmissionDecisionRejected)
+        mockApplicationStatus(SubmissionDecisionRejected)
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.SummaryController.get().url))
@@ -119,7 +119,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
       "alcohol is selected" in new Fixture with DateOfChangeHelper with RequestModifiers {
         val newRequest = requestWithAlcohol(request)
         mockCacheFetch[Hvd](None)
-        mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+        mockApplicationStatus(SubmissionDecisionApproved)
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoods).url))
@@ -128,7 +128,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
       "alcohol is selected and in edit mode" in new Fixture with DateOfChangeHelper with RequestModifiers {
         val newRequest = requestWithAlcohol(request)
         mockCacheFetch[Hvd](None)
-        mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+        mockApplicationStatus(SubmissionDecisionApproved)
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoodsEdit).url))
@@ -137,7 +137,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
       "alcohol is not selected" in new Fixture with DateOfChangeHelper with RequestModifiers {
         val newRequest = requestWithoutAlcohol(request)
         mockCacheFetch[Hvd](None)
-        mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+        mockApplicationStatus(SubmissionDecisionApproved)
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.howWillYouSellGoods).url))
@@ -146,7 +146,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
       "alcohol is not selected and in edit mode" in new Fixture with DateOfChangeHelper with RequestModifiers {
         val newRequest = requestWithoutAlcohol(request)
         mockCacheFetch[Hvd](None)
-        mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+        mockApplicationStatus(SubmissionDecisionApproved)
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers).url))
@@ -157,7 +157,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
       "alcohol is selected" in new Fixture with DateOfChangeHelper with RequestModifiers {
         val newRequest = requestWithAlcohol(request)
         mockCacheFetch[Hvd](None)
-        mockApplicationStatusNewAuth(ReadyForRenewal(None))
+        mockApplicationStatus(ReadyForRenewal(None))
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoods).url))
@@ -166,7 +166,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
       "alcohol is selected and in edit mode" in new Fixture with DateOfChangeHelper with RequestModifiers {
         val newRequest = requestWithAlcohol(request)
         mockCacheFetch[Hvd](None)
-        mockApplicationStatusNewAuth(ReadyForRenewal(None))
+        mockApplicationStatus(ReadyForRenewal(None))
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoodsEdit).url))
@@ -175,7 +175,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
       "alcohol is not selected" in new Fixture with DateOfChangeHelper with RequestModifiers {
         val newRequest = requestWithoutAlcohol(request)
         mockCacheFetch[Hvd](None)
-        mockApplicationStatusNewAuth(ReadyForRenewal(None))
+        mockApplicationStatus(ReadyForRenewal(None))
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.howWillYouSellGoods).url))
@@ -184,7 +184,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
       "alcohol is not selected and in edit mode" in new Fixture with DateOfChangeHelper with RequestModifiers {
         val newRequest = requestWithoutAlcohol(request)
         mockCacheFetch[Hvd](None)
-        mockApplicationStatusNewAuth(ReadyForRenewal(None))
+        mockApplicationStatus(ReadyForRenewal(None))
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers).url))
@@ -204,7 +204,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
 
             mockIsNewActivityNewAuth(true, Some(HighValueDealing))
             mockCacheFetch[Hvd](None)
-            mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+            mockApplicationStatus(SubmissionDecisionApproved)
 
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
@@ -219,7 +219,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
 
             mockIsNewActivityNewAuth(true, Some(HighValueDealing))
             mockCacheFetch[Hvd](None)
-            mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+            mockApplicationStatus(SubmissionDecisionApproved)
 
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
@@ -230,7 +230,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
     }
   }
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
     val controller = new ProductsController(mockCacheConnector,

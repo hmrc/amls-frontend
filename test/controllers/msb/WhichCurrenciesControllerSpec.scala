@@ -30,7 +30,7 @@ import org.scalatest.mock.MockitoSugar
 import play.api.http.Status.{BAD_REQUEST, SEE_OTHER}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
@@ -41,7 +41,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec
                                     with IntegrationPatience
                                     with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
@@ -83,14 +83,14 @@ class WhichCurrenciesControllerSpec extends AmlsSpec
     "get is called" should {
       "succeed" when {
         "status is pre-submission" in new Fixture {
-          mockApplicationStatusNewAuth(NotCompleted)
+          mockApplicationStatus(NotCompleted)
 
           val resp = controller.get(false).apply(request)
           status(resp) must be(200)
         }
 
         "status is approved but the service has just been added" in new Fixture {
-          mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+          mockApplicationStatus(SubmissionDecisionApproved)
 
           mockIsNewActivityNewAuth(true, Some(MoneyServiceBusinessActivity))
 
@@ -103,7 +103,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec
         val currentModel = WhichCurrencies(
           Seq("USD"))
 
-        mockApplicationStatusNewAuth(NotCompleted)
+        mockApplicationStatus(NotCompleted)
 
         when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
           .thenReturn(Future.successful(Some(MoneyServiceBusiness(whichCurrencies = Some(currentModel)))))
