@@ -18,22 +18,22 @@ package controllers.msb
 
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.moneyservicebusiness._
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.msb.business_use_an_ipsp
 
 import scala.concurrent.Future
 
 class BusinessUseAnIPSPController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                             val authConnector: AuthConnector
-                                            ) extends BaseController {
+                                             authAction: AuthAction
+                                            ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
         response =>
           val form: Form2[BusinessUseAnIPSP] = (for {
             msb <- response
@@ -43,14 +43,14 @@ class BusinessUseAnIPSPController @Inject() (val dataCacheConnector: DataCacheCo
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request => {
       Form2[BusinessUseAnIPSP](request.body) match {
         case f: InvalidForm => Future.successful(BadRequest(business_use_an_ipsp(f, edit)))
         case ValidForm(_, data) =>
           for {
-            msb <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
-            _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
+            msb <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
+            _ <- dataCacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
               msb.businessUseAnIPSP(data))
 
           } yield edit match {

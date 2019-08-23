@@ -16,8 +16,8 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{PersonName, ResponsiblePerson, SaRegisteredYes}
 import org.jsoup.Jsoup
@@ -27,8 +27,6 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import utils.AmlsSpec
-import play.api.i18n.Messages
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
@@ -44,7 +42,7 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
 
     val controller = new RegisteredForSelfAssessmentController (
       dataCacheConnector = mock[DataCacheConnector],
-      authConnector = self.authConnector
+      authAction = SuccessfulAuthAction
       )
   }
 
@@ -55,7 +53,7 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
 
     "get is called" must {
       "load the page with an empty form" in new Fixture {
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName)))))
 
         val result = controller.get(recordId)(request)
@@ -70,7 +68,7 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
 
         val utr = "0123456789"
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, saRegistered = Some(SaRegisteredYes(utr)))))))
 
         val result = controller.get(recordId)(request)
@@ -83,7 +81,7 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
       }
 
       "respond with NOT_FOUND when there is no responsiblePeople data" in new Fixture {
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get(recordId)(request)
@@ -97,8 +95,8 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
         val newRequest = request.withFormUrlEncodedBody(
           "saRegistered" -> "test"
         )
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName)))))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName)))))
 
         val result = controller.post(recordId)(newRequest)
         status(result) must be(BAD_REQUEST)
@@ -111,8 +109,8 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
           "utrNumber" -> "0123456789"
         )
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
         val result = controller.post(99)(newRequest)
         status(result) must be(NOT_FOUND)
@@ -124,11 +122,11 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
             "saRegistered" -> "true",
             "utrNumber" -> "0123456789"
           )
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+            (any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
-          when(controller.dataCacheConnector.save[ResponsiblePerson](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.save[ResponsiblePerson](any(), any(), any())
+            (any(), any())).thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(recordId, edit = false)(newRequest)
           status(result) must be(SEE_OTHER)
@@ -141,11 +139,11 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
             "saRegistered" -> "true",
             "utrNumber" -> "0123456789"
           )
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+            (any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
-          when(controller.dataCacheConnector.save[ResponsiblePerson](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.save[ResponsiblePerson](any(), any(), any())
+            (any(), any())).thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(recordId, true, Some(flowFromDeclaration))(newRequest)
           status(result) must be(SEE_OTHER)

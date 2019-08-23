@@ -17,6 +17,7 @@
 package controllers.businessdetails
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.autocomplete.NameValuePair
 import models.businessdetails.{BusinessDetails, CorrespondenceAddress, CorrespondenceAddressNonUk}
@@ -47,9 +48,9 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
 
     val controller = new CorrespondenceAddressNonUkController (
       dataConnector = mock[DataCacheConnector],
-      authConnector = self.authConnector,
       auditConnector = mock[AuditConnector],
-      autoCompleteService = mock[AutoCompleteService]
+      autoCompleteService = mock[AutoCompleteService],
+      authAction = SuccessfulAuthAction
     )
 
     when {
@@ -74,7 +75,7 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
           Some(CorrespondenceAddressNonUk("Name Test", "Test", "Test", "Test", Some("test"), None, Country("Albania", "AL"))))
         val businessDetails = BusinessDetails(None, None, None, None, None,None, None, None, None, Some(correspondenceAddress))
 
-        when(controller.dataConnector.fetch[BusinessDetails](any())(any(), any(), any()))
+        when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(businessDetails)))
 
         val result = controller.get(false)(request)
@@ -93,7 +94,7 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
 
       "no data exists in the keystore" in new Fixture {
 
-        when(controller.dataConnector.fetch[BusinessDetails](any())(any(), any(), any()))
+        when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get(false)(request)
@@ -123,11 +124,8 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
           "country" -> "AL"
         )
 
-        when(controller.dataConnector.fetch[BusinessDetails](any())
-          (any(), any(), any())).thenReturn(fetchResult)
-
-        when(controller.dataConnector.save[BusinessDetails](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any(), any())).thenReturn(fetchResult)
+        when(controller.dataConnector.save[BusinessDetails](any(), any(), any())(any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
@@ -160,11 +158,11 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
           "country" -> "AL"
         )
 
-        when(controller.dataConnector.fetch[BusinessDetails](any())
-          (any(), any(), any())).thenReturn(fetchResult)
+        when(controller.dataConnector.fetch[BusinessDetails](any(), any())
+          (any(), any())).thenReturn(fetchResult)
 
-        when(controller.dataConnector.save[BusinessDetails](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataConnector.save[BusinessDetails](any(), any(), any())
+          (any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(edit = true)(newRequest)
         status(result) must be(SEE_OTHER)
@@ -198,11 +196,11 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
           "country" -> "AL"
         )
 
-        when(controller.dataConnector.fetch[BusinessDetails](any())
-          (any(), any(), any())).thenReturn(fetchResult)
+        when(controller.dataConnector.fetch[BusinessDetails](any(), any())
+          (any(), any())).thenReturn(fetchResult)
 
-        when(controller.dataConnector.save[BusinessDetails](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataConnector.save[BusinessDetails](any(), any(), any())
+          (any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(false)(newRequest)
         status(result) must be(BAD_REQUEST)

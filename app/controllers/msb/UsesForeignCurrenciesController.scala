@@ -17,31 +17,28 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessMatching, BusinessMatchingMsbService, ForeignExchange}
 import models.moneyservicebusiness._
-import play.api.mvc.Result
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 
 import scala.concurrent.Future
 
-class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector,
+class UsesForeignCurrenciesController @Inject()(authAction: AuthAction,
                                                 implicit val dataCacheConnector: DataCacheConnector,
                                                 implicit val statusService: StatusService,
                                                 implicit val serviceFlow: ServiceFlow
-                                               ) extends BaseController {
+                                               ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request => {
-        dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+        dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
           response =>
             val form: Form2[UsesForeignCurrencies] = (for {
               msb <- response
@@ -54,14 +51,13 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request => {
         Form2[UsesForeignCurrencies](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.msb.uses_foreign_currencies(f, edit)))
           case ValidForm(_, data: UsesForeignCurrencies) =>
-            dataCacheConnector.fetchAll flatMap { maybeCache =>
+            dataCacheConnector.fetchAll(request.credId) flatMap { maybeCache =>
               val result = for {
                 cacheMap <- maybeCache
                 msb <- cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
@@ -69,7 +65,7 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
                 services <- bm.msbServices
                 register <- cacheMap.getEntry[ServiceChangeRegister](ServiceChangeRegister.key) orElse Some(ServiceChangeRegister())
               } yield {
-                dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
+                dataCacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
                   updateCurrencies(msb, data)) map {
                   _ => routing(services.msbServices, register, msb, edit, data)
                 }
@@ -99,7 +95,7 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
                       register: ServiceChangeRegister,
                       msb: MoneyServiceBusiness,
                       edit: Boolean,
-                      data: UsesForeignCurrencies)(implicit hc: HeaderCarrier, auth: AuthContext) = {
+                      data: UsesForeignCurrencies)(implicit hc: HeaderCarrier) = {
 
     if (data == UsesForeignCurrenciesYes) {
         Redirect(routes.MoneySourcesController.get(edit))

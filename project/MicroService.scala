@@ -32,7 +32,7 @@ trait MicroService {
     Seq(
 
        // Semicolon-separated list of regexs matching classes to exclude
-      ScoverageKeys.coverageExcludedPackages := "<empty>;Reverse.*;.*AuthService.*;modgiels/.data/..*;view.*;forms.*;config.*;" +
+      ScoverageKeys.coverageExcludedPackages := "<empty>;Reverse.*;modgiels/.data/..*;view.*;forms.*;config.*;" +
         ".*BuildInfo.;.*Routes;controllers.ExampleController;controllers.testonly.TestOnlyController",
       ScoverageKeys.coverageMinimum := 90,
       ScoverageKeys.coverageFailOnMinimum := true,

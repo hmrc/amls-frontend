@@ -18,32 +18,28 @@ package controllers.responsiblepeople
 
 import config.AppConfig
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.responsiblepeople.{NonUKPassport, ResponsiblePerson}
 import play.api.i18n.MessagesApi
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.person_non_uk_passport
 
 import scala.concurrent.Future
 
-class PersonNonUKPassportController @Inject()(
-                                            override val messagesApi: MessagesApi,
-                                            val dataCacheConnector: DataCacheConnector,
-                                            val authConnector: AuthConnector,
-                                            val appConfig:AppConfig
-                                          ) extends RepeatingSection with BaseController {
+class PersonNonUKPassportController @Inject()(override val messagesApi: MessagesApi,
+                                              val dataCacheConnector: DataCacheConnector,
+                                              authAction: AuthAction,
+                                              val appConfig:AppConfig
+                                             ) extends RepeatingSection with DefaultBaseController {
 
 
-  def get(index:Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext =>
+  def get(index:Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>
-        getData[ResponsiblePerson](index) map {
+        getData[ResponsiblePerson](request.credId, index) map {
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,Some(nonUKPassport),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
             Ok(person_non_uk_passport(Form2[NonUKPassport](nonUKPassport), edit, index, flow, personName.titleName))
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
@@ -52,29 +48,16 @@ class PersonNonUKPassportController @Inject()(
         }
   }
 
-  private def redirectToNextPage(result: Option[CacheMap], index: Int,
-                         edit: Boolean, flow: Option[String] )(implicit authContext:AuthContext, request: Request[AnyContent]) = {
-    (for {
-      cache <- result
-      rp <- getData[ResponsiblePerson](cache, index)
-    } yield (rp.dateOfBirth.isDefined, edit) match {
-      case (true, true) => Redirect(routes.DetailedAnswersController.get(index, flow))
-      case (true, false) => Redirect(routes.CountryOfBirthController.get(index, edit, flow))
-      case(false, _) => Redirect(routes.DateOfBirthController.get(index, edit, flow))
-    }).getOrElse(NotFound(notFoundView))
-  }
 
-
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext =>
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>
         Form2[NonUKPassport](request.body) match {
-          case f: InvalidForm => getData[ResponsiblePerson](index) map { rp =>
+          case f: InvalidForm => getData[ResponsiblePerson](request.credId, index) map { rp =>
             BadRequest(person_non_uk_passport(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
           }
           case ValidForm(_, data) => {
             for {
-              result <- fetchAllAndUpdateStrict[ResponsiblePerson](index) { (_, rp) =>
+              result <- fetchAllAndUpdateStrict[ResponsiblePerson](request.credId, index) { (_, rp) =>
                 rp.nonUKPassport(data)
               }
             } yield redirectToNextPage(result, index, edit, flow)
@@ -85,4 +68,15 @@ class PersonNonUKPassportController @Inject()(
         }
   }
 
+  private def redirectToNextPage(result: Option[CacheMap], index: Int, edit: Boolean, flow: Option[String])
+                                (implicit request: Request[AnyContent]) = {
+    (for {
+      cache <- result
+      rp <- getData[ResponsiblePerson](cache, index)
+    } yield (rp.dateOfBirth.isDefined, edit) match {
+      case (true, true) => Redirect(routes.DetailedAnswersController.get(index, flow))
+      case (true, false) => Redirect(routes.CountryOfBirthController.get(index, edit, flow))
+      case(false, _) => Redirect(routes.DateOfBirthController.get(index, edit, flow))
+    }).getOrElse(NotFound(notFoundView))
+  }
 }

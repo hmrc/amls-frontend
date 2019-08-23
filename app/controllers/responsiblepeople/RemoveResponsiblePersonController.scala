@@ -18,13 +18,12 @@ package controllers.responsiblepeople
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{ResponsiblePerson, ResponsiblePersonEndDate}
 import models.status._
 import services.StatusService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{RepeatingSection, StatusConstants}
+import utils.{AuthAction, RepeatingSection, StatusConstants}
 import views.html.responsiblepeople.remove_responsible_person
 
 import scala.concurrent.Future
@@ -32,22 +31,15 @@ import scala.concurrent.Future
 
 class RemoveResponsiblePersonController @Inject () (
                                                    val dataCacheConnector: DataCacheConnector,
-                                                   val authConnector: AuthConnector,
+                                                   authAction: AuthAction,
                                                    val statusService: StatusService
-                                                   ) extends RepeatingSection with BaseController {
+                                                   ) extends RepeatingSection with DefaultBaseController {
 
-  private def showRemovalDateField(status: SubmissionStatus, lineIdExists: Boolean): Boolean = {
-    status match {
-      case SubmissionDecisionApproved | ReadyForRenewal(_) | RenewalSubmitted(_) if lineIdExists => true
-      case _ => false
-    }
-  }
-
-  def get(index: Int, flow: Option[String] = None) = Authorised.async {
-    implicit authContext => implicit request =>
+  def get(index: Int, flow: Option[String] = None) = authAction.async {
+    implicit request =>
       for {
-        rp <- getData[ResponsiblePerson](index)
-        status <- statusService.getStatus
+        rp <- getData[ResponsiblePerson](request.credId, index)
+        status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
       } yield rp match {
         case Some(person) if (person.lineId.isDefined && !person.isComplete) =>
           Redirect(routes.WhatYouNeedController.get(index, flow))
@@ -63,24 +55,23 @@ class RemoveResponsiblePersonController @Inject () (
       }
   }
 
-  def remove(index: Int, flow: Option[String] = None) = Authorised.async {
-    implicit authContext => implicit request =>
-
-        def removeWithoutDate = removeDataStrict[ResponsiblePerson](index) map { _ =>
+  def remove(index: Int, flow: Option[String] = None) = authAction.async {
+    implicit request =>
+        def removeWithoutDate = removeDataStrict[ResponsiblePerson](request.credId, index) map { _ =>
           Redirect(routes.YourResponsiblePeopleController.get())
         }
 
-        statusService.getStatus flatMap {
+        statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) flatMap {
           case NotCompleted | SubmissionReady => removeWithoutDate
           case SubmissionReadyForReview =>
-              getData[ResponsiblePerson](index) flatMap {
+              getData[ResponsiblePerson](request.credId, index) flatMap {
                   case Some(person) if person.lineId.isDefined => for {
-                      _ <- updateDataStrict[ResponsiblePerson](index)(_.copy(status = Some(StatusConstants.Deleted), hasChanged = true))
+                      _ <- updateDataStrict[ResponsiblePerson](request.credId, index)(_.copy(status = Some(StatusConstants.Deleted), hasChanged = true))
                   } yield Redirect(routes.YourResponsiblePeopleController.get())
                   case _ => removeWithoutDate
               }
           case _ =>
-            getData[ResponsiblePerson](index) flatMap { _ match {
+            getData[ResponsiblePerson](request.credId, index) flatMap { _ match {
                 case Some(person) if person.lineId.isEmpty => removeWithoutDate
                 case Some(person) =>
                   val name = person.personName.fold("")(_.fullName)
@@ -99,7 +90,7 @@ class RemoveResponsiblePersonController @Inject () (
 
                     case ValidForm(_, data) => {
                       for {
-                        _ <- updateDataStrict[ResponsiblePerson](index) {
+                        _ <- updateDataStrict[ResponsiblePerson](request.credId, index) {
                           _.copy(status = Some(StatusConstants.Deleted), endDate = Some(data), hasChanged = true)
                         }
                       } yield Redirect(routes.YourResponsiblePeopleController.get())
@@ -109,5 +100,12 @@ class RemoveResponsiblePersonController @Inject () (
               }
             }
         }
+  }
+
+  private def showRemovalDateField(status: SubmissionStatus, lineIdExists: Boolean): Boolean = {
+    status match {
+      case SubmissionDecisionApproved | ReadyForRenewal(_) | RenewalSubmitted(_) if lineIdExists => true
+      case _ => false
+    }
   }
 }

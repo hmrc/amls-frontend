@@ -17,10 +17,11 @@
 package controllers.payments
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import generators.PaymentGenerator
-import models.{FeeResponse, SubmissionRequestStatus}
 import models.ResponseType.SubscriptionResponseType
-import models.status.SubmissionDecisionApproved
+import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview}
+import models.{FeeResponse, SubmissionRequestStatus}
 import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito.when
@@ -28,28 +29,28 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, FeeResponseService}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
 
     val request = addToken(authRequest)
 
     implicit val hc: HeaderCarrier = new HeaderCarrier()
-    implicit val ac: AuthContext = mock[AuthContext]
     implicit val ec: ExecutionContext = mock[ExecutionContext]
 
     val controller = new BankDetailsController(
       dataCacheConnector = mock[DataCacheConnector],
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       authEnrolmentsService = mock[AuthEnrolmentsService],
       feeResponseService = mock[FeeResponseService],
       statusService = mockStatusService
     )
+
+    val submissionStatus = SubmissionReadyForReview
 
   }
 
@@ -58,21 +59,21 @@ class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
     "get is called" must {
       "return OK with view" in new Fixture {
 
-        mockApplicationStatus(SubmissionDecisionApproved)
+        mockApplicationStatusNewAuth(SubmissionDecisionApproved)
 
         when {
-          controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any())
+          controller.authEnrolmentsService.amlsRegistrationNumber(any(),any())(any(), any())
         } thenReturn Future.successful(Some(amlsRegistrationNumber))
 
         when {
-          controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber))(any(),any(),any())
+          controller.feeResponseService.getFeeResponse(any(),any())(any(),any())
         } thenReturn Future.successful(Some(FeeResponse(
           SubscriptionResponseType,
           amlsRegistrationNumber, 100, None, None, 0, 200, Some(paymentReferenceNumber), None, DateTime.now()))
         )
 
         when {
-            controller.dataCacheConnector.fetch[SubmissionRequestStatus](eqTo(SubmissionRequestStatus.key))(any(),any(),any())
+            controller.dataCacheConnector.fetch[SubmissionRequestStatus](any(),eqTo(SubmissionRequestStatus.key))(any(),any())
         } thenReturn Future.successful(Some(SubmissionRequestStatus(true)))
 
         val result = controller.get()(request)
@@ -82,7 +83,5 @@ class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
 
       }
     }
-
   }
-
 }

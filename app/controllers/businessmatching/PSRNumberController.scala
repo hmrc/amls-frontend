@@ -20,7 +20,7 @@ import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import javax.inject.Inject
 import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
@@ -28,23 +28,22 @@ import models.flowmanagement.{ChangeSubSectorFlowModel, PsrNumberPageId}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.businessmatching.psr_number
 
-class PSRNumberController @Inject()(val authConnector: AuthConnector,
+class PSRNumberController @Inject()(authAction: AuthAction,
                                     val dataCacheConnector: DataCacheConnector,
                                     val statusService: StatusService,
                                     val businessMatchingService: BusinessMatchingService,
                                     val router: Router[ChangeSubSectorFlowModel],
                                     val helper: ChangeSubSectorHelper
-                                   ) extends BaseController {
+                                   ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
         (for {
-          bm <- businessMatchingService.getModel
-          status <- OptionT.liftF(statusService.getStatus)
+          bm <- businessMatchingService.getModel(request.credId)
+          status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
         } yield {
           val form: Form2[BusinessAppliedForPSRNumber] = bm.businessAppliedForPSRNumber map
                   Form2[BusinessAppliedForPSRNumber] getOrElse EmptyForm
@@ -52,26 +51,25 @@ class PSRNumberController @Inject()(val authConnector: AuthConnector,
         }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
    }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request => {
-        val route = router.getRoute(PsrNumberPageId, _: ChangeSubSectorFlowModel, edit)
+        val route = router.getRoute(request.credId, PsrNumberPageId, _: ChangeSubSectorFlowModel, edit)
         Form2[BusinessAppliedForPSRNumber](request.body) match {
           case f: InvalidForm =>
             (for {
-              bm <- businessMatchingService.getModel
-              status <- OptionT.liftF(statusService.getStatus)
+              bm <- businessMatchingService.getModel(request.credId)
+              status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
             } yield {
               BadRequest(psr_number(f, edit, bm.preAppComplete, statusService.isPreSubmission(status)))
             }) getOrElse BadRequest(psr_number(f, edit))
 
           case ValidForm(_, data) =>
-            helper.getOrCreateFlowModel flatMap { flowModel =>
-              dataCacheConnector.update[ChangeSubSectorFlowModel](ChangeSubSectorFlowModel.key) { _ =>
+            helper.getOrCreateFlowModel(request.credId) flatMap { flowModel =>
+              dataCacheConnector.update[ChangeSubSectorFlowModel](request.credId, ChangeSubSectorFlowModel.key) { _ =>
                 flowModel.copy(psrNumber = Some(data))
               } flatMap {
                 case Some(m@ChangeSubSectorFlowModel(_, Some(BusinessAppliedForPSRNumberYes(_)))) =>
-                  helper.updateSubSectors(m) flatMap { _ =>
+                  helper.updateSubSectors(request.credId, m) flatMap { _ =>
                     route(m)
                   }
                 case Some(m) =>

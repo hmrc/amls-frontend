@@ -21,7 +21,7 @@ import cats.implicits._
 import com.google.inject.Inject
 import config.AppConfig
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.Partnership
 import models.responsiblepeople.ResponsiblePerson
@@ -31,47 +31,44 @@ import play.api.mvc.Request
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, DeclarationHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper, DeclarationHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
 class DetailedAnswersController @Inject () (
                                              val dataCacheConnector: DataCacheConnector,
-                                             val authConnector: AuthConnector,
+                                             authAction: AuthAction,
                                              val statusService: StatusService,
                                              val config: AppConfig
-                                           ) extends BaseController with RepeatingSection {
+                                           ) extends DefaultBaseController with RepeatingSection {
 
-  private def showHideAddressMove(lineId: Option[Int])(implicit authContext: AuthContext, headerCarrier: HeaderCarrier): Future[Boolean] = {
-    statusService.getStatus map {
+  private def showHideAddressMove(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String, lineId: Option[Int])(implicit headerCarrier: HeaderCarrier): Future[Boolean] = {
+    statusService.getStatus(amlsRegistrationNo, accountTypeId, credId) map {
       case SubmissionDecisionApproved | ReadyForRenewal(_) | RenewalSubmitted(_) if lineId.isDefined => true
       case _ => false
     }
   }
 
-  def get(index: Int, flow: Option[String] = None) = Authorised.async {
-    implicit authContext =>
+  def get(index: Int, flow: Option[String] = None) = authAction.async {
       implicit request =>
-        dataCacheConnector.fetchAll flatMap {
+        dataCacheConnector.fetchAll(request.credId) flatMap {
           optionalCache =>
             (for {
               cache: CacheMap <- optionalCache
               businessMatching: BusinessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
             } yield {
-              redirect(cache, index, flow, businessMatching.prefixedAlphabeticalBusinessTypes())
+              redirect(request.amlsRefNumber, request.accountTypeId, request.credId, cache, index, flow, businessMatching.prefixedAlphabeticalBusinessTypes())
             }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
         }
   }
 
-  private def redirect(cache: CacheMap, index: Int, flow: Option[String] = None, businessTypes: Option[List[String]])
-                      (implicit authContext: AuthContext, request: Request[_]) =
+  private def redirect(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String, cache: CacheMap, index: Int, flow: Option[String] = None, businessTypes: Option[List[String]])
+                      (implicit request: Request[_]) =
     (for {
       responsiblePeople <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
     } yield responsiblePeople.lift(index - 1) match {
-      case Some(x) => showHideAddressMove(x.lineId) flatMap { showHide =>
-        isMsbOrTcsp().map {
+      case Some(x) => showHideAddressMove(amlsRegistrationNo, accountTypeId, credId, x.lineId) flatMap { showHide =>
+        isMsbOrTcsp(credId).map {
           msbOrTcsp: Option[Boolean] =>
 
             val shouldShowApprovalSection = !(msbOrTcsp.contains(true)) && x.approvalFlags.hasAlreadyPassedFitAndProper.contains(false)
@@ -81,34 +78,34 @@ class DetailedAnswersController @Inject () (
       case _ => Future.successful(NotFound(notFoundView))
     }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
 
-  def post(index: Int, flow: Option[String] = None) = Authorised.async{
-    implicit authContext => implicit request =>
-      updateDataStrict[ResponsiblePerson](index){ rp =>
+  def post(index: Int, flow: Option[String] = None) = authAction.async{
+    implicit request =>
+      updateDataStrict[ResponsiblePerson](request.credId, index){ rp =>
         rp.copy(hasAccepted = true)
       } flatMap { _ =>
         flow match {
-          case Some(`flowFromDeclaration`) => redirectFromDeclarationFlow()
+          case Some(`flowFromDeclaration`) => redirectFromDeclarationFlow(request.amlsRefNumber, request.accountTypeId, request.credId)
           case Some(`flowChangeOfficer`) => Future.successful(Redirect(controllers.changeofficer.routes.NewOfficerController.get()))
           case None => Future.successful(Redirect(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get()))
         }
       }
   }
 
-  private def isMsbOrTcsp()(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[Boolean]] = {
+  private def isMsbOrTcsp(credId: String)(implicit hc: HeaderCarrier): Future[Option[Boolean]] = {
     for {
-      businessmatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
+      businessmatching <- dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key)
     } yield businessmatching.map(_.msbOrTcsp)
   }
 
-  private def redirectFromDeclarationFlow()(implicit hc: HeaderCarrier, authContext: AuthContext) =
+  private def redirectFromDeclarationFlow(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)(implicit hc: HeaderCarrier) =
     (for {
-      model <- OptionT(fetchModel)
-      _ <- OptionT.liftF(dataCacheConnector.save(ResponsiblePerson.key, model.filterEmpty.map(_.copy(hasAccepted = true))))
-      hasNominatedOfficer <- OptionT.liftF(ControllerHelper.hasNominatedOfficer(dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key)))
-      businessmatching <- OptionT.liftF(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
+      model <- OptionT(fetchModel(credId))
+      _ <- OptionT.liftF(dataCacheConnector.save(credId, ResponsiblePerson.key, model.filterEmpty.map(_.copy(hasAccepted = true))))
+      hasNominatedOfficer <- OptionT.liftF(ControllerHelper.hasNominatedOfficer(dataCacheConnector.fetch[Seq[ResponsiblePerson]](credId, ResponsiblePerson.key)))
+      businessmatching <- OptionT.liftF(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
       reviewDetails <- OptionT.fromOption[Future](businessmatching.reviewDetails)
       businessType <- OptionT.fromOption[Future](reviewDetails.businessType)
-      status <- OptionT.liftF(statusService.getStatus)
+      status <- OptionT.liftF(statusService.getStatus(amlsRegistrationNo, accountTypeId, credId))
     } yield businessType match {
       case Partnership if DeclarationHelper.numberOfPartners(model) < 2 =>
         Redirect(controllers.declaration.routes.RegisterPartnersController.get())
@@ -116,7 +113,7 @@ class DetailedAnswersController @Inject () (
         Redirect(DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status))
     }) getOrElse InternalServerError("Cannot determine redirect")
 
-  private def fetchModel(implicit authContext: AuthContext, hc: HeaderCarrier) =
-    dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key)
+  private def fetchModel(credId: String)(implicit hc: HeaderCarrier) =
+    dataCacheConnector.fetch[Seq[ResponsiblePerson]](credId, ResponsiblePerson.key)
 
 }

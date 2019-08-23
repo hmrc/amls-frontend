@@ -18,12 +18,12 @@ package controllers.renewal
 
 import com.google.inject.Singleton
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.renewal.{CashPayments, CashPaymentsCustomerNotMet, HowCashPaymentsReceived}
 import services.RenewalService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.renewal.how_cash_payments_received
 
 import scala.concurrent.Future
@@ -31,13 +31,13 @@ import scala.concurrent.Future
 @Singleton
 class HowCashPaymentsReceivedController @Inject()(
                                          val dataCacheConnector: DataCacheConnector,
-                                         val authConnector: AuthConnector,
+                                         val authAction: AuthAction,
                                          val renewalService: RenewalService
-                                       ) extends BaseController {
+                                       ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      renewalService.getRenewal map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      renewalService.getRenewal(request.credId) map {
         response =>
           val form: Form2[HowCashPaymentsReceived] = (for {
             renewal <- response
@@ -49,15 +49,15 @@ class HowCashPaymentsReceivedController @Inject()(
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request => {
       Form2[HowCashPaymentsReceived](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(how_cash_payments_received(f, edit)))
         case ValidForm(_, data) =>
           for {
-            renewal <- renewalService.getRenewal
-            _ <- renewalService.updateRenewal(
+            renewal <- renewalService.getRenewal(request.credId)
+            _ <- renewalService.updateRenewal(request.credId,
               renewal.receiveCashPayments(renewal.receiveCashPayments match {
                 case Some(cp) if cp.cashPaymentsCustomerNotMet.receiveCashPayments => CashPayments(CashPaymentsCustomerNotMet(true), Some(data))
                 case Some(cp) if !cp.cashPaymentsCustomerNotMet.receiveCashPayments => CashPayments(CashPaymentsCustomerNotMet(false), None)

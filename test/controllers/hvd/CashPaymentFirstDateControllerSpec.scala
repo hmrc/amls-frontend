@@ -16,6 +16,7 @@
 
 package controllers.hvd
 
+import controllers.actions.SuccessfulAuthAction
 import models.hvd._
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -24,16 +25,16 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
 
 class CashPaymentFirstDateControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture  with DependencyMocks{
+  trait Fixture extends AuthorisedFixture  with DependencyMocksNewAuth{
     self => val request = addToken(authRequest)
-    val controller = new CashPaymentFirstDateController(mockCacheConnector, authConnector = self.authConnector)
+    val controller = new CashPaymentFirstDateController(mockCacheConnector, authAction = SuccessfulAuthAction)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -44,7 +45,7 @@ class CashPaymentFirstDateControllerSpec extends AmlsSpec with MockitoSugar {
 
       "load the Date of First Payment page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -65,10 +66,10 @@ class CashPaymentFirstDateControllerSpec extends AmlsSpec with MockitoSugar {
           "paymentDate.year" -> "1999"
         )
 
-        when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save[Hvd](any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(true)(newRequest)
@@ -84,10 +85,10 @@ class CashPaymentFirstDateControllerSpec extends AmlsSpec with MockitoSugar {
           "paymentDate.year" -> "1999"
         )
 
-        when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save[Hvd](any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
@@ -98,7 +99,7 @@ class CashPaymentFirstDateControllerSpec extends AmlsSpec with MockitoSugar {
       "show error if invalid data" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody()
-        when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.post()(newRequest)
@@ -114,7 +115,7 @@ class CashPaymentFirstDateControllerSpec extends AmlsSpec with MockitoSugar {
           "paymentDate.month" -> "5",
           "paymentDate.year" -> "1999"
         )
-        when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.post()(newRequest)
@@ -131,10 +132,10 @@ class CashPaymentFirstDateControllerSpec extends AmlsSpec with MockitoSugar {
           "paymentDate.year" -> "99"
         )
 
-        when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save[Hvd](any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
@@ -150,10 +151,10 @@ class CashPaymentFirstDateControllerSpec extends AmlsSpec with MockitoSugar {
           "paymentDate.year" -> "19995"
         )
 
-        when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save[Hvd](any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)

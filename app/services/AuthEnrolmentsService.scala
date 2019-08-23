@@ -17,9 +17,9 @@
 package services
 
 import config.AppConfig
+import connectors.{AuthConnector, EnrolmentStubConnector, TaxEnrolmentsConnector}
 import javax.inject.Inject
 import models.enrolment.{AmlsEnrolmentKey, TaxEnrolment}
-import connectors.{AuthConnector, TaxEnrolmentsConnector, EnrolmentStubConnector}
 import play.api.Logger
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -35,6 +35,7 @@ class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector,
   private val amlsNumberKey = "MLRRefNumber"
   private val prefix = "AuthEnrolmentsService"
 
+  @deprecated("to be removed when new auth completely implemented")
   def amlsRegistrationNumber(implicit authContext: AuthContext,
                              headerCarrier: HeaderCarrier,
                              ec: ExecutionContext): Future[Option[String]] = {
@@ -73,19 +74,46 @@ class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector,
     }
   }
 
-  def enrol(amlsRegistrationNumber: String, postcode: String)
-           (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[HttpResponse] = {
-    authConnector.getCurrentAuthority flatMap {
-      authority =>
-        enrolmentStore.enrol(AmlsEnrolmentKey(amlsRegistrationNumber), TaxEnrolment(authority.credId, postcode))
+  def amlsRegistrationNumber(amlsRegistrationNumber: Option[String], groupIdentifier: Option[String])
+                            (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Option[String]] = {
+
+    Logger.debug(s"[$prefix][amlsRegistrationNumber] - Begin...)")
+    Logger.debug(s"[$prefix][amlsRegistrationNumber] - config.enrolmentStubsEnabled: ${config.enrolmentStubsEnabled})")
+
+    val stubbedEnrolments =  if (config.enrolmentStubsEnabled) {
+      stubConnector.enrolmentsNewAuth(groupIdentifier.getOrElse(throw new Exception("Group ID is unavailable")))
+    } else {
+      Logger.debug(s"[$prefix][amlsRegistrationNumber] - Returning empty sequence...)")
+      Future.successful(Seq.empty)
+    }
+
+    amlsRegistrationNumber match {
+      case regNo@Some(_) => Future.successful(regNo)
+      case None => stubbedEnrolments map { enrolmentsList =>
+        Logger.debug(s"[$prefix][amlsRegistrationNumber] - enrolmentsList: $enrolmentsList)")
+          for {
+            amlsEnrolment   <- enrolmentsList.find(enrolment => enrolment.key == amlsKey)
+            amlsIdentifier  <- amlsEnrolment.identifiers.find(identifier => identifier.key == amlsNumberKey)
+          } yield {
+            Logger.debug(s"[$prefix][amlsRegistrationNumber] - amlsEnrolment: $amlsEnrolment)")
+            Logger.debug(s"[$prefix][amlsRegistrationNumber] : ${amlsIdentifier.value}")
+            amlsIdentifier.value
+          }
+        }
     }
   }
 
-  def deEnrol(amlsRegistrationNumber: String)
-             (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Boolean] = {
+  def enrol(amlsRegistrationNumber: String, postcode: String, groupId: Option[String], credId: String)
+           (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+
+    enrolmentStore.enrol(AmlsEnrolmentKey(amlsRegistrationNumber), TaxEnrolment(credId, postcode), groupId)
+  }
+
+  def deEnrol(amlsRegistrationNumber: String, groupId: Option[String])
+             (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] = {
     for {
       _ <- enrolmentStore.removeKnownFacts(amlsRegistrationNumber)
-      _ <- enrolmentStore.deEnrol(amlsRegistrationNumber)
+      _ <- enrolmentStore.deEnrol(amlsRegistrationNumber, groupId)
     } yield true
   }
 

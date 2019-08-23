@@ -18,27 +18,25 @@ package controllers.responsiblepeople
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms._
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.responsiblepeople._
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.position_within_business
 
 import scala.concurrent.Future
 
 class PositionWithinBusinessController @Inject () (
                                                   val dataCacheConnector: DataCacheConnector,
-                                                  val authConnector: AuthConnector
-                                                  )extends RepeatingSection with BaseController {
+                                                  authAction: AuthAction
+                                                  )extends RepeatingSection with DefaultBaseController {
 
 
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-      implicit authContext =>
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
         implicit request =>
-          dataCacheConnector.fetchAll map { optionalCache =>
+          dataCacheConnector.fetchAll(request.credId) map { optionalCache =>
             (optionalCache map { cache =>
 
               val bt = ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
@@ -60,12 +58,11 @@ class PositionWithinBusinessController @Inject () (
           }
     }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext =>
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>
         Form2[Set[PositionWithinBusiness]](request.body) match {
           case f: InvalidForm =>
-            dataCacheConnector.fetchAll map { optionalCache =>
+            dataCacheConnector.fetchAll(request.credId) map { optionalCache =>
               (optionalCache map { cache =>
 
                 val bt = ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
@@ -82,14 +79,14 @@ class PositionWithinBusinessController @Inject () (
             }
           case ValidForm(_, data) => {
             for {
-              _ <- updateDataStrict[ResponsiblePerson](index) { rp => {
+              _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp => {
                   rp.positions match {
                     case Some(x) => rp.positions(Positions.update(x, data))
                     case None => rp.positions(Positions(data, None))
                   }
                 }
               }
-              rpSeqOption <- dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key)
+              rpSeqOption <- dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key)
             } yield {
                   Redirect(routes.PositionWithinBusinessStartDateController.get(index, edit, flow))
             }

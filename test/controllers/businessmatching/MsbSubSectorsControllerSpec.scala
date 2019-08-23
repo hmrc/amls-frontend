@@ -19,6 +19,7 @@ package controllers.businessmatching
 import cats.data.OptionT
 import cats.implicits._
 import config.AppConfig
+import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
@@ -32,21 +33,21 @@ import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyServiceBusinessTestData with BusinessMatchingGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
     val request = addToken(authRequest)
 
     val config = mock[AppConfig]
 
     val controller = new MsbSubSectorsController(
-      self.authConnector,
+      SuccessfulAuthAction,
       mockCacheConnector,
       createRouter[ChangeSubSectorFlowModel],
       mock[BusinessMatchingService],
@@ -58,21 +59,21 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
     val cacheMapT = OptionT.some[Future, CacheMap](mockCacheMap)
 
     when {
-      controller.businessMatchingService.updateModel(any())(any(), any(), any())
+      controller.businessMatchingService.updateModel(any(), any())(any(), any())
     } thenReturn cacheMapT
 
     when {
-      controller.helper.updateSubSectors(any())(any(), any(), any())
+      controller.helper.updateSubSectors(any(), any())(any(), any())
     } thenReturn Future.successful(mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty)
 
     def setupModel(model: Option[BusinessMatching]): Unit = when {
-      controller.businessMatchingService.getModel(any(), any(), any())
+      controller.businessMatchingService.getModel(any())(any(), any())
     } thenReturn (model match {
       case Some(bm) => OptionT.pure[Future, BusinessMatching](bm)
       case _ => OptionT.none[Future, BusinessMatching]
     })
 
-    mockApplicationStatus(NotCompleted)
+    mockApplicationStatusNewAuth(NotCompleted)
   }
 
   "ServicesController" must {
@@ -172,7 +173,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
 
       status(result) mustBe SEE_OTHER
 
-      controller.router.verify(SubSectorsPageId, ChangeSubSectorFlowModel(Some(Set(TransmittingMoney))))
+      controller.router.verify("internalId", SubSectorsPageId, ChangeSubSectorFlowModel(Some(Set(TransmittingMoney))))
     }
 
     "redirect to the summary page when adding anything other than TransmittingMoney as a service" in new Fixture {
@@ -190,7 +191,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
 
       status(result) mustBe SEE_OTHER
 
-      controller.router.verify(SubSectorsPageId, ChangeSubSectorFlowModel(Some(Set(CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal, ForeignExchange))))
+      controller.router.verify("internalId", SubSectorsPageId, ChangeSubSectorFlowModel(Some(Set(CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal, ForeignExchange))))
 
     }
   }

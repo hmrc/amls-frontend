@@ -17,6 +17,7 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import generators.tradingpremises.TradingPremisesGenerator
 import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
 import models.tradingpremises._
@@ -31,7 +32,6 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
@@ -41,7 +41,7 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with OneAppPerSuite wit
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new AgentCompanyDetailsController (mock[DataCacheConnector], self.authConnector, messagesApi)
+    val controller = new AgentCompanyDetailsController (mock[DataCacheConnector], SuccessfulAuthAction , messagesApi)
   }
 
   "AgentCompanyDetailsController" when {
@@ -52,7 +52,7 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with OneAppPerSuite wit
     "get is called" must {
       "display agent company name Page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
 
         val result = controller.get(1)(request)
@@ -62,7 +62,7 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with OneAppPerSuite wit
 
       "display saved content" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(agentCompanyDetails = Some(AgentCompanyDetails("test", Some("12345678"))))))))
 
         val result = controller.get(1)(request)
@@ -75,7 +75,7 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with OneAppPerSuite wit
 
       "respond with NOT_FOUND" when {
         "there is no data at all at that index" in new Fixture {
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
             .thenReturn(Future.successful(None))
 
           val result = controller.get(1)(request)
@@ -96,7 +96,7 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with OneAppPerSuite wit
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(TradingPremises())))
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(99)(newRequest)
@@ -114,10 +114,10 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with OneAppPerSuite wit
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(tradingPremisesGen.sample.get)))
 
-          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(1)(newRequest)
@@ -135,10 +135,10 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with OneAppPerSuite wit
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(TradingPremises())))
 
-          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(1, true)(newRequest)
@@ -179,10 +179,10 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with OneAppPerSuite wit
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse, TradingPremises())))
 
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
-        when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(mockCacheMap))
 
         val result = controller.post(1)(newRequest)
@@ -192,12 +192,13 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with OneAppPerSuite wit
 
         verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
           any(),
+          any(),
           meq(Seq(tradingPremisesWithHasChangedFalse.copy(
             hasChanged = true,
             agentName = None,
             agentCompanyDetails = Some(AgentCompanyDetails("text", Some("12345678"))),
             agentPartnership = None
-          ), TradingPremises())))(any(), any(), any())
+          ), TradingPremises())))(any(), any())
       }
     }
   }

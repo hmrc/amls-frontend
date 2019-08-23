@@ -31,33 +31,28 @@ import play.api.Logger
 import services.{AuthEnrolmentsService, FeeResponseService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.BusinessName
+import utils.{AuthAction, BusinessName}
 import views.html.confirmation._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
-class PaymentConfirmationController @Inject()(
-                                        val authConnector: AuthConnector,
-                                        private[controllers] implicit val dataCacheConnector: DataCacheConnector,
-                                        private[controllers] implicit val amlsConnector: AmlsConnector,
-                                        private[controllers] implicit val statusService: StatusService,
-                                        private[controllers] val feeResponseService: FeeResponseService,
-                                        private[controllers] val authEnrolmentsService: AuthEnrolmentsService,
-                                        private[controllers] val auditConnector: AuditConnector
-                                      ) extends BaseController {
+class PaymentConfirmationController @Inject()(authAction: AuthAction,
+                                              private[controllers] implicit val dataCacheConnector: DataCacheConnector,
+                                              private[controllers] implicit val amlsConnector: AmlsConnector,
+                                              private[controllers] implicit val statusService: StatusService,
+                                              private[controllers] val feeResponseService: FeeResponseService,
+                                              private[controllers] val enrolmentService: AuthEnrolmentsService,
+                                              private[controllers] val auditConnector: AuditConnector) extends DefaultBaseController {
 
   val prefix = "[PaymentConfirmationController]"
 
-  def paymentConfirmation(reference: String) = Authorised.async {
-    implicit authContext =>
+  def paymentConfirmation(reference: String) = authAction.async {
       implicit request =>
 
         def companyName(maybeStatus: Option[ReadStatusResponse]): OptionT[Future, String] =
-          maybeStatus.fold[OptionT[Future, String]](OptionT.some("")) { r => BusinessName.getName(r.safeId) }
+          maybeStatus.fold[OptionT[Future, String]](OptionT.some("")) { r => BusinessName.getName(request.credId, r.safeId, request.accountTypeId) }
 
         val msgFromPaymentStatus = Map[String, String](
           "Failed" -> "confirmation.payment.failed.reason.failure",
@@ -69,13 +64,13 @@ class PaymentConfirmationController @Inject()(
         val isPaymentSuccessful = !request.queryString.contains("paymentStatus")
 
         val result = for {
-          (status, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus)
+          (status, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
           businessName <- companyName(detailedStatus) orElse OptionT.some("")
-          renewalData <- OptionT.liftF(dataCacheConnector.fetch[Renewal](Renewal.key))
-          paymentStatus <- OptionT.liftF(amlsConnector.refreshPaymentStatus(reference))
-          payment <- OptionT(amlsConnector.getPaymentByPaymentReference(reference))
-          businessDetails <- OptionT(dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key))
-          _ <- doAudit(paymentStatus.currentStatus)
+          renewalData <- OptionT.liftF(dataCacheConnector.fetch[Renewal](request.credId, Renewal.key))
+          paymentStatus <- OptionT.liftF(amlsConnector.refreshPaymentStatus(reference, request.accountTypeId))
+          payment <- OptionT(amlsConnector.getPaymentByPaymentReference(reference, request.accountTypeId))
+          businessDetails <- OptionT(dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key))
+          _ <- doAudit(paymentStatus.currentStatus, request.amlsRefNumber, request.accountTypeId, request.groupIdentifier)
         } yield if (isPaymentSuccessful) {
           (status, businessDetails.previouslyRegistered) match {
             case (ReadyForRenewal(_), _) if renewalData.isDefined =>
@@ -95,19 +90,22 @@ class PaymentConfirmationController @Inject()(
         result getOrElse InternalServerError("There was a problem trying to show the confirmation page")
   }
 
-  private def doAudit(paymentStatus: PaymentStatus)(implicit hc: HeaderCarrier, ac: AuthContext) = {
+  private def doAudit(paymentStatus: PaymentStatus, amlsRegistrationNumber: Option[String], accountTypeId: (String, String), groupIdentifier: Option[String])
+                     (implicit hc: HeaderCarrier) = {
     for {
-      fees <- OptionT(retrieveFeeResponse)
+      fees <- OptionT(retrieveFeeResponse(amlsRegistrationNumber, accountTypeId, groupIdentifier))
       payRef <- OptionT.fromOption[Future](fees.paymentReference)
       result <- OptionT.liftF(auditConnector.sendEvent(PaymentConfirmationEvent(fees.amlsReferenceNumber, payRef, paymentStatus)))
     } yield result
   }
 
-  private def retrieveFeeResponse(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[FeeResponse]] = {
+  private def retrieveFeeResponse(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), groupIdentifier: Option[String])
+                                 (implicit hc: HeaderCarrier): Future[Option[FeeResponse]] = {
+
     Logger.debug(s"[$prefix][retrieveFeeResponse] - Begin...)")
     (for {
-      amlsRegistrationNumber <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
-      fees <- OptionT(feeResponseService.getFeeResponse(amlsRegistrationNumber))
+      amlsRegNo <- OptionT(enrolmentService.amlsRegistrationNumber(amlsRegistrationNumber, groupIdentifier))
+      fees <- OptionT(feeResponseService.getFeeResponse(amlsRegNo, accountTypeId))
     } yield fees).value
   }
 }

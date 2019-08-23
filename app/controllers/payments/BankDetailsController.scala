@@ -19,31 +19,30 @@ package controllers.payments
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import javax.inject.Inject
 import models.SubmissionRequestStatus
 import services.{AuthEnrolmentsService, FeeResponseService, StatusService}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class BankDetailsController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                      val authConnector: AuthConnector,
+                                      val authAction: AuthAction,
                                       val authEnrolmentsService: AuthEnrolmentsService,
                                       val feeResponseService: FeeResponseService,
                                       val statusService: StatusService
-                                    ) extends BaseController{
+                                    ) extends DefaultBaseController{
 
 
-  def get(isUK: Boolean = true) = Authorised.async {
-    implicit authContext =>
+  def get(isUK: Boolean = true) = authAction.async {
       implicit request =>
         (for {
-          submissionRequestStatus <- OptionT.liftF(dataCacheConnector.fetch[SubmissionRequestStatus](SubmissionRequestStatus.key))
-          status <- OptionT.liftF(statusService.getStatus)
-          amlsRegistrationNumber <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
-          fees <- OptionT(feeResponseService.getFeeResponse(amlsRegistrationNumber))
+          submissionRequestStatus <- OptionT.liftF(dataCacheConnector.fetch[SubmissionRequestStatus](request.credId, SubmissionRequestStatus.key))
+          status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
+          amlsRegistrationNumber <- OptionT(authEnrolmentsService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
+          fees <- OptionT(feeResponseService.getFeeResponse(amlsRegistrationNumber, request.accountTypeId))
           paymentReference <- OptionT.fromOption[Future](fees.paymentReference)
         } yield {
           val amount = fees.toPay(status, submissionRequestStatus)

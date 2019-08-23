@@ -18,20 +18,20 @@ package controllers.businessactivities
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms._
 import models.businessactivities.{BusinessActivities, _}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
+import utils.{AuthAction, ControllerHelper}
 import views.html.businessactivities._
 
 class TaxMattersController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                      override val authConnector: AuthConnector
-                                     ) extends BaseController {
+                                      val authAction: AuthAction
+                                     ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
           case Some(BusinessActivities(_,_,_,_,_,_,_,_,_,_,_,Some(whoIsYourAccountant), Some(taxMatters),_,_,_))
           => Ok(tax_matters(Form2[TaxMatters](taxMatters), edit, whoIsYourAccountant.accountantsName))
           case Some(BusinessActivities(_,_,_,_,_,_,_,_,_,_,_,Some(whoIsYourAccountant), _,_,_,_))
@@ -40,17 +40,17 @@ class TaxMattersController @Inject() (val dataCacheConnector: DataCacheConnector
       }
   }
 
-  def post(edit : Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+  def post(edit : Boolean = false) = authAction.async {
+    implicit request =>
       Form2[TaxMatters](request.body) match {
         case f: InvalidForm =>
-          dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map { ba =>
+          dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map { ba =>
           BadRequest(tax_matters(f, edit, ControllerHelper.accountantName(ba)))
           }
         case ValidForm(_, data) =>
           for {
-            businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](
+            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](request.credId,
               BusinessActivities.key,
               businessActivities.taxMatters(Some(data))
             )

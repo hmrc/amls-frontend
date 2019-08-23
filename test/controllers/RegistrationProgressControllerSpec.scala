@@ -18,6 +18,7 @@ package controllers
 
 import cats.data.OptionT
 import cats.implicits._
+import controllers.actions.{SuccessfulAuthAction, SuccessfulAuthActionNoAmlsRefNo}
 import generators.AmlsReferenceNumberGenerator
 import generators.businesscustomer.ReviewDetailsGenerator
 import models.businessmatching._
@@ -33,40 +34,38 @@ import play.api.mvc.Call
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, ProgressService, SectionsProvider}
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class RegistrationProgressControllerSpec extends AmlsSpec
   with ReviewDetailsGenerator
   with AmlsReferenceNumberGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
     val request = addToken(authRequest)
 
     val mockBusinessMatching = mock[BusinessMatching]
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
     val controller = new RegistrationProgressController (
-      self.authConnector,
+      SuccessfulAuthAction,
       progressService = mock[ProgressService],
       dataCache = mockCacheConnector,
       enrolmentsService = mock[AuthEnrolmentsService],
       statusService = mockStatusService,
       sectionsProvider = mock[SectionsProvider],
       businessMatchingService = mockBusinessMatchingService,
-      serviceFlow = mockServiceFlow
-    )
+      serviceFlow = mockServiceFlow)
 
-    mockApplicationStatus(SubmissionReady)
+    mockApplicationStatusNewAuth(SubmissionReady)
     mockCacheFetch[Renewal](None)
 
     when(mockBusinessMatching.isComplete) thenReturn true
     when(mockBusinessMatching.reviewDetails) thenReturn Some(reviewDetailsGen.sample.get)
-    when(mockBusinessMatchingService.getAdditionalBusinessActivities(any(), any(), any())) thenReturn OptionT.none[Future, Set[BusinessActivity]]
+    when(mockBusinessMatchingService.getAdditionalBusinessActivities(any[String]())(any(), any())) thenReturn OptionT.none[Future, Set[BusinessActivity]]
 
     when {
       controller.sectionsProvider.sectionsFromBusinessActivities(any(), any())(any())
@@ -83,10 +82,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
     "get is called" when {
       "the user is enrolled into the AMLS Account" must {
         "show the update your information page" in new Fixture {
-          when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-            .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-          mockApplicationStatus(SubmissionReadyForReview)
+          mockApplicationStatusNewAuth(SubmissionReadyForReview)
 
           when(controller.sectionsProvider.sections(mockCacheMap))
             .thenReturn(Seq.empty[Section])
@@ -106,7 +103,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
             mockCacheFetch[Renewal](Some(Renewal(Some(InvolvedInOtherNo))))
 
-            mockApplicationStatus(ReadyForRenewal(None))
+            mockApplicationStatusNewAuth(ReadyForRenewal(None))
 
             val responseF = controller.get()(request)
             status(responseF) must be(SEE_OTHER)
@@ -115,8 +112,6 @@ class RegistrationProgressControllerSpec extends AmlsSpec
         }
         "status is renewal submitted and renewal data exists in mongoCache" must {
           "show the registration amendment page" in new Fixture {
-            when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-              .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
             when(controller.sectionsProvider.sections(mockCacheMap))
               .thenReturn(Seq(
@@ -126,7 +121,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
             mockCacheFetch[Renewal](Some(Renewal(Some(InvolvedInOtherNo))))
 
-            mockApplicationStatus(RenewalSubmitted(None))
+            mockApplicationStatusNewAuth(RenewalSubmitted(None))
 
             val responseF = controller.get()(request)
             status(responseF) must be(OK)
@@ -142,13 +137,10 @@ class RegistrationProgressControllerSpec extends AmlsSpec
         "status is ready for renewal and" must {
           "redirectWithNominatedOfficer" in new Fixture {
 
-            mockApplicationStatus(ReadyForRenewal(None))
+            mockApplicationStatusNewAuth(ReadyForRenewal(None))
 
             when(controller.sectionsProvider.sections(mockCacheMap))
               .thenReturn(Seq.empty[Section])
-
-            when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-              .thenReturn(Future.successful(None))
 
             val responseF = controller.get()(request)
             status(responseF) must be(OK)
@@ -167,8 +159,6 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
           "application is pre-submission" must {
             "enable the submission button" in new Fixture {
-              when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-                .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
               when(controller.sectionsProvider.sections(mockCacheMap))
                 .thenReturn(Seq(
@@ -188,10 +178,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           "application is post-submission" must {
             "show Submit Updates form" in new Fixture {
 
-              when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-                .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
-
-              mockApplicationStatus(SubmissionReadyForReview)
+              mockApplicationStatusNewAuth(SubmissionReadyForReview)
 
               when(controller.sectionsProvider.sections(mockCacheMap))
                 .thenReturn(Seq(
@@ -216,9 +203,6 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           "application is pre-submission" must {
             "enable the submission button" in new Fixture {
 
-              when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-                .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
-
               when(controller.sectionsProvider.sections(mockCacheMap))
                 .thenReturn(Seq(
                   Section("TESTSECTION1", Completed, false, mock[Call]),
@@ -237,10 +221,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           "application is post-submission" must {
             "show View Status button" in new Fixture {
 
-              mockApplicationStatus(SubmissionReadyForReview)
-
-              when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-                .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
+              mockApplicationStatusNewAuth(SubmissionReadyForReview)
 
               when(controller.sectionsProvider.sections(mockCacheMap))
                 .thenReturn(Seq(
@@ -259,9 +240,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
               submitAnchor.text() must include("Check your status and messages")
             }
           }
-
         }
-
       }
 
       "some sections are not complete and" when {
@@ -269,8 +248,6 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
           "application is pre-submission" must {
             "disable the submission button" in new Fixture {
-              when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-                .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
               when(controller.sectionsProvider.sections(mockCacheMap))
                 .thenReturn(Seq(
@@ -289,10 +266,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           "application is post-submission" must {
             "show View Status button" in new Fixture {
 
-              mockApplicationStatus(SubmissionReadyForReview)
-
-              when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-                .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
+              mockApplicationStatusNewAuth(SubmissionReadyForReview)
 
               when(controller.sectionsProvider.sections(mockCacheMap))
                 .thenReturn(Seq(
@@ -316,8 +290,6 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
         "no section has changed" must {
           "disable the submission button" in new Fixture {
-            when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-              .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
             when(controller.sectionsProvider.sections(mockCacheMap))
               .thenReturn(Seq(
@@ -337,10 +309,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
       "in any status" must {
         "show the business activities and hide the business matching section" in new Fixture {
           Seq(SubmissionReady, SubmissionReadyForReview, SubmissionDecisionApproved).foreach { subStatus =>
-            when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-              .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-            mockApplicationStatus(subStatus)
+            mockApplicationStatusNewAuth(subStatus)
 
             val sections = Seq(
               Section(BusinessMatching.messageKey, Completed, false, mock[Call]),
@@ -368,10 +338,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
       "in the approved status" must {
         "show the correct text on the screen" in new Fixture {
-          when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-            .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-          mockApplicationStatus(SubmissionDecisionApproved)
+          mockApplicationStatusNewAuth(SubmissionDecisionApproved)
 
           val sections = Seq(
             Section(BusinessMatching.messageKey, Completed, false, mock[Call]),
@@ -398,9 +366,6 @@ class RegistrationProgressControllerSpec extends AmlsSpec
         "show the registration progress page" in new Fixture {
           when(controller.sectionsProvider.sections(mockCacheMap))
             .thenReturn(Seq.empty[Section])
-
-          when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-            .thenReturn(Future.successful(None))
 
           val responseF = controller.get()(request)
           status(responseF) must be(OK)
@@ -429,11 +394,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
         "business matching is incomplete and status is not pre-application" in new Fixture {
           when(mockBusinessMatching.isComplete) thenReturn false
           when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(mockBusinessMatching))
-          mockApplicationStatus(SubmissionDecisionApproved)
 
-          when {
-            controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
-          } thenReturn Future.successful(Some(amlsRegistrationNumber))
+          mockApplicationStatusNewAuth(SubmissionDecisionApproved)
 
           val completeSection = Section(BusinessMatching.messageKey, Started, true, controllers.routes.LandingController.get())
           when(controller.sectionsProvider.sections(mockCacheMap)) thenReturn Seq(completeSection)
@@ -448,10 +410,6 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           when(mockBusinessMatching.isComplete) thenReturn true
           when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(mockBusinessMatching))
 
-          when {
-            controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
-          } thenReturn Future.successful(Some(amlsRegistrationNumber))
-
           val hvd = mock[models.hvd.Hvd]
           when(hvd.isComplete) thenReturn true
 
@@ -464,7 +422,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           val sections = Seq(models.moneyservicebusiness.MoneyServiceBusiness.section)
 
           when {
-            controller.sectionsProvider.sections(any())
+            controller.sectionsProvider.sections(any[CacheMap])
           } thenReturn sections
 
           val newSections = Set(
@@ -476,7 +434,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
             controller.sectionsProvider.sectionsFromBusinessActivities(any(), any())(any())
           } thenReturn newSections
 
-          mockApplicationStatus(SubmissionDecisionApproved)
+          mockApplicationStatusNewAuth(SubmissionDecisionApproved)
 
           val result = controller.get()(request)
           status(result) mustBe OK
@@ -493,7 +451,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
         val call = controllers.routes.RegistrationProgressController.get()
 
         when {
-          controller.progressService.getSubmitRedirect(any(), any(), any())
+          controller.progressService.getSubmitRedirect(any[Option[String]](), any(), any())(any(), any())
         } thenReturn Future.successful(Some(call))
 
         val result = controller.post()(request)
@@ -504,7 +462,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
       "return INTERNAL_SERVER_ERROR if no call is returned" in new Fixture {
 
         when {
-          controller.progressService.getSubmitRedirect(any(), any(), any())
+          controller.progressService.getSubmitRedirect(any[Option[String]](), any(), any())(any(), any())
         } thenReturn Future.successful(None)
 
         val result = controller.post()(request)

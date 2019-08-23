@@ -17,24 +17,22 @@
 package controllers.supervision
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.supervision.{ProfessionalBodies, Supervision}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.supervision.which_professional_body
 
 import scala.concurrent.Future
 
 class WhichProfessionalBodyController @Inject()(
                                                val dataCacheConnector: DataCacheConnector,
-                                               val authConnector: AuthConnector
-                                               ) extends BaseController {
+                                               val authAction: AuthAction) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        dataCacheConnector.fetch[Supervision](Supervision.key) map { response =>
+        dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map { response =>
 
           val form = (for {
             supervision <- response
@@ -47,14 +45,13 @@ class WhichProfessionalBodyController @Inject()(
         }
   }
 
-  def post(edit: Boolean = false) = Authorised.async{
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async{
       implicit request =>
         Form2[ProfessionalBodies](request.body) match {
           case ValidForm(_, data) =>
             for {
-              supervision <- dataCacheConnector.fetch[Supervision](Supervision.key)
-              _ <- dataCacheConnector.save[Supervision](Supervision.key,supervision.professionalBodies(Some(data)))
+              supervision <- dataCacheConnector.fetch[Supervision](request.credId, Supervision.key)
+              _ <- dataCacheConnector.save[Supervision](request.credId, Supervision.key,supervision.professionalBodies(Some(data)))
             } yield {
               if(edit){
                 Redirect(routes.SummaryController.post())

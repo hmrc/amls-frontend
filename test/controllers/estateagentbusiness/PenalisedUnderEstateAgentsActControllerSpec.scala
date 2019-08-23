@@ -17,6 +17,7 @@
 package controllers.estateagentbusiness
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.estateagentbusiness.{EstateAgentBusiness, PenalisedUnderEstateAgentsActYes}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -24,22 +25,21 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
 class PenalisedUnderEstateAgentsActControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture  {
     self => val request = addToken(authRequest)
 
     val controller = new PenalisedUnderEstateAgentsActController (
       dataCacheConnector = mock[DataCacheConnector],
-      authConnector = self.authConnector
+      authAction = SuccessfulAuthAction
     )
   }
 
@@ -48,7 +48,7 @@ class PenalisedUnderEstateAgentsActControllerSpec extends AmlsSpec with MockitoS
   "PenalisedUnderEstateAgentsActController" must {
 
     "load the blank page when the user visits the first time" in new Fixture {
-      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any(),any())( any(), any()))
         .thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -56,8 +56,8 @@ class PenalisedUnderEstateAgentsActControllerSpec extends AmlsSpec with MockitoS
     }
 
     "load the page with data when the user revisits at a later time" in new Fixture {
-      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(EstateAgentBusiness(None, None, None,
+      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(EstateAgentBusiness(None, None, None,
         Some(PenalisedUnderEstateAgentsActYes("Do not remember why penalised before"))))))
 
       val result = controller.get()(request)
@@ -76,11 +76,11 @@ class PenalisedUnderEstateAgentsActControllerSpec extends AmlsSpec with MockitoS
         "penalisedUnderEstateAgentsActDetails" -> "Do not remember why penalised before"
       )
 
-      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any(), any())
+        (any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)

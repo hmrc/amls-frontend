@@ -16,30 +16,26 @@
 
 package controllers.msb
 
-import cats.data.OptionT
-import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import javax.inject.Inject
 import models.businessmatching.BusinessMatching
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.moneyservicebusiness.MoneyServiceBusiness
 import services.StatusService
 import services.businessmatching.ServiceFlow
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.msb.summary
 
-class SummaryController @Inject()
-(
-  val authConnector: AuthConnector,
-  implicit val dataCache: DataCacheConnector,
-  implicit val statusService: StatusService,
-  implicit val serviceFlow: ServiceFlow
-) extends BaseController {
+class SummaryController @Inject()(authAction: AuthAction,
+                                  implicit val dataCache: DataCacheConnector,
+                                  implicit val statusService: StatusService,
+                                  implicit val serviceFlow: ServiceFlow
+                                  ) extends DefaultBaseController {
 
-  def get = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCache.fetchAll map {
+  def get = authAction.async {
+    implicit request =>
+      dataCache.fetchAll(request.credId) map {
         optionalCache =>
           (for {
             cache <- optionalCache
@@ -53,12 +49,12 @@ class SummaryController @Inject()
   }
 
 
-  def post() = Authorised.async{
-    implicit authContext => implicit request =>
-      (for {
-        model <- OptionT(dataCache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key))
-        _ <- OptionT.liftF(dataCache.save[MoneyServiceBusiness](MoneyServiceBusiness.key, model.copy(hasAccepted = true)))
-      } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Cannot update MoneyServiceBusiness")
+  def post() = authAction.async {
+    implicit request =>
+      for {
+        model <- dataCache.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
+        _ <- dataCache.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key, model.copy(hasAccepted = true))
+      } yield Redirect(controllers.routes.RegistrationProgressController.get())
   }
 
 }

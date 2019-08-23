@@ -17,33 +17,29 @@
 package controllers.hvd
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
-import models.businessmatching.HighValueDealing
 import models.hvd.Hvd
 import services.StatusService
 import services.businessmatching.ServiceFlow
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
+import utils.AuthAction
 import views.html.hvd.receiving
 
 import scala.concurrent.Future
 
-class ReceiveCashPaymentsController @Inject()(val authConnector: AuthConnector,
+class ReceiveCashPaymentsController @Inject()(val authAction: AuthAction,
                                               implicit val cacheConnector: DataCacheConnector,
                                               implicit val serviceFlow: ServiceFlow,
-                                              implicit val statusService: StatusService
-                                             ) extends BaseController {
+                                              implicit val statusService: StatusService) extends DefaultBaseController {
 
   val NAME = "receivePayments"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(NAME)
   implicit val boolRead = utils.BooleanFormReadWrite.formRule(NAME, "error.required.hvd.receive.cash.payments")
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        cacheConnector.fetch[Hvd](Hvd.key) map {
+        cacheConnector.fetch[Hvd](request.credId, Hvd.key) map {
           response =>
             val form: Form2[Boolean] = (for {
               hvd <- response
@@ -53,16 +49,15 @@ class ReceiveCashPaymentsController @Inject()(val authConnector: AuthConnector,
         }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request => {
         Form2[Boolean](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(receiving(f, edit)))
           case ValidForm(_, data) => {
             for {
-              hvd <- cacheConnector.fetch[Hvd](Hvd.key)
-              _ <- cacheConnector.save[Hvd](Hvd.key, {
+              hvd <- cacheConnector.fetch[Hvd](request.credId, Hvd.key)
+              _ <- cacheConnector.save[Hvd](request.credId, Hvd.key, {
                 (hvd.flatMap(h => h.receiveCashPayments).contains(true), data) match {
                   case (true, false) => hvd.receiveCashPayments(data).copy(cashPaymentMethods = None)
                   case _ => hvd.receiveCashPayments(data)
@@ -77,7 +72,7 @@ class ReceiveCashPaymentsController @Inject()(val authConnector: AuthConnector,
   def redirectTo(data: Boolean, hvd: Hvd, edit: Boolean) =
     (data, edit, hvd.cashPaymentMethods.isDefined) match {
       case (true, _, false) => Redirect(routes.ExpectToReceiveCashPaymentsController.get(edit))
-      case (_, true, _) => Redirect(routes.SummaryController.get())
-      case _ => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get(edit))
+      case (_, true, _)     => Redirect(routes.SummaryController.get())
+      case _                => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get(edit))
     }
 }

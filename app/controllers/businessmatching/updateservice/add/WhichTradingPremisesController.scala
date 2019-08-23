@@ -19,7 +19,7 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
@@ -31,9 +31,7 @@ import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{RepeatingSection, StatusConstants}
+import utils.{AuthAction, RepeatingSection, StatusConstants}
 import views.html.businessmatching.updateservice.add.which_trading_premises
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -41,18 +39,17 @@ import scala.concurrent.Future
 
 @Singleton
 class WhichTradingPremisesController @Inject()(
-                                                val authConnector: AuthConnector,
+                                                authAction: AuthAction,
                                                 implicit val dataCacheConnector: DataCacheConnector,
                                                 val statusService: StatusService,
                                                 val businessMatchingService: BusinessMatchingService,
                                                 val helper: AddBusinessTypeHelper,
                                                 val router: Router[AddBusinessTypeFlowModel]
-                                              ) extends BaseController with RepeatingSection {
+                                              ) extends DefaultBaseController with RepeatingSection {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        getFormData map { case (flowModel, activity, tradingPremises) =>
+        getFormData(request.credId) map { case (flowModel, activity, tradingPremises) =>
           val form = flowModel.tradingPremisesActivities.fold[Form2[TradingPremisesActivities]](EmptyForm)(Form2[TradingPremisesActivities])
 
           Ok(which_trading_premises(form, edit, tradingPremises, BusinessActivities.getValue(activity))
@@ -60,34 +57,33 @@ class WhichTradingPremisesController @Inject()(
         } getOrElse InternalServerError("Cannot retrieve form data")
   }
 
-  private def getFormData(implicit hc: HeaderCarrier, ac: AuthContext) = for {
-    flowModel <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key))
-    activity <- OptionT.fromOption[Future](flowModel.activity)
-    tradingPremises <- OptionT.liftF(tradingPremises)
-  } yield (flowModel, activity, tradingPremises)
-
-  private def tradingPremises(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[(TradingPremises, Int)]] =
-    getData[TradingPremises].map {
-      _.zipWithIndex.filterNot { case (tp, _) =>
-        tp.status.contains(StatusConstants.Deleted) | !tp.isComplete
-      }
-    }
-
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request =>
         Form2[TradingPremisesActivities](request.body) match {
-          case f: InvalidForm => getFormData map { case (_, activity, tradingPremises) =>
+          case f: InvalidForm => getFormData(request.credId) map { case (_, activity, tradingPremises) =>
             BadRequest(which_trading_premises(f, edit, tradingPremises, BusinessActivities.getValue(activity)))
           } getOrElse InternalServerError("Cannot retrieve form data")
 
           case ValidForm(_, data) =>
-            dataCacheConnector.update[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key) {
+            dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key) {
               case Some(model) => model.tradingPremisesActivities(Some(data))
           } flatMap {
-            case Some(model) => router.getRoute(WhichTradingPremisesPageId, model)
+            case Some(model) => router.getRoute(request.credId, WhichTradingPremisesPageId, model)
             case _ => Future.successful(InternalServerError("Cannot retrieve form data"))
           }
         }
   }
+
+  private def getFormData(credId: String)(implicit hc: HeaderCarrier) = for {
+    flowModel <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](credId, AddBusinessTypeFlowModel.key))
+    activity <- OptionT.fromOption[Future](flowModel.activity)
+    tradingPremises <- OptionT.liftF(tradingPremises(credId))
+  } yield (flowModel, activity, tradingPremises)
+
+  private def tradingPremises(credId: String)(implicit hc: HeaderCarrier): Future[Seq[(TradingPremises, Int)]] =
+    getData[TradingPremises](credId).map {
+      _.zipWithIndex.filterNot { case (tp, _) =>
+        tp.status.contains(StatusConstants.Deleted) | !tp.isComplete
+      }
+    }
 }

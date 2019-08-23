@@ -19,6 +19,7 @@ package controllers.renewal
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import generators.businessmatching.BusinessMatchingGenerator
 import models.ReadStatusResponse
 import models.businessmatching._
@@ -37,9 +38,8 @@ import services.businessmatching.BusinessMatchingService
 import services.{ProgressService, RenewalService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -50,7 +50,6 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
     self =>
     val request = addToken(authRequest)
 
-    implicit val authContext = mock[AuthContext]
     implicit val headerCarrier = HeaderCarrier()
 
     val dataCacheConnector = mock[DataCacheConnector]
@@ -59,16 +58,17 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
     val statusService = mock[StatusService]
     val sectionsProvider = mock[SectionsProvider]
     val businessMatchingService = mock[BusinessMatchingService]
+    val authAction = SuccessfulAuthAction
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[ProgressService].to(progressService))
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .bindings(bind[RenewalService].to(renewalService))
-      .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[StatusService].to(statusService))
       .overrides(bind[SectionsProvider].to(sectionsProvider))
       .overrides(bind[BusinessMatchingService].to(businessMatchingService))
+      .overrides(bind[AuthAction].to(authAction))
       .build()
 
     val controller = app.injector.instanceOf[RenewalProgressController]
@@ -80,7 +80,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
     val renewalSection = Section("renewal", NotStarted, hasChanged = false, mock[Call])
 
     when {
-      dataCacheConnector.fetchAll(any(), any())
+      dataCacheConnector.fetchAll(any())(any())
     } thenReturn Future.successful(Some(cacheMap))
 
     when {
@@ -88,7 +88,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
     } thenReturn Seq(defaultSection)
 
     when {
-      renewalService.getSection(any(), any(), any())
+      renewalService.getSection(any())(any(), any())
     } thenReturn Future.successful(renewalSection)
 
     val businessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
@@ -103,7 +103,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
     val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
       Some(renewalDate), false)
 
-    when(businessMatchingService.getAdditionalBusinessActivities(any(), any(), any()))
+    when(businessMatchingService.getAdditionalBusinessActivities(any())(any(), any()))
       .thenReturn(OptionT.none[Future, Set[BusinessActivity]])
 
     when {
@@ -116,7 +116,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
 
     "load the page when status is ReadyForRenewal" in new Fixture {
 
-      when(statusService.getDetailedStatus(any(), any(), any()))
+      when(statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
         .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
 
       val BusinessActivitiesModelWithoutTCSPOrMSB = BusinessActivities(Set(TelephonePaymentService))
@@ -137,7 +137,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
 
     "redirect to the registration progress controller when status is renewal submitted" in new Fixture {
 
-      when(statusService.getDetailedStatus(any(), any(), any()))
+      when(statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
         .thenReturn(Future.successful((RenewalSubmitted(Some(renewalDate)), Some(readStatusResponse))))
 
       val BusinessActivitiesModelWithoutTCSPOrMSB = BusinessActivities(Set(TelephonePaymentService))
@@ -156,7 +156,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
 
     "load the page when status is ReadyForRenewal and one of the section is modified" in new Fixture  {
 
-      when(statusService.getDetailedStatus(any(), any(), any()))
+      when(statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
         .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
 
       val BusinessActivitiesModelWithoutTCSPOrMSB = BusinessActivities(Set(TelephonePaymentService))
@@ -190,7 +190,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
     }
 
     "display all the available sections from a normal variation progress page" in new Fixture {
-      when(statusService.getDetailedStatus(any(), any(), any()))
+      when(statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
         .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
 
       val result = controller.get()(request)
@@ -198,11 +198,11 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
     }
 
     "respond with InternalServerError when no sections are returned" in new Fixture {
-      when(statusService.getDetailedStatus(any(), any(), any()))
+      when(statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
         .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
 
       when {
-        dataCacheConnector.fetchAll(any(), any())
+        dataCacheConnector.fetchAll(any())(any())
       } thenReturn Future.successful(None)
 
       val result = controller.get()(request)
@@ -217,7 +217,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
 
       val newRequest = request.withFormUrlEncodedBody()
 
-      when(controller.progressService.getSubmitRedirect(any(), any(), any()))
+      when(controller.progressService.getSubmitRedirect(any[Option[String]](), any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(controllers.declaration.routes.WhoIsRegisteringController.get())))
 
       val result = controller.post()(newRequest)

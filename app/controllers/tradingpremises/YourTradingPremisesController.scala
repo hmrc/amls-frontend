@@ -19,7 +19,7 @@ package controllers.tradingpremises
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
@@ -27,8 +27,7 @@ import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview, S
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.tradingpremises.your_trading_premises
 
 import scala.concurrent.Future
@@ -36,8 +35,8 @@ import scala.concurrent.Future
 @Singleton
 class YourTradingPremisesController @Inject()(val dataCacheConnector: DataCacheConnector,
                                               val statusService: StatusService,
-                                              val authConnector: AuthConnector
-                                             ) extends RepeatingSection with BaseController {
+                                              val authAction: AuthAction
+                                             ) extends RepeatingSection with DefaultBaseController {
 
   private def updateTradingPremises(tradingPremises: Option[Seq[TradingPremises]]) : Future[Option[Seq[TradingPremises]]] = {
     tradingPremises match {
@@ -51,11 +50,11 @@ class YourTradingPremisesController @Inject()(val dataCacheConnector: DataCacheC
     }
   }
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
       (for {
-        status <- statusService.getStatus
-        tp <- dataCacheConnector.fetchAll map {
+        status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+        tp <- dataCacheConnector.fetchAll(request.credId) map {
           cache =>
             for {
               c: CacheMap <- cache
@@ -72,21 +71,21 @@ class YourTradingPremisesController @Inject()(val dataCacheConnector: DataCacheC
       }
   }
 
-  def post = Authorised.async {
-    implicit authContext => implicit request =>
+  def post = authAction.async {
+    implicit request =>
       (for {
-        tp <- dataCacheConnector.fetch[Seq[TradingPremises]](TradingPremises.key)
+        tp <- dataCacheConnector.fetch[Seq[TradingPremises]](request.credId, TradingPremises.key)
         tpNew <- updateTradingPremises(tp)
-        _ <- dataCacheConnector.save[Seq[TradingPremises]](TradingPremises.key, tpNew.getOrElse(Seq.empty))
+        _ <- dataCacheConnector.save[Seq[TradingPremises]](request.credId, TradingPremises.key, tpNew.getOrElse(Seq.empty))
       } yield Redirect(controllers.routes.RegistrationProgressController.get())) recoverWith {
         case _: Throwable => Future.successful(InternalServerError("Unable to save data and get redirect link"))
       }
   }
 
-  def post(index: Int) = Authorised.async{
-    implicit authContext => implicit request =>
+  def post(index: Int) = authAction.async{
+    implicit request =>
       for {
-        _ <- updateDataStrict[TradingPremises](index){ tp =>
+        _ <- updateDataStrict[TradingPremises](request.credId, index){ tp =>
           tp.copy(hasAccepted = true, hasChanged = true)
         }
       } yield Redirect(controllers.tradingpremises.routes.YourTradingPremisesController.get())
@@ -94,11 +93,11 @@ class YourTradingPremisesController @Inject()(val dataCacheConnector: DataCacheC
 
   def answers = get(true)
 
-  def getIndividual(index: Int, edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+  def getIndividual(index: Int, edit: Boolean = false) = authAction.async {
+    implicit request =>
 
       (for {
-        cache <- OptionT(dataCacheConnector.fetchAll)
+        cache <- OptionT(dataCacheConnector.fetchAll(request.credId))
         bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
         tp <- OptionT.fromOption[Future](getData[TradingPremises](cache, index))
       } yield {

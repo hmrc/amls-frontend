@@ -17,28 +17,27 @@
 package controllers.renewal
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessActivity, BusinessMatching, HighValueDealing}
 import models.renewal.{CustomersOutsideIsUK, Renewal}
 import services.{AutoCompleteService, RenewalService}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.renewal._
 
 import scala.concurrent.Future
 
 @Singleton
 class CustomersOutsideIsUKController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                               val authConnector: AuthConnector,
+                                               val authAction: AuthAction,
                                                val renewalService: RenewalService,
                                                val autoCompleteService: AutoCompleteService
-                                            ) extends BaseController {
+                                            ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        renewalService.getRenewal map {
+        renewalService.getRenewal(request.credId) map {
           response =>
             val form: Form2[CustomersOutsideIsUK] = (for {
               renewal <- response
@@ -48,21 +47,20 @@ class CustomersOutsideIsUKController @Inject()(val dataCacheConnector: DataCache
         }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request =>
         Form2[CustomersOutsideIsUK](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(customers_outside_uk_isUK(f, edit)))
           case ValidForm(_, data: CustomersOutsideIsUK) =>
-            dataCacheConnector.fetchAll flatMap { optionalCache =>
+            dataCacheConnector.fetchAll(request.credId) flatMap { optionalCache =>
               (for {
                 cache <- optionalCache
                 renewal <- cache.getEntry[Renewal](Renewal.key)
                 businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
                 ba <- businessMatching.activities.map { a => a.businessActivities}
               } yield {
-                renewalService.updateRenewal(data.isOutside match {
+                renewalService.updateRenewal(request.credId, data.isOutside match {
                   case false => renewal.customersOutsideIsUK(data).copy(customersOutsideUK = None)
                   case true => renewal.customersOutsideIsUK(data)
                 }) map { _ =>

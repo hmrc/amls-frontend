@@ -30,34 +30,34 @@ import scala.concurrent.Future
 @Singleton
 class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificationConnector, val messagesApi: MessagesApi) {
 
-  def getNotifications(safeId: String)(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[NotificationRow]] =
-    amlsNotificationConnector.fetchAllBySafeId(safeId) map {
+  def getNotifications(safeId: String, accountTypeId: (String, String))(implicit hc: HeaderCarrier): Future[Seq[NotificationRow]] =
+    amlsNotificationConnector.fetchAllBySafeId(safeId, accountTypeId) map {
       case notifications@(_::_) => notifications.sortWith((x, y) => x.receivedAt.isAfter(y.receivedAt))
       case notifications => notifications
     }
 
-  def getMessageDetails(amlsRegNo: String, id: String, contactType: ContactType, templateVersion: String)
-                       (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
+  def getMessageDetails(amlsRegNo: String, id: String, contactType: ContactType, templateVersion: String, accountTypeId: (String, String))
+                       (implicit hc: HeaderCarrier): Future[Option[NotificationDetails]] = {
 
     contactType match {
 
       case ContactType.ApplicationAutorejectionForFailureToPay |
            ContactType.RegistrationVariationApproval |
-           ContactType.DeRegistrationEffectiveDateChange => handleStaticMessage(amlsRegNo, id, contactType, templateVersion)
+           ContactType.DeRegistrationEffectiveDateChange => handleStaticMessage(amlsRegNo, id, contactType, templateVersion, accountTypeId)
 
       case ContactType.ReminderToPayForVariation |
            ContactType.ReminderToPayForRenewal |
            ContactType.ReminderToPayForApplication |
-           ContactType.ReminderToPayForManualCharges => handleReminderMessage(amlsRegNo, id, contactType, templateVersion)
+           ContactType.ReminderToPayForManualCharges => handleReminderMessage(amlsRegNo, id, contactType, templateVersion, accountTypeId)
 
-      case ContactType.ApplicationApproval => handleEndDateWithRefMessage(amlsRegNo, id, contactType, templateVersion)
+      case ContactType.ApplicationApproval => handleEndDateWithRefMessage(amlsRegNo, id, contactType, templateVersion, accountTypeId)
 
       case ContactType.RenewalApproval |
            ContactType.AutoExpiryOfRegistration |
-           ContactType.RenewalReminder => handleEndDateMessage(amlsRegNo, id, contactType, templateVersion)
+           ContactType.RenewalReminder => handleEndDateMessage(amlsRegNo, id, contactType, templateVersion, accountTypeId)
 
       case _ => (for {
-        details <- OptionT(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id))
+        details <- OptionT(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id, accountTypeId))
         messageText <- OptionT.fromOption[Future](details.messageText match {
           case t@Some(_) => t
           case _ => Some("<![CDATA[<P>No content</P>]]>")
@@ -66,13 +66,13 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
     }
   }
 
-  private def handleStaticMessage(amlsRegNo: String, id: String, contactType: ContactType, templateVersion: String)
-                                 (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
+  private def handleStaticMessage(amlsRegNo: String, id: String, contactType: ContactType, templateVersion: String, accountTypeId: (String, String))
+                                 (implicit hc: HeaderCarrier): Future[Option[NotificationDetails]] = {
 
     val staticMessage = Class.forName(s"services.notifications.${ templateVersion }.MessageDetails")
       .newInstance().asInstanceOf[{ def static(contactType: ContactType, url: String): String }]
 
-    amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id) map {
+    amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id, accountTypeId) map {
       case Some(notificationDetails) => {
         Some(NotificationDetails(
           Some(contactType),
@@ -87,13 +87,13 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
 
   }
 
-  private def handleReminderMessage(amlsRegNo: String, id: String, contactType: ContactType, templateVersion: String)
-                                   (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
+  private def handleReminderMessage(amlsRegNo: String, id: String, contactType: ContactType, templateVersion: String, accountTypeId: (String, String))
+                                   (implicit hc: HeaderCarrier): Future[Option[NotificationDetails]] = {
 
     val reminderMessage = Class.forName(s"services.notifications.${ templateVersion }.MessageDetails")
       .newInstance().asInstanceOf[{ def reminder(contactType: ContactType, paymentAmount: String, referenceNumber: String): String }]
 
-    amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id) map {
+    amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id, accountTypeId) map {
       case Some(notificationDetails) => {
         for {
           message <- notificationDetails.messageText
@@ -110,13 +110,13 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
     }
   }
 
-  private def handleEndDateMessage(amlsRegNo: String, id: String, contactType: ContactType, templateVersion: String)
-                                  (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
+  private def handleEndDateMessage(amlsRegNo: String, id: String, contactType: ContactType, templateVersion: String, accountTypeId: (String, String))
+                                  (implicit hc: HeaderCarrier): Future[Option[NotificationDetails]] = {
 
     val endDateMessage = Class.forName(s"services.notifications.${ templateVersion }.MessageDetails")
       .newInstance().asInstanceOf[{ def endDate(contactType: ContactType, endDate: String, url: String, referenceNumber: String): String }]
 
-    amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id) map {
+    amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id, accountTypeId) map {
       case Some(notificationDetails) => {
         for {
           message <- notificationDetails.messageText
@@ -134,13 +134,13 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
     }
   }
 
-  private def handleEndDateWithRefMessage(amlsRegNo: String, id: String, contactType: ContactType, templateVersion: String)
-                                         (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
+  private def handleEndDateWithRefMessage(amlsRegNo: String, id: String, contactType: ContactType, templateVersion: String, accountTypeId: (String, String))
+                                         (implicit hc: HeaderCarrier): Future[Option[NotificationDetails]] = {
 
     val endDateMessage = Class.forName(s"services.notifications.${ templateVersion }.MessageDetails")
       .newInstance().asInstanceOf[{ def endDate(contactType: ContactType, endDate: String, url: String, referenceNumber: String): String }]
 
-    amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id) map {
+    amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id, accountTypeId) map {
       case Some(notificationDetails) => {
         for {
           message <- notificationDetails.messageText

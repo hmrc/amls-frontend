@@ -17,6 +17,7 @@
 package controllers.businessmatching
 
 import connectors.{DataCacheConnector, KeystoreConnector}
+import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businessmatching.{BusinessMatching, BusinessType}
 import org.mockito.Mockito._
@@ -29,7 +30,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -44,7 +45,7 @@ class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with Scal
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
-      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .build()
 
     val controller = app.injector.instanceOf[ConfirmPostCodeController]
@@ -73,12 +74,12 @@ class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with Scal
       val postRequest = request.withFormUrlEncodedBody {
         "postCode" -> "BB1 1BB"
       }
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(businessMatching)))
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(businessMatching)))
 
       val updatedModel = businessMatching.copy(reviewDetails = Some(reviewDtls.copy(businessAddress = businessAddress.copy(postcode = Some("BB1 1BB")))))
-      when(controller.dataCacheConnector.save[BusinessMatching](any(), meq(updatedModel))
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[BusinessMatching](any(), any(), meq(updatedModel))
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(postRequest)
       status(result) must be(SEE_OTHER)
@@ -89,12 +90,12 @@ class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with Scal
       val postRequest = request.withFormUrlEncodedBody {
         "postCode" -> "BB1 1BB"
       }
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(businessMatching.copy(reviewDetails = None))))
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(businessMatching.copy(reviewDetails = None))))
 
       val updatedModel = businessMatching.copy(reviewDetails = None)
-      when(controller.dataCacheConnector.save[BusinessMatching](any(), meq(updatedModel))
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[BusinessMatching](any(), any(), meq(updatedModel))
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(postRequest)
       status(result) must be(SEE_OTHER)

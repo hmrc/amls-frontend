@@ -16,12 +16,15 @@
 
 package connectors
 
-import uk.gov.hmrc.domain.{CtUtr, SaUtr, Org}
+import uk.gov.hmrc.domain.{CtUtr, Org, SaUtr}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.domain.{CtAccount, SaAccount, OrgAccount}
+import uk.gov.hmrc.play.frontend.auth.connectors.domain.{CtAccount, OrgAccount, SaAccount}
 
 object ConnectorHelper {
 
+
+  //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes.
+  @deprecated
   protected[connectors] def accountTypeAndId(implicit ac: AuthContext): (String, String) = {
     val accounts = ac.principal.accounts
 

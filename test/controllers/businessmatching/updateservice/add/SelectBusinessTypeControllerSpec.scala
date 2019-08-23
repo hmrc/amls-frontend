@@ -18,6 +18,7 @@ package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
+import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.ResponsiblePersonGenerator
 import models.businessmatching._
@@ -29,14 +30,14 @@ import org.mockito.Mockito.when
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class SelectBusinessTypeControllerSpec extends AmlsSpec {
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocks with ResponsiblePersonGenerator {
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth with ResponsiblePersonGenerator {
     self =>
 
     val request = addToken(authRequest)
@@ -44,20 +45,20 @@ class SelectBusinessTypeControllerSpec extends AmlsSpec {
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
     val controller = new SelectBusinessTypeController(
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       dataCacheConnector = mockCacheConnector,
       businessMatchingService = mockBusinessMatchingService,
       router = createRouter[AddBusinessTypeFlowModel]
     )
 
     when {
-      controller.businessMatchingService.getModel(any(), any(), any())
+      controller.businessMatchingService.getModel(any())(any(), any())
     } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
       activities = Some(BusinessActivities(Set(BillPaymentServices)))
     ))
 
     when {
-      controller.businessMatchingService.getSubmittedBusinessActivities(any(), any(), any())
+      controller.businessMatchingService.getSubmittedBusinessActivities(any())(any(), any())
     } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(BillPaymentServices))
 
     mockCacheFetch[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel(Some(BillPaymentServices), Some(true))), Some(AddBusinessTypeFlowModel.key))

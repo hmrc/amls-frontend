@@ -18,7 +18,7 @@ package controllers.declaration
 
 import config.AppConfig
 import connectors.{AmlsConnector, DataCacheConnector}
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.declaration.BusinessNominatedOfficer
@@ -29,7 +29,7 @@ import play.api.mvc.{AnyContent, Request, Result}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.declaration.select_business_nominated_officer
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -38,10 +38,10 @@ import scala.concurrent.Future
 class WhoIsTheBusinessNominatedOfficerController @Inject ()(
                                                              val amlsConnector: AmlsConnector,
                                                              val dataCacheConnector: DataCacheConnector,
-                                                             val authConnector: AuthConnector,
+                                                             authAction: AuthAction,
                                                              val statusService: StatusService,
-                                                             config: AppConfig) extends BaseController {
-
+                                                             config: AppConfig) extends DefaultBaseController {
+@deprecated("To be removed when new auth is implemented")
   def businessNominatedOfficerView(status: Status, form: Form2[BusinessNominatedOfficer], rp: Seq[ResponsiblePerson])
                                   (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] =
     statusService.getStatus map {
@@ -51,16 +51,29 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
       case _ => throw new Exception("Incorrect status - Page not permitted for this status")
     }
 
-  def get = Authorised.async {
-    implicit authContext =>
+  def businessNominatedOfficerView(amlsRegistrationNo: Option[String],
+                                   accountTypeId: (String, String),
+                                   cacheId: String,
+                                   status: Status,
+                                   form: Form2[BusinessNominatedOfficer],
+                                   rp: Seq[ResponsiblePerson])
+                                  (implicit request: Request[AnyContent]): Future[Result] =
+    statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) map {
+      case SubmissionReady => status(select_business_nominated_officer("submit.registration", form, rp))
+      case SubmissionReadyForReview | SubmissionDecisionApproved => status(select_business_nominated_officer("submit.amendment.application", form, rp))
+      case ReadyForRenewal(_) |  RenewalSubmitted (_) => status(select_business_nominated_officer("submit.renewal.application", form, rp))
+      case _ => throw new Exception("Incorrect status - Page not permitted for this status")
+    }
+
+  def get = authAction.async {
       implicit request =>
-        dataCacheConnector.fetchAll flatMap {
+        dataCacheConnector.fetchAll(request.credId) flatMap {
           optionalCache =>
             (for {
               cache <- optionalCache
               responsiblePeople <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
-            } yield businessNominatedOfficerView(Ok, EmptyForm, ResponsiblePerson.filter(responsiblePeople))
-              ) getOrElse businessNominatedOfficerView(Ok, EmptyForm, Seq.empty)
+            } yield businessNominatedOfficerView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, EmptyForm, ResponsiblePerson.filter(responsiblePeople))
+              ) getOrElse businessNominatedOfficerView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, EmptyForm, Seq.empty)
         }
   }
 
@@ -83,16 +96,16 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
     }
   }
 
-  def post = Authorised.async {
-    implicit authContext => implicit request =>
-      validateRequest(Form2[BusinessNominatedOfficer](request.body)){ data =>
+  def post = authAction.async {
+    implicit request =>
+      validateRequest(request.amlsRefNumber, request.accountTypeId, request.credId, Form2[BusinessNominatedOfficer](request.body)){ data =>
           data.value match {
             case "-1" => Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, Some(flowFromDeclaration))))
             case _ => for {
-              serviceStatus <- statusService.getStatus
-              responsiblePeople <- dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key)
+              serviceStatus <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+              responsiblePeople <- dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key)
               rp <- updateNominatedOfficer(responsiblePeople, data)
-              _ <- dataCacheConnector.save(ResponsiblePerson.key, rp)
+              _ <- dataCacheConnector.save(request.credId, ResponsiblePerson.key, rp)
             } yield {
               Redirect(routes.WhoIsRegisteringController.get())
             }
@@ -100,6 +113,7 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
       }
   }
 
+@deprecated("Remove once new auth upgrade is implemented")
   def validateRequest(form: Form2[BusinessNominatedOfficer])
                      (fn: BusinessNominatedOfficer => Future[Result])
                      (implicit ac: AuthContext, hc: HeaderCarrier, request: Request[AnyContent]): Future[Result] = {
@@ -107,6 +121,21 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
       case f: InvalidForm => dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key) flatMap {
         case Some(data) => businessNominatedOfficerView(BadRequest, f, ResponsiblePerson.filter(data))
         case None => businessNominatedOfficerView(BadRequest, f, Seq.empty)
+      }
+      case ValidForm(_, data) => fn(data)
+    }
+  }
+
+  def validateRequest(amlsRegistrationNo: Option[String],
+                      accountTypeId: (String, String),
+                      cacheId: String,
+                      form: Form2[BusinessNominatedOfficer])
+                     (fn: BusinessNominatedOfficer => Future[Result])
+                     (implicit hc: HeaderCarrier, request: Request[AnyContent]): Future[Result] = {
+    form match {
+      case f: InvalidForm => dataCacheConnector.fetch[Seq[ResponsiblePerson]](cacheId, ResponsiblePerson.key) flatMap {
+        case Some(data) => businessNominatedOfficerView(amlsRegistrationNo, accountTypeId, cacheId, BadRequest, f, ResponsiblePerson.filter(data))
+        case None => businessNominatedOfficerView(amlsRegistrationNo, accountTypeId, cacheId, BadRequest, f, Seq.empty)
       }
       case ValidForm(_, data) => fn(data)
     }

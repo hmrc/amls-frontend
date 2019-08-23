@@ -17,14 +17,14 @@
 package controllers.changeofficer
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople._
+import org.mockito.Matchers._
+import org.mockito.Mockito._
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, AmlsSpec}
-import org.mockito.Matchers._
-import org.mockito.Mockito._
+import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -36,7 +36,7 @@ class StillEmployedControllerSpec extends AmlsSpec {
     val cache = mock[DataCacheConnector]
 
     val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[DataCacheConnector].to(self.cache))
       .build()
 
@@ -52,7 +52,7 @@ class StillEmployedControllerSpec extends AmlsSpec {
       positions = Some(Positions(Set(Director),None))
     )
 
-    when(cache.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+    when(cache.fetch[Seq[ResponsiblePerson]](any(),any())( any(), any()))
       .thenReturn(Future.successful(Some(Seq(nominatedOfficer, otherResponsiblePerson))))
   }
 
@@ -70,14 +70,13 @@ class StillEmployedControllerSpec extends AmlsSpec {
       "redirect to NewOfficerController" when {
         "no nominated officer is found" in new TestFixture {
 
-          when(cache.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          when(cache.fetch[Seq[ResponsiblePerson]](any(),any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(otherResponsiblePerson))))
 
           val result = controller.get()(request)
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result) must be(Some(routes.NewOfficerController.get().url))
-
         }
       }
     }

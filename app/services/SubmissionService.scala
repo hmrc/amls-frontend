@@ -22,11 +22,11 @@ import connectors.{AmlsConnector, DataCacheConnector}
 import exceptions.{DuplicateSubscriptionException, NoEnrolmentException}
 import javax.inject.Inject
 import models._
-import models.businessdetails.{BusinessDetails, RegisteredOfficeUK}
 import models.asp.Asp
 import models.bankdetails.{BankDetails, NoBankAccountUsed}
 import models.businessactivities.BusinessActivities
-import models.businessmatching.{BusinessMatching, BusinessActivities => BusinessSevices, MoneyServiceBusiness => MSB}
+import models.businessdetails.{BusinessDetails, RegisteredOfficeUK}
+import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
@@ -43,24 +43,21 @@ import play.api.http.Status.UNPROCESSABLE_ENTITY
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.http.{HeaderCarrier, Upstream4xxResponse}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.StatusConstants
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SubmissionService @Inject()
-(
-  val cacheConnector: DataCacheConnector,
-  val ggService: GovernmentGatewayService,
-  val authEnrolmentsService: AuthEnrolmentsService,
-  val amlsConnector: AmlsConnector,
-  config: AppConfig
-) extends DataCacheService {
+class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
+                                  val ggService: GovernmentGatewayService,
+                                  val authEnrolmentsService: AuthEnrolmentsService,
+                                  val amlsConnector: AmlsConnector,
+                                  config: AppConfig) extends DataCacheService {
 
-  private def enrol(safeId: String, amlsRegistrationNumber: String, postcode: String)
-                   (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[_] =
+  private def enrol(safeId: String, amlsRegistrationNumber: String, postcode: String, groupId: Option[String], credId: String)
+                   (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[_] =
+
     if (config.enrolmentStoreToggle) {
-      authEnrolmentsService.enrol(amlsRegistrationNumber, postcode)
+      authEnrolmentsService.enrol(amlsRegistrationNumber, postcode, groupId, credId)
     } else {
       ggService.enrol(amlsRegistrationNumber, safeId, postcode)
     }
@@ -75,35 +72,26 @@ class SubmissionService @Inject()
     case _ => None
   }
 
-  def subscribe
-  (implicit
-   ec: ExecutionContext,
-   hc: HeaderCarrier,
-   ac: AuthContext
-  ): Future[SubscriptionResponse] = {
+  def subscribe(credId: String, accountTypeId: (String, String), groupId: Option[String])
+               (implicit ec: ExecutionContext, hc: HeaderCarrier): Future[SubscriptionResponse] = {
     (for {
-      cache <- getCache
+      cache <- getCache(credId)
       safeId <- safeId(cache)
       request <- Future.successful(createSubscriptionRequest(cache))
-      subscription <- amlsConnector.subscribe(request, safeId)
-      _ <- saveResponse(subscription, SubscriptionResponse.key)
+      subscription <- amlsConnector.subscribe(request, safeId, accountTypeId)
+      _ <- saveResponse(credId, subscription, SubscriptionResponse.key)
       _ <- enrol(safeId, subscription.amlsRefNo, request.businessDetailsSection.fold("")(_.registeredOffice match {
         case Some(o: RegisteredOfficeUK) => o.postCode
         case _ => ""
-      }))
+      }), groupId, credId)
     } yield subscription) recoverWith {
       case e: Upstream4xxResponse if e.upstreamResponseCode == UNPROCESSABLE_ENTITY =>
         Future.failed(SubscriptionErrorResponse.from(e).fold[Throwable](e)(r => DuplicateSubscriptionException(r.message)))
     }
   }
 
-  private def createSubscriptionRequest
-  (cache: CacheMap)
-  (implicit
-   ac: AuthContext,
-   hc: HeaderCarrier,
-   ec: ExecutionContext
-  ): SubscriptionRequest = {
+  private def createSubscriptionRequest(cache: CacheMap)
+                                              (implicit hc: HeaderCarrier, ec: ExecutionContext): SubscriptionRequest = {
 
     def filteredResponsiblePeople = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key).map(_.filterEmpty)
 
@@ -126,70 +114,63 @@ class SubmissionService @Inject()
     )
   }
 
-  def update
-  (implicit
-   ec: ExecutionContext,
-   hc: HeaderCarrier,
-   ac: AuthContext
-  ): Future[AmendVariationRenewalResponse] = {
+  def update(credId: String, amlsRegistrationNumber: Option[String], accountTypeId: (String, String))
+            (implicit ec: ExecutionContext, hc: HeaderCarrier): Future[AmendVariationRenewalResponse] = {
+
     for {
-      cache <- getCache
-      regNo <- authEnrolmentsService.amlsRegistrationNumber
+      cache <- getCache(credId)
       amendment <- amlsConnector.update(
         createSubscriptionRequest(cache),
-        regNo.getOrElse(throw NoEnrolmentException("[SubmissionService][update] - No enrolment"))
-      )
-      _ <- saveResponse(amendment, AmendVariationRenewalResponse.key)
+        amlsRegistrationNumber.getOrElse(throw NoEnrolmentException("[SubmissionService][update] - No enrolment")), accountTypeId)
+      _ <- saveResponse(credId, amendment, AmendVariationRenewalResponse.key)
     } yield amendment
   }
 
-  def variation
-  (implicit
-   ec: ExecutionContext,
-   hc: HeaderCarrier,
-   ac: AuthContext
-  ): Future[AmendVariationRenewalResponse] = {
+  def variation(credId: String, amlsRegistrationNumber: Option[String], accountTypeId: (String, String))
+               (implicit ec: ExecutionContext, hc: HeaderCarrier): Future[AmendVariationRenewalResponse] = {
+
     for {
-      cache <- getCache
-      regNo <- authEnrolmentsService.amlsRegistrationNumber
+      cache <- getCache(credId)
       amendment <- amlsConnector.variation(
         createSubscriptionRequest(cache),
-        regNo.getOrElse(throw NoEnrolmentException("[SubmissionService][variation] - No enrolment"))
-      )
-      _ <- saveResponse(amendment, AmendVariationRenewalResponse.key)
+        amlsRegistrationNumber.getOrElse(throw NoEnrolmentException("[SubmissionService][variation] - No enrolment")), accountTypeId)
+      _ <- saveResponse(credId, amendment, AmendVariationRenewalResponse.key)
 
     } yield amendment
   }
 
-  def renewal(renewal: Renewal)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[SubmissionResponse] = {
+  def renewal(credId: String, amlsRegistrationNumber: Option[String], accountTypeId: (String, String), renewal: Renewal)
+             (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[SubmissionResponse] = {
+
     for {
-      cache <- getCache
-      regNo <- authEnrolmentsService.amlsRegistrationNumber
+      cache <- getCache(credId)
       response <- amlsConnector.renewal(
         createSubscriptionRequest(cache).withRenewalData(renewal),
-        regNo.getOrElse(throw NoEnrolmentException("[SubmissionService][renewal] - No enrolment"))
-      )
-      _ <- saveResponse(response, AmendVariationRenewalResponse.key)
+        amlsRegistrationNumber.getOrElse(throw NoEnrolmentException("[SubmissionService][renewal] - No enrolment")), accountTypeId)
+      _ <- saveResponse(credId, response, AmendVariationRenewalResponse.key)
     } yield response
   }
 
-  def renewalAmendment(renewal: Renewal)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[SubmissionResponse] = {
+  def renewalAmendment(credId: String, amlsRegistrationNumber: Option[String], accountTypeId: (String, String), renewal: Renewal)
+                      (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[SubmissionResponse] = {
+
     for {
-      cache <- getCache
-      regNo <- authEnrolmentsService.amlsRegistrationNumber
+      cache <- getCache(credId)
       response <- amlsConnector.renewalAmendment(
         createSubscriptionRequest(cache).withRenewalData(renewal),
-        regNo.getOrElse(throw NoEnrolmentException("[SubmissionService][renewalAmendment] - No enrolment"))
-      )
-      _ <- saveResponse(response, AmendVariationRenewalResponse.key, isRenewalAmendment = true)
+        amlsRegistrationNumber.getOrElse(throw NoEnrolmentException("[SubmissionService][renewalAmendment] - No enrolment")), accountTypeId)
+      _ <- saveResponse(credId, response, AmendVariationRenewalResponse.key, isRenewalAmendment = true)
     } yield response
   }
 
-  private def saveResponse[T](response: T, key: String, isRenewalAmendment: Boolean = false)
-                             (implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext, fmt: Format[T]) = for {
-    _ <- cacheConnector.save[T](key, response)
-    c <- cacheConnector.save[SubmissionRequestStatus](SubmissionRequestStatus.key, SubmissionRequestStatus(true, Some(isRenewalAmendment)))
-  } yield c
+  private def saveResponse[T](credId: String, response: T, key: String, isRenewalAmendment: Boolean = false)
+                                    (implicit hc: HeaderCarrier, ex: ExecutionContext, fmt: Format[T]) = {
+
+      for {
+      _ <- cacheConnector.save[T](credId, key, response)
+      c <- cacheConnector.save[SubmissionRequestStatus](credId, SubmissionRequestStatus.key, SubmissionRequestStatus(true, Some(isRenewalAmendment)))
+    } yield c
+  }
 
   private def safeId(cache: CacheMap): Future[String] = {
     (for {

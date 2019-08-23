@@ -16,20 +16,19 @@
 
 package controllers.renewal
 
+import controllers.DefaultBaseController
 import javax.inject.{Inject, Singleton}
-
-import controllers.BaseController
 import models.registrationprogress.{NotStarted, Section, Started}
 import services.RenewalService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.renewal._
 
 @Singleton
-class WhatYouNeedController @Inject()(val authConnector: AuthConnector, renewalService: RenewalService) extends BaseController {
+class WhatYouNeedController @Inject()(val authAction: AuthAction, renewalService: RenewalService) extends DefaultBaseController {
 
-  def get = Authorised.async {
-    implicit authContext => implicit request =>
-      renewalService.getSection map {
+  def get = authAction.async {
+    implicit request =>
+      renewalService.getSection(request.credId) map {
         case Section(_,NotStarted | Started,_,_) => Ok(what_you_need())
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }

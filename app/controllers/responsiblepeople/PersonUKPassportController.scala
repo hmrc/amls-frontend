@@ -21,12 +21,11 @@ import cats.data.OptionT
 import cats.implicits._
 import config.AppConfig
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{ResponsiblePerson, UKPassport, UKPassportNo, UKPassportYes}
 import play.api.i18n.MessagesApi
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.person_uk_passport
 
 import scala.concurrent.Future
@@ -34,15 +33,14 @@ import scala.concurrent.Future
 class PersonUKPassportController @Inject()(
                                             override val messagesApi: MessagesApi,
                                             val dataCacheConnector: DataCacheConnector,
-                                            val authConnector: AuthConnector,
+                                            authAction: AuthAction,
                                             val appConfig: AppConfig
-                                          ) extends RepeatingSection with BaseController {
+                                          ) extends RepeatingSection with DefaultBaseController {
 
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext =>
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>
-        getData[ResponsiblePerson](index) map {
+        getData[ResponsiblePerson](request.credId, index) map {
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,Some(ukPassport),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
             Ok(person_uk_passport(Form2[UKPassport](ukPassport), edit, index, flow, personName.titleName))
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
@@ -51,16 +49,15 @@ class PersonUKPassportController @Inject()(
         }
   }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext =>
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>
         Form2[UKPassport](request.body) match {
-          case f: InvalidForm => getData[ResponsiblePerson](index) map { rp =>
+          case f: InvalidForm => getData[ResponsiblePerson](request.credId, index) map { rp =>
             BadRequest(person_uk_passport(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
           }
           case ValidForm(_, data) => {
             (for {
-              cache <- OptionT(fetchAllAndUpdateStrict[ResponsiblePerson](index) { (_, rp) =>
+              cache <- OptionT(fetchAllAndUpdateStrict[ResponsiblePerson](request.credId, index) { (_, rp) =>
                 data match {
                   case UKPassportYes(_) => rp.ukPassport(data).copy(nonUKPassport = None)
                   case _ => rp.ukPassport(data)

@@ -16,6 +16,7 @@
 
 package controllers.payments
 
+import controllers.actions.SuccessfulAuthAction
 import generators.PaymentGenerator
 import models.FeeResponse
 import models.ResponseType.SubscriptionResponseType
@@ -45,7 +46,7 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
     implicit val ec: ExecutionContext = mock[ExecutionContext]
 
     val controller = new TypeOfBankController(
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       auditConnector = mock[AuditConnector],
       authEnrolmentsService = mock[AuthEnrolmentsService],
       feeResponseService = mock[FeeResponseService],
@@ -55,11 +56,11 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
     val paymentRef = paymentRefGen.sample.get
 
     when {
-      controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any())
+      controller.authEnrolmentsService.amlsRegistrationNumber(any(), any())(any(),any())
     } thenReturn Future.successful(Some(amlsRegistrationNumber))
 
     when {
-      controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber))(any(),any(),any())
+      controller.feeResponseService.getFeeResponse(any(), any())(any(),any())
     } thenReturn Future.successful(Some(FeeResponse(
       SubscriptionResponseType,
       amlsRegistrationNumber,

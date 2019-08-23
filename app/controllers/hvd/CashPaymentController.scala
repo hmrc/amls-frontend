@@ -17,24 +17,24 @@
 package controllers.hvd
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.hvd._
 import play.api.mvc.Call
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.hvd.cash_payment
 
 import scala.concurrent.Future
 
 class CashPaymentController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                       val authConnector: AuthConnector
-                                        ) extends BaseController {
+                                       val authAction: AuthAction
+                                        ) extends DefaultBaseController {
 
   def get(edit: Boolean = false) =
-    Authorised.async {
-      implicit authContext => implicit request =>
-        dataCacheConnector.fetch[Hvd](Hvd.key) map {
+    authAction.async {
+      implicit request =>
+        dataCacheConnector.fetch[Hvd](request.credId, Hvd.key) map {
           response =>
             val form: Form2[CashPaymentOverTenThousandEuros] = (for {
               hvd <- response
@@ -46,18 +46,18 @@ class CashPaymentController @Inject() (val dataCacheConnector: DataCacheConnecto
 
 
   def post(edit: Boolean = false) =
-    Authorised.async {
-      implicit authContext => implicit request => {
+    authAction.async {
+      implicit request => {
         Form2[CashPaymentOverTenThousandEuros](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(cash_payment(f, edit)))
           case ValidForm(_, data) =>
             for {
-              hvd <- dataCacheConnector.fetch[Hvd](Hvd.key)
-              _ <- dataCacheConnector.save[Hvd](Hvd.key, hvd.cashPayment(
+              hvd <- dataCacheConnector.fetch[Hvd](request.credId, Hvd.key)
+              _ <- dataCacheConnector.save[Hvd](request.credId, Hvd.key, hvd.cashPayment(
                   hvd.cashPayment match {
                     case Some(cp) => CashPayment.update(cp, data)
-                    case None =>  CashPayment(data, None)
+                    case None     =>  CashPayment(data, None)
                   }
               ))
             } yield Redirect(getNextPage(edit, data))
@@ -67,9 +67,9 @@ class CashPaymentController @Inject() (val dataCacheConnector: DataCacheConnecto
 
   private def getNextPage(edit:Boolean, data: CashPaymentOverTenThousandEuros): Call = {
     (edit, data) match {
-      case (true, CashPaymentOverTenThousandEuros(false)) => routes.SummaryController.get()
+      case (true, CashPaymentOverTenThousandEuros(false))  => routes.SummaryController.get()
       case (false, CashPaymentOverTenThousandEuros(false)) => routes.LinkedCashPaymentsController.get()
-      case (_, CashPaymentOverTenThousandEuros(true)) => routes.CashPaymentFirstDateController.get(edit)
+      case (_, CashPaymentOverTenThousandEuros(true))      => routes.CashPaymentFirstDateController.get(edit)
     }
   }
 }

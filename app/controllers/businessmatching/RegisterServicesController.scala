@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import config.AppConfig
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessactivities.BusinessActivities
@@ -31,26 +31,23 @@ import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
+import utils.{AuthAction, RepeatingSection}
 import views.html.businessmatching._
 
 import scala.concurrent.Future
 
 @Singleton
-class RegisterServicesController @Inject()(val authConnector: AuthConnector,
+class RegisterServicesController @Inject()(authAction: AuthAction,
                                            val statusService: StatusService,
                                            val dataCacheConnector: DataCacheConnector,
                                            val businessMatchingService: BusinessMatchingService,
-                                           val appConfig:AppConfig)() extends BaseController with RepeatingSection {
+                                           val appConfig:AppConfig)() extends DefaultBaseController with RepeatingSection {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        statusService.isPreSubmission flatMap { isPreSubmission =>
+        statusService.isPreSubmission(request.amlsRefNumber, request.accountTypeId, request.credId) flatMap { isPreSubmission =>
           (for {
-            businessMatching <- businessMatchingService.getModel
+            businessMatching <- businessMatchingService.getModel(request.credId)
             businessActivities <- OptionT.fromOption[Future](businessMatching.activities)
           } yield {
             val form = Form2[BusinessMatchingActivities](businessActivities)
@@ -64,15 +61,14 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
         }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request =>
         import jto.validation.forms.Rules._
         Form2[BusinessMatchingActivities](request.body) match {
           case invalidForm: InvalidForm =>
-            statusService.isPreSubmission flatMap { isPreSubmission =>
+            statusService.isPreSubmission(request.amlsRefNumber, request.accountTypeId, request.credId) flatMap { isPreSubmission =>
               (for {
-                bm <- businessMatchingService.getModel
+                bm <- businessMatchingService.getModel(request.credId)
                 businessActivities <- OptionT.fromOption[Future](bm.activities)
               } yield {
                 businessActivities.businessActivities
@@ -94,8 +90,8 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
               }
             }
           case ValidForm(_, data) =>
-            businessActivities(data) flatMap { ba =>
-              getData[ResponsiblePerson] flatMap { responsiblePeople =>
+            businessActivities(request.amlsRefNumber, request.accountTypeId, request.credId, data) flatMap { ba =>
+              getData[ResponsiblePerson](request.credId) flatMap { responsiblePeople =>
 
                 val workFlow =
                   shouldPromptForApproval.tupled andThen
@@ -106,7 +102,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
 
                 val rps = responsiblePeople.map(rp => workFlow((rp, activities, isRemovingActivity)))
 
-                updateResponsiblePeople(rps) map { _ =>
+                updateResponsiblePeople(request.credId, rps) map { _ =>
                   redirectTo(data.businessActivities)
                 }
               }
@@ -114,21 +110,23 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
         }
   }
 
-  private def businessActivities(data: BusinessMatchingActivities)
-                        (implicit ac: AuthContext, hc: HeaderCarrier) = {
+  private def businessActivities(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String, data: BusinessMatchingActivities)
+                        (implicit hc: HeaderCarrier) = {
 
     lazy val empty = BusinessMatchingActivities(Set())
 
     for {
-      isPreSubmission <- statusService.isPreSubmission
-      businessMatching <- businessMatchingService.getModel.value
+      isPreSubmission <- statusService.isPreSubmission(amlsRegistrationNo, accountTypeId, credId)
+      businessMatching <- businessMatchingService.getModel(credId).value
       businessActivitiesModel <- updateModel(
+        credId,
         businessMatching,
         newModel(businessMatching.activities, data, isPreSubmission),
         isMsb(data, businessMatching.activities)
       )
-      _ <- maybeRemoveAccountantForAMLSRegulations(businessActivitiesModel)
+      _ <- maybeRemoveAccountantForAMLSRegulations(credId, businessActivitiesModel)
       _ <- clearRemovedSections(
+        credId,
         businessMatching.activities.getOrElse(empty).businessActivities,
         businessActivitiesModel.businessActivities
       )
@@ -144,48 +142,51 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
       .taxMatters(None)
       .copy(hasAccepted = true)
 
-  private def clearRemovedSections(previousBusinessActivities: Set[BusinessActivity],
+  private def clearRemovedSections(credId: String,
+                                   previousBusinessActivities: Set[BusinessActivity],
                                    currentBusinessActivities: Set[BusinessActivity]
-                                  )(implicit ac: AuthContext, hc: HeaderCarrier) = {
+                                  )(implicit hc: HeaderCarrier) = {
     for {
-      _ <- clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, AccountancyServices)
-      _ <- clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, EstateAgentBusinessService)
-      _ <- clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, HighValueDealing)
-      _ <- clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, MoneyServiceBusiness)
-      _ <- clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, TrustAndCompanyServices)
-      _ <- clearSupervisionIfNoLongerRequired(previousBusinessActivities, currentBusinessActivities)
+      _ <- clearSectionIfRemoved(credId, previousBusinessActivities, currentBusinessActivities, AccountancyServices)
+      _ <- clearSectionIfRemoved(credId, previousBusinessActivities, currentBusinessActivities, EstateAgentBusinessService)
+      _ <- clearSectionIfRemoved(credId, previousBusinessActivities, currentBusinessActivities, HighValueDealing)
+      _ <- clearSectionIfRemoved(credId, previousBusinessActivities, currentBusinessActivities, MoneyServiceBusiness)
+      _ <- clearSectionIfRemoved(credId, previousBusinessActivities, currentBusinessActivities, TrustAndCompanyServices)
+      _ <- clearSupervisionIfNoLongerRequired(credId, previousBusinessActivities, currentBusinessActivities)
     } yield true
   }
 
-  private def clearSectionIfRemoved(previousBusinessActivities: Set[BusinessActivity],
+  private def clearSectionIfRemoved(credId: String,
+                                    previousBusinessActivities: Set[BusinessActivity],
                                     currentBusinessActivities: Set[BusinessActivity],
                                     businessActivity: BusinessActivity
-                                   )(implicit ac: AuthContext, hc: HeaderCarrier) = {
+                                   )(implicit hc: HeaderCarrier) = {
     if (previousBusinessActivities.contains(businessActivity) && !currentBusinessActivities.contains(businessActivity)) {
-      businessMatchingService.clearSection(businessActivity)
+      businessMatchingService.clearSection(credId: String, businessActivity)
     } else {
       Future.successful(CacheMap)
     }
   }
 
-  private def clearSupervisionIfNoLongerRequired(previousBusinessActivities: Set[BusinessActivity],
+  private def clearSupervisionIfNoLongerRequired(credId: String,
+                                                 previousBusinessActivities: Set[BusinessActivity],
                                                  currentBusinessActivities: Set[BusinessActivity]
-                                                )(implicit ac: AuthContext, hc: HeaderCarrier) = {
+                                                )(implicit hc: HeaderCarrier) = {
     if (hasASPorTCSP(previousBusinessActivities) && !hasASPorTCSP(currentBusinessActivities)) {
-      dataCacheConnector.save[Supervision](Supervision.key, Supervision())
+      dataCacheConnector.save[Supervision](credId, Supervision.key, Supervision())
     } else {
       Future.successful(CacheMap)
     }
   }
 
-  private def maybeRemoveAccountantForAMLSRegulations(bmActivities: BusinessMatchingActivities)
-                                                     (implicit ac: AuthContext, hc: HeaderCarrier) = {
+  private def maybeRemoveAccountantForAMLSRegulations(credId: String, bmActivities: BusinessMatchingActivities)
+                                                     (implicit hc: HeaderCarrier) = {
     for {
-      activities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
+      activities <- dataCacheConnector.fetch[BusinessActivities](credId, BusinessActivities.key)
       strippedActivities <- Future.successful(withoutAccountantForAMLSRegulations(activities))
     } yield {
       if (bmActivities.hasBusinessOrAdditionalActivity(AccountancyServices) && activities.isDefined) {
-        dataCacheConnector.save[BusinessActivities](BusinessActivities.key, strippedActivities)
+        dataCacheConnector.save[BusinessActivities](credId, BusinessActivities.key, strippedActivities)
       } else {
         Future.successful(activities)
       }
@@ -230,9 +231,10 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
     }
   }
 
-  private def updateModel(businessMatching: BusinessMatching,
+  private def updateModel(credId: String,
+                          businessMatching: BusinessMatching,
                           updatedBusinessActivities: BusinessMatchingActivities,
-                          isMsb: Boolean)(implicit ac: AuthContext, hc: HeaderCarrier): Future[BusinessMatchingActivities] = {
+                          isMsb: Boolean)(implicit hc: HeaderCarrier): Future[BusinessMatchingActivities] = {
 
     val updatedBusinessMatching = isMsb match {
       case true =>
@@ -241,7 +243,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
         businessMatching.activities(updatedBusinessActivities).copy(msbServices = None)
     }
 
-    businessMatchingService.updateModel(updatedBusinessMatching).value map { _ =>
+    businessMatchingService.updateModel(credId, updatedBusinessMatching).value map { _ =>
       updatedBusinessActivities
     }
 
@@ -270,8 +272,8 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
       case _ => rp
     }
 
-  private def updateResponsiblePeople(responsiblePeople: Seq[ResponsiblePerson])(implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
-    dataCacheConnector.save[Seq[ResponsiblePerson]](ResponsiblePerson.key, responsiblePeople)
+  private def updateResponsiblePeople(credId: String, responsiblePeople: Seq[ResponsiblePerson])(implicit hc: HeaderCarrier): Future[_] =
+    dataCacheConnector.save[Seq[ResponsiblePerson]](credId, ResponsiblePerson.key, responsiblePeople)
 
   val shouldPromptForFitAndProper: (ResponsiblePerson, BusinessMatchingActivities) => ResponsiblePerson =
     (rp, activities) => {
