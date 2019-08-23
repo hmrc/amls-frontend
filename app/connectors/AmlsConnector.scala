@@ -29,8 +29,6 @@ import uk.gov.hmrc.http._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-// $COVERAGE-OFF$
-// Coverage has been turned off for these types until we remove the deprecated methods
 class AmlsConnector @Inject()(val httpPost: WSHttp,
                               val httpGet: WSHttp,
                               val httpPut: WSHttp,
@@ -215,22 +213,22 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
                           (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[PaymentStatusResult] = {
 
     val (accountType, accountId) = accountTypeId
-
     val putUrl = s"$paymentUrl/$accountType/$accountId/refreshstatus"
-
     Logger.debug(s"[AmlsConnector][refreshPaymentStatus]: Request to $putUrl with $paymentReference")
-
     httpPut.PUT[RefreshPaymentStatusRequest, PaymentStatusResult](putUrl, RefreshPaymentStatusRequest(paymentReference))
   }
 
   def registrationDetails(accountTypeId: (String, String), safeId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[RegistrationDetails] = {
-
     val getUrl = s"$registrationUrl/${accountTypeId._1}/${accountTypeId._2}/details/$safeId"
-
     httpGet.GET[RegistrationDetails](getUrl)
   }
 
-  def createBacsPayment(request: CreateBacsPaymentRequest, accountTypeId: (String, String))(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Payment] = {
+  def updateBacsStatus(accountTypeId: (String, String), ref: String, request: UpdateBacsRequest)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[HttpResponse] = {
+    val putUrl = s"$paymentUrl/${accountTypeId._1}/${accountTypeId._2}/$ref/bacs"
+    httpPut.PUT[UpdateBacsRequest, HttpResponse](putUrl, request)
+  }
+
+  def createBacsPayment(accountTypeId: (String, String), request: CreateBacsPaymentRequest)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Payment] = {
     val postUrl = s"$paymentUrl/${accountTypeId._1}/${accountTypeId._2}/bacs"
     httpPost.POST[CreateBacsPaymentRequest, Payment](postUrl, request)
   }

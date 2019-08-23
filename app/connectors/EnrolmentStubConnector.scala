@@ -26,7 +26,7 @@ class EnrolmentStubConnector @Inject()(http: HttpGet, config: AppConfig) {
 
   lazy val baseUrl = config.enrolmentStubsUrl
 
-  def enrolmentsNewAuth(groupId: String)(implicit hc: HeaderCarrier, ex: ExecutionContext) = {
+  def enrolments(groupId: String)(implicit hc: HeaderCarrier, ex: ExecutionContext) = {
     val requestUrl = s"$baseUrl/auth/oid/$groupId/enrolments"
     http.GET[Seq[GovernmentGatewayEnrolment]](requestUrl)
   }

@@ -50,10 +50,6 @@ object BusinessName {
     })
   }
 
-  def getName(credId: String, accountTypeId:(String, String), safeId: Option[String])
-             (implicit hc: HeaderCarrier,  ec: ExecutionContext, cache: DataCacheConnector, amls: AmlsConnector) =
-    safeId.fold(getNameFromCache(credId))(v => getNameFromAmls(accountTypeId, v) orElse getNameFromCache(credId))
-
   def getName(credId: String, safeId: Option[String], accountTypeId: (String, String))
              (implicit hc: HeaderCarrier, ec: ExecutionContext, cache: DataCacheConnector, amls: AmlsConnector) =
     safeId.fold(getNameFromCache(credId))(v => getNameFromAmls(accountTypeId, v) orElse getNameFromCache(credId))

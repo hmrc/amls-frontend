@@ -17,15 +17,15 @@
 package services
 
 import config.AppConfig
-import connectors.{AuthConnector, EnrolmentStubConnector, TaxEnrolmentsConnector}
+import connectors.{EnrolmentStubConnector, TaxEnrolmentsConnector}
 import javax.inject.Inject
 import models.enrolment.{AmlsEnrolmentKey, TaxEnrolment}
 import play.api.Logger
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector,
-                                      val enrolmentStore: TaxEnrolmentsConnector,
+class AuthEnrolmentsService @Inject()(val enrolmentStore: TaxEnrolmentsConnector,
                                       val config: AppConfig,
                                       val stubConnector: EnrolmentStubConnector) {
 
@@ -40,7 +40,7 @@ class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector,
     Logger.debug(s"[$prefix][amlsRegistrationNumber] - config.enrolmentStubsEnabled: ${config.enrolmentStubsEnabled})")
 
     val stubbedEnrolments =  if (config.enrolmentStubsEnabled) {
-      stubConnector.enrolmentsNewAuth(groupIdentifier.getOrElse(throw new Exception("Group ID is unavailable")))
+      stubConnector.enrolments(groupIdentifier.getOrElse(throw new Exception("Group ID is unavailable")))
     } else {
       Logger.debug(s"[$prefix][amlsRegistrationNumber] - Returning empty sequence...)")
       Future.successful(Seq.empty)

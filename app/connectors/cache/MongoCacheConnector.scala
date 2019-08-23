@@ -16,7 +16,6 @@
 
 package connectors.cache
 
-import connectors.AuthConnector
 import javax.inject.Inject
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Format
@@ -25,7 +24,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import scala.concurrent.Future
 
-class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory, authConnector: AuthConnector) extends Conversions {
+class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory) extends Conversions {
 
   lazy val mongoCache: MongoCacheClient = cacheClientFactory.createClient
 
@@ -39,7 +38,7 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
     * Saves the data item in the mongo store with the specified key
     */
   def save[T](credId: String, key: String, data: T)(implicit hc: HeaderCarrier, format: Format[T]): Future[CacheMap] = {
-    mongoCache.createOrUpdate(credId, None, data, key).map(toCacheMap)
+    mongoCache.createOrUpdate(credId, data, key).map(toCacheMap)
   }
 
   /**
@@ -53,7 +52,7 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
     * Fetches the entire cache from the mongo store
     */
   private def fetchAllByCredId(credId: String)(implicit hc: HeaderCarrier): Future[Option[CacheMap]] = {
-    mongoCache.fetchAll(Some(credId), deprecatedFilter = false).map(_.map(toCacheMap))
+    mongoCache.fetchAll(Some(credId)).map(_.map(toCacheMap))
   }
 
   def fetchAll[T](credId: String)(implicit hc: HeaderCarrier): Future[Option[CacheMap]] = {
@@ -65,15 +64,15 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
     */
 
   def fetchAllWithDefault(credId: String)(implicit hc: HeaderCarrier): Future[CacheMap] = {
-    mongoCache.fetchAllWithDefault(credId, deprecatedFilter = false).map(toCacheMap)
+    mongoCache.fetchAllWithDefault(credId).map(toCacheMap)
   }
 
   def remove(cacheId: String)(implicit hc: HeaderCarrier): Future[Boolean] = {
-        mongoCache.removeById(cacheId, deprecatedFilter = false)
+        mongoCache.removeById(cacheId)
   }
 
   def removeByKey[T](credId: String, key: String)(implicit hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
-        mongoCache.removeByKey(credId, None, key).map(toCacheMap)
+        mongoCache.removeByKey(credId, key).map(toCacheMap)
 
 
   def saveAll(credId: String, cacheMap: Future[CacheMap])(implicit hc: HeaderCarrier): Future[CacheMap] = {
@@ -91,6 +90,6 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory,
   def update[T](credId: String, key: String)(f: Option[T] => T)(implicit hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
       mongoCache.find[T](credId, key) flatMap { maybeModel =>
         val transformed = f(maybeModel)
-        mongoCache.createOrUpdate(credId, None, transformed, key) map { _ => Some(transformed) }
+        mongoCache.createOrUpdate(credId, transformed, key) map { _ => Some(transformed) }
       }
 }
