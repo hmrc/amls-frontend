@@ -43,7 +43,7 @@
     }
 }
 
-@headingFunction = { @businessTypes.map { types =>
+@getServicesHeading = { @businessTypes.map { types =>
     @if(types.size > 1) {
         @Messages("responsiblepeople.experiencetraining.heading.multiple", personName)
     } else {
@@ -62,7 +62,7 @@
         @fieldsetWithErrorGroup(
             f = f("experienceTraining"),
             section = "summary.responsiblepeople",
-            heading = headingFunction.toString(),
+            heading = getServicesHeading.toString(),
             supportingContent = supportingContent,
             panel = false
         ) {

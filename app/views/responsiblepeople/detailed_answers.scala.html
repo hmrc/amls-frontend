@@ -71,7 +71,7 @@
     @heading("title.cya", "summary.responsiblepeople")
 }
 
-@headingFunction = { @businessTypes.map { types =>
+@getServicesHeading = { @businessTypes.map { types =>
     @if(types.size > 1) {
         @Messages("responsiblepeople.experiencetraining.heading.multiple", personName)
     } else {
@@ -385,7 +385,7 @@
         }
 
         @detailedAnswers(
-            question = headingFunction.toString(),
+            question = getServicesHeading.toString(),
             editUrl = controllers.responsiblepeople.routes.ExperienceTrainingController.get(idx, true, flow).toString(),
             dataItem = person.experienceTraining
         ) { ex =>
