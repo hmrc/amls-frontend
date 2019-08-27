@@ -21,6 +21,7 @@
 @import utils.DateHelper
 @import forms.EmptyForm
 @import config.ApplicationConfig
+@import models.businessmatching._
 
 @(model: Option[ResponsiblePerson],
     idx: Int,
@@ -28,8 +29,7 @@
     rpName: String = "",
     flow: Option[String] = None,
     showApprovalSection: Boolean = false,
-    businessTypes : Option[List[String]]
-)(implicit request: Request[_],m:Messages, lang: Lang)
+    businessMatching: BusinessMatching)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @detailedAnswers[T](
     question: String = "",
@@ -71,11 +71,11 @@
     @heading("title.cya", "summary.responsiblepeople")
 }
 
-@getServicesHeading = { @businessTypes.map { types =>
-    @if(types.size > 1) {
+@getServicesHeading = { @businessMatching.activities.map { types =>
+    @if(types.businessActivities.size > 1) {
         @Messages("responsiblepeople.experiencetraining.heading.multiple", personName)
     } else {
-        @Messages("responsiblepeople.experiencetraining.heading", personName, types.head)
+        @Messages("responsiblepeople.experiencetraining.heading", personName, businessMatching.prefixedAlphabeticalBusinessTypes(true).fold("")(names => names.head))
     }
 }
 }
@@ -389,7 +389,7 @@
             editUrl = controllers.responsiblepeople.routes.ExperienceTrainingController.get(idx, true, flow).toString(),
             dataItem = person.experienceTraining
         ) { ex =>
-            @businessTypes.map { types =>
+            @businessMatching.alphabeticalBusinessActivitiesLowerCase(false).map { types =>
                 @if(types.size > 1) {
                     <p>@Messages("responsiblepeople.experiencetraining.cya")</p>
 

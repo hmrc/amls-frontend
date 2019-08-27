@@ -17,6 +17,7 @@
 package views.responsiblepeople
 
 import controllers.responsiblepeople.NinoUtil
+import models.businessmatching.{AccountancyServices, BusinessActivities, BusinessMatching, MoneyServiceBusiness}
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ZeroToFiveMonths}
 import models.responsiblepeople._
 import models.{Country, DateOfChange}
@@ -40,6 +41,8 @@ class detailed_answersSpec extends AmlsSpec
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
+    val businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness))))
+
     val sectionChecks = Table[String, Element => Boolean](
       ("title key", "check"),
       (Messages("responsiblepeople.detailed_answers.uk_resident", personName.fullName), checkElementTextIncludes(_, nino)),
@@ -57,7 +60,7 @@ class detailed_answersSpec extends AmlsSpec
       (Messages("responsiblepeople.detailed_answers.soleproprietor_for_other_business"), checkElementTextIncludes(_, "Yes")),
       (Messages("responsiblepeople.detailed_answers.registered_for_vat"), checkElementTextIncludes(_, "No")),
       (Messages("responsiblepeople.detailed_answers.registered_for_sa"), checkElementTextIncludes(_, "Registered for Self Assessment")),
-      (Messages("responsiblepeople.experiencetraining.heading", "firstName middleName lastName", "Money service business"), checkElementTextIncludes(_, "experience")),
+      (Messages("responsiblepeople.experiencetraining.heading", "firstName middleName lastName", "a money service business"), checkElementTextIncludes(_, "experience")),
       (Messages("responsiblepeople.detailed_answers.training_in_anti_money_laundering"), checkElementTextIncludes(_, "training")),
       (Messages("responsiblepeople.detailed_answers.already_passed_fit_and_proper"), checkElementTextIncludes(_, "Yes"))
     )
@@ -67,13 +70,13 @@ class detailed_answersSpec extends AmlsSpec
   "summary view" must {
 
     "have correct title" in new ViewFixture {
-      def view = views.html.responsiblepeople.detailed_answers(Some(ResponsiblePerson()), 1, true, businessTypes = Some(List("Money Service Business")))
+      def view = views.html.responsiblepeople.detailed_answers(Some(ResponsiblePerson()), 1, true, businessMatching = businessMatching)
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.responsiblepeople"))
     }
 
     "have correct headings" in new ViewFixture {
-      def view = views.html.responsiblepeople.detailed_answers(Some(ResponsiblePerson()), 1, true, businessTypes = Some(List("Money Service Business")))
+      def view = views.html.responsiblepeople.detailed_answers(Some(ResponsiblePerson()), 1, true, businessMatching = businessMatching)
 
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.responsiblepeople"))
@@ -83,7 +86,7 @@ class detailed_answersSpec extends AmlsSpec
 
       "a full uk address history" in new ViewFixture {
         def view = {
-          views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModel), 1, true, personName.fullName, businessTypes = Some(List("Money service business")))
+          views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModel), 1, true, personName.fullName, businessMatching = businessMatching)
         }
 
         val element = doc.getElementsMatchingOwnText(Messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
@@ -103,7 +106,7 @@ class detailed_answersSpec extends AmlsSpec
 
       "seperate experience heading test" in new ViewFixture {
         def view = {
-          views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModel), 1, true, personName.fullName, businessTypes = Some(List("Money service business", "Accountancy service provider")))
+          views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModel), 1, true, personName.fullName, businessMatching = businessMatching.copy(activities = Some(BusinessActivities(Set(MoneyServiceBusiness, AccountancyServices)))))
         }
 
         override val sectionChecks = Table[String, Element => Boolean](
@@ -114,7 +117,6 @@ class detailed_answersSpec extends AmlsSpec
         forAll(sectionChecks) { (key, check) => {
           val headers = doc.select("section.check-your-answers h2")
           val header = headers.toList.find(e => e.text() == key)
-          println(header.toList.toString())
           header must not be None
           val section = header.get.parents().select("section").first()
           check(section) must be(true)
@@ -147,7 +149,7 @@ class detailed_answersSpec extends AmlsSpec
         )
 
         def view = {
-          views.html.responsiblepeople.detailed_answers(Some(nonUkresponsiblePeopleModel), 1, false, personName.fullName, businessTypes = Some(List("Money Service Business")))
+          views.html.responsiblepeople.detailed_answers(Some(nonUkresponsiblePeopleModel), 1, false, personName.fullName, businessMatching = businessMatching)
         }
 
         forAll(sectionChecks) { (key, check) => {
@@ -188,7 +190,7 @@ class detailed_answersSpec extends AmlsSpec
         )
 
         def view = {
-          views.html.responsiblepeople.detailed_answers(Some(nonUKPassportResponsiblePeopleModel), 1, false, personName.fullName, businessTypes = Some(List("Money Service Business")))
+          views.html.responsiblepeople.detailed_answers(Some(nonUKPassportResponsiblePeopleModel), 1, false, personName.fullName, businessMatching = businessMatching)
         }
 
         forAll(sectionChecks) { (key, check) => {
@@ -215,7 +217,7 @@ class detailed_answersSpec extends AmlsSpec
         )
 
         def view = {
-          views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModelWithDOB), 1, false, personName.fullName, businessTypes = Some(List("Money Service Business")))
+          views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModelWithDOB), 1, false, personName.fullName, businessMatching = businessMatching)
         }
 
         forAll(sectionChecks) { (key, check) => {
@@ -249,7 +251,7 @@ class detailed_answersSpec extends AmlsSpec
             checkElementTextIncludes(_, s"${personName.fullName}’s passport number: 0000000000")))
 
         def view = {
-          views.html.responsiblepeople.detailed_answers(Some(ukPassportResponsiblePeopleModel), 1, false, personName.fullName, businessTypes = Some(List("Money Service Business")))
+          views.html.responsiblepeople.detailed_answers(Some(ukPassportResponsiblePeopleModel), 1, false, personName.fullName, businessMatching = businessMatching)
         }
 
         forAll(sectionChecks) { (key, check) => {
@@ -284,7 +286,7 @@ class detailed_answersSpec extends AmlsSpec
         )
 
         def view = {
-          views.html.responsiblepeople.detailed_answers(Some(ukPassportResponsiblePeopleModel), 1, false, personName.fullName, businessTypes = Some(List("Money Service Business")))
+          views.html.responsiblepeople.detailed_answers(Some(ukPassportResponsiblePeopleModel), 1, false, personName.fullName, businessMatching = businessMatching)
         }
 
         forAll(sectionChecks) { (key, check) => {
@@ -311,7 +313,7 @@ class detailed_answersSpec extends AmlsSpec
         )
 
         def view = {
-          views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModelWithApprovalCheck), 1, true, personName.fullName, showApprovalSection = true, businessTypes = Some(List("Money Service Business")))
+          views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModelWithApprovalCheck), 1, true, personName.fullName, showApprovalSection = true, businessMatching = businessMatching)
         }
 
         forAll(sectionChecks) { (key, check) => {
@@ -336,7 +338,7 @@ class detailed_answersSpec extends AmlsSpec
         )
 
         def view = {
-          views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModelWithApprovalCheck), 1, true, personName.fullName, showApprovalSection = false, businessTypes = Some(List("Money Service Business")))
+          views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModelWithApprovalCheck), 1, true, personName.fullName, showApprovalSection = false, businessMatching = businessMatching)
         }
 
         forAll(sectionChecks) { (key, check) => {
@@ -350,7 +352,7 @@ class detailed_answersSpec extends AmlsSpec
     }
 
     "display address on separate lines" in new ViewFixture {
-      def view = views.html.responsiblepeople.detailed_answers(Some(ResponsiblePerson(addressHistory = Some(addressHistory))), 1, true, businessTypes = Some(List("Money Service Business")))
+      def view = views.html.responsiblepeople.detailed_answers(Some(ResponsiblePerson(addressHistory = Some(addressHistory))), 1, true, businessMatching = businessMatching)
 
       def checkElementHasAttribute(el: Element, keys: String*) = {
         val t = el.text()
@@ -382,7 +384,7 @@ class detailed_answersSpec extends AmlsSpec
 
       val responsiblePeople = ResponsiblePerson(personName = Some(personName), addressHistory = Some(addressHistory))
 
-      def view = views.html.responsiblepeople.detailed_answers(Some(responsiblePeople), 1, false, personName.fullName, businessTypes = Some(List("Money Service Business")))
+      def view = views.html.responsiblepeople.detailed_answers(Some(responsiblePeople), 1, false, personName.fullName, businessMatching = businessMatching)
 
       val timeAtAddresses = doc.getElementsMatchingOwnText(Messages("responsiblepeople.timeataddress.address_history.heading", "firstName middleName lastName"))
 
@@ -394,7 +396,7 @@ class detailed_answersSpec extends AmlsSpec
 
     "have the correct href" in new ViewFixture {
       def view = {
-        views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModel), 1, true, businessTypes = Some(List("Money Service Business")))
+        views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModel), 1, true, businessMatching = businessMatching)
       }
 
       override val sectionChecks = Table[String, Element => Boolean](

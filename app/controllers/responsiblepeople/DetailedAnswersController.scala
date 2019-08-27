@@ -58,12 +58,12 @@ class DetailedAnswersController @Inject () (
               cache: CacheMap <- optionalCache
               businessMatching: BusinessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
             } yield {
-              redirect(request.amlsRefNumber, request.accountTypeId, request.credId, cache, index, flow, businessMatching.alphabeticalBusinessActivitiesLowerCase())
+              redirect(request.amlsRefNumber, request.accountTypeId, request.credId, cache, index, flow, businessMatching)
             }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
         }
   }
 
-  private def redirect(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String, cache: CacheMap, index: Int, flow: Option[String] = None, businessTypes: Option[List[String]])
+  private def redirect(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String, cache: CacheMap, index: Int, flow: Option[String] = None, businessMatching: BusinessMatching)
                       (implicit request: Request[_]) =
     (for {
       responsiblePeople <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
@@ -73,7 +73,7 @@ class DetailedAnswersController @Inject () (
           msbOrTcsp: Option[Boolean] =>
 
             val shouldShowApprovalSection = !(msbOrTcsp.contains(true)) && x.approvalFlags.hasAlreadyPassedFitAndProper.contains(false)
-            Ok(views.html.responsiblepeople.detailed_answers(Some(x), index, showHide, ControllerHelper.rpTitleName(Some(x)), flow, shouldShowApprovalSection, businessTypes))
+            Ok(views.html.responsiblepeople.detailed_answers(Some(x), index, showHide, ControllerHelper.rpTitleName(Some(x)), flow, shouldShowApprovalSection, businessMatching))
         }
       }
       case _ => Future.successful(NotFound(notFoundView))

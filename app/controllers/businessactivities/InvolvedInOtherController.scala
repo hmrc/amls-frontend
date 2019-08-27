@@ -45,8 +45,8 @@ class InvolvedInOtherController @Inject() ( val dataCacheConnector: DataCacheCon
             (for {
               businessActivities <- cache.getEntry[BusinessActivities](BusinessActivities.key)
               involvedInOther <- businessActivities.involvedInOther
-            } yield Ok(involved_in_other_name(Form2[InvolvedInOther](involvedInOther), edit, businessMatching.prefixedAlphabeticalBusinessTypes)))
-              .getOrElse(Ok(involved_in_other_name(EmptyForm, edit, businessMatching.prefixedAlphabeticalBusinessTypes)))
+            } yield Ok(involved_in_other_name(Form2[InvolvedInOther](involvedInOther), edit, businessMatching.prefixedAlphabeticalBusinessTypes(false))))
+              .getOrElse(Ok(involved_in_other_name(EmptyForm, edit, businessMatching.prefixedAlphabeticalBusinessTypes(false))))
           }) getOrElse Ok(involved_in_other_name(EmptyForm, edit, None))
       }
   }
@@ -58,7 +58,7 @@ class InvolvedInOtherController @Inject() ( val dataCacheConnector: DataCacheCon
           for {
             businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
           } yield businessMatching match {
-            case Some(x) => BadRequest(involved_in_other_name(f, edit, businessMatching.prefixedAlphabeticalBusinessTypes))
+            case Some(x) => BadRequest(involved_in_other_name(f, edit, businessMatching.prefixedAlphabeticalBusinessTypes(false)))
             case None => BadRequest(involved_in_other_name(f, edit, None))
           }
         case ValidForm(_, data) =>

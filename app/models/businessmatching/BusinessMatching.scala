@@ -122,12 +122,13 @@ case class BusinessMatching(
     }
   }
 
-  def alphabeticalBusinessActivitiesLowerCase()(implicit message: Messages): Option[List[String]] = {
+  def alphabeticalBusinessActivitiesLowerCase(estateAgent: Boolean = false)(implicit message: Messages): Option[List[String]] = {
     activities map { a =>
       a.businessActivities.map {
         case AccountancyServices => Messages("businessactivities.registerservices.servicename.lbl.01")
         case BillPaymentServices => Messages("businessactivities.registerservices.servicename.lbl.02")
-        case EstateAgentBusinessService => Messages("businessactivities.registerservices.servicename.lbl.03.agent")
+        case EstateAgentBusinessService if estateAgent => Messages("businessactivities.registerservices.servicename.lbl.03.agent")
+        case EstateAgentBusinessService => Messages("businessactivities.registerservices.servicename.lbl.03")
         case HighValueDealing => Messages("businessactivities.registerservices.servicename.lbl.04")
         case MoneyServiceBusiness => Messages("businessactivities.registerservices.servicename.lbl.05")
         case TrustAndCompanyServices => Messages("businessactivities.registerservices.servicename.lbl.06")
@@ -136,10 +137,16 @@ case class BusinessMatching(
     }
   }
 
-  def prefixedAlphabeticalBusinessTypes()(implicit message: Messages): Option[List[String]] = {
+  def prefixedAlphabeticalBusinessTypes(estateAgent: Boolean = false)(implicit message: Messages): Option[List[String]] = {
     val vowels = List("a", "e", "i", "o", "u")
 
-    alphabeticalBusinessTypes.map {
+    val businessActivities = if (estateAgent) {
+      alphabeticalBusinessActivitiesLowerCase(estateAgent)
+    } else {
+      alphabeticalBusinessTypes
+    }
+
+    businessActivities.map {
       businessType =>
         businessType.map(item => {
           val prefix = if (vowels.exists(item.toLowerCase.startsWith(_))) "an" else "a"

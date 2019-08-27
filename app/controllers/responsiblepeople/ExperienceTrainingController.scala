@@ -40,9 +40,9 @@ class ExperienceTrainingController @Inject () (
           bm =>
             getData[ResponsiblePerson](request.credId, index) map {
               case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_, Some(experienceTraining),_,_,_,_,_,_,_,_))
-              => Ok(experience_training(Form2[ExperienceTraining](experienceTraining), bm.alphabeticalBusinessActivitiesLowerCase, edit, index, flow, personName.titleName))
+              => Ok(experience_training(Form2[ExperienceTraining](experienceTraining), bm, edit, index, flow, personName.titleName))
               case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-              => Ok(experience_training(EmptyForm, bm.alphabeticalBusinessTypes, edit, index, flow, personName.titleName))
+              => Ok(experience_training(EmptyForm, bm, edit, index, flow, personName.titleName))
               case _
               => NotFound(notFoundView)
             }
@@ -57,7 +57,7 @@ class ExperienceTrainingController @Inject () (
             Form2[ExperienceTraining](request.body) match {
               case f: InvalidForm =>
                 getData[ResponsiblePerson](request.credId, index) map { rp =>
-                  BadRequest(views.html.responsiblepeople.experience_training(f, bm.alphabeticalBusinessActivitiesLowerCase, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+                  BadRequest(views.html.responsiblepeople.experience_training(f, bm, edit, index, flow, ControllerHelper.rpTitleName(rp)))
                 }
               case ValidForm(_, data) => {
                 for {
