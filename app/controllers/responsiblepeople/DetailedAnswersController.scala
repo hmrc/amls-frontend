@@ -42,7 +42,8 @@ class DetailedAnswersController @Inject () (
                                              val config: AppConfig
                                            ) extends DefaultBaseController with RepeatingSection {
 
-  private def showHideAddressMove(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String, lineId: Option[Int])(implicit headerCarrier: HeaderCarrier): Future[Boolean] = {
+  private def showHideAddressMove(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String, lineId: Option[Int])
+                                 (implicit headerCarrier: HeaderCarrier): Future[Boolean] = {
     statusService.getStatus(amlsRegistrationNo, accountTypeId, credId) map {
       case SubmissionDecisionApproved | ReadyForRenewal(_) | RenewalSubmitted(_) if lineId.isDefined => true
       case _ => false
@@ -57,7 +58,7 @@ class DetailedAnswersController @Inject () (
               cache: CacheMap <- optionalCache
               businessMatching: BusinessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
             } yield {
-              redirect(request.amlsRefNumber, request.accountTypeId, request.credId, cache, index, flow, businessMatching.prefixedAlphabeticalBusinessTypes())
+              redirect(request.amlsRefNumber, request.accountTypeId, request.credId, cache, index, flow, businessMatching.alphabeticalBusinessActivitiesLowerCase())
             }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
         }
   }
