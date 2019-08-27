@@ -58,16 +58,9 @@ class AuthEnrolmentsServiceSpec extends AmlsSpec
     "connect to the stubs microservice when enabled and enrolments were returned by auth" in new Fixture {
       when(config.enrolmentStubsEnabled) thenReturn true
 
-      // OG: Remove all these comments
-      //when(authConnector.enrolments(any())(any(),any())).thenReturn(Future.successful(enrolmentsList))
-
       when {
         enrolmentStubConnector.enrolments(eqTo(groupId))(any(), any())
       } thenReturn Future.successful(enrolmentsList)
-
-//      when {
-//        authConnector.userDetails(any(), any(), any())
-//      } thenReturn Future.successful(UserDetails("Test", None, "Group", None, Some(groupId)))
 
       whenReady(service.amlsRegistrationNumber(Some(amlsRegistrationNumber), Some(groupId))) { result =>
         result mustBe Some(amlsRegistrationNumber)
@@ -75,7 +68,6 @@ class AuthEnrolmentsServiceSpec extends AmlsSpec
     }
 
     "return an AMLS registration number" in new Fixture {
-//      when(authConnector.enrolments(any())(any(),any())).thenReturn(Future.successful(enrolmentsList))
 
       whenReady(service.amlsRegistrationNumber(Some(amlsRegistrationNumber), Some(groupId))){
         number => number.get mustEqual amlsRegistrationNumber
@@ -83,9 +75,6 @@ class AuthEnrolmentsServiceSpec extends AmlsSpec
     }
 
     "create an enrolment" in new Fixture {
-//      when {
-//        authConnector.getCurrentAuthority(any(), any())
-//      } thenReturn Future.successful(Authority("", Accounts(), "/user-details", "/ids", "12345678"))
 
       when {
         service.enrolmentStore.enrol(any(), any(), any())(any(), any())
