@@ -86,7 +86,7 @@ class WaysToPayController @Inject()(
 
     val submissionDetails = for {
       amlsRefNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
-      (_, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus(amlsRefNo, request.accountTypeId))
+      (_, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus(Option(amlsRefNo), request.accountTypeId, request.credId))
       fees <- OptionT(feeResponseService.getFeeResponse(amlsRefNo, request.accountTypeId))
     } yield (fees, detailedStatus)
 
