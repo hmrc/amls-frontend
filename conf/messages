@@ -1207,6 +1207,7 @@ businessmatching.registerservices.servicename.lbl.07 = Telecommunications, digit
 businessactivities.registerservices.servicename.lbl.01 = accountancy service provider
 businessactivities.registerservices.servicename.lbl.02 = bill payment service provider
 businessactivities.registerservices.servicename.lbl.03 = estate agency business
+businessactivities.registerservices.servicename.lbl.03.agent = estate agent
 businessactivities.registerservices.servicename.lbl.04 = high value dealer
 businessactivities.registerservices.servicename.lbl.05 = money service business
 businessactivities.registerservices.servicename.lbl.06 = trust or company service provider
