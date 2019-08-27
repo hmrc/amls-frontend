@@ -17,24 +17,23 @@
 package controllers.supervision
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.supervision.{ProfessionalBodyMember, ProfessionalBodyMemberNo, ProfessionalBodyMemberYes, Supervision}
 import play.api.mvc.Result
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.supervision.member_of_professional_body
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class ProfessionalBodyMemberController @Inject()(
                                                   val dataCacheConnector: DataCacheConnector,
-                                                  val authConnector: AuthConnector
-                                                ) extends BaseController {
+                                                  val authAction: AuthAction) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[Supervision](Supervision.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map {
         response =>
           val form: Form2[ProfessionalBodyMember] = (for {
             supervision <- response
@@ -44,16 +43,16 @@ class ProfessionalBodyMemberController @Inject()(
       }
   }
 
-  def post(edit : Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+  def post(edit : Boolean = false) = authAction.async {
+    implicit request =>
       Form2[ProfessionalBodyMember](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(member_of_professional_body(f, edit)))
         case ValidForm(_, data) => {
           for {
-            supervision <- dataCacheConnector.fetch[Supervision](Supervision.key)
+            supervision <- dataCacheConnector.fetch[Supervision](request.credId, Supervision.key)
             updatedSupervision <- updateSupervisionFromIncomingData(data, supervision)
-            _ <- dataCacheConnector.save[Supervision](Supervision.key, updatedSupervision)
+            _ <- dataCacheConnector.save[Supervision](request.credId, Supervision.key, updatedSupervision)
           } yield redirectTo(updatedSupervision, edit)
         }
       }

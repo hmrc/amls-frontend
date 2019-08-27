@@ -16,6 +16,7 @@
 
 package controllers.hvd
 
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.HighValueDealing
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.hvd.{Hvd, PercentageOfCashPaymentOver15000}
@@ -28,24 +29,22 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
 class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
     val request = addToken(authRequest)
 
-    val controller = new PercentageOfCashPaymentOver15000Controller(
-      self.authConnector,
-      mockCacheConnector,
-      mockServiceFlow,
-      mockStatusService
-    )
+    val controller = new PercentageOfCashPaymentOver15000Controller(SuccessfulAuthAction,
+                                                                    mockCacheConnector,
+                                                                    mockServiceFlow,
+                                                                    mockStatusService)
 
-    mockIsNewActivity(false)
+    mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, None)
   }
 
@@ -54,10 +53,10 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
   "PercentageOfCashPaymentOver15000Controller" must {
 
     "on get display the Percentage Of CashPayment Over 15000 page" in new Fixture {
-      when(controller.statusService.getStatus(any(), any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
-      when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
         .thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
@@ -66,11 +65,11 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
     }
 
     "on get display the Percentage Of CashPayment Over 15000 page with pre populated data" in new Fixture {
-      when(controller.statusService.getStatus(any(), any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
-      when(controller.dataCacheConnector.fetch[Hvd](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Hvd(percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First)))))
+      when(controller.dataCacheConnector.fetch[Hvd](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(Hvd(percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First)))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -81,13 +80,13 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
 
     "continue to show the correct view" when {
       "application is in variation mode but the service has just been added" in new Fixture {
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved))
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+          .thenReturn(Future.successful(NotCompleted))
 
-        when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
-        mockIsNewActivity(true, Some(HighValueDealing))
+        mockIsNewActivityNewAuth(true, Some(HighValueDealing))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -100,11 +99,11 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
       val newRequest = request.withFormUrlEncodedBody(
       )
 
-      when(controller.dataCacheConnector.fetch[Hvd](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[Hvd](any(), any())
+        (any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[Hvd](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[Hvd](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -117,11 +116,11 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
         "percentage" -> "01"
       )
 
-      when(controller.dataCacheConnector.fetch[Hvd](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[Hvd](any(), any())
+        (any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[Hvd](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[Hvd](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -134,11 +133,11 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
         "percentage" -> "01"
       )
 
-      when(controller.dataCacheConnector.fetch[Hvd](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[Hvd](any(), any())
+        (any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[Hvd](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[Hvd](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)

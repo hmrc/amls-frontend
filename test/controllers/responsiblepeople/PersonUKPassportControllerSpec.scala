@@ -18,6 +18,7 @@ package controllers.responsiblepeople
 
 import config.AppConfig
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople._
 import org.joda.time.LocalDate
@@ -29,8 +30,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -46,7 +46,7 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
-      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[AppConfig].to(mockAppConfig))
       .build()
 
@@ -70,7 +70,7 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
 
           val responsiblePeople = ResponsiblePerson(Some(personName))
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
           val result = controller.get(1)(request)
@@ -92,7 +92,7 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
             )
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
           val result = controller.get(1)(request)
@@ -109,7 +109,7 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
       "display Not Found" when {
         "a populated ResponsiblePeople model cannot be found" in new Fixture {
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
           val result = controller.get(1)(request)
@@ -132,16 +132,16 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
 
             val responsiblePeople = ResponsiblePerson()
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
               .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = Some(personName))))))
 
             when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
               .thenReturn(Some(Seq(responsiblePeople)))
 
-            when(controller.dataCacheConnector.fetchAll(any(), any()))
+            when(controller.dataCacheConnector.fetchAll(any())(any()))
               .thenReturn(Future.successful(Some(mockCacheMap)))
 
-            when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+            when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
               .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(1)(newRequest)
@@ -159,16 +159,16 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
 
             val responsiblePeople = ResponsiblePerson()
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
               .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = Some(personName))))))
 
             when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
               .thenReturn(Some(Seq(responsiblePeople)))
 
-            when(controller.dataCacheConnector.fetchAll(any(), any()))
+            when(controller.dataCacheConnector.fetchAll(any())(any()))
               .thenReturn(Future.successful(Some(mockCacheMap)))
 
-            when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+            when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
               .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(1)(newRequest)
@@ -185,16 +185,16 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
               ukPassport = Some(UKPassportNo)
             )
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
               .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = Some(personName))))))
 
             when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
               .thenReturn(Some(Seq(responsiblePeople)))
 
-            when(controller.dataCacheConnector.fetchAll(any(), any()))
+            when(controller.dataCacheConnector.fetchAll(any())(any()))
               .thenReturn(Future.successful(Some(mockCacheMap)))
 
-            when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+            when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
               .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(1, false)(newRequest)
@@ -216,16 +216,16 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
               ukPassport = Some(UKPassportYes(ukPassportNumber))
             )
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
               .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = Some(personName))))))
 
             when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
               .thenReturn(Some(Seq(responsiblePeople)))
 
-            when(controller.dataCacheConnector.fetchAll(any(), any()))
+            when(controller.dataCacheConnector.fetchAll(any())(any()))
               .thenReturn(Future.successful(Some(mockCacheMap)))
 
-            when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+            when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
               .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(1, true)(newRequest)
@@ -247,16 +247,16 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
               dateOfBirth = Some(DateOfBirth(new LocalDate(2001,12,1)))
             )
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
               .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = Some(personName))))))
 
             when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
               .thenReturn(Some(Seq(responsiblePeople)))
 
-            when(controller.dataCacheConnector.fetchAll(any(), any()))
+            when(controller.dataCacheConnector.fetchAll(any())(any()))
               .thenReturn(Future.successful(Some(mockCacheMap)))
 
-            when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+            when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
               .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
@@ -275,16 +275,16 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
               ukPassport = Some(UKPassportNo)
             )
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
               .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = Some(personName))))))
 
             when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
               .thenReturn(Some(Seq(responsiblePeople)))
 
-            when(controller.dataCacheConnector.fetchAll(any(), any()))
+            when(controller.dataCacheConnector.fetchAll(any())(any()))
               .thenReturn(Future.successful(Some(mockCacheMap)))
 
-            when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+            when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
               .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
@@ -305,16 +305,16 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
 
           val responsiblePeople = ResponsiblePerson()
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = Some(personName))))))
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(responsiblePeople)))
 
-          when(controller.dataCacheConnector.fetchAll(any(), any()))
+          when(controller.dataCacheConnector.fetchAll(any())(any()))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
-          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(1)(newRequest)
@@ -332,16 +332,16 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
 
           val responsiblePeople = ResponsiblePerson()
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = Some(personName))))))
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(responsiblePeople)))
 
-          when(controller.dataCacheConnector.fetchAll(any(), any()))
+          when(controller.dataCacheConnector.fetchAll(any())(any()))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
-          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(10)(newRequest)
@@ -371,28 +371,28 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
           dateOfBirth = Some(dateOfBirth)
         )
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = Some(personName), dateOfBirth = Some(dateOfBirth))))))
 
         when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
           .thenReturn(Some(Seq(responsiblePeople)))
 
-        when(controller.dataCacheConnector.fetchAll(any(), any()))
+        when(controller.dataCacheConnector.fetchAll(any())(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
-        when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(mockCacheMap))
 
         val result = controller.post(1, true)(newRequest)
         status(result) must be(SEE_OTHER)
 
         verify(controller.dataCacheConnector)
-          .save[Seq[ResponsiblePerson]](any(), meq(Seq(responsiblePeople.copy(
+          .save[Seq[ResponsiblePerson]](any(), any(), meq(Seq(responsiblePeople.copy(
           ukPassport = Some(UKPassportYes(ukPassportNumber)),
           nonUKPassport = None,
           dateOfBirth = Some(dateOfBirth),
           hasChanged = true
-        ))))(any(), any(), any())
+        ))))(any(), any())
 
       }
     }

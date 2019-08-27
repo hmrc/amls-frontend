@@ -18,26 +18,26 @@ package controllers.businessdetails
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms._
 import models.businessdetails.BusinessDetails
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import services.StatusService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.businessdetails._
 
 
 class SummaryController @Inject () (
                                    val dataCache: DataCacheConnector,
                                    val statusService: StatusService,
-                                   val authConnector: AuthConnector
-                                   ) extends BaseController {
+                                   val authAction: AuthAction
+                                   ) extends DefaultBaseController {
 
-  def get = Authorised.async {
-    implicit authContext => implicit request =>
+  def get = authAction.async {
+    implicit request =>
       for {
-        businessDetails <- dataCache.fetch[BusinessDetails](BusinessDetails.key)
-        status <- statusService.getStatus
+        businessDetails <- dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key)
+        status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
       } yield businessDetails match {
         case Some(data) => {
           val showRegisteredForMLR = status match {
@@ -50,11 +50,11 @@ class SummaryController @Inject () (
       }
   }
 
-  def post = Authorised.async {
-    implicit authContext => implicit request =>
+  def post = authAction.async {
+    implicit request =>
       for {
-        businessDetails <- dataCache.fetch[BusinessDetails](BusinessDetails.key)
-        _ <- dataCache.save[BusinessDetails](BusinessDetails.key,
+        businessDetails <- dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key)
+        _ <- dataCache.save[BusinessDetails](request.credId, BusinessDetails.key,
           businessDetails.copy(hasAccepted = true)
         )
       } yield {

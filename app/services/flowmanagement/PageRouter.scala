@@ -25,10 +25,7 @@ import play.api.mvc.Results.Redirect
 import scala.concurrent.{ExecutionContext, Future}
 
 trait PageRouter[A] {
-  def getPageRoute(model: A, edit: Boolean = false)(implicit ac: AuthContext,
-                                                              hc: HeaderCarrier,
-                                                              ec: ExecutionContext
-  ): Future[Result]
+  def getRoute(credId: String, model: A, edit: Boolean = false)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result]
 
   implicit def toFutureRedirect(call: Call): Future[Result] = Future.successful(Redirect(call))
   implicit def toFuture(result: Result): Future[Result] = Future.successful(result)

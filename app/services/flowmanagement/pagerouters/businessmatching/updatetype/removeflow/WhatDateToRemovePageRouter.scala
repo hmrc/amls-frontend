@@ -33,9 +33,9 @@ import scala.concurrent.{ExecutionContext, Future}
 class WhatDateToRemovePageRouter @Inject()(val statusService: StatusService,
                                            val businessMatchingService: BusinessMatchingService) extends PageRouter[RemoveBusinessTypeFlowModel] {
 
-  override def getPageRoute(model: RemoveBusinessTypeFlowModel, edit: Boolean = false)
-                           (implicit ac: AuthContext,
-                            hc: HeaderCarrier,
+
+  override def getRoute(credId: String, model: RemoveBusinessTypeFlowModel, edit: Boolean = false)
+                       (implicit hc: HeaderCarrier,
                             ec: ExecutionContext
 
                            ): Future[Result] = {

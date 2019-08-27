@@ -17,32 +17,30 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
+import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import utils.AmlsSpec
-import play.api.i18n.Messages
-import play.api.test.Helpers._
-import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AuthorisedFixture
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import org.mockito.Matchers.{eq => meq, _}
 import org.scalatestplus.play.OneAppPerSuite
-import uk.gov.hmrc.play.frontend.auth.AuthContext
+import play.api.i18n.Messages
+import play.api.test.Helpers._
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 class AgentCompanyNameControllerSpec extends AmlsSpec with OneAppPerSuite with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new AgentCompanyNameController(mock[DataCacheConnector], self.authConnector, messagesApi)
+    val controller = new AgentCompanyNameController(mock[DataCacheConnector], SuccessfulAuthAction, messagesApi)
   }
 
   "AgentCompanyDetailsController" when {
@@ -53,7 +51,7 @@ class AgentCompanyNameControllerSpec extends AmlsSpec with OneAppPerSuite with M
     "get is called" must {
       "display agent company name Page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
 
         val result = controller.get(1)(request)
@@ -63,7 +61,7 @@ class AgentCompanyNameControllerSpec extends AmlsSpec with OneAppPerSuite with M
 
       "display saved content" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(agentCompanyDetails = Some(AgentCompanyName("test")))))))
 
         val result = controller.get(1)(request)
@@ -76,7 +74,7 @@ class AgentCompanyNameControllerSpec extends AmlsSpec with OneAppPerSuite with M
 
       "respond with NOT_FOUND" when {
         "there is no data at all at that index" in new Fixture {
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
             .thenReturn(Future.successful(None))
 
           val result = controller.get(1)(request)
@@ -96,7 +94,7 @@ class AgentCompanyNameControllerSpec extends AmlsSpec with OneAppPerSuite with M
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse, TradingPremises())))
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(99)(newRequest)
@@ -113,10 +111,10 @@ class AgentCompanyNameControllerSpec extends AmlsSpec with OneAppPerSuite with M
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse, TradingPremises())))
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
-          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(1)(newRequest)
@@ -133,10 +131,10 @@ class AgentCompanyNameControllerSpec extends AmlsSpec with OneAppPerSuite with M
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse, TradingPremises())))
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
-          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(1, true)(newRequest)
@@ -156,10 +154,10 @@ class AgentCompanyNameControllerSpec extends AmlsSpec with OneAppPerSuite with M
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse, TradingPremises())))
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
-          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(1)(newRequest)
@@ -176,10 +174,10 @@ class AgentCompanyNameControllerSpec extends AmlsSpec with OneAppPerSuite with M
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse, TradingPremises())))
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
-          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(1)(newRequest)
@@ -195,10 +193,10 @@ class AgentCompanyNameControllerSpec extends AmlsSpec with OneAppPerSuite with M
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse, TradingPremises())))
 
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
-        when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(mockCacheMap))
 
         val result = controller.post(1)(newRequest)
@@ -208,12 +206,13 @@ class AgentCompanyNameControllerSpec extends AmlsSpec with OneAppPerSuite with M
 
         verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
           any(),
+          any(),
           meq(Seq(tradingPremisesWithHasChangedFalse.copy(
             hasChanged = true,
             agentName = None,
             agentCompanyDetails = Some(AgentCompanyName("text")),
             agentPartnership = None
-          ), TradingPremises())))(any(), any(), any())
+          ), TradingPremises())))(any(), any())
       }
     }
   }

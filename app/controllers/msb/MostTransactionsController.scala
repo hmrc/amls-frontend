@@ -17,33 +17,31 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessMatching, BusinessMatchingMsbService, CurrencyExchange, ForeignExchange}
 import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions}
-import play.api.mvc.Result
 import services.businessmatching.ServiceFlow
 import services.{AutoCompleteService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 
 import scala.concurrent.Future
 
 @Singleton
-class MostTransactionsController @Inject()(val authConnector: AuthConnector,
+class MostTransactionsController @Inject()(authAction: AuthAction,
                                            implicit val cacheConnector: DataCacheConnector,
                                            implicit val statusService: StatusService,
                                            implicit val serviceFlow: ServiceFlow,
                                            val autoCompleteService: AutoCompleteService
-                                          ) extends BaseController {
+                                          ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        cacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+        cacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
           response =>
             val form = (for {
               msb <- response
@@ -53,14 +51,13 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector,
         }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request =>
         Form2[MostTransactions](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.msb.most_transactions(f, edit, autoCompleteService.getCountries)))
           case ValidForm(_, data) =>
-            cacheConnector.fetchAll flatMap { maybeCache =>
+            cacheConnector.fetchAll(request.credId) flatMap { maybeCache =>
               val result = for {
                 cacheMap <- maybeCache
                 msb <- cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
@@ -68,7 +65,7 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector,
                 services <- bm.msbServices
                 register <- cacheMap.getEntry[ServiceChangeRegister](ServiceChangeRegister.key) orElse Some(ServiceChangeRegister())
               } yield {
-                cacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
+                cacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
                   msb.mostTransactions(Some(data))
                 ) map {
                   _ => routing(services.msbServices, register, msb, edit)
@@ -99,7 +96,7 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector,
   }
 
   private def routing(msbServices: Set[BusinessMatchingMsbService], register: ServiceChangeRegister, msb: MoneyServiceBusiness, edit: Boolean)
-                     (implicit hc: HeaderCarrier, auth: AuthContext) = {
+                     (implicit hc: HeaderCarrier) = {
 
     if (shouldAnswerCurrencyExchangeQuestions(msbServices, register, msb, edit)) {
       Redirect(routes.CETransactionsInNext12MonthsController.get(edit))

@@ -17,6 +17,7 @@
 package controllers.businessactivities
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.businessactivities._
 import models.businessmatching.{AccountancyServices, BusinessMatching, MoneyServiceBusiness, BusinessActivities => BMBusinessActivities}
 import org.jsoup.Jsoup
@@ -39,7 +40,7 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
 
     val controller = new DocumentRiskAssessmentController (
       dataCacheConnector = mock[DataCacheConnector],
-      authConnector = self.authConnector
+      SuccessfulAuthAction
     )
   }
 
@@ -50,7 +51,7 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
     "get is called" must {
       "load the Document Risk assessment Page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -63,7 +64,7 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
 
       "pre-populate the Document Risk assessment Page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(BusinessActivities(
             riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(PaperBased, Digital)))))
           )))
@@ -91,13 +92,13 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(BusinessMatching(None, Some(BMBusinessActivities(Set(AccountancyServices, MoneyServiceBusiness))))))
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), RiskAssessmentTypes(Set())))))))
 
-          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post()(newRequest)
@@ -117,13 +118,13 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(BusinessMatching(None, Some(BMBusinessActivities(Set(MoneyServiceBusiness))))))
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), RiskAssessmentTypes(Set())))))))
 
-          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post()(newRequest)
@@ -137,11 +138,11 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
             val newRequest = request.withFormUrlEncodedBody(
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-              (any(), any(), any())).thenReturn(Future.successful(None))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+              .thenReturn(Future.successful(None))
 
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-              (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+              .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post()(newRequest)
             status(result) must be(BAD_REQUEST)
@@ -157,11 +158,11 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
               "riskassessments[1]" -> ""
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-              (any(), any(), any())).thenReturn(Future.successful(None))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+              .thenReturn(Future.successful(None))
 
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-              (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+              .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post()(newRequest)
             status(result) must be(BAD_REQUEST)
@@ -186,13 +187,13 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(BusinessMatching(None, Some(BMBusinessActivities(Set(MoneyServiceBusiness))))))
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), RiskAssessmentTypes(Set())))))))
 
-          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(true)(newRequest)

@@ -64,7 +64,7 @@ class experience_trainingSpec extends AmlsSpec with MustMatchers  {
       def view: _root_.play.twirl.api.HtmlFormat.Appendable =
         views.html.responsiblepeople.experience_training(form2, businessTypes, false, 0, None, "FirstName LastName")
 
-      heading.html() must be(Messages("responsiblepeople.experiencetraining.heading", "FirstName LastName"))
+      heading.html() must be(Messages("responsiblepeople.experiencetraining.heading", "FirstName LastName", "AccountancyServices"))
     }
 
     "show errors in correct places when validation fails" in new ViewFixture {

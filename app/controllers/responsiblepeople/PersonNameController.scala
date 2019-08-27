@@ -18,24 +18,21 @@ package controllers.responsiblepeople
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms._
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
+import utils.{AuthAction, RepeatingSection}
 import views.html.responsiblepeople.person_name
 
 import scala.concurrent.Future
 
-class PersonNameController @Inject () (
-                                        val dataCacheConnector: DataCacheConnector,
-                                        val authConnector: AuthConnector
-                                      ) extends RepeatingSection with BaseController {
+class PersonNameController @Inject () ( val dataCacheConnector: DataCacheConnector,
+                                        authAction: AuthAction
+                                      ) extends RepeatingSection with DefaultBaseController {
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext =>
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>
-        getData[ResponsiblePerson](index) map {
+        getData[ResponsiblePerson](request.credId, index) map {
           case Some(ResponsiblePerson(Some(name),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(person_name(Form2[PersonName](name), edit, index, flow))
           case Some(ResponsiblePerson(_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
@@ -45,15 +42,14 @@ class PersonNameController @Inject () (
         }
   }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext =>
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request => {
         Form2[PersonName](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.responsiblepeople.person_name(f, edit, index, flow)))
           case ValidForm(_, data) => {
             for {
-              _ <- updateDataStrict[ResponsiblePerson](index) { rp =>
+              _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
                 rp.personName(data)
               }
             } yield edit match {

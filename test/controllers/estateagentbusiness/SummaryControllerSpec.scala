@@ -17,6 +17,7 @@
 package controllers.estateagentbusiness
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.estateagentbusiness.EstateAgentBusiness
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
@@ -34,28 +35,31 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new SummaryController(mock[DataCacheConnector], self.authConnector, mock[StatusService], mock[ServiceFlow])
+    val controller = new SummaryController(
+      mock[DataCacheConnector],
+      SuccessfulAuthAction,
+      mock[StatusService],
+      mock[ServiceFlow])
 
     val model = EstateAgentBusiness(None, None)
 
     when {
-      controller.statusService.isPreSubmission(any(), any(), any())
+      controller.statusService.isPreSubmission(Some(any()), any(), any())(any(),any())
     } thenReturn Future.successful(false)
   }
 
   "Get" must {
 
     "load the summary page when section data is available" in new Fixture {
-      when(controller.dataCache.fetch[EstateAgentBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(model)))
+      when(controller.dataCache.fetch[EstateAgentBusiness](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(model)))
 
       val result = controller.get()(request)
       status(result) must be(OK)
     }
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
-      when(controller.dataCache.fetch[EstateAgentBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCache.fetch[EstateAgentBusiness](any(), any())(any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
@@ -71,10 +75,10 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
         val newRequest = request.withFormUrlEncodedBody( "hasAccepted" -> "true")
 
-        when(controller.dataCache.fetch[EstateAgentBusiness](any())(any(), any(), any()))
+        when(controller.dataCache.fetch[EstateAgentBusiness](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(model.copy(hasAccepted = false))))
 
-        when(controller.dataCache.save[EstateAgentBusiness](meq(EstateAgentBusiness.key), any())(any(), any(), any()))
+        when(controller.dataCache.save[EstateAgentBusiness](any(), meq(EstateAgentBusiness.key), any())( any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)

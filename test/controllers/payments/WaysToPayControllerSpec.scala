@@ -16,6 +16,7 @@
 
 package controllers.payments
 
+import controllers.actions.SuccessfulAuthAction
 import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
 import models.ResponseType.SubscriptionResponseType
 import models.confirmation.Currency
@@ -29,7 +30,6 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -43,11 +43,10 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
     val safeId = safeIdGen.sample.get
 
     implicit val hc: HeaderCarrier = new HeaderCarrier()
-    implicit val ac: AuthContext = mock[AuthContext]
     implicit val ec: ExecutionContext = mock[ExecutionContext]
 
     val controller = new WaysToPayController(
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       statusService = mock[StatusService],
       paymentsService = mock[PaymentsService],
       authEnrolmentsService = mock[AuthEnrolmentsService],
@@ -58,21 +57,19 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
 
     val fees = FeeResponse(SubscriptionResponseType, amlsRegistrationNumber, 100, None, None, 0, 100, Some(paymentReferenceNumber), None, DateTime.now())
 
-    when {
-      controller.paymentsService.updateBacsStatus(any(), any())(any(), any(), any())
-    } thenReturn Future.successful(HttpResponse(OK))
+
 
     val submissionStatus = SubmissionReadyForReview
-
     val readStatusResponse = mock[ReadStatusResponse]
+
     when(readStatusResponse.safeId) thenReturn Some(safeId)
 
     when {
-      controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+      controller.authEnrolmentsService.amlsRegistrationNumber(any(), any())(any(), any())
     } thenReturn Future.successful(Some(amlsRegistrationNumber))
 
     when {
-      controller.statusService.getStatus(any(), any(), any())
+      controller.statusService.getStatus(any(), any())(any(), any())
     } thenReturn Future.successful(submissionStatus)
 
     when {
@@ -80,15 +77,19 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
     } thenReturn Some(Currency.fromInt(100))
 
     when {
-      controller.paymentsService.createBacsPayment(any())(any(), any(), any())
+      controller.paymentsService.createBacsPayment(any(), any())(any(), any())
     } thenReturn Future.successful(paymentGen.sample.get)
 
     when {
-      controller.statusService.getDetailedStatus(any())(any(), any(), any())
+      controller.paymentsService.updateBacsStatus(any(), any())(any(), any(), any())
+    } thenReturn Future.successful(HttpResponse(OK))
+
+    when {
+      controller.statusService.getDetailedStatus(any[String], any())(any(), any())
     } thenReturn Future.successful((submissionStatus, Some(readStatusResponse)))
 
     when {
-      controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber))(any(),any(),any())
+      controller.feeResponseService.getFeeResponse(any(), any())(any(),any())
     } thenReturn Future.successful(Some(fees))
 
   }
@@ -120,7 +121,7 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
           redirectLocation(result) must be(Some(controllers.payments.routes.TypeOfBankController.get().url))
 
           val bacsModel: CreateBacsPaymentRequest = CreateBacsPaymentRequest(amlsRegistrationNumber, paymentReferenceNumber, safeId, 10000)
-          verify(controller.paymentsService).createBacsPayment(eqTo(bacsModel))(any(), any(), any())
+          verify(controller.paymentsService).createBacsPayment(eqTo(bacsModel), any())(any(), any())
 
         }
       }
@@ -132,7 +133,7 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
           )
 
           when {
-            controller.paymentsService.requestPaymentsUrl(any(), any(), any(), any())(any(), any(), any(), any())
+            controller.paymentsService.requestPaymentsUrl(any(), any(), any(), any(), any())(any(), any(), any())
           } thenReturn Future.successful(NextUrl("/payments-next-url"))
 
           val result = controller.post()(postRequest)
@@ -142,8 +143,9 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
             eqTo(fees),
             eqTo(paymentsReturnLocation(paymentReferenceNumber).url),
             eqTo(amlsRegistrationNumber),
-            eqTo(safeId)
-          )(any(), any(), any(), any())
+            eqTo(safeId),
+            any()
+          )(any(), any(), any())
 
           redirectLocation(result) mustBe Some("/payments-next-url")
         }
@@ -156,11 +158,11 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
             )
 
             when {
-              controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+              controller.authEnrolmentsService.amlsRegistrationNumber(any(), any())(any(), any())
             } thenReturn Future.successful(None)
 
             when {
-              controller.statusService.getStatus(any(), any(), any())
+              controller.statusService.getStatus(any(), any())(any(), any())
             } thenReturn Future.successful(submissionStatus)
 
             val result = controller.post()(postRequest)

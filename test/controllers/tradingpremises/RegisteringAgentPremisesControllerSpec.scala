@@ -17,6 +17,7 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.TradingPremisesSection
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
@@ -27,17 +28,18 @@ import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
 class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture  {
     self => val request = addToken(authRequest)
-    val controller = new RegisteringAgentPremisesController (mock[DataCacheConnector],
-      self.authConnector, messagesApi)
+    val controller = new RegisteringAgentPremisesController (
+      mock[DataCacheConnector],
+      SuccessfulAuthAction,
+      messagesApi)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -57,7 +59,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
             )
             val businessMatchingActivitiesAll = BusinessMatchingActivities(
               Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
-            when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
               .thenReturn(Future.successful(Some(mockCacheMap)))
             when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
               .thenReturn(Some(Seq(model)))
@@ -78,7 +80,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
             val businessMatchingActivitiesAll = BusinessMatchingActivities(
               Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
             val model = TradingPremises()
-            when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
               .thenReturn(Future.successful(Some(mockCacheMap)))
             when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
               .thenReturn(Some(Seq(model)))
@@ -99,7 +101,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
             )
             val businessMatchingActivitiesAll = BusinessMatchingActivities(
               Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
-            when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
               .thenReturn(Future.successful(Some(mockCacheMap)))
             when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
               .thenReturn(Some(Seq(model)))
@@ -122,7 +124,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
             )
             val businessMatchingActivitiesAll = BusinessMatchingActivities(
               Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
-            when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
               .thenReturn(Future.successful(Some(mockCacheMap)))
             when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
               .thenReturn(Some(Seq(model)))
@@ -145,7 +147,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
             )
             val businessMatchingActivitiesAll = BusinessMatchingActivities(
               Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
-            when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
               .thenReturn(Future.successful(None))
             when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
               .thenReturn(None)
@@ -164,7 +166,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
             )
             val businessMatchingActivitiesAll = BusinessMatchingActivities(
               Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
-            when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
               .thenReturn(Future.successful(None))
             when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
               .thenReturn(Some(Seq(model)))
@@ -199,12 +201,12 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
           "agentPremises" -> "false"
         )
 
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(model)))
 
-        when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(mockCacheMap))
 
         val result = controller.post(1,edit = true)(newRequest)
@@ -225,12 +227,12 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
           "agentPremises" -> "false"
         )
 
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(model, model)))
 
-        when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(mockCacheMap))
 
         val result = controller.post(1,edit = false)(newRequest)
@@ -250,12 +252,12 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
           "agentPremises" -> "true"
         )
 
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(model)))
 
-        when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(mockCacheMap))
 
         val result = controller.post(1,edit = false)(newRequest)
@@ -270,7 +272,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
           val newRequest = request.withFormUrlEncodedBody(
             "agentPremises" -> "true"
           )
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(TradingPremises(Some(RegisteringAgentPremises(true)), None, None, None))))
@@ -287,13 +289,13 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
         val newRequest = request.withFormUrlEncodedBody(
           "agentPremises" -> "false"
         )
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse, TradingPremises())))
 
-        when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(1)(newRequest)
@@ -302,7 +304,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
         redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1, false).url))
 
         verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
-          any(),
+          any(), any(),
           meq(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse.copy(
             hasChanged = true,
             registeringAgentPremises = Some(RegisteringAgentPremises(false)),
@@ -310,7 +312,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
             businessStructure=None,
             agentCompanyDetails=None,
             agentPartnership=None
-          ), TradingPremises())))(any(), any(), any())
+          ), TradingPremises())))(any(), any())
       }
 
     }

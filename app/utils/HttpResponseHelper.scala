@@ -19,6 +19,7 @@ package utils
 import play.api.libs.json.{JsNull, JsResult, Json, Reads}
 import uk.gov.hmrc.http.{ HttpReads, HttpResponse }
 
+// $COVERAGE-OFF$
 trait HttpResponseHelper {
 
   // scalastyle:off object.name

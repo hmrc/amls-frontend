@@ -31,7 +31,7 @@ import play.api.http.Status._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TaxEnrolmentsConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth: AuthConnector, audit: AuditConnector) {
+class TaxEnrolmentsConnector @Inject()(http: WSHttp, appConfig: AppConfig, audit: AuditConnector) {
 
   lazy val baseUrl = if (appConfig.enrolmentStubsEnabled) {
     s"${appConfig.enrolmentStubsUrl}/tax-enrolments"
@@ -46,12 +46,11 @@ class TaxEnrolmentsConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth:
     val invalidCredentialRole = "INVALID_CREDENTIAL_ID"
   }
 
-  def enrol(enrolKey: EnrolmentKey, enrolment: TaxEnrolment)
-           (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[HttpResponse] = {
-    auth.userDetails flatMap { details =>
+  def enrol(enrolKey: EnrolmentKey, enrolment: TaxEnrolment, groupId: Option[String])
+           (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+
       Logger.debug("TaxEnrolmentsConnector:enrol:enrolKey:" + enrolKey)
-      Logger.debug("TaxEnrolmentsConnector:enrol:auth.userDetails:" + details)
-      details.groupIdentifier match {
+      groupId match {
         case Some(groupId) =>
           val url = s"$baseUrl/groups/$groupId/enrolments/${enrolKey.key}"
 
@@ -79,16 +78,14 @@ class TaxEnrolmentsConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth:
 
         case _ => throw new Exception("Group identifier is unavailable")
       }
-    }
   }
 
-  def deEnrol(registrationNumber: String)
-             (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[HttpResponse] = {
+  def deEnrol(registrationNumber: String, groupId: Option[String])
+             (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+
     val enrolKey = AmlsEnrolmentKey(registrationNumber).key
-    auth.userDetails flatMap { details =>
       Logger.debug("TaxEnrolmentsConnector:deEnrol:enrolKey:" + enrolKey)
-      Logger.debug("TaxEnrolmentsConnector:deEnrol:auth.userDetails:" + details)
-      details.groupIdentifier match {
+      groupId match {
         case Some(groupId) =>
           val url = s"$baseUrl/groups/$groupId/enrolments/$enrolKey"
 
@@ -99,11 +96,10 @@ class TaxEnrolmentsConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth:
 
         case _ => throw new Exception("Group identifier is unavailable")
       }
-    }
   }
 
   def removeKnownFacts(registrationNumber: String)
-                      (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[HttpResponse] = {
+                      (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
 
     val enrolKey = AmlsEnrolmentKey(registrationNumber).key
     val url = s"$baseUrl/enrolments/$enrolKey"

@@ -18,26 +18,24 @@ package controllers.tradingpremises
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.tradingpremises.{AgentRemovalReason, TradingPremises}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
+import utils.{AuthAction, RepeatingSection}
 import views.html.tradingpremises.remove_agent_premises_reasons
 
 import scala.concurrent.Future
 
 class RemoveAgentPremisesReasonsController @Inject () (
                                                       val dataCacheConnector: DataCacheConnector,
-                                                      val authConnector: AuthConnector
-                                                      )extends RepeatingSection with BaseController {
+                                                      val authAction: AuthAction
+                                                      )extends RepeatingSection with DefaultBaseController {
 
 
-  def get(index: Int, complete: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(index: Int, complete: Boolean = false) = authAction.async {
       implicit request =>
         for {
-          tp <- getData[TradingPremises](index)
+          tp <- getData[TradingPremises](request.credId, index)
         } yield tp match {
           case (Some(tradingPremises)) => {
             Ok(views.html.tradingpremises.remove_agent_premises_reasons(EmptyForm, index, complete))
@@ -47,14 +45,13 @@ class RemoveAgentPremisesReasonsController @Inject () (
   }
 
   def post(index: Int, complete: Boolean = false) =
-    Authorised.async {
-      implicit authContext =>
+    authAction.async {
         implicit request =>
           Form2[AgentRemovalReason](request.body) match {
             case form: InvalidForm => Future.successful(
               BadRequest(remove_agent_premises_reasons(form, index, complete)))
 
-            case ValidForm(_, data) => updateDataStrict[TradingPremises](index) {
+            case ValidForm(_, data) => updateDataStrict[TradingPremises](request.credId, index) {
               _.copy(
                 removalReason = Some(data.removalReason),
                 removalReasonOther = data.removalReasonOther

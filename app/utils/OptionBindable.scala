@@ -18,6 +18,7 @@ package utils
 
 import play.api.mvc.PathBindable
 
+// $COVERAGE-OFF$
 object Binders {
   implicit def optionBindable[T : PathBindable] = new PathBindable[Option[T]] {
     override def bind(key: String, value: String): Either[String, Option[T]] =

@@ -16,47 +16,41 @@
 
 package controllers.renewal
 
-import javax.inject.Inject
-
 import cats.data.OptionT
-import controllers.BaseController
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.renewal.{CustomersOutsideUK, Renewal, TransactionsInLast12Months}
-import services.RenewalService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import views.html.renewal.transactions_in_last_12_months
 import cats.implicits._
 import connectors.DataCacheConnector
+import controllers.DefaultBaseController
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.businessmatching._
-import models.moneyservicebusiness.MoneyServiceBusiness
-import play.api.mvc.Result
-import utils.ControllerHelper
+import models.renewal.{Renewal, TransactionsInLast12Months}
+import services.RenewalService
+import utils.AuthAction
+import views.html.renewal.transactions_in_last_12_months
 
 import scala.concurrent.Future
 
 class TransactionsInLast12MonthsController @Inject()(
-                                                      val authConnector: AuthConnector,
+                                                      val authAction: AuthAction,
                                                       val dataCacheConnector: DataCacheConnector,
-                                                      renewalService: RenewalService) extends BaseController {
+                                                      renewalService: RenewalService) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
         (for {
-          renewal <- OptionT(renewalService.getRenewal)
+          renewal <- OptionT(renewalService.getRenewal(request.credId))
           transfers <- OptionT.fromOption[Future](renewal.transactionsInLast12Months)
         } yield {
           Ok(transactions_in_last_12_months(Form2[TransactionsInLast12Months](transfers), edit))
         }) getOrElse Ok(transactions_in_last_12_months(EmptyForm, edit))
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request =>
         Form2[TransactionsInLast12Months](request.body) match {
           case f: InvalidForm => Future.successful(BadRequest(transactions_in_last_12_months(f, edit)))
           case ValidForm(_, model) =>
-            dataCacheConnector.fetchAll flatMap {
+            dataCacheConnector.fetchAll(request.credId) flatMap {
               optMap =>
                 (for {
                   cacheMap <- optMap
@@ -64,7 +58,7 @@ class TransactionsInLast12MonthsController @Inject()(
                   bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
                   services <- bm.msbServices
                 } yield {
-                  renewalService.updateRenewal(renewal.transactionsInLast12Months(model)) map { _ =>
+                  renewalService.updateRenewal(request.credId, renewal.transactionsInLast12Months(model)) map { _ =>
                     redirectTo(services.msbServices, edit)
                   }
                 }) getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))

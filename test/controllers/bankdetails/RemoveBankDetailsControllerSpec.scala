@@ -16,6 +16,7 @@
 
 package controllers.bankdetails
 
+import controllers.actions.SuccessfulAuthAction
 import models.bankdetails._
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
@@ -24,21 +25,20 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec, StatusConstants}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth, StatusConstants}
 
 class RemoveBankDetailsControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
     val request = addToken(authRequest)
 
     val controller = new RemoveBankDetailsController (
       dataCacheConnector =  mockCacheConnector,
-      authConnector = self.authConnector
+      authAction = SuccessfulAuthAction
     )
   }
 
   "Get" must {
-
     "load the remove bank account page when section data is available" in new Fixture {
 
       mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None))))
@@ -96,10 +96,9 @@ class RemoveBankDetailsControllerSpec extends AmlsSpec with MockitoSugar {
 
       verify(controller.dataCacheConnector).save[Seq[BankDetails]](
         any(),
+        any(),
         meq(Seq(completeModel1, completeModel2,completeModel3,completeModel4))
-      )(any(), any(), any())
-
+      )(any(), any())
     }
-
   }
 }

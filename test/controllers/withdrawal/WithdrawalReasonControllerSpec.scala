@@ -18,6 +18,7 @@ package controllers.withdrawal
 
 import cats.implicits._
 import connectors.AmlsConnector
+import controllers.actions.SuccessfulAuthAction
 import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawSubscriptionResponse, WithdrawalReason}
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
@@ -27,13 +28,13 @@ import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
 class WithdrawalReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
 
-  trait TestFixture extends AuthorisedFixture with DependencyMocks {
+  trait TestFixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
 
     val request = addToken(authRequest)
@@ -41,16 +42,16 @@ class WithdrawalReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
     val authService = mock[AuthEnrolmentsService]
     val statusService = mock[StatusService]
 
-    lazy val controller = new WithdrawalReasonController(authConnector, amlsConnector, authService, statusService, mockCacheConnector)
+    lazy val controller = new WithdrawalReasonController(SuccessfulAuthAction, amlsConnector, authService, statusService, mockCacheConnector)
 
     val amlsRegistrationNumber = "XA1234567890L"
 
     when {
-      authService.amlsRegistrationNumber(any(), any(), any())
+      authService.amlsRegistrationNumber(Some(any()), Some(any()))(any(), any())
     } thenReturn Future.successful(amlsRegistrationNumber.some)
 
     when {
-      amlsConnector.withdraw(eqTo(amlsRegistrationNumber), any())(any(), any(), any())
+      amlsConnector.withdraw(eqTo(amlsRegistrationNumber), any(), any())(any(), any())
     } thenReturn Future.successful(mock[WithdrawSubscriptionResponse])
   }
 
@@ -89,7 +90,7 @@ class WithdrawalReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
               status(result) must be(SEE_OTHER)
 
               val captor = ArgumentCaptor.forClass(classOf[WithdrawSubscriptionRequest])
-              verify(amlsConnector).withdraw(eqTo(amlsRegistrationNumber), captor.capture())(any(), any(), any())
+              verify(amlsConnector).withdraw(eqTo(amlsRegistrationNumber), captor.capture(), any())(any(), any())
 
               captor.getValue.withdrawalReason mustBe WithdrawalReason.OutOfScope
 
@@ -107,7 +108,7 @@ class WithdrawalReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
               status(result) must be(SEE_OTHER)
 
               val captor = ArgumentCaptor.forClass(classOf[WithdrawSubscriptionRequest])
-              verify(amlsConnector).withdraw(eqTo(amlsRegistrationNumber), captor.capture())(any(), any(), any())
+              verify(amlsConnector).withdraw(eqTo(amlsRegistrationNumber), captor.capture(), any())(any(), any())
 
               captor.getValue.withdrawalReason mustBe WithdrawalReason.Other("reason")
               captor.getValue.withdrawalReasonOthers mustBe "reason".some
@@ -136,7 +137,7 @@ class WithdrawalReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
         "return InternalServerError" in new TestFixture {
 
           when {
-            authService.amlsRegistrationNumber(any(), any(), any())
+            authService.amlsRegistrationNumber(Some(any()), Some(any()))(any(), any())
           } thenReturn Future.successful(None)
 
           val newRequest = request.withFormUrlEncodedBody(

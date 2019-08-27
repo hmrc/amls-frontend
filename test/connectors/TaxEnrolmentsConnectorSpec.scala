@@ -23,7 +23,8 @@ import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
 import models.enrolment.{AmlsEnrolmentKey, ErrorResponse, TaxEnrolment}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{AbstractPatienceConfiguration, ScalaFutures}
+import org.scalatest.time.{Millis, Seconds, Span}
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HttpResponse, Upstream4xxResponse}
@@ -39,17 +40,18 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
   with UserDetailsGenerator
   with BaseGenerator {
 
+  implicit override val patienceConfig = PatienceConfig(timeout = Span(2, Seconds), interval = Span(20, Millis))
+
   trait Fixture {
 
     val http = mock[WSHttp]
     val appConfig = mock[AppConfig]
-    val authConnector = mock[AuthConnector]
     val auditConnector = mock[AuditConnector]
+    val groupIdentfier = stringOfLengthGen(10).sample.get
 
-    val connector = new TaxEnrolmentsConnector(http, appConfig, authConnector, auditConnector)
+    val connector = new TaxEnrolmentsConnector(http, appConfig, auditConnector)
     val baseUrl = "http://localhost:3001"
     val serviceStub = "tax-enrolments"
-    val userDetails = userDetailsGen.sample.get
     val enrolKey = AmlsEnrolmentKey(amlsRegistrationNumber)
 
     when {
@@ -60,14 +62,9 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
       appConfig.enrolmentStubsUrl
     } thenReturn serviceStub
 
-    when {
-      authConnector.userDetails(any(), any(), any())
-    } thenReturn Future.successful(userDetails)
-
     val enrolment = TaxEnrolment("123456789", postcodeGen.sample.get)
 
     def jsonError(code: String, message: String): String = Json.toJson(ErrorResponse(code, message)).toString
-
   }
 
   "configuration" when {
@@ -91,26 +88,22 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
   "enrol" when {
     "called" must {
       "call the ES8 enrolment store endpoint to enrol the user" in new Fixture {
-        val endpointUrl = s"$baseUrl/${serviceStub}/groups/${userDetails.groupIdentifier.get}/enrolments/${enrolKey.key}"
+
+        val endpointUrl = s"$baseUrl/${serviceStub}/groups/$groupIdentfier/enrolments/${enrolKey.key}"
 
         when {
           http.POST[TaxEnrolment, HttpResponse](any(), any(), any())(any(), any(), any(), any())
         } thenReturn Future.successful(HttpResponse(OK))
 
-        whenReady(connector.enrol(enrolKey, enrolment)) { _ =>
-          verify(authConnector).userDetails(any(), any(), any())
+        whenReady(connector.enrol(enrolKey, enrolment, Some(groupIdentfier))) { _ =>
           verify(http).POST[TaxEnrolment, HttpResponse](eqTo(endpointUrl), eqTo(enrolment), any())(any(), any(), any(), any())
           verify(auditConnector).sendEvent(any())(any(), any())
         }
       }
 
       "throw an exception when no group identifier is available" in new Fixture {
-        when {
-          authConnector.userDetails(any(), any(), any())
-        } thenReturn Future.successful(userDetails.copy(groupIdentifier = None))
-
         intercept[Exception] {
-          await(connector.enrol(enrolKey, enrolment))
+          await(connector.enrol(enrolKey, enrolment, None))
         }
       }
 
@@ -120,7 +113,7 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
         } thenReturn Future.failed(Upstream4xxResponse(jsonError("ERROR_INVALID_IDENTIFIERS", "The enrolment identifiers provided were invalid"), BAD_REQUEST, BAD_REQUEST))
 
         intercept[DuplicateEnrolmentException] {
-          await(connector.enrol(enrolKey, enrolment))
+          await(connector.enrol(enrolKey, enrolment, Some(groupIdentfier)))
         }
       }
 
@@ -130,7 +123,7 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
         } thenReturn Future.failed(Upstream4xxResponse(jsonError("INVALID_CREDENTIAL_ID", "Invalid credential ID"), FORBIDDEN, FORBIDDEN))
 
         intercept[InvalidEnrolmentCredentialsException] {
-          await(connector.enrol(enrolKey, enrolment))
+          await(connector.enrol(enrolKey, enrolment, Some(groupIdentfier)))
         }
       }
     }
@@ -140,26 +133,21 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
     "called" must {
       "call the ES9 API endpoint" in new Fixture {
         val authority = mock[Authority]
-        val endpointUrl = s"$baseUrl/${serviceStub}/groups/${userDetails.groupIdentifier.get}/enrolments/${enrolKey.key}"
+        val endpointUrl = s"$baseUrl/${serviceStub}/groups/$groupIdentfier/enrolments/${enrolKey.key}"
 
         when {
           http.DELETE[HttpResponse](any())(any(), any(), any())
         } thenReturn Future.successful(HttpResponse(NO_CONTENT))
 
-        whenReady(connector.deEnrol(amlsRegistrationNumber)) { _ =>
-          verify(authConnector).userDetails(any(), any(), any())
+        whenReady(connector.deEnrol(amlsRegistrationNumber, Some(groupIdentfier))) { _ =>
           verify(http).DELETE[HttpResponse](eqTo(endpointUrl))(any(), any(), any())
           verify(auditConnector).sendEvent(any())(any(), any())
         }
       }
 
       "throw an exception when there is no group identifier" in new Fixture {
-        val details = userDetailsGen.sample.get.copy(groupIdentifier = None)
-
-        when(authConnector.userDetails(any(), any(), any())).thenReturn(Future.successful(details))
-
         intercept[Exception] {
-          await(connector.deEnrol(amlsRegistrationNumber))
+          await(connector.deEnrol(amlsRegistrationNumber, None))
         } match {
           case ex => ex.getMessage mustBe "Group identifier is unavailable"
         }

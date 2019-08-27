@@ -17,28 +17,27 @@
 package controllers.renewal
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching._
 import models.renewal.{CustomersOutsideUK, Renewal}
 import services.{AutoCompleteService, RenewalService}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.renewal._
 
 import scala.concurrent.Future
 
 @Singleton
 class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                             val authConnector: AuthConnector,
+                                             val authAction: AuthAction,
                                              val renewalService: RenewalService,
                                              val autoCompleteService: AutoCompleteService
-                                            ) extends BaseController {
+                                            ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        renewalService.getRenewal map {
+        renewalService.getRenewal(request.credId).map {
           response =>
             val form: Form2[CustomersOutsideUK] = (for {
               renewal <- response
@@ -48,20 +47,19 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
         }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request =>
         Form2[CustomersOutsideUK](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(customers_outside_uk(f, edit, autoCompleteService.getCountries)))
           case ValidForm(_, data) => {
-            dataCacheConnector.fetchAll flatMap { optionalCache =>
+            dataCacheConnector.fetchAll(request.credId).flatMap { optionalCache =>
               (for {
                 cache <- optionalCache
                 businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
                 renewal <- cache.getEntry[Renewal](Renewal.key)
               } yield {
-                renewalService.updateRenewal(renewal.customersOutsideUK(data)) map {
+                renewalService.updateRenewal(request.credId, renewal.customersOutsideUK(data)) map {
                   _ =>
                     (edit, businessMatching) match {
                       case (true, _) => Redirect(routes.SummaryController.get())

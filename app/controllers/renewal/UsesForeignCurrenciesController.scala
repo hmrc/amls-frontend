@@ -19,26 +19,25 @@ package controllers.renewal
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching._
 import models.renewal._
 import services.RenewalService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.renewal.uses_foreign_currencies
 
 import scala.concurrent.Future
 
-class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector,
+class UsesForeignCurrenciesController @Inject()(val authAction: AuthAction,
                                                 renewalService: RenewalService,
-                                                dataCacheConnector: DataCacheConnector) extends BaseController {
+                                                dataCacheConnector: DataCacheConnector) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
         val block = for {
-          renewal <- OptionT(renewalService.getRenewal)
+          renewal <- OptionT(renewalService.getRenewal(request.credId))
           whichCurrencies <- OptionT.fromOption[Future](renewal.whichCurrencies)
           ufc <- OptionT.fromOption[Future](whichCurrencies.usesForeignCurrencies)
         } yield {
@@ -48,13 +47,12 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
         block getOrElse Ok(uses_foreign_currencies(EmptyForm, edit))
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request =>
         Form2[UsesForeignCurrencies](request.body) match {
           case f: InvalidForm => Future.successful(BadRequest(uses_foreign_currencies(f, edit)))
           case ValidForm(_, model) =>
-            dataCacheConnector.fetchAll flatMap {
+            dataCacheConnector.fetchAll(request.credId) flatMap {
               optMap =>
                 val result = for {
                   cacheMap <- optMap
@@ -63,7 +61,7 @@ class UsesForeignCurrenciesController @Inject()(val authConnector: AuthConnector
                   ba <- bm.activities
                   services <- bm.msbServices
                 } yield {
-                  renewalService.updateRenewal(updateCurrencies(renewal, model)) map { _ =>
+                  renewalService.updateRenewal(request.credId, updateCurrencies(renewal, model)) map { _ =>
                     model match {
                       case UsesForeignCurrenciesYes => Redirect(routes.MoneySourcesController.get(edit))
                       case _ => routing(ba.businessActivities, services.msbServices, edit)

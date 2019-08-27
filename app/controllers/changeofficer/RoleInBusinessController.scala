@@ -16,49 +16,46 @@
 
 package controllers.changeofficer
 
-import javax.inject.Inject
-
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import controllers.changeofficer.Helpers._
-import forms.{InvalidForm, Form2, ValidForm, EmptyForm}
+import forms.{Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.businessmatching.BusinessMatching
-import models.changeofficer.{Role, ChangeOfficer, RoleInBusiness}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import models.changeofficer.{ChangeOfficer, Role, RoleInBusiness}
+import uk.gov.hmrc.http.HeaderCarrier
+import utils.AuthAction
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 class RoleInBusinessController @Inject()
-(val authConnector: AuthConnector, implicit val dataCacheConnector: DataCacheConnector) extends BaseController {
-  def get = Authorised.async {
-    implicit authContext => implicit request =>
+(authAction: AuthAction, implicit val dataCacheConnector: DataCacheConnector) extends DefaultBaseController {
+  def get = authAction.async {
+    implicit request =>
 
       val result = for {
-        co <- OptionT(dataCacheConnector.fetch[ChangeOfficer](ChangeOfficer.key)) orElse OptionT.some(ChangeOfficer(RoleInBusiness(Set.empty[Role])))
-        (businessType, name) <- getBusinessNameAndName
+        co <- OptionT(dataCacheConnector.fetch[ChangeOfficer](request.credId, ChangeOfficer.key)) orElse OptionT.some(ChangeOfficer(RoleInBusiness(Set.empty[Role])))
+        (businessType, name) <- getBusinessNameAndName(request.credId)
       } yield {
         Ok(views.html.changeofficer.role_in_business(Form2[RoleInBusiness](co.roleInBusiness), businessType, name))
       }
-
       result getOrElse InternalServerError("Unable to get nominated officer")
   }
 
-  def post() = Authorised.async {
-    implicit authContext => implicit request =>
+  def post() = authAction.async {
+    implicit request =>
       Form2[RoleInBusiness](request.body) match {
         case f: InvalidForm =>
-          val result = getBusinessNameAndName map {
+          val result = getBusinessNameAndName(request.credId) map {
             case (businessType, name) => BadRequest(views.html.changeofficer.role_in_business(f, businessType, name))
           }
 
           result getOrElse InternalServerError("Unable to get nominated officer")
 
         case ValidForm(_, data) =>
-          dataCacheConnector.save(ChangeOfficer.key, ChangeOfficer(data)) map { _ =>
+          dataCacheConnector.save(request.credId, ChangeOfficer.key, ChangeOfficer(data)) map { _ =>
             if(data.roles.isEmpty){
               Redirect(routes.RemoveResponsiblePersonController.get())
             } else {
@@ -68,12 +65,12 @@ class RoleInBusinessController @Inject()
       }
   }
 
-  private def getBusinessNameAndName(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
+  private def getBusinessNameAndName(credId: String)(implicit headerCarrier: HeaderCarrier) = {
     for {
-      businessMatching <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
+      businessMatching <- OptionT(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
       reviewDetails <- OptionT.fromOption[Future](businessMatching.reviewDetails)
       businessType <- OptionT.fromOption[Future](reviewDetails.businessType)
-      name <- getNominatedOfficerName()
+      name <- getNominatedOfficerName(credId)
     } yield (businessType, name)
   }
 }

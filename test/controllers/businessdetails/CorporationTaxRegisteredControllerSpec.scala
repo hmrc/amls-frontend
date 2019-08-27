@@ -17,24 +17,25 @@
 package controllers.businessdetails
 
 import connectors.BusinessMatchingConnector
+import controllers.actions.SuccessfulAuthAction
 import models.{Country}
 import models.businessdetails.{BusinessDetails, CorporationTaxRegisteredYes}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.businessmatching.BusinessType.{LimitedCompany, UnincorporatedBody}
 import org.mockito.Matchers.any
-import org.mockito.Mockito.{verify, when}
+import org.mockito.Mockito.{verify}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
-import org.mockito.Matchers.{eq => eqTo, _}
+import utils.DependencyMocksNewAuth
+import utils.{AmlsSpec, AuthorisedFixture}
+import org.mockito.Matchers.{eq => eqTo}
 
-import scala.concurrent.Future
+class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with DependencyMocksNewAuth {
 
-class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with DependencyMocks {
-
-  trait Fixture extends AuthorisedFixture { self =>
+  trait Fixture extends AuthorisedFixture {
+    self =>
 
     val request = addToken(authRequest)
 
@@ -51,10 +52,10 @@ class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar 
     mockCacheGetEntry[BusinessMatching](Some(businessMatching), BusinessMatching.key)
     mockCacheSave[BusinessDetails]
 
-    val controller = new CorporationTaxRegisteredController (
+    val controller = new CorporationTaxRegisteredController(
       dataCacheConnector = mockCacheConnector,
-      authConnector = self.authConnector,
-      businessMatchingConnector = mock[BusinessMatchingConnector]
+      businessMatchingConnector = mock[BusinessMatchingConnector],
+      authAction = SuccessfulAuthAction
     )
   }
 
@@ -62,92 +63,88 @@ class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar 
 
     "get is called" must {
 
-      "redirect to ConfirmRegisteredOfficeController" when {
-        "edit is false" in new Fixture {
+      "redirect to ConfirmRegisteredOfficeController" in new Fixture {
 
-          val data = BusinessDetails(corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1111111111")))
+        val data = BusinessDetails(corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1111111111")))
 
-          mockCacheGetEntry[BusinessDetails](Some(data), BusinessDetails.key)
+        mockCacheGetEntry[BusinessDetails](Some(data), BusinessDetails.key)
 
-          val result = controller.get()(request)
-          status(result) must be(SEE_OTHER)
+        val result = controller.get()(request)
+        status(result) must be(SEE_OTHER)
 
-          redirectLocation(result) must be(Some(routes.ConfirmRegisteredOfficeController.get().url))
-        }
+        redirectLocation(result) must be(Some(routes.ConfirmRegisteredOfficeController.get().url))
+      }
+    }
+
+    "process the UTR" when {
+      "business matching UTR exists" in new Fixture {
+        val reviewDtlsUtr = ReviewDetails(
+          "BusinessName",
+          Some(BusinessType.LimitedCompany),
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
+          "XE0000000000000",
+          Some("1111111111")
+        )
+
+        val corpTax = CorporationTaxRegisteredYes(reviewDtlsUtr.utr.get)
+
+        override val businessMatching = BusinessMatching(Some(reviewDtlsUtr))
+
+        mockCacheFetchAll
+        mockCacheGetEntry[BusinessMatching](Some(businessMatching), BusinessMatching.key)
+        mockCacheSave[BusinessDetails]
+
+        val data = BusinessDetails(corporationTaxRegistered = None)
+
+        mockCacheGetEntry[BusinessDetails](Some(data), BusinessDetails.key)
+
+        val result = controller.get()(request)
+        status(result) must be(SEE_OTHER)
+
+        verify(controller.dataCacheConnector).save(eqTo("internalId"), eqTo(BusinessDetails.key),
+          eqTo(data.corporationTaxRegistered(corpTax)))(any(), any())
       }
 
-      "process the UTR" when {
-        "business matching UTR exists" in new Fixture {
-          val reviewDtlsUtr = ReviewDetails(
-            "BusinessName",
-            Some(BusinessType.LimitedCompany),
-            Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
-            "XE0000000000000",
-            Some("1111111111")
-          )
+      "business matching UTR NOT exists" in new Fixture {
+        val reviewDtlsUtr = ReviewDetails(
+          "BusinessName",
+          Some(BusinessType.LimitedCompany),
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
+          "XE0000000000000",
+          None
+        )
 
-          val corpTax = CorporationTaxRegisteredYes(reviewDtlsUtr.utr.get)
+        override val businessMatching = BusinessMatching(Some(reviewDtlsUtr))
 
-          override val businessMatching = BusinessMatching(Some(reviewDtlsUtr))
+        mockCacheFetchAll
+        mockCacheGetEntry[BusinessMatching](Some(businessMatching), BusinessMatching.key)
+        mockCacheSave[BusinessDetails]
 
-          mockCacheFetchAll
-          mockCacheGetEntry[BusinessMatching](Some(businessMatching), BusinessMatching.key)
-          mockCacheSave[BusinessDetails]
+        val data = BusinessDetails(corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1111111111")))
 
-          val data = BusinessDetails(corporationTaxRegistered = None)
+        mockCacheGetEntry[BusinessDetails](Some(data), BusinessDetails.key)
 
-          mockCacheGetEntry[BusinessDetails](Some(data), BusinessDetails.key)
-
-          val result = controller.get()(request)
-          status(result) must be(SEE_OTHER)
-
-          verify(controller.dataCacheConnector).save(eqTo(BusinessDetails.key),
-            eqTo(data.corporationTaxRegistered(corpTax)))(any(), any(), any())
-        }
-
-        "business matching UTR NOT exists" in new Fixture {
-          val reviewDtlsUtr = ReviewDetails(
-            "BusinessName",
-            Some(BusinessType.LimitedCompany),
-            Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
-            "XE0000000000000",
-            None
-          )
-
-          override val businessMatching = BusinessMatching(Some(reviewDtlsUtr))
-
-          mockCacheFetchAll
-          mockCacheGetEntry[BusinessMatching](Some(businessMatching), BusinessMatching.key)
-          mockCacheSave[BusinessDetails]
-
-          val data = BusinessDetails(corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1111111111")))
-
-          mockCacheGetEntry[BusinessDetails](Some(data), BusinessDetails.key)
-
-          val result = controller.get()(request)
-          status(result) must be(SEE_OTHER)
-        }
+        val result = controller.get()(request)
+        status(result) must be(SEE_OTHER)
       }
+    }
 
-      "respond with NOT_FOUND" must {
-         "business type is UnincorporatedBody" in new Fixture {
+    "respond with NOT_FOUND" must {
+      "business type is UnincorporatedBody" in new Fixture {
 
-           mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(Some(ReviewDetails(
-             "BusinessName",
-             Some(UnincorporatedBody),
-             Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
-           ))), BusinessMatching.key)
+        mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(Some(ReviewDetails(
+          "BusinessName",
+          Some(UnincorporatedBody),
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
+        ))), BusinessMatching.key)
 
-           val data = BusinessDetails(corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1111111111")))
+        val data = BusinessDetails(corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1111111111")))
 
-           mockCacheGetEntry[BusinessDetails](Some(data), BusinessDetails.key)
+        mockCacheGetEntry[BusinessDetails](Some(data), BusinessDetails.key)
 
-           val result = controller.get()(request)
-           status(result) must be(NOT_FOUND)
-        }
+        val result = controller.get()(request)
+        status(result) must be(NOT_FOUND)
       }
-
     }
   }
-
 }

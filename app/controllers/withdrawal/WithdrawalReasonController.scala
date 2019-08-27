@@ -19,33 +19,30 @@ package controllers.withdrawal
 import cats.data.OptionT
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawalReason}
 import org.joda.time.LocalDate
 import services.{AuthEnrolmentsService, StatusService}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AckRefGenerator
+import utils.{AckRefGenerator, AuthAction}
 import views.html.withdrawal.withdrawal_reason
 
 import scala.concurrent.Future
 
 class WithdrawalReasonController @Inject()(
-                                            val authConnector: AuthConnector,
+                                            authAction: AuthAction,
                                             val amls: AmlsConnector,
                                             enrolments: AuthEnrolmentsService,
                                             statusService: StatusService,
-                                            cacheConnector: DataCacheConnector) extends BaseController {
+                                            cacheConnector: DataCacheConnector) extends DefaultBaseController {
 
-  def get = Authorised.async {
-    implicit authContext =>
-      implicit request =>
-        Future.successful(Ok(withdrawal_reason(EmptyForm)))
+  def get = authAction.async {
+    implicit request =>
+      Future.successful(Ok(withdrawal_reason(EmptyForm)))
   }
 
-  def post = Authorised.async {
-    implicit authContext =>
+  def post = authAction.async {
       implicit request =>
         Form2[WithdrawalReason](request.body) match {
           case f: InvalidForm => Future.successful(BadRequest(withdrawal_reason(f)))
@@ -63,8 +60,8 @@ class WithdrawalReasonController @Inject()(
             )
 
             (for {
-              regNumber <- OptionT(enrolments.amlsRegistrationNumber)
-              _ <- OptionT.liftF(amls.withdraw(regNumber, withdrawal))
+              regNumber <- OptionT(enrolments.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
+              _ <- OptionT.liftF(amls.withdraw(regNumber, withdrawal, request.accountTypeId))
             } yield Redirect(controllers.routes.LandingController.get())) getOrElse InternalServerError("Unable to withdraw the application")
           }
         }

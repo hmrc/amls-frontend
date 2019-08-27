@@ -18,20 +18,18 @@ package controllers.deregister
 
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.{BusinessActivities, BusinessMatching, HighValueDealing, MoneyServiceBusiness}
 import models.deregister.{DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse, DeregistrationReason}
-import models.withdrawal.WithdrawSubscriptionRequest
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -46,16 +44,16 @@ class DeregistrationReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
     val dataCacheConnector = mock[DataCacheConnector]
     val statusService = mock[StatusService]
 
-    lazy val controller = new DeregistrationReasonController(authConnector, dataCacheConnector, amlsConnector, authService, statusService)
+    lazy val controller = new DeregistrationReasonController(SuccessfulAuthAction, dataCacheConnector, amlsConnector, authService, statusService)
 
     val amlsRegistrationNumber = "XA1234567890L"
 
     when {
-      authService.amlsRegistrationNumber(any(), any(), any())
+      authService.amlsRegistrationNumber(Some(any()), Some(any()))(any(), any())
     } thenReturn Future.successful(amlsRegistrationNumber.some)
 
     when {
-      amlsConnector.deregister(eqTo(amlsRegistrationNumber), any())(any(), any(), any())
+      amlsConnector.deregister(eqTo(amlsRegistrationNumber), any(), any())(any(), any())
     } thenReturn Future.successful(mock[DeRegisterSubscriptionResponse])
 
   }
@@ -71,7 +69,7 @@ class DeregistrationReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
               activities = Some(BusinessActivities(Set(HighValueDealing)))
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(),any(),any()))
+            when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(),any()))
               .thenReturn(Future.successful(Some(businessMatching)))
 
             val result = controller.get()(request)
@@ -96,7 +94,7 @@ class DeregistrationReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
               activities = Some(BusinessActivities(Set(MoneyServiceBusiness)))
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(),any(),any()))
+            when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(),any()))
               .thenReturn(Future.successful(Some(businessMatching)))
 
             val result = controller.get()(request)
@@ -134,7 +132,7 @@ class DeregistrationReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
               status(result) must be(SEE_OTHER)
 
               val captor = ArgumentCaptor.forClass(classOf[DeRegisterSubscriptionRequest])
-              verify(amlsConnector).deregister(eqTo(amlsRegistrationNumber), captor.capture())(any(), any(), any())
+              verify(amlsConnector).deregister(eqTo(amlsRegistrationNumber), captor.capture(), any())(any(), any())
 
               captor.getValue.deregistrationReason mustBe DeregistrationReason.OutOfScope
 
@@ -152,7 +150,7 @@ class DeregistrationReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
               status(result) must be(SEE_OTHER)
 
               val captor = ArgumentCaptor.forClass(classOf[DeRegisterSubscriptionRequest])
-              verify(amlsConnector).deregister(eqTo(amlsRegistrationNumber), captor.capture())(any(), any(), any())
+              verify(amlsConnector).deregister(eqTo(amlsRegistrationNumber), captor.capture(), any())(any(), any())
 
               captor.getValue.deregistrationReason mustBe DeregistrationReason.Other("reason")
               captor.getValue.deregReasonOther mustBe "reason".some
@@ -181,7 +179,7 @@ class DeregistrationReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
         "return InternalServerError" in new TestFixture {
 
           when {
-            authService.amlsRegistrationNumber(any(), any(), any())
+            authService.amlsRegistrationNumber(Some(any()), Some(any()))(any(), any())
           } thenReturn Future.successful(None)
 
           val newRequest = request.withFormUrlEncodedBody(

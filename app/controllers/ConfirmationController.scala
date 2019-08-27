@@ -23,56 +23,47 @@ import javax.inject.{Inject, Singleton}
 import models.ResponseType.AmendOrVariationResponseType
 import models.confirmation.{BreakdownRow, Currency}
 import models.status._
-import models.{FeeResponse, ReadStatusResponse, SubmissionRequestStatus}
+import models.{FeeResponse, SubmissionRequestStatus}
 import play.api.Logger
 import play.api.mvc.{AnyContent, Request, Result}
 import services.{AuthEnrolmentsService, FeeResponseService, StatusService, _}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.BusinessName
+import utils.{AuthAction, BusinessName}
 import views.html.confirmation._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
-class ConfirmationController @Inject()(
-                                        val authConnector: AuthConnector,
-                                        private[controllers] val keystoreConnector: KeystoreConnector,
-                                        private[controllers] implicit val dataCacheConnector: DataCacheConnector,
-                                        private[controllers] implicit val amlsConnector: AmlsConnector,
-                                        private[controllers] implicit val statusService: StatusService,
-                                        private[controllers] val authenticator: AuthenticatorConnector,
-                                        private[controllers] val feeResponseService: FeeResponseService,
-                                        private[controllers] val authEnrolmentsService: AuthEnrolmentsService,
-                                        private[controllers] val confirmationService: ConfirmationService
-                                      ) extends BaseController {
+class ConfirmationController @Inject()(authAction: AuthAction,
+                                       private[controllers] val keystoreConnector: KeystoreConnector,
+                                       private[controllers] implicit val dataCacheConnector: DataCacheConnector,
+                                       private[controllers] implicit val amlsConnector: AmlsConnector,
+                                       private[controllers] implicit val statusService: StatusService,
+                                       private[controllers] val authenticator: AuthenticatorConnector,
+                                       private[controllers] val feeResponseService: FeeResponseService,
+                                       private[controllers] val enrolmentService: AuthEnrolmentsService,
+                                       private[controllers] val confirmationService: ConfirmationService) extends DefaultBaseController {
 
   val prefix = "[ConfirmationController]"
 
-  def get() = Authorised.async {
-    Logger.debug(s"[$prefix] - begin get()...")
-    implicit authContext =>
+  def get() = authAction.async {
       implicit request =>
+        Logger.debug(s"[$prefix] - begin get()...")
         for {
           _ <- authenticator.refreshProfile
-          status <- statusService.getStatus
-          submissionRequestStatus <- dataCacheConnector.fetch[SubmissionRequestStatus](SubmissionRequestStatus.key)
-          result <- resultFromStatus(status, submissionRequestStatus)
+          status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+          submissionRequestStatus <- dataCacheConnector.fetch[SubmissionRequestStatus](request.credId, SubmissionRequestStatus.key)
+          result <- resultFromStatus(status, submissionRequestStatus, request.amlsRefNumber, request.accountTypeId, request.credId, request.groupIdentifier)
           _ <- keystoreConnector.setConfirmationStatus
         } yield result
   }
 
-  private def showRenewalConfirmation(
-                                             fees: FeeResponse,
-                                             breakdownRows: Future[Option[Seq[BreakdownRow]]],
-                                             status: SubmissionStatus,
-                                             submissionRequestStatus: Option[SubmissionRequestStatus]
-                                     )
-                                     (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
+  private def showRenewalConfirmation(fees: FeeResponse, breakdownRows: Future[Option[Seq[BreakdownRow]]],
+                                      status: SubmissionStatus, submissionRequestStatus: Option[SubmissionRequestStatus], credId: String)
+                                     (implicit hc: HeaderCarrier, request: Request[AnyContent]) = {
 
-    confirmationService.isRenewalDefined flatMap { isRenewalDefined =>
+    confirmationService.isRenewalDefined(credId) flatMap { isRenewalDefined =>
       breakdownRows map {
         case maybeRows@Some(rows) if fees.toPay(status, submissionRequestStatus) > 0 =>
           if (isRenewalDefined) {
@@ -93,12 +84,10 @@ class ConfirmationController @Inject()(
     }
   }
 
-  private def showAmendmentVariationConfirmation(
-                                                fees: FeeResponse,
-                                                breakdownRows: Future[Option[Seq[BreakdownRow]]],
-                                                status: SubmissionStatus,
-                                                submissionRequestStatus: Option[SubmissionRequestStatus])
-                                                (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
+  private def showAmendmentVariationConfirmation(fees: FeeResponse, breakdownRows: Future[Option[Seq[BreakdownRow]]],
+                                                 status: SubmissionStatus, submissionRequestStatus: Option[SubmissionRequestStatus])
+                                                (implicit hc: HeaderCarrier, request: Request[AnyContent]) = {
+
     breakdownRows map { maybeRows =>
       val amount = fees.toPay(status, submissionRequestStatus)
 
@@ -110,18 +99,16 @@ class ConfirmationController @Inject()(
     }
   }
 
-  private def resultFromStatus(status: SubmissionStatus, submissionRequestStatus: Option[SubmissionRequestStatus])
-                              (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent], statusService: StatusService): Future[Result] = {
+  private def resultFromStatus(status: SubmissionStatus, submissionRequestStatus: Option[SubmissionRequestStatus],
+                               amlsRegistrationNumber: Option[String], accountTypeId: (String, String), credId: String, groupIdentifier: Option[String])
+                              (implicit hc: HeaderCarrier, request: Request[AnyContent], statusService: StatusService): Future[Result] = {
 
     Logger.debug(s"[$prefix][resultFromStatus] - Begin get fee response...)")
 
-    def companyName(maybeStatus: Option[ReadStatusResponse]): OptionT[Future, String] =
-      maybeStatus.fold[OptionT[Future, String]](OptionT.some("")) { r => BusinessName.getNameFromAmls(r.safeId.get) }
-
-    OptionT.liftF(retrieveFeeResponse) flatMap {
+    OptionT.liftF(retrieveFeeResponse(amlsRegistrationNumber, accountTypeId, groupIdentifier)) flatMap {
       case Some(fees) if fees.paymentReference.isDefined && fees.toPay(status, submissionRequestStatus) > 0 =>
         Logger.debug(s"[$prefix][resultFromStatus] - Fee found)")
-        lazy val breakdownRows = confirmationService.getBreakdownRows(status, fees)
+        lazy val breakdownRows = confirmationService.getBreakdownRows(credId, status, fees)
 
         Logger.debug(s"[$prefix][resultFromStatus] - fees: $fees")
 
@@ -129,7 +116,7 @@ class ConfirmationController @Inject()(
           case SubmissionReadyForReview | SubmissionDecisionApproved if fees.responseType equals AmendOrVariationResponseType =>
             OptionT(showAmendmentVariationConfirmation(fees, breakdownRows, status, submissionRequestStatus))
           case ReadyForRenewal(_) | RenewalSubmitted(_) =>
-            OptionT(showRenewalConfirmation(fees, breakdownRows, status, submissionRequestStatus))
+            OptionT(showRenewalConfirmation(fees, breakdownRows, status, submissionRequestStatus, credId))
           case _ =>
             OptionT.liftF(breakdownRows) map { maybeRows =>
               Ok(confirmation_new(fees.paymentReference, fees.totalFees, maybeRows, controllers.payments.routes.WaysToPayController.get().url))
@@ -139,17 +126,19 @@ class ConfirmationController @Inject()(
       case _ =>
         Logger.debug(s"[$prefix][resultFromStatus] - No fee found)")
         for {
-          name <- BusinessName.getBusinessNameFromAmls()
+          name <- BusinessName.getBusinessNameFromAmls(amlsRegistrationNumber, accountTypeId, credId)
       } yield {
         Ok(confirmation_no_fee(name))}
     } getOrElse InternalServerError("Could not determine a response")
   }
 
-  private def retrieveFeeResponse(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[FeeResponse]] = {
+  private def retrieveFeeResponse(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), groupIdentifier: Option[String])
+                                 (implicit hc: HeaderCarrier): Future[Option[FeeResponse]] = {
+
     Logger.debug(s"[$prefix][retrieveFeeResponse] - Begin...)")
     (for {
-      amlsRegistrationNumber <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
-      fees <- OptionT(feeResponseService.getFeeResponse(amlsRegistrationNumber))
+      amlsRegNo <- OptionT(enrolmentService.amlsRegistrationNumber(amlsRegistrationNumber, groupIdentifier))
+      fees <- OptionT(feeResponseService.getFeeResponse(amlsRegNo, accountTypeId))
     } yield fees).value
   }
 }

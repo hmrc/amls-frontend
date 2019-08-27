@@ -17,6 +17,7 @@
 package controllers.tradingpremises
 
 import connectors.{AmlsConnector, DataCacheConnector}
+import controllers.actions.SuccessfulAuthAction
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.Country
@@ -30,13 +31,13 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
 class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with TradingPremisesGenerator with BusinessMatchingGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
     val applicationReference = "SUIYD3274890384"
 
@@ -49,7 +50,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
     val controller = new ConfirmAddressController(
       messagesApi,
       self.dataCache,
-      self.authConnector,
+      SuccessfulAuthAction,
       enrolments,
       statusService,
       amls
@@ -142,15 +143,15 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
           )
 
           when {
-            controller.dataCacheConnector.fetch[BusinessMatching](meq(BusinessMatching.key))(any(), any(), any())
+            controller.dataCacheConnector.fetch[BusinessMatching](any(), meq(BusinessMatching.key))(any(), any())
           } thenReturn Future.successful(Some(model))
 
           when {
-            controller.amlsConnector.registrationDetails(meq(safeId))(any(), any(), any())
+            controller.amlsConnector.registrationDetails(any(), meq(safeId))(any(), any())
           } thenReturn Future.successful(RegistrationDetails("Business Name from registration", isIndividual = false))
 
           when {
-            controller.statusService.getSafeIdFromReadStatus(any())(any(), any(), any())
+            controller.statusService.getSafeIdFromReadStatus(any(), any())(any(), any())
           } thenReturn Future.successful(Some(safeId))
 
           val newRequest = request.withFormUrlEncodedBody(
@@ -160,7 +161,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
           mockCacheGetEntry(Some(Seq(TradingPremises())), TradingPremises.key)
           mockCacheGetEntry(Some(model), BusinessMatching.key)
 
-          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(1)(newRequest)
@@ -170,7 +171,8 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
 
           verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
             any(),
-            meq(Seq(TradingPremises(yourTradingPremises = Some(ytp)))))(any(), any(), any())
+            any(),
+            meq(Seq(TradingPremises(yourTradingPremises = Some(ytp)))))(any(), any())
 
         }
 
@@ -182,7 +184,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
           mockCacheGetEntry(Some(Seq(TradingPremises(yourTradingPremises = Some(mock[YourTradingPremises])))), TradingPremises.key)
           mockCacheGetEntry(Some(bm), BusinessMatching.key)
 
-          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(1)(newRequest)

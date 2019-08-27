@@ -16,22 +16,23 @@
 
 package controllers.tradingpremises
 
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.BusinessMatching
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito._
 import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import org.mockito.Mockito._
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec, StatusConstants}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth, StatusConstants}
 
 class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar with PrivateMethodTester {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
 
     val request = addToken(authRequest)
 
@@ -44,7 +45,7 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
     mockCacheGetEntry[Seq[TradingPremises]](Some(Seq(TradingPremises())), TradingPremises.key)
     mockCacheGetEntry[BusinessMatching](Some(BusinessMatching()), BusinessMatching.key)
 
-    val controller = new IsResidentialController(messagesApi, self.authConnector, mockCacheConnector)
+    val controller = new IsResidentialController(messagesApi, SuccessfulAuthAction, mockCacheConnector)
 
     mockCacheSave[Seq[TradingPremises]]
   }
@@ -257,10 +258,10 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
 
       status(result) must be(SEE_OTHER)
 
-      verify(controller.dataCacheConnector).save[Seq[TradingPremises]](eqTo(TradingPremises.key), eqTo(Seq(TradingPremises(
+      verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(), eqTo(TradingPremises.key), eqTo(Seq(TradingPremises(
         yourTradingPremises = Some(ytp.copy(isResidential = Some(true))),
         hasChanged = true
-      ))))(any(),any(),any())
+      ))))(any(), any())
 
     }
 

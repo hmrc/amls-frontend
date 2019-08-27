@@ -16,13 +16,11 @@
 
 package controllers.renewal
 
-import connectors.DataCacheConnector
-import models.DateOfChange
+import controllers.actions.SuccessfulAuthAction
 import models.businessactivities._
 import models.businessmatching.{BusinessActivities => Activities, _}
-import models.flowmanagement.RemoveBusinessTypeFlowModel
-import models.renewal.Renewal
 import models.renewal.AMLSTurnover.First
+import models.renewal.Renewal
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -32,13 +30,13 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
 
 import scala.concurrent.Future
 
 class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
     self =>
     val request = addToken(authRequest)
 
@@ -46,7 +44,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
     val controller = new AMLSTurnoverController(
       dataCacheConnector = mockCacheConnector,
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       renewalService = mockRenewalService
     )
 
@@ -56,7 +54,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
     def testRenewal: Option[Renewal] = None
 
-    when(mockCacheConnector.fetchAll(any(), any()))
+    when(mockCacheConnector.fetchAll(any())(any()))
       .thenReturn(Future.successful(Some(mockCacheMap)))
 
     when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
@@ -102,7 +100,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(bMatching))
 
-        when(mockCacheConnector.fetchAll(any(), any()))
+        when(mockCacheConnector.fetchAll(any())(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get()(request)
@@ -123,7 +121,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(bMatching))
 
-        when(mockCacheConnector.fetchAll(any(), any()))
+        when(mockCacheConnector.fetchAll(any())(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get()(request)
@@ -144,7 +142,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(bMatching))
 
-        when(mockCacheConnector.fetchAll(any(), any()))
+        when(mockCacheConnector.fetchAll(any())(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get()(request)
@@ -165,7 +163,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(bMatching))
 
-        when(mockCacheConnector.fetchAll(any(), any()))
+        when(mockCacheConnector.fetchAll(any())(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get()(request)
@@ -186,7 +184,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(bMatching))
 
-        when(mockCacheConnector.fetchAll(any(), any()))
+        when(mockCacheConnector.fetchAll(any())(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get()(request)
@@ -207,7 +205,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(bMatching))
 
-        when(mockCacheConnector.fetchAll(any(), any()))
+        when(mockCacheConnector.fetchAll(any())(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get()(request)
@@ -228,7 +226,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(bMatching))
 
-        when(mockCacheConnector.fetchAll(any(), any()))
+        when(mockCacheConnector.fetchAll(any())(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get()(request)
@@ -255,10 +253,10 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
               activities = Some(Activities(Set(BillPaymentServices)))
             )
 
-            when(mockRenewalService.getRenewal(any(), any(), any()))
+            when(mockRenewalService.getRenewal(any())(any(), any()))
               .thenReturn(Future.successful(None))
 
-            when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+            when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
               .thenReturn(Future.successful(mockCacheMap))
 
             mockCacheFetch[BusinessMatching](Some(bMatching), Some(BusinessMatching.key))
@@ -279,9 +277,9 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
             mockCacheFetch(Some(bMatching))
 
-            when(mockRenewalService.getRenewal(any(), any(), any()))
+            when(mockRenewalService.getRenewal(any())(any(), any()))
               .thenReturn(Future.successful(None))
-            when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+            when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
               .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post()(newRequest)
@@ -302,9 +300,9 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
             mockCacheFetch(Some(bMatching))
 
-            when(mockRenewalService.getRenewal(any(), any(), any()))
+            when(mockRenewalService.getRenewal(any())(any(), any()))
               .thenReturn(Future.successful(None))
-            when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+            when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
               .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post()(newRequest)
@@ -326,9 +324,9 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
             mockCacheFetch(Some(bMatching))
 
-            when(mockRenewalService.getRenewal(any(), any(), any()))
+            when(mockRenewalService.getRenewal(any())(any(), any()))
               .thenReturn(Future.successful(None))
-            when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+            when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
               .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post()(newRequest)
@@ -344,7 +342,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
         "show BAD_REQUEST" in new Fixture {
 
-          when(mockCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
+          when(mockCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
             .thenReturn(Future.successful(Some(businessMatching)))
 
           val result = controller.post(true)(request)

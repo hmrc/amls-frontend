@@ -18,21 +18,22 @@ package controllers.businessactivities
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, NCARegistered}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.businessactivities._
 
 import scala.concurrent.Future
 
 class NCARegisteredController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                         override val authConnector: AuthConnector
-                                        )extends BaseController {
+                                         val authAction: AuthAction
+                                        ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request => {
+      dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
         response =>
           val form: Form2[NCARegistered] = (for {
             businessActivities <- response
@@ -40,17 +41,18 @@ class NCARegisteredController @Inject() (val dataCacheConnector: DataCacheConnec
           } yield Form2[NCARegistered](ncaRegistered)).getOrElse(EmptyForm)
           Ok(nca_registered(form, edit))
       }
+    }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request =>
       Form2[NCARegistered](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(nca_registered(f, edit)))
         case ValidForm(_, data) =>
           for {
-            businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key,
+            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
               businessActivities.ncaRegistered(data)
             )
           } yield edit match {
@@ -59,5 +61,4 @@ class NCARegisteredController @Inject() (val dataCacheConnector: DataCacheConnec
           }
       }
     }
-  }
 }

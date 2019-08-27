@@ -16,8 +16,8 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ZeroToFiveMonths}
 import models.responsiblepeople._
 import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview}
@@ -43,7 +43,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
     val timeAtAddressController = new TimeAtCurrentAddressController (
       dataCacheConnector = mockDataCacheConnector,
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       statusService = mock[StatusService]
       )
   }
@@ -68,7 +68,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
          val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
          val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
 
-          when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
           val result = timeAtAddressController.get(RecordId)(request)
@@ -86,8 +86,8 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
           val responsiblePeople = ResponsiblePerson(personName)
 
-          when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+            (any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
           val result = timeAtAddressController.get(RecordId)(request)
           status(result) must be(OK)
@@ -107,8 +107,8 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         val responsiblePeople = ResponsiblePerson()
 
-        when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = timeAtAddressController.get(outOfBounds)(request)
         status(result) must be(NOT_FOUND)
@@ -128,11 +128,11 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
 
-          when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+          when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(timeAtAddressController.statusService.getStatus(any(), any(), any()))
+          when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
           val result = timeAtAddressController.post(RecordId)(requestWithParams)
@@ -148,10 +148,10 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
             "timeAtAddress" -> ""
           )
 
-          when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+          when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(timeAtAddressController.statusService.getStatus(any(), any(), any()))
+          when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
           val result = timeAtAddressController.post(RecordId)(requestWithMissingParams)
@@ -170,11 +170,11 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
 
-          when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+          when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(timeAtAddressController.statusService.getStatus(any(), any(), any()))
+          when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
           val result = timeAtAddressController.post(outOfBounds, true)(requestWithParams)
@@ -198,11 +198,11 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
                 val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
                 val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
 
-                when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+                when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
                   .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-                when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+                when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
                   .thenReturn(Future.successful(emptyCache))
-                when(timeAtAddressController.statusService.getStatus(any(), any(), any()))
+                when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any()))
                   .thenReturn(Future.successful(SubmissionReadyForReview))
 
                 val result = timeAtAddressController.post(RecordId, true)(requestWithParams)
@@ -226,11 +226,11 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
                 )
                 val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
 
-                when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+                when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
                   .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-                when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+                when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
                   .thenReturn(Future.successful(emptyCache))
-                when(timeAtAddressController.statusService.getStatus(any(), any(), any()))
+                when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any()))
                   .thenReturn(Future.successful(SubmissionReadyForReview))
 
                 val result = timeAtAddressController.post(RecordId, true)(requestWithParams)
@@ -252,11 +252,11 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
               val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
               val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
 
-              when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+              when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
                 .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-              when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+              when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
                 .thenReturn(Future.successful(emptyCache))
-              when(timeAtAddressController.statusService.getStatus(any(), any(), any()))
+              when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any()))
                 .thenReturn(Future.successful(SubmissionReadyForReview))
 
               val result = timeAtAddressController.post(RecordId, true)(requestWithParams)
@@ -276,12 +276,12 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
               val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
               val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
 
-              when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+              when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
                 .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-              when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+              when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
                 .thenReturn(Future.successful(emptyCache))
 
-              when(timeAtAddressController.statusService.getStatus(any(), any(), any()))
+              when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any()))
                 .thenReturn(Future.successful(SubmissionReadyForReview))
 
               val result = timeAtAddressController.post(RecordId, true)(requestWithParams)
@@ -306,11 +306,11 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
                 "timeAtAddress" -> "01"
               )
 
-              when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+              when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
                 .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-              when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+              when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
                 .thenReturn(Future.successful(emptyCache))
-              when(timeAtAddressController.statusService.getStatus(any(), any(), any()))
+              when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any()))
                 .thenReturn(Future.successful(SubmissionReadyForReview))
 
               val result = timeAtAddressController.post(RecordId)(requestWithParams)
@@ -326,11 +326,11 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
                 "timeAtAddress" -> "03"
               )
 
-              when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+              when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
                 .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-              when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+              when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
                 .thenReturn(Future.successful(emptyCache))
-              when(timeAtAddressController.statusService.getStatus(any(), any(), any()))
+              when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any()))
                 .thenReturn(Future.successful(SubmissionReadyForReview))
 
               val result = timeAtAddressController.post(RecordId)(requestWithParams)
@@ -346,11 +346,11 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
                 "timeAtAddress" -> "04"
               )
 
-              when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+              when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
                 .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-              when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+              when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
                 .thenReturn(Future.successful(emptyCache))
-              when(timeAtAddressController.statusService.getStatus(any(), any(), any()))
+              when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any()))
                 .thenReturn(Future.successful(SubmissionReadyForReview))
 
               val result = timeAtAddressController.post(RecordId)(requestWithParams)
@@ -380,11 +380,11 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
                   lineId = Some(1)
                 )
 
-                when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+                when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
                   .thenReturn(Future.successful(Some(Seq(originalResponsiblePeople))))
-                when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+                when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
                   .thenReturn(Future.successful(emptyCache))
-                when(timeAtAddressController.statusService.getStatus(any(), any(), any()))
+                when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any()))
                   .thenReturn(Future.successful(SubmissionDecisionApproved))
 
                 val result = timeAtAddressController.post(RecordId, true)(requestWithParams)
@@ -408,11 +408,11 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
                   lineId = Some(1)
                 )
 
-                when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+                when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
                   .thenReturn(Future.successful(Some(Seq(originalResponsiblePeople))))
-                when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+                when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
                   .thenReturn(Future.successful(emptyCache))
-                when(timeAtAddressController.statusService.getStatus(any(), any(), any()))
+                when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any()))
                   .thenReturn(Future.successful(SubmissionDecisionApproved))
 
                 val result = timeAtAddressController.post(RecordId, true)(requestWithParams)
@@ -437,11 +437,11 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
                   "timeAtAddress" -> "01"
                 )
 
-                when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+                when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
                   .thenReturn(Future.successful(Some(Seq(originalResponsiblePeople))))
-                when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+                when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
                   .thenReturn(Future.successful(emptyCache))
-                when(timeAtAddressController.statusService.getStatus(any(), any(), any()))
+                when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any()))
                   .thenReturn(Future.successful(SubmissionDecisionApproved))
 
                 val result = timeAtAddressController.post(RecordId, false)(requestWithParams)
@@ -456,11 +456,11 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
                   "timeAtAddress" -> "03"
                 )
 
-                when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+                when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
                   .thenReturn(Future.successful(Some(Seq(originalResponsiblePeople))))
-                when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+                when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
                   .thenReturn(Future.successful(emptyCache))
-                when(timeAtAddressController.statusService.getStatus(any(), any(), any()))
+                when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any()))
                   .thenReturn(Future.successful(SubmissionDecisionApproved))
 
                 val result = timeAtAddressController.post(RecordId, false)(requestWithParams)
@@ -487,11 +487,11 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
                   lineId = None
                 )
 
-                when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+                when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
                   .thenReturn(Future.successful(Some(Seq(originalResponsiblePeople))))
-                when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+                when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
                   .thenReturn(Future.successful(emptyCache))
-                when(timeAtAddressController.statusService.getStatus(any(), any(), any()))
+                when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any()))
                   .thenReturn(Future.successful(SubmissionDecisionApproved))
 
                 val result = timeAtAddressController.post(RecordId, true)(requestWithParams)
@@ -514,11 +514,11 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
                   lineId = None
                 )
 
-                when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+                when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
                   .thenReturn(Future.successful(Some(Seq(originalResponsiblePeople))))
-                when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+                when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
                   .thenReturn(Future.successful(emptyCache))
-                when(timeAtAddressController.statusService.getStatus(any(), any(), any()))
+                when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any()))
                   .thenReturn(Future.successful(SubmissionDecisionApproved))
 
                 val result = timeAtAddressController.post(RecordId, true)(requestWithParams)
