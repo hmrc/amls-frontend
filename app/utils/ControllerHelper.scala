@@ -18,6 +18,7 @@ package utils
 
 import cats.implicits._
 import connectors.DataCacheConnector
+import forms.InvalidForm
 import models.businessactivities.{BusinessActivities => BA}
 import models.businessmatching._
 import models.businessmatching.updateservice.ServiceChangeRegister
@@ -196,5 +197,26 @@ object ControllerHelper {
     case AnotherBodyYes(_, Some(_), Some(_), Some(_)) => true
     case AnotherBodyNo => true
     case _ => false
+  }
+
+  def stripEmptyValuesFromFormWithArray(form: InvalidForm, arrayName: String, indexUpdater: Int => Int = a => a): InvalidForm = {
+
+    def removeEmptyFieldsFromFormData(f: Map[String, Seq[String]]): Map[String, Seq[String]] = f
+      .filter(field => field._1.contains(arrayName))
+      .filter(field => field._2.exists(s => s.nonEmpty))
+
+    def updateIndexesInFormData(formData: Map[String, Seq[String]]): Map[String, Seq[String]] = {
+      def updateIndexesInFormKeys(formKey: String, index: Int)= formKey.replaceFirst("[\\d]", s"${indexUpdater(index)}")
+      formData.zipWithIndex
+        .map((fieldAndIndex: ((String, Seq[String]), Int)) =>
+          ( updateIndexesInFormKeys(formKey = fieldAndIndex._1._1, index = fieldAndIndex._2), fieldAndIndex._1._2 )
+        )
+    }
+
+    val csrfToken = form.data.head
+    val nonEmptyFormData:Map[String, Seq[String]] = removeEmptyFieldsFromFormData(form.data.tail)
+    val reindexedNonEmptyFormData = updateIndexesInFormData(nonEmptyFormData)
+
+    form.copy(data = reindexedNonEmptyFormData + csrfToken)
   }
 }

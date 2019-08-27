@@ -39,10 +39,10 @@ class BankDetailsController @Inject()(val dataCacheConnector: DataCacheConnector
   def get(isUK: Boolean = true) = authAction.async {
       implicit request =>
         (for {
-          amlsRefNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
           submissionRequestStatus <- OptionT.liftF(dataCacheConnector.fetch[SubmissionRequestStatus](request.credId, SubmissionRequestStatus.key))
-          status <- OptionT.liftF(statusService.getStatus(Some(amlsRefNo), request.accountTypeId, request.credId))
-          fees <- OptionT(feeResponseService.getFeeResponse(request.credId, request.accountTypeId))
+          status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
+          amlsRegistrationNumber <- OptionT(authEnrolmentsService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
+          fees <- OptionT(feeResponseService.getFeeResponse(amlsRegistrationNumber, request.accountTypeId))
           paymentReference <- OptionT.fromOption[Future](fees.paymentReference)
         } yield {
           val amount = fees.toPay(status, submissionRequestStatus)

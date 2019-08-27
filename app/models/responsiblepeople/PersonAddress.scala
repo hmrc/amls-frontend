@@ -70,17 +70,17 @@ object PersonAddress {
       import models.FormTypes._
       import utils.MappingUtils.Implicits._
 
-      (__ \ "isUK").read[Boolean].withMessage("error.required.uk.or.overseas") flatMap {
+    (__ \ "isUK").read[Boolean].withMessage("error.required.uk.or.overseas") flatMap {
         case true => (
-            (__ \ "addressLine1").read(notEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
-            (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
+            (__ \ "addressLine1").read(trimNotEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
+            (__ \ "addressLine2").read(trimNotEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
             (__ \ "addressLine3").read(optionR(validateAddress)) ~
             (__ \ "addressLine4").read(optionR(validateAddress)) ~
             (__ \ "postCode").read(notEmptyStrip andThen postcodeType)
           )(PersonAddressUK.apply _)
         case false => (
-            (__ \ "addressLineNonUK1").read(notEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
-            (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
+            (__ \ "addressLineNonUK1").read(trimNotEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
+            (__ \ "addressLineNonUK2").read(trimNotEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
             (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
             (__ \ "addressLineNonUK4").read(optionR(validateAddress)) ~
             (__ \ "country").read(validateCountry)

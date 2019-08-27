@@ -81,7 +81,11 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
     } thenReturn Future.successful(paymentGen.sample.get)
 
     when {
-      controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any())
+      controller.paymentsService.updateBacsStatus(any(), any())(any(), any(), any())
+    } thenReturn Future.successful(HttpResponse(OK))
+
+    when {
+      controller.statusService.getDetailedStatus(any[String], any())(any(), any())
     } thenReturn Future.successful((submissionStatus, Some(readStatusResponse)))
 
     when {
