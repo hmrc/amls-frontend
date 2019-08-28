@@ -29,14 +29,16 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
+
+    implicit val ec = app.injector.instanceOf[ExecutionContext]
 
     val controller = new MostTransactionsController(
       SuccessfulAuthAction,
@@ -46,12 +48,14 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       mockAutoComplete
     )
 
+
+
     mockCacheFetch[ServiceChangeRegister](None, None)
     mockCacheGetEntry[ServiceChangeRegister](Some(ServiceChangeRegister()), ServiceChangeRegister.key)
-    mockApplicationStatusNewAuth(NotCompleted)
+    mockApplicationStatus(NotCompleted)
 
     when {
-      mockStatusService.isPreSubmission(any(), any(), any())
+      mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
     } thenReturn Future.successful(true)
   }
 
@@ -84,7 +88,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       )
 
       mockIsNewActivityNewAuth(false)
-      mockApplicationStatusNewAuth(NotCompleted)
+      mockApplicationStatus(NotCompleted)
       mockCacheFetch[MoneyServiceBusiness](Some(model), Some(MoneyServiceBusiness.key))
 
       val result = controller.get()(request)
@@ -99,7 +103,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
     "render the SendTheLargestAmountOfMoney view" when {
       "application is in variation and a service has just been added" in new Fixture {
-        mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+        mockApplicationStatus(SubmissionDecisionApproved)
         mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
         mockIsNewActivityNewAuth(true, Some(MoneyServiceBusinessActivity))
 
@@ -109,7 +113,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       }
 
       "application is in variation mode and no service has been added" in new Fixture {
-        mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+        mockApplicationStatus(SubmissionDecisionApproved)
         mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
         mockIsNewActivityNewAuth(false)
 
@@ -183,7 +187,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
         )
 
         when {
-          mockStatusService.isPreSubmission(any(), any(), any())
+          mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
         } thenReturn Future.successful(false)
 
         mockCacheFetchAll
@@ -215,7 +219,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
         )
 
         when {
-          mockStatusService.isPreSubmission(any(), any(), any())
+          mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
         } thenReturn Future.successful(false)
 
         mockCacheFetchAll
@@ -276,7 +280,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
         )
 
         when {
-          mockStatusService.isPreSubmission(any(), any(), any())
+          mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
         } thenReturn Future.successful(false)
 
         mockCacheFetchAll
@@ -316,7 +320,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key))
       
       when {
-        mockStatusService.isPreSubmission(any(), any(), any())
+        mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
       } thenReturn Future.successful(false)
 
       val result = controller.post()(newRequest)

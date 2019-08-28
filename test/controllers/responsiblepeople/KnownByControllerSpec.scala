@@ -30,7 +30,7 @@ import utils._
 
 class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
 
-  trait TestFixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
+  trait TestFixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(self.authRequest)
     val RecordId = 1
 

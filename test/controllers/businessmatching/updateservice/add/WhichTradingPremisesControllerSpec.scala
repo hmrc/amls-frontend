@@ -28,13 +28,13 @@ import org.scalatest.PrivateMethodTester
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class WhichTradingPremisesControllerSpec extends AmlsSpec
   with PrivateMethodTester
   with TradingPremisesGenerator {
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
 
     val request = addToken(authRequest)

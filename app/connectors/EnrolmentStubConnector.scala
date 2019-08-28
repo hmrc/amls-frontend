@@ -20,21 +20,13 @@ import config.AppConfig
 import javax.inject.Inject
 import models.enrolment.GovernmentGatewayEnrolment
 import uk.gov.hmrc.http.{HeaderCarrier, HttpGet}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.ExecutionContext
 
 class EnrolmentStubConnector @Inject()(http: HttpGet, config: AppConfig) {
 
   lazy val baseUrl = config.enrolmentStubsUrl
 
-  @deprecated("to be removed when auth migration complete")
-  def enrolments(groupId: String)(implicit hc: HeaderCarrier, ac: AuthContext, ex: ExecutionContext) = {
-    val requestUrl = s"$baseUrl/auth/oid/$groupId/enrolments"
-    http.GET[Seq[GovernmentGatewayEnrolment]](requestUrl)
-  }
-
-  def enrolmentsNewAuth(groupId: String)(implicit hc: HeaderCarrier, ex: ExecutionContext) = {
+  def enrolments(groupId: String)(implicit hc: HeaderCarrier, ex: ExecutionContext) = {
     val requestUrl = s"$baseUrl/auth/oid/$groupId/enrolments"
     http.GET[Seq[GovernmentGatewayEnrolment]](requestUrl)
   }

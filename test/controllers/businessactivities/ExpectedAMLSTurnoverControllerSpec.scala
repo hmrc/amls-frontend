@@ -22,7 +22,7 @@ import controllers.actions.SuccessfulAuthAction
 import models.businessactivities.ExpectedAMLSTurnover.First
 import models.businessactivities._
 import models.businessmatching.{BusinessActivities => Activities, _}
-import models.status.{NotCompleted, SubmissionDecisionApproved}
+import models.status.NotCompleted
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -34,13 +34,15 @@ import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self =>
     val request = addToken(authRequest)
+    implicit val ec = app.injector.instanceOf[ExecutionContext]
+
 
     val controller = new ExpectedAMLSTurnoverController (
       dataCacheConnector = mock[DataCacheConnector],
@@ -73,7 +75,7 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
             )))
           )
 
-          when(controller.statusService.getStatus(any(), any(), any()))
+          when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(NotCompleted))
 
           when(mockCache.getEntry[BusinessActivities](BusinessActivities.key))
@@ -125,7 +127,7 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
             )))
           )
 
-          when(controller.statusService.getStatus(any(), any(), any()))
+          when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(NotCompleted))
 
           when(controller.dataCacheConnector.fetchAll(any())(any()))
@@ -148,7 +150,7 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
 
           override def model = Some(BusinessActivities(expectedAMLSTurnover = Some(First)))
 
-          when(controller.statusService.getStatus(any(), any(), any()))
+          when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(NotCompleted))
 
           when(controller.dataCacheConnector.fetchAll(any())(any()))

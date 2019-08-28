@@ -61,7 +61,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
     TelephonePaymentService
   )
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
@@ -273,7 +273,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           status(result) must be(SEE_OTHER)
 
           verify(controller.dataCacheConnector, times(0))
-            .save(eqTo(BusinessActivities.key), any())(any(), any(), any())
+            .save(any(), eqTo(BusinessActivities.key), any())(any(), any())
 
         }
       }

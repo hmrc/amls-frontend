@@ -18,13 +18,11 @@ package connectors
 
 import config.{AppConfig, WSHttp}
 import javax.inject.Inject
-import models.auth.UserDetails
 import models.enrolment.GovernmentGatewayEnrolment
 import org.apache.http.HttpStatus
 import play.api.libs.json.Json
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.controllers.RestFormats
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -75,13 +73,6 @@ class AuthConnector @Inject()(val http: WSHttp, config: AppConfig) {
 
   def getIds(authority: Authority)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Ids] = {
     http.GET[Ids](s"$authUrl/${authority.normalisedIds}")
-  }
-
-  def userDetails(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[UserDetails] = {
-    ac.userDetailsUri match {
-      case Some(uri) => http.GET[UserDetails](uri)
-      case _ => Future.failed(new Exception("No user details Uri available"))
-    }
   }
 
   def getCredId(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext) = getCurrentAuthority flatMap {

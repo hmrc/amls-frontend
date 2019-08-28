@@ -29,21 +29,22 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val request = addToken(authRequest)
     val controller = new SendMoneyToOtherCountryController(mockCacheConnector, SuccessfulAuthAction, mockStatusService)
+    implicit val ec = app.injector.instanceOf[ExecutionContext]
 
     mockCacheGetEntry[ServiceChangeRegister](None, ServiceChangeRegister.key)
 
     when {
-      mockStatusService.isPreSubmission(any(), any(), any())
+      mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
     } thenReturn Future.successful(true)
 
     val emptyCache = CacheMap("", Map.empty)
@@ -263,7 +264,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
         mockCacheSave[MoneyServiceBusiness]
 
         when {
-          controller.statusService.isPreSubmission(any(), any(), any())
+          controller.statusService.isPreSubmission(any(), any(), any())(any(), any())
         } thenReturn Future.successful(false)
       }
 
@@ -315,7 +316,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
         mockCacheSave[MoneyServiceBusiness]
 
         when {
-          controller.statusService.isPreSubmission(any(), any(), any())
+          controller.statusService.isPreSubmission(any(), any(), any())(any(), any())
         } thenReturn Future.successful(false)
       }
 
@@ -355,7 +356,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
         )
 
         when {
-          controller.statusService.isPreSubmission(any(), any(), any())
+          controller.statusService.isPreSubmission(any(), any(), any())(any(), any())
         } thenReturn Future.successful(false)
 
         mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)

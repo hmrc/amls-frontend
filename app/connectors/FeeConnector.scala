@@ -16,14 +16,12 @@
 
 package connectors
 
-import javax.inject.Inject
-
 import config.AppConfig
+import javax.inject.Inject
 import models._
 import play.api.Logger
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.http._
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -32,23 +30,6 @@ class FeeConnector @Inject()(
                               appConfig: AppConfig) {
 
   val feePaymentUrl = appConfig.feePaymentUrl
-
-  @deprecated("To be removed when auth implementation is complete")
-  def feeResponse(amlsRegistrationNumber: String)
-                 (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, reqW: Writes[FeeResponse], ac: AuthContext): Future[FeeResponse] = {
-
-    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
-    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
-
-    val getUrl = s"$feePaymentUrl/$accountType/$accountId/$amlsRegistrationNumber"
-    val prefix = "[FeeConnector]"
-    Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
-    http.GET[FeeResponse](getUrl) map {
-      response =>
-        Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
-        response
-    }
-  }
 
   def feeResponse(amlsRegistrationNumber: String, accountTypeId: (String, String))
                  (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, reqW: Writes[FeeResponse]): Future[FeeResponse] = {

@@ -43,7 +43,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
   with ResponsiblePersonGenerator
   with FutureAssertions {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
     val tradingPremisesService = mock[TradingPremisesService]
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]

@@ -16,11 +16,11 @@
 
 package services
 
-import config.ApplicationConfig
 import cats.implicits._
+import config.ApplicationConfig
 import connectors.{AmlsConnector, PayApiConnector}
 import generators.PaymentGenerator
-import models.{FeeResponse, ReturnLocation}
+import models.FeeResponse
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import models.confirmation.Currency
 import models.payments._
@@ -30,8 +30,7 @@ import org.mockito.Mockito._
 import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.http.HttpResponse
 import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -52,6 +51,8 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
 
     val paymentRefNo = "XA000000000000"
     val safeId = amlsRefNoGen.sample.get
+
+    val accountTypeId = ("accountType", "accountId")
 
     val currency = Currency.fromInt(100)
 
@@ -95,11 +96,11 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
         val request = UpdateBacsRequest(true)
 
         when {
-          testPaymentService.amlsConnector.updateBacsStatus(any(), any())(any(), any(), any())
+          testPaymentService.amlsConnector.updateBacsStatus(any(), any(), any())(any(), any())
         } thenReturn Future.successful(HttpResponse(OK))
 
-        whenReady(testPaymentService.updateBacsStatus(paymentRef, request)) { _ =>
-          verify(testPaymentService.amlsConnector).updateBacsStatus(eqTo(paymentRef), eqTo(request))(any(), any(), any())
+        whenReady(testPaymentService.updateBacsStatus(accountTypeId, paymentRef, request)) { _ =>
+          verify(testPaymentService.amlsConnector).updateBacsStatus(any(), eqTo(paymentRef), eqTo(request))(any(), any())
         }
 
       }
@@ -111,10 +112,10 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
         val payment: Payment = paymentGen.sample.get
 
         when {
-          testPaymentService.amlsConnector.createBacsPayment(eqTo(request))(any(), any(), any())
+          testPaymentService.amlsConnector.createBacsPayment(any(), eqTo(request))(any(), any())
         } thenReturn Future.successful(payment)
 
-        whenReady(testPaymentService.createBacsPayment(request)) {
+        whenReady(testPaymentService.createBacsPayment(request, accountTypeId)) {
           _ mustBe payment
         }
       }
@@ -130,7 +131,7 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
           } thenReturn Future.successful(None)
 
           //noinspection ScalaStyle
-          whenReady(testPaymentService.paymentsUrlOrDefault("ref", 100, "http://return.com", "ref-no", "safeid")) { result =>
+          whenReady(testPaymentService.paymentsUrlOrDefault("ref", 100, "http://return.com", "ref-no", "safeid", accountTypeId)) { result =>
             result mustBe NextUrl(ApplicationConfig.paymentsUrl)
           }
 
@@ -148,10 +149,10 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
           } thenReturn Future.successful(Some(paymentResponse))
 
           when {
-            mockAmlsConnector.savePayment(any(), any(), any())(any(), any(), any())
+            mockAmlsConnector.savePayment(any(), any(), any(), any())(any(), any())
           } thenReturn Future.successful(HttpResponse(CREATED))
 
-          whenReady(testPaymentService.requestPaymentsUrl(testFeeResponseAmendVariation, "http://return.com", "XAML0000000001", safeId)) { result =>
+          whenReady(testPaymentService.requestPaymentsUrl(testFeeResponseAmendVariation, "http://return.com", "XAML0000000001", safeId, accountTypeId)) { result =>
             result mustBe NextUrl("http://return.com")
           }
         }
@@ -162,10 +163,10 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
           } thenReturn Future.successful(Some(paymentResponse))
 
           when {
-            mockAmlsConnector.savePayment(any(), any(), any())(any(), any(), any())
+            mockAmlsConnector.savePayment(any(), any(), any(), any())(any(), any())
           } thenReturn Future.successful(HttpResponse(CREATED))
 
-          whenReady(testPaymentService.requestPaymentsUrl(testFeeResponseSubscription, "http://return.com", "XAML0000000001", safeId)) { result =>
+          whenReady(testPaymentService.requestPaymentsUrl(testFeeResponseSubscription, "http://return.com", "XAML0000000001", safeId, accountTypeId)) { result =>
             result mustBe NextUrl("http://return.com")
           }
         }
@@ -174,7 +175,7 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
       "return default payments url" in new Fixture {
 
         whenReady(testPaymentService.requestPaymentsUrl(
-          testFeeResponseAmendVariation.copy(difference = None, paymentReference = None), "http://return.com", "XAML0000000001", safeId)) { result =>
+          testFeeResponseAmendVariation.copy(difference = None, paymentReference = None), "http://return.com", "XAML0000000001", safeId, accountTypeId)) { result =>
           result mustBe NextUrl(ApplicationConfig.paymentsUrl)
         }
       }
@@ -201,13 +202,13 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
     "called" must {
       "fail if cannot save payment" in new Fixture with PrivateMethodTester {
         when {
-          mockAmlsConnector.savePayment(any(), any(), any())(any(), any(), any())
+          mockAmlsConnector.savePayment(any(), any(), any(), any())(any(), any())
         } thenThrow new IllegalArgumentException()
 
         val savePaymentBeforeResponse = PrivateMethod[Future[Unit]]('savePaymentBeforeResponse)
 
         intercept[IllegalArgumentException] {
-          testPaymentService invokePrivate savePaymentBeforeResponse(paymentResponse, "xxx", "zzz", headerCarrier, authContext)
+          testPaymentService invokePrivate savePaymentBeforeResponse(paymentResponse, "xxx", "zzz", headerCarrier)
         }
       }
     }

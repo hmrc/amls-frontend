@@ -22,7 +22,6 @@ import models.flowmanagement.{PsrNumberPageId, ChangeSubSectorFlowModel}
 import play.api.mvc.Result
 import services.flowmanagement.PageRouter
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import play.api.mvc.Results.Redirect
 import scala.concurrent.{ExecutionContext, Future}
 

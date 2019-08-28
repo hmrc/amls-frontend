@@ -34,7 +34,7 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
     val request = addToken(authRequest)
     val controller = new TransactionRecordController(SuccessfulAuthAction, mockCacheConnector)
 
-    mockCacheSaveNewAuth[BusinessActivities]
+    mockCacheSave[BusinessActivities]
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -43,7 +43,7 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
 
     "get is called" must {
       "load the Customer Record Page with an empty form" in new Fixture {
-        mockCacheFetchNewAuth[BusinessActivities](None)
+        mockCacheFetch[BusinessActivities](None)
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -54,7 +54,7 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
       }
 
       "pre-populate the Customer Record Page" in new Fixture {
-        mockCacheFetchNewAuth(Some(BusinessActivities(
+        mockCacheFetch(Some(BusinessActivities(
           transactionRecord = Some(true)
         )))
 
@@ -73,7 +73,7 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
             "isRecorded" -> "true"
           )
 
-          mockCacheFetchNewAuth[BusinessActivities](None)
+          mockCacheFetch[BusinessActivities](None)
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
@@ -85,7 +85,7 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
             "isRecorded" -> "false"
           )
 
-          mockCacheFetchNewAuth[BusinessActivities](None)
+          mockCacheFetch[BusinessActivities](None)
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
@@ -98,7 +98,7 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
             "isRecorded" -> "false"
           )
 
-          mockCacheFetchNewAuth[BusinessActivities](None)
+          mockCacheFetch[BusinessActivities](None)
 
           val result = controller.post(true)(newRequest)
           status(result) must be(SEE_OTHER)
@@ -111,7 +111,7 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
             "isRecorded" -> "true"
           )
 
-          mockCacheFetchNewAuth[BusinessActivities](None)
+          mockCacheFetch[BusinessActivities](None)
 
           val result = controller.post(true)(newRequest)
           status(result) must be(SEE_OTHER)
@@ -123,7 +123,7 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
             "isRecorded" -> "true"
           )
 
-          mockCacheFetchNewAuth(Some(BusinessActivities(
+          mockCacheFetch(Some(BusinessActivities(
             transactionRecord = Some(true),
             transactionRecordTypes = Some(TransactionTypes(Set(Paper)))
           )))
@@ -139,7 +139,7 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
           "isRecorded" -> "false"
         )
 
-        mockCacheFetchNewAuth[BusinessActivities](Some(BusinessActivities(
+        mockCacheFetch[BusinessActivities](Some(BusinessActivities(
           transactionRecord = Some(true),
           transactionRecordTypes = Some(TransactionTypes(Set(Paper)))
         )))
@@ -162,7 +162,7 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with BAD_REQUEST when given invalid data" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody()
 
-        mockCacheFetchNewAuth[BusinessActivities](None)
+        mockCacheFetch[BusinessActivities](None)
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)

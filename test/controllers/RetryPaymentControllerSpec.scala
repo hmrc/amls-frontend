@@ -79,7 +79,7 @@ class RetryPaymentControllerSpec extends AmlsSpec
     } thenReturn Future.successful(HttpResponse(CREATED))
 
     when {
-      controller.amlsConnector.registrationDetails(any())(any(), any(), any())
+      controller.amlsConnector.registrationDetails(any(), any())(any(), any())
     } thenReturn Future.successful(RegistrationDetails(companyNameFromRegistration, isIndividual = false))
 
     when {

@@ -26,12 +26,9 @@ import models.{AmendVariationRenewalResponse, _}
 import play.api.Logger
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.http._
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
-// $COVERAGE-OFF$
-// Coverage has been turned off for these types until we remove the deprecated methods
 class AmlsConnector @Inject()(val httpPost: WSHttp,
                               val httpGet: WSHttp,
                               val httpPut: WSHttp,
@@ -52,23 +49,6 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     val prefix = "[AmlsConnector][subscribe]"
     Logger.debug(s"$prefix - Request Body: ${Json.toJson(subscriptionRequest)}")
     httpPost.POST[SubscriptionRequest, SubscriptionResponse](postUrl, subscriptionRequest) map {
-      response =>
-        Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
-        response
-    }
-  }
-
-  @deprecated("to be removed when new auth completely implemented")
-  def status(amlsRegistrationNumber: String)
-            (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, reqW: Writes[ReadStatusResponse], ac: AuthContext): Future[ReadStatusResponse] = {
-
-    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
-
-    val getUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/status"
-    val prefix = "[AmlsConnector][status]"
-    Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
-
-    httpGet.GET[ReadStatusResponse](getUrl) map {
       response =>
         Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
         response
@@ -170,16 +150,6 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     }
   }
 
-  @deprecated("To be removed with auth implementation")
-  def withdraw(amlsRegistrationNumber: String, request: WithdrawSubscriptionRequest)
-              (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[WithdrawSubscriptionResponse] = {
-
-    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
-    val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/withdrawal"
-
-    httpPost.POST[WithdrawSubscriptionRequest, WithdrawSubscriptionResponse](postUrl, request)
-  }
-
   def withdraw(amlsRegistrationNumber: String, request: WithdrawSubscriptionRequest, accountTypeId: (String, String))
               (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[WithdrawSubscriptionResponse] = {
     
@@ -187,15 +157,6 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/withdrawal"
 
     httpPost.POST[WithdrawSubscriptionRequest, WithdrawSubscriptionResponse](postUrl, request)
-  }
-
-  @deprecated("To be removed when new auth is implemented")
-  def deregister(amlsRegistrationNumber: String, request: DeRegisterSubscriptionRequest)
-                (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[DeRegisterSubscriptionResponse] = {
-    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
-    val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/deregistration"
-
-    httpPost.POST[DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse](postUrl, request)
   }
 
   def deregister(amlsRegistrationNumber: String, request: DeRegisterSubscriptionRequest, accountTypeId: (String, String))
@@ -207,18 +168,6 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     httpPost.POST[DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse](postUrl, request)
   }
 
-  @deprecated("to be removed after new auth changes implemented")
-  def savePayment(paymentId: String, amlsRefNo: String, safeId: String)
-                 (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[HttpResponse] = {
-
-    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
-    val postUrl = s"$paymentUrl/$accountType/$accountId/$amlsRefNo/$safeId"
-
-    Logger.debug(s"[AmlsConnector][savePayment]: Request to $postUrl with paymentId $paymentId")
-
-    httpPost.POSTString[HttpResponse](postUrl, paymentId)
-  }
-
   def savePayment(paymentId: String, amlsRefNo: String, safeId: String, accountTypeId: (String, String))
                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
 
@@ -228,22 +177,6 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     Logger.debug(s"[AmlsConnector][savePayment]: Request to $postUrl with paymentId $paymentId")
 
     httpPost.POSTString[HttpResponse](postUrl, paymentId)
-  }
-
-  @deprecated("to be removed after new auth changes implemented")
-  def getPaymentByPaymentReference(paymentReference: String)
-                                  (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[Option[Payment]] = {
-
-    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
-    val getUrl = s"$paymentUrl/$accountType/$accountId/payref/$paymentReference"
-
-    Logger.debug(s"[AmlsConnector][getPaymentByPaymentReference]: Request to $getUrl with $paymentReference")
-
-    httpGet.GET[Payment](getUrl) map { result =>
-      Some(result)
-    } recover {
-      case _: NotFoundException => None
-    }
   }
 
   def getPaymentByPaymentReference(paymentReference: String, accountTypeId: (String, String))
@@ -280,46 +213,22 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
                           (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[PaymentStatusResult] = {
 
     val (accountType, accountId) = accountTypeId
-
     val putUrl = s"$paymentUrl/$accountType/$accountId/refreshstatus"
-
     Logger.debug(s"[AmlsConnector][refreshPaymentStatus]: Request to $putUrl with $paymentReference")
-
     httpPut.PUT[RefreshPaymentStatusRequest, PaymentStatusResult](putUrl, RefreshPaymentStatusRequest(paymentReference))
   }
 
   def registrationDetails(accountTypeId: (String, String), safeId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[RegistrationDetails] = {
-
     val getUrl = s"$registrationUrl/${accountTypeId._1}/${accountTypeId._2}/details/$safeId"
-
     httpGet.GET[RegistrationDetails](getUrl)
   }
 
-  @deprecated("To be removed when auth implementation is complete")
-  def registrationDetails(safeId: String)(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[RegistrationDetails] = {
-
-    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
-    val getUrl = s"$registrationUrl/$accountType/$accountId/details/$safeId"
-
-    httpGet.GET[RegistrationDetails](getUrl)
-  }
-
-  def updateBacsStatus(ref: String, request: UpdateBacsRequest)(implicit ec: ExecutionContext, hc: HeaderCarrier, ac: AuthContext): Future[HttpResponse] = {
-    //TODO - deprecated by AuthAction.accountTypeAndId after new auth changes
-    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
-    val putUrl = s"$paymentUrl/$accountType/$accountId/$ref/bacs"
-
+  def updateBacsStatus(accountTypeId: (String, String), ref: String, request: UpdateBacsRequest)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[HttpResponse] = {
+    val putUrl = s"$paymentUrl/${accountTypeId._1}/${accountTypeId._2}/$ref/bacs"
     httpPut.PUT[UpdateBacsRequest, HttpResponse](putUrl, request)
   }
 
-  @deprecated("To be removed when auth implementation is complete")
-  def createBacsPayment(request: CreateBacsPaymentRequest)(implicit ec: ExecutionContext, hc: HeaderCarrier, ac: AuthContext): Future[Payment] = {
-    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
-    val postUrl = s"$paymentUrl/$accountType/$accountId/bacs"
-    httpPost.POST[CreateBacsPaymentRequest, Payment](postUrl, request)
-  }
-
-  def createBacsPayment(request: CreateBacsPaymentRequest, accountTypeId: (String, String))(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Payment] = {
+  def createBacsPayment(accountTypeId: (String, String), request: CreateBacsPaymentRequest)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Payment] = {
     val postUrl = s"$paymentUrl/${accountTypeId._1}/${accountTypeId._2}/bacs"
     httpPost.POST[CreateBacsPaymentRequest, Payment](postUrl, request)
   }

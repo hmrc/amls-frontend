@@ -33,7 +33,7 @@ import utils._
 
 class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
@@ -76,7 +76,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
         "status is pre-submission" in new Fixture {
 
-          mockApplicationStatusNewAuth(SubmissionReady)
+          mockApplicationStatus(SubmissionReady)
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
           mockCacheGetEntry[BusinessNominatedOfficer](None, BusinessNominatedOfficer.key)
 
@@ -88,7 +88,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
         "status is pending" in new Fixture {
 
-          mockApplicationStatusNewAuth(SubmissionReadyForReview)
+          mockApplicationStatus(SubmissionReadyForReview)
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
           mockCacheGetEntry[BusinessNominatedOfficer](None, BusinessNominatedOfficer.key)
 
@@ -100,7 +100,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
         "status is approved" in new Fixture {
 
-          mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+          mockApplicationStatus(SubmissionDecisionApproved)
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
           mockCacheGetEntry[BusinessNominatedOfficer](None, BusinessNominatedOfficer.key)
 
@@ -112,7 +112,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
         "status is ready for renewal" in new Fixture {
 
-          mockApplicationStatusNewAuth(ReadyForRenewal(Some(new LocalDate())))
+          mockApplicationStatus(ReadyForRenewal(Some(new LocalDate())))
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
           mockCacheGetEntry[BusinessNominatedOfficer](None, BusinessNominatedOfficer.key)
 
@@ -136,7 +136,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
           ), rp2)
 
           mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeoples), Some(ResponsiblePerson.key))
-          mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+          mockApplicationStatus(SubmissionDecisionApproved)
           mockCacheSave[Option[Seq[ResponsiblePerson]]](Some(updatedList))
 
           val result = controller.post()(newRequest)
@@ -153,7 +153,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
           ), rp2)
 
           mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeoples), Some(ResponsiblePerson.key))
-          mockApplicationStatusNewAuth(SubmissionReadyForReview)
+          mockApplicationStatus(SubmissionReadyForReview)
           mockCacheSave[Option[Seq[ResponsiblePerson]]](Some(updatedList))
 
           val result = controller.post()(newRequest)
@@ -169,7 +169,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
         val newRequest = request.withFormUrlEncodedBody("value" -> "-1")
 
         mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
-        mockApplicationStatusNewAuth(SubmissionReady)
+        mockApplicationStatus(SubmissionReady)
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -182,7 +182,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
         val newRequest = request.withFormUrlEncodedBody()
 
         mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeoples), Some(ResponsiblePerson.key))
-        mockApplicationStatusNewAuth(SubmissionReady)
+        mockApplicationStatus(SubmissionReady)
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)

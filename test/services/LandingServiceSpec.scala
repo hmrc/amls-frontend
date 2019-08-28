@@ -17,13 +17,12 @@
 package services
 
 import connectors._
-import controllers.actions.SuccessfulAuthAction
-import models.asp.{Accountancy, BookKeeping, ServicesOfBusiness}
-import models.businessdetails.{BusinessDetails, CorrespondenceAddress, CorrespondenceAddressIsUk, CorrespondenceAddressNonUk}
-import models.asp.Asp
+import models._
+import models.asp.{Accountancy, Asp, BookKeeping, ServicesOfBusiness}
 import models.bankdetails.BankDetails
 import models.businessactivities.{CustomersOutsideUK => BACustomersOutsideUK, InvolvedInOtherYes => BAInvolvedInOtherYes, _}
 import models.businesscustomer.{Address, ReviewDetails}
+import models.businessdetails.{BusinessDetails, CorrespondenceAddress, CorrespondenceAddressIsUk, CorrespondenceAddressNonUk}
 import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
@@ -36,7 +35,6 @@ import models.status.{RenewalSubmitted, SubmissionReadyForReview}
 import models.supervision.Supervision
 import models.tcsp._
 import models.tradingpremises.TradingPremises
-import models._
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -44,7 +42,7 @@ import play.api.libs.json.Writes
 import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser}
+import uk.gov.hmrc.play.frontend.auth.LoggedInUser
 import utils.AmlsSpec
 
 import scala.concurrent.ExecutionContext.Implicits._
@@ -87,6 +85,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
   )
 
   val credId = "internalId"
+
 
   def setUpMockView[T](mock: DataCacheConnector, result: CacheMap, key: String, section: T) = {
     when {
@@ -230,8 +229,6 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
       val user = mock[LoggedInUser]
 
-      when(authContext.user).thenReturn(user)
-      when(user.oid).thenReturn("")
       when(service.cacheConnector.remove(any[String])(any())).thenReturn(Future.successful(true))
 
       when {
@@ -322,7 +319,6 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
       val user = mock[LoggedInUser]
 
-      when(authContext.user).thenReturn(user)
       when(user.oid).thenReturn("")
       when(service.cacheConnector.remove(any())(any())).thenReturn(Future.successful(true))
 
@@ -465,7 +461,6 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
       val user = mock[LoggedInUser]
 
-      when(authContext.user).thenReturn(user)
       when(user.oid).thenReturn("")
       when(service.cacheConnector.remove(any())(any())).thenReturn(Future.successful(true))
 

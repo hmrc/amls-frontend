@@ -24,13 +24,13 @@ import org.mockito.Mockito._
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
 class BusinessUseAnIPSPControllerSpec  extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth{
+  trait Fixture extends AuthorisedFixture with DependencyMocks{
     self => val request = addToken(authRequest)
 
     val controller = new BusinessUseAnIPSPController(mockCacheConnector, authAction = SuccessfulAuthAction)

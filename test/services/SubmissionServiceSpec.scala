@@ -42,11 +42,8 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.Helpers._
-import uk.gov.hmrc.domain.Org
 import uk.gov.hmrc.http.{HttpResponse, Upstream4xxResponse}
-import uk.gov.hmrc.play.frontend.auth.Principal
-import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, OrgAccount}
-import utils.{AmlsSpec, DependencyMocksNewAuth}
+import utils.{AmlsSpec, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
@@ -61,7 +58,7 @@ class SubmissionServiceSpec extends AmlsSpec
     .configure("microservice.amounts.registration" -> 100)
     .build()
 
-  trait Fixture extends DependencyMocksNewAuth {
+  trait Fixture extends DependencyMocks {
 
     val config = mock[AppConfig]
 
@@ -71,10 +68,6 @@ class SubmissionServiceSpec extends AmlsSpec
       mock[AuthEnrolmentsService],
       mock[AmlsConnector],
       config)
-
-    when {
-      authContext.principal
-    } thenReturn Principal(None, Accounts(org = Some(OrgAccount("", Org("TestOrgRef")))))
 
     val enrolmentResponse = HttpResponse(OK)
 

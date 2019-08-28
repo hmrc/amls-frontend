@@ -129,7 +129,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       reviewDetails = Some(testReviewDetails)
     )
 
-    mockApplicationStatusNewAuth(SubmissionReadyForReview)
+    mockApplicationStatus(SubmissionReadyForReview)
 
     mockCacheFetch[BusinessMatching](Some(testBusinessMatch))
 

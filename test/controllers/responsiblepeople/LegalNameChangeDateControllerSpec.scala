@@ -25,12 +25,12 @@ import org.scalatest.concurrent.ScalaFutures
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocks}
 
 
 class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures {
 
-  trait TestFixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
+  trait TestFixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(self.authRequest)
     val RecordId = 1
 

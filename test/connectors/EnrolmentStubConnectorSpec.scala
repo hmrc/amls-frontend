@@ -61,7 +61,7 @@ class EnrolmentStubConnectorSpec extends AmlsSpec with BaseGenerator {
         http.GET[Seq[GovernmentGatewayEnrolment]](any())(any(), any(), any())
       } thenReturn Future.successful(enrolments)
 
-      val result = await(connector.enrolmentsNewAuth(groupId))
+      val result = await(connector.enrolments(groupId))
 
       result mustBe enrolments
 

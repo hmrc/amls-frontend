@@ -45,6 +45,10 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
     lazy val app = builder.build()
     lazy val service = app.injector.instanceOf[ProgressService]
 
+    val amlsRefNo = Some("REFNO")
+    val accountTypeId = ("accountType", "accountId")
+    val credId = "12341234"
+
   }
 
   "Progress Service" must {
@@ -70,7 +74,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
         mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
-        whenReady(service.getSubmitRedirect) {
+        whenReady(service.getSubmitRedirect(amlsRefNo, accountTypeId, credId)) {
           _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get())
         }
 
@@ -96,7 +100,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
         mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
-        whenReady(service.getSubmitRedirect) {
+        whenReady(service.getSubmitRedirect(amlsRefNo, accountTypeId, credId)) {
           _ mustEqual Some( controllers.declaration.routes.WhoIsRegisteringController.get())
         }
       }
@@ -123,7 +127,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
         mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
-        whenReady(service.getSubmitRedirect) {
+        whenReady(service.getSubmitRedirect(amlsRefNo, accountTypeId, credId)) {
           _ mustEqual Some(controllers.declaration.routes.RegisterPartnersController.get())
         }
       }
@@ -150,7 +154,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
         mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
-        whenReady(service.getSubmitRedirect) {
+        whenReady(service.getSubmitRedirect(amlsRefNo, accountTypeId, credId)) {
           _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get())
         }
       }
@@ -175,7 +179,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
         mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
-        whenReady(service.getSubmitRedirect) {
+        whenReady(service.getSubmitRedirect(amlsRefNo, accountTypeId, credId)) {
           _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get())
         }
       }
@@ -200,7 +204,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
         mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
-        whenReady(service.getSubmitRedirect) {
+        whenReady(service.getSubmitRedirect(amlsRefNo, accountTypeId, credId)) {
           _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get())
         }
       }
@@ -229,7 +233,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
           mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
           mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
-          whenReady(service.getSubmitRedirect) {
+          whenReady(service.getSubmitRedirect(amlsRefNo, accountTypeId, credId)) {
             _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get())
           }
 
@@ -258,7 +262,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
           mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
           mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
-          whenReady(service.getSubmitRedirect) {
+          whenReady(service.getSubmitRedirect(amlsRefNo, accountTypeId, credId)) {
             _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get())
           }
         }
@@ -287,7 +291,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
         mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
-        whenReady(service.getSubmitRedirect) {
+        whenReady(service.getSubmitRedirect(amlsRefNo, accountTypeId, credId)) {
           _ mustEqual Some(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.get())
         }
       }
@@ -312,7 +316,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
         mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
-        whenReady(service.getSubmitRedirect) {
+        whenReady(service.getSubmitRedirect(amlsRefNo, accountTypeId, credId)) {
           _ mustEqual Some(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.getWithAmendment())
         }
 
@@ -337,7 +341,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
         mockCacheFetch[Seq[ResponsiblePerson]](None, Some(ResponsiblePerson.key))
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
-        whenReady(service.getSubmitRedirect) {
+        whenReady(service.getSubmitRedirect(amlsRefNo, accountTypeId, credId)) {
           _ mustEqual None
         }
       }

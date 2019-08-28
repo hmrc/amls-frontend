@@ -24,7 +24,6 @@ import models.DateOfChange
 import models.businessdetails.BusinessDetails
 import models.asp.Asp
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.AuthAction
 import views.html.date_of_change
 
@@ -63,21 +62,6 @@ class ServicesOfBusinessDateOfChangeController @Inject()(val dataCacheConnector:
               }
             }
         }
-  }
-
-  private def getModelWithDateMap()(implicit authContext: AuthContext, hc: HeaderCarrier): Future[(Asp, Map[_ <: String, Seq[String]])] = {
-    dataCacheConnector.fetchAll map {
-      optionalCache =>
-        (for {
-          cache <- optionalCache
-          businessDetails <- cache.getEntry[BusinessDetails](BusinessDetails.key)
-          asp <- cache.getEntry[Asp](Asp.key)
-        } yield (asp, businessDetails.activityStartDate)) match {
-          case Some((asp, Some(activityStartDate))) => (asp, Map("activityStartDate" -> Seq(activityStartDate.startDate.toString("yyyy-MM-dd"))))
-          case Some((asp, _)) => (asp, Map())
-          case _ => (Asp(), Map())
-        }
-    }
   }
 
   private def getModelWithDateMap(cacheId: String)(implicit hc: HeaderCarrier): Future[(Asp, Map[_ <: String, Seq[String]])] = {

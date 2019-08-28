@@ -17,8 +17,8 @@
 package connectors.cache
 
 import config.AppConfig
-import connectors.{AuthConnector, Authority}
-import org.mockito.Matchers.{any, eq => meq}
+import connectors.Authority
+import org.mockito.Matchers.any
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.prop.PropertyChecks
@@ -52,28 +52,15 @@ class DataCacheConnectorSpec
     val newCache = cache.copy(id = credId)
     implicit val ec = mock[ExecutionContext]
 
-    when(authContext.user) thenReturn user
-    when(user.oid) thenReturn oId
-
-    val mockAuthConnector = mock[AuthConnector]
-
     val factory = mock[MongoCacheClientFactory]
     val client = mock[MongoCacheClient]
     val authority = Authority("", Accounts(), "/user-details", "/ids", credId)
 
     when(factory.createClient) thenReturn client
 
-    when {
-      mockAuthConnector.getCurrentAuthority(any(), any())
-    } thenReturn Future.successful(authority)
-
-    when {
-      mockAuthConnector.getCredId(any(), any())
-    } thenReturn Future.successful(credId)
-
     val appConfig = mock[AppConfig]
 
-    val dataCacheConnector = new MongoCacheConnector(factory, mockAuthConnector) {
+    val dataCacheConnector = new MongoCacheConnector(factory) {
       override lazy val mongoCache: MongoCacheClient =  mock[MongoCacheClient]
     }
   }
@@ -92,10 +79,10 @@ class DataCacheConnectorSpec
       val model = Model("data")
 
       when {
-        dataCacheConnector.mongoCache.createOrUpdate(credId, Some(oId), model, key)
+        dataCacheConnector.mongoCache.createOrUpdate(credId, model, key)
       } thenReturn Future.successful(newCache)
 
-      whenReady(dataCacheConnector.save(key, model)) { result =>
+      whenReady(dataCacheConnector.save(credId, key, model)) { result =>
         result mustBe toCacheMap(newCache)
         result.id mustBe credId
       }
@@ -105,46 +92,29 @@ class DataCacheConnectorSpec
       val model = Model("data")
 
       when {
-        dataCacheConnector.mongoCache.find[Model](credId, Some(oId), key)
+        dataCacheConnector.mongoCache.find[Model](credId, key)
       } thenReturn Future.successful(Some(model))
 
-      whenReady(dataCacheConnector.fetch[Model](key)) { _ mustBe Some(model) }
+      whenReady(dataCacheConnector.fetch[Model](credId, key)) { _ mustBe Some(model) }
     }
 
     "fetch all data from Mongo" in new Fixture {
       val model = Model("data")
 
       when {
-        dataCacheConnector.mongoCache.fetchAll(Some(credId), deprecatedFilter = false)
+        dataCacheConnector.mongoCache.fetchAll(Some(credId))
       } thenReturn Future.successful(Some(newCache))
 
-      whenReady(dataCacheConnector.fetchAll) { _ mustBe Some(toCacheMap(newCache)) }
+      whenReady(dataCacheConnector.fetchAll(credId)) { _ mustBe Some(toCacheMap(newCache)) }
     }
 
     "remove data from Mongo for CredId" in new Fixture {
+
       when {
-        dataCacheConnector.mongoCache.removeById(oId, deprecatedFilter = true)
+        dataCacheConnector.mongoCache.removeById(credId)
       } thenReturn Future.successful(true)
 
-      when {
-        dataCacheConnector.mongoCache.removeById(credId, deprecatedFilter = false)
-      } thenReturn Future.successful(true)
-
-      whenReady(dataCacheConnector.remove) {
-        _ mustBe true
-      }
-    }
-
-    "remove data from Mongo for Oid" in new Fixture {
-      when {
-        dataCacheConnector.mongoCache.removeById(any(), meq(false))
-      } thenReturn Future.successful(false)
-
-      when {
-        dataCacheConnector.mongoCache.removeById(oId, deprecatedFilter = true)
-      } thenReturn Future.successful(true)
-
-      whenReady(dataCacheConnector.remove) {
+      whenReady(dataCacheConnector.remove(credId)) {
         _ mustBe true
       }
     }

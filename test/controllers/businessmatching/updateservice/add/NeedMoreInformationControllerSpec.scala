@@ -31,7 +31,7 @@ import utils._
 
 class NeedMoreInformationControllerSpec extends AmlsSpec with MockitoSugar with FutureAssertions with ScalaFutures {
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
 
     val request = addToken(authRequest)

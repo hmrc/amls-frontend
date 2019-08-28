@@ -30,7 +30,6 @@ import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -42,7 +41,6 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
     val request = addToken(authRequest)
 
     implicit val hc: HeaderCarrier = new HeaderCarrier()
-    implicit val ac: AuthContext = mock[AuthContext]
     implicit val ec: ExecutionContext = mock[ExecutionContext]
 
     val controller = new TypeOfBankController(

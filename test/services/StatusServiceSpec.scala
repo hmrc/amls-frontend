@@ -17,7 +17,6 @@
 package services
 
 import connectors.AmlsConnector
-import controllers.actions.SuccessfulAuthAction
 import models.ReadStatusResponse
 import models.registrationprogress.{Completed, NotStarted, Section}
 import models.status._
@@ -29,7 +28,6 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
@@ -42,8 +40,11 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
     sectionsProvider = mock[SectionsProvider]
   )
 
+  val amlsRegNo = Some("X0123456789")
+  val accountTypeId = ("accountType", "accountId")
+  val credId = "123412345"
+  
   implicit val hc = mock[HeaderCarrier]
-  implicit val ac = mock[AuthContext]
   implicit val ec = mock[ExecutionContext]
 
   val readStatusResponse: ReadStatusResponse = ReadStatusResponse(new LocalDateTime(), "Pending", None, None, None,
@@ -52,68 +53,70 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
   "Status Service" must {
     "return NotCompleted" in {
 
-      when(service.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
-      when(service.sectionsProvider.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", NotStarted, false, Call("", "")))))
-      whenReady(service.getStatus) {
+      when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any())).thenReturn(Future.successful(None))
+      when(service.sectionsProvider.sections(any[String]())(any(), any())).thenReturn(Future.successful(Seq(Section("test", NotStarted, false, Call("", "")))))
+      when(service.amlsConnector.status(any(), any())(any(), any(), any())).thenReturn(Future.successful(readStatusResponse))
+      whenReady(service.getStatus(None, accountTypeId, credId)) {
         _ mustEqual NotCompleted
       }
     }
 
     "return SubmissionReady" in {
 
-      when(service.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
-      when(service.sectionsProvider.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
-      whenReady(service.getStatus) {
+      when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any())).thenReturn(Future.successful(None))
+      when(service.sectionsProvider.sections(any[String]())(any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(service.amlsConnector.status(any(), any())(any(), any(), any())).thenReturn(Future.successful(readStatusResponse))
+      whenReady(service.getStatus(None, accountTypeId, credId)) {
         _ mustEqual SubmissionReady
       }
     }
 
     "return SubmissionReadyForReview" in {
 
-      when(service.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
-      when(service.sectionsProvider.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
-      when(service.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse))
-      whenReady(service.getStatus) {
+      when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any())).thenReturn(Future.successful(Some("amlsref")))
+      when(service.sectionsProvider.sections(any[String]())(any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(service.amlsConnector.status(any(), any())(any(), any(), any())).thenReturn(Future.successful(readStatusResponse))
+      whenReady(service.getStatus(amlsRegNo, accountTypeId, credId)) {
         _ mustEqual SubmissionReadyForReview
       }
     }
 
     "return SubmissionDecisionApproved" in {
 
-      when(service.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
-      when(service.sectionsProvider.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
-      when(service.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Approved")))
-      whenReady(service.getStatus) {
+      when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any())).thenReturn(Future.successful(Some("amlsref")))
+      when(service.sectionsProvider.sections(any[String]())(any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(service.amlsConnector.status(any(), any())(any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Approved")))
+      whenReady(service.getStatus(amlsRegNo, accountTypeId, credId)) {
         _ mustEqual SubmissionDecisionApproved
       }
     }
 
     "return SubmissionDecisionRejected" in {
 
-      when(service.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
-      when(service.sectionsProvider.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
-      when(service.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Rejected")))
-      whenReady(service.getStatus) {
+      when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any())).thenReturn(Future.successful(Some("amlsref")))
+      when(service.sectionsProvider.sections(any[String]())(any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(service.amlsConnector.status(any(), any())(any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Rejected")))
+      whenReady(service.getStatus(amlsRegNo, accountTypeId, credId)) {
         _ mustEqual SubmissionDecisionRejected
       }
     }
 
     "return SubmissionDecisionRevoked" in {
 
-      when(service.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
-      when(service.sectionsProvider.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
-      when(service.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Revoked")))
-      whenReady(service.getStatus) {
+      when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any())).thenReturn(Future.successful(Some("amlsref")))
+      when(service.sectionsProvider.sections(any[String]())(any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(service.amlsConnector.status(any(), any())(any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Revoked")))
+      whenReady(service.getStatus(amlsRegNo, accountTypeId, credId)) {
         _ mustEqual SubmissionDecisionRevoked
       }
     }
 
     "return SubmissionDecisionExpired" in {
 
-      when(service.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
-      when(service.sectionsProvider.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
-      when(service.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Expired")))
-      whenReady(service.getStatus) {
+      when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any())).thenReturn(Future.successful(Some("amlsref")))
+      when(service.sectionsProvider.sections(any[String]())(any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(service.amlsConnector.status(any(), any())(any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Expired")))
+      whenReady(service.getStatus(amlsRegNo, accountTypeId, credId)) {
         _ mustEqual SubmissionDecisionExpired
       }
     }
@@ -121,10 +124,10 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
     "return ReadyForRenewal" in {
       val renewalDate = LocalDate.now().plusDays(15)
 
-      when(service.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
-      when(service.sectionsProvider.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
-      when(service.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Approved", currentRegYearEndDate = Some(renewalDate))))
-      whenReady(service.getStatus) {
+      when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any())).thenReturn(Future.successful(Some("amlsref")))
+      when(service.sectionsProvider.sections(any[String]())(any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(service.amlsConnector.status(any(), any())(any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Approved", currentRegYearEndDate = Some(renewalDate))))
+      whenReady(service.getStatus(amlsRegNo, accountTypeId, credId)) {
         _ mustEqual ReadyForRenewal(Some(renewalDate))
       }
 
@@ -134,10 +137,10 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       val renewalDate = new LocalDate(2017,3,31)
       DateTimeUtils.setCurrentMillisFixed((new LocalDate(2017,3,2)).toDateTimeAtStartOfDay.getMillis)
 
-      when(service.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
-      when(service.sectionsProvider.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
-      when(service.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Approved", currentRegYearEndDate = Some(renewalDate))))
-      whenReady(service.getStatus) {
+      when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any())).thenReturn(Future.successful(Some("amlsref")))
+      when(service.sectionsProvider.sections(any[String]())(any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(service.amlsConnector.status(any(), any())(any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Approved", currentRegYearEndDate = Some(renewalDate))))
+      whenReady(service.getStatus(amlsRegNo, accountTypeId, credId)) {
         _ mustEqual ReadyForRenewal(Some(renewalDate))
       }
 
@@ -149,10 +152,10 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       val renewalDate = new LocalDate(2017,3,31)
       DateTimeUtils.setCurrentMillisFixed((new LocalDate(2017,3,1)).toDateTimeAtStartOfDay.getMillis)
 
-      when(service.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
-      when(service.sectionsProvider.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
-      when(service.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Approved", currentRegYearEndDate = Some(renewalDate))))
-      whenReady(service.getStatus) {
+      when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any())).thenReturn(Future.successful(Some("amlsref")))
+      when(service.sectionsProvider.sections(any[String]())(any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(service.amlsConnector.status(any(), any())(any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Approved", currentRegYearEndDate = Some(renewalDate))))
+      whenReady(service.getStatus(amlsRegNo, accountTypeId, credId)) {
         _ mustEqual SubmissionDecisionApproved
       }
 
@@ -163,48 +166,48 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
     "not return ReadyForRenewal" in {
       val renewalDate = LocalDate.now().plusDays(15)
 
-      when(service.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
-      when(service.sectionsProvider.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
-      when(service.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "adasdasd", currentRegYearEndDate = Some(renewalDate))))
-      whenReady(service.getStatus.failed) {
+      when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any())).thenReturn(Future.successful(Some("amlsref")))
+      when(service.sectionsProvider.sections(any[String]())(any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(service.amlsConnector.status(any(), any())(any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "adasdasd", currentRegYearEndDate = Some(renewalDate))))
+      whenReady(service.getStatus(amlsRegNo, accountTypeId, credId).failed) {
         _.getMessage mustBe("ETMP returned status is inconsistent")
       }
 
     }
 
     "return RenewalSubmitted" in {
-      when(service.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
-      when(service.sectionsProvider.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
-      when(service.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Approved",renewalConFlag = true)))
-      whenReady(service.getStatus) {
+      when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any())).thenReturn(Future.successful(Some("amlsref")))
+      when(service.sectionsProvider.sections(any[String]())(any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(service.amlsConnector.status(any(), any())(any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Approved",renewalConFlag = true)))
+      whenReady(service.getStatus(amlsRegNo, accountTypeId, credId)) {
         _ mustEqual RenewalSubmitted(None)
       }
     }
 
     "return SubmissionWithdrawn" in {
-      when(service.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
-      when(service.sectionsProvider.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
-      when(service.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Withdrawal")))
-      whenReady(service.getStatus) {
+      when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any())).thenReturn(Future.successful(Some("amlsref")))
+      when(service.sectionsProvider.sections(any[String]())(any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(service.amlsConnector.status(any(), any())(any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Withdrawal")))
+      whenReady(service.getStatus(amlsRegNo, accountTypeId, credId)) {
         _ mustEqual SubmissionWithdrawn
       }
     }
 
     "return DeRegistered" in {
-      when(service.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
-      when(service.sectionsProvider.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
-      when(service.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "De-Registered")))
-      whenReady(service.getStatus) {
+      when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any())).thenReturn(Future.successful(Some("amlsref")))
+      when(service.sectionsProvider.sections(any[String]())(any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(service.amlsConnector.status(any(), any())(any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "De-Registered")))
+      whenReady(service.getStatus(amlsRegNo, accountTypeId, credId)) {
         _ mustEqual DeRegistered
       }
     }
 
     "return SafeId" in {
       val safeId = "J4JF8EJ3NDJWI32W"
-      when(service.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
-      when(service.sectionsProvider.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
-      when(service.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(safeId = Some(safeId))))
-      whenReady(service.getSafeIdFromReadStatus("amlsref")) {
+      when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any())).thenReturn(Future.successful(Some("amlsref")))
+      when(service.sectionsProvider.sections(any[String]())(any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(service.amlsConnector.status(any(), any())(any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(safeId = Some(safeId))))
+      whenReady(service.getSafeIdFromReadStatus("amlsref", accountTypeId)) {
         _ mustEqual Some(safeId)
       }
     }

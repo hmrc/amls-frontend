@@ -37,7 +37,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.test.Helpers._
-import utils.{AmlsSpec, DependencyMocksNewAuth, FutureAssertions}
+import utils.{AmlsSpec, DependencyMocks, FutureAssertions}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -49,7 +49,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
   with TradingPremisesGenerator
   with BusinessMatchingGenerator {
 
-  trait Fixture extends DependencyMocksNewAuth {
+  trait Fixture extends DependencyMocks {
     val mockAppConfig = mock[AppConfig]
     val service = new BusinessMatchingService(mockStatusService, mockCacheConnector, mockAppConfig)
 

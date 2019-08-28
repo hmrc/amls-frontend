@@ -29,7 +29,6 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
@@ -39,8 +38,6 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar with GeneratorD
   implicit val hc = HeaderCarrier()
 
   trait Fixture extends AuthorisedFixture {
-
-    implicit val authContext = mock[AuthContext]
 
     val amlsNotificationConnector = mock[AmlsNotificationConnector]
 

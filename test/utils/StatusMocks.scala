@@ -21,7 +21,6 @@ import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import services.StatusService
-import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 
@@ -30,10 +29,6 @@ trait StatusMocks extends MockitoSugar {
   implicit val mockStatusService = mock[StatusService]
 
   def mockApplicationStatus(status: SubmissionStatus)(implicit service: StatusService) = when {
-    service.getStatus(any[HeaderCarrier], any(), any())
-  } thenReturn Future.successful(status)
-
-  def mockApplicationStatusNewAuth(status: SubmissionStatus)(implicit service: StatusService) = when {
     service.getStatus(any[Option[String]], any(), any())(any(), any())
   } thenReturn Future.successful(status)
 

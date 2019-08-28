@@ -27,11 +27,11 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocks}
 
 class RegisterResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
@@ -53,7 +53,7 @@ class RegisterResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar
     "status is ReadyForRenewal" must {
       "respond with OK and show the correct subtitle" in new Fixture {
 
-        mockApplicationStatusNewAuth(ReadyForRenewal(None))
+        mockApplicationStatus(ReadyForRenewal(None))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -64,7 +64,7 @@ class RegisterResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar
     "status is SubmissionDecisionApproved" must {
       "respond with OK and show the correct subtitle" in new Fixture {
 
-        mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+        mockApplicationStatus(SubmissionDecisionApproved)
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -75,7 +75,7 @@ class RegisterResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar
     "status is SubmissionReadyForReview" must {
       "respond with OK and show the correct subtitle" in new Fixture {
 
-        mockApplicationStatusNewAuth(SubmissionReadyForReview)
+        mockApplicationStatus(SubmissionReadyForReview)
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -86,7 +86,7 @@ class RegisterResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar
     "status is other e.g. SubmissionReady" must {
       "respond with OK and show the correct subtitle" in new Fixture {
 
-        mockApplicationStatusNewAuth(SubmissionReady)
+        mockApplicationStatus(SubmissionReady)
 
         val result = controller.get()(request)
         status(result) must be(OK)

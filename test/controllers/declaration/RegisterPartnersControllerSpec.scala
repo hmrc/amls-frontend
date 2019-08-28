@@ -38,7 +38,7 @@ import scala.concurrent.Future
 
 class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
@@ -87,7 +87,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
           dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(),any())
         } thenReturn Future.successful(Some(Seq(ResponsiblePerson())))
 
-        mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+        mockApplicationStatus(SubmissionDecisionApproved)
 
         val result = controller.get()(request)
 
@@ -105,7 +105,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
-          mockApplicationStatusNewAuth(SubmissionReady)
+          mockApplicationStatus(SubmissionReady)
 
           val updatedList = Seq(rp.copy(positions = Some(positions.copy(positions
             = Set(BeneficialOwner, InternalAccountant, Partner)))), rp2)
@@ -128,7 +128,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
-          mockApplicationStatusNewAuth(SubmissionReady)
+          mockApplicationStatus(SubmissionReady)
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -141,7 +141,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
-          mockApplicationStatusNewAuth(SubmissionReadyForReview)
+          mockApplicationStatus(SubmissionReadyForReview)
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -154,7 +154,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
-          mockApplicationStatusNewAuth(ReadyForRenewal(Some(new LocalDate())))
+          mockApplicationStatus(ReadyForRenewal(Some(new LocalDate())))
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -167,7 +167,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(None))
 
-          mockApplicationStatusNewAuth(SubmissionReadyForReview)
+          mockApplicationStatus(SubmissionReadyForReview)
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)

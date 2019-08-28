@@ -25,7 +25,7 @@ import org.scalacheck.Gen
 import org.scalatest.concurrent.ScalaFutures
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth, StatusConstants}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
 import views.TitleValidator
 
 class WhatYouNeedControllerSpec
@@ -34,7 +34,7 @@ class WhatYouNeedControllerSpec
     with TitleValidator
     with BankDetailsGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val request = addToken(authRequest)
     val controller = new WhatYouNeedController(SuccessfulAuthAction, mockCacheConnector)

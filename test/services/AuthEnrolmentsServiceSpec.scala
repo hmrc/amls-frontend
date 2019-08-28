@@ -17,16 +17,14 @@
 package services
 
 import config.AppConfig
-import connectors.{AuthConnector, Authority, TaxEnrolmentsConnector, EnrolmentStubConnector}
+import connectors.{EnrolmentStubConnector, TaxEnrolmentsConnector}
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
-import models.auth.UserDetails
-import models.enrolment.{AmlsEnrolmentKey, EnrolmentIdentifier, TaxEnrolment, GovernmentGatewayEnrolment}
+import models.enrolment.{AmlsEnrolmentKey, EnrolmentIdentifier, GovernmentGatewayEnrolment, TaxEnrolment}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
 import utils.AmlsSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -42,19 +40,17 @@ class AuthEnrolmentsServiceSpec extends AmlsSpec
   trait Fixture {
     val enrolmentStore = mock[TaxEnrolmentsConnector]
     val enrolmentStubConnector = mock[EnrolmentStubConnector]
-    val authConnector = mock[AuthConnector]
     val config = mock[AppConfig]
 
     val groupId = stringOfLengthGen(10).sample.get
 
-    val service = new AuthEnrolmentsService(authConnector, enrolmentStore, config, enrolmentStubConnector)
+    val service = new AuthEnrolmentsService(enrolmentStore, config, enrolmentStubConnector)
 
     val enrolmentsList = List[GovernmentGatewayEnrolment](
       GovernmentGatewayEnrolment("HMCE-VATVAR-ORG", List[EnrolmentIdentifier](EnrolmentIdentifier("VATRegNo", "000000000")), "Activated"),
       GovernmentGatewayEnrolment("HMRC-MLR-ORG", List[EnrolmentIdentifier](EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Activated"))
 
     when(config.enrolmentStubsEnabled) thenReturn false
-    when(authContext.enrolmentsUri).thenReturn(Some("uri"))
   }
 
   "AuthEnrolmentsService" must {
@@ -62,33 +58,23 @@ class AuthEnrolmentsServiceSpec extends AmlsSpec
     "connect to the stubs microservice when enabled and enrolments were returned by auth" in new Fixture {
       when(config.enrolmentStubsEnabled) thenReturn true
 
-      when(authConnector.enrolments(any())(any(),any())).thenReturn(Future.successful(enrolmentsList))
-
       when {
-        enrolmentStubConnector.enrolments(eqTo(groupId))(any(), any(), any())
+        enrolmentStubConnector.enrolments(eqTo(groupId))(any(), any())
       } thenReturn Future.successful(enrolmentsList)
 
-      when {
-        authConnector.userDetails(any(), any(), any())
-      } thenReturn Future.successful(UserDetails("Test", None, "Group", None, Some(groupId)))
-
-      whenReady(service.amlsRegistrationNumber) { result =>
+      whenReady(service.amlsRegistrationNumber(Some(amlsRegistrationNumber), Some(groupId))) { result =>
         result mustBe Some(amlsRegistrationNumber)
       }
     }
 
     "return an AMLS registration number" in new Fixture {
-      when(authConnector.enrolments(any())(any(),any())).thenReturn(Future.successful(enrolmentsList))
 
-      whenReady(service.amlsRegistrationNumber){
+      whenReady(service.amlsRegistrationNumber(Some(amlsRegistrationNumber), Some(groupId))){
         number => number.get mustEqual amlsRegistrationNumber
       }
     }
 
     "create an enrolment" in new Fixture {
-      when {
-        authConnector.getCurrentAuthority(any(), any())
-      } thenReturn Future.successful(Authority("", Accounts(), "/user-details", "/ids", "12345678"))
 
       when {
         service.enrolmentStore.enrol(any(), any(), any())(any(), any())
@@ -126,7 +112,7 @@ class AuthEnrolmentsServiceSpec extends AmlsSpec
       when(config.enrolmentStubsEnabled) thenReturn true
 
       when {
-        enrolmentStubConnector.enrolmentsNewAuth(eqTo(groupId))(any(), any())
+        enrolmentStubConnector.enrolments(eqTo(groupId))(any(), any())
       } thenReturn Future.successful(enrolmentsList)
 
       whenReady(service.amlsRegistrationNumber(None, Some(groupId))) { result =>
@@ -138,7 +124,7 @@ class AuthEnrolmentsServiceSpec extends AmlsSpec
       when(config.enrolmentStubsEnabled) thenReturn false
 
       when {
-        enrolmentStubConnector.enrolmentsNewAuth(eqTo(groupId))(any(), any())
+        enrolmentStubConnector.enrolments(eqTo(groupId))(any(), any())
       } thenReturn Future.successful(enrolmentsList)
 
       whenReady(service.amlsRegistrationNumber(None, Some(groupId))) { result =>

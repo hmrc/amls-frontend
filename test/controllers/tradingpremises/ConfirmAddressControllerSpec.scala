@@ -31,13 +31,13 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
 class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with TradingPremisesGenerator with BusinessMatchingGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val applicationReference = "SUIYD3274890384"
 
@@ -57,7 +57,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
     )
 
     when {
-      enrolments.amlsRegistrationNumber(any(), any(), any())
+      enrolments.amlsRegistrationNumber(any(), any())(any(), any())
     } thenReturn Future.successful(Some(applicationReference))
 
     mockCacheFetchAll

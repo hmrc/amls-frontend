@@ -21,8 +21,6 @@ import models.responsiblepeople.{Partner, ResponsiblePerson}
 import models.status._
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -66,15 +64,6 @@ object DeclarationHelper {
       case SubmissionReady | NotCompleted | SubmissionReadyForReview | ReadyForRenewal(_) =>
         declaration.routes.WhoIsTheBusinessNominatedOfficerController.get()
       case _ => declaration.routes.WhoIsTheBusinessNominatedOfficerController.getWithAmendment()
-    }
-  }
-@deprecated("To be removed when auth upgrade is in place")
-  def statusSubtitle()(implicit statusService: StatusService, hc: HeaderCarrier, auth: AuthContext): Future[String] = {
-    statusService.getStatus map {
-      case SubmissionReady => "submit.registration"
-      case SubmissionReadyForReview | SubmissionDecisionApproved => "submit.amendment.application"
-      case ReadyForRenewal(_) | RenewalSubmitted(_) => "submit.renewal.application"
-      case _ => throw new Exception("Incorrect status - Page not permitted for this status")
     }
   }
 

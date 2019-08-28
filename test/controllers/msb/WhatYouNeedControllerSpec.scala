@@ -25,16 +25,16 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val request = addToken(authRequest)
-
+    implicit val ec = app.injector.instanceOf[ExecutionContext]
     val controller = new WhatYouNeedController(
       SuccessfulAuthAction,
       mockStatusService,
@@ -65,7 +65,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       "redirect to the expected throughput controller if in pre-submission status" in new Fixture {
         when {
-          mockStatusService.isPreSubmission(any(), any(), any())
+          mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
         } thenReturn Future.successful(true)
 
         val result = controller.post(request)
@@ -74,7 +74,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       "redirect to the expected throughput page if MSB has just been added to the application" in new Fixture {
         when {
-          mockStatusService.isPreSubmission(any(), any(), any())
+          mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
         } thenReturn Future.successful(false)
 
         mockCacheFetch(
@@ -88,7 +88,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       "redirect to the expected throughput page if not in pre-submission status" in new Fixture {
 
         when {
-          mockStatusService.isPreSubmission(any(), any(), any())
+          mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
         } thenReturn Future.successful(false)
 
 

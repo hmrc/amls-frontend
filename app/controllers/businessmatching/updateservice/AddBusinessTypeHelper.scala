@@ -31,7 +31,6 @@ import models.supervision.Supervision
 import models.tradingpremises.TradingPremises
 import services.{ResponsiblePeopleService, TradingPremisesService}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AuthAction, RepeatingSection, StatusConstants}
 
 import scala.concurrent.ExecutionContext.Implicits.global

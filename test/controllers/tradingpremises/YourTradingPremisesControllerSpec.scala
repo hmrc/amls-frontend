@@ -33,7 +33,7 @@ import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
@@ -46,7 +46,7 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
   //val mockCacheMap = mock[CacheMap]
   val mockYtp = mock[TradingPremises]
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
     val ytpController = new YourTradingPremisesController(

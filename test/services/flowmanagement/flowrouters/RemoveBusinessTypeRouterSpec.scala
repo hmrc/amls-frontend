@@ -34,14 +34,14 @@ import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.flowrouters.businessmatching.RemoveBusinessTypeRouter
 import services.flowmanagement.pagerouters.removeflow._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
 class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerator {
 
-  trait Fixture extends DependencyMocksNewAuth with AuthorisedFixture {
+  trait Fixture extends DependencyMocks with AuthorisedFixture {
     self =>
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]

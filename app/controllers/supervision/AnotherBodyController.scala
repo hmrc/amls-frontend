@@ -22,7 +22,6 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.supervision.{AnotherBody, AnotherBodyNo, AnotherBodyYes, Supervision}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.AuthAction
 import views.html.supervision.another_body
 

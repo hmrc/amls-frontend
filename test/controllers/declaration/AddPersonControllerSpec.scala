@@ -20,7 +20,7 @@ import java.util.UUID
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
-import forms.{EmptyForm, InvalidForm}
+import forms.InvalidForm
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
@@ -36,14 +36,14 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
 
 class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
@@ -77,7 +77,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
       (any(), any())).thenReturn(Future.successful(Some(defaultBM)))
     when(addPersonController.dataCacheConnector.save[AddPerson](any(), any(), any())(any(), any()))
       .thenReturn(Future.successful(emptyCache))
-    mockApplicationStatusNewAuth(SubmissionReady)
+    mockApplicationStatus(SubmissionReady)
   }
 
   "AddPersonController" when {
@@ -106,7 +106,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             "roleWithinBusiness[]" -> "ExternalAccountant"
           )
 
-          mockApplicationStatusNewAuth(SubmissionReadyForReview)
+          mockApplicationStatus(SubmissionReadyForReview)
 
           val result = addPersonController.get()(requestWithParams)
           status(result) must be(OK)
@@ -121,7 +121,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             "roleWithinBusiness[]" -> "ExternalAccountant"
           )
 
-          mockApplicationStatusNewAuth(ReadyForRenewal(Some(new LocalDate)))
+          mockApplicationStatus(ReadyForRenewal(Some(new LocalDate)))
 
           val result = addPersonController.get()(requestWithParams)
           status(result) must be(OK)
@@ -180,7 +180,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
             "positions" -> "08"
           )
 
-          mockApplicationStatusNewAuth(SubmissionReadyForReview)
+          mockApplicationStatus(SubmissionReadyForReview)
 
           val result = addPersonController.post()(requestWithParams)
           status(result) must be(SEE_OTHER)
@@ -233,8 +233,8 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
         "business type is LimitedCompany and position is not filled" in new Fixture {
           val rd = defaultReviewDetails.copy(businessType = Some(LimitedCompany))
           val bm = BusinessMatching(reviewDetails = Some(rd))
-          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
+          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
+            (any(), any())).thenReturn(Future.successful(Some(bm)))
 
           val roleMissingInRequest = request.withFormUrlEncodedBody(
             "firstName" -> "firstName",
@@ -337,7 +337,7 @@ class AddPersonControllerWithoutAmendmentSpec extends AmlsSpec with MockitoSugar
   val userId = s"user-${UUID.randomUUID()}"
   val mockDataCacheConnector = mock[DataCacheConnector]
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
     val addPersonController = new AddPersonController (
@@ -357,7 +357,7 @@ class AddPersonControllerWithoutAmendmentSpec extends AmlsSpec with MockitoSugar
           when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
             (any(), any())).thenReturn(Future.successful(None))
 
-          mockApplicationStatusNewAuth(SubmissionReadyForReview)
+          mockApplicationStatus(SubmissionReadyForReview)
 
           val result = addPersonController.get()(request)
           status(result) must be(OK)

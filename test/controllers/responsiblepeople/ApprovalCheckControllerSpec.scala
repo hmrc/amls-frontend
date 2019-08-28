@@ -26,10 +26,10 @@
  import play.api.inject.bind
  import play.api.inject.guice.GuiceApplicationBuilder
  import play.api.test.Helpers._
- import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocksNewAuth}
+ import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocks}
 
  class ApprovalCheckControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
-   trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth { self =>
+   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(authRequest)
      lazy val defaultBuilder = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]

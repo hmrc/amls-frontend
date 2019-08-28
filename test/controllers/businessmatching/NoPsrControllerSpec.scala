@@ -43,7 +43,7 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
     "called" must {
       "return an OK status" when {
         "application status is pre-application" in new Fixture {
-          mockApplicationStatusNewAuth(NotCompleted)
+          mockApplicationStatus(NotCompleted)
 
           val result = controller.get()(request)
 
@@ -52,7 +52,7 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
         }
 
         "application status is beyond pre-application" in new Fixture {
-          mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+          mockApplicationStatus(SubmissionDecisionApproved)
 
           val result = controller.get()(request)
           status(result) mustBe OK

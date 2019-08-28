@@ -16,17 +16,16 @@
 
 package connectors
 
-import config.{AppConfig, ApplicationConfig, WSHttp}
+import config.ApplicationConfig
 import javax.inject.Inject
-import uk.gov.hmrc.http.{HeaderCarrier, HttpDelete, HttpGet}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.http.{HeaderCarrier, HttpDelete}
 
 import scala.concurrent.ExecutionContext
 
 class TestOnlyStubConnector @Inject()(http: HttpDelete) {
   lazy val baseUrl = ApplicationConfig.testOnlyStubsUrl
 
-  def clearState()(implicit hc: HeaderCarrier, ac: AuthContext, ex: ExecutionContext) = {
+  def clearState()(implicit hc: HeaderCarrier, ex: ExecutionContext) = {
     val requestUrl = s"$baseUrl/clearstate"
     http.DELETE(requestUrl)
   }

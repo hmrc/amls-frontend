@@ -18,30 +18,12 @@ package services
 
 import connectors.DataCacheConnector
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.{Future, ExecutionContext}
 import uk.gov.hmrc.http.{ HeaderCarrier, NotFoundException }
 
 private[services] trait DataCacheService {
 
   private[services] def cacheConnector: DataCacheConnector
-
-  @deprecated("to be removed when auth migration complete")
-  def getCache
-  (implicit
-   ec: ExecutionContext,
-   hc: HeaderCarrier,
-   ac: AuthContext
-  ): Future[CacheMap] =
-    cacheConnector.fetchAll flatMap {
-      case Some(cache) =>
-        Future.successful(cache)
-      case None =>
-        Future.failed {
-          new NotFoundException("No CacheMap found for user")
-        }
-    }
 
   def getCache(credId: String)
               (implicit ec: ExecutionContext, hc: HeaderCarrier): Future[CacheMap] =

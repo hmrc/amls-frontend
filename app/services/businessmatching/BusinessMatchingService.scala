@@ -31,8 +31,6 @@ import models.tcsp.Tcsp
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -42,44 +40,19 @@ class BusinessMatchingService @Inject()(
                                          appConfig: AppConfig
                                        ) {
 
-@deprecated("To be removed when auth implementation is done")
-  def preApplicationComplete(implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext): Future[Boolean] = {
-    for {
-      bm <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
-    } yield bm.preAppComplete
-  } getOrElse false
-
   def preApplicationComplete(credId: String)(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Boolean] = {
     for {
       bm <- OptionT(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
     } yield bm.preAppComplete
   } getOrElse false
 
-  @deprecated("To be removed when auth implementation is complete")
-  def getModel(implicit ac:AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, BusinessMatching] =
-    OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
-
   def getModel(credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, BusinessMatching] =
     OptionT(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
-@deprecated("To be removed when auth implementation is completed")
-  def updateModel(model: BusinessMatching)
-                 (implicit ac:AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, CacheMap] =
-      OptionT.liftF(dataCacheConnector.save[BusinessMatching](BusinessMatching.key, model))
 
   def updateModel(credId: String, model: BusinessMatching)
                  (implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, CacheMap] =
     OptionT.liftF(dataCacheConnector.save[BusinessMatching](credId, BusinessMatching.key, model))
 
-  @deprecated("To be removed when auth implementation is complete")
-  private def fetchActivitySet(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext) =
-    for {
-      viewResponse <- OptionT(dataCacheConnector.fetch[ViewResponse](ViewResponse.key))
-      submitted <- OptionT.fromOption[Future](viewResponse.businessMatchingSection.activities)
-      model <- getModel
-      current <- OptionT.fromOption[Future](model.activities)
-    } yield (current.businessActivities, current.removeActivities.fold(submitted.businessActivities) { removed =>
-      submitted.businessActivities diff removed
-    })
 
   private def fetchActivitySet(cacheId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext) =
     for {
@@ -90,24 +63,14 @@ class BusinessMatchingService @Inject()(
     } yield (current.businessActivities, current.removeActivities.fold(submitted.businessActivities) { removed =>
       submitted.businessActivities diff removed
     })
-  @deprecated("To be removed when auth implementation is complete")
-  private def getActivitySet(fn: (Set[BusinessActivity], Set[BusinessActivity]) => Set[BusinessActivity])
-                            (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
-    fetchActivitySet map fn.tupled
 
   private def getActivitySet(cacheId: String, fn: (Set[BusinessActivity], Set[BusinessActivity]) => Set[BusinessActivity])
                             (implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
     fetchActivitySet(cacheId) map fn.tupled
 
-  @deprecated("To be removed when auth implementation is complete")
-  def getAdditionalBusinessActivities(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
-    getActivitySet(_ diff _)
 
   def getAdditionalBusinessActivities(cacheId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
     getActivitySet(cacheId, _ diff _)
-@deprecated("To be removed when auth implementation is complete")
-  def getSubmittedBusinessActivities(implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
-    getActivitySet(_ intersect _)
 
   def getSubmittedBusinessActivities(credId: String)(implicit hc: HeaderCarrier, ex: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
     getActivitySet(credId, _ intersect _)

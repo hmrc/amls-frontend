@@ -40,8 +40,6 @@ import models.tradingpremises.TradingPremises
 import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.{ExecutionContext, Future}
 
 class LandingService @Inject() (val cacheConnector: DataCacheConnector,
@@ -49,9 +47,6 @@ class LandingService @Inject() (val cacheConnector: DataCacheConnector,
                                 val desConnector: AmlsConnector,
                                 val statusService: StatusService,
                                 val businessMatchingConnector: BusinessMatchingConnector){
-
-  @deprecated("to be removed when new auth completely implemented")
-  def cacheMap(implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[Option[CacheMap]] = cacheConnector.fetchAll
 
   def cacheMap(credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CacheMap]] = cacheConnector.fetchAll(credId)
 

@@ -17,17 +17,16 @@
 package services
 
 import connectors.DataCacheConnector
+import org.mockito.Matchers._
+import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import org.mockito.Matchers.{eq => eqTo, _}
-import org.mockito.Mockito._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits._
-import uk.gov.hmrc.http.{ HeaderCarrier, NotFoundException }
+import scala.concurrent.Future
 
 class DataCacheServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
@@ -36,19 +35,19 @@ class DataCacheServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures 
   }
 
   val cacheMap = CacheMap("", Map.empty)
+  val credID = "12345678"
 
   implicit val hc = HeaderCarrier()
-  implicit val ac = mock[AuthContext]
 
   "getCache" must {
 
     "Return a successful future when a cache exists" in {
 
       when {
-        DataCacheService.cacheConnector.fetchAll(any(), any())
+        DataCacheService.cacheConnector.fetchAll(any())(any())
       } thenReturn Future.successful(Some(cacheMap))
 
-      whenReady (DataCacheService.getCache) {
+      whenReady (DataCacheService.getCache(credID)) {
         result =>
           result mustEqual cacheMap
       }
@@ -57,12 +56,12 @@ class DataCacheServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures 
     "Return a failed future when no cache exists" in {
 
       when {
-        DataCacheService.cacheConnector.fetchAll(any(), any())
+        DataCacheService.cacheConnector.fetchAll(any())(any())
       } thenReturn Future.successful(None)
 
-      val result = DataCacheService.getCache
+      val result = DataCacheService.getCache(credID)
 
-      whenReady (DataCacheService.getCache.failed) {
+      whenReady (DataCacheService.getCache(credID).failed) {
         exception =>
           exception mustBe a[NotFoundException]
       }

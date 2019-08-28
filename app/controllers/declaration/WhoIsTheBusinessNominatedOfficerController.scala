@@ -28,7 +28,6 @@ import models.status._
 import play.api.mvc.{AnyContent, Request, Result}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.AuthAction
 import views.html.declaration.select_business_nominated_officer
 
@@ -41,15 +40,6 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
                                                              authAction: AuthAction,
                                                              val statusService: StatusService,
                                                              config: AppConfig) extends DefaultBaseController {
-@deprecated("To be removed when new auth is implemented")
-  def businessNominatedOfficerView(status: Status, form: Form2[BusinessNominatedOfficer], rp: Seq[ResponsiblePerson])
-                                  (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] =
-    statusService.getStatus map {
-      case SubmissionReady => status(select_business_nominated_officer("submit.registration", form, rp))
-      case SubmissionReadyForReview | SubmissionDecisionApproved => status(select_business_nominated_officer("submit.amendment.application", form, rp))
-      case ReadyForRenewal(_) |  RenewalSubmitted (_) => status(select_business_nominated_officer("submit.renewal.application", form, rp))
-      case _ => throw new Exception("Incorrect status - Page not permitted for this status")
-    }
 
   def businessNominatedOfficerView(amlsRegistrationNo: Option[String],
                                    accountTypeId: (String, String),
@@ -111,19 +101,6 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
             }
           }
       }
-  }
-
-@deprecated("Remove once new auth upgrade is implemented")
-  def validateRequest(form: Form2[BusinessNominatedOfficer])
-                     (fn: BusinessNominatedOfficer => Future[Result])
-                     (implicit ac: AuthContext, hc: HeaderCarrier, request: Request[AnyContent]): Future[Result] = {
-    form match {
-      case f: InvalidForm => dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key) flatMap {
-        case Some(data) => businessNominatedOfficerView(BadRequest, f, ResponsiblePerson.filter(data))
-        case None => businessNominatedOfficerView(BadRequest, f, Seq.empty)
-      }
-      case ValidForm(_, data) => fn(data)
-    }
   }
 
   def validateRequest(amlsRegistrationNo: Option[String],

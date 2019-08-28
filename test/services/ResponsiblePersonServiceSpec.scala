@@ -21,14 +21,14 @@ import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import org.scalacheck.Gen
 import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
-import utils.{AmlsSpec, DependencyMocksNewAuth, StatusConstants}
+import utils.{AmlsSpec, DependencyMocks, StatusConstants}
 import ResponsiblePeopleService._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class ResponsiblePersonServiceSpec extends AmlsSpec with ResponsiblePersonGenerator with ScalaFutures {
 
-  trait Fixture extends DependencyMocksNewAuth {
+  trait Fixture extends DependencyMocks {
 
     // scalastyle:off magic.number
     val responsiblePeople: List[ResponsiblePerson] = Gen.listOfN(5, responsiblePersonGen).sample.get

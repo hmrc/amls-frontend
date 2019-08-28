@@ -25,11 +25,11 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with MockitoSugar {
 
-  trait Fixture extends DependencyMocksNewAuth with AuthorisedFixture { self =>
+  trait Fixture extends DependencyMocks with AuthorisedFixture { self =>
 
     val request = addToken(authRequest)
 

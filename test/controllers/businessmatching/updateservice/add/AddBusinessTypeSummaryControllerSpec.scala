@@ -38,7 +38,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.TradingPremisesService
 import services.businessmatching.BusinessMatchingService
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -48,7 +48,7 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
   with TradingPremisesGenerator
   with BusinessMatchingGenerator {
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
@@ -74,7 +74,7 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
     )
 
     mockCacheFetch(Some(flowModel))
-    mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+    mockApplicationStatus(SubmissionDecisionApproved)
   }
 
   "UpdateServicesSummaryController" when {

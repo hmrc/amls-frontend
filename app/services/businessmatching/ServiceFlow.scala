@@ -21,17 +21,15 @@ import connectors.DataCacheConnector
 import javax.inject.Inject
 import models.businessmatching.BusinessActivity
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.{ExecutionContext, Future}
 
 case class NextService(url: String, activity: BusinessActivity)
 
 class ServiceFlow @Inject()(businessMatchingService: BusinessMatchingService, cacheConnector: DataCacheConnector) {
-  @deprecated("To be removed when auth implementation is complete")
-  def isNewActivity(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =
-    businessMatchingService.getAdditionalBusinessActivities map {_.contains(activity)} getOrElse false
 
   def isNewActivity(cacheId: String, activity: BusinessActivity)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =
-    businessMatchingService.getAdditionalBusinessActivities(cacheId) map {_.contains(activity)} getOrElse false
+    businessMatchingService.getAdditionalBusinessActivities(cacheId)
+      .map {
+        _.contains(activity)
+      } getOrElse false
 }

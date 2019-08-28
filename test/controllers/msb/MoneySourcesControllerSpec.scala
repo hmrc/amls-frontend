@@ -43,14 +43,14 @@ class MoneySourcesControllerSpec extends AmlsSpec
   with IntegrationPatience
   with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
     when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
       .thenReturn(Future.successful(None))
 
-    when(mockCacheConnector.save[MoneyServiceBusiness](any(), any())(any(), any(), any()))
+    when(mockCacheConnector.save[MoneyServiceBusiness](any(), any(), any())(any(), any()))
       .thenReturn(Future.successful(CacheMap("TESTID", Map())))
 
     val controller = new MoneySourcesController(dataCacheConnector = mockCacheConnector,
@@ -72,7 +72,7 @@ class MoneySourcesControllerSpec extends AmlsSpec
       .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
   }
 
-  trait DealsInForeignCurrencyFixture extends AuthorisedFixture with MoneyServiceBusinessTestData with DependencyMocksNewAuth {
+  trait DealsInForeignCurrencyFixture extends AuthorisedFixture with MoneyServiceBusinessTestData with DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
@@ -108,14 +108,14 @@ class MoneySourcesControllerSpec extends AmlsSpec
     "get is called" should {
       "succeed" when {
         "status is pre-submission" in new Fixture {
-          mockApplicationStatusNewAuth(NotCompleted)
+          mockApplicationStatus(NotCompleted)
 
           val resp = controller.get(false).apply(request)
           status(resp) must be(200)
         }
 
         "status is approved but the service has just been added" in new Fixture with ServiceFlowMocks {
-          mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+          mockApplicationStatus(SubmissionDecisionApproved)
 
           mockIsNewActivityNewAuth(true, Some(MoneyServiceBusinessActivity))
 
@@ -130,7 +130,7 @@ class MoneySourcesControllerSpec extends AmlsSpec
           None,
           Some(true))
 
-        mockApplicationStatusNewAuth(NotCompleted)
+        mockApplicationStatus(NotCompleted)
 
         when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
           .thenReturn(Future.successful(Some(MoneyServiceBusiness(whichCurrencies = Some(WhichCurrencies(Seq(), None, Some(currentModel)))))))

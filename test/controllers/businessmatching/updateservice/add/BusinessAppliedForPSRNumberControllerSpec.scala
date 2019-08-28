@@ -31,7 +31,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocksNewAuth}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
   with MockitoSugar
@@ -40,7 +40,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
 
   val emptyCache = CacheMap("", Map.empty)
 
-  trait Fixture extends AuthorisedFixture with DependencyMocksNewAuth {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
@@ -56,7 +56,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
 
     mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel())
     mockCacheFetch(Some(AddBusinessTypeFlowModel(Some(HighValueDealing))))
-    mockApplicationStatusNewAuth(SubmissionDecisionApproved)
+    mockApplicationStatus(SubmissionDecisionApproved)
 
     val businessMatching = businessMatchingGen.sample.get
     mockCacheSave[BusinessMatching]

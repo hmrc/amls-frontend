@@ -23,8 +23,6 @@ import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import services.flowmanagement.pagerouters.removeflow._
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
