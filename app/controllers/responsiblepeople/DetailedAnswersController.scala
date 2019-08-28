@@ -27,9 +27,10 @@ import models.businessmatching.BusinessType.Partnership
 import models.responsiblepeople.ResponsiblePerson
 import models.responsiblepeople.ResponsiblePerson.{flowChangeOfficer, flowFromDeclaration}
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved}
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.Request
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, ControllerHelper, DeclarationHelper, RepeatingSection}
 
 import scala.concurrent.Future
@@ -41,36 +42,42 @@ class DetailedAnswersController @Inject () (
                                              val config: AppConfig
                                            ) extends DefaultBaseController with RepeatingSection {
 
-  def get(index: Int, flow: Option[String] = None): Action[AnyContent] =
-    authAction.async {
-      implicit request =>
-        fetchModel(request.credId) flatMap {
-          case Some(data) => {
-            data.lift(index - 1) match {
-              case Some(x) => showHideAddressMove(request.amlsRefNumber, request.accountTypeId, request.credId, x.lineId) flatMap { showHide =>
-
-                isMsbOrTcsp(request.credId).map {
-                  (msbOrTcsp: Option[Boolean]) =>
-
-                    val shouldShowApprovalSection = !(msbOrTcsp.contains(true)) && x.approvalFlags.hasAlreadyPassedFitAndProper.contains(false)
-                    Ok(
-                      views.html.responsiblepeople.detailed_answers(
-                        Some(x),
-                        index,
-                        showHide,
-                        ControllerHelper.rpTitleName(Some(x)),
-                        flow,
-                        shouldShowApprovalSection
-                      )
-                    )
-                }
-              }
-              case _ => Future.successful(NotFound(notFoundView))
-            }
-          }
-          case _ => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
-        }
+  private def showHideAddressMove(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String, lineId: Option[Int])
+                                 (implicit headerCarrier: HeaderCarrier): Future[Boolean] = {
+    statusService.getStatus(amlsRegistrationNo, accountTypeId, credId) map {
+      case SubmissionDecisionApproved | ReadyForRenewal(_) | RenewalSubmitted(_) if lineId.isDefined => true
+      case _ => false
     }
+  }
+
+  def get(index: Int, flow: Option[String] = None) = authAction.async {
+      implicit request =>
+        dataCacheConnector.fetchAll(request.credId) flatMap {
+          optionalCache =>
+            (for {
+              cache: CacheMap <- optionalCache
+              businessMatching: BusinessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+            } yield {
+              redirect(request.amlsRefNumber, request.accountTypeId, request.credId, cache, index, flow, businessMatching)
+            }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+        }
+  }
+
+  private def redirect(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String, cache: CacheMap, index: Int, flow: Option[String] = None, businessMatching: BusinessMatching)
+                      (implicit request: Request[_]) =
+    (for {
+      responsiblePeople <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
+    } yield responsiblePeople.lift(index - 1) match {
+      case Some(x) => showHideAddressMove(amlsRegistrationNo, accountTypeId, credId, x.lineId) flatMap { showHide =>
+        isMsbOrTcsp(credId).map {
+          msbOrTcsp: Option[Boolean] =>
+
+            val shouldShowApprovalSection = !(msbOrTcsp.contains(true)) && x.approvalFlags.hasAlreadyPassedFitAndProper.contains(false)
+            Ok(views.html.responsiblepeople.detailed_answers(Some(x), index, showHide, ControllerHelper.rpTitleName(Some(x)), flow, shouldShowApprovalSection, businessMatching))
+        }
+      }
+      case _ => Future.successful(NotFound(notFoundView))
+    }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
 
   def post(index: Int, flow: Option[String] = None) = authAction.async{
     implicit request =>
@@ -83,13 +90,6 @@ class DetailedAnswersController @Inject () (
           case None => Future.successful(Redirect(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get()))
         }
       }
-  }
-
-  private def showHideAddressMove(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String, lineId: Option[Int])(implicit headerCarrier: HeaderCarrier): Future[Boolean] = {
-    statusService.getStatus(amlsRegistrationNo, accountTypeId, credId) map {
-      case SubmissionDecisionApproved | ReadyForRenewal(_) | RenewalSubmitted(_) if lineId.isDefined => true
-      case _ => false
-    }
   }
 
   private def isMsbOrTcsp(credId: String)(implicit hc: HeaderCarrier): Future[Option[Boolean]] = {

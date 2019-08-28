@@ -45,8 +45,8 @@ class InvolvedInOtherController @Inject()(
                 renewal <- cache.getEntry[Renewal](Renewal.key)
                 involvedInOther <- renewal.involvedInOtherActivities
               } yield {
-                Ok(involved_in_other(Form2[InvolvedInOther](involvedInOther), edit, businessMatching.prefixedAlphabeticalBusinessTypes))
-              }) getOrElse Ok(involved_in_other(EmptyForm, edit, businessMatching.prefixedAlphabeticalBusinessTypes))
+                Ok(involved_in_other(Form2[InvolvedInOther](involvedInOther), edit, businessMatching.prefixedAlphabeticalBusinessTypes(false)))
+              }) getOrElse Ok(involved_in_other(EmptyForm, edit, businessMatching.prefixedAlphabeticalBusinessTypes(false)))
             }) getOrElse Ok(involved_in_other(EmptyForm, edit, None))
         }
   }
@@ -58,7 +58,7 @@ class InvolvedInOtherController @Inject()(
             for {
               businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
             } yield businessMatching match {
-              case Some(_) => BadRequest(involved_in_other(f, edit, businessMatching.prefixedAlphabeticalBusinessTypes))
+              case Some(_) => BadRequest(involved_in_other(f, edit, businessMatching.prefixedAlphabeticalBusinessTypes(false)))
               case None => BadRequest(involved_in_other(f, edit, None))
             }
           case ValidForm(_, data) =>

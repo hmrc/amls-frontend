@@ -49,7 +49,7 @@ class AMLSTurnoverController @Inject()(
               val businessTypes = if (businessMatching.activities.getOrElse(BusinessActivities(Set())).businessActivities.size > 1) {
                 businessMatching.alphabeticalBusinessTypes
               } else {
-                businessMatching.prefixedAlphabeticalBusinessTypes
+                businessMatching.prefixedAlphabeticalBusinessTypes(false)
               }
               Ok(amls_turnover(form, edit, businessTypes))
 
