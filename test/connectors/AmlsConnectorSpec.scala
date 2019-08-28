@@ -358,10 +358,6 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       when {
         amlsConnector.httpPut.PUT[UpdateBacsRequest, HttpResponse](any(), any())(any(), any(), any(), any())
       } thenReturn Future.successful(HttpResponse(OK))
-
-//      whenReady(amlsConnector.updateBacsStatus(paymentRef, bacsRequest, accountTypeId)) { result =>
-//        verify(amlsConnector.httpPut).PUT(eqTo(putUrl), eqTo(bacsRequest))(any(), any(), any(), any())
-//      }
     }
   }
 

@@ -52,24 +52,11 @@ class DataCacheConnectorSpec
     val newCache = cache.copy(id = credId)
     implicit val ec = mock[ExecutionContext]
 
-//    when(authContext.user) thenReturn user
-//    when(user.oid) thenReturn oId
-
-//    val mockAuthConnector = mock[AuthConnector]
-
     val factory = mock[MongoCacheClientFactory]
     val client = mock[MongoCacheClient]
     val authority = Authority("", Accounts(), "/user-details", "/ids", credId)
 
     when(factory.createClient) thenReturn client
-
-//    when {
-//      mockAuthConnector.getCurrentAuthority(any(), any())
-//    } thenReturn Future.successful(authority)
-
-//    when {
-//      mockAuthConnector.getgetCredId(any(), any())
-//    } thenReturn Future.successful(credId)
 
     val appConfig = mock[AppConfig]
 

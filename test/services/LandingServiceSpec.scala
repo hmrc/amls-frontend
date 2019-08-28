@@ -229,8 +229,6 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
       val user = mock[LoggedInUser]
 
-//      when(authContext.user).thenReturn(user)
-//      when(user.oid).thenReturn("")
       when(service.cacheConnector.remove(any[String])(any())).thenReturn(Future.successful(true))
 
       when {

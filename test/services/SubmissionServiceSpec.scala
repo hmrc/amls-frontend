@@ -69,10 +69,6 @@ class SubmissionServiceSpec extends AmlsSpec
       mock[AmlsConnector],
       config)
 
-//    when {
-//      authContext.principal
-//    } thenReturn Principal(None, Accounts(org = Some(OrgAccount("", Org("TestOrgRef")))))
-
     val enrolmentResponse = HttpResponse(OK)
 
     val subscriptionResponse = SubscriptionResponse(
