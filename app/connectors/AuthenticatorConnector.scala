@@ -21,12 +21,13 @@ import play.api.Mode.Mode
 import play.api.{Configuration, Environment, Logger}
 import play.api.http.Status._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpPost, HttpResponse}
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.config.ServicesConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AuthenticatorConnector @Inject()(http: HttpPost,
+class AuthenticatorConnector @Inject()(http: HttpClient,
                                        environment: Environment,
                                        val runModeConfiguration: Configuration) extends ServicesConfig {
 

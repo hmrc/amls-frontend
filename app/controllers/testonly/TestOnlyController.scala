@@ -16,18 +16,17 @@
 
 package controllers.testonly
 
+import org.joda.time.LocalDate
 import config.BusinessCustomerSessionCache
 import connectors.cache.MongoCacheConnector
 import connectors.{AmlsConnector, DataCacheConnector, TestOnlyStubConnector}
-import controllers.BaseController
+import controllers.DefaultBaseController
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.HighValueDealing
 import models.tradingpremises._
-import org.joda.time.LocalDate
 import play.api.libs.json.Json
 import services.UpdateMongoCacheService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthAction
 import views.html.submission.duplicate_submission
 
@@ -35,14 +34,13 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
-class TestOnlyController @Inject()(val authConnector: AuthConnector,
-                                   implicit val dataCacheConnector: DataCacheConnector,
+class TestOnlyController @Inject()(implicit val dataCacheConnector: DataCacheConnector,
                                    val mongoCacheConnector: MongoCacheConnector,
                                    implicit val testOnlyStubConnector: TestOnlyStubConnector,
                                    val stubsService: UpdateMongoCacheService,
                                    val amlsConnector: AmlsConnector,
                                    val authAction: AuthAction,
-                                    val customerCache: BusinessCustomerSessionCache) extends BaseController {
+                                   val customerCache: BusinessCustomerSessionCache) extends DefaultBaseController {
 
 
   def dropMongoCache = authAction.async {

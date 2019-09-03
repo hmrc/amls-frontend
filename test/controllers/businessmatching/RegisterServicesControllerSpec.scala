@@ -39,7 +39,7 @@ import play.api.test.Helpers._
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.auth.core.AuthConnector
 import utils._
 
 import scala.concurrent.ExecutionContext.Implicits.global

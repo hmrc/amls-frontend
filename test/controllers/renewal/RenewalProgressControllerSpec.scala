@@ -38,7 +38,7 @@ import services.businessmatching.BusinessMatchingService
 import services.{ProgressService, RenewalService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.auth.core.AuthConnector
 import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
 
 import scala.concurrent.ExecutionContext.Implicits.global

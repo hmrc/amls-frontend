@@ -22,7 +22,7 @@ import controllers.DefaultBaseController
 import forms.{Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, UkAccountantsAddress, WhoIsYourAccountant}
 import services.AutoCompleteService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+
 import utils.AuthAction
 
 import scala.concurrent.Future

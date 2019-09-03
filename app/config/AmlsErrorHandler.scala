@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-package controllers.auth
+package config
 
-import config.ApplicationConfig
-import uk.gov.hmrc.play.frontend.auth.GovernmentGateway
+import com.google.inject.Inject
+import play.api.Configuration
+import play.api.i18n.MessagesApi
+import play.api.mvc.Request
+import uk.gov.hmrc.play.bootstrap.http.FrontendErrorHandler
 
-object AmlsGovernmentGateway extends GovernmentGateway {
-  override def loginURL: String = ApplicationConfig.loginUrl
-  override def continueURL: String = ApplicationConfig.loginContinue
+class AmlsErrorHandler @Inject()(val messagesApi: MessagesApi, val configuration: Configuration) extends FrontendErrorHandler {
+
+  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit request: Request[_]) =
+    views.html.error(pageTitle, heading, message)
 }

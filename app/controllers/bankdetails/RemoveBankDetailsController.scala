@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import models.bankdetails.BankDetails
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+
 import utils.{AuthAction, StatusConstants}
 
 @Singleton

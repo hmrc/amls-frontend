@@ -22,7 +22,7 @@ import javax.inject.{Inject, Singleton}
 import models.bankdetails._
 import play.api.mvc.Request
 import services.StatusService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+
 import utils.AuthAction
 
 import scala.concurrent.Future

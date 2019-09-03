@@ -14,9 +14,10 @@
  * limitations under the License.
  *@
 
-@import config.{ApplicationConfig => appConfig, CachedStaticHtmlPartialProvider}
+@import config.{ApplicationConfig => appConfig}
 @import layouts.{govuk_template => hmrcGovUkTemplate}
 @import uk.gov.hmrc.play.views.html.{layouts => uiLayouts}
+@import CachedStaticHtmlPartialProvider
 
 @(
     title: String,
@@ -104,7 +105,7 @@
 }
 
 @getHelpForm = {
-    @config.CachedStaticHtmlPartialProvider.getPartialContent(appConfig.reportAProblemUrl)
+    @CachedStaticHtmlPartialProvider.getPartialContent(appConfig.reportAProblemUrl)
 }
 
 @content = {

@@ -21,7 +21,7 @@ import connectors.DataCacheConnector
 import controllers.DefaultBaseController
 import forms._
 import models.businessactivities.{BusinessActivities, _}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+
 import utils.{AuthAction, ControllerHelper}
 import views.html.businessactivities._
 

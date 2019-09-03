@@ -23,7 +23,7 @@ import connectors.DataCacheConnector
 import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, TransactionTypes}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+
 import utils.AuthAction
 import views.html.businessactivities.transaction_types
 

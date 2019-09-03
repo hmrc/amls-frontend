@@ -22,11 +22,12 @@ import models._
 import play.api.Logger
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.http._
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class FeeConnector @Inject()(
-                              private[connectors] val http: CoreGet,
+                              private[connectors] val http: HttpClient,
                               appConfig: AppConfig) {
 
   val feePaymentUrl = appConfig.feePaymentUrl

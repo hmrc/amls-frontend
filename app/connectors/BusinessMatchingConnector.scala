@@ -16,20 +16,21 @@
 
 package connectors
 
-import config.WSHttp
 import javax.inject.Inject
 import play.api.Mode.Mode
 import play.api.{Configuration, Logger, Play}
 import play.api.libs.json.Json
 import play.api.mvc.Request
-import uk.gov.hmrc.crypto.ApplicationCrypto
+import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
 import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.frontend.filters.SessionCookieCryptoFilter
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import uk.gov.hmrc.http.NotFoundException
+import uk.gov.hmrc.play.bootstrap.filters.frontend.crypto.SessionCookieCrypto
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.play.http.ws.WSHttp
 
 case class BusinessMatchingAddress(line_1: String,
                                    line_2: String,
@@ -67,12 +68,11 @@ object BusinessMatchingReviewDetails {
   implicit val formats = Json.format[BusinessMatchingReviewDetails]
 }
 
-class BusinessMatchingConnector @Inject()(val http: WSHttp,
-                                          val applicationCrypto: ApplicationCrypto
+class BusinessMatchingConnector @Inject()(val http: HttpClient,
+                                          sessionCookieCrypto: SessionCookieCrypto
                                           ) extends ServicesConfig with HeaderCarrierForPartialsConverter {
 
-  val sessionCookieCryptoFilter: SessionCookieCryptoFilter = new SessionCookieCryptoFilter(applicationCrypto)
-  override val crypto: String => String = sessionCookieCryptoFilter.encrypt _
+  override val crypto: String => String = str => sessionCookieCrypto.crypto.encrypt(PlainText(str)).value
 
   val businessMatchingUrl = s"${baseUrl("business-customer")}/business-customer"
   val serviceName = "amls"

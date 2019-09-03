@@ -13,7 +13,7 @@ private object AppDependencies {
   import play.core.PlayVersion
 
   private val frontendBootstrapVersion = "12.6.0"
-  private val playPartialsVersion = "6.4.0"
+  private val playPartialsVersion = "6.9.0-play-25"
   private val httpCachingClientVersion = "8.2.0"
   private val playWhitelistFilterVersion = "2.0.0"
   private val validationVersion = "2.0.1"
@@ -22,12 +22,14 @@ private object AppDependencies {
   private val jsonEncryptionVersion = "3.2.0"
   private val playReactivemongoVersion = "6.2.0"
   private val authVersion = "2.24.0-play-25"
+  private val domain = "5.6.0-play-25"
 
   private val playJars = ExclusionRule(organization = "com.typesafe.play")
 
   val compile = Seq(
     ws,
-    "uk.gov.hmrc" %% "frontend-bootstrap" % frontendBootstrapVersion,
+    //"uk.gov.hmrc" %% "frontend-bootstrap" % frontendBootstrapVersion,
+    "uk.gov.hmrc" %% "domain" % domain,
     "uk.gov.hmrc" %% "play-partials" % playPartialsVersion,
     "uk.gov.hmrc" %% "http-caching-client" % httpCachingClientVersion,
     "uk.gov.hmrc" %% "play-whitelist-filter" % playWhitelistFilterVersion,
@@ -36,6 +38,7 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "auth-client" % authVersion,
     "uk.gov.hmrc" %% "play-ui" % "7.40.0-play-25",
     "uk.gov.hmrc" %% "bootstrap-play-25" % "4.13.0",
+    "uk.gov.hmrc" %% "govuk-template" % "5.38.0-play-25",
 
     "io.github.jto" %% "validation-core"      % validationVersion excludeAll playJars,
     "io.github.jto" %% "validation-playjson"  % validationVersion excludeAll playJars,

@@ -16,12 +16,11 @@
 
 package controllers.businessactivities
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.BusinessActivities
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+
 import views.html.businessactivities._
 import javax.inject.Inject
 import utils.AuthAction

@@ -18,7 +18,7 @@ package controllers
 
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.Request
-import uk.gov.hmrc.play.frontend.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import utils.ControllerHelper
 
 trait DefaultBaseController extends FrontendController with I18nSupport {

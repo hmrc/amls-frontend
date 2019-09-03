@@ -54,7 +54,6 @@ class DataCacheConnectorSpec
 
     val factory = mock[MongoCacheClientFactory]
     val client = mock[MongoCacheClient]
-    val authority = Authority("", Accounts(), "/user-details", "/ids", credId)
 
     when(factory.createClient) thenReturn client
 

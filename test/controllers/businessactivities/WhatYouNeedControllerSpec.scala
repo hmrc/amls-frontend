@@ -22,7 +22,7 @@ import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.auth.core.AuthConnector
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {

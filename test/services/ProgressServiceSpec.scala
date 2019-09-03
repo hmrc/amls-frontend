@@ -25,7 +25,7 @@ import org.joda.time.LocalDate
 import org.scalatest.concurrent.ScalaFutures
 import play.api.inject._
 import play.api.inject.guice.GuiceApplicationBuilder
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.auth.core.AuthConnector
 import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits._

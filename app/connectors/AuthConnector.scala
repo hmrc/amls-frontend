@@ -16,68 +16,68 @@
 
 package connectors
 
-import config.{AppConfig, WSHttp}
+import config.AppConfig
 import javax.inject.Inject
 import models.enrolment.GovernmentGatewayEnrolment
 import org.apache.http.HttpStatus
 import play.api.libs.json.Json
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.controllers.RestFormats
-import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
+import uk.gov.hmrc.play.http.ws.WSHttp
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Ids(internalId: String)
+//case class Ids(internalId: String)
+//
+//object Ids {
+//  implicit val format = Json.format[Ids]
+//}
 
-object Ids {
-  implicit val format = Json.format[Ids]
-}
-
-case class Authority(uri: String,
-                     accounts: Accounts,
-                     userDetailsLink: String,
-                     ids: String,
-                     credId: String
-                    ) {
-
-  def normalisedIds: String = if (ids.startsWith("/")) ids.drop(1) else ids
-}
+//case class Authority(uri: String,
+//                     accounts: Accounts,
+//                     userDetailsLink: String,
+//                     ids: String,
+//                     credId: String
+//                    ) {
+//
+//  def normalisedIds: String = if (ids.startsWith("/")) ids.drop(1) else ids
+//}
 
 // $COVERAGE-OFF$
-object Authority {
-  implicit val format = {
-    implicit val dateFormat = RestFormats.dateTimeFormats
-    implicit val accountsFormat = Accounts.format
-    Json.format[Authority]
-  }
-}
+//object Authority {
+//  implicit val format = {
+//    implicit val dateFormat = RestFormats.dateTimeFormats
+//    implicit val accountsFormat = Accounts.format
+//    Json.format[Authority]
+//  }
+//}
 // $COVERAGE-ON$
 
-class AuthConnector @Inject()(val http: WSHttp, config: AppConfig) {
-
-  private lazy val authUrl = config.authUrl
-
-  def enrolments(uri: String)(implicit
-                              headerCarrier: HeaderCarrier,
-                              ec: ExecutionContext): Future[List[GovernmentGatewayEnrolment]] = {
-
-    http.GET[List[GovernmentGatewayEnrolment]](authUrl + uri)
-  }
-
-  def getCurrentAuthority(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Authority] = {
-    http.GET[Authority](s"$authUrl/auth/authority").recoverWith {
-      case (t: Upstream4xxResponse) if t.upstreamResponseCode == HttpStatus.SC_UNAUTHORIZED => Future.failed(new Exception("Bearer token expired"))
-
-    }
-  }
-
-  def getIds(authority: Authority)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Ids] = {
-    http.GET[Ids](s"$authUrl/${authority.normalisedIds}")
-  }
-
-  def getCredId(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext) = getCurrentAuthority flatMap {
-    case authority => Future.successful(authority.credId)
-    case _ => Future.failed(new NotFoundException("No credId available"))
-  }
-}
+//class AuthConnector @Inject()(val http: WSHttp, config: AppConfig) {
+//
+//  private lazy val authUrl = config.authUrl
+//
+//  def enrolments(uri: String)(implicit
+//                              headerCarrier: HeaderCarrier,
+//                              ec: ExecutionContext): Future[List[GovernmentGatewayEnrolment]] = {
+//
+//    http.GET[List[GovernmentGatewayEnrolment]](authUrl + uri)
+//  }
+//
+//  def getCurrentAuthority(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Authority] = {
+//    http.GET[Authority](s"$authUrl/auth/authority").recoverWith {
+//      case (t: Upstream4xxResponse) if t.upstreamResponseCode == HttpStatus.SC_UNAUTHORIZED => Future.failed(new Exception("Bearer token expired"))
+//
+//    }
+//  }
+//
+//  def getIds(authority: Authority)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Ids] = {
+//    http.GET[Ids](s"$authUrl/${authority.normalisedIds}")
+//  }
+//
+//  def getCredId(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext) = getCurrentAuthority flatMap {
+//    case authority => Future.successful(authority.credId)
+//    case _ => Future.failed(new NotFoundException("No credId available"))
+//  }
+//}
 

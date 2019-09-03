@@ -18,9 +18,8 @@ package controllers.businessactivities
 
 import controllers.DefaultBaseController
 import javax.inject.Inject
-import models.status._
 import services.StatusService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.auth.core.AuthConnector
 import utils.AuthAction
 import views.html.businessactivities._
 

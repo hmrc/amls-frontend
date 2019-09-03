@@ -16,12 +16,14 @@
 
 package connectors
 
-import config.{AppConfig, WSHttp}
+import config.{AppConfig}
 import javax.inject.Inject
 import models.notifications.{NotificationDetails, NotificationRow}
 import play.api.Logger
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http._
+import uk.gov.hmrc.play.http.ws.WSHttp
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 

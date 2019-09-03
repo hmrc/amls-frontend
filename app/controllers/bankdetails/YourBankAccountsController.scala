@@ -21,7 +21,7 @@ import forms.EmptyForm
 import javax.inject.Inject
 import models.bankdetails.BankDetails
 import models.bankdetails.BankDetails.Filters._
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+
 import utils.AuthAction
 
 class YourBankAccountsController @Inject()(

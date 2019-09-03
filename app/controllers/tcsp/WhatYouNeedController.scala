@@ -18,7 +18,6 @@ package controllers.tcsp
 
 import controllers.DefaultBaseController
 import javax.inject.Inject
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthAction
 import views.html.tcsp.what_you_need
 

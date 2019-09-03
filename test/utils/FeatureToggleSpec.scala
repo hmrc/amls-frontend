@@ -16,18 +16,15 @@
 
 package utils
 
-import controllers.BaseController
+import controllers.DefaultBaseController
 import play.api.mvc.Action
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 class FeatureToggleSpec extends AmlsSpec {
 
-
-
   trait TestController {
-    self: BaseController =>
+    self: DefaultBaseController =>
     def TestToggle:FeatureToggle
     lazy val get = TestToggle {
       Action {
@@ -36,13 +33,11 @@ class FeatureToggleSpec extends AmlsSpec {
     }
   }
 
-  object ToggleOnController extends BaseController with TestController {
-    override protected val authConnector: AuthConnector = mock[AuthConnector]
+  object ToggleOnController extends DefaultBaseController with TestController {
     override val TestToggle = FeatureToggle(true)
   }
 
-  object ToggleOffController extends BaseController with TestController {
-    override protected val authConnector = mock[AuthConnector]
+  object ToggleOffController extends DefaultBaseController with TestController {
     override val TestToggle = FeatureToggle(false)
   }
 

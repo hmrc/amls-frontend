@@ -22,7 +22,7 @@ import org.scalatest.mock.MockitoSugar
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Org
 import uk.gov.hmrc.http.SessionKeys
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+
 import uk.gov.hmrc.play.frontend.auth.connectors.domain._
 
 import scala.concurrent.Future

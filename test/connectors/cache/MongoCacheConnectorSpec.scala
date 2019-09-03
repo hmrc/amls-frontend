@@ -58,7 +58,6 @@ class MongoCacheConnectorSpec extends FreeSpec
     val credId = "12345678"
     val key = arbitrary[String].sample.get
 
-    val authority = Authority("", Accounts(), "/user-details", "/ids", "12345678")
     val cacheMap = CacheMap("12345678", Map("id" -> Json.toJson("12345678")))
 
     when(factory.createClient) thenReturn client

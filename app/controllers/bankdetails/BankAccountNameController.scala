@@ -17,7 +17,6 @@
 package controllers.bankdetails
 
 import connectors.DataCacheConnector
-import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import jto.validation.forms.Rules._
@@ -28,8 +27,7 @@ import models.bankdetails.BankDetails
 import play.api.mvc.{Action, AnyContent, Request, Result}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthAction, RepeatingSection, StatusConstants}
+import utils.{AuthAction, StatusConstants}
 
 import scala.concurrent.Future
 

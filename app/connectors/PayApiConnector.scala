@@ -19,7 +19,6 @@ package connectors
 import javax.inject.Inject
 import audit.{CreatePaymentEvent, CreatePaymentFailureEvent}
 import cats.implicits._
-import config.{WSHttp}
 import models.payments.{CreatePaymentRequest, CreatePaymentResponse}
 import play.api.Mode.Mode
 import play.api.{Configuration, Logger, Play}
@@ -27,6 +26,7 @@ import play.api.libs.json.{JsSuccess, Json}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.play.http.ws.WSHttp
 import utils.HttpResponseHelper
 
 import scala.concurrent.{ExecutionContext, Future}
