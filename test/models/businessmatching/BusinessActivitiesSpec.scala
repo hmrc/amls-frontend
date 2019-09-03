@@ -32,22 +32,22 @@ class BusinessActivitiesSpec extends AmlsSpec with MockitoSugar {
   "The BusinessActivities model" must {
     "successfully validate" when {
       "a few check boxes are selected" in {
-        val model1 = Map("businessActivities[]" -> Seq("03", "01", "02"))
+        val model1 = Map("businessActivities[]" -> Seq("04", "01", "03"))
 
         BusinessActivities.formReads.validate(model1) must
           be(Valid(BusinessActivities(Set(EstateAgentBusinessService, AccountancyServices, BillPaymentServices))))
 
-        val model2 = Map("businessActivities[]" -> Seq("04", "05", "06"))
+        val model2 = Map("businessActivities[]" -> Seq("05", "06", "07"))
 
         BusinessActivities.formReads.validate(model2) must
           be(Valid(BusinessActivities(Set(HighValueDealing, MoneyServiceBusiness, TrustAndCompanyServices))))
 
-        BusinessActivities.formReads.validate(Map("businessActivities[]" -> Seq("07"))) must
+        BusinessActivities.formReads.validate(Map("businessActivities[]" -> Seq("08"))) must
           be(Valid(BusinessActivities(Set(TelephonePaymentService))))
       }
 
       "residential business activity check box is selected" in {
-        val model = Map("businessActivities" -> Seq("07"))
+        val model = Map("businessActivities" -> Seq("08"))
 
         BusinessActivities.formReads.validate(model) must
           be(Valid(BusinessActivities(Set(TelephonePaymentService))))
@@ -63,7 +63,7 @@ class BusinessActivitiesSpec extends AmlsSpec with MockitoSugar {
 
       "given invalid data" in {
 
-        val model = Map("businessActivities[]" -> Seq("01", "99", "03"))
+        val model = Map("businessActivities[]" -> Seq("01", "99", "04"))
 
         BusinessActivities.formReads.validate(model) must
           be(Invalid(Seq((Path \ "businessActivities" \ 1 \ "businessActivities") -> Seq(ValidationError("error.invalid")))))
@@ -82,7 +82,7 @@ class BusinessActivitiesSpec extends AmlsSpec with MockitoSugar {
 
         "multiple activities selected" in {
           BusinessActivities.formWrites.writes(BusinessActivities(Set(TelephonePaymentService, TrustAndCompanyServices, HighValueDealing))) must
-            be(Map("businessActivities[]" -> Seq("07", "06", "04")))
+            be(Map("businessActivities[]" -> Seq("08", "07", "05")))
         }
 
       }
@@ -91,14 +91,14 @@ class BusinessActivitiesSpec extends AmlsSpec with MockitoSugar {
         "single activities selected" in {
 
           BusinessActivities.formWrites.writes(BusinessActivities(Set(AccountancyServices), Some(Set(HighValueDealing)))) must
-            be(Map("businessActivities[]" -> Seq("04")))
+            be(Map("businessActivities[]" -> Seq("05")))
         }
 
         "multiple activities selected" in {
           BusinessActivities.formWrites.writes(BusinessActivities(
             Set(TelephonePaymentService, TrustAndCompanyServices, HighValueDealing),
             Some(Set(AccountancyServices, TelephonePaymentService))
-          )) must be(Map("businessActivities[]" -> Seq("01", "07")))
+          )) must be(Map("businessActivities[]" -> Seq("01", "08")))
         }
 
       }
@@ -107,17 +107,18 @@ class BusinessActivitiesSpec extends AmlsSpec with MockitoSugar {
     "get the value for each activity type" in {
       val ba = BusinessActivities(Set(EstateAgentBusinessService, AccountancyServices, HighValueDealing,
         MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
-      BusinessActivities.getValue(EstateAgentBusinessService) must be("03")
+      BusinessActivities.getValue(EstateAgentBusinessService) must be("04")
       BusinessActivities.getValue(AccountancyServices) must be("01")
-      BusinessActivities.getValue(HighValueDealing) must be("04")
-      BusinessActivities.getValue(MoneyServiceBusiness) must be("05")
-      BusinessActivities.getValue(TrustAndCompanyServices) must be("06")
-      BusinessActivities.getValue(TelephonePaymentService) must be("07")
+      BusinessActivities.getValue(HighValueDealing) must be("05")
+      BusinessActivities.getValue(MoneyServiceBusiness) must be("06")
+      BusinessActivities.getValue(TrustAndCompanyServices) must be("07")
+      BusinessActivities.getValue(TelephonePaymentService) must be("08")
 
     }
 
     "get the message for each activity type" in {
       AccountancyServices.getMessage(false) must be(Messages("businessmatching.registerservices.servicename.lbl.01"))
+      ArtMarketParticipant.getMessage(false) must be(Messages("businessmatching.registerservices.servicename.lbl.02"))
       BillPaymentServices.getMessage(false) must be(Messages("businessmatching.registerservices.servicename.lbl.03"))
       EstateAgentBusinessService.getMessage(false) must be(Messages("businessmatching.registerservices.servicename.lbl.04"))
       HighValueDealing.getMessage(false) must be(Messages("businessmatching.registerservices.servicename.lbl.05"))
@@ -128,6 +129,7 @@ class BusinessActivitiesSpec extends AmlsSpec with MockitoSugar {
 
     "get the phrased message for each activity type" in {
       AccountancyServices.getMessage(true) must be(Messages("businessmatching.registerservices.servicename.lbl.01.phrased"))
+      ArtMarketParticipant.getMessage(true) must be(Messages("businessmatching.registerservices.servicename.lbl.02.phrased"))
       BillPaymentServices.getMessage(true) must be(Messages("businessmatching.registerservices.servicename.lbl.03.phrased"))
       EstateAgentBusinessService.getMessage(true) must be(Messages("businessmatching.registerservices.servicename.lbl.04.phrased"))
       HighValueDealing.getMessage(true) must be(Messages("businessmatching.registerservices.servicename.lbl.05.phrased"))
@@ -151,6 +153,9 @@ class BusinessActivitiesSpec extends AmlsSpec with MockitoSugar {
 
           Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("04"))) must
             be(JsSuccess(BusinessActivities(Set(HighValueDealing))))
+
+          Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("08"))) must
+            be(JsSuccess(BusinessActivities(Set(ArtMarketParticipant))))
 
         }
 
