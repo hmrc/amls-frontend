@@ -21,9 +21,9 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models.asp.Asp
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, BusinessActivity => BMBusinessActivity, BusinessMatching => BMBusinessMatching, _}
 import models.estateagentbusiness.EstateAgentBusiness
-import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.RemoveBusinessTypeFlowModel
 import models.hvd.Hvd
 import models.moneyservicebusiness.{MoneyServiceBusiness => MSBSection}
@@ -32,7 +32,6 @@ import models.tcsp.Tcsp
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthAction
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -60,6 +59,8 @@ class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
 
     def removeActivity(activity: BMBusinessActivity): Future[CacheMap] = {
       activity match {
+        case ArtMarketParticipant =>
+          dataCacheConnector.removeByKey[](credId, MSBSection.key)
         case MoneyServiceBusiness =>
           dataCacheConnector.removeByKey[MSBSection](credId, MSBSection.key)
         case HighValueDealing =>
