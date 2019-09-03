@@ -60,12 +60,12 @@ class summarySpec extends AmlsSpec
 
     val fullActivitiesSet = Set(
       "businessmatching.registerservices.servicename.lbl.01",
-      "businessmatching.registerservices.servicename.lbl.02",
       "businessmatching.registerservices.servicename.lbl.03",
       "businessmatching.registerservices.servicename.lbl.04",
       "businessmatching.registerservices.servicename.lbl.05",
       "businessmatching.registerservices.servicename.lbl.06",
-      "businessmatching.registerservices.servicename.lbl.07"
+      "businessmatching.registerservices.servicename.lbl.07",
+      "businessmatching.registerservices.servicename.lbl.08"
     )
 
     val sectionChecks = Table[String, Element=>Boolean, String](

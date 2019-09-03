@@ -203,6 +203,7 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
 
     val activities: Set[String] = Set(
       AccountancyServices,
+      ArtMarketParticipant,
       BillPaymentServices,
       EstateAgentBusinessService,
       HighValueDealing,

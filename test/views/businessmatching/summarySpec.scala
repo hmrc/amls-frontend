@@ -102,12 +102,12 @@ class summarySpec extends AmlsSpec
           controllers.businessmatching.routes.CompanyRegistrationNumberController.get(true).toString),
         ("businessmatching.registerservices.title", checkListContainsItems(_, Set(
           "businessmatching.registerservices.servicename.lbl.01",
-          "businessmatching.registerservices.servicename.lbl.02",
           "businessmatching.registerservices.servicename.lbl.03",
           "businessmatching.registerservices.servicename.lbl.04",
           "businessmatching.registerservices.servicename.lbl.05",
           "businessmatching.registerservices.servicename.lbl.06",
-          "businessmatching.registerservices.servicename.lbl.07")),
+          "businessmatching.registerservices.servicename.lbl.07",
+          "businessmatching.registerservices.servicename.lbl.08")),
           defaultActivitiesUrl),
         ("businessmatching.services.title", checkListContainsItems(_, Set(
           "businessmatching.services.list.lbl.01",
@@ -169,11 +169,11 @@ class summarySpec extends AmlsSpec
           controllers.businessmatching.routes.TypeOfBusinessController.get(true).toString),
         ("businessmatching.registerservices.title", checkListContainsItems(_, Set(
           "businessmatching.registerservices.servicename.lbl.01",
-          "businessmatching.registerservices.servicename.lbl.02",
           "businessmatching.registerservices.servicename.lbl.03",
           "businessmatching.registerservices.servicename.lbl.04",
-          "businessmatching.registerservices.servicename.lbl.06",
-          "businessmatching.registerservices.servicename.lbl.07")),
+          "businessmatching.registerservices.servicename.lbl.05",
+          "businessmatching.registerservices.servicename.lbl.07",
+          "businessmatching.registerservices.servicename.lbl.08")),
           defaultActivitiesUrl
         )
       )

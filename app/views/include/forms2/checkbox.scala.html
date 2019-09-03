@@ -19,9 +19,9 @@
     labelText: String,
     value: String,
     disabled: Boolean = false,
-    target: String = ""
+    target: String = "",
+    description: String = ""
 )(implicit lang:Lang,  m: Messages)
-
     <div class="multiple-choice">
         <input
                 type="checkbox"
@@ -33,6 +33,8 @@
                 @if(disabled){ disabled}
         />
         <label class="block-label" for="@{f.id}-@value">@Messages(labelText)</label>
-
+        @if(!description.isEmpty) {
+            <span class="form-hint clear checkbox-description">@Messages(description)</span>
+        }
     </div>
 </label>

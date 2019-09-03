@@ -118,22 +118,22 @@ class BusinessActivitiesSpec extends AmlsSpec with MockitoSugar {
 
     "get the message for each activity type" in {
       AccountancyServices.getMessage(false) must be(Messages("businessmatching.registerservices.servicename.lbl.01"))
-      BillPaymentServices.getMessage(false) must be(Messages("businessmatching.registerservices.servicename.lbl.02"))
-      EstateAgentBusinessService.getMessage(false) must be(Messages("businessmatching.registerservices.servicename.lbl.03"))
-      HighValueDealing.getMessage(false) must be(Messages("businessmatching.registerservices.servicename.lbl.04"))
-      MoneyServiceBusiness.getMessage(false) must be(Messages("businessmatching.registerservices.servicename.lbl.05"))
-      TrustAndCompanyServices.getMessage(false) must be(Messages("businessmatching.registerservices.servicename.lbl.06"))
-      TelephonePaymentService.getMessage(false) must be(Messages("businessmatching.registerservices.servicename.lbl.07"))
+      BillPaymentServices.getMessage(false) must be(Messages("businessmatching.registerservices.servicename.lbl.03"))
+      EstateAgentBusinessService.getMessage(false) must be(Messages("businessmatching.registerservices.servicename.lbl.04"))
+      HighValueDealing.getMessage(false) must be(Messages("businessmatching.registerservices.servicename.lbl.05"))
+      MoneyServiceBusiness.getMessage(false) must be(Messages("businessmatching.registerservices.servicename.lbl.06"))
+      TrustAndCompanyServices.getMessage(false) must be(Messages("businessmatching.registerservices.servicename.lbl.07"))
+      TelephonePaymentService.getMessage(false) must be(Messages("businessmatching.registerservices.servicename.lbl.08"))
     }
 
     "get the phrased message for each activity type" in {
       AccountancyServices.getMessage(true) must be(Messages("businessmatching.registerservices.servicename.lbl.01.phrased"))
-      BillPaymentServices.getMessage(true) must be(Messages("businessmatching.registerservices.servicename.lbl.02.phrased"))
-      EstateAgentBusinessService.getMessage(true) must be(Messages("businessmatching.registerservices.servicename.lbl.03.phrased"))
-      HighValueDealing.getMessage(true) must be(Messages("businessmatching.registerservices.servicename.lbl.04.phrased"))
-      MoneyServiceBusiness.getMessage(true) must be(Messages("businessmatching.registerservices.servicename.lbl.05.phrased"))
-      TrustAndCompanyServices.getMessage(true) must be(Messages("businessmatching.registerservices.servicename.lbl.06.phrased"))
-      TelephonePaymentService.getMessage(true) must be(Messages("businessmatching.registerservices.servicename.lbl.07.phrased"))
+      BillPaymentServices.getMessage(true) must be(Messages("businessmatching.registerservices.servicename.lbl.03.phrased"))
+      EstateAgentBusinessService.getMessage(true) must be(Messages("businessmatching.registerservices.servicename.lbl.04.phrased"))
+      HighValueDealing.getMessage(true) must be(Messages("businessmatching.registerservices.servicename.lbl.05.phrased"))
+      MoneyServiceBusiness.getMessage(true) must be(Messages("businessmatching.registerservices.servicename.lbl.06.phrased"))
+      TrustAndCompanyServices.getMessage(true) must be(Messages("businessmatching.registerservices.servicename.lbl.07.phrased"))
+      TelephonePaymentService.getMessage(true) must be(Messages("businessmatching.registerservices.servicename.lbl.08.phrased"))
     }
 
     "JSON validation" when {
