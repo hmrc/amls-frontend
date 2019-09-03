@@ -1206,13 +1206,14 @@ businessmatching.registerservices.servicename.lbl.07 = Trust or company service 
 businessmatching.registerservices.servicename.lbl.08 = Telecommunications, digital and IT payment service provider
 
 businessactivities.registerservices.servicename.lbl.01 = accountancy service provider
-businessactivities.registerservices.servicename.lbl.02 = bill payment service provider
-businessactivities.registerservices.servicename.lbl.03 = estate agency business
-businessactivities.registerservices.servicename.lbl.03.agent = estate agent
-businessactivities.registerservices.servicename.lbl.04 = high value dealer
-businessactivities.registerservices.servicename.lbl.05 = money service business
-businessactivities.registerservices.servicename.lbl.06 = trust or company service provider
-businessactivities.registerservices.servicename.lbl.07 = telecommunications, digital and IT payment service provider
+businessactivities.registerservices.servicename.lbl.02 = art market participant
+businessactivities.registerservices.servicename.lbl.03 = bill payment service provider
+businessactivities.registerservices.servicename.lbl.04 = estate agency business
+businessactivities.registerservices.servicename.lbl.04.agent = estate agent
+businessactivities.registerservices.servicename.lbl.05 = high value dealer
+businessactivities.registerservices.servicename.lbl.06 = money service business
+businessactivities.registerservices.servicename.lbl.07 = trust or company service provider
+businessactivities.registerservices.servicename.lbl.08 = telecommunications, digital and IT payment service provider
 
 businessmatching.registerservices.servicename.lbl.01.phrased = accountancy services
 businessmatching.registerservices.servicename.lbl.02.phrased = art market participant
