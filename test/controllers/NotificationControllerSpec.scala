@@ -101,6 +101,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,
       authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       amlsNotificationService = mockNotificationService,
       amlsConnector = mockAmlsConnector,
       dataCacheConnector = mockCacheConnector)
@@ -112,7 +113,8 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       authAction = SuccessfulAuthActionNoAmlsRefNo,
       amlsNotificationService = mockNotificationService,
       amlsConnector = mockAmlsConnector,
-      dataCacheConnector = mockCacheConnector)
+      dataCacheConnector = mockCacheConnector,
+      ds = commonDependencies)
 
     val mockBusinessMatching = mock[BusinessMatching]
     val mockReviewDetails = mock[ReviewDetails]

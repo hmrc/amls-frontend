@@ -42,8 +42,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
     val controller = new RemoveTradingPremisesController (
       dataCacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService],
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction, ds = commonDependencies)
   }
 
   "RemoveTradingPremisesController" must {

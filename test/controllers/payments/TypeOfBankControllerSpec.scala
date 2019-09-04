@@ -44,7 +44,7 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
     implicit val ec: ExecutionContext = mock[ExecutionContext]
 
     val controller = new TypeOfBankController(
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       auditConnector = mock[AuditConnector],
       authEnrolmentsService = mock[AuthEnrolmentsService],
       feeResponseService = mock[FeeResponseService],

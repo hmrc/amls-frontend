@@ -54,7 +54,7 @@ class MoneySourcesControllerSpec extends AmlsSpec
       .thenReturn(Future.successful(CacheMap("TESTID", Map())))
 
     val controller = new MoneySourcesController(dataCacheConnector = mockCacheConnector,
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mockStatusService,
       serviceFlow = mockServiceFlow)
 
@@ -93,7 +93,7 @@ class MoneySourcesControllerSpec extends AmlsSpec
       .thenReturn(Future.successful(cacheMap))
 
     val controller = new MoneySourcesController(dataCacheConnector = mockCacheConnector,
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
       serviceFlow = mock[ServiceFlow])
 

@@ -41,7 +41,7 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with Mockito
 
     val timeAtAddressController = new TimeAtCurrentAddressController (
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService]
     )
   }

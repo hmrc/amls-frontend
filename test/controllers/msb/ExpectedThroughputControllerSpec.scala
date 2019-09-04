@@ -41,7 +41,7 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
 
     val controller = new ExpectedThroughputController(
       dataCacheConnector = mockCacheConnector,
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mockStatusService,
       serviceFlow = mockServiceFlow)
 

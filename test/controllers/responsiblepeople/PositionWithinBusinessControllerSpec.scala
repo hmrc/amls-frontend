@@ -48,8 +48,7 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
 
     val controller = new PositionWithinBusinessController (
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction
-      )
+      authAction = SuccessfulAuthAction, ds = commonDependencies)
 
     object DefaultValues {
       val noNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant), startDate)

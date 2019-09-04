@@ -37,7 +37,7 @@ class TradingPremisesControllerSpec extends AmlsSpec with BusinessMatchingGenera
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
     val controller = new TradingPremisesController(
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,

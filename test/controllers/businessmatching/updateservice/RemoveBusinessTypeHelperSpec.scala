@@ -42,7 +42,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
     self =>
 
     val helper = new RemoveBusinessTypeHelper(
-      SuccessfulAuthAction,
+      SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector
     )
   }

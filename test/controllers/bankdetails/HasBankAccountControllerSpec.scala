@@ -27,7 +27,7 @@ class HasBankAccountControllerSpec extends AmlsSpec {
     self =>
 
     val request = addToken(authRequest)
-    val controller = new HasBankAccountController(SuccessfulAuthAction, mockCacheConnector)
+    val controller = new HasBankAccountController(SuccessfulAuthAction, ds = commonDependencies, mockCacheConnector)
 
   }
 

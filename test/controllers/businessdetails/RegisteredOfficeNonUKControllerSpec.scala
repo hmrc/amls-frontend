@@ -50,8 +50,7 @@ class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar{
       statusService = mock[StatusService],
       auditConnector = mock[AuditConnector],
       autoCompleteService = mockAutoComplete,
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction, ds = commonDependencies)
 
     when {
       controller.auditConnector.sendEvent(any())(any(), any())

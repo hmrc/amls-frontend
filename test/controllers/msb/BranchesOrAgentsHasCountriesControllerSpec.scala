@@ -34,7 +34,7 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
-    val controller = new BranchesOrAgentsController(mockCacheConnector, authAction = SuccessfulAuthAction, mockAutoComplete)
+    val controller = new BranchesOrAgentsController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, mockAutoComplete)
   }
 
   "BranchesOrAgentsHasCountriesController" must {

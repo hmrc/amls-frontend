@@ -38,8 +38,7 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar {
     self => val request = addToken(authRequest)
     val controller = new NCARegisteredController (
       dataCacheConnector = mock[DataCacheConnector],
-      SuccessfulAuthAction
-    )
+      SuccessfulAuthAction, ds = commonDependencies)
   }
 
   val emptyCache = CacheMap("", Map.empty)

@@ -38,8 +38,7 @@ class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar  {
 
     val controller = new ServicesDateOfChangeController (
       dataCacheConnector = mock[DataCacheConnector],
-      SuccessfulAuthAction
-    )
+      SuccessfulAuthAction, ds = commonDependencies)
   }
 
   val emptyCache = CacheMap("", Map.empty)

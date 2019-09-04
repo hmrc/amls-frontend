@@ -29,8 +29,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     self => val request = addToken(authRequest)
 
     val controller = new WhatYouNeedController (
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction, ds = commonDependencies)
   }
   "WhatYouNeedController" must {
 

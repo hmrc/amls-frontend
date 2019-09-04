@@ -34,7 +34,7 @@ class CashPaymentFirstDateControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture  with DependencyMocks{
     self => val request = addToken(authRequest)
-    val controller = new CashPaymentFirstDateController(mockCacheConnector, authAction = SuccessfulAuthAction)
+    val controller = new CashPaymentFirstDateController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies)
   }
 
   val emptyCache = CacheMap("", Map.empty)

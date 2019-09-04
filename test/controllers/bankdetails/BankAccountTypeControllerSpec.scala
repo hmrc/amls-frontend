@@ -32,7 +32,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
     val request = addToken(authRequest)
 
     val controller = new BankAccountTypeController(
-      SuccessfulAuthAction,
+      SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
       mockStatusService
     )

@@ -34,8 +34,7 @@ class RemoveBankDetailsControllerSpec extends AmlsSpec with MockitoSugar {
 
     val controller = new RemoveBankDetailsController (
       dataCacheConnector =  mockCacheConnector,
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction, ds = commonDependencies)
   }
 
   "Get" must {

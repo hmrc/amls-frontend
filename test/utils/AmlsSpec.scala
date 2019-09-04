@@ -17,6 +17,7 @@
 package utils
 
 import connectors.KeystoreConnector
+import controllers.CommonPlayDependencies
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
@@ -36,6 +37,8 @@ trait AmlsSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with MustM
     .disable[com.kenshoo.play.metrics.PlayModule]
     .bindings(bindModules:_*).in(Mode.Test)
     .build()
+
+  val commonDependencies = app.injector.instanceOf(classOf[CommonPlayDependencies])
 
   implicit lazy val messagesApi = app.injector.instanceOf[MessagesApi]
   implicit lazy val messages = messagesApi.preferred(FakeRequest())

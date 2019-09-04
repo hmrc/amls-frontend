@@ -38,8 +38,7 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
 
     val controller = new ProfessionalBodyMemberController (
       dataCacheConnector = mockCacheConnector,
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction, ds = commonDependencies)
 
     mockCacheSave[Supervision]
 

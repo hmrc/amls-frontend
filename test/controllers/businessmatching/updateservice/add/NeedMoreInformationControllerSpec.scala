@@ -39,7 +39,7 @@ class NeedMoreInformationControllerSpec extends AmlsSpec with MockitoSugar with 
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
     val controller = new NeedMoreInformationController(
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[AddBusinessTypeFlowModel]
     )

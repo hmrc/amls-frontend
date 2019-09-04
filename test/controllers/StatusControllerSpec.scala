@@ -64,6 +64,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
        mockCacheConnector,
        mock[AuthenticatorConnector],
        SuccessfulAuthAction,
+      commonDependencies,
        mock[FeeResponseService])
 
     val controllerNoAmlsNumber = new StatusController (
@@ -77,6 +78,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
       mockCacheConnector,
       mock[AuthenticatorConnector],
       SuccessfulAuthActionNoAmlsRefNo,
+      commonDependencies,
       mock[FeeResponseService])
 
     val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(PositionStartDate(new LocalDate())))

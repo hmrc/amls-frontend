@@ -49,7 +49,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
     val controller = new BusinessAppliedForPSRNumberController(
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[AddBusinessTypeFlowModel]
     )

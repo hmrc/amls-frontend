@@ -52,7 +52,7 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
     val mockRPService = mock[ResponsiblePeopleService]
 
     val controller = new WhichFitAndProperController(
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,

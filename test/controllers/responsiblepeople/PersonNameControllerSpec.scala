@@ -43,8 +43,7 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
 
     val personNameController = new PersonNameController (
       dataCacheConnector = mockDataCacheConnector ,
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction, ds = commonDependencies)
   }
 
   val emptyCache = CacheMap("", Map.empty)

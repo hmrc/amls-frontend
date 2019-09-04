@@ -34,8 +34,7 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
     val request = addToken(authRequest)
 
     val controller = new WhichProfessionalBodyController(mockCacheConnector,
-                                                         authAction = SuccessfulAuthAction
-    )
+                                                         authAction = SuccessfulAuthAction, ds = commonDependencies)
     mockCacheFetch[Supervision](Some(Supervision()))
     mockCacheSave[Supervision]
   }

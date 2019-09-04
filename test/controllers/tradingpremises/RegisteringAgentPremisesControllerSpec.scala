@@ -38,7 +38,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
     self => val request = addToken(authRequest)
     val controller = new RegisteringAgentPremisesController (
       mock[DataCacheConnector],
-      SuccessfulAuthAction,
+      SuccessfulAuthAction, ds = commonDependencies,
       messagesApi)
   }
 

@@ -41,7 +41,7 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
     val controller = new FXTransactionsInLast12MonthsController (
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       renewalService = mockRenewalService
     )
 

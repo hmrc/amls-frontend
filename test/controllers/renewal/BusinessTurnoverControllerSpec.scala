@@ -47,7 +47,7 @@ class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
     val controller = new BusinessTurnoverController(
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       renewalService = mockRenewalService
     )
 

@@ -45,8 +45,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
     val controller = new LettersAddressController (
       dataCache = dataCacheConnector,
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction, ds = commonDependencies)
 
     val emptyCache = CacheMap("", Map.empty)
 

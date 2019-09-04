@@ -39,7 +39,7 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
     val controller = new ServicesOfBusinessController(
       mockCacheConnector,
       mockStatusService,
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       mockServiceFlow
     )
 

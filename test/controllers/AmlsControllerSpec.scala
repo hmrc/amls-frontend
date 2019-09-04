@@ -31,7 +31,7 @@ class AmlsControllerSpec extends AmlsSpec {
       implicit val unauthenticatedRequest = FakeRequest()
       val request = addToken(unauthenticatedRequest)
 
-      val controller = new AmlsController(SuccessfulAuthAction)
+      val controller = new AmlsController(SuccessfulAuthAction, ds = commonDependencies, ds = commonDependencies, commonDependencies)
     }
 
     "AmlsController" must {

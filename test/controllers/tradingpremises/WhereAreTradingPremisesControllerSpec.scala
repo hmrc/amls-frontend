@@ -51,7 +51,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
 
     val controller = new WhereAreTradingPremisesController (
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
       auditConnector = mock[AuditConnector]
       )

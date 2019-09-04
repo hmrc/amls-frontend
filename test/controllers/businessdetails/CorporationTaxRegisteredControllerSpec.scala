@@ -55,8 +55,7 @@ class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar 
     val controller = new CorporationTaxRegisteredController(
       dataCacheConnector = mockCacheConnector,
       businessMatchingConnector = mock[BusinessMatchingConnector],
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction, ds = commonDependencies)
   }
 
   "CorporationTaxRegisteredController" when {

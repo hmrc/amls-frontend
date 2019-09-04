@@ -36,7 +36,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     val request = addToken(authRequest)
     implicit val ec = app.injector.instanceOf[ExecutionContext]
     val controller = new WhatYouNeedController(
-      SuccessfulAuthAction,
+      SuccessfulAuthAction, ds = commonDependencies,
       mockStatusService,
       mockCacheConnector)
 

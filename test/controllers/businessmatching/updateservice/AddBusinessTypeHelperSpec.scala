@@ -51,7 +51,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
     val mockAppConfig = mock[AppConfig]
 
     val SUT = new AddBusinessTypeHelper(
-      SuccessfulAuthAction,
+      SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
       tradingPremisesService,
       responsiblePeopleService,

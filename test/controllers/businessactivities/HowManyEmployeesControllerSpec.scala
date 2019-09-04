@@ -41,8 +41,7 @@ class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with Sca
     self => val request = addToken(authRequest)
     val controller = new HowManyEmployeesController (
       dataCacheConnector = mock[DataCacheConnector],
-      SuccessfulAuthAction
-    )
+      SuccessfulAuthAction, ds = commonDependencies)
   }
 
   val emptyCache = CacheMap("", Map.empty)

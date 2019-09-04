@@ -43,7 +43,7 @@ class CashPaymentsCustomersNotMetControllerSpec extends AmlsSpec {
 
     val controller = new CashPaymentsCustomersNotMetController (
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       renewalService = mockRenewalService
     )
 

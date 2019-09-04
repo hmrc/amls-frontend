@@ -33,7 +33,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
     val request = addToken(authRequest)
 
     implicit val ec = app.injector.instanceOf[ExecutionContext]
-    val controller = new SummaryController(mockCacheConnector, mockServiceFlow, mockStatusService, authAction = SuccessfulAuthAction)
+    val controller = new SummaryController(mockCacheConnector, mockServiceFlow, mockStatusService, authAction = SuccessfulAuthAction, ds = commonDependencies)
 
     mockCacheSave[Asp]
 

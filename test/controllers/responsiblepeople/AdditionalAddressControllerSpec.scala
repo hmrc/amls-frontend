@@ -57,7 +57,7 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
     val additionalAddressController = new AdditionalAddressController(
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       auditConnector = auditConnector,
       autoCompleteService = autoCompleteService
     )

@@ -49,8 +49,7 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
       dataConnector = mock[DataCacheConnector],
       auditConnector = mock[AuditConnector],
       autoCompleteService = mock[AutoCompleteService],
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction, ds = commonDependencies)
 
     when {
       controller.autoCompleteService.getCountries

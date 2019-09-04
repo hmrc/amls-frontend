@@ -45,7 +45,7 @@ class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSuga
     val request = addToken(authRequest)
     val mockDataCacheConnector = mock[DataCacheConnector]
 
-    lazy val controller = new TransactionsInLast12MonthsController(SuccessfulAuthAction, mockDataCacheConnector, renewalService)
+    lazy val controller = new TransactionsInLast12MonthsController(SuccessfulAuthAction, ds = commonDependencies, mockDataCacheConnector, renewalService)
 
     when {
       renewalService.getRenewal(any())(any(), any())

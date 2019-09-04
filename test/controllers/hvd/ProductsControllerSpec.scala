@@ -235,7 +235,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
 
     val controller = new ProductsController(mockCacheConnector,
       mockStatusService,
-      SuccessfulAuthAction,
+      SuccessfulAuthAction, ds = commonDependencies,
       mockServiceFlow
     )
 

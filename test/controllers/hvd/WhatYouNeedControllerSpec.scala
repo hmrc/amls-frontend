@@ -28,7 +28,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new WhatYouNeedController (authAction = SuccessfulAuthAction) {
+    val controller = new WhatYouNeedController (authAction = SuccessfulAuthAction, ds = commonDependencies) {
 
     }
   }

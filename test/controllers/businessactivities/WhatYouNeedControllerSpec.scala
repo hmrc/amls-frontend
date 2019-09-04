@@ -32,7 +32,7 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
     val request = addToken(authRequest)
     val controller = new WhatYouNeedController(
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mockStatusService,
       authConnector = mock[AuthConnector])
   }

@@ -45,7 +45,7 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
     mockCacheGetEntry[Seq[TradingPremises]](Some(Seq(TradingPremises())), TradingPremises.key)
     mockCacheGetEntry[BusinessMatching](Some(BusinessMatching()), BusinessMatching.key)
 
-    val controller = new IsResidentialController(messagesApi, SuccessfulAuthAction, mockCacheConnector)
+    val controller = new IsResidentialController(messagesApi, SuccessfulAuthAction, ds = commonDependencies, mockCacheConnector)
 
     mockCacheSave[Seq[TradingPremises]]
   }

@@ -49,7 +49,7 @@ class WhichTradingPremisesControllerSpec extends AmlsSpec
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
     val controller = new WhichTradingPremisesController(
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,

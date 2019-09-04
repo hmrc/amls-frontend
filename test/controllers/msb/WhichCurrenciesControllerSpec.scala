@@ -52,7 +52,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec
       .thenReturn(Future.successful(CacheMap("TESTID", Map())))
 
     val controller = new WhichCurrenciesController(dataCacheConnector = mockCacheConnector,
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mockStatusService,
       serviceFlow = mockServiceFlow)
 

@@ -33,8 +33,7 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
 
     val controller = new PenalisedByProfessionalController (
       dataCacheConnector = mockCacheConnector,
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction, ds = commonDependencies)
 
     mockCacheSave[Supervision]
 

@@ -33,7 +33,7 @@ class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSug
     self =>
     val request = addToken(authRequest)
 
-    val controller = new ExpectToReceiveCashPaymentsController(SuccessfulAuthAction,
+    val controller = new ExpectToReceiveCashPaymentsController(SuccessfulAuthAction, ds = commonDependencies,
                                                                mockCacheConnector,
                                                                mockStatusService,
                                                                mockServiceFlow)

@@ -33,7 +33,7 @@ class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends AuthorisedFixture  with DependencyMocks{
     self => val request = addToken(authRequest)
 
-    val controller = new TcspTypesController(mockCacheConnector, authAction = SuccessfulAuthAction)
+    val controller = new TcspTypesController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies)
   }
 
   val cacheMap = CacheMap("", Map.empty)

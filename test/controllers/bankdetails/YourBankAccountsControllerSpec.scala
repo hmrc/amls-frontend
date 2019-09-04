@@ -84,8 +84,7 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
 
     val controller = new YourBankAccountsController(
       dataCacheConnector = mockCacheConnector,
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction, ds = commonDependencies)
   }
 
   "Get" must {

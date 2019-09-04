@@ -38,7 +38,7 @@ class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSuga
     val request = addToken(authRequest)
 
     val controller = new TransactionsInNext12MonthsController(
-      SuccessfulAuthAction,
+      SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
       mockStatusService,
       mockServiceFlow

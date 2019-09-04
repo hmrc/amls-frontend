@@ -43,8 +43,7 @@ class ResponsiblePersonAddControllerSpec extends AmlsSpec
 
     val controller = new ResponsiblePeopleAddController (
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction, ds = commonDependencies)
 
     @tailrec
     final def buildTestSequence(requiredCount: Int, acc: Seq[ResponsiblePerson] = Nil): Seq[ResponsiblePerson] = {

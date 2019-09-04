@@ -31,7 +31,7 @@ class SupervisionEndReasonsControllerSpec extends AmlsSpec with MockitoSugar wit
   trait Fixture extends AuthorisedFixture  with DependencyMocks{
     self => val request = addToken(authRequest)
 
-    val controller = new SupervisionEndReasonsController(mockCacheConnector, authAction = SuccessfulAuthAction)
+    val controller = new SupervisionEndReasonsController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies)
   }
 
   "SupervisionEndReasonsController" must {

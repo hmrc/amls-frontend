@@ -40,8 +40,7 @@ class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSug
 
     val controller = new IdentifySuspiciousActivityController (
       dataCacheConnector = mock[DataCacheConnector],
-      SuccessfulAuthAction
-    )
+      SuccessfulAuthAction, ds = commonDependencies)
   }
 
   "IdentifySuspiciousActivityController" when {

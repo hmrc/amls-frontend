@@ -49,7 +49,7 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
       .build()
 
     val mockApplicationConfig = mock[AppConfig]
-    val controller = new PersonNonUKPassportController(messagesApi = messagesApi, dataCacheConnector, SuccessfulAuthAction, mockApplicationConfig)
+    val controller = new PersonNonUKPassportController(messagesApi = messagesApi, dataCacheConnector, SuccessfulAuthAction, ds = commonDependencies, mockApplicationConfig)
 
     val emptyCache = CacheMap("", Map.empty)
     val mockCacheMap = mock[CacheMap]

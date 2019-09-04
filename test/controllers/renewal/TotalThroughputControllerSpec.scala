@@ -46,7 +46,7 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
     val cacheMap = mock[CacheMap]
 
     lazy val controller = new TotalThroughputController(
-      SuccessfulAuthAction,
+      SuccessfulAuthAction, ds = commonDependencies,
       renewalService,
       dataCacheConnector
     )

@@ -33,7 +33,7 @@ class WhatDateRemovedControllerSpec extends AmlsSpec {
     val request = addToken(authRequest)
 
     val controller = new WhatDateRemovedController(
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[RemoveBusinessTypeFlowModel]
     )

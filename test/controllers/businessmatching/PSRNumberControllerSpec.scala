@@ -51,7 +51,7 @@ class PSRNumberControllerSpec extends AmlsSpec
     val request = addToken(authRequest)
 
     val controller = new PSRNumberController(
-      SuccessfulAuthAction,
+      SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
       mockStatusService,
       mock[BusinessMatchingService],

@@ -43,7 +43,7 @@ class HowCashPaymentsReceivedControllerSpec extends AmlsSpec {
 
     val controller = new HowCashPaymentsReceivedController (
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       renewalService = mockRenewalService
     )
 

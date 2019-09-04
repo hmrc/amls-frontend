@@ -50,7 +50,7 @@ class DeRegisterApplicationControllerSpec extends AmlsSpec with MustMatchers wit
     val dataCache = mock[DataCacheConnector]
     val enrolments = mock[AuthEnrolmentsService]
     val amlsConnector = mock[AmlsConnector]
-    val controller = new DeRegisterApplicationController(SuccessfulAuthAction, dataCache, statusService, enrolments, amlsConnector)
+    val controller = new DeRegisterApplicationController(SuccessfulAuthAction, ds = commonDependencies, dataCache, statusService, enrolments, amlsConnector)
 
     when {
       dataCache.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any())

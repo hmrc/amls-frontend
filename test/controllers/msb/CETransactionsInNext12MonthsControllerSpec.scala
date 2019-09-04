@@ -38,7 +38,7 @@ class CETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
     val request = addToken(authRequest)
 
     val controller = new CETransactionsInNext12MonthsController(
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       statusService = mockStatusService,
       serviceFlow = mockServiceFlow)

@@ -50,7 +50,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
     val controller = new ConfirmAddressController(
       messagesApi,
       self.dataCache,
-      SuccessfulAuthAction,
+      SuccessfulAuthAction, ds = commonDependencies,
       enrolments,
       statusService,
       amls

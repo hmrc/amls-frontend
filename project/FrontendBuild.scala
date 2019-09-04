@@ -12,7 +12,6 @@ private object AppDependencies {
   import play.sbt.PlayImport._
   import play.core.PlayVersion
 
-  private val frontendBootstrapVersion = "12.6.0"
   private val playPartialsVersion = "6.9.0-play-25"
   private val httpCachingClientVersion = "8.2.0"
   private val playWhitelistFilterVersion = "2.0.0"
@@ -28,7 +27,6 @@ private object AppDependencies {
 
   val compile = Seq(
     ws,
-    //"uk.gov.hmrc" %% "frontend-bootstrap" % frontendBootstrapVersion,
     "uk.gov.hmrc" %% "domain" % domain,
     "uk.gov.hmrc" %% "play-partials" % playPartialsVersion,
     "uk.gov.hmrc" %% "http-caching-client" % httpCachingClientVersion,

@@ -35,7 +35,7 @@ class ProvidedServicesControllerSpec extends AmlsSpec with MockitoSugar with Sca
   trait Fixture extends AuthorisedFixture  with DependencyMocks{
     self => val request = addToken(authRequest)
 
-    val controller = new ProvidedServicesController(mockCacheConnector, authAction = SuccessfulAuthAction)
+    val controller = new ProvidedServicesController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies)
   }
 
   "ProvidedServicesController" must {

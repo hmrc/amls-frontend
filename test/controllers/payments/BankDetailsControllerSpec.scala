@@ -44,7 +44,7 @@ class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
 
     val controller = new BankDetailsController(
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       authEnrolmentsService = mock[AuthEnrolmentsService],
       feeResponseService = mock[FeeResponseService],
       statusService = mockStatusService

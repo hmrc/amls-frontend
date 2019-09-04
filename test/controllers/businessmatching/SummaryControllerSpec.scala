@@ -43,7 +43,7 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
 
     val controller = new SummaryController (
       dataCache = mockCacheConnector,
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService
     )

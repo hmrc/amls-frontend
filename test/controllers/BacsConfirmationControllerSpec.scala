@@ -58,7 +58,8 @@ class BacsConfirmationControllerSpec extends AmlsSpec
       dataCacheConnector = mock[DataCacheConnector],
       amlsConnector = mock[AmlsConnector],
       authenticator = mock[AuthenticatorConnector],
-      enrolmentService = mock[AuthEnrolmentsService])
+      enrolmentService = mock[AuthEnrolmentsService],
+      ds = commonDependencies)
 
     when(controller.enrolmentService.amlsRegistrationNumber(any(), any())(any(), any()))
       .thenReturn(Future.successful(Some(amlsRegistrationNumber)))

@@ -42,8 +42,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
     val controller = new ActivityStartDateController (
       dataCache = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction, ds = commonDependencies)
   }
 
   // scalastyle:off

@@ -43,7 +43,7 @@ class WhoIsYourAccountantControllerSpec extends AmlsSpec
 
     val controller = new WhoIsYourAccountantController (
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       autoCompleteService = mockAutoComplete
     )
   }

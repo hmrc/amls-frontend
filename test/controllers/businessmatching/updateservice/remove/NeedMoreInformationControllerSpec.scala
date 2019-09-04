@@ -33,7 +33,7 @@ class NeedMoreInformationControllerSpec extends AmlsSpec {
     val request = addToken(authRequest)
 
     val controller = new NeedMoreInformationController(
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[RemoveBusinessTypeFlowModel]
     )

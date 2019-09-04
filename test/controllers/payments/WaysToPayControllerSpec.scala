@@ -46,7 +46,7 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
     implicit val ec: ExecutionContext = mock[ExecutionContext]
 
     val controller = new WaysToPayController(
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
       paymentsService = mock[PaymentsService],
       authEnrolmentsService = mock[AuthEnrolmentsService],

@@ -42,7 +42,7 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
 
     val controller = new CurrentAddressDateOfChangeController(
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = statusService
     )
   }

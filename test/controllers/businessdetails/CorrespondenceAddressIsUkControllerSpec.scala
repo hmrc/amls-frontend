@@ -47,8 +47,7 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
     val controller = new CorrespondenceAddressIsUkController (
       dataConnector = mock[DataCacheConnector],
       auditConnector = mock[AuditConnector],
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction, ds = commonDependencies)
 
     when {
       controller.auditConnector.sendEvent(any())(any(), any())

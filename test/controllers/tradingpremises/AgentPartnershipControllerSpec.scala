@@ -37,7 +37,7 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
     val request = addToken(authRequest)
 
-    val controller = new AgentPartnershipController(mockCacheConnector, SuccessfulAuthAction, messagesApi)
+    val controller = new AgentPartnershipController(mockCacheConnector, SuccessfulAuthAction, ds = commonDependencies, messagesApi)
 
     mockCacheFetchAll
     mockCacheGetEntry[Seq[TradingPremises]](Some(Seq(tradingPremisesGen.sample.get)), TradingPremises.key)

@@ -47,7 +47,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
     val request = addToken(authRequest)
     val controller = new WhoIsRegisteringController (
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       amlsConnector = mock[AmlsConnector],
       statusService = mock[StatusService],
       renewalService = mock[RenewalService]

@@ -40,8 +40,7 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
 
     val controller = new RiskAssessmentController (
       dataCacheConnector = mock[DataCacheConnector],
-      SuccessfulAuthAction
-    )
+      SuccessfulAuthAction, ds = commonDependencies)
   }
 
   val emptyCache = CacheMap("", Map.empty)

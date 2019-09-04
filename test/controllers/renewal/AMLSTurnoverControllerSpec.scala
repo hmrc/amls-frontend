@@ -45,6 +45,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
     val controller = new AMLSTurnoverController(
       dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       renewalService = mockRenewalService
     )
 

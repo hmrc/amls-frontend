@@ -59,7 +59,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
     val currentAddressController = new CurrentAddressController (
       dataCacheConnector = mockDataCacheConnector,
       auditConnector = auditConnector,
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = statusService,
       autoCompleteService = autoCompleteService
     )

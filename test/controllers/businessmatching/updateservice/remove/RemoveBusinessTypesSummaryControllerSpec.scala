@@ -49,7 +49,7 @@ class RemoveBusinessTypesSummaryControllerSpec extends AmlsSpec with TitleValida
     val router = createRouter[RemoveBusinessTypeFlowModel]
 
     val controller = new RemoveBusinessTypesSummaryController(
-      SuccessfulAuthAction,
+      SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
       removeServiceHelper,
       router

@@ -32,7 +32,7 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
     self => val request = addToken(authRequest)
 
     val controller = new ServicesOfAnotherTCSPController (
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector
     )
   }

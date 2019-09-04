@@ -39,8 +39,7 @@ class BusinessTypeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
     val controller = new BusinessTypeController (
       dataCache = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction, ds = commonDependencies)
   }
 
   "BusinessTypeController" must {

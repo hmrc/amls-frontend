@@ -45,7 +45,7 @@ class SelectBusinessTypeControllerSpec extends AmlsSpec {
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
     val controller = new SelectBusinessTypeController(
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       businessMatchingService = mockBusinessMatchingService,
       router = createRouter[AddBusinessTypeFlowModel]

@@ -37,8 +37,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
 
     val controller = new WhatYouNeedController (
       mockDataCacheConnector,
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction, ds = commonDependencies)
   }
 
   "WhatYouNeedController" must {

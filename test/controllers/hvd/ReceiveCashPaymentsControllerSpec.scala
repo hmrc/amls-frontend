@@ -34,7 +34,7 @@ class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
     val request = addToken(authRequest)
 
     val controller = new ReceiveCashPaymentsController(
-      SuccessfulAuthAction,
+      SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
       mockServiceFlow,
       mockStatusService

@@ -56,7 +56,8 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       authAction = SuccessfulAuthActionNoAmlsRefNo,
       auditConnector = mock[AuditConnector],
       cacheConnector = mock[DataCacheConnector],
-      statusService = mock[StatusService])
+      statusService = mock[StatusService],
+      ds = commonDependencies)
 
     val controllerNoUserRole = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],
@@ -64,7 +65,8 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       authAction = SuccessfulAuthActionNoUserRole,
       auditConnector = mock[AuditConnector],
       cacheConnector = mock[DataCacheConnector],
-      statusService = mock[StatusService])
+      statusService = mock[StatusService],
+      ds = commonDependencies)
 
     when {
       controllerNoAmlsNumber.landingService.setAltCorrespondenceAddress(any(), any[String])(any(), any())

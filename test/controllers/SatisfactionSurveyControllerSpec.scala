@@ -38,7 +38,8 @@ class SatisfactionSurveyControllerSpec extends AmlsSpec with MockitoSugar with S
 
     val controller = new SatisfactionSurveyController (
       mock[AuditConnector],
-      SuccessfulAuthAction
+      SuccessfulAuthAction,
+      ds = commonDependencies
     )
 
     def model: Option[BusinessActivities] = None

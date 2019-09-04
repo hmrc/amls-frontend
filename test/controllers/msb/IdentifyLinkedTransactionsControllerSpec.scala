@@ -35,7 +35,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
     trait Fixture extends AuthorisedFixture with DependencyMocks {
       self => val request = addToken(authRequest)
-      val controller = new IdentifyLinkedTransactionsController(mockCacheConnector, authAction = SuccessfulAuthAction)
+      val controller = new IdentifyLinkedTransactionsController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies)
     }
 
   val cacheMap = mock[CacheMap]

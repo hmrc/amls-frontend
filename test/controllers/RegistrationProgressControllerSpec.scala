@@ -58,7 +58,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
       statusService = mockStatusService,
       sectionsProvider = mock[SectionsProvider],
       businessMatchingService = mockBusinessMatchingService,
-      serviceFlow = mockServiceFlow)
+      serviceFlow = mockServiceFlow,
+      ds = commonDependencies)
 
     mockApplicationStatus(SubmissionReady)
     mockCacheFetch[Renewal](None)

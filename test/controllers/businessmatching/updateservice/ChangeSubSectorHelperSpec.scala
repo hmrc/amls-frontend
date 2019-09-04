@@ -34,7 +34,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec {
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val helper = new ChangeSubSectorHelper(
-      SuccessfulAuthAction,
+      SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector)
   }
 

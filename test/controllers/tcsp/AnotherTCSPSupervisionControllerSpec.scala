@@ -29,7 +29,7 @@ class AnotherTCSPSupervisionControllerSpec extends AmlsSpec with MockitoSugar {
     self => val request = addToken(authRequest)
 
     val controller = new AnotherTCSPSupervisionController(
-      SuccessfulAuthAction,
+      SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector
     )
   }

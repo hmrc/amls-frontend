@@ -36,7 +36,7 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
     self =>
     val request = addToken(authRequest)
     val dataCache: DataCacheConnector = mock[DataCacheConnector]
-    val controller = new MovedAddressController(messagesApi, self.dataCache, SuccessfulAuthAction)
+    val controller = new MovedAddressController(messagesApi, self.dataCache, SuccessfulAuthAction, ds = commonDependencies)
 
   }
 

@@ -34,7 +34,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends AuthorisedFixture  with DependencyMocks with SupervisionValues {
     self => val request = addToken(authRequest)
 
-    val controller = new SummaryController(mockCacheConnector, authAction = SuccessfulAuthAction)
+    val controller = new SummaryController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies)
 
     val model = Supervision(None)
   }

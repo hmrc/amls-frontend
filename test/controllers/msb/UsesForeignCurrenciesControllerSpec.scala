@@ -53,7 +53,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
       .thenReturn(Future.successful(CacheMap("TESTID", Map())))
 
     val controller = new UsesForeignCurrenciesController(dataCacheConnector = mockCacheConnector,
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mockStatusService,
       serviceFlow = mockServiceFlow)
 
@@ -74,7 +74,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
   trait Fixture2 extends AuthorisedFixture with DependencyMocks with MoneyServiceBusinessTestData {
     self =>
     val request = addToken(authRequest)
-    val controller = new UsesForeignCurrenciesController(SuccessfulAuthAction, mockCacheConnector, mockStatusService, mockServiceFlow)
+    val controller = new UsesForeignCurrenciesController(SuccessfulAuthAction, ds = commonDependencies, mockCacheConnector, mockStatusService, mockServiceFlow)
     implicit val ec = app.injector.instanceOf[ExecutionContext]
 
     when {

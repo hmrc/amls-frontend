@@ -32,7 +32,7 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     self =>
     val request = addToken(authRequest)
 
-    val controller = new AnotherBodyController(mockCacheConnector, authAction = SuccessfulAuthAction)
+    val controller = new AnotherBodyController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies)
   }
 
   "AnotherBodyControllerController" must {

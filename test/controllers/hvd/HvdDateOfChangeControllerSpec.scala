@@ -39,7 +39,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
     self => val request = addToken(authRequest)
 
     val dataCacheConnector = mock[DataCacheConnector]
-    val controller = new HvdDateOfChangeController(dataCacheConnector, authAction = SuccessfulAuthAction)
+    val controller = new HvdDateOfChangeController(dataCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies)
 
   }
 

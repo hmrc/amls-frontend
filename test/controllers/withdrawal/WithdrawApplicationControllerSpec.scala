@@ -45,7 +45,7 @@ class WithdrawApplicationControllerSpec extends AmlsSpec with OneAppPerSuite {
     val statusService = mock[StatusService]
     val enrolments = mock[AuthEnrolmentsService]
 
-    val controller = new WithdrawApplicationController(SuccessfulAuthAction, amlsConnector, cacheConnector, enrolments, statusService)
+    val controller = new WithdrawApplicationController(SuccessfulAuthAction, ds = commonDependencies, amlsConnector, cacheConnector, enrolments, statusService)
 
     val applicationReference = "SUIYD3274890384"
     val safeId = "X87FUDIKJJKJH87364"

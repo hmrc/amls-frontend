@@ -46,7 +46,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
     val controller = new NationalityController (
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       autoCompleteService = autoCompleteService
     )
 

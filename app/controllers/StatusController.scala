@@ -43,7 +43,8 @@ class StatusController @Inject()(val landingService: LandingService,
                                  val amlsConnector: AmlsConnector,
                                  val dataCache: DataCacheConnector,
                                  val authenticator: AuthenticatorConnector,
-                                 authAction: AuthAction, val ds: CommonPlayDependencies,
+                                 authAction: AuthAction,
+                                 val ds: CommonPlayDependencies,
                                  val feeResponseService: FeeResponseService) extends AmlsBaseController(ds) {
 
   def get(fromDuplicateSubmission: Boolean = false) = authAction.async {

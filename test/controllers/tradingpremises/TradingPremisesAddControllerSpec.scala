@@ -36,7 +36,7 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with PropertyChecks with
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new TradingPremisesAddController (mock[DataCacheConnector], SuccessfulAuthAction)
+    val controller = new TradingPremisesAddController (mock[DataCacheConnector], SuccessfulAuthAction, ds = commonDependencies)
   }
 
   "TradingPremisesAddController" should {

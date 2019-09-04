@@ -50,7 +50,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
 
     val controller = new RemoveBusinessTypesController(
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       businessMatchingService = mockBusinessMatchingService,
       removeBusinessTypeHelper = mockRemoveBusinessTypeHelper,

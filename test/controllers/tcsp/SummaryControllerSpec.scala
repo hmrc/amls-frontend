@@ -50,7 +50,7 @@ class SummaryControllerSpec extends AmlsSpec {
 
     val controller = new SummaryController(
       mockCacheConnector,
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       mock[ServiceFlow],
       mockStatusService
     )

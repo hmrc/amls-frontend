@@ -42,8 +42,7 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
 
     val controller = new RegisteredForSelfAssessmentController (
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction
-      )
+      authAction = SuccessfulAuthAction, ds = commonDependencies)
   }
 
   val emptyCache = CacheMap("", Map.empty)

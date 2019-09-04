@@ -37,7 +37,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
     val controller = new SummaryController(
       mock[DataCacheConnector],
-      SuccessfulAuthAction,
+      SuccessfulAuthAction, ds = commonDependencies,
       mock[StatusService],
       mock[ServiceFlow])
 
