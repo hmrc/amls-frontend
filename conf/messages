@@ -115,7 +115,7 @@ error.submission.wrong_credentials.content = Your account doesn’t have enough 
 ########################################################################################################################
 ####  Business Matching ####
 error.required.bm.register.service = Select one or more options to show what you need to register
-error.required.bm.register.service.single = Select the type of business you need to register
+error.required.bm.register.service.single = Select which service you need to register.
 error.required.bm.remove.service = You must have at least one business type selected.
 error.required.bm.remove.leave.one = You must leave at least one business type unselected.
 error.required.bm.registration.number = Enter a valid company registration number
@@ -1321,11 +1321,11 @@ businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredin
 businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.2 = You can apply for a PSR reference number from the Financial Conduct Authority (FCA).
 businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.button.text = Return to about your business
 
-businessmatching.updateservice.selectactivities.title = What type of business do you need to register?
-businessmatching.updateservice.selectactivities.heading = What type of business do you need to register?
-businessmatching.updateservice.selectactivities.hint = You can only add one type of business at a time
-businessmatching.updateservice.selectactivities.currentactivities.hint = You’ve told us your business type is:
-businessmatching.updateservice.selectactivities.currentactivities.hint.plural = You’ve told us your business types are:
+businessmatching.updateservice.selectactivities.title = Which service do you need to register?
+businessmatching.updateservice.selectactivities.heading = Which service do you need to register?
+businessmatching.updateservice.selectactivities.hint = You can only add one service at a time.
+businessmatching.updateservice.selectactivities.currentactivities.hint = You have registered as an
+businessmatching.updateservice.selectactivities.currentactivities.hint.plural = You have registered the following services:
 
 businessmatching.updateservice.tradingpremises.title = Will you do these activities from any of your registered trading premises?
 businessmatching.updateservice.tradingpremises.heading = Will you do {0} activities from any of your registered trading premises?
@@ -1333,7 +1333,6 @@ businessmatching.updateservice.tradingpremises.summary = Will you do {0} from an
 
 businessmatching.updateservice.currenttradingpremises.title = Will you still do this activity from all of your registered trading premises?
 businessmatching.updateservice.currenttradingpremises.heading = Will you still do {0} from all of your registered trading premises?
-
 
 businessmatching.updateservice.whichtradingpremises.title = Which premises will you do these activities from?
 businessmatching.updateservice.whichtradingpremises.heading = Which premises will you do {0} activities from?
@@ -1347,7 +1346,6 @@ businessmatching.updateservice.whatdoyoudohere.list.lbl.02 = Currency exchange
 businessmatching.updateservice.whatdoyoudohere.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
 businessmatching.updateservice.whatdoyoudohere.list.lbl.04 = Cheque cashing (scrap metal dealers)
 businessmatching.updateservice.whatdoyoudohere.list.lbl.05 = Foreign exchange
-
 
 businessmatching.updateservice.addmoreactivities.title = Do you want to add another type of business?
 businessmatching.updateservice.addmoreactivities.heading = Do you want to add another type of business?

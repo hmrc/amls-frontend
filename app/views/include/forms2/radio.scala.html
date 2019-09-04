@@ -19,6 +19,7 @@
     labelText: String,
     value: String,
     target: String = "",
+    description: String = "",
     inline: Boolean = false,
     spaced: Boolean = false
 )(implicit lang:Lang, m: Messages)
@@ -33,3 +34,7 @@
                 @if(target.nonEmpty){ data-toggle="@target"} />
         <label class="block-label" for="@{f.id}-@value">@Messages(labelText)</label>
     </div>
+
+    @if(!description.isEmpty) {
+    <span class="form-hint clear checkbox-description">@Messages(description)</span>
+    }
