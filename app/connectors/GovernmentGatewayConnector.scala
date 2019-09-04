@@ -26,12 +26,12 @@ import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.Audit
-import uk.gov.hmrc.play.http.ws.WSHttp
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import utils.AuditHelper
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class GovernmentGatewayConnector @Inject()(val http: WSHttp,
+class GovernmentGatewayConnector @Inject()(val http: HttpClient,
                                            val appConfig: AppConfig,
                                            val auditConnector: AuditConnector) {
 
