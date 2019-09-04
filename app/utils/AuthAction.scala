@@ -26,7 +26,7 @@ import play.api.mvc.Results.Redirect
 import play.api.mvc._
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
-import uk.gov.hmrc.auth.core.retrieve.~
+import uk.gov.hmrc.auth.core.retrieve.{Credentials, Retrieval, ~}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.HeaderCarrierConverter
 
@@ -57,9 +57,7 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector)
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
 
-    // TODO - Auth will currently play ticket AIV-1097 meaning authorisation can take place on `User` in place of `Admin`
-    // TODO - Note: This can not be changed to User until this ticket has been played out.
-    authorised(Admin).retrieve(
+    authorised(User).retrieve(
       Retrievals.allEnrolments and
         Retrievals.credentials and
         Retrievals.affinityGroup and
