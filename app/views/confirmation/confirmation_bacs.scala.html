@@ -16,8 +16,9 @@
 
 @import include._
 @import forms2._
+@import config.CachedStaticHtmlPartialProvider
 
-@(businessName: String)(implicit request: Request[_],m:Messages)
+@(businessName: String)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
 
 @main(
     title = Messages("confirmation.payment.bacs.title") + " - " + Messages("submit.registration")

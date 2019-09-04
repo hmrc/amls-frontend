@@ -18,7 +18,7 @@ package controllers.tradingpremises
 
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
 import utils.{AuthAction, ControllerHelper}
@@ -26,7 +26,7 @@ import views.html.tradingpremises._
 
 @Singleton
 class WhatYouNeedController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                      val authAction: AuthAction) extends DefaultBaseController {
+                                      val authAction: AuthAction, val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
 
   def get(index: Int) = authAction.async {
     implicit request =>

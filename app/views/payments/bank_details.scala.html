@@ -16,10 +16,11 @@
 
 @import include._
 @import forms2._
+@import config.CachedStaticHtmlPartialProvider
 
 @import models.confirmation.Currency
 
-@(isUK: Boolean, fee: Currency, paymentReference: String)(implicit request: Request[_],m:Messages)
+@(isUK: Boolean, fee: Currency, paymentReference: String)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
 
 @header = {
     @components.back_link()

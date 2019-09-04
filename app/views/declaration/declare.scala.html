@@ -17,8 +17,9 @@
 @import forms.EmptyForm
 @import include._
 @import include.forms2._
+@import config.CachedStaticHtmlPartialProvider
 
-@(title: String, subtitle: String, name: String, isAmendment: Boolean)(implicit request: Request[_],m:Messages)
+@(title: String, subtitle: String, name: String, isAmendment: Boolean)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
 
 @header = {
  @components.back_link()

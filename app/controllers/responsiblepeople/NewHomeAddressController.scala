@@ -17,7 +17,7 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.DateOfChange
@@ -31,10 +31,10 @@ import views.html.responsiblepeople
 import scala.concurrent.Future
 
 @Singleton
-class NewHomeAddressController @Inject()(authAction: AuthAction,
+class NewHomeAddressController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
                                          val dataCacheConnector: DataCacheConnector,
                                          val autoCompleteService: AutoCompleteService
-                                        ) extends RepeatingSection with DefaultBaseController {
+                                        ) extends AmlsBaseController(ds) with RepeatingSection {
 
   final val DefaultAddressHistory = NewHomeAddress(PersonAddressUK("", "", None, None, ""))
 

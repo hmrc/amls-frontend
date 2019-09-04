@@ -17,7 +17,7 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching.updateservice.ServiceChangeRegister
@@ -31,9 +31,9 @@ import views.html.msb.send_money_to_other_country
 import scala.concurrent.Future
 
 class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                  authAction: AuthAction,
+                                                  authAction: AuthAction, val ds: CommonPlayDependencies,
                                                   val statusService: StatusService
-                                                 ) extends DefaultBaseController {
+                                                 ) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

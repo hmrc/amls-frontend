@@ -17,7 +17,7 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.moneyservicebusiness.{BranchesOrAgents, BranchesOrAgentsHasCountries, BranchesOrAgentsWhichCountries, MoneyServiceBusiness}
@@ -28,9 +28,9 @@ import utils.AuthAction
 import scala.concurrent.Future
 
 class BranchesOrAgentsWhichCountriesController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                         authAction: AuthAction,
+                                                         authAction: AuthAction, val ds: CommonPlayDependencies,
                                                          val autoCompleteService: AutoCompleteService
-                                                        ) extends DefaultBaseController {
+                                                        ) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

@@ -18,7 +18,7 @@ package controllers.responsiblepeople
 
 import javax.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businesscustomer.{Address => BusinessCustomerAddress}
 import models.businessmatching.BusinessMatching
@@ -29,7 +29,7 @@ import views.html.responsiblepeople.confirm_address
 
 class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
                                          val dataCacheConnector: DataCacheConnector,
-                                         authAction: AuthAction) extends RepeatingSection with DefaultBaseController {
+                                         authAction: AuthAction, val ds: CommonPlayDependencies) extends AmlsBaseController(ds) with RepeatingSection {
 
   def get(index: Int) = authAction.async {
       implicit request =>

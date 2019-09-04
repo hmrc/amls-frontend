@@ -18,7 +18,7 @@ package controllers.tradingpremises
 
 import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, _}
 import models.businessmatching.BusinessMatching
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
@@ -29,8 +29,8 @@ import scala.concurrent.Future
 
 @Singleton
 class RegisteringAgentPremisesController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                   val authAction: AuthAction,
-                                                   override val messagesApi: MessagesApi) extends RepeatingSection with DefaultBaseController {
+                                                   val authAction: AuthAction, val ds: CommonPlayDependencies,
+                                                   override val messagesApi: MessagesApi) extends AmlsBaseController(ds) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false) = authAction.async {
    implicit request =>

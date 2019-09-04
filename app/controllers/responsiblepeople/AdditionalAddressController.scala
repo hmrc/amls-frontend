@@ -22,7 +22,7 @@ import cats.data.OptionT
 import cats.implicits._
 import com.google.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ThreeYearsPlus}
 import models.responsiblepeople._
@@ -39,10 +39,10 @@ import scala.concurrent.Future
 @Singleton
 class AdditionalAddressController @Inject() (
                                               override val dataCacheConnector: DataCacheConnector,
-                                              authAction: AuthAction,
+                                              authAction: AuthAction, val ds: CommonPlayDependencies,
                                               auditConnector: AuditConnector,
                                               val autoCompleteService: AutoCompleteService
-                                            ) extends RepeatingSection with DefaultBaseController {
+                                            ) extends AmlsBaseController(ds) with RepeatingSection {
 
   final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None)
 

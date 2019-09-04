@@ -18,13 +18,11 @@
 @import include._
 @import forms2._
 @import models.FeeResponse
-@import config.{ApplicationConfig => appConfig}
+@import config.{ApplicationConfig => appConfig, CachedStaticHtmlPartialProvider}
 
-@(feeResponse: Option[FeeResponse])(implicit request: Request[_],m:Messages, lang: Lang)
+@(feeResponse: Option[FeeResponse])(implicit request: Request[_],m:Messages, lang: Lang, partialProvider: CachedStaticHtmlPartialProvider)
 
-@getHelpForm = {
-@config.CachedStaticHtmlPartialProvider.getPartialContent(appConfig.reportAProblemUrl)
-}
+@getHelpForm = @{partialProvider.getPartialContent(appConfig.reportAProblemUrl)}
 
 @feeResponse match {
     case Some(fee) => {

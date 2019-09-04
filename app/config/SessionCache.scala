@@ -171,7 +171,7 @@ class AmlsSessionCache @Inject()( environment: Environment,
 //    amlsControllerConfig.paramsForController(controllerName).needsLogging
 //}
 //
-//class CachedStaticHtmlPartialProvider @Inject()(wsclient: WSClient,
+//class config.CachedStaticHtmlPartialProvider @Inject()(wsclient: WSClient,
 //                                                config: Configuration,
 //                                                playActorSystem: ActorSystem)
 //  extends CachedStaticHtmlPartialRetriever {
@@ -185,7 +185,7 @@ class AmlsSessionCache @Inject()( environment: Environment,
 //  }
 //}
 //
-//object CachedStaticHtmlPartialProvider {
+//object config.CachedStaticHtmlPartialProvider {
 //  def getPartialContent(url: String)(implicit request: Request[_]): Html = {
 //    val partialContent: Html = this.getPartialContent(url)
 //    partialContent.body match {

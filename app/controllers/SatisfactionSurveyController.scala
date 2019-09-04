@@ -28,7 +28,7 @@ import scala.concurrent.Future
 
 @Singleton
 class SatisfactionSurveyController @Inject()(val auditConnector: AuditConnector,
-                                             authAction: AuthAction) extends DefaultBaseController {
+                                             authAction: AuthAction, val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

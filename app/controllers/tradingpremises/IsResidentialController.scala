@@ -17,7 +17,7 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import javax.inject.{Inject, Singleton}
 import models.businesscustomer.Address
@@ -32,8 +32,8 @@ import scala.concurrent.Future
 @Singleton
 class  IsResidentialController @Inject()(
                                           override val messagesApi: MessagesApi,
-                                          val authAction: AuthAction,
-                                          val dataCacheConnector: DataCacheConnector) extends RepeatingSection with DefaultBaseController {
+                                          val authAction: AuthAction, val ds: CommonPlayDependencies,
+                                          val dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false) = authAction.async{
       implicit request =>

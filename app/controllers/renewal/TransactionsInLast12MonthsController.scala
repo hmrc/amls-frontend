@@ -19,7 +19,7 @@ package controllers.renewal
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching._
@@ -31,9 +31,9 @@ import views.html.renewal.transactions_in_last_12_months
 import scala.concurrent.Future
 
 class TransactionsInLast12MonthsController @Inject()(
-                                                      val authAction: AuthAction,
+                                                      val authAction: AuthAction, val ds: CommonPlayDependencies,
                                                       val dataCacheConnector: DataCacheConnector,
-                                                      renewalService: RenewalService) extends DefaultBaseController {
+                                                      renewalService: RenewalService) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

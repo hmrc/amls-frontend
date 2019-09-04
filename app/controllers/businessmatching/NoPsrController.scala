@@ -16,13 +16,13 @@
 
 package controllers.businessmatching
 
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import models.status.{NotCompleted, SubmissionReady}
 import services.StatusService
 import utils.AuthAction
 
-class NoPsrController @Inject()(val authAction: AuthAction, statusService: StatusService) extends DefaultBaseController {
+class NoPsrController @Inject()(val authAction: AuthAction, val ds: CommonPlayDependencies, statusService: StatusService) extends AmlsBaseController(ds) {
 
   def get = authAction.async {
     implicit request =>

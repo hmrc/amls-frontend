@@ -19,7 +19,7 @@ package controllers.responsiblepeople
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.responsiblepeople.{ResponsiblePerson, VATRegistered}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople._
@@ -28,8 +28,8 @@ import scala.concurrent.Future
 
 class VATRegisteredController @Inject () (
                                          val dataCacheConnector: DataCacheConnector,
-                                         authAction: AuthAction
-                                         ) extends RepeatingSection with DefaultBaseController {
+                                         authAction: AuthAction, val ds: CommonPlayDependencies
+                                         ) extends AmlsBaseController(ds) with RepeatingSection {
 
 
 

@@ -17,7 +17,7 @@
 package controllers.tcsp
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.tcsp._
@@ -26,8 +26,8 @@ import views.html.tcsp._
 
 import scala.concurrent.Future
 
-class ComplexCorpStructureCreationController @Inject()(val authAction: AuthAction,
-                                                       val dataCacheConnector: DataCacheConnector) extends DefaultBaseController {
+class ComplexCorpStructureCreationController @Inject()(val authAction: AuthAction, val ds: CommonPlayDependencies,
+                                                       val dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
 
   val NAME = "complexCorpStructureCreation"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(NAME)

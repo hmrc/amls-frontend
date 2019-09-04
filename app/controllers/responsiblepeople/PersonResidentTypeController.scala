@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import config.AppConfig
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.Country
@@ -33,8 +33,8 @@ import scala.concurrent.Future
 
 class PersonResidentTypeController @Inject()(override val messagesApi: MessagesApi,
                                              val dataCacheConnector: DataCacheConnector,
-                                             authAction: AuthAction,
-                                             val appConfig:AppConfig) extends RepeatingSection with DefaultBaseController {
+                                             authAction: AuthAction, val ds: CommonPlayDependencies,
+                                             val appConfig:AppConfig) extends AmlsBaseController(ds) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>

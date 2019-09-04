@@ -19,7 +19,7 @@ package controllers.payments
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import models.SubmissionRequestStatus
 import services.{AuthEnrolmentsService, FeeResponseService, StatusService}
@@ -29,11 +29,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class BankDetailsController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                      val authAction: AuthAction,
+                                      val authAction: AuthAction, val ds: CommonPlayDependencies,
                                       val authEnrolmentsService: AuthEnrolmentsService,
                                       val feeResponseService: FeeResponseService,
                                       val statusService: StatusService
-                                    ) extends DefaultBaseController{
+                                    ) extends AmlsBaseController(ds){
 
 
   def get(isUK: Boolean = true) = authAction.async {

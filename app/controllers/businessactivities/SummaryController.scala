@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.EmptyForm
 import models.businessactivities.BusinessActivities
 import models.businessmatching.{AccountancyServices, BusinessMatching}
@@ -32,8 +32,8 @@ import scala.concurrent.Future
 
 class SummaryController @Inject() (val dataCache: DataCacheConnector,
                                    implicit val statusService: StatusService,
-                                   val authAction: AuthAction
-                                  )extends DefaultBaseController {
+                                   val authAction: AuthAction, val ds: CommonPlayDependencies
+                                  )extends AmlsBaseController(ds) {
 
   def get = authAction.async {
     implicit request =>

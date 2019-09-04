@@ -17,6 +17,7 @@
 package utils
 
 import cats.implicits._
+import config.CachedStaticHtmlPartialProvider
 import connectors.DataCacheConnector
 import forms.InvalidForm
 import models.businessactivities.{BusinessActivities => BA}
@@ -35,6 +36,7 @@ import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -156,7 +158,7 @@ object ControllerHelper {
 
   def rpTitleName(rp:Option[ResponsiblePerson]):String = rp.fold("")(_.personName.fold("")(_.titleName))
 
-  def notFoundView(implicit request: Request[_]) = {
+  def notFoundView(implicit request: Request[_], partialProvider: CachedStaticHtmlPartialProvider) = {
     views.html.error(Messages("error.not-found.title"),
       Messages("error.not-found.heading"),
       Messages("error.not-found.message"))

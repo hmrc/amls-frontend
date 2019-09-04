@@ -19,8 +19,9 @@
 @import config.ApplicationConfig
 @import org.joda.time.LocalDate
 @import utils.DateHelper
+@import config.CachedStaticHtmlPartialProvider
 
-@(businessName: Option[String], deregistrationDate: Option[LocalDate])(implicit request: Request[_],m:Messages)
+@(businessName: Option[String], deregistrationDate: Option[LocalDate])(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
 
 @main2(title = s"${Messages("status.submissionderegistered.title")} - Your registration", showURRBanner = true) {
 

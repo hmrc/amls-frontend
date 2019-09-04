@@ -18,7 +18,7 @@ package controllers.declaration
 
 import com.google.inject.Inject
 import connectors.{AmlsConnector, DataCacheConnector}
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.declaration._
@@ -35,12 +35,12 @@ import views.html.declaration.{who_is_registering_this_registration, who_is_regi
 import scala.concurrent.Future
 
 class WhoIsRegisteringController @Inject () (
-                                            authAction: AuthAction,
+                                            authAction: AuthAction, val ds: CommonPlayDependencies,
                                             val dataCacheConnector: DataCacheConnector,
                                             val statusService: StatusService,
                                             val renewalService: RenewalService,
                                             val amlsConnector: AmlsConnector
-                                            ) extends DefaultBaseController {
+                                            ) extends AmlsBaseController(ds) {
 
   def get = authAction.async {
     implicit request =>

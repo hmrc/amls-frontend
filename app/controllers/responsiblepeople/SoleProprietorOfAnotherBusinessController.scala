@@ -16,7 +16,7 @@
 
 package controllers.responsiblepeople
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.responsiblepeople.{ResponsiblePerson, SoleProprietorOfAnotherBusiness, VATRegistered}
@@ -28,8 +28,8 @@ import scala.concurrent.Future
 
 @Singleton
 class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                          authAction: AuthAction,
-                                                          val statusService: StatusService) extends RepeatingSection with DefaultBaseController {
+                                                          authAction: AuthAction, val ds: CommonPlayDependencies,
+                                                          val statusService: StatusService) extends AmlsBaseController(ds) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request => {

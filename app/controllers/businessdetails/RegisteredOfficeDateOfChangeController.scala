@@ -18,7 +18,7 @@ package controllers.businessdetails
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.businessdetails.{BusinessDetails, RegisteredOfficeNonUK, RegisteredOfficeUK}
@@ -31,8 +31,8 @@ import scala.concurrent.Future
 class RegisteredOfficeDateOfChangeController @Inject () (
                                                           val dataCacheConnector: DataCacheConnector,
                                                           val statusService: StatusService,
-                                                          val authAction: AuthAction
-                                                        ) extends DefaultBaseController with DateOfChangeHelper {
+                                                          val authAction: AuthAction, val ds: CommonPlayDependencies
+                                                        ) extends AmlsBaseController(ds) with DateOfChangeHelper {
 
 
 

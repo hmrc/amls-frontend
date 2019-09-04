@@ -16,9 +16,10 @@
 
 @import include._
 @import forms2._
+@import config.CachedStaticHtmlPartialProvider
 @import forms.EmptyForm
 @import models.businessmatching._
-@(services: BusinessMatchingMsbServices = BusinessMatchingMsbServices(Set()))(implicit request: Request[_],m:Messages)
+@(services: BusinessMatchingMsbServices = BusinessMatchingMsbServices(Set()))(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
 
 @header = {
     @components.back_link()

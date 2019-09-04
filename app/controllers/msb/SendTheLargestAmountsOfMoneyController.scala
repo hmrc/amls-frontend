@@ -17,7 +17,7 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.moneyservicebusiness.{MoneyServiceBusiness, SendTheLargestAmountsOfMoney}
@@ -28,12 +28,12 @@ import views.html.msb.send_largest_amounts_of_money
 
 import scala.concurrent.Future
 
-class SendTheLargestAmountsOfMoneyController @Inject()(authAction: AuthAction,
+class SendTheLargestAmountsOfMoneyController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
                                                        implicit val cacheConnector: DataCacheConnector,
                                                        implicit val statusService: StatusService,
                                                        implicit val serviceFlow: ServiceFlow,
                                                        val autoCompleteService: AutoCompleteService
-                                                      ) extends DefaultBaseController {
+                                                      ) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

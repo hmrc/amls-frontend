@@ -18,7 +18,7 @@ package controllers.responsiblepeople
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, FormHelpers, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.responsiblepeople.ResponsiblePerson
@@ -33,9 +33,9 @@ import scala.concurrent.Future
 
 class CurrentAddressDateOfChangeController @Inject () (
                                                       val dataCacheConnector: DataCacheConnector,
-                                                      authAction: AuthAction,
+                                                      authAction: AuthAction, val ds: CommonPlayDependencies,
                                                       statusService: StatusService
-                                                      ) extends RepeatingSection with DefaultBaseController with DateOfChangeHelper with FormHelpers {
+                                                      ) extends AmlsBaseController(ds) with RepeatingSection with DateOfChangeHelper with FormHelpers {
 
   def get(index: Int, edit: Boolean) = authAction {
     implicit request =>

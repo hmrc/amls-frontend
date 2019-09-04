@@ -19,7 +19,7 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import jto.validation.forms.UrlFormEncoded
@@ -39,11 +39,11 @@ import scala.concurrent.Future
 
 @Singleton
 class SelectBusinessTypeController @Inject()(
-                                            authAction: AuthAction,
+                                            authAction: AuthAction, val ds: CommonPlayDependencies,
                                             implicit val dataCacheConnector: DataCacheConnector,
                                             val businessMatchingService: BusinessMatchingService,
                                             val router: Router[AddBusinessTypeFlowModel]
-                                          ) extends DefaultBaseController with RepeatingSection {
+                                          ) extends AmlsBaseController(ds) with RepeatingSection {
 
   implicit val activityReader: Rule[UrlFormEncoded, BusinessActivity] =
     FormTypes.businessActivityRule("error.required.bm.register.service.single") map {

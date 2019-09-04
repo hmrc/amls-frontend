@@ -16,13 +16,14 @@
 
 @import include._
 @import forms2._
+@import config.CachedStaticHtmlPartialProvider
 @import models.bankdetails._
 @import utils.StatusConstants
 @import models.status._
 @import config.ApplicationConfig
 @import forms.EmptyForm
 
-@(bankDetails: BankDetails, index: Integer)(implicit request: Request[_],m:Messages, lang: Lang)
+@(bankDetails: BankDetails, index: Integer)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.bankdetails")

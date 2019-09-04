@@ -17,7 +17,7 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import models.businessmatching.BusinessMatching
 import services.StatusService
@@ -26,9 +26,9 @@ import views.html.msb.what_you_need
 
 import scala.concurrent.Future
 
-class WhatYouNeedController @Inject()(authAction: AuthAction,
+class WhatYouNeedController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
                                       val statusService: StatusService,
-                                      val dataCacheConnector: DataCacheConnector) extends DefaultBaseController {
+                                      val dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
 
   def get = authAction.async {
       implicit request =>

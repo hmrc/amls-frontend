@@ -19,7 +19,7 @@ package controllers.withdrawal
 import cats.data.OptionT
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawalReason}
@@ -31,11 +31,11 @@ import views.html.withdrawal.withdrawal_reason
 import scala.concurrent.Future
 
 class WithdrawalReasonController @Inject()(
-                                            authAction: AuthAction,
+                                            authAction: AuthAction, val ds: CommonPlayDependencies,
                                             val amls: AmlsConnector,
                                             enrolments: AuthEnrolmentsService,
                                             statusService: StatusService,
-                                            cacheConnector: DataCacheConnector) extends DefaultBaseController {
+                                            cacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
 
   def get = authAction.async {
     implicit request =>

@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import config.AppConfig
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
@@ -33,13 +33,13 @@ import utils.AuthAction
 
 import scala.concurrent.Future
 
-class MsbSubSectorsController @Inject()(authAction: AuthAction,
+class MsbSubSectorsController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
                                         val dataCacheConnector: DataCacheConnector,
                                         val router: Router[ChangeSubSectorFlowModel],
                                         val businessMatchingService: BusinessMatchingService,
                                         val statusService:StatusService,
                                         val helper: ChangeSubSectorHelper,
-                                        val config: AppConfig) extends DefaultBaseController {
+                                        val config: AppConfig) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

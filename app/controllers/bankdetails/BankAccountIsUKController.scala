@@ -19,6 +19,7 @@ package controllers.bankdetails
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
+import controllers.CommonPlayDependencies
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.bankdetails.{Account, BankDetails}
@@ -32,9 +33,10 @@ import scala.concurrent.Future
 class BankAccountIsUKController @Inject()(
                                            val dataCacheConnector: DataCacheConnector,
                                            val authAction: AuthAction,
+                                           val ds: CommonPlayDependencies,
                                            val auditConnector: AuditConnector,
                                            val statusService: StatusService
-                                         ) extends BankDetailsController {
+                                         ) extends BankDetailsController(ds) {
 
   def get(index: Int, edit: Boolean = false) = authAction.async{
       implicit request =>

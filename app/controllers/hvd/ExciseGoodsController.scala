@@ -17,7 +17,7 @@
 package controllers.hvd
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching.HighValueDealing
@@ -33,8 +33,8 @@ import scala.concurrent.Future
 
 class ExciseGoodsController @Inject() (val dataCacheConnector: DataCacheConnector,
                                        val statusService: StatusService,
-                                       val authAction: AuthAction,
-                                       val serviceFlow: ServiceFlow) extends DefaultBaseController with DateOfChangeHelper {
+                                       val authAction: AuthAction, val ds: CommonPlayDependencies,
+                                       val serviceFlow: ServiceFlow) extends AmlsBaseController(ds) with DateOfChangeHelper {
 
   def get(edit: Boolean = false) = authAction.async {
         implicit request =>

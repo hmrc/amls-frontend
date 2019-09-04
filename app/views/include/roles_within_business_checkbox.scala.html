@@ -16,9 +16,10 @@
 
 @import include._
 @import forms2._
+@import config.CachedStaticHtmlPartialProvider
 @import models.businessmatching.{BusinessType, BusinessMatching}
 
-@(f: forms.Form2[_], id:String)(implicit lang:Lang, m:Messages)
+@(f: forms.Form2[_], id:String)(implicit lang:Lang, m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
 
 @checkbox(
     f = f("positions[]"),

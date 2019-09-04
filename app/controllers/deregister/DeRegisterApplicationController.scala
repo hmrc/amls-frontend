@@ -19,7 +19,7 @@ package controllers.deregister
 import cats.data.OptionT
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import models.businessmatching.BusinessMatching
 import services.{AuthEnrolmentsService, StatusService}
@@ -28,11 +28,11 @@ import views.html.deregister.deregister_application
 
 import scala.concurrent.Future
 
-class DeRegisterApplicationController @Inject() (authAction: AuthAction,
+class DeRegisterApplicationController @Inject() (authAction: AuthAction, val ds: CommonPlayDependencies,
                                                  implicit val cache: DataCacheConnector,
                                                  implicit val statusService: StatusService,
                                                  enrolments: AuthEnrolmentsService,
-                                                 implicit val amls: AmlsConnector) extends DefaultBaseController {
+                                                 implicit val amls: AmlsConnector) extends AmlsBaseController(ds) {
 
   def get() = authAction.async {
         implicit request =>

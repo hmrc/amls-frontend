@@ -17,8 +17,9 @@
 @import include._
 @import models.confirmation._
 @import config.ApplicationConfig
+@import config.CachedStaticHtmlPartialProvider
 
-@(companyName: String)(implicit request: Request[_],messages:Messages)
+@(companyName: String)(implicit request: Request[_],messages:Messages,partialProvider: CachedStaticHtmlPartialProvider)
 
 @main(title = messages("confirmation.variation.title")) {
 

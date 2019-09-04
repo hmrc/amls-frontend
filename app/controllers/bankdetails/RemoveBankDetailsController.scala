@@ -17,17 +17,17 @@
 package controllers.bankdetails
 
 import connectors.DataCacheConnector
+import controllers.CommonPlayDependencies
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import models.bankdetails.BankDetails
-
 import utils.{AuthAction, StatusConstants}
 
 @Singleton
 class RemoveBankDetailsController @Inject()(
-                                             val authAction: AuthAction,
+                                             val authAction: AuthAction, val ds: CommonPlayDependencies,
                                              val dataCacheConnector: DataCacheConnector
-                                           ) extends BankDetailsController {
+                                           ) extends BankDetailsController(ds) {
 
   def get(index: Int) = authAction.async {
       implicit request =>

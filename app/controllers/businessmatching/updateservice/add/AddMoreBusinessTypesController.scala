@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
@@ -35,10 +35,10 @@ import scala.concurrent.Future
 
 @Singleton
 class AddMoreBusinessTypesController @Inject()(
-                                                authAction: AuthAction,
+                                                authAction: AuthAction, val ds: CommonPlayDependencies,
                                                 implicit val dataCacheConnector: DataCacheConnector,
                                                 val router: Router[AddBusinessTypeFlowModel]
-                                           ) extends DefaultBaseController {
+                                           ) extends AmlsBaseController(ds) {
 
   val fieldName = "addmoreactivities"
 

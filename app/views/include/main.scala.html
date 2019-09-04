@@ -14,10 +14,9 @@
  * limitations under the License.
  *@
 
-@import config.{ApplicationConfig => appConfig}
+@import config.{ApplicationConfig => appConfig, CachedStaticHtmlPartialProvider}
 @import layouts.{govuk_template => hmrcGovUkTemplate}
 @import uk.gov.hmrc.play.views.html.{layouts => uiLayouts}
-@import CachedStaticHtmlPartialProvider
 
 @(
     title: String,
@@ -32,7 +31,7 @@
     userLoggedIn : Boolean = true,
     heading: Html = HtmlFormat.empty,
     showGetHelpForm: Boolean = true
-)(mainContent: Html = HtmlFormat.empty)(implicit request: Request[_],m:Messages)
+)(mainContent: Html = HtmlFormat.empty)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
 
 @styles = {
     <link href="@routes.Assets.versioned("jquery-ui.css")" rel="stylesheet"/>
@@ -104,9 +103,7 @@
     )
 }
 
-@getHelpForm = {
-    @CachedStaticHtmlPartialProvider.getPartialContent(appConfig.reportAProblemUrl)
-}
+@getHelpForm = @{partialProvider.getPartialContent(appConfig.reportAProblemUrl)}
 
 @content = {
     <main id="wrapper" role="main">

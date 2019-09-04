@@ -15,8 +15,9 @@
  *@
 
 @import include.main
+@import config.CachedStaticHtmlPartialProvider
 
-@(title: String, heading: String, message: String)(implicit request: Request[_],m:Messages)
+@(title: String, heading: String, message: String)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
 
 @main(
     title = title

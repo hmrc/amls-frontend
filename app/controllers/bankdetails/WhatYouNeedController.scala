@@ -19,7 +19,7 @@ package controllers.bankdetails
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import models.bankdetails.BankDetails
 import models.bankdetails.BankDetails.Filters._
@@ -27,12 +27,12 @@ import play.api.mvc.Call
 import utils.AuthAction
 import views.html.bankdetails._
 
-class WhatYouNeedController @Inject()(val authAction: AuthAction,
-                                      dataCacheConnector: DataCacheConnector) extends DefaultBaseController {
+class WhatYouNeedController @Inject()(val authAction: AuthAction, val ds: CommonPlayDependencies,
+                                      dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
 
   def get = authAction.async {
       implicit request =>
-        val view = what_you_need.apply(_: Call)(request, implicitly)
+        val view = what_you_need.apply(_: Call)(request, implicitly, implicitly)
 
         val result = for {
             bankDetails <- OptionT(dataCacheConnector.fetch[Seq[BankDetails]](request.credId, BankDetails.key))

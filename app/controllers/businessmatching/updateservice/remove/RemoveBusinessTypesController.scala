@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.data.Validated.{Invalid, Valid}
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
@@ -41,12 +41,12 @@ import scala.concurrent.Future
 
 @Singleton
 class RemoveBusinessTypesController @Inject()(
-                                               authAction: AuthAction,
+                                               authAction: AuthAction, val ds: CommonPlayDependencies,
                                                val dataCacheConnector: DataCacheConnector,
                                                val businessMatchingService: BusinessMatchingService,
                                                val removeBusinessTypeHelper: RemoveBusinessTypeHelper,
                                                val router: Router[RemoveBusinessTypeFlowModel]
-                                             ) extends DefaultBaseController {
+                                             ) extends AmlsBaseController(ds) {
 
   def formReaderminLengthR: Rule[UrlFormEncoded, Set[BusinessActivity]] = From[UrlFormEncoded] { __ =>
     (__ \ "businessActivities").read(minLengthR[Set[BusinessActivity]](1).withMessage("error.required.bm.remove.service"))

@@ -18,7 +18,7 @@ package controllers.businessdetails
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import models.businessdetails._
 import utils.AuthAction
@@ -28,8 +28,8 @@ import scala.concurrent.Future
 
 class ContactingYouController @Inject () (
                                            val dataCache: DataCacheConnector,
-                                           val authAction: AuthAction
-                                         ) extends DefaultBaseController {
+                                           val authAction: AuthAction, val ds: CommonPlayDependencies
+                                         ) extends AmlsBaseController(ds) {
 
   def updateData(contactingYou: Option[ContactingYou], data: ContactingYouEmail): ContactingYou = {
     contactingYou.fold[ContactingYou](ContactingYou(email = Some(data.email)))(x => x.copy(email = Some(data.email)))

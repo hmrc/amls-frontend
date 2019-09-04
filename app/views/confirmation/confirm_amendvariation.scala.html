@@ -17,8 +17,9 @@
 @import include._
 @import models.confirmation._
 @import views.html.confirmation.{breakdown => breakdown_display}
+@import config.CachedStaticHtmlPartialProvider
 
-@(paymentReference: Option[String], total: Currency, amountToPay: Currency, maybeBreakdown: Option[Seq[BreakdownRow]], paymentsUrl: String)(implicit request: Request[_], m:Messages)
+@(paymentReference: Option[String], total: Currency, amountToPay: Currency, maybeBreakdown: Option[Seq[BreakdownRow]], paymentsUrl: String)(implicit request: Request[_], m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
 
 @main(
     title = Messages("confirmation.amendment.header")

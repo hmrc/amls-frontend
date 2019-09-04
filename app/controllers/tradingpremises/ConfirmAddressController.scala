@@ -19,7 +19,7 @@ package controllers.tradingpremises
 import cats.data.OptionT
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businesscustomer.{ReviewDetails, Address => BCAddress}
@@ -35,12 +35,12 @@ import scala.concurrent.Future
 @Singleton
 class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
                                          implicit val dataCacheConnector: DataCacheConnector,
-                                         val authAction: AuthAction,
+                                         val authAction: AuthAction, val ds: CommonPlayDependencies,
                                          enrolments: AuthEnrolmentsService,
                                          implicit val statusService: StatusService,
                                          implicit val amlsConnector: AmlsConnector)
 
-  extends RepeatingSection with DefaultBaseController {
+  extends AmlsBaseController(ds) with RepeatingSection {
 
   def getAddress(businessMatching: BusinessMatching): Option[BCAddress] =
     businessMatching.reviewDetails.fold[Option[BCAddress]](None)(r => Some(r.businessAddress))

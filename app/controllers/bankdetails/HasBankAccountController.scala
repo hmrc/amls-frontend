@@ -17,7 +17,7 @@
 package controllers.bankdetails
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.bankdetails.BankDetails
@@ -27,8 +27,8 @@ import views.html.bankdetails._
 
 import scala.concurrent.Future
 
-class HasBankAccountController @Inject()(val authAction: AuthAction,
-                                         cacheConnector: DataCacheConnector) extends DefaultBaseController {
+class HasBankAccountController @Inject()(val authAction: AuthAction, val ds: CommonPlayDependencies,
+                                         cacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
 
   val router: Boolean => Call = {
     case true => routes.BankAccountNameController.getNoIndex()

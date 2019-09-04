@@ -20,7 +20,7 @@ import audit.AddressConversions._
 import audit.{AddressCreatedEvent, AddressModifiedEvent}
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import models.businessdetails.{BusinessDetails, RegisteredOffice}
 import play.api.mvc.Request
@@ -36,8 +36,8 @@ class RegisteredOfficeUKController @Inject ()(
                                             val dataCacheConnector: DataCacheConnector,
                                             val statusService: StatusService,
                                             val auditConnector: AuditConnector,
-                                            val authAction: AuthAction
-                                            ) extends DefaultBaseController with DateOfChangeHelper {
+                                            val authAction: AuthAction, val ds: CommonPlayDependencies
+                                            ) extends AmlsBaseController(ds) with DateOfChangeHelper {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

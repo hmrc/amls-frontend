@@ -21,8 +21,9 @@
 @import org.joda.time.LocalDateTime
 @import org.joda.time.LocalDate
 @import utils.DateHelper
+@import config.CachedStaticHtmlPartialProvider
 
-@(regNo: String, businessName: Option[String], endDate: Option[LocalDate], name: Option[String], showChangeOfficer: Boolean = true)(implicit request: Request[_],m:Messages)
+@(regNo: String, businessName: Option[String], endDate: Option[LocalDate], name: Option[String], showChangeOfficer: Boolean = true)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
 
 @main2(title = Messages("status.submissiondecisionsupervised.heading") + " - Your registration", showURRBanner = true) {
 

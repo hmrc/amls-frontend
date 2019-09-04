@@ -18,7 +18,7 @@ package controllers.changeofficer
 
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import controllers.changeofficer.Helpers._
 import controllers.changeofficer.routes._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -28,8 +28,8 @@ import utils.AuthAction
 
 import scala.concurrent.Future
 
-class StillEmployedController @Inject()(authAction: AuthAction, implicit val dataCacheConnector: DataCacheConnector)
-                              extends DefaultBaseController {
+class StillEmployedController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies, implicit val dataCacheConnector: DataCacheConnector)
+                              extends AmlsBaseController(ds) {
 
   def get = authAction.async {
      implicit request =>

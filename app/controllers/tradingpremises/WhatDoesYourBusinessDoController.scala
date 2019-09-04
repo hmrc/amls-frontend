@@ -18,7 +18,7 @@ package controllers.tradingpremises
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.businessmatching._
@@ -37,9 +37,9 @@ import scala.concurrent.Future
 
 class WhatDoesYourBusinessDoController @Inject () (
                                                     val dataCacheConnector: DataCacheConnector,
-                                                    val authAction: AuthAction,
+                                                    val authAction: AuthAction, val ds: CommonPlayDependencies,
                                                     val statusService: StatusService
-                                                  ) extends RepeatingSection with DefaultBaseController with FormHelpers with DateOfChangeHelper {
+                                                  ) extends AmlsBaseController(ds) with RepeatingSection with FormHelpers with DateOfChangeHelper {
 
 
 

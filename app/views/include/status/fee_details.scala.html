@@ -18,8 +18,9 @@
 @import models.ResponseType.{SubscriptionResponseType,AmendOrVariationResponseType}
 @import models.confirmation.Currency
 @import config.ApplicationConfig
+@import config.CachedStaticHtmlPartialProvider
 
-@(feeResponse: FeeResponse)(implicit request: Request[_],m:Messages, lang: Lang)
+@(feeResponse: FeeResponse)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang)
 
 <p>@Messages("fee.details.heading")</p>
 

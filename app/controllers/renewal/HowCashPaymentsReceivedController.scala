@@ -18,7 +18,7 @@ package controllers.renewal
 
 import com.google.inject.Singleton
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.renewal.{CashPayments, CashPaymentsCustomerNotMet, HowCashPaymentsReceived}
@@ -31,9 +31,9 @@ import scala.concurrent.Future
 @Singleton
 class HowCashPaymentsReceivedController @Inject()(
                                          val dataCacheConnector: DataCacheConnector,
-                                         val authAction: AuthAction,
+                                         val authAction: AuthAction, val ds: CommonPlayDependencies,
                                          val renewalService: RenewalService
-                                       ) extends DefaultBaseController {
+                                       ) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

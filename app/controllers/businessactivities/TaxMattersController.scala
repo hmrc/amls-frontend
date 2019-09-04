@@ -18,7 +18,7 @@ package controllers.businessactivities
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import models.businessactivities.{BusinessActivities, _}
 
@@ -26,8 +26,8 @@ import utils.{AuthAction, ControllerHelper}
 import views.html.businessactivities._
 
 class TaxMattersController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                      val authAction: AuthAction
-                                     ) extends DefaultBaseController {
+                                      val authAction: AuthAction, val ds: CommonPlayDependencies
+                                     ) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

@@ -20,7 +20,7 @@ import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching._
 import models.flowmanagement.{AddBusinessTypeFlowModel, PsrNumberPageId}
@@ -32,10 +32,10 @@ import scala.concurrent.Future
 
 @Singleton
 class BusinessAppliedForPSRNumberController @Inject()(
-                                                       authAction: AuthAction,
+                                                       authAction: AuthAction, val ds: CommonPlayDependencies,
                                                        implicit val dataCacheConnector: DataCacheConnector,
                                                        val router: Router[AddBusinessTypeFlowModel]
-                                                     ) extends DefaultBaseController {
+                                                     ) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

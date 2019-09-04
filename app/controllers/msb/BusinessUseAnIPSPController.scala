@@ -18,7 +18,7 @@ package controllers.msb
 
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.moneyservicebusiness._
@@ -28,8 +28,8 @@ import views.html.msb.business_use_an_ipsp
 import scala.concurrent.Future
 
 class BusinessUseAnIPSPController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                             authAction: AuthAction
-                                            ) extends DefaultBaseController {
+                                             authAction: AuthAction, val ds: CommonPlayDependencies
+                                            ) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

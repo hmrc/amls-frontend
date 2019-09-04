@@ -14,7 +14,9 @@
  * limitations under the License.
  *@
 
-@(call: Call)(implicit request: Request[_],m:Messages)
+@import config.CachedStaticHtmlPartialProvider
+
+@(call: Call)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
 <p>@Messages("status.submissionready.description")</p>
 <p>@Messages("status.submissionready.description2")</p>
 <p>@Messages("status.submissionready.description3")</p>

@@ -17,7 +17,7 @@
 package controllers.estateagentbusiness
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import javax.inject.Inject
 import models.estateagentbusiness.{EstateAgentBusiness, PenalisedUnderEstateAgentsAct}
@@ -28,7 +28,7 @@ import scala.concurrent.Future
 
 class PenalisedUnderEstateAgentsActController @Inject()(
                                                          val dataCacheConnector: DataCacheConnector,
-                                                         authAction: AuthAction) extends DefaultBaseController {
+                                                         authAction: AuthAction, val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

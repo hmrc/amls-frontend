@@ -18,7 +18,7 @@ package controllers.responsiblepeople
 
 import audit.{AddressCreatedEvent, AddressModifiedEvent}
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople._
 import models.status.SubmissionStatus
@@ -37,8 +37,8 @@ class CurrentAddressController @Inject () (
                                             auditConnector: AuditConnector,
                                             autoCompleteService: AutoCompleteService,
                                             statusService: StatusService,
-                                            authAction: AuthAction
-                                          ) extends RepeatingSection with DefaultBaseController with DateOfChangeHelper {
+                                            authAction: AuthAction, val ds: CommonPlayDependencies
+                                          ) extends AmlsBaseController(ds) with RepeatingSection with DateOfChangeHelper {
 
   final val DefaultAddressHistory = ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), None)
 

@@ -18,7 +18,7 @@ package controllers.businessmatching
 
 import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.{BusinessMatching, ConfirmPostcode}
@@ -28,8 +28,8 @@ import views.html.businessmatching.confirm_postcode
 import scala.concurrent.Future
 
 @Singleton
-class ConfirmPostCodeController @Inject()(authAction: AuthAction,
-                                          val dataCacheConnector: DataCacheConnector)() extends DefaultBaseController {
+class ConfirmPostCodeController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
+                                          val dataCacheConnector: DataCacheConnector)() extends AmlsBaseController(ds) {
 
 
   def get() = authAction.async {

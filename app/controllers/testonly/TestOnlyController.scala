@@ -20,7 +20,7 @@ import org.joda.time.LocalDate
 import config.BusinessCustomerSessionCache
 import connectors.cache.MongoCacheConnector
 import connectors.{AmlsConnector, DataCacheConnector, TestOnlyStubConnector}
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.HighValueDealing
 import models.tradingpremises._
@@ -39,8 +39,8 @@ class TestOnlyController @Inject()(implicit val dataCacheConnector: DataCacheCon
                                    implicit val testOnlyStubConnector: TestOnlyStubConnector,
                                    val stubsService: UpdateMongoCacheService,
                                    val amlsConnector: AmlsConnector,
-                                   val authAction: AuthAction,
-                                   val customerCache: BusinessCustomerSessionCache) extends DefaultBaseController {
+                                   val authAction: AuthAction, val ds: CommonPlayDependencies,
+                                   val customerCache: BusinessCustomerSessionCache) extends AmlsBaseController(ds) {
 
 
   def dropMongoCache = authAction.async {

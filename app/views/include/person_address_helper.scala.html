@@ -15,9 +15,10 @@
  *@
 
 @import include.forms2._
+@import config.CachedStaticHtmlPartialProvider
 @import models.responsiblepeople._
 
-@(model: PersonAddress)(implicit m:Messages)
+@(model: PersonAddress)(implicit m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
 
   @panel(
     jsHidden = false,

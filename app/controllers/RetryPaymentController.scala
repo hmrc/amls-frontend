@@ -27,11 +27,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
-class RetryPaymentController @Inject()(authAction: AuthAction,
+class RetryPaymentController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
                                        private[controllers] implicit val dataCacheConnector: DataCacheConnector,
                                        private[controllers] implicit val amlsConnector: AmlsConnector,
                                        private[controllers] implicit val statusService: StatusService,
-                                       private[controllers] val paymentsService: PaymentsService) extends DefaultBaseController {
+                                       private[controllers] val paymentsService: PaymentsService) extends AmlsBaseController(ds) {
 
   def retryPayment = authAction.async {
       implicit request =>

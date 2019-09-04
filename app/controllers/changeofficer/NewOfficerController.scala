@@ -19,7 +19,7 @@ package controllers.changeofficer
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import controllers.changeofficer.Helpers.getOfficer
 import forms.{Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
@@ -31,8 +31,8 @@ import utils.{AuthAction, RepeatingSection, StatusConstants}
 
 import scala.concurrent.Future
 
-class NewOfficerController @Inject()(authAction: AuthAction,
-                                     val cacheConnector: DataCacheConnector) extends DefaultBaseController with RepeatingSection {
+class NewOfficerController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
+                                     val cacheConnector: DataCacheConnector) extends AmlsBaseController(ds) with RepeatingSection {
 
   override def dataCacheConnector: DataCacheConnector = cacheConnector
 

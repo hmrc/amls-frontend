@@ -17,7 +17,7 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.moneyservicebusiness.{FXTransactionsInNext12Months, MoneyServiceBusiness}
@@ -28,11 +28,11 @@ import views.html.msb.fx_transaction_in_next_12_months
 
 import scala.concurrent.Future
 
-class FXTransactionsInNext12MonthsController @Inject()(authAction: AuthAction,
+class FXTransactionsInNext12MonthsController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
                                                        implicit val dataCacheConnector: DataCacheConnector,
                                                        implicit val statusService: StatusService,
                                                        implicit val serviceFlow: ServiceFlow
-                                                      ) extends DefaultBaseController {
+                                                      ) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

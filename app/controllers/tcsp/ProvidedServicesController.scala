@@ -17,7 +17,7 @@
 package controllers.tcsp
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import javax.inject.Inject
 import models.tcsp.{ProvidedServices, Tcsp}
@@ -27,7 +27,7 @@ import views.html.tcsp.provided_services
 import scala.concurrent.Future
 
 class ProvidedServicesController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                            val authAction: AuthAction) extends DefaultBaseController {
+                                            val authAction: AuthAction, val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

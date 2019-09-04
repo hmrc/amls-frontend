@@ -18,7 +18,7 @@ package controllers.payments
 
 import cats.data.OptionT
 import cats.implicits._
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.FeeResponse
@@ -33,12 +33,12 @@ import scala.concurrent.Future
 
 @Singleton
 class WaysToPayController @Inject()(
-                                     val authAction: AuthAction,
+                                     val authAction: AuthAction, val ds: CommonPlayDependencies,
                                      val statusService: StatusService,
                                      val paymentsService: PaymentsService,
                                      val authEnrolmentsService: AuthEnrolmentsService,
                                      val feeResponseService: FeeResponseService
-                                   ) extends DefaultBaseController {
+                                   ) extends AmlsBaseController(ds) {
 
   def get() = authAction.async {
       implicit request =>

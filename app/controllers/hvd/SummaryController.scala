@@ -19,7 +19,7 @@ package controllers.hvd
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.EmptyForm
 import javax.inject.Inject
 import models.hvd.Hvd
@@ -28,10 +28,10 @@ import services.businessmatching.ServiceFlow
 import utils.AuthAction
 import views.html.hvd.summary
 
-class SummaryController @Inject() (val authAction: AuthAction,
+class SummaryController @Inject() (val authAction: AuthAction, val ds: CommonPlayDependencies,
                                    implicit val dataCache: DataCacheConnector,
                                    implicit val statusService: StatusService,
-                                   implicit val serviceFlow: ServiceFlow) extends DefaultBaseController {
+                                   implicit val serviceFlow: ServiceFlow) extends AmlsBaseController(ds) {
 
   def get = authAction.async {
       implicit request =>

@@ -16,8 +16,9 @@
 
 @import include.forms2._
 @import models.businessdetails._
+@import config.CachedStaticHtmlPartialProvider
 
-@(model: RegisteredOffice)(implicit m:Messages)
+@(model: RegisteredOffice)(implicit m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
 
       <p>@model.toLines.map { line =>
           @line<br />

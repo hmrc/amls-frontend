@@ -20,7 +20,7 @@ import javax.inject.Inject
 import cats.implicits._
 import cats.data.OptionT
 import connectors.{AmlsConnector, DataCacheConnector}
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.{BusinessMatching, HighValueDealing}
 import models.deregister.{DeRegisterSubscriptionRequest, DeregistrationReason}
@@ -31,11 +31,11 @@ import views.html.deregister.deregistration_reason
 
 import scala.concurrent.Future
 
-class DeregistrationReasonController @Inject()(authAction: AuthAction,
+class DeregistrationReasonController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
                                                val dataCacheConnector: DataCacheConnector,
                                                amls: AmlsConnector,
                                                enrolments: AuthEnrolmentsService,
-                                               statusService: StatusService) extends DefaultBaseController {
+                                               statusService: StatusService) extends AmlsBaseController(ds) {
 
   def get = {
     authAction.async {

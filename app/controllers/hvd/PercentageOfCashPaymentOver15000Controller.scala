@@ -17,7 +17,7 @@
 package controllers.hvd
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import javax.inject.Inject
 import models.hvd.{Hvd, PercentageOfCashPaymentOver15000}
@@ -28,10 +28,10 @@ import views.html.hvd.percentage
 
 import scala.concurrent.Future
 
-class PercentageOfCashPaymentOver15000Controller @Inject() (val authAction: AuthAction,
+class PercentageOfCashPaymentOver15000Controller @Inject() (val authAction: AuthAction, val ds: CommonPlayDependencies,
                                                             implicit val dataCacheConnector: DataCacheConnector,
                                                             implicit val serviceFlow: ServiceFlow,
-                                                            implicit val statusService: StatusService) extends DefaultBaseController {
+                                                            implicit val statusService: StatusService) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

@@ -18,7 +18,7 @@ package controllers.businessdetails
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessdetails.{BusinessDetails, CorrespondenceAddress, CorrespondenceAddressIsUk}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -30,8 +30,8 @@ import scala.concurrent.Future
 class CorrespondenceAddressIsUkController @Inject ()(
                                                  val dataConnector: DataCacheConnector,
                                                  val auditConnector: AuditConnector,
-                                                 val authAction: AuthAction
-                                                 ) extends DefaultBaseController {
+                                                 val authAction: AuthAction, val ds: CommonPlayDependencies
+                                                 ) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

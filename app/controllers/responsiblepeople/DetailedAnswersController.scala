@@ -21,7 +21,7 @@ import cats.implicits._
 import com.google.inject.Inject
 import config.AppConfig
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.Partnership
 import models.responsiblepeople.ResponsiblePerson
@@ -37,10 +37,10 @@ import scala.concurrent.Future
 
 class DetailedAnswersController @Inject () (
                                              val dataCacheConnector: DataCacheConnector,
-                                             authAction: AuthAction,
+                                             authAction: AuthAction, val ds: CommonPlayDependencies,
                                              val statusService: StatusService,
                                              val config: AppConfig
-                                           ) extends DefaultBaseController with RepeatingSection {
+                                           ) extends AmlsBaseController(ds) with RepeatingSection {
 
   private def showHideAddressMove(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String, lineId: Option[Int])
                                  (implicit headerCarrier: HeaderCarrier): Future[Boolean] = {

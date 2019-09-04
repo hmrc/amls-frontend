@@ -19,7 +19,7 @@ package controllers.responsiblepeople
 import javax.inject.{Inject, Singleton}
 import config.AppConfig
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, _}
 import models.businessmatching.BusinessMatching
 import models.responsiblepeople.ResponsiblePerson
@@ -32,9 +32,9 @@ import scala.concurrent.Future
 @Singleton
 class FitAndProperController @Inject()(
                                         val dataCacheConnector: DataCacheConnector,
-                                        authAction: AuthAction,
+                                        authAction: AuthAction, val ds: CommonPlayDependencies,
                                         appConfig: AppConfig
-                                      ) extends RepeatingSection with DefaultBaseController {
+                                      ) extends AmlsBaseController(ds) with RepeatingSection {
 
   val FIELDNAME = "hasAlreadyPassedFitAndProper"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(FIELDNAME)

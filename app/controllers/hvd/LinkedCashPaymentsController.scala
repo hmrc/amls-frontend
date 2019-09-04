@@ -17,7 +17,7 @@
 package controllers.hvd
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.hvd.{Hvd, LinkedCashPayments}
@@ -27,7 +27,7 @@ import views.html.hvd.linked_cash_payments
 import scala.concurrent.Future
 
 class LinkedCashPaymentsController @Inject() ( val dataCacheConnector: DataCacheConnector,
-                                               val authAction: AuthAction) extends DefaultBaseController {
+                                               val authAction: AuthAction, val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) =
     authAction.async {

@@ -19,7 +19,7 @@ package controllers.estateagentbusiness
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.EmptyForm
 import javax.inject.Inject
 import models.estateagentbusiness.EstateAgentBusiness
@@ -31,10 +31,10 @@ import views.html.estateagentbusiness._
 class SummaryController @Inject()
 (
   val dataCache: DataCacheConnector,
-  authAction: AuthAction,
+  authAction: AuthAction, val ds: CommonPlayDependencies,
   implicit val statusService: StatusService,
   implicit val serviceFlow: ServiceFlow
-) extends DefaultBaseController {
+) extends AmlsBaseController(ds) {
 
   def get() = authAction.async {
     implicit request =>

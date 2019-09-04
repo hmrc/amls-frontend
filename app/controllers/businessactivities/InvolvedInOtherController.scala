@@ -18,7 +18,7 @@ package controllers.businessactivities
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import models.businessactivities.{BusinessActivities, _}
 import models.businessmatching._
@@ -31,8 +31,8 @@ import scala.concurrent.Future
 
 class InvolvedInOtherController @Inject() ( val dataCacheConnector: DataCacheConnector,
                                             implicit val statusService: StatusService,
-                                            val authAction: AuthAction
-                                          )extends DefaultBaseController {
+                                            val authAction: AuthAction, val ds: CommonPlayDependencies
+                                          )extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

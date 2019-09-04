@@ -18,15 +18,15 @@ package controllers.responsiblepeople
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.responsiblepeople.ResponsiblePerson
 import utils.{AuthAction, RepeatingSection}
 import views.html.responsiblepeople.your_responsible_people
 
 class YourResponsiblePeopleController @Inject () (
                                                  val dataCacheConnector: DataCacheConnector,
-                                                 authAction: AuthAction
-                                                 ) extends RepeatingSection with DefaultBaseController {
+                                                 authAction: AuthAction, val ds: CommonPlayDependencies
+                                                 ) extends AmlsBaseController(ds) with RepeatingSection {
 
   def get() =
       authAction.async {

@@ -19,7 +19,7 @@ package controllers.tradingpremises
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
@@ -35,8 +35,8 @@ import scala.concurrent.Future
 @Singleton
 class YourTradingPremisesController @Inject()(val dataCacheConnector: DataCacheConnector,
                                               val statusService: StatusService,
-                                              val authAction: AuthAction
-                                             ) extends RepeatingSection with DefaultBaseController {
+                                              val authAction: AuthAction, val ds: CommonPlayDependencies
+                                             ) extends AmlsBaseController(ds) with RepeatingSection {
 
   private def updateTradingPremises(tradingPremises: Option[Seq[TradingPremises]]) : Future[Option[Seq[TradingPremises]]] = {
     tradingPremises match {

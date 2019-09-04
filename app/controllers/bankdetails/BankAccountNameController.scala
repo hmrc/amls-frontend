@@ -17,6 +17,7 @@
 package controllers.bankdetails
 
 import connectors.DataCacheConnector
+import controllers.CommonPlayDependencies
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import jto.validation.forms.Rules._
@@ -33,10 +34,10 @@ import scala.concurrent.Future
 
 @Singleton
 class BankAccountNameController @Inject()(
-                                           val authAction: AuthAction,
+                                           val authAction: AuthAction, val ds: CommonPlayDependencies,
                                            val dataCacheConnector: DataCacheConnector,
                                            val statusService: StatusService
-                                         ) extends BankDetailsController {
+                                         ) extends BankDetailsController(ds) {
 
   implicit def write: Write[String, UrlFormEncoded] = Write { data =>
     Map("accountName" -> Seq(data))

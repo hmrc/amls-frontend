@@ -19,7 +19,7 @@ package controllers.supervision
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.EmptyForm
 import javax.inject.Inject
 import models.supervision.Supervision
@@ -28,7 +28,7 @@ import utils.ControllerHelper
 import views.html.supervision.summary
 
 class SummaryController  @Inject() (val dataCacheConnector: DataCacheConnector,
-                                    val authAction: AuthAction) extends DefaultBaseController {
+                                    val authAction: AuthAction, val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
 
   def get() = authAction.async {
     implicit request =>

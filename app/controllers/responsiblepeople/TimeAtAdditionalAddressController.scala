@@ -18,7 +18,7 @@ package controllers.responsiblepeople
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ThreeYearsPlus}
 import models.responsiblepeople._
@@ -30,8 +30,8 @@ import scala.concurrent.Future
 
 class TimeAtAdditionalAddressController @Inject () (
                                                    val dataCacheConnector: DataCacheConnector,
-                                                   authAction: AuthAction
-                                                   ) extends RepeatingSection with DefaultBaseController {
+                                                   authAction: AuthAction, val ds: CommonPlayDependencies
+                                                   ) extends AmlsBaseController(ds) with RepeatingSection {
 
   final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None)
 

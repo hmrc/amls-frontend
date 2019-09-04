@@ -18,7 +18,7 @@ package controllers.responsiblepeople
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import models.businessmatching.BusinessMatching
 import models.responsiblepeople.{ExperienceTraining, ResponsiblePerson}
@@ -31,8 +31,8 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 class ExperienceTrainingController @Inject () (
                                               val dataCacheConnector: DataCacheConnector,
-                                              authAction: AuthAction
-                                              ) extends RepeatingSection with DefaultBaseController {
+                                              authAction: AuthAction, val ds: CommonPlayDependencies
+                                              ) extends AmlsBaseController(ds) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>

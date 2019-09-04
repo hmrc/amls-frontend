@@ -17,15 +17,15 @@
 package controllers.responsiblepeople
 
 import com.google.inject.Inject
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import utils.AuthAction
 import views.html.responsiblepeople._
 
 import scala.concurrent.Future
 
 class WhatYouNeedController @Inject () (
-                                       authAction: AuthAction
-                                       ) extends DefaultBaseController {
+                                       authAction: AuthAction, val ds: CommonPlayDependencies
+                                       ) extends AmlsBaseController(ds) {
 
   def get(index: Int, flow: Option[String] = None) =
     authAction.async {

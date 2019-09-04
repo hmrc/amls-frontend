@@ -19,7 +19,7 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
@@ -36,13 +36,13 @@ import scala.concurrent.Future
 
 @Singleton
 class TradingPremisesController @Inject()(
-                                           authAction: AuthAction,
+                                           authAction: AuthAction, val ds: CommonPlayDependencies,
                                            implicit val dataCacheConnector: DataCacheConnector,
                                            val statusService: StatusService,
                                            val businessMatchingService: BusinessMatchingService,
                                            val helper: AddBusinessTypeHelper,
                                            val router: Router[AddBusinessTypeFlowModel]
-                                         ) extends DefaultBaseController {
+                                         ) extends AmlsBaseController(ds) {
 
   val fieldName = "tradingPremisesNewActivities"
   implicit val boolWrite = BooleanFormReadWrite.formWrites(fieldName)

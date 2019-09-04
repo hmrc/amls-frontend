@@ -19,8 +19,9 @@
 @import models.confirmation._
 @import include.forms2._
 @import forms.EmptyForm
+@import config.CachedStaticHtmlPartialProvider
 
-@(reasonMsg: String, amount: Currency, reference: String)(implicit request: Request[_], messages: Messages)
+@(reasonMsg: String, amount: Currency, reference: String)(implicit request: Request[_], messages: Messages,partialProvider: CachedStaticHtmlPartialProvider)
 
 @main(title = messages("confirmation.payment.failed.title")) {
 

@@ -17,7 +17,7 @@
 package controllers.asp
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.asp.{Asp, ServicesOfBusiness}
@@ -31,9 +31,9 @@ import scala.concurrent.Future
 
 class ServicesOfBusinessController @Inject()(val dataCacheConnector: DataCacheConnector,
                                              val statusService: StatusService,
-                                             authAction: AuthAction,
+                                             authAction: AuthAction, val ds: CommonPlayDependencies,
                                              val serviceFlow: ServiceFlow
-                                            ) extends DefaultBaseController with DateOfChangeHelper {
+                                            ) extends AmlsBaseController(ds) with DateOfChangeHelper {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

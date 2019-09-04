@@ -17,15 +17,15 @@
 package controllers.businessdetails
 
 import com.google.inject.Inject
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import utils.AuthAction
 import views.html.businessdetails._
 
 import scala.concurrent.Future
 
 class WhatYouNeedController @Inject () (
-                                       val authAction: AuthAction
-                                       ) extends DefaultBaseController {
+                                       val authAction: AuthAction, val ds: CommonPlayDependencies
+                                       ) extends AmlsBaseController(ds) {
 
   def get = authAction.async {
     implicit request =>

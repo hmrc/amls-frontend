@@ -18,7 +18,7 @@ package controllers.responsiblepeople
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.responsiblepeople._
@@ -29,8 +29,8 @@ import scala.concurrent.Future
 
 class PositionWithinBusinessController @Inject () (
                                                   val dataCacheConnector: DataCacheConnector,
-                                                  authAction: AuthAction
-                                                  )extends RepeatingSection with DefaultBaseController {
+                                                  authAction: AuthAction, val ds: CommonPlayDependencies
+                                                  )extends AmlsBaseController(ds) with RepeatingSection {
 
 
 

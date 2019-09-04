@@ -18,7 +18,7 @@ package controllers.tradingpremises
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, _}
 import models.businessmatching.BusinessMatching
 import models.status.SubmissionStatus
@@ -31,9 +31,9 @@ import scala.concurrent.Future
 
 class MSBServicesController @Inject () (
                                        val dataCacheConnector: DataCacheConnector,
-                                       val authAction: AuthAction,
+                                       val authAction: AuthAction, val ds: CommonPlayDependencies,
                                        val statusService: StatusService
-                                       ) extends RepeatingSection with DefaultBaseController with DateOfChangeHelper with FormHelpers {
+                                       ) extends AmlsBaseController(ds) with RepeatingSection with DateOfChangeHelper with FormHelpers {
 
   def get(index: Int, edit: Boolean = false, changed: Boolean = false) = authAction.async {
     implicit request =>

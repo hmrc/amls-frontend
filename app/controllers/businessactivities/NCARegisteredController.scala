@@ -18,7 +18,7 @@ package controllers.businessactivities
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, NCARegistered}
 
@@ -28,8 +28,8 @@ import views.html.businessactivities._
 import scala.concurrent.Future
 
 class NCARegisteredController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                         val authAction: AuthAction
-                                        ) extends DefaultBaseController {
+                                         val authAction: AuthAction, val ds: CommonPlayDependencies
+                                        ) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request => {

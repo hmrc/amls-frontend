@@ -14,7 +14,9 @@
  * limitations under the License.
  *@
 
-@(endDate: String)(implicit request: Request[_],m:Messages)
+@import config.CachedStaticHtmlPartialProvider
+
+@(endDate: String)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
 <h2 class="heading-medium no-margin">@Messages("status.renewalincomplete.description")</h2>
 <p>@Messages("status.renewalincomplete.description2")</p>
 <p>@Messages("status.renewalincomplete.description3", endDate)</p>

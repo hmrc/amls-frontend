@@ -35,7 +35,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
-class ConfirmationController @Inject()(authAction: AuthAction,
+class ConfirmationController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
                                        private[controllers] val keystoreConnector: KeystoreConnector,
                                        private[controllers] implicit val dataCacheConnector: DataCacheConnector,
                                        private[controllers] implicit val amlsConnector: AmlsConnector,
@@ -43,7 +43,7 @@ class ConfirmationController @Inject()(authAction: AuthAction,
                                        private[controllers] val authenticator: AuthenticatorConnector,
                                        private[controllers] val feeResponseService: FeeResponseService,
                                        private[controllers] val enrolmentService: AuthEnrolmentsService,
-                                       private[controllers] val confirmationService: ConfirmationService) extends DefaultBaseController {
+                                       private[controllers] val confirmationService: ConfirmationService) extends AmlsBaseController(ds) {
 
   val prefix = "[ConfirmationController]"
 

@@ -16,7 +16,7 @@
 
 package controllers.renewal
 
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
 import models.registrationprogress.{NotStarted, Section, Started}
 import services.RenewalService
@@ -24,7 +24,7 @@ import utils.AuthAction
 import views.html.renewal._
 
 @Singleton
-class WhatYouNeedController @Inject()(val authAction: AuthAction, renewalService: RenewalService) extends DefaultBaseController {
+class WhatYouNeedController @Inject()(val authAction: AuthAction, val ds: CommonPlayDependencies, renewalService: RenewalService) extends AmlsBaseController(ds) {
 
   def get = authAction.async {
     implicit request =>

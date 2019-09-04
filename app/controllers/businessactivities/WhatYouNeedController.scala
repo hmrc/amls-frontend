@@ -16,14 +16,14 @@
 
 package controllers.businessactivities
 
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import services.StatusService
 import uk.gov.hmrc.auth.core.AuthConnector
 import utils.AuthAction
 import views.html.businessactivities._
 
-class WhatYouNeedController @Inject()(val authConnector: AuthConnector, statusService: StatusService, authAction: AuthAction) extends DefaultBaseController {
+class WhatYouNeedController @Inject()(val authConnector: AuthConnector, statusService: StatusService, authAction: AuthAction, val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
 import scala.concurrent.Future
 
   def get = authAction.async {

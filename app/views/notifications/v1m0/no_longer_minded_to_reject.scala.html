@@ -16,8 +16,9 @@
 
 @import include._
 @import models.notifications.NotificationParams
+@import config.CachedStaticHtmlPartialProvider
 
-@(notificationParams: NotificationParams)(implicit request: Request[_],m:Messages)
+@(notificationParams: NotificationParams)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
 
 @header = {
     @components.back_link()

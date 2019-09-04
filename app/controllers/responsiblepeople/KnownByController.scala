@@ -18,7 +18,7 @@ package controllers.responsiblepeople
 
 import config.AppConfig
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.responsiblepeople.{KnownBy, ResponsiblePerson}
@@ -29,8 +29,8 @@ import scala.concurrent.Future
 
 @Singleton
 class KnownByController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                  authAction: AuthAction,
-                                  val appConfig: AppConfig) extends RepeatingSection with DefaultBaseController {
+                                  authAction: AuthAction, val ds: CommonPlayDependencies,
+                                  val appConfig: AppConfig) extends AmlsBaseController(ds) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>

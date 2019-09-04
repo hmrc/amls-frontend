@@ -19,7 +19,7 @@ package controllers.businessdetails
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.businessdetails.{BusinessDetails, LettersAddress, RegisteredOffice}
 import play.api.mvc.Result
 import utils.AuthAction
@@ -30,8 +30,8 @@ import scala.concurrent.Future
 
 class LettersAddressController @Inject () (
                                           val dataCache: DataCacheConnector,
-                                          val authAction: AuthAction
-                                          ) extends DefaultBaseController {
+                                          val authAction: AuthAction, val ds: CommonPlayDependencies
+                                          ) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

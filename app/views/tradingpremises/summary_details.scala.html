@@ -16,12 +16,13 @@
 
 @import include._
 @import forms2._
+@import config.CachedStaticHtmlPartialProvider
 @import forms.EmptyForm
 @import models.tradingpremises._
 @import models.businessmatching.MoneyServiceBusiness
 @import utils._
 
-@(model: TradingPremises, isMsb: Boolean, index: Int, hasOneService: Boolean, hasOneMsbService: Boolean = None)(implicit request: Request[_], m: Messages, lang: Lang)
+@(model: TradingPremises, isMsb: Boolean, index: Int, hasOneService: Boolean, hasOneMsbService: Boolean = None)(implicit request: Request[_], m: Messages, lang: Lang,partialProvider: CachedStaticHtmlPartialProvider)
 
 @header = {
     @heading("summary.checkyouranswers.title", "summary.tradingpremises")

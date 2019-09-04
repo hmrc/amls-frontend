@@ -16,7 +16,8 @@
 
 @import include._
 @import forms2._
-@()(implicit request: Request[_],m:Messages)
+@import config.CachedStaticHtmlPartialProvider
+@()(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
 
 
 @main(

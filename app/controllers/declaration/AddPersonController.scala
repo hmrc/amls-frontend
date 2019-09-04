@@ -18,7 +18,7 @@ package controllers.declaration
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.businessmatching.{BusinessMatching, BusinessType}
@@ -33,8 +33,8 @@ import scala.concurrent.Future
 
 class AddPersonController @Inject () (val dataCacheConnector: DataCacheConnector,
                                        val statusService: StatusService,
-                                       authAction: AuthAction
-                                     ) extends DefaultBaseController {
+                                       authAction: AuthAction, val ds: CommonPlayDependencies
+                                     ) extends AmlsBaseController(ds) {
 
 
   def get() = authAction.async {

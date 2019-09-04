@@ -19,7 +19,7 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BillPaymentServices, TelephonePaymentService}
@@ -31,10 +31,10 @@ import views.html.businessmatching.updateservice.add.new_service_information
 import scala.concurrent.Future
 
 @Singleton
-class NeedMoreInformationController @Inject()(authAction: AuthAction,
+class NeedMoreInformationController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
                                               implicit val dataCacheConnector: DataCacheConnector,
                                               val router: Router[AddBusinessTypeFlowModel]
-                                             ) extends DefaultBaseController {
+                                             ) extends AmlsBaseController(ds) {
 
   def get() = authAction.async {
       implicit request =>

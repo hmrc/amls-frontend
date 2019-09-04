@@ -17,7 +17,7 @@
 package controllers.businessmatching
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching.{BusinessMatching, TypeOfBusiness}
@@ -27,7 +27,7 @@ import views.html.businessmatching.type_of_business
 import scala.concurrent.Future
 
 class TypeOfBusinessController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                         authAction: AuthAction) extends DefaultBaseController {
+                                         authAction: AuthAction, val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

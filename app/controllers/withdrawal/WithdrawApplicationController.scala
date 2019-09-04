@@ -19,7 +19,7 @@ package controllers.withdrawal
 import cats.data.OptionT
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import models.businessmatching.BusinessMatching
 import services.{AuthEnrolmentsService, StatusService}
@@ -29,11 +29,11 @@ import views.html.withdrawal.withdraw_application
 import scala.concurrent.Future
 
 class WithdrawApplicationController @Inject()(
-                                               authAction: AuthAction,
+                                               authAction: AuthAction, val ds: CommonPlayDependencies,
                                                implicit val amls: AmlsConnector,
                                                implicit val dc: DataCacheConnector,
                                                enrolments: AuthEnrolmentsService,
-                                               implicit val statusService: StatusService) extends DefaultBaseController {
+                                               implicit val statusService: StatusService) extends AmlsBaseController(ds) {
 
   def get = authAction.async {
       implicit request =>

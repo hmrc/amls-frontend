@@ -17,7 +17,7 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.updateservice.ServiceChangeRegister
@@ -31,12 +31,12 @@ import utils.AuthAction
 import scala.concurrent.Future
 
 @Singleton
-class MostTransactionsController @Inject()(authAction: AuthAction,
+class MostTransactionsController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
                                            implicit val cacheConnector: DataCacheConnector,
                                            implicit val statusService: StatusService,
                                            implicit val serviceFlow: ServiceFlow,
                                            val autoCompleteService: AutoCompleteService
-                                          ) extends DefaultBaseController {
+                                          ) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

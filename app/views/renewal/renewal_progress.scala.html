@@ -24,6 +24,7 @@
 @import views.html.helper.CSRF
 @import org.joda.time.LocalDate
 @import utils.DateHelper
+@import config.CachedStaticHtmlPartialProvider
 
 @(
     sections: Seq[Section],
@@ -33,7 +34,7 @@
     msbOrTcspExists: Boolean,
     renewal: Renewal,
     renewalSectionCompleted: Boolean = false
-)(implicit messages: Messages, request: Request[_])
+)(implicit messages: Messages, request: Request[_],partialProvider: CachedStaticHtmlPartialProvider)
 
 @header = {
     @heading("renewal.progress.title")

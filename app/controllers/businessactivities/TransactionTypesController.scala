@@ -20,7 +20,7 @@ import javax.inject.Inject
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, TransactionTypes}
 
@@ -29,8 +29,8 @@ import views.html.businessactivities.transaction_types
 
 import scala.concurrent.Future
 
-class TransactionTypesController @Inject()(val authAction: AuthAction,
-                                           val cacheConnector: DataCacheConnector) extends DefaultBaseController {
+class TransactionTypesController @Inject()(val authAction: AuthAction, val ds: CommonPlayDependencies,
+                                           val cacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request => {

@@ -17,7 +17,7 @@
 package controllers.hvd
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import jto.validation.{Path, ValidationError}
@@ -30,10 +30,10 @@ import views.html.hvd.expect_to_receive
 import scala.concurrent.Future
 
 @Singleton
-class ExpectToReceiveCashPaymentsController @Inject()( val authAction: AuthAction,
+class ExpectToReceiveCashPaymentsController @Inject()( val authAction: AuthAction, val ds: CommonPlayDependencies,
                                                        implicit val cacheConnector: DataCacheConnector,
                                                        implicit val statusService: StatusService,
-                                                       implicit val serviceFlow: ServiceFlow) extends DefaultBaseController {
+                                                       implicit val serviceFlow: ServiceFlow) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

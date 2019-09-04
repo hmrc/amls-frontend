@@ -16,12 +16,13 @@
 
 @import include._
 @import forms2._
+@import config.CachedStaticHtmlPartialProvider
 @import models.tcsp._
 @import forms.EmptyForm
 @import config.ApplicationConfig
 @import scala.math.Ordering
 
-@(model: Tcsp, sortedProviders: List[String])(implicit request: Request[_],m:Messages, lang: Lang)
+@(model: Tcsp, sortedProviders: List[String])(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.tcsp")

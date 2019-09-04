@@ -19,7 +19,7 @@ package controllers.businessmatching
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching.{BusinessMatching, CompanyRegistrationNumber}
@@ -30,10 +30,10 @@ import utils.AuthAction
 
 import scala.concurrent.Future
 
-class CompanyRegistrationNumberController@Inject()(authAction: AuthAction,
+class CompanyRegistrationNumberController@Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
                                                    val dataCacheConnector: DataCacheConnector,
                                                    val statusService: StatusService,
-                                                   val businessMatchingService:BusinessMatchingService) extends DefaultBaseController {
+                                                   val businessMatchingService:BusinessMatchingService) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

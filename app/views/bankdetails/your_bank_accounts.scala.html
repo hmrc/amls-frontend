@@ -16,12 +16,13 @@
 
 @import include._
 @import forms2._
+@import config.CachedStaticHtmlPartialProvider
 @import models.bankdetails._
 @import utils.StatusConstants
 @import models.status._
 @import config.ApplicationConfig
 
-@(f: forms.Form2[_], inCompleteModel: Seq[(BankDetails, Int)], completedModel: Seq[(BankDetails, Int)])(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: forms.Form2[_], inCompleteModel: Seq[(BankDetails, Int)], completedModel: Seq[(BankDetails, Int)])(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang)
 
 @header = {
     @heading("bankdetails.yourbankaccounts.title", "summary.bankdetails")

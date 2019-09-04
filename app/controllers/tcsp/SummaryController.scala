@@ -19,7 +19,7 @@ package controllers.tcsp
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import models.tcsp._
 import play.api.i18n.Messages
@@ -32,9 +32,9 @@ import utils.AuthAction
 
 class SummaryController @Inject()(
                                   val dataCache: DataCacheConnector,
-                                  val authAction: AuthAction,
+                                  val authAction: AuthAction, val ds: CommonPlayDependencies,
                                   val serviceFlow: ServiceFlow,
-                                  val statusService: StatusService) extends DefaultBaseController {
+                                  val statusService: StatusService) extends AmlsBaseController(ds) {
 
   def sortProviders(data: Tcsp): List[String] = {
 

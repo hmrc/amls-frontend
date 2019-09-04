@@ -17,9 +17,10 @@
 @import include._
 @import forms._
 @import forms2._
-
+@import config.CachedStaticHtmlPartialProvider
 @import models.renewal.TotalThroughput
-@(f: Form2[_], edit: Boolean)(implicit request: Request[_], messages: Messages)
+
+@(f: Form2[_], edit: Boolean)(implicit request: Request[_], messages: Messages,partialProvider: CachedStaticHtmlPartialProvider)
 
 @header = {
     @components.back_link()

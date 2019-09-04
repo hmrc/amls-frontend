@@ -17,8 +17,9 @@
 @import include._
 @import models.responsiblepeople._
 @import forms2._
+@import config.CachedStaticHtmlPartialProvider
 
-@(f: forms.Form2[_], model : Seq[ResponsiblePerson])(implicit lang:Lang,  m: Messages, request: Request[_])
+@(f: forms.Form2[_], model : Seq[ResponsiblePerson])(implicit lang:Lang,  m: Messages, request: Request[_],partialProvider: CachedStaticHtmlPartialProvider)
 
 @header = {
     @components.back_link()
@@ -41,7 +42,7 @@
             f,
             model,
             "summary.submit.renewal",
-            supportingContent)(m, request)
+            supportingContent)(m, request, partialProvider)
 
         @submit(buttonId=Some("confirm-continue"))
     }

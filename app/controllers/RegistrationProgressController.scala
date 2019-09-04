@@ -37,14 +37,14 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
-class RegistrationProgressController @Inject()(protected[controllers] val authAction: AuthAction,
+class RegistrationProgressController @Inject()(protected[controllers] val authAction: AuthAction, val ds: CommonPlayDependencies,
                                                protected[controllers] val dataCache: DataCacheConnector,
                                                protected[controllers] val enrolmentsService: AuthEnrolmentsService,
                                                protected[controllers] val statusService: StatusService,
                                                protected[controllers] val progressService: ProgressService,
                                                protected[controllers] val sectionsProvider: SectionsProvider,
                                                protected[controllers] val businessMatchingService: BusinessMatchingService,
-                                               protected[controllers] val serviceFlow: ServiceFlow) extends DefaultBaseController {
+                                               protected[controllers] val serviceFlow: ServiceFlow) extends AmlsBaseController(ds) {
 
   def get() = authAction.async {
       implicit request =>

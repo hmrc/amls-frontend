@@ -36,8 +36,8 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "json-encryption" % jsonEncryptionVersion,
     "uk.gov.hmrc" %% "play-reactivemongo" % playReactivemongoVersion,
     "uk.gov.hmrc" %% "auth-client" % authVersion,
-    "uk.gov.hmrc" %% "play-ui" % "7.40.0-play-25",
-    "uk.gov.hmrc" %% "bootstrap-play-25" % "4.13.0",
+    "uk.gov.hmrc" %% "play-ui" % "8.0.0-play-25",
+    "uk.gov.hmrc" %% "bootstrap-play-25" % "4.16.0",
     "uk.gov.hmrc" %% "govuk-template" % "5.38.0-play-25",
 
     "io.github.jto" %% "validation-core"      % validationVersion excludeAll playJars,

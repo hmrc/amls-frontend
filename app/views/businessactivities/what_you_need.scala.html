@@ -16,7 +16,8 @@
 
 @import include._
 @import forms2._
-@(nextPageUrl: String)(implicit request: Request[_],m:Messages)
+@import config.CachedStaticHtmlPartialProvider
+@(nextPageUrl: String)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
 
 @header = {
     @components.back_link()

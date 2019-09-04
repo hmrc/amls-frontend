@@ -18,7 +18,7 @@ package controllers.declaration
 
 import config.AppConfig
 import connectors.{AmlsConnector, DataCacheConnector}
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.declaration.BusinessNominatedOfficer
@@ -37,9 +37,9 @@ import scala.concurrent.Future
 class WhoIsTheBusinessNominatedOfficerController @Inject ()(
                                                              val amlsConnector: AmlsConnector,
                                                              val dataCacheConnector: DataCacheConnector,
-                                                             authAction: AuthAction,
+                                                             authAction: AuthAction, val ds: CommonPlayDependencies,
                                                              val statusService: StatusService,
-                                                             config: AppConfig) extends DefaultBaseController {
+                                                             config: AppConfig) extends AmlsBaseController(ds) {
 
   def businessNominatedOfficerView(amlsRegistrationNo: Option[String],
                                    accountTypeId: (String, String),

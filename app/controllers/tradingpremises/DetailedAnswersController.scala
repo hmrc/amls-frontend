@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Singleton
 import models.businessmatching.BusinessMatching
 import models.tradingpremises.TradingPremises
@@ -30,8 +30,8 @@ import views.html.tradingpremises.summary_details
 import scala.concurrent.Future
 
 @Singleton
-class DetailedAnswersController @Inject()(val authAction: AuthAction,
-                                          val dataCacheConnector: DataCacheConnector) extends DefaultBaseController with RepeatingSection {
+class DetailedAnswersController @Inject()(val authAction: AuthAction, val ds: CommonPlayDependencies,
+                                          val dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) with RepeatingSection {
 
   def get(index: Int) = authAction.async {
     implicit request =>

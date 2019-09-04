@@ -16,7 +16,7 @@
 
 package controllers.supervision
 
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import utils.AuthAction
 import views.html.supervision.what_you_need
@@ -24,7 +24,7 @@ import views.html.supervision.what_you_need
 import scala.concurrent.Future
 
 
-class WhatYouNeedController @Inject() (val authAction: AuthAction) extends DefaultBaseController {
+class WhatYouNeedController @Inject() (val authAction: AuthAction, val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
   def get() =
     authAction.async {
       implicit request =>

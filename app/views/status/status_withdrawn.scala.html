@@ -19,8 +19,9 @@
 @import config.ApplicationConfig
 @import org.joda.time.LocalDate
 @import utils.DateHelper
+@import config.CachedStaticHtmlPartialProvider
 
-@(businessName: Option[String])(implicit request: Request[_],m:Messages)
+@(businessName: Option[String])(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
 
 @main2(title = s"${Messages("status.submissiondecisionwithdrawn.title")} - Your registration", showURRBanner = true) {
 

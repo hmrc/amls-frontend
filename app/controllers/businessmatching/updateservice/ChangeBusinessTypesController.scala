@@ -19,7 +19,7 @@ package controllers.businessmatching.updateservice
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching._
@@ -34,12 +34,12 @@ import views.html.businessmatching.updateservice._
 import scala.collection.immutable.SortedSet
 import scala.concurrent.Future
 
-class ChangeBusinessTypesController @Inject()(authAction: AuthAction,
+class ChangeBusinessTypesController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
                                               implicit val dataCacheConnector: DataCacheConnector,
                                               val businessMatchingService: BusinessMatchingService,
                                               val router: Router[ChangeBusinessType],
                                               val helper: RemoveBusinessTypeHelper
-                                            ) extends DefaultBaseController with RepeatingSection {
+                                            ) extends AmlsBaseController(ds) with RepeatingSection {
 
   def get() = authAction.async {
       implicit request =>

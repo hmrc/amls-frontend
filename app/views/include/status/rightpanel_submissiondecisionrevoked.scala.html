@@ -15,9 +15,10 @@
  *@
 
 @import include.forms2._
+@import config.CachedStaticHtmlPartialProvider
 @import forms.EmptyForm
 
-@(showReregisterButton: Boolean = true)(implicit request: Request[_],m:Messages)
+@(showReregisterButton: Boolean = true)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
 <p>@Messages("status.submissiondecisionrevoked.description")</p>
 <p id="revoked.p2">@Messages("status.submissiondecisionrevoked.description2")</p>
 

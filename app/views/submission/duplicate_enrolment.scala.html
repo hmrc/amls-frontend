@@ -16,13 +16,11 @@
 
 @import include._
 @import utils.Strings._
-@import config.{ApplicationConfig => appConfig}
+@import config.{ApplicationConfig => appConfig, CachedStaticHtmlPartialProvider}
 
-@()(implicit request: Request[_], m: Messages)
+@()(implicit request: Request[_], m: Messages,partialProvider: CachedStaticHtmlPartialProvider)
 
-@getHelpForm = {
-    @config.CachedStaticHtmlPartialProvider.getPartialContent(appConfig.reportAProblemUrl)
-}
+@getHelpForm = @{partialProvider.getPartialContent(appConfig.reportAProblemUrl)}
 
 @header = {
     @heading("error.submission.problem.title")

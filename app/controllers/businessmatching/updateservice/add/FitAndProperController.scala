@@ -19,7 +19,7 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement.{AddBusinessTypeFlowModel, FitAndProperPageId}
@@ -33,10 +33,10 @@ import scala.concurrent.Future
 
 @Singleton
 class FitAndProperController @Inject()(
-                                        authAction: AuthAction,
+                                        authAction: AuthAction, val ds: CommonPlayDependencies,
                                         implicit val dataCacheConnector: DataCacheConnector,
                                         val router: Router[AddBusinessTypeFlowModel]
-                                      ) extends DefaultBaseController with RepeatingSection {
+                                      ) extends AmlsBaseController(ds) with RepeatingSection {
 
   val NAME = "passedFitAndProper"
 

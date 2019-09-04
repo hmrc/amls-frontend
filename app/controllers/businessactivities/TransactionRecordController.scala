@@ -17,7 +17,7 @@
 package controllers.businessactivities
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.BusinessActivities
 
@@ -28,8 +28,8 @@ import utils.BooleanFormReadWrite._
 
 import scala.concurrent.Future
 
-class TransactionRecordController @Inject()(val authAction: AuthAction,
-                                            val dataCacheConnector: DataCacheConnector) extends DefaultBaseController {
+class TransactionRecordController @Inject()(val authAction: AuthAction, val ds: CommonPlayDependencies,
+                                            val dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
 
   val fieldName = "isRecorded"
   implicit val reader = formRule(fieldName, "error.required.ba.select.transaction.record")

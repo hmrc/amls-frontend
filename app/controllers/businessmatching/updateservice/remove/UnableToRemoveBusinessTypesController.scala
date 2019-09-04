@@ -19,7 +19,7 @@ package controllers.businessmatching.updateservice.remove
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessActivity, BusinessMatching}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -29,9 +29,9 @@ import views.html.businessmatching.updateservice.remove.unable_to_remove_activit
 import scala.concurrent.Future
 
 @Singleton
-class UnableToRemoveBusinessTypesController @Inject()(authAction: AuthAction,
+class UnableToRemoveBusinessTypesController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
                                                       val dataCacheConnector: DataCacheConnector
-                                                     ) extends DefaultBaseController {
+                                                     ) extends AmlsBaseController(ds) {
 
   def get = authAction.async {
       implicit request =>

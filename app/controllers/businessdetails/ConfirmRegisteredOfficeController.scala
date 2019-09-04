@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businesscustomer.Address
 import models.businessdetails.{BusinessDetails, ConfirmRegisteredOffice, RegisteredOffice, RegisteredOfficeUK}
@@ -33,8 +33,8 @@ import scala.concurrent.Future
 
 class ConfirmRegisteredOfficeController @Inject () (
                                                    val dataCache: DataCacheConnector,
-                                                   val authAction: AuthAction
-                                                   ) extends DefaultBaseController {
+                                                   val authAction: AuthAction, val ds: CommonPlayDependencies
+                                                   ) extends AmlsBaseController(ds) {
 
 
   def updateBMAddress(bm: BusinessMatching): Option[RegisteredOffice] = {

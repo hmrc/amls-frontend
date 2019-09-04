@@ -17,7 +17,7 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import javax.inject.Inject
 import models.moneyservicebusiness.{FundsTransfer, MoneyServiceBusiness}
@@ -27,8 +27,8 @@ import views.html.msb._
 import scala.concurrent.Future
 
 class FundsTransferController @Inject() ( val dataCacheConnector: DataCacheConnector,
-                                          authAction: AuthAction
-                                        ) extends DefaultBaseController {
+                                          authAction: AuthAction, val ds: CommonPlayDependencies
+                                        ) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

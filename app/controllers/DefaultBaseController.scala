@@ -22,7 +22,7 @@ import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import utils.ControllerHelper
 
 trait DefaultBaseController extends FrontendController with I18nSupport {
-  def notFoundView(implicit request: Request[_]) = ControllerHelper.notFoundView(request)
+  //def notFoundView(implicit request: Request[_]) = ControllerHelper.notFoundView(request)
 
   import play.api.Play.current
   implicit def messagesApi = Messages.Implicits.applicationMessages.messages

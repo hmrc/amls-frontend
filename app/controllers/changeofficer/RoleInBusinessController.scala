@@ -19,7 +19,7 @@ package controllers.changeofficer
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import controllers.changeofficer.Helpers._
 import forms.{Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
@@ -31,7 +31,7 @@ import utils.AuthAction
 import scala.concurrent.Future
 
 class RoleInBusinessController @Inject()
-(authAction: AuthAction, implicit val dataCacheConnector: DataCacheConnector) extends DefaultBaseController {
+(authAction: AuthAction, val ds: CommonPlayDependencies, implicit val dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
   def get = authAction.async {
     implicit request =>
 

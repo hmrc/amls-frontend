@@ -17,7 +17,7 @@
 package controllers.hvd
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.DateOfChange
@@ -31,7 +31,7 @@ import views.html.date_of_change
 import scala.concurrent.Future
 
 class HvdDateOfChangeController @Inject() ( val dataCacheConnector: DataCacheConnector,
-                                            val authAction: AuthAction) extends RepeatingSection with DefaultBaseController with DateOfChangeHelper {
+                                            val authAction: AuthAction, val ds: CommonPlayDependencies) extends AmlsBaseController(ds) with RepeatingSection with DateOfChangeHelper {
 
   def get(redirect: String) = authAction.async {
       implicit request =>

@@ -16,8 +16,9 @@
 
 @import include.{heading, main}
 @import include.forms2.anchor
+@import config.CachedStaticHtmlPartialProvider
 
-@(activity: String)(implicit request: Request[_],messages:Messages)
+@(activity: String)(implicit request: Request[_],messages:Messages,partialProvider: CachedStaticHtmlPartialProvider)
 
 @header = {
   @components.back_link()

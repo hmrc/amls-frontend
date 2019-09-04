@@ -27,12 +27,12 @@ import utils.{AuthAction, BusinessName}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
-class BacsConfirmationController @Inject()(authAction: AuthAction,
+class BacsConfirmationController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
                                            private[controllers] implicit val dataCacheConnector: DataCacheConnector,
                                            private[controllers] implicit val amlsConnector: AmlsConnector,
                                            private[controllers] implicit val statusService: StatusService,
                                            private[controllers] val authenticator: AuthenticatorConnector,
-                                           private[controllers] val enrolmentService: AuthEnrolmentsService) extends DefaultBaseController {
+                                           private[controllers] val enrolmentService: AuthEnrolmentsService) extends AmlsBaseController(ds) {
 
   def bacsConfirmation() = authAction.async {
       implicit request =>

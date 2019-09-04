@@ -18,7 +18,7 @@ package controllers.businessactivities
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, UkAccountantsAddress, WhoIsYourAccountant}
 import services.AutoCompleteService
@@ -29,8 +29,8 @@ import scala.concurrent.Future
 
 class WhoIsYourAccountantController @Inject() ( val dataCacheConnector: DataCacheConnector,
                                                 val autoCompleteService: AutoCompleteService,
-                                                val authAction: AuthAction
-                                              )extends DefaultBaseController {
+                                                val authAction: AuthAction, val ds: CommonPlayDependencies
+                                              )extends AmlsBaseController(ds) {
 
   //Joe - cannot seem to provide a default for UK/Non UK without providing defaults for other co-products
   private val defaultValues = WhoIsYourAccountant("", None, UkAccountantsAddress("","", None, None, ""))

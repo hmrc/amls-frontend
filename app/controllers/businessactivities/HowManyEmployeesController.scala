@@ -18,7 +18,7 @@ package controllers.businessactivities
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, EmployeeCount, HowManyEmployees}
 import utils.AuthAction
@@ -27,8 +27,8 @@ import views.html.businessactivities._
 import scala.concurrent.Future
 
 class HowManyEmployeesController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                            val authAction: AuthAction
-                                           ) extends DefaultBaseController {
+                                            val authAction: AuthAction, val ds: CommonPlayDependencies
+                                           ) extends AmlsBaseController(ds) {
 
   def updateData(howManyEmployees: Option[HowManyEmployees], data: EmployeeCount): HowManyEmployees = {
     howManyEmployees.fold[HowManyEmployees](HowManyEmployees(employeeCount = Some(data.employeeCount)))(x =>

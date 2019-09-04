@@ -19,7 +19,7 @@ package controllers.responsiblepeople
 import javax.inject.{Inject, Singleton}
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.Country
 import models.responsiblepeople.{CountryOfBirth, PersonResidenceType, ResponsiblePerson}
 import services.AutoCompleteService
@@ -29,9 +29,9 @@ import views.html.responsiblepeople.country_of_birth
 import scala.concurrent.Future
 
 @Singleton
-class CountryOfBirthController @Inject()(authAction: AuthAction,
+class CountryOfBirthController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
                                          val dataCacheConnector: DataCacheConnector,
-                                         val autoCompleteService: AutoCompleteService) extends RepeatingSection with DefaultBaseController {
+                                         val autoCompleteService: AutoCompleteService) extends AmlsBaseController(ds) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>

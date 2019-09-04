@@ -19,7 +19,7 @@ package controllers.payments
 import audit.BacsPaymentEvent
 import cats.data.OptionT
 import cats.implicits._
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.payments.TypeOfBank
@@ -31,12 +31,12 @@ import utils.AuthAction
 import scala.concurrent.Future
 
 class TypeOfBankController @Inject()(
-                                      val authAction: AuthAction,
+                                      val authAction: AuthAction, val ds: CommonPlayDependencies,
                                       val auditConnector: AuditConnector,
                                       val authEnrolmentsService: AuthEnrolmentsService,
                                       val feeResponseService: FeeResponseService,
                                       val paymentsService: PaymentsService
-                                    ) extends DefaultBaseController {
+                                    ) extends AmlsBaseController(ds) {
 
   def get() = authAction.async {
       implicit request =>

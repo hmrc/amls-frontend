@@ -17,7 +17,7 @@
 package controllers.estateagentbusiness
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{EstateAgentBusinessService => EAB}
@@ -33,8 +33,8 @@ import scala.concurrent.Future
 class BusinessServicesController @Inject()(val dataCacheConnector: DataCacheConnector,
                                             val statusService: StatusService,
                                             val serviceFlow: ServiceFlow,
-                                            authAction: AuthAction
-                                          ) extends DefaultBaseController with DateOfChangeHelper {
+                                            authAction: AuthAction, val ds: CommonPlayDependencies
+                                          ) extends AmlsBaseController(ds) with DateOfChangeHelper {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

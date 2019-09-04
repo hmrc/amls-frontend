@@ -18,7 +18,7 @@ package controllers.responsiblepeople
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{ResponsiblePerson, ResponsiblePersonEndDate}
 import models.status._
@@ -31,9 +31,9 @@ import scala.concurrent.Future
 
 class RemoveResponsiblePersonController @Inject () (
                                                    val dataCacheConnector: DataCacheConnector,
-                                                   authAction: AuthAction,
+                                                   authAction: AuthAction, val ds: CommonPlayDependencies,
                                                    val statusService: StatusService
-                                                   ) extends RepeatingSection with DefaultBaseController {
+                                                   ) extends AmlsBaseController(ds) with RepeatingSection {
 
   def get(index: Int, flow: Option[String] = None) = authAction.async {
     implicit request =>

@@ -22,7 +22,7 @@ import cats.data._
 import cats.implicits._
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople._
 import play.api.mvc.{AnyContent, Request}
@@ -37,10 +37,10 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 class AdditionalExtraAddressController @Inject() (
                                                    val dataCacheConnector: DataCacheConnector,
-                                                   authAction: AuthAction,
+                                                   authAction: AuthAction, val ds: CommonPlayDependencies,
                                                    auditConnector: AuditConnector,
                                                    autoCompleteService: AutoCompleteService
-                                                 ) extends RepeatingSection with DefaultBaseController {
+                                                 ) extends AmlsBaseController(ds) with RepeatingSection {
 
 
   final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None)

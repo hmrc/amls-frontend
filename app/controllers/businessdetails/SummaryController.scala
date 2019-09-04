@@ -18,7 +18,7 @@ package controllers.businessdetails
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import models.businessdetails.BusinessDetails
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
@@ -30,8 +30,8 @@ import views.html.businessdetails._
 class SummaryController @Inject () (
                                    val dataCache: DataCacheConnector,
                                    val statusService: StatusService,
-                                   val authAction: AuthAction
-                                   ) extends DefaultBaseController {
+                                   val authAction: AuthAction, val ds: CommonPlayDependencies
+                                   ) extends AmlsBaseController(ds) {
 
   def get = authAction.async {
     implicit request =>

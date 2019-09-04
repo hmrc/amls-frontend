@@ -18,7 +18,7 @@ package controllers.declaration
 
 import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReadyForReview}
 import services.StatusService
 import utils.AuthAction
@@ -26,9 +26,9 @@ import utils.AuthAction
 @Singleton
 class RegisterResponsiblePersonController @Inject()(
                                                      val dataCacheConnector: DataCacheConnector,
-                                                     authAction: AuthAction,
+                                                     authAction: AuthAction, val ds: CommonPlayDependencies,
                                                      val statusService: StatusService
-                                                   ) extends DefaultBaseController {
+                                                   ) extends AmlsBaseController(ds) {
 
   def get() = authAction.async {
     implicit request => {

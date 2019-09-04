@@ -15,8 +15,9 @@
  *@
 
 @import include._
+@import config.CachedStaticHtmlPartialProvider
 
-@()(implicit request: Request[_],m:Messages)
+@()(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
 
 @header = {
     @heading("start.title")

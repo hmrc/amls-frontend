@@ -18,7 +18,7 @@ package controllers.tradingpremises
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.tradingpremises.{AgentRemovalReason, TradingPremises}
 import utils.{AuthAction, RepeatingSection}
@@ -28,8 +28,8 @@ import scala.concurrent.Future
 
 class RemoveAgentPremisesReasonsController @Inject () (
                                                       val dataCacheConnector: DataCacheConnector,
-                                                      val authAction: AuthAction
-                                                      )extends RepeatingSection with DefaultBaseController {
+                                                      val authAction: AuthAction, val ds: CommonPlayDependencies
+                                                      )extends AmlsBaseController(ds) with RepeatingSection {
 
 
   def get(index: Int, complete: Boolean = false) = authAction.async {

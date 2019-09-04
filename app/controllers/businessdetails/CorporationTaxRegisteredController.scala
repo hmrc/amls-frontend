@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import com.google.inject.Inject
 import connectors.{BusinessMatchingConnector, DataCacheConnector}
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.businessdetails.{BusinessDetails, CorporationTaxRegistered, CorporationTaxRegisteredYes}
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany}
@@ -39,8 +39,8 @@ import scala.concurrent.Future
 class CorporationTaxRegisteredController @Inject () (
                                                       val dataCacheConnector: DataCacheConnector,
                                                       val businessMatchingConnector: BusinessMatchingConnector,
-                                                      val authAction: AuthAction
-                                                    ) extends DefaultBaseController {
+                                                      val authAction: AuthAction, val ds: CommonPlayDependencies
+                                                    ) extends AmlsBaseController(ds) {
 
   val failedResult = InternalServerError("Failed to update the business corporation tax number")
 

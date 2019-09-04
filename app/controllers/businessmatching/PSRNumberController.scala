@@ -20,7 +20,7 @@ import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import javax.inject.Inject
 import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
@@ -31,13 +31,13 @@ import services.flowmanagement.Router
 import utils.AuthAction
 import views.html.businessmatching.psr_number
 
-class PSRNumberController @Inject()(authAction: AuthAction,
+class PSRNumberController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
                                     val dataCacheConnector: DataCacheConnector,
                                     val statusService: StatusService,
                                     val businessMatchingService: BusinessMatchingService,
                                     val router: Router[ChangeSubSectorFlowModel],
                                     val helper: ChangeSubSectorHelper
-                                   ) extends DefaultBaseController {
+                                   ) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

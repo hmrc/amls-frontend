@@ -17,7 +17,7 @@
 package controllers.renewal
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching._
@@ -29,10 +29,10 @@ import utils.AuthAction
 import scala.concurrent.Future
 
 @Singleton
-class MostTransactionsController @Inject()(val authAction: AuthAction,
+class MostTransactionsController @Inject()(val authAction: AuthAction, val ds: CommonPlayDependencies,
                                            val cache: DataCacheConnector,
                                            val renewalService: RenewalService,
-                                           val autoCompleteService: AutoCompleteService) extends DefaultBaseController {
+                                           val autoCompleteService: AutoCompleteService) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

@@ -19,7 +19,7 @@ package controllers.businessdetails
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.businessdetails._
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany}
@@ -31,8 +31,8 @@ import scala.concurrent.Future
 
 class VATRegisteredController @Inject () (
                                          val dataCacheConnector: DataCacheConnector,
-                                         val authAction: AuthAction
-                                         ) extends DefaultBaseController {
+                                         val authAction: AuthAction, val ds: CommonPlayDependencies
+                                         ) extends AmlsBaseController(ds) {
 
 
 

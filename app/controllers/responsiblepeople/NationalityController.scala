@@ -18,7 +18,7 @@ package controllers.responsiblepeople
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{Nationality, ResponsiblePerson}
 import services.AutoCompleteService
@@ -29,9 +29,9 @@ import scala.concurrent.Future
 
 class NationalityController @Inject () (
                                        val dataCacheConnector: DataCacheConnector,
-                                       authAction: AuthAction,
+                                       authAction: AuthAction, val ds: CommonPlayDependencies,
                                        val autoCompleteService: AutoCompleteService
-                                       ) extends RepeatingSection with DefaultBaseController {
+                                       ) extends AmlsBaseController(ds) with RepeatingSection {
 
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {

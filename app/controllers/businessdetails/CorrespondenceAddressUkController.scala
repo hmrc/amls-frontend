@@ -22,7 +22,7 @@ import cats.data.OptionT
 import cats.implicits._
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessdetails.{BusinessDetails, CorrespondenceAddress, CorrespondenceAddressUk}
 import play.api.mvc.Request
@@ -39,8 +39,8 @@ class CorrespondenceAddressUkController @Inject ()(
                                                  val dataConnector: DataCacheConnector,
                                                  val auditConnector: AuditConnector,
                                                  val autoCompleteService: AutoCompleteService,
-                                                 val authAction: AuthAction
-                                                 ) extends DefaultBaseController {
+                                                 val authAction: AuthAction, val ds: CommonPlayDependencies
+                                                 ) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

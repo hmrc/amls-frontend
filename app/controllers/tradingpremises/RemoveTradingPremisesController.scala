@@ -18,7 +18,7 @@ package controllers.tradingpremises
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.status._
 import models.tradingpremises.{ActivityEndDate, TradingPremises}
@@ -28,9 +28,9 @@ import views.html.tradingpremises.remove_trading_premises
 
 class RemoveTradingPremisesController @Inject () (
                                                    val dataCacheConnector: DataCacheConnector,
-                                                   val authAction: AuthAction,
+                                                   val authAction: AuthAction, val ds: CommonPlayDependencies,
                                                    val statusService: StatusService
-                                                 ) extends RepeatingSection with DefaultBaseController {
+                                                 ) extends AmlsBaseController(ds) with RepeatingSection {
 
   def get(index: Int, complete: Boolean = false) = authAction.async {
     implicit request =>
