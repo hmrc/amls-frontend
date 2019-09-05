@@ -53,6 +53,7 @@ class RemoveBusinessTypesController @Inject()(
   }
 
   def maxLengthValidator(count: Int): Rule[Set[BusinessActivity], Set[BusinessActivity]] = Rule.fromMapping[Set[BusinessActivity], Set[BusinessActivity]] {
+    case s if s.size == 2 && s.size == count => Invalid(Seq(ValidationError("error.required.bm.remove.leave.twobusinesses")))
     case s if s.size == count => Invalid(Seq(ValidationError("error.required.bm.remove.leave.one")))
     case s => Valid(s)
   }
