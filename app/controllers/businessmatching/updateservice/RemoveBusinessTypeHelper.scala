@@ -59,6 +59,8 @@ class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
 
     def removeActivity(activity: BMBusinessActivity): Future[CacheMap] = {
       activity match {
+//        case ArtMarketParticipant =>
+//          dataCacheConnector.removeByKey[ArtMarketParticipant](credId, ArtMarketParticipant.key)
         case MoneyServiceBusiness =>
           dataCacheConnector.removeByKey[MSBSection](credId, MSBSection.key)
         case HighValueDealing =>

@@ -1289,10 +1289,14 @@ businessmatching.updateservice.removeactivitiesinformation.info.3 = You need to 
 businessmatching.updateservice.removeactivitiesinformation.info.1.all = You need to add a new service before you remove the services you are currently registered for.
 businessmatching.updateservice.removeactivitiesinformation.info.2 = If you want to de-register your business for anti-money laundering supervision, you can do this from your registration status page.
 
-businessmatching.updateservice.removeactivities.title = What type of business do you need to remove?
-businessmatching.updateservice.removeactivities.heading = What type of business do you need to remove?
-businessmatching.updateservice.removeactivities.summary = You can remove one (or more) of your business types here.
-businessmatching.updateservice.removeactivities.list.heading = Leave at least one business type. For anti-money laundering supervision one business type (or more) must be registered with us.
+businessmatching.updateservice.removeactivities.title.twobusinesses = Which service do you need to remove?
+businessmatching.updateservice.removeactivities.title.multibusinesses = Which services do you need to remove?
+businessmatching.updateservice.removeactivities.heading = Which service do you need to remove?
+
+businessmatching.updateservice.removeactivities.summary.twobusinesses = You can remove one (or more) of your business types here.
+businessmatching.updateservice.removeactivities.list.heading.twobusinesses = If you want to remove both services, you’ll need to de-register your business from your registration status page.
+businessmatching.updateservice.removeactivities.summary.multibusinesses = You can remove one (or more) of your business types here.
+businessmatching.updateservice.removeactivities.list.heading.multibusinesses = If you want to remove all services, you’ll need to de-register your business from your registration status page.
 businessmatching.updateservice.removeactivities.button = Continue
 
 businessmatching.updateservice.updateotherinformation.heading = We need you to update other information
