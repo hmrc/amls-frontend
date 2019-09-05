@@ -16,18 +16,14 @@
 
 @import include.forms2._
 
-@(existingActivities: Set[String])(implicit m: Messages)
+@(existingActivities: Seq[String])(implicit m: Messages)
 
-@if(existingActivities.size == 2) {
-<h1>@Messages("businessmatching.updateservice.removeactivities.title.twobusinesses")</h1>
-<p>@Messages("businessmatching.updateservice.removeactivities.summary.twobusinesses")</p>
-<p>@Messages("businessmatching.updateservice.removeactivities.list.heading.twobusinesses")</p>
-}
-
-
-
-else {
-<h1>@Messages("businessmatching.updateservice.removeactivities.title.multibusinesses")</h1>
-<p>@Messages("businessmatching.updateservice.removeactivities.summary.multibusinesses")</p>
-<p>@Messages("businessmatching.updateservice.removeactivities.list.heading.multibusinesses")</p>
-}
+  @if(existingActivities.size == 2) {
+      @heading(Messages("businessmatching.updateservice.removeactivities.title.twobusinesses"))
+      <p>@Messages("businessmatching.updateservice.removeactivities.summary.twobusinesses")</p>
+      <p>@Messages("businessmatching.updateservice.removeactivities.list.heading.twobusinesses")</p>
+  } else {
+      <h1>@Messages("businessmatching.updateservice.removeactivities.title.multibusinesses")</h1>
+      <p>@Messages("businessmatching.updateservice.removeactivities.summary.multibusinesses")</p>
+      <p>@Messages("businessmatching.updateservice.removeactivities.list.heading.multibusinesses")</p>
+  }

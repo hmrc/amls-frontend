@@ -1293,9 +1293,9 @@ businessmatching.updateservice.removeactivities.title.twobusinesses = Which serv
 businessmatching.updateservice.removeactivities.title.multibusinesses = Which services do you need to remove?
 businessmatching.updateservice.removeactivities.heading = Which service do you need to remove?
 
-businessmatching.updateservice.removeactivities.summary.twobusinesses = You can remove one (or more) of your business types here.
+businessmatching.updateservice.removeactivities.summary.twobusinesses = If you no longer want to be registered with HMRC for one of your services, you can remove it.
 businessmatching.updateservice.removeactivities.list.heading.twobusinesses = If you want to remove both services, you’ll need to de-register your business from your registration status page.
-businessmatching.updateservice.removeactivities.summary.multibusinesses = You can remove one (or more) of your business types here.
+businessmatching.updateservice.removeactivities.summary.multibusinesses = If you no longer want to be registered with HMRC for one or more of your services, you can remove them.
 businessmatching.updateservice.removeactivities.list.heading.multibusinesses = If you want to remove all services, you’ll need to de-register your business from your registration status page.
 businessmatching.updateservice.removeactivities.button = Continue
 
