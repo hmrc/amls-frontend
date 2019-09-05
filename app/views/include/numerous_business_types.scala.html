@@ -19,12 +19,13 @@
 @(existingActivities: Seq[String])(implicit m: Messages)
 
   @if(existingActivities.size == 2) {
-      @heading(Messages("businessmatching.updateservice.removeactivities.title.twobusinesses"))
+      @heading(Messages("businessmatching.updateservice.removeactivities.heading.twobusinesses"))
       <p>@Messages("businessmatching.updateservice.removeactivities.summary.twobusinesses")</p>
       <p>@Messages("businessmatching.updateservice.removeactivities.list.heading.twobusinesses")</p>
 
   } else {
-      @heading(Messages("businessmatching.updateservice.removeactivities.title.multibusinesses"))
+
+      @heading(Messages("businessmatching.updateservice.removeactivities.heading.multibusinesses"))
       <p>@Messages("businessmatching.updateservice.removeactivities.summary.multibusinesses")</p>
       <p>@Messages("businessmatching.updateservice.removeactivities.list.heading.multibusinesses")</p>
   }

@@ -32,7 +32,8 @@
 }
 
 @main(
-    title = Messages("businessmatching.updateservice.removeactivities.title") + " - " + Messages("summary.updateservice"),
+    title = if(activityValues.size == 2)  Messages("businessmatching.updateservice.removeactivities.title.twobusinesses")
+    else Messages("businessmatching.updateservice.removeactivities.title.multibusinesses"),
     heading = header
 ) {
 

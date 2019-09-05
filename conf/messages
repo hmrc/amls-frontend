@@ -1290,8 +1290,9 @@ businessmatching.updateservice.removeactivitiesinformation.info.1.all = You need
 businessmatching.updateservice.removeactivitiesinformation.info.2 = If you want to de-register your business for anti-money laundering supervision, you can do this from your registration status page.
 
 businessmatching.updateservice.removeactivities.title.twobusinesses = Which service do you need to remove?
+businessmatching.updateservice.removeactivities.heading.twobusinesses = Which service do you need to remove?
 businessmatching.updateservice.removeactivities.title.multibusinesses = Which services do you need to remove?
-businessmatching.updateservice.removeactivities.heading = Which service do you need to remove?
+businessmatching.updateservice.removeactivities.heading.multibusinesses = Which services do you need to remove?
 
 businessmatching.updateservice.removeactivities.summary.twobusinesses = If you no longer want to be registered with HMRC for one of your services, you can remove it.
 businessmatching.updateservice.removeactivities.list.heading.twobusinesses = If you want to remove both services, you’ll need to de-register your business from your registration status page.
