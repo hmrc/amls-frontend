@@ -16,6 +16,7 @@
 
 package connectors
 
+import config.AmlsHeaderCarrierForPartialsConverter
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -58,10 +59,14 @@ class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture { self =>
 
-    object TestBusinessMatchingConnector extends BusinessMatchingConnector (
-      http = mock[HttpClient],
-      sessionCookieCrypto = mock[SessionCookieCrypto]
-    )
+//    object TestBusinessMatchingConnector extends BusinessMatchingConnector (
+//      http = mock[HttpClient],
+//      sessionCookieCrypto = mock[SessionCookieCrypto]
+//    )
+
+    lazy val hc: AmlsHeaderCarrierForPartialsConverter = app.injector.instanceOf[AmlsHeaderCarrierForPartialsConverter]
+
+    val testBusinessMatchingConnector = new BusinessMatchingConnector(mock[HttpClient], hc)
 
     val address = BusinessMatchingAddress("1 Test Street", "Test Town", None, None, None, "UK")
 
@@ -87,20 +92,20 @@ class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
 
     "get the review details" in new Fixture {
 
-      when(TestBusinessMatchingConnector.http.GET[BusinessMatchingReviewDetails](any())(any(), any(), any()))
+      when(testBusinessMatchingConnector.http.GET[BusinessMatchingReviewDetails](any())(any(), any(), any()))
         .thenReturn(Future.successful(validResponseDetail))
 
-      whenReady(TestBusinessMatchingConnector.getReviewDetails) { result =>
+      whenReady(testBusinessMatchingConnector.getReviewDetails) { result =>
         result mustBe Some(validResponseDetail)
       }
 
     }
 
     "return None when business matching returns 404" in new Fixture {
-      when(TestBusinessMatchingConnector.http.GET[BusinessMatchingReviewDetails](any())(any(), any(), any()))
+      when(testBusinessMatchingConnector.http.GET[BusinessMatchingReviewDetails](any())(any(), any(), any()))
         .thenReturn(Future.failed(new NotFoundException("The review details were not found")))
 
-      whenReady(TestBusinessMatchingConnector.getReviewDetails) { result =>
+      whenReady(testBusinessMatchingConnector.getReviewDetails) { result =>
         result mustBe None
       }
     }
@@ -109,11 +114,11 @@ class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
       val ex = new Exception("Some other exception")
 
       when {
-        TestBusinessMatchingConnector.http.GET[BusinessMatchingReviewDetails](any())(any(), any(), any())
+        testBusinessMatchingConnector.http.GET[BusinessMatchingReviewDetails](any())(any(), any(), any())
       } thenReturn Future.failed(ex)
 
       intercept[Exception] {
-        await(TestBusinessMatchingConnector.getReviewDetails)
+        await(testBusinessMatchingConnector.getReviewDetails)
       } mustBe ex
     }
 

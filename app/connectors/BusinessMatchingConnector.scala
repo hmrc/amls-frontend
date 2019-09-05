@@ -16,6 +16,7 @@
 
 package connectors
 
+import config.AmlsHeaderCarrierForPartialsConverter
 import javax.inject.Inject
 import play.api.Mode.Mode
 import play.api.{Configuration, Logger, Play}
@@ -69,10 +70,10 @@ object BusinessMatchingReviewDetails {
 }
 
 class BusinessMatchingConnector @Inject()(val http: HttpClient,
-                                          sessionCookieCrypto: SessionCookieCrypto
-                                          ) extends ServicesConfig with HeaderCarrierForPartialsConverter {
+                                          hc: AmlsHeaderCarrierForPartialsConverter
+                                          ) extends ServicesConfig {
 
-  override val crypto: String => String = str => sessionCookieCrypto.crypto.encrypt(PlainText(str)).value
+  import hc._
 
   val businessMatchingUrl = s"${baseUrl("business-customer")}/business-customer"
   val serviceName = "amls"
