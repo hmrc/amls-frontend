@@ -91,7 +91,7 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   }
 }
 
-class AppConfig @Inject()(environment: Environment, val runModeConfiguration: Configuration, baseConfig: Configuration)
+class AppConfig @Inject()(val environment: Environment, val runModeConfiguration: Configuration, baseConfig: Configuration)
   extends ApplicationConfig with ServicesConfig {
 
   override protected def mode: Mode = environment.mode

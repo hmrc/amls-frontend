@@ -18,16 +18,15 @@ package connectors
 
 import javax.inject.{Inject, Singleton}
 import play.api.Mode.Mode
-import play.api.{Configuration, Environment, Logger}
 import play.api.http.Status._
+import play.api.{Configuration, Environment, Logger}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpPost, HttpResponse}
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.config.ServicesConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AuthenticatorConnector @Inject()(http: HttpClient,
+class AuthenticatorConnector @Inject()(http: HttpPost,
                                        environment: Environment,
                                        val runModeConfiguration: Configuration) extends ServicesConfig {
 

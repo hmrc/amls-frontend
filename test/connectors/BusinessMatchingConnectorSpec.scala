@@ -59,11 +59,6 @@ class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture { self =>
 
-//    object TestBusinessMatchingConnector extends BusinessMatchingConnector (
-//      http = mock[HttpClient],
-//      sessionCookieCrypto = mock[SessionCookieCrypto]
-//    )
-
     lazy val hc: AmlsHeaderCarrierForPartialsConverter = app.injector.instanceOf[AmlsHeaderCarrierForPartialsConverter]
 
     val testBusinessMatchingConnector = new BusinessMatchingConnector(mock[HttpClient], hc)

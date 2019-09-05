@@ -57,11 +57,7 @@ class PayApiConnectorSpec extends AmlsSpec with ScalaFutures with IntegrationPat
 
     val auditConnector = mock[AuditConnector]
 
-    val injector = new GuiceInjectorBuilder()
-      .bindings(bind[AuditConnector].to(auditConnector))
-      .build()
-
-    lazy val connector = injector.instanceOf[PayApiConnector]
+    lazy val connector = new PayApiConnector(http, auditConnector)
   }
 
   "The Pay-API connector" when {
