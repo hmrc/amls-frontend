@@ -16,7 +16,7 @@
 
 package connectors
 
-import config.{AppConfig, WSHttp}
+import config.AppConfig
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
 import generators.auth.UserDetailsGenerator
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
@@ -29,6 +29,7 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HttpResponse, Upstream4xxResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import utils.AmlsSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -44,7 +45,7 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
 
   trait Fixture {
 
-    val http = mock[WSHttp]
+    val http = mock[HttpClient]
     val appConfig = mock[AppConfig]
     val auditConnector = mock[AuditConnector]
     val groupIdentfier = stringOfLengthGen(10).sample.get
@@ -132,7 +133,6 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
   "deEnrol" when {
     "called" must {
       "call the ES9 API endpoint" in new Fixture {
-        val authority = mock[Authority]
         val endpointUrl = s"$baseUrl/${serviceStub}/groups/$groupIdentfier/enrolments/${enrolKey.key}"
 
         when {

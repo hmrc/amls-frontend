@@ -16,8 +16,6 @@
 
 package services
 
-
-import config.WSHttp
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
@@ -42,6 +40,8 @@ import org.mockito.Mockito.verify
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.play.http.ws.WSHttp
 import utils.{AmlsSpec, DependencyMocks}
 
 import scala.collection.Seq
@@ -55,7 +55,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
 
   trait Fixture extends DependencyMocks {
 
-    val http = mock[WSHttp]
+    val http = mock[HttpClient]
     val updateMongoCacheService = new UpdateMongoCacheService(http, mockCacheConnector)
 
     val credId = "12341234"

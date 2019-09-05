@@ -38,7 +38,8 @@ import scala.concurrent.Future
 class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolmentsService,
                                        val statusService: StatusService,
                                        val businessMatchingService: BusinessMatchingService,
-                                       authAction: AuthAction, val ds: CommonPlayDependencies,
+                                       authAction: AuthAction,
+                                       val ds: CommonPlayDependencies,
                                        val amlsNotificationService: NotificationService,
                                        implicit val amlsConnector: AmlsConnector,
                                        implicit val dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {

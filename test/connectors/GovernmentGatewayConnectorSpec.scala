@@ -16,7 +16,7 @@
 
 package connectors
 
-import config.{AppConfig, WSHttp}
+import config.AppConfig
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator, GovernmentGatewayGenerator}
 import models.governmentgateway.EnrolmentRequest
@@ -28,6 +28,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.{Audit, DataEvent}
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import utils.{AmlsSpec, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -46,7 +47,7 @@ class GovernmentGatewayConnectorSpec extends AmlsSpec
   trait Fixture extends DependencyMocks {
     val audit = mock[Audit]
 
-    val connector = new GovernmentGatewayConnector(mock[WSHttp], mock[AppConfig], mock[AuditConnector])
+    val connector = new GovernmentGatewayConnector(mock[HttpClient], mock[AppConfig], mock[AuditConnector])
 
     val fn: DataEvent => Unit = d => {}
 

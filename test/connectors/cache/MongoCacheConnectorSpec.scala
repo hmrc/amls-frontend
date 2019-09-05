@@ -16,7 +16,6 @@
 
 package connectors.cache
 
-import connectors.Authority
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito.{reset, when}
 import org.scalacheck.Arbitrary.arbitrary
@@ -28,8 +27,6 @@ import play.api.libs.json.{JsBoolean, JsString, JsValue, Json}
 import services.cache.{Cache, MongoCacheClient, MongoCacheClientFactory}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.LoggedInUser
-import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -50,7 +47,6 @@ class MongoCacheConnectorSpec extends FreeSpec
 
   trait Fixture {
     implicit val hc = HeaderCarrier()
-    implicit val user = mock[LoggedInUser]
     implicit val ec = mock[ExecutionContext]
 
     val factory = mock[MongoCacheClientFactory]

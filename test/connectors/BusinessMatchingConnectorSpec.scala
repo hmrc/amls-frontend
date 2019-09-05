@@ -16,14 +16,14 @@
 
 package connectors
 
-import config.WSHttp
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import play.api.libs.json.Json
 import play.api.test.Helpers._
-import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.http.NotFoundException
+import uk.gov.hmrc.play.bootstrap.filters.frontend.crypto.SessionCookieCrypto
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
@@ -58,11 +58,9 @@ class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture { self =>
 
-    val applicationCrypto:ApplicationCrypto = app.injector.instanceOf(classOf[ApplicationCrypto])
-
     object TestBusinessMatchingConnector extends BusinessMatchingConnector (
-      http = mock[WSHttp],
-      applicationCrypto = applicationCrypto
+      http = mock[HttpClient],
+      sessionCookieCrypto = mock[SessionCookieCrypto]
     )
 
     val address = BusinessMatchingAddress("1 Test Street", "Test Town", None, None, None, "UK")

@@ -20,9 +20,10 @@ import config.AppConfig
 import generators.BaseGenerator
 import models.enrolment.{EnrolmentIdentifier, GovernmentGatewayEnrolment}
 import org.mockito.Matchers.{any, eq => eqTo}
-import org.mockito.Mockito.{when, verify}
+import org.mockito.Mockito.{verify, when}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpGet
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import utils.AmlsSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -35,7 +36,7 @@ class EnrolmentStubConnectorSpec extends AmlsSpec with BaseGenerator {
     val enrolments = Seq(GovernmentGatewayEnrolment("HMRC-MLR-ORG",
       List(EnrolmentIdentifier("MLRRefNumber", "AV23456789")), ""))
 
-    val http = mock[HttpGet]
+    val http = mock[HttpClient]
     val config = mock[AppConfig]
     val connector = new EnrolmentStubConnector(http, config)
     val groupId = stringOfLengthGen(10).sample.get

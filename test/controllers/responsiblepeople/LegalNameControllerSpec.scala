@@ -33,12 +33,7 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
     val request = addToken(self.authRequest)
     val RecordId = 1
 
-    val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
-      .build()
-
-    lazy val controller = injector.instanceOf[LegalNameController]
+    lazy val controller = new LegalNameController(mockCacheConnector, SuccessfulAuthAction, commonDependencies)
 
   }
 

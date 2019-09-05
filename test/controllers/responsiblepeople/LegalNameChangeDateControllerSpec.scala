@@ -34,15 +34,9 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures {
     val request = addToken(self.authRequest)
     val RecordId = 1
 
-    val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
-      .build()
+    lazy val controller = new LegalNameChangeDateController(mockCacheConnector, SuccessfulAuthAction, commonDependencies)
 
-    lazy val controller = injector.instanceOf[LegalNameChangeDateController]
     val personName = PersonName("firstname", None, "lastname")
-
-
   }
 
   "The LegalNameChangeDateController" when {

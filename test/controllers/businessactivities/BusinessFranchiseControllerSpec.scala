@@ -16,7 +16,6 @@
 
 package controllers.businessactivities
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.businessactivities.{BusinessActivities, BusinessFranchiseYes}
@@ -26,11 +25,10 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.AmlsSpec
-import play.api.test.Helpers._
 import play.api.i18n.Messages
+import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -41,7 +39,8 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
 
     val controller = new BusinessFranchiseController (
       dataCacheConnector = mock[DataCacheConnector],
-      SuccessfulAuthAction, ds = commonDependencies)
+      SuccessfulAuthAction,
+      ds = commonDependencies)
   }
 
   val emptyCache = CacheMap("", Map.empty)

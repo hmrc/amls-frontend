@@ -16,8 +16,9 @@
 
 package utils
 
+import config.CachedStaticHtmlPartialProvider
 import connectors.KeystoreConnector
-import controllers.CommonPlayDependencies
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
@@ -29,6 +30,8 @@ import play.api.{Application, Mode}
 import play.filters.csrf.CSRF.Token
 import play.filters.csrf.{CSRFConfigProvider, CSRFFilter}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
+
 trait AmlsSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with MustMatchers {
 
   protected val bindModules: Seq[GuiceableModule] = Seq(bind[KeystoreConnector].to(mock[KeystoreConnector]))
@@ -40,10 +43,12 @@ trait AmlsSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with MustM
 
   val commonDependencies = app.injector.instanceOf(classOf[CommonPlayDependencies])
 
-  implicit lazy val messagesApi = app.injector.instanceOf[MessagesApi]
+  implicit lazy val messagesApi = app.injector.instanceOf(classOf[MessagesApi])
   implicit lazy val messages = messagesApi.preferred(FakeRequest())
 
   implicit val headerCarrier = HeaderCarrier()
+
+  implicit val partialsProvider = app.injector.instanceOf(classOf[CachedStaticHtmlPartialProvider])
 
   def addToken[T](fakeRequest: FakeRequest[T]) = {
     val csrfConfig     = app.injector.instanceOf[CSRFConfigProvider].get

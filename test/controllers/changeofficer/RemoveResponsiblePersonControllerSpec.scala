@@ -39,12 +39,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar {
 
     val dataCacheConnector = mock[DataCacheConnector]
 
-    val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .overrides(bind[DataCacheConnector].to(dataCacheConnector))
-      .build()
-
-    lazy val controller = injector.instanceOf[RemoveResponsiblePersonController]
+    lazy val controller = new RemoveResponsiblePersonController(SuccessfulAuthAction, commonDependencies, dataCacheConnector)
 
     val nominatedOfficer = ResponsiblePerson(
       personName = Some(PersonName("firstName", None, "lastName")),

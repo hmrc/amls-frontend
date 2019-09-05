@@ -16,11 +16,10 @@
 
 package controllers.declaration
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
-import models.declaration.{AddPerson, InternalAccountant}
 import models.status.{NotCompleted, ReadyForRenewal, SubmissionReadyForReview}
 import models.{ReadStatusResponse, SubscriptionFees, SubscriptionResponse}
 import org.joda.time.{LocalDate, LocalDateTime}
@@ -28,12 +27,9 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import play.api.i18n.Messages
-import play.api.test.FakeApplication
 import play.api.test.Helpers._
-import services.StatusService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 

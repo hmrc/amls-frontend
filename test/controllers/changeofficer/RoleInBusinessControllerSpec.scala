@@ -43,12 +43,7 @@ class RoleInBusinessControllerSpec extends AmlsSpec{
 
     val cache = mock[DataCacheConnector]
 
-    val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .overrides(bind[DataCacheConnector].to(cache))
-      .build()
-
-    lazy val controller = injector.instanceOf[RoleInBusinessController]
+    lazy val controller = new RoleInBusinessController(SuccessfulAuthAction, commonDependencies, cache)
 
     val nominatedOfficer = ResponsiblePerson(
       personName = Some(PersonName("firstName", None, "lastName")),

@@ -19,6 +19,7 @@ package controllers.responsiblepeople
 import config.AppConfig
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import controllers.changeofficer.RoleInBusinessController
 import models.responsiblepeople.{KnownBy, PersonName, ResponsiblePerson}
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
@@ -34,16 +35,11 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
     val request = addToken(self.authRequest)
     val RecordId = 1
 
-    val mockAppConfig = mock[AppConfig]
-
-    val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
-      .overrides(bind[AppConfig].to(mockAppConfig))
-      .build()
-
-    lazy val controller = injector.instanceOf[KnownByController]
-
+    lazy val controller = new KnownByController(
+      mockCacheConnector,
+      SuccessfulAuthAction,
+      commonDependencies,
+      commonDependencies.amlsConfig)
   }
 
   "The KnownByController" when {

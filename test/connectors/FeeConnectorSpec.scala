@@ -27,6 +27,7 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.http.{HeaderCarrier, HttpGet}
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -35,7 +36,7 @@ class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with
 
   trait Fixture {
     val connector = new FeeConnector(
-      http = mock[HttpGet],
+      http = mock[HttpClient],
       appConfig = mock[AppConfig])
 
     val safeId = "SAFEID"

@@ -39,12 +39,7 @@ class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSu
 
     val cache = mock[DataCacheConnector]
 
-    val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .overrides(bind[DataCacheConnector].to(self.cache))
-      .build()
-
-    lazy val controller = injector.instanceOf[ComplexCorpStructureCreationController]
+    lazy val controller = new ComplexCorpStructureCreationController(SuccessfulAuthAction, commonDependencies, cache)
 
     val tcsp = Tcsp(
       Some(TcspTypes(Set(

@@ -43,7 +43,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
     val cache: DataCacheConnector = mock[DataCacheConnector]
     val authAction: AuthAction = SuccessfulAuthAction
 
-    val controller = new ActivityStartDateController(messagesApi, authAction, self.cache)
+    val controller = new ActivityStartDateController(messagesApi, authAction, commonDependencies, self.cache)
   }
 
   "ActivityStartDateController" must {

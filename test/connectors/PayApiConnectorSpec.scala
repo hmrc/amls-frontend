@@ -16,7 +16,6 @@
 
 package connectors
 
-import config.WSHttp
 import models.ReturnLocation
 import models.payments.{CreatePaymentRequest, CreatePaymentResponse, NextUrl}
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -29,6 +28,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import utils.AmlsSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -52,13 +52,12 @@ class PayApiConnectorSpec extends AmlsSpec with ScalaFutures with IntegrationPat
       ReturnLocation("/confirmation", "http://localhost:9222"))
 
     val validResponse = CreatePaymentResponse(NextUrl(paymentUrl), paymentId)
-    val http = mock[WSHttp]
+    val http = mock[HttpClient]
     val payApiUrl = "http://localhost:9057"
 
     val auditConnector = mock[AuditConnector]
 
     val injector = new GuiceInjectorBuilder()
-      .overrides(bind[WSHttp].to(http))
       .bindings(bind[AuditConnector].to(auditConnector))
       .build()
 

@@ -31,7 +31,8 @@ import utils.{AuthAction, RepeatingSection, StatusConstants}
 
 import scala.concurrent.Future
 
-class NewOfficerController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
+class NewOfficerController @Inject()(authAction: AuthAction,
+                                     val ds: CommonPlayDependencies,
                                      val cacheConnector: DataCacheConnector) extends AmlsBaseController(ds) with RepeatingSection {
 
   override def dataCacheConnector: DataCacheConnector = cacheConnector

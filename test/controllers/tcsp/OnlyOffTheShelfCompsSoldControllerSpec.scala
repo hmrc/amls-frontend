@@ -23,11 +23,9 @@ import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import play.api.inject.bind
-import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -39,12 +37,10 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
 
     val cache = mock[DataCacheConnector]
 
-    val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .overrides(bind[DataCacheConnector].to(self.cache))
-      .build()
-
-    lazy val controller = injector.instanceOf[OnlyOffTheShelfCompsSoldController]
+    lazy val controller = new OnlyOffTheShelfCompsSoldController(
+      SuccessfulAuthAction,
+      commonDependencies,
+      cache)
 
     val tcsp = Tcsp(
       Some(TcspTypes(Set(

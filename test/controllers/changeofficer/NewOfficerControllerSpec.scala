@@ -50,12 +50,8 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
 
     val cache = mock[DataCacheConnector]
 
-    val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .overrides(bind[DataCacheConnector].to(cache))
-      .build()
+    val controller = new NewOfficerController(SuccessfulAuthAction, commonDependencies, cache)
 
-    lazy val controller = injector.instanceOf[NewOfficerController]
     lazy val responsiblePeople = Gen.listOf(completeResponsiblePersonGen).sample.get
     lazy val emptyPerson = new ResponsiblePerson()
     lazy val responsiblePeopleWithEmptyPerson = responsiblePeople :+ emptyPerson
@@ -104,10 +100,6 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
     lazy val emptyPerson = ResponsiblePerson()
     lazy val responsiblePeopleWithEmptyPerson = responsiblePeopleGen :+ emptyPerson
 
-    val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .overrides(bind[DataCacheConnector].to(dataCacheConnector))
-      .build()
 
     when {
       controller.dataCacheConnector.fetchAll(any())(any())
@@ -129,7 +121,7 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
       controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any())
     } thenReturn Future.successful(cacheMap)
 
-    lazy val controller = injector.instanceOf[NewOfficerController]
+    lazy val controller = new NewOfficerController(SuccessfulAuthAction, commonDependencies, dataCacheConnector)
   }
 
   trait TestFixtureForDeleteOldOfficer extends TestFixtureForChangeNominatedOfficer {
@@ -161,7 +153,7 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
       )
     )))
 
-    override lazy val controller = injector.instanceOf[NewOfficerController]
+    override lazy val controller = new NewOfficerController(SuccessfulAuthAction, commonDependencies, dataCacheConnector)
   }
 
   "The NewOfficerController" when {

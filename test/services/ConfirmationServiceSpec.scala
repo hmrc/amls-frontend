@@ -52,8 +52,6 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.domain.Org
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, OrgAccount}
-import uk.gov.hmrc.play.frontend.auth.{Principal}
 import utils.StatusConstants
 
 import scala.concurrent.ExecutionContext.Implicits._
@@ -149,7 +147,7 @@ class ConfirmationServiceSpec extends PlaySpec
     val activities = mock[BusinessActivities]
     val businessMatching = mock[BusinessMatching]
     val cache = mock[CacheMap]
-    val principle = Principal(None, Accounts(org = Some(OrgAccount("", Org("TestOrgRef")))))
+    //val principle = Principal(None, Accounts(org = Some(OrgAccount("", Org("TestOrgRef")))))
 
     when {
       businessMatching.activities

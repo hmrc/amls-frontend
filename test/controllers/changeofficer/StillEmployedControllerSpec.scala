@@ -21,10 +21,8 @@ import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import play.api.inject.bind
-import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -35,12 +33,7 @@ class StillEmployedControllerSpec extends AmlsSpec {
 
     val cache = mock[DataCacheConnector]
 
-    val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .overrides(bind[DataCacheConnector].to(self.cache))
-      .build()
-
-    lazy val controller = injector.instanceOf[StillEmployedController]
+    val controller = new StillEmployedController(SuccessfulAuthAction, commonDependencies, cache)
 
     val nominatedOfficer = ResponsiblePerson(
       personName = Some(PersonName("firstName", None, "lastName")),

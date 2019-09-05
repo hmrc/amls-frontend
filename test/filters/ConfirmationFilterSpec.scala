@@ -30,9 +30,8 @@ import play.api.test.Helpers._
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.play.frontend.filters.MicroserviceFilterSupport
 
-class ConfirmationFilterSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with Results with MicroserviceFilterSupport {
+class ConfirmationFilterSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with Results {
 
   val keystore = mock[KeystoreConnector]
   val authenticator = mock[AuthenticatorConnector]
@@ -43,6 +42,8 @@ class ConfirmationFilterSpec extends PlaySpec with OneAppPerSuite with MockitoSu
     .build()
 
   trait TestFixture {
+
+    implicit val materializer = app.materializer
 
     val confirmationStatusResult = ConfirmationStatus(Some(true))
 
