@@ -16,19 +16,18 @@
 
 package connectors
 
-import javax.inject.Inject
 import audit.{ESDeEnrolEvent, ESEnrolEvent, ESEnrolFailureEvent, ESRemoveKnownFactsEvent}
 import config.AppConfig
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
+import javax.inject.Inject
 import models.enrolment.ErrorResponse._
 import models.enrolment.{AmlsEnrolmentKey, EnrolmentKey, ErrorResponse, TaxEnrolment}
 import play.api.Logger
+import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, Upstream4xxResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import play.api.http.Status._
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import uk.gov.hmrc.play.http.ws.WSHttp
 
 import scala.concurrent.{ExecutionContext, Future}
 

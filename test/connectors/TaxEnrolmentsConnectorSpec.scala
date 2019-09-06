@@ -50,7 +50,8 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
     val auditConnector = mock[AuditConnector]
     val groupIdentfier = stringOfLengthGen(10).sample.get
 
-    val connector = new TaxEnrolmentsConnector(http, appConfig, auditConnector)
+    lazy val connector = new TaxEnrolmentsConnector(http, appConfig, auditConnector)
+
     val baseUrl = "http://localhost:3001"
     val serviceStub = "tax-enrolments"
     val enrolKey = AmlsEnrolmentKey(amlsRegistrationNumber)
@@ -136,11 +137,11 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
         val endpointUrl = s"$baseUrl/${serviceStub}/groups/$groupIdentfier/enrolments/${enrolKey.key}"
 
         when {
-          http.DELETE[HttpResponse](any())(any(), any(), any())
+          http.DELETE[HttpResponse](any(), any())(any(), any(), any())
         } thenReturn Future.successful(HttpResponse(NO_CONTENT))
 
         whenReady(connector.deEnrol(amlsRegistrationNumber, Some(groupIdentfier))) { _ =>
-          verify(http).DELETE[HttpResponse](eqTo(endpointUrl))(any(), any(), any())
+          verify(http).DELETE[HttpResponse](eqTo(endpointUrl), any())(any(), any(), any())
           verify(auditConnector).sendEvent(any())(any(), any())
         }
       }
@@ -162,11 +163,11 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
         val endpointUrl = s"$baseUrl/${serviceStub}/enrolments/${enrolKey.key}"
 
         when {
-          http.DELETE[HttpResponse](any())(any(), any(), any())
+          http.DELETE[HttpResponse](any(), any())(any(), any(), any())
         } thenReturn Future.successful(HttpResponse(NO_CONTENT))
 
         whenReady(connector.removeKnownFacts(amlsRegistrationNumber)) { _ =>
-          verify(http).DELETE[HttpResponse](eqTo(endpointUrl))(any(), any(), any())
+          verify(http).DELETE[HttpResponse](eqTo(endpointUrl), any())(any(), any(), any())
           verify(auditConnector).sendEvent(any())(any(), any())
         }
       }
