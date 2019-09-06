@@ -39,12 +39,10 @@ class BusinessCustomerSessionCache @Inject()(environment: Environment,
                                              override val runModeConfiguration: Configuration,
                                              override val appNameConfiguration: Configuration,
                                              httpClient: HttpClient) extends SessionCache with AppName with ServicesConfig{
-  override lazy val http = httpClient
-  override lazy val defaultSource: String = getConfString("cachable.session-cache.review-details.cache","business-customer-frontend")
-
-  override lazy val baseUri = baseUrl("cachable.session-cache")
-  override lazy val domain = getConfString("cachable.session-cache.domain", throw new Exception(s"Could not find config 'cachable.session-cache.domain'"))
-
+  override def http = httpClient
+  override def defaultSource: String = getConfString("cachable.session-cache.review-details.cache","business-customer-frontend")
+  override def baseUri = baseUrl("cachable.session-cache")
+  override def domain = getConfString("cachable.session-cache.domain", throw new Exception(s"Could not find config 'cachable.session-cache.domain'"))
   override protected def mode: Mode = environment.mode
 }
 
