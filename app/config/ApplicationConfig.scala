@@ -124,6 +124,8 @@ class AppConfig @Inject()(val environment: Environment, val runModeConfiguration
 
   def enrolUrl = s"$ggUrl/enrol"
 
+  def ggAuthUrl = baseUrl("government-gateway-authentication")
+
   val mongoEncryptionEnabled = baseConfig.getBoolean("appCache.mongo.encryptionEnabled") getOrElse true
   val mongoAppCacheEnabled = baseConfig.getBoolean("appCache.mongo.enabled") getOrElse false
   val cacheExpiryInSeconds = baseConfig.getInt("appCache.expiryInSeconds") getOrElse 60
