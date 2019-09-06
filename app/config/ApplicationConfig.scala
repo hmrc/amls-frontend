@@ -142,4 +142,5 @@ class AppConfig @Inject()(val environment: Environment, val runModeConfiguration
 
   val testOnlyStubsUrl = baseUrl("test-only") + getConfigString("test-only.get-base-url")
 
+  def whitelist = baseConfig.getStringSeq("whitelist") getOrElse Seq.empty
 }
