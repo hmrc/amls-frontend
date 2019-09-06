@@ -14,11 +14,11 @@ private object AppDependencies {
 
   private val playPartialsVersion = "6.9.0-play-25"
   private val httpCachingClientVersion = "8.5.0-play-25"
-  private val playWhitelistFilterVersion = "2.0.0"
+  private val playWhitelistFilterVersion = "3.1.0-play-25"
   private val validationVersion = "2.0.1"
   private val flexmarkVersion = "0.19.1"
   private val okHttpVersion = "3.9.1"
-  private val jsonEncryptionVersion = "3.2.0"
+  private val jsonEncryptionVersion = "4.4.0-play-25"
   private val playReactivemongoVersion = "6.2.0"
   private val authVersion = "2.24.0-play-25"
   private val domain = "5.6.0-play-25"
