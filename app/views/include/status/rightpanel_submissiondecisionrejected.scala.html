@@ -16,9 +16,8 @@
 
 @import include.forms2._
 @import forms.EmptyForm
-@import config.CachedStaticHtmlPartialProvider
 
-@(showReregisterButton: Boolean = true)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
+@(showReregisterButton: Boolean = true)(implicit request: Request[_],m:Messages)
 <p>@Messages("status.submissiondecisionrejected.description")</p>
 <p id="rejected.p2">@Messages("status.submissiondecisionrejected.description2")</p>
 

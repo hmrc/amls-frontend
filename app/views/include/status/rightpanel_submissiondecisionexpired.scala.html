@@ -15,10 +15,9 @@
  *@
 
 @import include.forms2._
-@import config.CachedStaticHtmlPartialProvider
 @import forms.EmptyForm
 
-@()(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
+@()(implicit request: Request[_],m:Messages)
 <p>@Messages("status.submissiondecisionexpired.description")</p>
 <p>@Messages("status.submissiondecisionexpired.description2")</p>
 

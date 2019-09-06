@@ -14,9 +14,7 @@
  * limitations under the License.
  *@
 
-@import config.CachedStaticHtmlPartialProvider
-
-@()(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
+@()(implicit request: Request[_],m:Messages)
 <p>@Messages("status.incomplete.description")</p>
 <p>@Messages("status.incomplete.description1")</p>
 <a id="return-to-saved-application" href="@controllers.routes.RegistrationProgressController.get()" class="button" type="submit">@Messages("status.incomplete.buttontext")</a>
