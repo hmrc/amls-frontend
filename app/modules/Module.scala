@@ -16,11 +16,9 @@
 
 package modules
 
-import com.google.inject.{AbstractModule, Provides, TypeLiteral}
-import com.typesafe.config.Config
+import com.google.inject.{AbstractModule, TypeLiteral}
 import models.businessmatching.updateservice.ChangeBusinessType
 import models.flowmanagement.{AddBusinessTypeFlowModel, ChangeSubSectorFlowModel, RemoveBusinessTypeFlowModel}
-import play.api.Configuration
 import services.flowmanagement.Router
 import services.flowmanagement.flowrouters.businessmatching.{AddBusinessTypeRouter, ChangeBusinessTypeRouter, ChangeSubSectorRouter, RemoveBusinessTypeRouter}
 
@@ -32,8 +30,4 @@ class Module extends AbstractModule {
     bind(new TypeLiteral[Router[RemoveBusinessTypeFlowModel]] {}).to(classOf[RemoveBusinessTypeRouter])
     bind(new TypeLiteral[Router[ChangeSubSectorFlowModel]] {}).to(classOf[ChangeSubSectorRouter])
   }
-
-  @Provides
-  def configProvider(configuration: Configuration): Config =
-    configuration.underlying
 }
