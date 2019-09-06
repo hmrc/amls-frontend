@@ -47,11 +47,11 @@ class TestOnlyStubConnectorSpec extends AmlsSpec
     "clear the state from the stubs service" in new Fixture {
 
       when {
-        http.DELETE[HttpResponse](any())(any(), any(), any())
+        http.DELETE[HttpResponse](any(), any())(any(), any(), any())
       } thenReturn Future.successful(HttpResponse(NO_CONTENT))
 
       whenReady(connector.clearState()) { _ =>
-        verify(http).DELETE[HttpResponse](any())(any(), any(), any())
+        verify(http).DELETE[HttpResponse](any(), any())(any(), any(), any())
       }
     }
   }
