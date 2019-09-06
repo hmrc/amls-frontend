@@ -27,7 +27,8 @@ import views.html.bankdetails._
 
 import scala.concurrent.Future
 
-class HasBankAccountController @Inject()(val authAction: AuthAction, val ds: CommonPlayDependencies,
+class HasBankAccountController @Inject()(val authAction: AuthAction,
+                                         val ds: CommonPlayDependencies,
                                          cacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
 
   val router: Boolean => Call = {

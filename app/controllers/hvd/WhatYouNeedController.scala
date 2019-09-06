@@ -24,7 +24,8 @@ import views.html.hvd.what_you_need
 import scala.concurrent.Future
 
 
-class WhatYouNeedController @Inject() (val authAction: AuthAction, val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+class WhatYouNeedController @Inject() (val authAction: AuthAction,
+                                       val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
 
   def get = authAction.async {
     implicit request =>

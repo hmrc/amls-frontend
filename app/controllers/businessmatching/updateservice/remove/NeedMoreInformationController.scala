@@ -30,10 +30,10 @@ import views.html.businessmatching.updateservice.remove.need_more_information
 import scala.concurrent.Future
 
 @Singleton
-class NeedMoreInformationController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
+class NeedMoreInformationController @Inject()(authAction: AuthAction,
+                                              val ds: CommonPlayDependencies,
                                               implicit val dataCacheConnector: DataCacheConnector,
-                                              val router: Router[RemoveBusinessTypeFlowModel]
-                                             ) extends AmlsBaseController(ds) {
+                                              val router: Router[RemoveBusinessTypeFlowModel]) extends AmlsBaseController(ds) {
 
   def get() = authAction.async {
       implicit request =>

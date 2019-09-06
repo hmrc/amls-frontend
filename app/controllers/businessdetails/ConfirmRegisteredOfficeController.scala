@@ -31,10 +31,9 @@ import views.html.businessdetails._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ConfirmRegisteredOfficeController @Inject () (
-                                                   val dataCache: DataCacheConnector,
-                                                   val authAction: AuthAction, val ds: CommonPlayDependencies
-                                                   ) extends AmlsBaseController(ds) {
+class ConfirmRegisteredOfficeController @Inject () (val dataCache: DataCacheConnector,
+                                                    val authAction: AuthAction,
+                                                    val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
 
 
   def updateBMAddress(bm: BusinessMatching): Option[RegisteredOffice] = {

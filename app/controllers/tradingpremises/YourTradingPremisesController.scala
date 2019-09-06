@@ -35,7 +35,8 @@ import scala.concurrent.Future
 @Singleton
 class YourTradingPremisesController @Inject()(val dataCacheConnector: DataCacheConnector,
                                               val statusService: StatusService,
-                                              val authAction: AuthAction, val ds: CommonPlayDependencies
+                                              val authAction: AuthAction,
+                                              val ds: CommonPlayDependencies
                                              ) extends AmlsBaseController(ds) with RepeatingSection {
 
   private def updateTradingPremises(tradingPremises: Option[Seq[TradingPremises]]) : Future[Option[Seq[TradingPremises]]] = {

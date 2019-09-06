@@ -33,12 +33,12 @@ import scala.concurrent.Future
 
 @Singleton
 class WaysToPayController @Inject()(
-                                     val authAction: AuthAction, val ds: CommonPlayDependencies,
+                                     val authAction: AuthAction,
+                                     val ds: CommonPlayDependencies,
                                      val statusService: StatusService,
                                      val paymentsService: PaymentsService,
                                      val authEnrolmentsService: AuthEnrolmentsService,
-                                     val feeResponseService: FeeResponseService
-                                   ) extends AmlsBaseController(ds) {
+                                     val feeResponseService: FeeResponseService) extends AmlsBaseController(ds) {
 
   def get() = authAction.async {
       implicit request =>

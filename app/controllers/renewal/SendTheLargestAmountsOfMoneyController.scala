@@ -28,12 +28,11 @@ import views.html.renewal.send_largest_amounts_of_money
 import scala.concurrent.Future
 
 @Singleton
-class SendTheLargestAmountsOfMoneyController @Inject()(
-                                                        val dataCacheConnector: DataCacheConnector,
-                                                        val authAction: AuthAction, val ds: CommonPlayDependencies,
-                                                        val renewalService: RenewalService,
-                                                        val autoCompleteService: AutoCompleteService
-                                                      ) extends AmlsBaseController(ds) {
+class SendTheLargestAmountsOfMoneyController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                                       val authAction: AuthAction,
+                                                       val ds: CommonPlayDependencies,
+                                                       val renewalService: RenewalService,
+                                                       val autoCompleteService: AutoCompleteService) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

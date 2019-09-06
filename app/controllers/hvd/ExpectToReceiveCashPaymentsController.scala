@@ -30,7 +30,8 @@ import views.html.hvd.expect_to_receive
 import scala.concurrent.Future
 
 @Singleton
-class ExpectToReceiveCashPaymentsController @Inject()( val authAction: AuthAction, val ds: CommonPlayDependencies,
+class ExpectToReceiveCashPaymentsController @Inject()( val authAction: AuthAction,
+                                                       val ds: CommonPlayDependencies,
                                                        implicit val cacheConnector: DataCacheConnector,
                                                        implicit val statusService: StatusService,
                                                        implicit val serviceFlow: ServiceFlow) extends AmlsBaseController(ds) {

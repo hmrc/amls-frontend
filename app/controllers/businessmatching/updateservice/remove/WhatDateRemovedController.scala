@@ -35,10 +35,10 @@ import scala.concurrent.Future
 
 @Singleton
 class WhatDateRemovedController @Inject()(
-                                           authAction: AuthAction, val ds: CommonPlayDependencies,
+                                           authAction: AuthAction,
+                                           val ds: CommonPlayDependencies,
                                            val dataCacheConnector: DataCacheConnector,
-                                           val router: Router[RemoveBusinessTypeFlowModel]
-                                           ) extends AmlsBaseController(ds) {
+                                           val router: Router[RemoveBusinessTypeFlowModel]) extends AmlsBaseController(ds) {
 
   implicit val dateWrites: Write[DateOfChange, UrlFormEncoded] =
     Write {

@@ -41,8 +41,7 @@ class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
                                       implicit val dataCacheConnector: DataCacheConnector,
                                       val tradingPremisesService: TradingPremisesService,
                                       val responsiblePeopleService: ResponsiblePeopleService,
-                                      val appConfig:AppConfig
-                                   ) extends RepeatingSection {
+                                      val appConfig:AppConfig) extends RepeatingSection {
 
   def updateBusinessActivities(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier): OptionT[Future, BusinessActivities] = {
     OptionT(dataCacheConnector.update[BusinessActivities](credId, BusinessActivities.key) {

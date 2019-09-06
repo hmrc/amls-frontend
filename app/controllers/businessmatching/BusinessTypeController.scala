@@ -28,7 +28,8 @@ import views.html.businessmatching._
 import scala.concurrent.Future
 
 class BusinessTypeController @Inject()(val dataCache: DataCacheConnector,
-                                       authAction: AuthAction, val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                       authAction: AuthAction,
+                                       val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
 
   def get() = authAction.async {
     implicit request =>

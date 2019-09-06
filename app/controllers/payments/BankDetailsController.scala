@@ -29,11 +29,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class BankDetailsController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                      val authAction: AuthAction, val ds: CommonPlayDependencies,
+                                      val authAction: AuthAction,
+                                      val ds: CommonPlayDependencies,
                                       val authEnrolmentsService: AuthEnrolmentsService,
                                       val feeResponseService: FeeResponseService,
-                                      val statusService: StatusService
-                                    ) extends AmlsBaseController(ds){
+                                      val statusService: StatusService) extends AmlsBaseController(ds){
 
 
   def get(isUK: Boolean = true) = authAction.async {

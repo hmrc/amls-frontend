@@ -28,13 +28,11 @@ import services.businessmatching.ServiceFlow
 import utils.AuthAction
 import views.html.estateagentbusiness._
 
-class SummaryController @Inject()
-(
-  val dataCache: DataCacheConnector,
-  authAction: AuthAction, val ds: CommonPlayDependencies,
-  implicit val statusService: StatusService,
-  implicit val serviceFlow: ServiceFlow
-) extends AmlsBaseController(ds) {
+class SummaryController @Inject()(val dataCache: DataCacheConnector,
+                                  authAction: AuthAction,
+                                  val ds: CommonPlayDependencies,
+                                  implicit val statusService: StatusService,
+                                  implicit val serviceFlow: ServiceFlow) extends AmlsBaseController(ds) {
 
   def get() = authAction.async {
     implicit request =>

@@ -24,10 +24,9 @@ import models.bankdetails.BankDetails
 import models.bankdetails.BankDetails.Filters._
 import utils.AuthAction
 
-class YourBankAccountsController @Inject()(
-                                            val dataCacheConnector: DataCacheConnector,
-                                            val authAction: AuthAction, val ds: CommonPlayDependencies
-                                          ) extends BankDetailsController(ds) {
+class YourBankAccountsController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                           val authAction: AuthAction,
+                                           val ds: CommonPlayDependencies) extends BankDetailsController(ds) {
 
   def get(complete: Boolean = false) = authAction.async {
       implicit request =>

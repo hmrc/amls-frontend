@@ -28,7 +28,8 @@ import views.html.businessmatching.confirm_postcode
 import scala.concurrent.Future
 
 @Singleton
-class ConfirmPostCodeController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
+class ConfirmPostCodeController @Inject()(authAction: AuthAction,
+                                          val ds: CommonPlayDependencies,
                                           val dataCacheConnector: DataCacheConnector)() extends AmlsBaseController(ds) {
 
 

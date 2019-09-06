@@ -27,8 +27,8 @@ import views.html.responsiblepeople.person_name
 import scala.concurrent.Future
 
 class PersonNameController @Inject () ( val dataCacheConnector: DataCacheConnector,
-                                        authAction: AuthAction, val ds: CommonPlayDependencies
-                                      ) extends AmlsBaseController(ds) with RepeatingSection {
+                                        authAction: AuthAction,
+                                        val ds: CommonPlayDependencies) extends AmlsBaseController(ds) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>

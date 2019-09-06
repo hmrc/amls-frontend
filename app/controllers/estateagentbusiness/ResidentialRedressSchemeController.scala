@@ -26,9 +26,9 @@ import views.html.estateagentbusiness._
 
 import scala.concurrent.Future
 
-class ResidentialRedressSchemeController  @Inject()(
-                                                    val dataCacheConnector: DataCacheConnector,
-                                                    authAction: AuthAction, val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+class ResidentialRedressSchemeController  @Inject()(val dataCacheConnector: DataCacheConnector,
+                                                    authAction: AuthAction,
+                                                    val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

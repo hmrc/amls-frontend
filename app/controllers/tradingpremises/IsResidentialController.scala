@@ -32,7 +32,8 @@ import scala.concurrent.Future
 @Singleton
 class  IsResidentialController @Inject()(
                                           override val messagesApi: MessagesApi,
-                                          val authAction: AuthAction, val ds: CommonPlayDependencies,
+                                          val authAction: AuthAction,
+                                          val ds: CommonPlayDependencies,
                                           val dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false) = authAction.async{

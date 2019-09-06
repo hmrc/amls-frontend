@@ -31,12 +31,12 @@ import utils.AuthAction
 import scala.concurrent.Future
 
 class TypeOfBankController @Inject()(
-                                      val authAction: AuthAction, val ds: CommonPlayDependencies,
+                                      val authAction: AuthAction,
+                                      val ds: CommonPlayDependencies,
                                       val auditConnector: AuditConnector,
                                       val authEnrolmentsService: AuthEnrolmentsService,
                                       val feeResponseService: FeeResponseService,
-                                      val paymentsService: PaymentsService
-                                    ) extends AmlsBaseController(ds) {
+                                      val paymentsService: PaymentsService) extends AmlsBaseController(ds) {
 
   def get() = authAction.async {
       implicit request =>

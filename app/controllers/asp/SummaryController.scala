@@ -29,7 +29,9 @@ import views.html.asp.summary
 class SummaryController @Inject()(val dataCache: DataCacheConnector,
                                   val serviceFlow: ServiceFlow,
                                   val statusService: StatusService,
-                                  authAction: AuthAction, val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                  authAction: AuthAction,
+                                  val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+
   def get = authAction.async {
       implicit request =>
         dataCache.fetch[Asp](request.credId, Asp.key) map {

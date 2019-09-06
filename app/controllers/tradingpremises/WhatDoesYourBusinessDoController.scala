@@ -37,11 +37,9 @@ import scala.concurrent.Future
 
 class WhatDoesYourBusinessDoController @Inject () (
                                                     val dataCacheConnector: DataCacheConnector,
-                                                    val authAction: AuthAction, val ds: CommonPlayDependencies,
-                                                    val statusService: StatusService
-                                                  ) extends AmlsBaseController(ds) with RepeatingSection with FormHelpers with DateOfChangeHelper {
-
-
+                                                    val authAction: AuthAction,
+                                                    val ds: CommonPlayDependencies,
+                                                    val statusService: StatusService) extends AmlsBaseController(ds) with RepeatingSection with FormHelpers with DateOfChangeHelper {
 
   private def data(credId: String, index: Int, edit: Boolean)(implicit hc: HeaderCarrier)
   : Future[Either[Result, (CacheMap, Set[BusinessActivity])]] = {

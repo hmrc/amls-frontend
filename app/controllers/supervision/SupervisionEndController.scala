@@ -28,7 +28,8 @@ import views.html.supervision.supervision_end
 import scala.concurrent.Future
 
 class SupervisionEndController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                         val authAction: AuthAction, val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                         val authAction: AuthAction,
+                                         val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

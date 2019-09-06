@@ -29,7 +29,8 @@ import views.html.withdrawal.withdraw_application
 import scala.concurrent.Future
 
 class WithdrawApplicationController @Inject()(
-                                               authAction: AuthAction, val ds: CommonPlayDependencies,
+                                               authAction: AuthAction,
+                                               val ds: CommonPlayDependencies,
                                                implicit val amls: AmlsConnector,
                                                implicit val dc: DataCacheConnector,
                                                enrolments: AuthEnrolmentsService,

@@ -31,10 +31,10 @@ import scala.concurrent.Future
 
 @Singleton
 class BusinessServicesController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                            val statusService: StatusService,
-                                            val serviceFlow: ServiceFlow,
-                                            authAction: AuthAction, val ds: CommonPlayDependencies
-                                          ) extends AmlsBaseController(ds) with DateOfChangeHelper {
+                                           val statusService: StatusService,
+                                           val serviceFlow: ServiceFlow,
+                                           authAction: AuthAction,
+                                           val ds: CommonPlayDependencies) extends AmlsBaseController(ds) with DateOfChangeHelper {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

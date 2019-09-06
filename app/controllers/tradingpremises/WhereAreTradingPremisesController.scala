@@ -41,8 +41,8 @@ class WhereAreTradingPremisesController @Inject () (
                                                      val dataCacheConnector: DataCacheConnector,
                                                      val statusService: StatusService,
                                                      val auditConnector: AuditConnector,
-                                                     val authAction: AuthAction, val ds: CommonPlayDependencies
-                                                   )extends AmlsBaseController(ds) with RepeatingSection with DateOfChangeHelper with FormHelpers {
+                                                     val authAction: AuthAction,
+                                                     val ds: CommonPlayDependencies)extends AmlsBaseController(ds) with RepeatingSection with DateOfChangeHelper with FormHelpers {
 
 
 

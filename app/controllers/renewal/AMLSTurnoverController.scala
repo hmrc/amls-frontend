@@ -27,11 +27,10 @@ import utils.{AuthAction, ControllerHelper}
 import views.html.renewal.amls_turnover
 
 @Singleton
-class AMLSTurnoverController @Inject()(
-                                        val dataCacheConnector: DataCacheConnector,
-                                        val authAction: AuthAction, val ds: CommonPlayDependencies,
-                                        val renewalService: RenewalService
-                                      ) extends AmlsBaseController(ds) {
+class AMLSTurnoverController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                       val authAction: AuthAction,
+                                       val ds: CommonPlayDependencies,
+                                       val renewalService: RenewalService) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

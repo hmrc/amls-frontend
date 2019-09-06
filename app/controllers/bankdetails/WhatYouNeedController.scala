@@ -27,7 +27,8 @@ import play.api.mvc.Call
 import utils.AuthAction
 import views.html.bankdetails._
 
-class WhatYouNeedController @Inject()(val authAction: AuthAction, val ds: CommonPlayDependencies,
+class WhatYouNeedController @Inject()(val authAction: AuthAction,
+                                      val ds: CommonPlayDependencies,
                                       dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
 
   def get = authAction.async {

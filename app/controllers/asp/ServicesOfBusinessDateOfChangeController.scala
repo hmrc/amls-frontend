@@ -30,8 +30,8 @@ import views.html.date_of_change
 import scala.concurrent.Future
 
 class ServicesOfBusinessDateOfChangeController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                         val authAction: AuthAction, val ds: CommonPlayDependencies
-                                                       ) extends AmlsBaseController(ds) {
+                                                         val authAction: AuthAction,
+                                                         val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
 
   def get = authAction.async {
       implicit request =>

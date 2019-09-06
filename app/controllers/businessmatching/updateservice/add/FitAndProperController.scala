@@ -33,10 +33,10 @@ import scala.concurrent.Future
 
 @Singleton
 class FitAndProperController @Inject()(
-                                        authAction: AuthAction, val ds: CommonPlayDependencies,
+                                        authAction: AuthAction,
+                                        val ds: CommonPlayDependencies,
                                         implicit val dataCacheConnector: DataCacheConnector,
-                                        val router: Router[AddBusinessTypeFlowModel]
-                                      ) extends AmlsBaseController(ds) with RepeatingSection {
+                                        val router: Router[AddBusinessTypeFlowModel]) extends AmlsBaseController(ds) with RepeatingSection {
 
   val NAME = "passedFitAndProper"
 

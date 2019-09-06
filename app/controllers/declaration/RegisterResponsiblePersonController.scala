@@ -24,11 +24,10 @@ import services.StatusService
 import utils.AuthAction
 
 @Singleton
-class RegisterResponsiblePersonController @Inject()(
-                                                     val dataCacheConnector: DataCacheConnector,
-                                                     authAction: AuthAction, val ds: CommonPlayDependencies,
-                                                     val statusService: StatusService
-                                                   ) extends AmlsBaseController(ds) {
+class RegisterResponsiblePersonController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                                    authAction: AuthAction,
+                                                    val ds: CommonPlayDependencies,
+                                                    val statusService: StatusService) extends AmlsBaseController(ds) {
 
   def get() = authAction.async {
     implicit request => {

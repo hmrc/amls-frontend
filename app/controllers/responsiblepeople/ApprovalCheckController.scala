@@ -28,9 +28,9 @@ import scala.concurrent.Future
 
 class ApprovalCheckController @Inject()(
                                          val dataCacheConnector: DataCacheConnector,
-                                         authAction: AuthAction, val ds: CommonPlayDependencies,
-                                         appConfig: AppConfig
-                                       ) extends AmlsBaseController(ds) with RepeatingSection {
+                                         authAction: AuthAction,
+                                         val ds: CommonPlayDependencies,
+                                         appConfig: AppConfig) extends AmlsBaseController(ds) with RepeatingSection {
 
   val FIELD_NAME = "hasAlreadyPaidApprovalCheck"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(FIELD_NAME)

@@ -27,8 +27,8 @@ import views.html.asp.other_business_tax_matters
 import scala.concurrent.Future
 
 class OtherBusinessTaxMattersController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                  authAction: AuthAction, val ds: CommonPlayDependencies
-                                                 ) extends AmlsBaseController(ds) {
+                                                  authAction: AuthAction,
+                                                  val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

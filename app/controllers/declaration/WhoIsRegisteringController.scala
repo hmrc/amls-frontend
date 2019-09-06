@@ -34,13 +34,12 @@ import views.html.declaration.{who_is_registering_this_registration, who_is_regi
 
 import scala.concurrent.Future
 
-class WhoIsRegisteringController @Inject () (
-                                            authAction: AuthAction, val ds: CommonPlayDependencies,
-                                            val dataCacheConnector: DataCacheConnector,
-                                            val statusService: StatusService,
-                                            val renewalService: RenewalService,
-                                            val amlsConnector: AmlsConnector
-                                            ) extends AmlsBaseController(ds) {
+class WhoIsRegisteringController @Inject () (authAction: AuthAction,
+                                             val ds: CommonPlayDependencies,
+                                             val dataCacheConnector: DataCacheConnector,
+                                             val statusService: StatusService,
+                                             val renewalService: RenewalService,
+                                             val amlsConnector: AmlsConnector) extends AmlsBaseController(ds) {
 
   def get = authAction.async {
     implicit request =>

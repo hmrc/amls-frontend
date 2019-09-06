@@ -31,9 +31,9 @@ import scala.concurrent.Future
 
 class RemoveResponsiblePersonController @Inject () (
                                                    val dataCacheConnector: DataCacheConnector,
-                                                   authAction: AuthAction, val ds: CommonPlayDependencies,
-                                                   val statusService: StatusService
-                                                   ) extends AmlsBaseController(ds) with RepeatingSection {
+                                                   authAction: AuthAction,
+                                                   val ds: CommonPlayDependencies,
+                                                   val statusService: StatusService) extends AmlsBaseController(ds) with RepeatingSection {
 
   def get(index: Int, flow: Option[String] = None) = authAction.async {
     implicit request =>

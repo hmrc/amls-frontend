@@ -32,9 +32,9 @@ import scala.concurrent.Future
 @Singleton
 class FitAndProperController @Inject()(
                                         val dataCacheConnector: DataCacheConnector,
-                                        authAction: AuthAction, val ds: CommonPlayDependencies,
-                                        appConfig: AppConfig
-                                      ) extends AmlsBaseController(ds) with RepeatingSection {
+                                        authAction: AuthAction,
+                                        val ds: CommonPlayDependencies,
+                                        appConfig: AppConfig) extends AmlsBaseController(ds) with RepeatingSection {
 
   val FIELDNAME = "hasAlreadyPassedFitAndProper"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(FIELDNAME)

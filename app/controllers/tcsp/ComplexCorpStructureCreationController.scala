@@ -26,7 +26,8 @@ import views.html.tcsp._
 
 import scala.concurrent.Future
 
-class ComplexCorpStructureCreationController @Inject()(val authAction: AuthAction, val ds: CommonPlayDependencies,
+class ComplexCorpStructureCreationController @Inject()(val authAction: AuthAction,
+                                                       val ds: CommonPlayDependencies,
                                                        val dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
 
   val NAME = "complexCorpStructureCreation"

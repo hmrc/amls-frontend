@@ -30,9 +30,9 @@ import views.html.businessdetails._
 import scala.concurrent.Future
 
 class VATRegisteredController @Inject () (
-                                         val dataCacheConnector: DataCacheConnector,
-                                         val authAction: AuthAction, val ds: CommonPlayDependencies
-                                         ) extends AmlsBaseController(ds) {
+                                           val dataCacheConnector: DataCacheConnector,
+                                           val authAction: AuthAction,
+                                           val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
 
 
 

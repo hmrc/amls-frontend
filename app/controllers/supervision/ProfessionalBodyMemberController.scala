@@ -29,7 +29,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ProfessionalBodyMemberController @Inject()(
                                                   val dataCacheConnector: DataCacheConnector,
-                                                  val authAction: AuthAction, val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                                  val authAction: AuthAction,
+                                                  val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

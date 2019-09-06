@@ -31,12 +31,12 @@ import utils.AuthAction
 import scala.concurrent.Future
 
 @Singleton
-class MostTransactionsController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
+class MostTransactionsController @Inject()(authAction: AuthAction,
+                                           val ds: CommonPlayDependencies,
                                            implicit val cacheConnector: DataCacheConnector,
                                            implicit val statusService: StatusService,
                                            implicit val serviceFlow: ServiceFlow,
-                                           val autoCompleteService: AutoCompleteService
-                                          ) extends AmlsBaseController(ds) {
+                                           val autoCompleteService: AutoCompleteService) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

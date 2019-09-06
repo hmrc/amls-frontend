@@ -31,7 +31,8 @@ import views.html.withdrawal.withdrawal_reason
 import scala.concurrent.Future
 
 class WithdrawalReasonController @Inject()(
-                                            authAction: AuthAction, val ds: CommonPlayDependencies,
+                                            authAction: AuthAction,
+                                            val ds: CommonPlayDependencies,
                                             val amls: AmlsConnector,
                                             enrolments: AuthEnrolmentsService,
                                             statusService: StatusService,

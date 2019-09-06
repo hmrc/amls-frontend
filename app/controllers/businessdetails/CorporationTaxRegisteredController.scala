@@ -36,11 +36,10 @@ import scala.concurrent.Future
 // This controller no longer has a vew or POST method. The UTR is acquired in BM and should be copied
 // to Business Details only once pre-submission. API5 then populates this field from ETMP. The user
 // should have no requirement to update it.
-class CorporationTaxRegisteredController @Inject () (
-                                                      val dataCacheConnector: DataCacheConnector,
-                                                      val businessMatchingConnector: BusinessMatchingConnector,
-                                                      val authAction: AuthAction, val ds: CommonPlayDependencies
-                                                    ) extends AmlsBaseController(ds) {
+class CorporationTaxRegisteredController @Inject () (val dataCacheConnector: DataCacheConnector,
+                                                     val businessMatchingConnector: BusinessMatchingConnector,
+                                                     val authAction: AuthAction,
+                                                     val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
 
   val failedResult = InternalServerError("Failed to update the business corporation tax number")
 

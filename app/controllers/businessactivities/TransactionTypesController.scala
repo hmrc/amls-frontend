@@ -29,7 +29,8 @@ import views.html.businessactivities.transaction_types
 
 import scala.concurrent.Future
 
-class TransactionTypesController @Inject()(val authAction: AuthAction, val ds: CommonPlayDependencies,
+class TransactionTypesController @Inject()(val authAction: AuthAction,
+                                           val ds: CommonPlayDependencies,
                                            val cacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {

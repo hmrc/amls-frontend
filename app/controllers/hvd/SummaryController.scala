@@ -28,7 +28,8 @@ import services.businessmatching.ServiceFlow
 import utils.AuthAction
 import views.html.hvd.summary
 
-class SummaryController @Inject() (val authAction: AuthAction, val ds: CommonPlayDependencies,
+class SummaryController @Inject() (val authAction: AuthAction,
+                                   val ds: CommonPlayDependencies,
                                    implicit val dataCache: DataCacheConnector,
                                    implicit val statusService: StatusService,
                                    implicit val serviceFlow: ServiceFlow) extends AmlsBaseController(ds) {

@@ -29,10 +29,9 @@ import views.html.businessdetails.activity_start_date
 
 import scala.concurrent.Future
 
-class ActivityStartDateController @Inject () (
-                                             val dataCache: DataCacheConnector,
-                                             val authAction: AuthAction, val ds: CommonPlayDependencies
-                                             ) extends AmlsBaseController(ds) {
+class ActivityStartDateController @Inject () (val dataCache: DataCacheConnector,
+                                              val authAction: AuthAction,
+                                              val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

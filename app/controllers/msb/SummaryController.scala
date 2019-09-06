@@ -27,11 +27,11 @@ import services.businessmatching.ServiceFlow
 import utils.AuthAction
 import views.html.msb.summary
 
-class SummaryController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
+class SummaryController @Inject()(authAction: AuthAction,
+                                  val ds: CommonPlayDependencies,
                                   implicit val dataCache: DataCacheConnector,
                                   implicit val statusService: StatusService,
-                                  implicit val serviceFlow: ServiceFlow
-                                  ) extends AmlsBaseController(ds) {
+                                  implicit val serviceFlow: ServiceFlow) extends AmlsBaseController(ds) {
 
   def get = authAction.async {
     implicit request =>

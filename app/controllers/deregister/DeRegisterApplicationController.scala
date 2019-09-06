@@ -28,7 +28,8 @@ import views.html.deregister.deregister_application
 
 import scala.concurrent.Future
 
-class DeRegisterApplicationController @Inject() (authAction: AuthAction, val ds: CommonPlayDependencies,
+class DeRegisterApplicationController @Inject() (authAction: AuthAction,
+                                                 val ds: CommonPlayDependencies,
                                                  implicit val cache: DataCacheConnector,
                                                  implicit val statusService: StatusService,
                                                  enrolments: AuthEnrolmentsService,

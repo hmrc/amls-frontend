@@ -30,10 +30,10 @@ import scala.concurrent.Future
 
 @Singleton
 class CustomersOutsideIsUKController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                               val authAction: AuthAction, val ds: CommonPlayDependencies,
+                                               val authAction: AuthAction,
+                                               val ds: CommonPlayDependencies,
                                                val renewalService: RenewalService,
-                                               val autoCompleteService: AutoCompleteService
-                                            ) extends AmlsBaseController(ds) {
+                                               val autoCompleteService: AutoCompleteService) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

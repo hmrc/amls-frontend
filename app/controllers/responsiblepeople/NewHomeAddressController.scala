@@ -31,10 +31,10 @@ import views.html.responsiblepeople
 import scala.concurrent.Future
 
 @Singleton
-class NewHomeAddressController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
+class NewHomeAddressController @Inject()(authAction: AuthAction,
+                                         val ds: CommonPlayDependencies,
                                          val dataCacheConnector: DataCacheConnector,
-                                         val autoCompleteService: AutoCompleteService
-                                        ) extends AmlsBaseController(ds) with RepeatingSection {
+                                         val autoCompleteService: AutoCompleteService) extends AmlsBaseController(ds) with RepeatingSection {
 
   final val DefaultAddressHistory = NewHomeAddress(PersonAddressUK("", "", None, None, ""))
 

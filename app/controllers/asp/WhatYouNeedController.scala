@@ -23,8 +23,9 @@ import views.html.asp._
 
 import scala.concurrent.Future
 
-class WhatYouNeedController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies
-                                     ) extends AmlsBaseController(ds) {
+class WhatYouNeedController @Inject()(authAction: AuthAction,
+                                      val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+
   def get = authAction.async {
       implicit request =>
         Future.successful(Ok(what_you_need()))

@@ -31,8 +31,8 @@ import scala.concurrent.Future
 class RegisteredOfficeDateOfChangeController @Inject () (
                                                           val dataCacheConnector: DataCacheConnector,
                                                           val statusService: StatusService,
-                                                          val authAction: AuthAction, val ds: CommonPlayDependencies
-                                                        ) extends AmlsBaseController(ds) with DateOfChangeHelper {
+                                                          val authAction: AuthAction,
+                                                          val ds: CommonPlayDependencies) extends AmlsBaseController(ds) with DateOfChangeHelper {
 
 
 

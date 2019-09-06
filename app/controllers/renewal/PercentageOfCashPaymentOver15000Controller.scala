@@ -29,11 +29,10 @@ import scala.concurrent.Future
 
 
 @Singleton
-class PercentageOfCashPaymentOver15000Controller @Inject()(
-                                           val dataCacheConnector: DataCacheConnector,
-                                           val authAction: AuthAction, val ds: CommonPlayDependencies,
-                                           val renewalService: RenewalService
-                                         ) extends AmlsBaseController(ds) {
+class PercentageOfCashPaymentOver15000Controller @Inject()(val dataCacheConnector: DataCacheConnector,
+                                                           val authAction: AuthAction,
+                                                           val ds: CommonPlayDependencies,
+                                                           val renewalService: RenewalService) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

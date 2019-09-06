@@ -29,8 +29,8 @@ import scala.concurrent.Future
 
 class WhoIsYourAccountantController @Inject() ( val dataCacheConnector: DataCacheConnector,
                                                 val autoCompleteService: AutoCompleteService,
-                                                val authAction: AuthAction, val ds: CommonPlayDependencies
-                                              )extends AmlsBaseController(ds) {
+                                                val authAction: AuthAction,
+                                                val ds: CommonPlayDependencies)extends AmlsBaseController(ds) {
 
   //Joe - cannot seem to provide a default for UK/Non UK without providing defaults for other co-products
   private val defaultValues = WhoIsYourAccountant("", None, UkAccountantsAddress("","", None, None, ""))

@@ -34,10 +34,10 @@ import scala.concurrent.Future
 
 @Singleton
 class BankAccountNameController @Inject()(
-                                           val authAction: AuthAction, val ds: CommonPlayDependencies,
+                                           val authAction: AuthAction,
+                                           val ds: CommonPlayDependencies,
                                            val dataCacheConnector: DataCacheConnector,
-                                           val statusService: StatusService
-                                         ) extends BankDetailsController(ds) {
+                                           val statusService: StatusService) extends BankDetailsController(ds) {
 
   implicit def write: Write[String, UrlFormEncoded] = Write { data =>
     Map("accountName" -> Seq(data))

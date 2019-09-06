@@ -46,8 +46,7 @@ class RemoveBusinessTypesController @Inject()(
                                                val dataCacheConnector: DataCacheConnector,
                                                val businessMatchingService: BusinessMatchingService,
                                                val removeBusinessTypeHelper: RemoveBusinessTypeHelper,
-                                               val router: Router[RemoveBusinessTypeFlowModel]
-                                             ) extends AmlsBaseController(ds) {
+                                               val router: Router[RemoveBusinessTypeFlowModel]) extends AmlsBaseController(ds) {
 
   def formReaderminLengthR: Rule[UrlFormEncoded, Set[BusinessActivity]] = From[UrlFormEncoded] { __ =>
     (__ \ "businessActivities").read(minLengthR[Set[BusinessActivity]](1).withMessage("error.required.bm.remove.service"))

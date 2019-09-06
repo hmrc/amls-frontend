@@ -31,9 +31,10 @@ import views.html.renewal.money_sources
 
 import scala.concurrent.Future
 
-class MoneySourcesController @Inject()(val authAction: AuthAction, val ds: CommonPlayDependencies,
-                                                renewalService: RenewalService,
-                                                dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
+class MoneySourcesController @Inject()(val authAction: AuthAction,
+                                       val ds: CommonPlayDependencies,
+                                       renewalService: RenewalService,
+                                       dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

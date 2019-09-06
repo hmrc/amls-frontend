@@ -39,10 +39,10 @@ import scala.concurrent.Future
 @Singleton
 class AdditionalAddressController @Inject() (
                                               override val dataCacheConnector: DataCacheConnector,
-                                              authAction: AuthAction, val ds: CommonPlayDependencies,
+                                              authAction: AuthAction,
+                                              val ds: CommonPlayDependencies,
                                               auditConnector: AuditConnector,
-                                              val autoCompleteService: AutoCompleteService
-                                            ) extends AmlsBaseController(ds) with RepeatingSection {
+                                              val autoCompleteService: AutoCompleteService) extends AmlsBaseController(ds) with RepeatingSection {
 
   final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None)
 

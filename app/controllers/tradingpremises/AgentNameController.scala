@@ -36,9 +36,9 @@ import scala.concurrent.Future
 @Singleton
 class AgentNameController @Inject()(
                                      val dataCacheConnector: DataCacheConnector,
-                                     val authAction: AuthAction, val ds: CommonPlayDependencies,
-                                     val statusService: StatusService
-                                   ) extends AmlsBaseController(ds) with RepeatingSection with DateOfChangeHelper with FormHelpers {
+                                     val authAction: AuthAction,
+                                     val ds: CommonPlayDependencies,
+                                     val statusService: StatusService) extends AmlsBaseController(ds) with RepeatingSection with DateOfChangeHelper with FormHelpers {
 
   def get(index: Int, edit: Boolean = false) = authAction.async {
       implicit request =>

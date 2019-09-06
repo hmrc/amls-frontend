@@ -28,7 +28,8 @@ import views.html.hvd.percentage
 
 import scala.concurrent.Future
 
-class PercentageOfCashPaymentOver15000Controller @Inject() (val authAction: AuthAction, val ds: CommonPlayDependencies,
+class PercentageOfCashPaymentOver15000Controller @Inject() (val authAction: AuthAction,
+                                                            val ds: CommonPlayDependencies,
                                                             implicit val dataCacheConnector: DataCacheConnector,
                                                             implicit val serviceFlow: ServiceFlow,
                                                             implicit val statusService: StatusService) extends AmlsBaseController(ds) {

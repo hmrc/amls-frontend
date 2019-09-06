@@ -37,10 +37,10 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 class AdditionalExtraAddressController @Inject() (
                                                    val dataCacheConnector: DataCacheConnector,
-                                                   authAction: AuthAction, val ds: CommonPlayDependencies,
+                                                   authAction: AuthAction,
+                                                   val ds: CommonPlayDependencies,
                                                    auditConnector: AuditConnector,
-                                                   autoCompleteService: AutoCompleteService
-                                                 ) extends AmlsBaseController(ds) with RepeatingSection {
+                                                   autoCompleteService: AutoCompleteService) extends AmlsBaseController(ds) with RepeatingSection {
 
 
   final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None)

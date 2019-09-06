@@ -27,11 +27,10 @@ import views.html.businessdetails._
 
 import scala.concurrent.Future
 
-class CorrespondenceAddressIsUkController @Inject ()(
-                                                 val dataConnector: DataCacheConnector,
-                                                 val auditConnector: AuditConnector,
-                                                 val authAction: AuthAction, val ds: CommonPlayDependencies
-                                                 ) extends AmlsBaseController(ds) {
+class CorrespondenceAddressIsUkController @Inject ()(val dataConnector: DataCacheConnector,
+                                                     val auditConnector: AuditConnector,
+                                                     val authAction: AuthAction,
+                                                     val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

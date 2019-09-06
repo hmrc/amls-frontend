@@ -30,9 +30,9 @@ import views.html.businessactivities._
 import scala.concurrent.Future
 
 class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                                val authAction: AuthAction, val ds: CommonPlayDependencies,
-                                                implicit val statusService: StatusService
-                                               ) extends AmlsBaseController(ds) {
+                                                val authAction: AuthAction,
+                                                val ds: CommonPlayDependencies,
+                                                implicit val statusService: StatusService) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

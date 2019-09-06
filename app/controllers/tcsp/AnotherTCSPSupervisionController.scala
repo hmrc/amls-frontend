@@ -25,7 +25,8 @@ import utils.AuthAction
 
 import scala.concurrent.Future
 
-class AnotherTCSPSupervisionController @Inject()(val authAction: AuthAction, val ds: CommonPlayDependencies,
+class AnotherTCSPSupervisionController @Inject()(val authAction: AuthAction,
+                                                 val ds: CommonPlayDependencies,
                                                  val dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {

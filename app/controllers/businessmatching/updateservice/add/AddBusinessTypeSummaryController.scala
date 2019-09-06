@@ -34,14 +34,14 @@ import scala.concurrent.Future
 
 @Singleton
 class AddBusinessTypeSummaryController @Inject()(
-                                                  authAction: AuthAction, val ds: CommonPlayDependencies,
+                                                  authAction: AuthAction,
+                                                  val ds: CommonPlayDependencies,
                                                   implicit val dataCacheConnector: DataCacheConnector,
                                                   val statusService: StatusService,
                                                   val businessMatchingService: BusinessMatchingService,
                                                   val helper: AddBusinessTypeHelper,
                                                   val router: Router[AddBusinessTypeFlowModel],
-                                                  val tradingPremisesService: TradingPremisesService
-                                               ) extends AmlsBaseController(ds) with RepeatingSection {
+                                                  val tradingPremisesService: TradingPremisesService) extends AmlsBaseController(ds) with RepeatingSection {
 
   def get() = authAction.async {
       implicit request =>

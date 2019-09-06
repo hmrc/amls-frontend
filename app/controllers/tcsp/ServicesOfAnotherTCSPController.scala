@@ -27,7 +27,8 @@ import views.html.tcsp._
 import scala.concurrent.Future
 
 class ServicesOfAnotherTCSPController @Inject()(
-                                                 val authAction: AuthAction, val ds: CommonPlayDependencies,
+                                                 val authAction: AuthAction,
+                                                 val ds: CommonPlayDependencies,
                                                  val dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
 
   val NAME = "servicesOfAnotherTCSP"

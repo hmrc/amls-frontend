@@ -31,11 +31,11 @@ import views.html.businessmatching.updateservice.remove.remove_activities_summar
 
 import scala.concurrent.Future
 
-class RemoveBusinessTypesSummaryController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
+class RemoveBusinessTypesSummaryController @Inject()(authAction: AuthAction,
+                                                     val ds: CommonPlayDependencies,
                                                      val dataCacheConnector: DataCacheConnector,
                                                      val helper: RemoveBusinessTypeHelper,
-                                                     val router: Router[RemoveBusinessTypeFlowModel]
-                                                    ) extends AmlsBaseController(ds) {
+                                                     val router: Router[RemoveBusinessTypeFlowModel]) extends AmlsBaseController(ds) {
 
   def get = authAction.async {
       implicit request => {

@@ -30,7 +30,8 @@ import scala.concurrent.Future
 
 @Singleton
 class TradingPremisesAddController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                             val authAction: AuthAction, val ds: CommonPlayDependencies) extends AmlsBaseController(ds) with RepeatingSection {
+                                             val authAction: AuthAction,
+                                             val ds: CommonPlayDependencies) extends AmlsBaseController(ds) with RepeatingSection {
 
   private def isMSBSelected(cacheMap: Option[CacheMap])(implicit hc: HeaderCarrier): Boolean = {
     val test = for {

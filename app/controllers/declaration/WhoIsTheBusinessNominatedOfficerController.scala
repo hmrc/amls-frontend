@@ -37,7 +37,8 @@ import scala.concurrent.Future
 class WhoIsTheBusinessNominatedOfficerController @Inject ()(
                                                              val amlsConnector: AmlsConnector,
                                                              val dataCacheConnector: DataCacheConnector,
-                                                             authAction: AuthAction, val ds: CommonPlayDependencies,
+                                                             authAction: AuthAction,
+                                                             val ds: CommonPlayDependencies,
                                                              val statusService: StatusService,
                                                              config: AppConfig) extends AmlsBaseController(ds) {
 

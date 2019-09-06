@@ -28,8 +28,9 @@ import utils.AuthAction
 
 import scala.concurrent.Future
 
-class StillEmployedController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies, implicit val dataCacheConnector: DataCacheConnector)
-                              extends AmlsBaseController(ds) {
+class StillEmployedController @Inject()(authAction: AuthAction,
+                                        val ds: CommonPlayDependencies,
+                                        implicit val dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
 
   def get = authAction.async {
      implicit request =>

@@ -32,8 +32,8 @@ import scala.concurrent.Future
 
 class SummaryController @Inject() (val dataCache: DataCacheConnector,
                                    implicit val statusService: StatusService,
-                                   val authAction: AuthAction, val ds: CommonPlayDependencies
-                                  )extends AmlsBaseController(ds) {
+                                   val authAction: AuthAction,
+                                   val ds: CommonPlayDependencies)extends AmlsBaseController(ds) {
 
   def get = authAction.async {
     implicit request =>

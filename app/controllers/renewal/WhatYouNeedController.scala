@@ -24,7 +24,9 @@ import utils.AuthAction
 import views.html.renewal._
 
 @Singleton
-class WhatYouNeedController @Inject()(val authAction: AuthAction, val ds: CommonPlayDependencies, renewalService: RenewalService) extends AmlsBaseController(ds) {
+class WhatYouNeedController @Inject()(val authAction: AuthAction,
+                                      val ds: CommonPlayDependencies,
+                                      renewalService: RenewalService) extends AmlsBaseController(ds) {
 
   def get = authAction.async {
     implicit request =>

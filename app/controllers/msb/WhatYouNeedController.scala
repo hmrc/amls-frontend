@@ -26,7 +26,8 @@ import views.html.msb.what_you_need
 
 import scala.concurrent.Future
 
-class WhatYouNeedController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
+class WhatYouNeedController @Inject()(authAction: AuthAction,
+                                      val ds: CommonPlayDependencies,
                                       val statusService: StatusService,
                                       val dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
 

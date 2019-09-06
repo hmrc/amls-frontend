@@ -37,8 +37,8 @@ class CurrentAddressController @Inject () (
                                             auditConnector: AuditConnector,
                                             autoCompleteService: AutoCompleteService,
                                             statusService: StatusService,
-                                            authAction: AuthAction, val ds: CommonPlayDependencies
-                                          ) extends AmlsBaseController(ds) with RepeatingSection with DateOfChangeHelper {
+                                            authAction: AuthAction,
+                                            val ds: CommonPlayDependencies) extends AmlsBaseController(ds) with RepeatingSection with DateOfChangeHelper {
 
   final val DefaultAddressHistory = ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), None)
 

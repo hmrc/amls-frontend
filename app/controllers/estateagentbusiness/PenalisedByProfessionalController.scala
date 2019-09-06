@@ -26,9 +26,9 @@ import views.html.estateagentbusiness._
 
 import scala.concurrent.Future
 
-class PenalisedByProfessionalController @Inject()(
-                                                   val authAction: AuthAction, val ds: CommonPlayDependencies,
-                                                   val dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
+class PenalisedByProfessionalController @Inject()(val authAction: AuthAction,
+                                                  val ds: CommonPlayDependencies,
+                                                  val dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

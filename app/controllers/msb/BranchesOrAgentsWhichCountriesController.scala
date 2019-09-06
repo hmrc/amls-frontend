@@ -28,9 +28,9 @@ import utils.AuthAction
 import scala.concurrent.Future
 
 class BranchesOrAgentsWhichCountriesController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                         authAction: AuthAction, val ds: CommonPlayDependencies,
-                                                         val autoCompleteService: AutoCompleteService
-                                                        ) extends AmlsBaseController(ds) {
+                                                         authAction: AuthAction,
+                                                         val ds: CommonPlayDependencies,
+                                                         val autoCompleteService: AutoCompleteService) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
