@@ -16,20 +16,12 @@
 
 package config
 
-import akka.actor.ActorSystem
 import com.google.inject.Inject
 import play.api.Mode.Mode
-import play.api.libs.ws.WSClient
-import play.api.mvc.Request
-import play.api.{Application, Configuration, Environment, Logger}
-import play.twirl.api.Html
+import play.api.{Application, Configuration, Environment}
 import uk.gov.hmrc.http.cache.client.SessionCache
-import uk.gov.hmrc.http.hooks.HttpHook
-import uk.gov.hmrc.http.{CoreDelete, CoreGet, CorePut, HttpGet}
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.play.bootstrap.http.{DefaultHttpClient, HttpClient}
 import uk.gov.hmrc.play.config.{AppName, ServicesConfig}
-import uk.gov.hmrc.play.http.ws.{WSGet, WSHttp}
-import uk.gov.hmrc.play.partials.CachedStaticHtmlPartialRetriever
 
 ///*
 // * Copyright 2019 HM Revenue & Customs
@@ -103,7 +95,9 @@ import uk.gov.hmrc.play.partials.CachedStaticHtmlPartialRetriever
 //  override def controllerConfigs: Config = application.configuration.underlying.getConfig("controllers")
 //}
 //
-class BusinessCustomerSessionCache @Inject()(application: Application, wsHttp: WSHttp) extends SessionCache with AppName with ServicesConfig{
+//trait AmlsHttpClient extends HttpGet with HttpPut with HttpPost with HttpDelete with HttpPatch
+
+class BusinessCustomerSessionCache @Inject()(application: Application, wsHttp: DefaultHttpClient) extends SessionCache with AppName with ServicesConfig{
   override lazy val http = wsHttp
   override lazy val defaultSource: String = getConfString("cachable.session-cache.review-details.cache","business-customer-frontend")
 
@@ -127,8 +121,7 @@ class BusinessCustomerSessionCache @Inject()(application: Application, wsHttp: W
 class AmlsSessionCache @Inject()( environment: Environment,
                                   override val runModeConfiguration: Configuration,
                                   override val appNameConfiguration: Configuration,
-                                  wsHttp: HttpClient)
-  extends SessionCache with AppName with ServicesConfig {
+                                  wsHttp: HttpClient) extends SessionCache with AppName with ServicesConfig {
 
   override def http = wsHttp
   override def defaultSource = getConfString("amls-frontend.cache", "amls-frontend")

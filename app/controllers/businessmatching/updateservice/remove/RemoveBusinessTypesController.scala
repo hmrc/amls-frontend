@@ -41,7 +41,8 @@ import scala.concurrent.Future
 
 @Singleton
 class RemoveBusinessTypesController @Inject()(
-                                               authAction: AuthAction, val ds: CommonPlayDependencies,
+                                               authAction: AuthAction,
+                                               val ds: CommonPlayDependencies,
                                                val dataCacheConnector: DataCacheConnector,
                                                val businessMatchingService: BusinessMatchingService,
                                                val removeBusinessTypeHelper: RemoveBusinessTypeHelper,

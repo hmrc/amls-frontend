@@ -94,6 +94,8 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 class AppConfig @Inject()(val environment: Environment, val runModeConfiguration: Configuration, baseConfig: Configuration)
   extends ApplicationConfig with ServicesConfig {
 
+  private def getConfigString(key: String) = getConfString(key, throw new Exception(s"Could not find config '$key'"))
+
   override protected def mode: Mode = environment.mode
 
   def amlsUrl = baseUrl("amls")
@@ -135,4 +137,7 @@ class AppConfig @Inject()(val environment: Environment, val runModeConfiguration
 
     s"$scheme://$host"
   }
+
+  val testOnlyStubsUrl = baseUrl("test-only") + getConfigString("test-only.get-base-url")
+
 }

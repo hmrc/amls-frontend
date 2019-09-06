@@ -26,14 +26,7 @@ import services.flowmanagement.flowrouters.businessmatching.{AddBusinessTypeRout
 
 class Module extends AbstractModule {
 
-  //type HmrcAuthConnector = uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-
   def configure() = {
-//    bind(classOf[HttpGet]).to(classOf[WSHttp])
-//    bind(classOf[HttpPost]).to(classOf[WSHttp])
-//    bind(classOf[HttpDelete]).to(classOf[WSHttp])
-//    bind(classOf[CorePost]).to(classOf[WSHttp])
-//    bind(classOf[CoreGet]).to(classOf[WSHttp])
     bind(new TypeLiteral[Router[AddBusinessTypeFlowModel]] {}).to(classOf[AddBusinessTypeRouter])
     bind(new TypeLiteral[Router[ChangeBusinessType]] {}).to(classOf[ChangeBusinessTypeRouter])
     bind(new TypeLiteral[Router[RemoveBusinessTypeFlowModel]] {}).to(classOf[RemoveBusinessTypeRouter])

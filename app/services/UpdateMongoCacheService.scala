@@ -36,11 +36,12 @@ import models.tradingpremises.TradingPremises
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.http.{HeaderCarrier, HttpGet, NotFoundException}
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class UpdateMongoCacheService @Inject()(http: HttpGet, val cacheConnector: DataCacheConnector) {
+class UpdateMongoCacheService @Inject()(http: HttpClient, val cacheConnector: DataCacheConnector) {
 
   def update(credId: String, response: UpdateMongoCacheResponse)
             (implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Any] = {

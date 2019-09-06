@@ -39,7 +39,8 @@ class TestOnlyController @Inject()(implicit val dataCacheConnector: DataCacheCon
                                    implicit val testOnlyStubConnector: TestOnlyStubConnector,
                                    val stubsService: UpdateMongoCacheService,
                                    val amlsConnector: AmlsConnector,
-                                   val authAction: AuthAction, val ds: CommonPlayDependencies,
+                                   val authAction: AuthAction,
+                                   val ds: CommonPlayDependencies,
                                    val customerCache: BusinessCustomerSessionCache) extends AmlsBaseController(ds) {
 
 

@@ -13,7 +13,7 @@ private object AppDependencies {
   import play.core.PlayVersion
 
   private val playPartialsVersion = "6.9.0-play-25"
-  private val httpCachingClientVersion = "8.2.0"
+  private val httpCachingClientVersion = "8.5.0-play-25"
   private val playWhitelistFilterVersion = "2.0.0"
   private val validationVersion = "2.0.1"
   private val flexmarkVersion = "0.19.1"

@@ -22,13 +22,14 @@ import org.mockito.Mockito.{verify, when}
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
+import play.api.{Configuration, Environment}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HttpDelete, HttpResponse}
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import utils.AmlsSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-
 
 class TestOnlyStubConnectorSpec extends AmlsSpec
   with MustMatchers
@@ -37,9 +38,9 @@ class TestOnlyStubConnectorSpec extends AmlsSpec
 
   // scalastyle:off magic.number
   trait Fixture {
-    val http = mock[HttpDelete]
+    val http = mock[HttpClient]
     val config = mock[ApplicationConfig]
-    val connector = new TestOnlyStubConnector(http)
+    val connector = new TestOnlyStubConnector(http, mock[AppConfig],  mock[Configuration], mock[Environment])
   }
 
   "The TestOnly Stub Connector" must {
