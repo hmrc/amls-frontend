@@ -18,9 +18,9 @@
 @import include._
 @import forms2._
 @import models.FeeResponse
-@import config.{ApplicationConfig => appConfig}
+@import config.{ApplicationConfig => appConfig, CachedStaticHtmlPartialProvider}
 
-@(feeResponse: Option[FeeResponse])(implicit request: Request[_],m:Messages, lang: Lang)
+@(feeResponse: Option[FeeResponse])(implicit request: Request[_],m:Messages, lang: Lang, partialProvider: CachedStaticHtmlPartialProvider)
 
 @getHelpForm = @{partialProvider.getPartialContent(appConfig.reportAProblemUrl)}
 
