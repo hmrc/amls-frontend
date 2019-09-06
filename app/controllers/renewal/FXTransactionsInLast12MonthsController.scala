@@ -29,11 +29,10 @@ import views.html.renewal.fx_transaction_in_last_12_months
 
 import scala.concurrent.Future
 
-class FXTransactionsInLast12MonthsController @Inject()(
-                                                        val dataCacheConnector: DataCacheConnector,
-                                                        val authAction: AuthAction, val ds: CommonPlayDependencies,
-                                                        val renewalService: RenewalService
-                                                      ) extends AmlsBaseController(ds) {
+class FXTransactionsInLast12MonthsController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                                       val authAction: AuthAction,
+                                                       val ds: CommonPlayDependencies,
+                                                       val renewalService: RenewalService) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

@@ -34,12 +34,12 @@ import views.html.businessmatching.updateservice._
 import scala.collection.immutable.SortedSet
 import scala.concurrent.Future
 
-class ChangeBusinessTypesController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
+class ChangeBusinessTypesController @Inject()(authAction: AuthAction,
+                                              val ds: CommonPlayDependencies,
                                               implicit val dataCacheConnector: DataCacheConnector,
                                               val businessMatchingService: BusinessMatchingService,
                                               val router: Router[ChangeBusinessType],
-                                              val helper: RemoveBusinessTypeHelper
-                                            ) extends AmlsBaseController(ds) with RepeatingSection {
+                                              val helper: RemoveBusinessTypeHelper) extends AmlsBaseController(ds) with RepeatingSection {
 
   def get() = authAction.async {
       implicit request =>

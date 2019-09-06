@@ -32,7 +32,8 @@ import utils.AuthAction
 
 class SummaryController @Inject()(
                                   val dataCache: DataCacheConnector,
-                                  val authAction: AuthAction, val ds: CommonPlayDependencies,
+                                  val authAction: AuthAction,
+                                  val ds: CommonPlayDependencies,
                                   val serviceFlow: ServiceFlow,
                                   val statusService: StatusService) extends AmlsBaseController(ds) {
 

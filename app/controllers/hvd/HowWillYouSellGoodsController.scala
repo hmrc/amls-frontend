@@ -33,7 +33,8 @@ import scala.concurrent.Future
 
 class HowWillYouSellGoodsController @Inject()( val dataCacheConnector: DataCacheConnector,
                                                val statusService: StatusService,
-                                               val authAction: AuthAction, val ds: CommonPlayDependencies,
+                                               val authAction: AuthAction,
+                                               val ds: CommonPlayDependencies,
                                                val serviceFlow: ServiceFlow) extends AmlsBaseController(ds) with DateOfChangeHelper {
 
   def get(edit: Boolean = false) = authAction.async {

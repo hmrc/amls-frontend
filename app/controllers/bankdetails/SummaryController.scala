@@ -25,10 +25,9 @@ import utils.AuthAction
 import scala.concurrent.Future
 
 @Singleton
-class SummaryController @Inject()(
-                                   val dataCacheConnector: DataCacheConnector,
-                                   val authAction: AuthAction, val ds: CommonPlayDependencies
-                                 ) extends BankDetailsController(ds) {
+class SummaryController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                  val authAction: AuthAction,
+                                  val ds: CommonPlayDependencies) extends BankDetailsController(ds) {
 
   def get(index: Int) = authAction.async {
     implicit request =>

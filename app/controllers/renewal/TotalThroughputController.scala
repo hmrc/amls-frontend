@@ -31,7 +31,8 @@ import views.html.renewal.total_throughput
 
 import scala.concurrent.Future
 
-class TotalThroughputController @Inject()(val authAction: AuthAction, val ds: CommonPlayDependencies,
+class TotalThroughputController @Inject()(val authAction: AuthAction,
+                                          val ds: CommonPlayDependencies,
                                           renewals: RenewalService,
                                           dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
 

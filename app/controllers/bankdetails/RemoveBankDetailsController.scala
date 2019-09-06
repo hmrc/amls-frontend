@@ -24,10 +24,9 @@ import models.bankdetails.BankDetails
 import utils.{AuthAction, StatusConstants}
 
 @Singleton
-class RemoveBankDetailsController @Inject()(
-                                             val authAction: AuthAction, val ds: CommonPlayDependencies,
-                                             val dataCacheConnector: DataCacheConnector
-                                           ) extends BankDetailsController(ds) {
+class RemoveBankDetailsController @Inject()(val authAction: AuthAction,
+                                            val ds: CommonPlayDependencies,
+                                            val dataCacheConnector: DataCacheConnector) extends BankDetailsController(ds) {
 
   def get(index: Int) = authAction.async {
       implicit request =>

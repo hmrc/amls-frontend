@@ -31,9 +31,9 @@ import scala.concurrent.Future
 
 class ServicesOfBusinessController @Inject()(val dataCacheConnector: DataCacheConnector,
                                              val statusService: StatusService,
-                                             authAction: AuthAction, val ds: CommonPlayDependencies,
-                                             val serviceFlow: ServiceFlow
-                                            ) extends AmlsBaseController(ds) with DateOfChangeHelper {
+                                             authAction: AuthAction,
+                                             val ds: CommonPlayDependencies,
+                                             val serviceFlow: ServiceFlow) extends AmlsBaseController(ds) with DateOfChangeHelper {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

@@ -29,8 +29,8 @@ import views.html.msb.identify_linked_transactions
 import scala.concurrent.Future
 
 class IdentifyLinkedTransactionsController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                                      authAction: AuthAction, val ds: CommonPlayDependencies
-                                                     ) extends AmlsBaseController(ds) {
+                                                      authAction: AuthAction,
+                                                      val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

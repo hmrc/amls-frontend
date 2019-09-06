@@ -35,12 +35,11 @@ import scala.concurrent.Future
 @Singleton
 class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
                                          implicit val dataCacheConnector: DataCacheConnector,
-                                         val authAction: AuthAction, val ds: CommonPlayDependencies,
+                                         val authAction: AuthAction,
+                                         val ds: CommonPlayDependencies,
                                          enrolments: AuthEnrolmentsService,
                                          implicit val statusService: StatusService,
-                                         implicit val amlsConnector: AmlsConnector)
-
-  extends AmlsBaseController(ds) with RepeatingSection {
+                                         implicit val amlsConnector: AmlsConnector) extends AmlsBaseController(ds) with RepeatingSection {
 
   def getAddress(businessMatching: BusinessMatching): Option[BCAddress] =
     businessMatching.reviewDetails.fold[Option[BCAddress]](None)(r => Some(r.businessAddress))

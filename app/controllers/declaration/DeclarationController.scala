@@ -28,11 +28,10 @@ import utils.AuthAction
 
 import scala.concurrent.Future
 
-class DeclarationController @Inject () (
-                                       val dataCacheConnector: DataCacheConnector,
-                                       val statusService: StatusService,
-                                       authAction: AuthAction, val ds: CommonPlayDependencies
-                                       ) extends AmlsBaseController(ds) {
+class DeclarationController @Inject () (val dataCacheConnector: DataCacheConnector,
+                                        val statusService: StatusService,
+                                        authAction: AuthAction,
+                                        val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
 
   lazy val defaultView = declarationView("declaration.declaration.title", "submit.registration", isAmendment = false)
 

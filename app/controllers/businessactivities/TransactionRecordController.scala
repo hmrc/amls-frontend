@@ -28,7 +28,8 @@ import utils.BooleanFormReadWrite._
 
 import scala.concurrent.Future
 
-class TransactionRecordController @Inject()(val authAction: AuthAction, val ds: CommonPlayDependencies,
+class TransactionRecordController @Inject()(val authAction: AuthAction,
+                                            val ds: CommonPlayDependencies,
                                             val dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
 
   val fieldName = "isRecorded"

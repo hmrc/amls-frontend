@@ -33,7 +33,8 @@ import utils.AuthAction
 
 import scala.concurrent.Future
 
-class MsbSubSectorsController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
+class MsbSubSectorsController @Inject()(authAction: AuthAction,
+                                        val ds: CommonPlayDependencies,
                                         val dataCacheConnector: DataCacheConnector,
                                         val router: Router[ChangeSubSectorFlowModel],
                                         val businessMatchingService: BusinessMatchingService,

@@ -27,11 +27,10 @@ import utils.AuthAction
 import views.html.renewal.involved_in_other
 
 @Singleton
-class InvolvedInOtherController @Inject()(
-                                           val dataCacheConnector: DataCacheConnector,
-                                           val authAction: AuthAction, val ds: CommonPlayDependencies,
-                                           val renewalService: RenewalService
-                                         ) extends AmlsBaseController(ds) {
+class InvolvedInOtherController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                          val authAction: AuthAction,
+                                          val ds: CommonPlayDependencies,
+                                          val renewalService: RenewalService) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

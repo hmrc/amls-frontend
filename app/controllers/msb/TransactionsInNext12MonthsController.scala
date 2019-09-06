@@ -28,11 +28,11 @@ import views.html.msb.transactions_in_next_12_months
 
 import scala.concurrent.Future
 
-class TransactionsInNext12MonthsController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
+class TransactionsInNext12MonthsController @Inject()(authAction: AuthAction,
+                                                     val ds: CommonPlayDependencies,
                                                      implicit val dataCacheConnector: DataCacheConnector,
                                                      implicit val statusService: StatusService,
-                                                     implicit val serviceFlow: ServiceFlow
-                                                    ) extends AmlsBaseController(ds) {
+                                                     implicit val serviceFlow: ServiceFlow) extends AmlsBaseController(ds) {
 
 
   def get(edit: Boolean = false) = authAction.async {

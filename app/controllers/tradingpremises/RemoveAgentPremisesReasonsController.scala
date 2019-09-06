@@ -28,9 +28,8 @@ import scala.concurrent.Future
 
 class RemoveAgentPremisesReasonsController @Inject () (
                                                       val dataCacheConnector: DataCacheConnector,
-                                                      val authAction: AuthAction, val ds: CommonPlayDependencies
-                                                      )extends AmlsBaseController(ds) with RepeatingSection {
-
+                                                      val authAction: AuthAction,
+                                                      val ds: CommonPlayDependencies)extends AmlsBaseController(ds) with RepeatingSection {
 
   def get(index: Int, complete: Boolean = false) = authAction.async {
       implicit request =>

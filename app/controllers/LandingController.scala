@@ -54,7 +54,8 @@ class LandingController @Inject()(val landingService: LandingService,
                                   val enrolmentsService: AuthEnrolmentsService,
                                   val auditConnector: AuditConnector,
                                   val cacheConnector: DataCacheConnector,
-                                  authAction: AuthAction, val ds: CommonPlayDependencies,
+                                  authAction: AuthAction,
+                                  val ds: CommonPlayDependencies,
                                   val statusService: StatusService) extends AmlsBaseController(ds) {
 
   private lazy val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role()).absoluteUrl, "utf-8")

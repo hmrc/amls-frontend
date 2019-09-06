@@ -28,7 +28,8 @@ import views.html.hvd.receiving
 
 import scala.concurrent.Future
 
-class ReceiveCashPaymentsController @Inject()(val authAction: AuthAction, val ds: CommonPlayDependencies,
+class ReceiveCashPaymentsController @Inject()(val authAction: AuthAction,
+                                              val ds: CommonPlayDependencies,
                                               implicit val cacheConnector: DataCacheConnector,
                                               implicit val serviceFlow: ServiceFlow,
                                               implicit val statusService: StatusService) extends AmlsBaseController(ds) {

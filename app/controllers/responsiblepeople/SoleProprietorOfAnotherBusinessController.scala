@@ -28,7 +28,8 @@ import scala.concurrent.Future
 
 @Singleton
 class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                          authAction: AuthAction, val ds: CommonPlayDependencies,
+                                                          authAction: AuthAction,
+                                                          val ds: CommonPlayDependencies,
                                                           val statusService: StatusService) extends AmlsBaseController(ds) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {

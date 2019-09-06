@@ -29,7 +29,8 @@ import views.html.responsiblepeople.country_of_birth
 import scala.concurrent.Future
 
 @Singleton
-class CountryOfBirthController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
+class CountryOfBirthController @Inject()(authAction: AuthAction,
+                                         val ds: CommonPlayDependencies,
                                          val dataCacheConnector: DataCacheConnector,
                                          val autoCompleteService: AutoCompleteService) extends AmlsBaseController(ds) with RepeatingSection {
 

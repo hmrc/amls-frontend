@@ -31,9 +31,9 @@ import views.html.msb.send_money_to_other_country
 import scala.concurrent.Future
 
 class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                  authAction: AuthAction, val ds: CommonPlayDependencies,
-                                                  val statusService: StatusService
-                                                 ) extends AmlsBaseController(ds) {
+                                                  authAction: AuthAction,
+                                                  val ds: CommonPlayDependencies,
+                                                  val statusService: StatusService) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

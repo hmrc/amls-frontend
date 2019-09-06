@@ -35,11 +35,11 @@ import views.html.declaration.register_partners
 import scala.concurrent.Future
 
 @Singleton
-class RegisterPartnersController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
+class RegisterPartnersController @Inject()(authAction: AuthAction,
+                                           val ds: CommonPlayDependencies,
                                            val dataCacheConnector: DataCacheConnector,
                                            implicit val statusService: StatusService,
-                                           implicit val progressService: ProgressService
-                                          ) extends AmlsBaseController(ds) {
+                                           implicit val progressService: ProgressService) extends AmlsBaseController(ds) {
   def get() = authAction.async {
     implicit request => {
 

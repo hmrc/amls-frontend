@@ -30,7 +30,8 @@ import scala.concurrent.Future
 
 @Singleton
 class BusinessStructureController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                            val authAction: AuthAction, val ds: CommonPlayDependencies,
+                                            val authAction: AuthAction,
+                                            val ds: CommonPlayDependencies,
                                             override val messagesApi: MessagesApi) extends AmlsBaseController(ds) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false) = authAction.async {

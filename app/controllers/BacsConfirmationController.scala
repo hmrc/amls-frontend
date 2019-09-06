@@ -27,7 +27,8 @@ import utils.{AuthAction, BusinessName}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
-class BacsConfirmationController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
+class BacsConfirmationController @Inject()(authAction: AuthAction,
+                                           val ds: CommonPlayDependencies,
                                            private[controllers] implicit val dataCacheConnector: DataCacheConnector,
                                            private[controllers] implicit val amlsConnector: AmlsConnector,
                                            private[controllers] implicit val statusService: StatusService,

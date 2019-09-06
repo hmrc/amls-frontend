@@ -32,10 +32,10 @@ import scala.concurrent.Future
 
 @Singleton
 class BusinessAppliedForPSRNumberController @Inject()(
-                                                       authAction: AuthAction, val ds: CommonPlayDependencies,
+                                                       authAction: AuthAction,
+                                                       val ds: CommonPlayDependencies,
                                                        implicit val dataCacheConnector: DataCacheConnector,
-                                                       val router: Router[AddBusinessTypeFlowModel]
-                                                     ) extends AmlsBaseController(ds) {
+                                                       val router: Router[AddBusinessTypeFlowModel]) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

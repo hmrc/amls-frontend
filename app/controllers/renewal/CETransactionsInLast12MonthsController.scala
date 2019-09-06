@@ -28,11 +28,10 @@ import views.html.renewal.ce_transactions_in_last_12_months
 import scala.concurrent.Future
 
 @Singleton
-class CETransactionsInLast12MonthsController @Inject()(
-                                                           val dataCacheConnector: DataCacheConnector,
-                                                           val authAction: AuthAction, val ds: CommonPlayDependencies,
-                                                           val renewalService: RenewalService
-                                                         ) extends AmlsBaseController(ds) {
+class CETransactionsInLast12MonthsController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                                       val authAction: AuthAction,
+                                                       val ds: CommonPlayDependencies,
+                                                       val renewalService: RenewalService) extends AmlsBaseController(ds) {
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[Renewal](request.credId, Renewal.key) map {

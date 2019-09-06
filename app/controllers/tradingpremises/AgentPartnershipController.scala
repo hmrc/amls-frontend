@@ -28,8 +28,9 @@ import scala.concurrent.Future
 
 @Singleton
 class AgentPartnershipController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                            val authAction: AuthAction, val ds: CommonPlayDependencies,
-                                            override val messagesApi: MessagesApi) extends AmlsBaseController(ds) with RepeatingSection {
+                                           val authAction: AuthAction,
+                                           val ds: CommonPlayDependencies,
+                                           override val messagesApi: MessagesApi) extends AmlsBaseController(ds) with RepeatingSection {
 
     def get(index: Int, edit: Boolean = false) = authAction.async {
       implicit request =>

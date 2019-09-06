@@ -30,10 +30,10 @@ import views.html.renewal.send_money_to_other_country
 
 import scala.concurrent.Future
 
-class SendMoneyToOtherCountryController @Inject()(
-                                                   val authAction: AuthAction, val ds: CommonPlayDependencies,
-                                                   val dataCacheConnector: DataCacheConnector,
-                                                   renewalService: RenewalService) extends AmlsBaseController(ds) {
+class SendMoneyToOtherCountryController @Inject()(val authAction: AuthAction,
+                                                  val ds: CommonPlayDependencies,
+                                                  val dataCacheConnector: DataCacheConnector,
+                                                  renewalService: RenewalService) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

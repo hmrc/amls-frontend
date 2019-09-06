@@ -39,11 +39,11 @@ import scala.concurrent.Future
 
 @Singleton
 class SelectBusinessTypeController @Inject()(
-                                            authAction: AuthAction, val ds: CommonPlayDependencies,
+                                            authAction: AuthAction,
+                                            val ds: CommonPlayDependencies,
                                             implicit val dataCacheConnector: DataCacheConnector,
                                             val businessMatchingService: BusinessMatchingService,
-                                            val router: Router[AddBusinessTypeFlowModel]
-                                          ) extends AmlsBaseController(ds) with RepeatingSection {
+                                            val router: Router[AddBusinessTypeFlowModel]) extends AmlsBaseController(ds) with RepeatingSection {
 
   implicit val activityReader: Rule[UrlFormEncoded, BusinessActivity] =
     FormTypes.businessActivityRule("error.required.bm.register.service.single") map {

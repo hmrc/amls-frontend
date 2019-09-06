@@ -28,7 +28,8 @@ import utils.ControllerHelper
 import views.html.supervision.summary
 
 class SummaryController  @Inject() (val dataCacheConnector: DataCacheConnector,
-                                    val authAction: AuthAction, val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                    val authAction: AuthAction,
+                                    val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
 
   def get() = authAction.async {
     implicit request =>

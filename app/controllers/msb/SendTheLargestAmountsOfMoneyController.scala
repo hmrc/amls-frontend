@@ -28,12 +28,12 @@ import views.html.msb.send_largest_amounts_of_money
 
 import scala.concurrent.Future
 
-class SendTheLargestAmountsOfMoneyController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
+class SendTheLargestAmountsOfMoneyController @Inject()(authAction: AuthAction,
+                                                       val ds: CommonPlayDependencies,
                                                        implicit val cacheConnector: DataCacheConnector,
                                                        implicit val statusService: StatusService,
                                                        implicit val serviceFlow: ServiceFlow,
-                                                       val autoCompleteService: AutoCompleteService
-                                                      ) extends AmlsBaseController(ds) {
+                                                       val autoCompleteService: AutoCompleteService) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

@@ -28,11 +28,11 @@ import views.html.msb.expected_throughput
 
 import scala.concurrent.Future
 
-class ExpectedThroughputController @Inject() (authAction: AuthAction, val ds: CommonPlayDependencies,
+class ExpectedThroughputController @Inject() (authAction: AuthAction,
+                                              val ds: CommonPlayDependencies,
                                               implicit val dataCacheConnector: DataCacheConnector,
                                               implicit val statusService: StatusService,
-                                              implicit val serviceFlow: ServiceFlow
-                                             ) extends AmlsBaseController(ds) {
+                                              implicit val serviceFlow: ServiceFlow) extends AmlsBaseController(ds) {
 
 
   def get(edit: Boolean = false) = authAction.async {

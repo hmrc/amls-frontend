@@ -31,8 +31,8 @@ import scala.concurrent.Future
 
 class InvolvedInOtherController @Inject() ( val dataCacheConnector: DataCacheConnector,
                                             implicit val statusService: StatusService,
-                                            val authAction: AuthAction, val ds: CommonPlayDependencies
-                                          )extends AmlsBaseController(ds) {
+                                            val authAction: AuthAction,
+                                            val ds: CommonPlayDependencies)extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

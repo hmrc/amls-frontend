@@ -31,13 +31,13 @@ import services.flowmanagement.Router
 import utils.AuthAction
 import views.html.businessmatching.psr_number
 
-class PSRNumberController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
+class PSRNumberController @Inject()(authAction: AuthAction,
+                                    val ds: CommonPlayDependencies,
                                     val dataCacheConnector: DataCacheConnector,
                                     val statusService: StatusService,
                                     val businessMatchingService: BusinessMatchingService,
                                     val router: Router[ChangeSubSectorFlowModel],
-                                    val helper: ChangeSubSectorHelper
-                                   ) extends AmlsBaseController(ds) {
+                                    val helper: ChangeSubSectorHelper) extends AmlsBaseController(ds) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

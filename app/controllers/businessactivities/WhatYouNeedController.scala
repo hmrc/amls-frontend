@@ -23,7 +23,10 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import utils.AuthAction
 import views.html.businessactivities._
 
-class WhatYouNeedController @Inject()(val authConnector: AuthConnector, statusService: StatusService, authAction: AuthAction, val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+class WhatYouNeedController @Inject()(val authConnector: AuthConnector,
+                                      statusService: StatusService,
+                                      authAction: AuthAction,
+                                      val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
 import scala.concurrent.Future
 
   def get = authAction.async {

@@ -23,7 +23,8 @@ import views.html.login_event
 import scala.concurrent.Future
 
 @Singleton
-class LoginEventController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+class LoginEventController @Inject()(authAction: AuthAction,
+                                     val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
 
   def get: Action[AnyContent] = authAction.async {
     implicit request => Future(Ok(login_event()))

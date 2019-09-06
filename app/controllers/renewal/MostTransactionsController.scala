@@ -29,7 +29,8 @@ import utils.AuthAction
 import scala.concurrent.Future
 
 @Singleton
-class MostTransactionsController @Inject()(val authAction: AuthAction, val ds: CommonPlayDependencies,
+class MostTransactionsController @Inject()(val authAction: AuthAction,
+                                           val ds: CommonPlayDependencies,
                                            val cache: DataCacheConnector,
                                            val renewalService: RenewalService,
                                            val autoCompleteService: AutoCompleteService) extends AmlsBaseController(ds) {

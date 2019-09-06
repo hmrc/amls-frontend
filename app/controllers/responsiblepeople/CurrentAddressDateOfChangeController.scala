@@ -33,9 +33,9 @@ import scala.concurrent.Future
 
 class CurrentAddressDateOfChangeController @Inject () (
                                                       val dataCacheConnector: DataCacheConnector,
-                                                      authAction: AuthAction, val ds: CommonPlayDependencies,
-                                                      statusService: StatusService
-                                                      ) extends AmlsBaseController(ds) with RepeatingSection with DateOfChangeHelper with FormHelpers {
+                                                      authAction: AuthAction,
+                                                      val ds: CommonPlayDependencies,
+                                                      statusService: StatusService) extends AmlsBaseController(ds) with RepeatingSection with DateOfChangeHelper with FormHelpers {
 
   def get(index: Int, edit: Boolean) = authAction {
     implicit request =>

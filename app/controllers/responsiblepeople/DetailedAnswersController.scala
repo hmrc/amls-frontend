@@ -37,10 +37,10 @@ import scala.concurrent.Future
 
 class DetailedAnswersController @Inject () (
                                              val dataCacheConnector: DataCacheConnector,
-                                             authAction: AuthAction, val ds: CommonPlayDependencies,
+                                             authAction: AuthAction,
+                                             val ds: CommonPlayDependencies,
                                              val statusService: StatusService,
-                                             val config: AppConfig
-                                           ) extends AmlsBaseController(ds) with RepeatingSection {
+                                             val config: AppConfig) extends AmlsBaseController(ds) with RepeatingSection {
 
   private def showHideAddressMove(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String, lineId: Option[Int])
                                  (implicit headerCarrier: HeaderCarrier): Future[Boolean] = {

@@ -29,7 +29,8 @@ import views.html.renewal.which_currencies
 
 import scala.concurrent.Future
 
-class WhichCurrenciesController @Inject()(val authAction: AuthAction, val ds: CommonPlayDependencies,
+class WhichCurrenciesController @Inject()(val authAction: AuthAction,
+                                          val ds: CommonPlayDependencies,
                                           renewalService: RenewalService,
                                           dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
 

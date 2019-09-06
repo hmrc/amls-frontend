@@ -34,7 +34,8 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
                                      val statusService: StatusService,
                                      val renewalService: RenewalService,
                                      val authenticator: AuthenticatorConnector,
-                                     authAction: AuthAction, val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                     authAction: AuthAction,
+                                     val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
 
   private def handleRenewalAmendment(credId: String, amlsRegistrationNumber: Option[String], accountTypeId: (String, String))
                                     (implicit headerCarrier: HeaderCarrier) = {

@@ -30,7 +30,8 @@ import views.html.tradingpremises.summary_details
 import scala.concurrent.Future
 
 @Singleton
-class DetailedAnswersController @Inject()(val authAction: AuthAction, val ds: CommonPlayDependencies,
+class DetailedAnswersController @Inject()(val authAction: AuthAction,
+                                          val ds: CommonPlayDependencies,
                                           val dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) with RepeatingSection {
 
   def get(index: Int) = authAction.async {

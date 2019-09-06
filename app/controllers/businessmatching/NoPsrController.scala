@@ -22,7 +22,9 @@ import models.status.{NotCompleted, SubmissionReady}
 import services.StatusService
 import utils.AuthAction
 
-class NoPsrController @Inject()(val authAction: AuthAction, val ds: CommonPlayDependencies, statusService: StatusService) extends AmlsBaseController(ds) {
+class NoPsrController @Inject()(val authAction: AuthAction,
+                                val ds: CommonPlayDependencies,
+                                statusService: StatusService) extends AmlsBaseController(ds) {
 
   def get = authAction.async {
     implicit request =>

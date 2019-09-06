@@ -37,7 +37,8 @@ import views.html.businessmatching._
 import scala.concurrent.Future
 
 @Singleton
-class RegisterServicesController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
+class RegisterServicesController @Inject()(authAction: AuthAction,
+                                           val ds: CommonPlayDependencies,
                                            val statusService: StatusService,
                                            val dataCacheConnector: DataCacheConnector,
                                            val businessMatchingService: BusinessMatchingService,

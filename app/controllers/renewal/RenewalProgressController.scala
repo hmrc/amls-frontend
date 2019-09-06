@@ -34,8 +34,8 @@ import scala.concurrent.Future
 
 
 @Singleton
-class RenewalProgressController @Inject()(
-                                          val authAction: AuthAction, val ds: CommonPlayDependencies,
+class RenewalProgressController @Inject()(val authAction: AuthAction,
+                                          val ds: CommonPlayDependencies,
                                           val dataCacheConnector: DataCacheConnector,
                                           val progressService: ProgressService,
                                           val sectionsProvider: SectionsProvider,

@@ -24,8 +24,8 @@ import utils.{AuthAction, RepeatingSection}
 
 class ResponsiblePeopleAddController @Inject () (
                                                 val dataCacheConnector: DataCacheConnector,
-                                                authAction: AuthAction, val ds: CommonPlayDependencies
-                                                ) extends AmlsBaseController(ds) with RepeatingSection {
+                                                authAction: AuthAction,
+                                                val ds: CommonPlayDependencies) extends AmlsBaseController(ds) with RepeatingSection {
 
   def get(displayGuidance: Boolean = true, flow: Option[String] = None) = authAction.async {
     implicit request => {

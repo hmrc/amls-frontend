@@ -32,9 +32,9 @@ import scala.concurrent.Future
 
 class PersonNonUKPassportController @Inject()(override val messagesApi: MessagesApi,
                                               val dataCacheConnector: DataCacheConnector,
-                                              authAction: AuthAction, val ds: CommonPlayDependencies,
-                                              val appConfig:AppConfig
-                                             ) extends AmlsBaseController(ds) with RepeatingSection {
+                                              authAction: AuthAction,
+                                              val ds: CommonPlayDependencies,
+                                              val appConfig:AppConfig) extends AmlsBaseController(ds) with RepeatingSection {
 
 
   def get(index:Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {

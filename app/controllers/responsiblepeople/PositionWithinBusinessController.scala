@@ -29,8 +29,8 @@ import scala.concurrent.Future
 
 class PositionWithinBusinessController @Inject () (
                                                   val dataCacheConnector: DataCacheConnector,
-                                                  authAction: AuthAction, val ds: CommonPlayDependencies
-                                                  )extends AmlsBaseController(ds) with RepeatingSection {
+                                                  authAction: AuthAction,
+                                                  val ds: CommonPlayDependencies)extends AmlsBaseController(ds) with RepeatingSection {
 
 
 

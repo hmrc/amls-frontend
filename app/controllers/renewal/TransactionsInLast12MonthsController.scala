@@ -31,7 +31,8 @@ import views.html.renewal.transactions_in_last_12_months
 import scala.concurrent.Future
 
 class TransactionsInLast12MonthsController @Inject()(
-                                                      val authAction: AuthAction, val ds: CommonPlayDependencies,
+                                                      val authAction: AuthAction,
+                                                      val ds: CommonPlayDependencies,
                                                       val dataCacheConnector: DataCacheConnector,
                                                       renewalService: RenewalService) extends AmlsBaseController(ds) {
 

@@ -35,13 +35,13 @@ import scala.concurrent.Future
 
 @Singleton
 class WhatDoYouDoHereController @Inject()(
-                                           authAction: AuthAction, val ds: CommonPlayDependencies,
+                                           authAction: AuthAction,
+                                           val ds: CommonPlayDependencies,
                                            implicit val dataCacheConnector: DataCacheConnector,
                                            val statusService: StatusService,
                                            val businessMatchingService: BusinessMatchingService,
                                            val helper: AddBusinessTypeHelper,
-                                           val router: Router[AddBusinessTypeFlowModel]
-                                         ) extends AmlsBaseController(ds) {
+                                           val router: Router[AddBusinessTypeFlowModel]) extends AmlsBaseController(ds) {
 
   var msbServiceValues: Set[String] = Set()
 

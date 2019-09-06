@@ -29,8 +29,8 @@ import scala.concurrent.Future
 
 class TimeAtAdditionalExtraAddressController @Inject () (
                                                         val dataCacheConnector: DataCacheConnector,
-                                                        authAction: AuthAction, val ds: CommonPlayDependencies
-                                                        ) extends AmlsBaseController(ds) with RepeatingSection {
+                                                        authAction: AuthAction,
+                                                        val ds: CommonPlayDependencies) extends AmlsBaseController(ds) with RepeatingSection {
 
   final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None)
 

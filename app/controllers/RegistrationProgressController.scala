@@ -37,7 +37,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
-class RegistrationProgressController @Inject()(protected[controllers] val authAction: AuthAction, val ds: CommonPlayDependencies,
+class RegistrationProgressController @Inject()(protected[controllers] val authAction: AuthAction,
+                                               val ds: CommonPlayDependencies,
                                                protected[controllers] val dataCache: DataCacheConnector,
                                                protected[controllers] val enrolmentsService: AuthEnrolmentsService,
                                                protected[controllers] val statusService: StatusService,

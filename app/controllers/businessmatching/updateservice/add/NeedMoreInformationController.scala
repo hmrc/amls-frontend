@@ -31,10 +31,10 @@ import views.html.businessmatching.updateservice.add.new_service_information
 import scala.concurrent.Future
 
 @Singleton
-class NeedMoreInformationController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
+class NeedMoreInformationController @Inject()(authAction: AuthAction,
+                                              val ds: CommonPlayDependencies,
                                               implicit val dataCacheConnector: DataCacheConnector,
-                                              val router: Router[AddBusinessTypeFlowModel]
-                                             ) extends AmlsBaseController(ds) {
+                                              val router: Router[AddBusinessTypeFlowModel]) extends AmlsBaseController(ds) {
 
   def get() = authAction.async {
       implicit request =>

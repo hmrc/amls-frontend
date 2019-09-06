@@ -27,9 +27,9 @@ import views.html.businessdetails._
 import scala.concurrent.Future
 
 class RegisteredOfficeIsUKController @Inject ()(
-                                            val dataCacheConnector: DataCacheConnector,
-                                            val authAction: AuthAction, val ds: CommonPlayDependencies
-                                            ) extends AmlsBaseController(ds) with DateOfChangeHelper {
+                                                val dataCacheConnector: DataCacheConnector,
+                                                val authAction: AuthAction,
+                                                val ds: CommonPlayDependencies) extends AmlsBaseController(ds) with DateOfChangeHelper {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

@@ -26,10 +26,9 @@ import views.html.businessdetails._
 
 import scala.concurrent.Future
 
-class ContactingYouPhoneController @Inject () (
-                                              val dataCache: DataCacheConnector,
-                                              val authAction: AuthAction, val ds: CommonPlayDependencies
-                                              ) extends AmlsBaseController(ds) {
+class ContactingYouPhoneController @Inject () (val dataCache: DataCacheConnector,
+                                               val authAction: AuthAction,
+                                               val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
 
   def updateData(contactingYou: Option[ContactingYou], data: ContactingYouPhone): ContactingYou = {
     contactingYou.fold[ContactingYou](ContactingYou())(x => x.copy(phoneNumber = Some(data.phoneNumber)))

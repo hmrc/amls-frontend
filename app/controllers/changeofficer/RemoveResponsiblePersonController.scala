@@ -27,9 +27,9 @@ import models.changeofficer._
 import models.responsiblepeople.{ResponsiblePerson, ResponsiblePersonEndDate}
 import utils.{AuthAction, RepeatingSection, StatusConstants}
 
-class RemoveResponsiblePersonController @Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
-                                                   implicit val dataCacheConnector: DataCacheConnector
-                                                 ) extends AmlsBaseController(ds) with RepeatingSection {
+class RemoveResponsiblePersonController @Inject()(authAction: AuthAction,
+                                                  val ds: CommonPlayDependencies,
+                                                  implicit val dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) with RepeatingSection {
 
   def get() = authAction.async {
      implicit request => {

@@ -37,14 +37,14 @@ import scala.concurrent.Future
 
 @Singleton
 class WhichFitAndProperController @Inject()(
-                                             authAction: AuthAction, val ds: CommonPlayDependencies,
+                                             authAction: AuthAction,
+                                             val ds: CommonPlayDependencies,
                                              implicit val dataCacheConnector: DataCacheConnector,
                                              val statusService: StatusService,
                                              val businessMatchingService: BusinessMatchingService,
                                              val responsiblePeopleService: ResponsiblePeopleService,
                                              val helper: AddBusinessTypeHelper,
-                                             val router: Router[AddBusinessTypeFlowModel]
-                                           ) extends AmlsBaseController(ds) with RepeatingSection {
+                                             val router: Router[AddBusinessTypeFlowModel]) extends AmlsBaseController(ds) with RepeatingSection {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

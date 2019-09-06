@@ -30,7 +30,8 @@ import utils.AuthAction
 
 import scala.concurrent.Future
 
-class CompanyRegistrationNumberController@Inject()(authAction: AuthAction, val ds: CommonPlayDependencies,
+class CompanyRegistrationNumberController@Inject()(authAction: AuthAction,
+                                                   val ds: CommonPlayDependencies,
                                                    val dataCacheConnector: DataCacheConnector,
                                                    val statusService: StatusService,
                                                    val businessMatchingService:BusinessMatchingService) extends AmlsBaseController(ds) {

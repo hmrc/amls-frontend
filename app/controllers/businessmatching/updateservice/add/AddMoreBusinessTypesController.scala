@@ -35,10 +35,10 @@ import scala.concurrent.Future
 
 @Singleton
 class AddMoreBusinessTypesController @Inject()(
-                                                authAction: AuthAction, val ds: CommonPlayDependencies,
+                                                authAction: AuthAction,
+                                                val ds: CommonPlayDependencies,
                                                 implicit val dataCacheConnector: DataCacheConnector,
-                                                val router: Router[AddBusinessTypeFlowModel]
-                                           ) extends AmlsBaseController(ds) {
+                                                val router: Router[AddBusinessTypeFlowModel]) extends AmlsBaseController(ds) {
 
   val fieldName = "addmoreactivities"
 
