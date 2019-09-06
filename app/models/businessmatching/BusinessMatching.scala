@@ -126,7 +126,7 @@ case class BusinessMatching(
     activities map { a =>
       a.businessActivities.map {
         case AccountancyServices => Messages("businessactivities.registerservices.servicename.lbl.01")
-        case ArtMarketParticipant => Messages("businessactivities.registerservices.servicename.lbl.03")
+        case ArtMarketParticipant => Messages("businessactivities.registerservices.servicename.lbl.02")
         case BillPaymentServices => Messages("businessactivities.registerservices.servicename.lbl.03")
         case EstateAgentBusinessService if estateAgent => Messages("businessactivities.registerservices.servicename.lbl.04.agent")
         case EstateAgentBusinessService => Messages("businessactivities.registerservices.servicename.lbl.04")
