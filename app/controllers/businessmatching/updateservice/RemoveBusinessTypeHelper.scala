@@ -20,6 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
+import models.amp.Amp
 import models.asp.Asp
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, BusinessActivity => BMBusinessActivity, BusinessMatching => BMBusinessMatching, _}
@@ -59,8 +60,8 @@ class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
 
     def removeActivity(activity: BMBusinessActivity): Future[CacheMap] = {
       activity match {
-//        case ArtMarketParticipant =>
-//          dataCacheConnector.removeByKey[ArtMarketParticipant](credId, ArtMarketParticipant.key)
+         case ArtMarketParticipant =>
+          dataCacheConnector.removeByKey[Amp](credId, Amp.key)
         case MoneyServiceBusiness =>
           dataCacheConnector.removeByKey[MSBSection](credId, MSBSection.key)
         case HighValueDealing =>

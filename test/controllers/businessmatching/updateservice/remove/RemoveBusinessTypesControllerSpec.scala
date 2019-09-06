@@ -76,7 +76,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.removeactivities.title"))
+        Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.removeactivities.title.multibusinesses"))
       }
     }
 

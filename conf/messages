@@ -115,8 +115,9 @@ error.submission.wrong_credentials.content = Your account doesn’t have enough 
 ########################################################################################################################
 ####  Business Matching ####
 error.required.bm.register.service = Select one or more options to show what you need to register
-error.required.bm.register.service.single = Select which service you need to register.
-error.required.bm.remove.service = You must have at least one business type selected.
+error.required.bm.register.service.single = Select which service you need to register
+error.required.bm.remove.service = Select which service you need to remove
+error.required.bm.remove.service.multiple = Select which services you need to remove
 error.required.bm.remove.leave.twobusinesses = You cannot remove both of your registered services
 error.required.bm.remove.leave.one = You cannot remove all of your registered services
 error.required.bm.registration.number = Enter a valid company registration number
@@ -1290,6 +1291,7 @@ businessmatching.updateservice.removeactivitiesinformation.info.3 = You need to 
 businessmatching.updateservice.removeactivitiesinformation.info.1.all = You need to add a new service before you remove the services you are currently registered for.
 businessmatching.updateservice.removeactivitiesinformation.info.2 = If you want to de-register your business for anti-money laundering supervision, you can do this from your registration status page.
 
+businessmatching.updateservice.removeactivities.heading = Which service do you need to remove?
 businessmatching.updateservice.removeactivities.title.twobusinesses = Which service do you need to remove?
 businessmatching.updateservice.removeactivities.heading.twobusinesses = Which service do you need to remove?
 businessmatching.updateservice.removeactivities.title.multibusinesses = Which services do you need to remove?

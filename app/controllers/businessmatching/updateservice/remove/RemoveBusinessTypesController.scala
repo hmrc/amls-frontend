@@ -48,17 +48,17 @@ class RemoveBusinessTypesController @Inject()(
                                                val router: Router[RemoveBusinessTypeFlowModel]
                                              ) extends DefaultBaseController {
 
-  def formReaderminLengthR: Rule[UrlFormEncoded, Set[BusinessActivity]] = From[UrlFormEncoded] { __ =>
-    (__ \ "businessActivities").read(minLengthR[Set[BusinessActivity]](1).withMessage("error.required.bm.remove.service"))
-  }
+  def formReaderminLengthR(msg: String): Rule[UrlFormEncoded, Set[BusinessActivity]] = From[UrlFormEncoded] { __ =>
+    (__ \ "businessActivities").read(minLengthR[Set[BusinessActivity]](1).withMessage(msg))
 
+  }
   def maxLengthValidator(count: Int): Rule[Set[BusinessActivity], Set[BusinessActivity]] = Rule.fromMapping[Set[BusinessActivity], Set[BusinessActivity]] {
     case s if s.size == 2 && s.size == count => Invalid(Seq(ValidationError("error.required.bm.remove.leave.twobusinesses")))
     case s if s.size == count => Invalid(Seq(ValidationError("error.required.bm.remove.leave.one")))
     case s => Valid(s)
   }
 
-  def combinedReader(count: Int) = formReaderminLengthR andThen maxLengthValidator(count).repath(_ => Path \ "businessActivities")
+  def combinedReader(count: Int, msg: String) = formReaderminLengthR(msg) andThen maxLengthValidator(count).repath(_ => Path \ "businessActivities")
 
 
   implicit def activitySetWrites(implicit w: Write[BusinessActivity, String]) = Write[Set[BusinessActivity], UrlFormEncoded] { activities =>
@@ -79,31 +79,42 @@ class RemoveBusinessTypesController @Inject()(
 
   def post(edit: Boolean = false) = authAction.async {
       implicit request =>
-        getFormData(request.credId).value flatMap {
-          case Some((names, values)) =>
-        Form2[Set[BusinessActivity]](request.body)(combinedReader(names.size)) match {
-          case f: InvalidForm => getFormData(request.credId) map {
-            case (_, values) =>
-              BadRequest(remove_activities(f, edit, values))
-          } getOrElse InternalServerError("Post: Invalid form on Remove Activities page")
+        businessMatchingService.getSubmittedBusinessActivities(request.credId)
+            .map(ba => if (ba.size > 2) {
+              "error.required.bm.remove.service.multiple"
+            } else {
+              "error.required.bm.remove.service"
+            }).value.flatMap( msg =>
+              getFormData(request.credId).value flatMap {
+                case Some((names, values)) =>
+                  Form2[Set[BusinessActivity]](request.body)(combinedReader(names.size, msg.getOrElse(""))) match {
+                    case f: InvalidForm => getFormData(request.credId) map {
+                      case (_, values) =>
+                        BadRequest(remove_activities(f, edit, values))
+                    } getOrElse InternalServerError("Post: Invalid form on Remove Activities page")
 
-          case ValidForm(_, data) =>
-            (for {
-              model <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](request.credId, RemoveBusinessTypeFlowModel.key)) orElse OptionT.some(RemoveBusinessTypeFlowModel())
-              dateApplicable <- removeBusinessTypeHelper.dateOfChangeApplicable(request.credId, data)
-              servicesChanged <- OptionT.some[Future, Boolean](model.activitiesToRemove.getOrElse(Set.empty) != data)
-              newModel <- OptionT.some[Future, RemoveBusinessTypeFlowModel](
-                model.copy(activitiesToRemove = Some(data), dateOfChange = if (!dateApplicable || servicesChanged) None else model.dateOfChange)
-              )
-              _ <- OptionT.liftF(dataCacheConnector.save(request.credId, RemoveBusinessTypeFlowModel.key, newModel))
+                    case ValidForm(_, data) =>
+                      (for {
+                        model <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](request.credId, RemoveBusinessTypeFlowModel.key)) orElse OptionT.some(RemoveBusinessTypeFlowModel())
+                        dateApplicable <- removeBusinessTypeHelper.dateOfChangeApplicable(request.credId, data)
+                        servicesChanged <- OptionT.some[Future, Boolean](model.activitiesToRemove.getOrElse(Set.empty) != data)
+                        newModel <- OptionT.some[Future, RemoveBusinessTypeFlowModel](
+                          model.copy(activitiesToRemove = Some(data), dateOfChange = if (!dateApplicable || servicesChanged) None else model.dateOfChange)
+                        )
+                        _ <- OptionT.liftF(dataCacheConnector.save(request.credId, RemoveBusinessTypeFlowModel.key, newModel))
 
-              route <- OptionT.liftF(router.getRoute(request.credId, WhatBusinessTypesToRemovePageId, newModel, edit))
-            } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: RemoveActivitiesController")
+                        route <- OptionT.liftF(router.getRoute(request.credId, WhatBusinessTypesToRemovePageId, newModel, edit))
+                      } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: RemoveActivitiesController")
 
-        }
+                  }
+              }
+
+        )
+
       }
 
-  }
+
+
 
   private def getFormData(credId: String)(implicit hc: HeaderCarrier) = for {
     model <- businessMatchingService.getModel(credId)
