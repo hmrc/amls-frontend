@@ -226,8 +226,6 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         service.desConnector.view(any[String], any())(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]])
       } thenReturn Future.successful(viewResponse)
 
-      //val user = mock[LoggedInUser]
-
       when(service.cacheConnector.remove(any[String])(any())).thenReturn(Future.successful(true))
 
       when {
@@ -316,9 +314,6 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         service.desConnector.view(any[String], any())(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]])
       } thenReturn Future.successful(viewResponse)
 
-//      val user = mock[LoggedInUser]
-//
-//      when(user.oid).thenReturn("")
       when(service.cacheConnector.remove(any())(any())).thenReturn(Future.successful(true))
 
       when {
@@ -458,9 +453,6 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         service.cacheConnector.fetch[AmendVariationRenewalResponse](any(), eqTo(AmendVariationRenewalResponse.key))(any(), any())
       } thenReturn Future.successful(None)
 
-//      val user = mock[LoggedInUser]
-//
-//      when(user.oid).thenReturn("")
       when(service.cacheConnector.remove(any())(any())).thenReturn(Future.successful(true))
 
       when {

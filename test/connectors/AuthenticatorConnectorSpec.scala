@@ -39,12 +39,6 @@ class AuthenticatorConnectorSpec extends AmlsSpec with ScalaFutures {
     val http = mock[HttpClient]
     val appConfig = mock[AppConfig]
 
-//    lazy val app = new GuiceApplicationBuilder()
-//      .disable[com.kenshoo.play.metrics.PlayModule]
-//      .configure("microservice.services.feature-toggle.refresh-profile" -> featureToggleSetting)
-//      .overrides(bind[HttpPost].to(http))
-//      .build()
-
     lazy val connector = new AuthenticatorConnector(http, mock[Environment], mock[Configuration], appConfig)
   }
 

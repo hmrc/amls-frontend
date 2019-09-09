@@ -147,7 +147,6 @@ class ConfirmationServiceSpec extends PlaySpec
     val activities = mock[BusinessActivities]
     val businessMatching = mock[BusinessMatching]
     val cache = mock[CacheMap]
-    //val principle = Principal(None, Accounts(org = Some(OrgAccount("", Org("TestOrgRef")))))
 
     when {
       businessMatching.activities
