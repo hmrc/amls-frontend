@@ -1287,7 +1287,7 @@ businessmatching.updateservice.changeservices.choice.remove = Remove business ty
 
 businessmatching.updateservice.removeactivitiesinformation.title = Unable to remove services
 businessmatching.updateservice.removeactivitiesinformation.heading = Unable to remove {0}
-businessmatching.updateservice.removeactivitiesinformation.info.3 = You need to add a new service before you can remove the one you're currently registered for.
+businessmatching.updateservice.removeactivitiesinformation.info.3 = You need to add a new service before you can remove the one you’re currently registered for.
 businessmatching.updateservice.removeactivitiesinformation.info.1.all = You need to add a new service before you remove the services you are currently registered for.
 businessmatching.updateservice.removeactivitiesinformation.info.2 = If you no longer need to be registered with HMRC under the Money Laundering Regulations, you can de-register your business. You can do this from your registration page.
 
@@ -1300,7 +1300,7 @@ businessmatching.updateservice.removeactivities.heading.multibusinesses = Which 
 businessmatching.updateservice.removeactivities.summary.twobusinesses = If you no longer want to be registered with HMRC for one of your services, you can remove it.
 businessmatching.updateservice.removeactivities.list.heading.twobusinesses = If you want to remove both services, you’ll need to de-register with HMRC under the Money Laundering Regulations. You can do this from your registration page.
 businessmatching.updateservice.removeactivities.summary.multibusinesses = If you no longer want to be registered with HMRC for one or more of your services, you can remove them.
-businessmatching.updateservice.removeactivities.list.heading.multibusinesses = If you want to remove all services, you'll need to de-register with HMRC under the Money Laundering Regulations. You can do this from your registration page.
+businessmatching.updateservice.removeactivities.list.heading.multibusinesses = If you want to remove all services, you’ll need to de-register with HMRC under the Money Laundering Regulations. You can do this from your registration page.
 businessmatching.updateservice.removeactivities.button = Continue
 
 businessmatching.updateservice.updateotherinformation.heading = We need you to update other information
