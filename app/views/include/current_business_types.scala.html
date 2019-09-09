@@ -16,12 +16,16 @@
 
 @import include.forms2._
 
-@(existingActivities: Set[String])(implicit m: Messages)
+@(existingActivities: List[String])(implicit m: Messages)
 
     @if(existingActivities.size == 1) {
         <p>@Messages("businessmatching.updateservice.selectactivities.currentactivities.hint")
-            @existingActivities.head</p>
+            @existingActivities.head@Messages("full.stop")</p>
     } else {
         <p>@Messages("businessmatching.updateservice.selectactivities.currentactivities.hint.plural")</p>
-        <p>@bulletedList(existingActivities)</p>
+        <p><ul class="list list-bullet">
+            @existingActivities.map{x =>
+                <li>@x</li>
+            }
+        </ul></p>
     }

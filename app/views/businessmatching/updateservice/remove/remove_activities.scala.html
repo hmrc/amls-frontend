@@ -32,7 +32,7 @@
 }
 
 @main(
-    title = if(activityValues.size == 2)  Messages("businessmatching.updateservice.removeactivities.title.twobusinesses")
+    title = if(activityValues.size == 2) Messages("businessmatching.updateservice.removeactivities.title.twobusinesses")
     else Messages("businessmatching.updateservice.removeactivities.title.multibusinesses"),
     heading = header
 ) {
@@ -42,6 +42,7 @@
         @fieldsetWithErrorGroup(
             f = f("businessActivities"),
             section = "summary.updateservice",
+            heading = if(activityValues.size == 2) Messages("businessmatching.updateservice.removeactivities.heading.twobusinesses") else Messages("businessmatching.updateservice.removeactivities.heading.multibusinesses"),
             panel = false,
             supportingContent = numerous_business_types(activityValues)
         ) {

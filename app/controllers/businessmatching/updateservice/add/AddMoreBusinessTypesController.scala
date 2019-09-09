@@ -49,7 +49,7 @@ class AddMoreBusinessTypesController @Inject()(
       implicit request =>
         (for {
           activities <- OptionT(getActivities(request.credId))
-        } yield Ok(add_more_activities(EmptyForm, activities))) getOrElse InternalServerError("Get :Unable to show add more activities page")
+        } yield Ok(add_more_activities(EmptyForm, activities.toList.sorted))) getOrElse InternalServerError("Get :Unable to show add more activities page")
   }
 
   def post() = authAction.async {
@@ -57,7 +57,7 @@ class AddMoreBusinessTypesController @Inject()(
         Form2[Boolean](request.body) match {
           case f: InvalidForm =>
             OptionT(getActivities(request.credId)) map { activities =>
-              BadRequest(add_more_activities(f, activities))
+              BadRequest(add_more_activities(f, activities.toList.sorted))
             } getOrElse InternalServerError("Post: Unable to show add more activities page")
 
           case ValidForm(_, data) =>

@@ -213,5 +213,4 @@ object BusinessActivities {
       case "07" => TrustAndCompanyServices
       case "08" => TelephonePaymentService
     }
-
 }
