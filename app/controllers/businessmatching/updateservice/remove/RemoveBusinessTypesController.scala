@@ -17,24 +17,18 @@
 package controllers.businessmatching.updateservice.remove
 
 import cats.data.OptionT
-import cats.data.Validated.{Invalid, Valid}
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
 import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
-import jto.validation.forms.Rules._
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Path, Rule, ValidationError, Write}
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, WhatBusinessTypesToRemovePageId}
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
-import utils.MappingUtils.Implicits._
-import utils.TraversableValidators.minLengthR
 import views.html.businessmatching.updateservice.remove.remove_activities
 
 import scala.concurrent.Future
@@ -48,22 +42,7 @@ class RemoveBusinessTypesController @Inject()(
                                                val router: Router[RemoveBusinessTypeFlowModel]
                                              ) extends DefaultBaseController {
 
-  def formReaderminLengthR(msg: String): Rule[UrlFormEncoded, Set[BusinessActivity]] = From[UrlFormEncoded] { __ =>
-    (__ \ "businessActivities").read(minLengthR[Set[BusinessActivity]](1).withMessage(msg))
-
-  }
-  def maxLengthValidator(count: Int): Rule[Set[BusinessActivity], Set[BusinessActivity]] = Rule.fromMapping[Set[BusinessActivity], Set[BusinessActivity]] {
-    case s if s.size == 2 && s.size == count => Invalid(Seq(ValidationError("error.required.bm.remove.leave.twobusinesses")))
-    case s if s.size == count => Invalid(Seq(ValidationError("error.required.bm.remove.leave.one")))
-    case s => Valid(s)
-  }
-
-  def combinedReader(count: Int, msg: String) = formReaderminLengthR(msg) andThen maxLengthValidator(count).repath(_ => Path \ "businessActivities")
-
-
-  implicit def activitySetWrites(implicit w: Write[BusinessActivity, String]) = Write[Set[BusinessActivity], UrlFormEncoded] { activities =>
-    Map("businessActivities[]" -> activities.toSeq.map { a => BusinessActivities.getValue(a) })
-  }
+  import models.businessmatching.BusinessActivities._
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>
@@ -79,13 +58,21 @@ class RemoveBusinessTypesController @Inject()(
 
   def post(edit: Boolean = false) = authAction.async {
       implicit request =>
-        businessMatchingService.getSubmittedBusinessActivities(request.credId)
-            .map(ba => if (ba.size > 2) {
-              "error.required.bm.remove.service.multiple"
-            } else {
-              "error.required.bm.remove.service"
-            }).value.flatMap( msg =>
-              getFormData(request.credId).value flatMap {
+
+        val errorMessage = (for {
+          submittedActivities <- businessMatchingService.getSubmittedBusinessActivities(request.credId)
+        } yield {if(submittedActivities.size > 2) {
+          "error.required.bm.remove.service.multiple"
+        } else {
+          "error.required.bm.remove.service"
+        }}).value
+
+        val formData = (for {
+          data <- getFormData(request.credId)
+        } yield data).value
+
+        errorMessage.flatMap(msg =>
+              formData flatMap {
                 case Some((names, values)) =>
                   Form2[Set[BusinessActivity]](request.body)(combinedReader(names.size, msg.getOrElse(""))) match {
                     case f: InvalidForm => getFormData(request.credId) map {

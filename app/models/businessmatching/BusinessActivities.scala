@@ -16,14 +16,15 @@
 
 package models.businessmatching
 
+import cats.data.Validated.{Invalid, Valid}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{Rule, ValidationError, _}
 import models.{DateOfChange, FormTypes}
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.i18n.{Lang, Messages}
-import play.api.libs.json.{Reads, Writes, _}
 import play.api.libs.functional.syntax._
+import play.api.libs.json.{Reads, Writes, _}
 
 case class BusinessActivities(businessActivities: Set[BusinessActivity],
                               additionalActivities: Option[Set[BusinessActivity]] = None,
@@ -134,6 +135,25 @@ object BusinessActivities {
 
   private def activitiesWriter(activities: BusinessActivities)(implicit w: Write[BusinessActivity, String]) =
     Map("businessActivities[]" -> activities.additionalActivities.fold(activities.businessActivities){act => act}.toSeq.map(w.writes))
+
+  import jto.validation.forms.Rules._
+  import utils.TraversableValidators.minLengthR
+
+  def formReaderMinLengthR(msg: String): Rule[UrlFormEncoded, Set[BusinessActivity]] = From[UrlFormEncoded] { __ =>
+    (__ \ "businessActivities").read(minLengthR[Set[BusinessActivity]](1).withMessage(msg))
+  }
+
+  def maxLengthValidator(count: Int): Rule[Set[BusinessActivity], Set[BusinessActivity]] = Rule.fromMapping[Set[BusinessActivity], Set[BusinessActivity]] {
+    case s if s.size == 2 && s.size == count => Invalid(Seq(ValidationError("error.required.bm.remove.leave.twobusinesses")))
+    case s if s.size == count => Invalid(Seq(ValidationError("error.required.bm.remove.leave.one")))
+    case s => Valid(s)
+  }
+
+  def combinedReader(count: Int, msg: String) = formReaderMinLengthR(msg) andThen maxLengthValidator(count).repath(_ => Path \ "businessActivities")
+
+  implicit def activitySetWrites(implicit w: Write[BusinessActivity, String]) = Write[Set[BusinessActivity], UrlFormEncoded] { activities =>
+    Map("businessActivities[]" -> activities.toSeq.map { a => BusinessActivities.getValue(a) })
+  }
 
   implicit val format = Json.writes[BusinessActivities]
 
