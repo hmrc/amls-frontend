@@ -38,7 +38,7 @@ import uk.gov.hmrc.auth.core.AffinityGroup.Individual
 import uk.gov.hmrc.auth.core.{Enrolments, User}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, AuthorisedRequest, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, AuthorisedRequest}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -301,7 +301,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
             when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
               .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesSingle))))
 
-            val newRequest = request.withFormUrlEncodedBody("activities[0]" -> "01", "activities[1]" -> "05")
+            val newRequest = request.withFormUrlEncodedBody("activities[0]" -> "01", "activities[1]" -> "06")
 
             val result = whatDoesYourBusinessDoController.post(recordId1, edit = true)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -394,8 +394,8 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
 
         val newRequest = request.withFormUrlEncodedBody(
           "activities[0]" -> "01",
-          "activities[1]" -> "02",
-          "activities[2]" -> "03"
+          "activities[1]" -> "03",
+          "activities[2]" -> "04"
         )
 
         when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))

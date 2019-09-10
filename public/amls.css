@@ -1642,3 +1642,7 @@ h2.override-heading-medium {
 legend .page-header {
     margin: 0;
 }
+
+.checkbox-description {
+    margin-left: 0.6em;
+}

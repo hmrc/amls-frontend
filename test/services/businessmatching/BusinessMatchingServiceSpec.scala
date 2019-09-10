@@ -188,14 +188,14 @@ class BusinessMatchingServiceSpec extends PlaySpec
       mockCacheFetch(Some(businessMatching), Some(BusinessMatching.key))
 
       whenReady(service.getRemainingBusinessActivities("internalId").value) { result =>
-        result mustBe Some(Set(TelephonePaymentService, EstateAgentBusinessService,TrustAndCompanyServices, MoneyServiceBusiness))
+        result mustBe Some(Set(TelephonePaymentService, ArtMarketParticipant, EstateAgentBusinessService,TrustAndCompanyServices, MoneyServiceBusiness))
       }
     }
 
     "return an empty set if all the available activities have been added" in new Fixture {
       val businessMatching = BusinessMatching(
         activities = Some(BMActivities(
-          Set(BillPaymentServices, HighValueDealing, AccountancyServices, TelephonePaymentService, EstateAgentBusinessService, TrustAndCompanyServices, MoneyServiceBusiness)
+          Set(BillPaymentServices, ArtMarketParticipant, HighValueDealing, AccountancyServices, TelephonePaymentService, EstateAgentBusinessService, TrustAndCompanyServices, MoneyServiceBusiness)
         ))
       )
 

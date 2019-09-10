@@ -23,7 +23,6 @@ import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
 import models.DateOfChange
 import models.businessmatching._
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, WhatBusinessTypesToRemovePageId}
-import org.mockito.Matchers._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -128,7 +127,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
         mockCacheSave[RemoveBusinessTypeFlowModel]
 
         val result = await(controller.post()(request.withFormUrlEncodedBody(
-          "businessActivities[]" -> "04"
+          "businessActivities[]" -> "05"
         )))
 
         controller.router.verify("internalId", WhatBusinessTypesToRemovePageId, flowModel.copy(dateOfChange = None, activitiesToRemove = Some(Set(HighValueDealing))))
@@ -148,7 +147,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
         mockCacheSave[RemoveBusinessTypeFlowModel]
 
         val result = await(controller.post()(request.withFormUrlEncodedBody(
-          "businessActivities[]" -> "04"
+          "businessActivities[]" -> "05"
         )))
 
         controller.router.verify("internalId", WhatBusinessTypesToRemovePageId, RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing))))
@@ -168,7 +167,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
         mockCacheSave[RemoveBusinessTypeFlowModel]
 
         val result = await(controller.post()(request.withFormUrlEncodedBody(
-          "businessActivities[]" -> "04"
+          "businessActivities[]" -> "05"
         )))
 
         controller.router.verify("internalId", WhatBusinessTypesToRemovePageId, RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing))))
@@ -188,7 +187,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
         mockCacheSave[RemoveBusinessTypeFlowModel]
 
         val result = await(controller.post()(request.withFormUrlEncodedBody(
-          "businessActivities[]" -> "04"
+          "businessActivities[]" -> "05"
         )))
 
         controller.router.verify("internalId", WhatBusinessTypesToRemovePageId, RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing)), dateOfChange = Some(DateOfChange(LocalDate.now))))
@@ -222,12 +221,12 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
         val result = controller.post()(request.withFormUrlEncodedBody(
 
         "businessActivities[]" -> "01",
-        "businessActivities[]" -> "02",
         "businessActivities[]" -> "03",
         "businessActivities[]" -> "04",
         "businessActivities[]" -> "05",
         "businessActivities[]" -> "06",
-        "businessActivities[]" -> "07"
+        "businessActivities[]" -> "07",
+        "businessActivities[]" -> "08"
         ))
 
         status(result) must be(BAD_REQUEST)

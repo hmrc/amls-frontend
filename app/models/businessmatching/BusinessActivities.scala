@@ -43,17 +43,19 @@ sealed trait BusinessActivity {
     val message = s"businessmatching.registerservices.servicename.lbl."
     this match {
       case AccountancyServices => Messages(s"${message}01${phrasedString}")
-      case BillPaymentServices => Messages(s"${message}02${phrasedString}")
-      case EstateAgentBusinessService => Messages(s"${message}03${phrasedString}")
-      case HighValueDealing => Messages(s"${message}04${phrasedString}")
-      case MoneyServiceBusiness => Messages(s"${message}05${phrasedString}")
-      case TrustAndCompanyServices => Messages(s"${message}06${phrasedString}")
-      case TelephonePaymentService => Messages(s"${message}07${phrasedString}")
+      case ArtMarketParticipant => Messages(s"${message}02${phrasedString}")
+      case BillPaymentServices => Messages(s"${message}03${phrasedString}")
+      case EstateAgentBusinessService => Messages(s"${message}04${phrasedString}")
+      case HighValueDealing => Messages(s"${message}05${phrasedString}")
+      case MoneyServiceBusiness => Messages(s"${message}06${phrasedString}")
+      case TrustAndCompanyServices => Messages(s"${message}07${phrasedString}")
+      case TelephonePaymentService => Messages(s"${message}08${phrasedString}")
     }
   }
 }
 
 case object AccountancyServices extends BusinessActivity
+case object ArtMarketParticipant extends BusinessActivity
 case object BillPaymentServices extends  BusinessActivity
 case object EstateAgentBusinessService extends BusinessActivity
 case object HighValueDealing extends BusinessActivity
@@ -65,27 +67,30 @@ object BusinessActivity {
 
   implicit val activityFormRead = Rule[String, BusinessActivity] {
       case "01" => Valid(AccountancyServices)
-      case "02" => Valid(BillPaymentServices)
-      case "03" => Valid(EstateAgentBusinessService)
-      case "04" => Valid(HighValueDealing)
-      case "05" => Valid(MoneyServiceBusiness)
-      case "06" => Valid(TrustAndCompanyServices)
-      case "07" => Valid(TelephonePaymentService)
+      case "02" => Valid(ArtMarketParticipant)
+      case "03" => Valid(BillPaymentServices)
+      case "04" => Valid(EstateAgentBusinessService)
+      case "05" => Valid(HighValueDealing)
+      case "06" => Valid(MoneyServiceBusiness)
+      case "07" => Valid(TrustAndCompanyServices)
+      case "08" => Valid(TelephonePaymentService)
       case _ => Invalid(Seq((Path \ "businessActivities") -> Seq(ValidationError("error.invalid"))))
   }
 
   implicit val activityFormWrite = Write[BusinessActivity, String] {
       case AccountancyServices => "01"
-      case BillPaymentServices => "02"
-      case EstateAgentBusinessService => "03"
-      case HighValueDealing => "04"
-      case MoneyServiceBusiness => "05"
-      case TrustAndCompanyServices => "06"
-      case TelephonePaymentService => "07"
+      case ArtMarketParticipant => "02"
+      case BillPaymentServices => "03"
+      case EstateAgentBusinessService => "04"
+      case HighValueDealing => "05"
+      case MoneyServiceBusiness => "06"
+      case TrustAndCompanyServices => "07"
+      case TelephonePaymentService => "08"
   }
 
   implicit val jsonActivityReads: Reads[BusinessActivity] = Reads {
     case JsString("01") => JsSuccess(AccountancyServices)
+    case JsString("08") => JsSuccess(ArtMarketParticipant)
     case JsString("02") => JsSuccess(BillPaymentServices)
     case JsString("03") => JsSuccess(EstateAgentBusinessService)
     case JsString("04") => JsSuccess(HighValueDealing)
@@ -97,6 +102,7 @@ object BusinessActivity {
 
   implicit val jsonActivityWrite = Writes[BusinessActivity] {
     case AccountancyServices => JsString("01")
+    case ArtMarketParticipant => JsString("08")
     case BillPaymentServices => JsString("02")
     case EstateAgentBusinessService => JsString("03")
     case HighValueDealing => JsString("04")
@@ -112,6 +118,7 @@ object BusinessActivities {
 
   val all: Set[BusinessActivity] = Set(
     AccountancyServices,
+    ArtMarketParticipant,
     BillPaymentServices,
     EstateAgentBusinessService,
     HighValueDealing,
@@ -171,6 +178,7 @@ object BusinessActivities {
   private def activitiesReader(values: Set[String], path: String): Set[Reads[_ <: BusinessActivity]] = {
     values map {
       case "01" => Reads(_ => JsSuccess(AccountancyServices)) map identity[BusinessActivity]
+      case "08" => Reads(_ => JsSuccess(ArtMarketParticipant)) map identity[BusinessActivity]
       case "02" => Reads(_ => JsSuccess(BillPaymentServices)) map identity[BusinessActivity]
       case "03" => Reads(_ => JsSuccess(EstateAgentBusinessService)) map identity[BusinessActivity]
       case "04" => Reads(_ => JsSuccess(HighValueDealing)) map identity[BusinessActivity]
@@ -185,23 +193,25 @@ object BusinessActivities {
   def getValue(ba:BusinessActivity): String =
     ba match {
       case AccountancyServices => "01"
-      case BillPaymentServices => "02"
-      case EstateAgentBusinessService => "03"
-      case HighValueDealing => "04"
-      case MoneyServiceBusiness => "05"
-      case TrustAndCompanyServices => "06"
-      case TelephonePaymentService => "07"
+      case ArtMarketParticipant => "02"
+      case BillPaymentServices => "03"
+      case EstateAgentBusinessService => "04"
+      case HighValueDealing => "05"
+      case MoneyServiceBusiness => "06"
+      case TrustAndCompanyServices => "07"
+      case TelephonePaymentService => "08"
     }
 
   def getBusinessActivity(ba:String): BusinessActivity =
     ba match {
       case "01" => AccountancyServices
-      case "02" => BillPaymentServices
-      case "03" => EstateAgentBusinessService
-      case "04" => HighValueDealing
-      case "05" => MoneyServiceBusiness
-      case "06" => TrustAndCompanyServices
-      case "07" => TelephonePaymentService
+      case "02" => ArtMarketParticipant
+      case "03" => BillPaymentServices
+      case "04" => EstateAgentBusinessService
+      case "05" => HighValueDealing
+      case "06" => MoneyServiceBusiness
+      case "07" => TrustAndCompanyServices
+      case "08" => TelephonePaymentService
     }
 
 }
