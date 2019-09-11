@@ -39,11 +39,11 @@ class remove_activitiesSpec extends AmlsSpec with MustMatchers {
   "The select activities to remove view" must {
 
     "have the correct title" in new ViewFixture {
-      doc.title must startWith(Messages("businessmatching.updateservice.removeactivities.title") + " - " + Messages("summary.updateservice"))
+      doc.title must startWith(Messages("businessmatching.updateservice.removeactivities.title.multibusinesses"))
     }
 
     "have correct heading" in new ViewFixture {
-      heading.html must be(Messages("businessmatching.updateservice.removeactivities.heading"))
+      heading.html must be(Messages("businessmatching.updateservice.removeactivities.title.multibusinesses"))
     }
 
     "have correct subHeading" in new ViewFixture {
@@ -68,7 +68,7 @@ class remove_activitiesSpec extends AmlsSpec with MustMatchers {
         doc.body().html() must include(BusinessActivities.getValue(a))
       }
 
-      doc.body().text() must include (Messages("businessmatching.updateservice.removeactivities.summary"))
+      doc.body().text() must include (Messages("businessmatching.updateservice.removeactivities.title.multibusinesses"))
       doc.getElementById("removeactivities-submit").text() must include (Messages("businessmatching.updateservice.removeactivities.button"))
 
     }

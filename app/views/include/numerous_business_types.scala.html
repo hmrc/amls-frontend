@@ -16,16 +16,12 @@
 
 @import include.forms2._
 
-@(existingActivities: List[String])(implicit m: Messages)
+@(existingActivities: Seq[String])(implicit m: Messages)
 
-    @if(existingActivities.size == 1) {
-        <p>@Messages("businessmatching.updateservice.selectactivities.currentactivities.hint")
-            @existingActivities.head@Messages("full.stop")</p>
-    } else {
-        <p>@Messages("businessmatching.updateservice.selectactivities.currentactivities.hint.plural")</p>
-        <p><ul class="list list-bullet">
-            @existingActivities.map{x =>
-                <li>@x</li>
-            }
-        </ul></p>
-    }
+  @if(existingActivities.size == 2) {
+      <p>@Messages("businessmatching.updateservice.removeactivities.summary.twobusinesses")</p>
+      <p>@Messages("businessmatching.updateservice.removeactivities.list.heading.twobusinesses")</p>
+  } else {
+      <p>@Messages("businessmatching.updateservice.removeactivities.summary.multibusinesses")</p>
+      <p>@Messages("businessmatching.updateservice.removeactivities.list.heading.multibusinesses")</p>
+  }

@@ -64,11 +64,11 @@ class change_servicesSpec extends AmlsSpec with MustMatchers {
     }
 
     "show the correct business type text for only one existing service" in new ViewFixture {
-      doc.body().text() must include(Messages("businessmatching.updateservice.changeservices.existing.single"))
+      doc.body().text() must include(Messages("businessmatching.updateservice.selectactivities.currentactivities.hint"))
     }
 
     "show the correct business type text for more than one existing service" in new MultipleViewFixture {
-      doc.body().text() must include(Messages("businessmatching.updateservice.changeservices.existing.multiple"))
+      doc.body().text() must include(Messages("businessmatching.updateservice.selectactivities.currentactivities.hint.plural"))
     }
 
 

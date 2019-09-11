@@ -20,6 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
+import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import jto.validation.forms.UrlFormEncoded
@@ -42,7 +43,8 @@ class SelectBusinessTypeController @Inject()(
                                             authAction: AuthAction,
                                             implicit val dataCacheConnector: DataCacheConnector,
                                             val businessMatchingService: BusinessMatchingService,
-                                            val router: Router[AddBusinessTypeFlowModel]
+                                            val router: Router[AddBusinessTypeFlowModel],
+                                            val addHelper: AddBusinessTypeHelper
                                           ) extends DefaultBaseController with RepeatingSection {
 
   implicit val activityReader: Rule[UrlFormEncoded, BusinessActivity] =
@@ -66,7 +68,7 @@ class SelectBusinessTypeController @Inject()(
           (names, values) <- getFormData(request.credId)
         } yield {
           val form = model.activity.fold[Form2[BusinessActivity]](EmptyForm)(a => Form2(a))
-          Ok(select_activities(form, edit, values, names))
+          Ok(select_activities(form, edit, values, names.toSeq))
         }) getOrElse InternalServerError("Get: Unable to show Select Activities page. Failed to retrieve data")
   }
 
@@ -75,7 +77,7 @@ class SelectBusinessTypeController @Inject()(
         Form2[BusinessActivity](request.body) match {
           case f: InvalidForm => getFormData(request.credId) map {
             case (names, values) =>
-              BadRequest(select_activities(f, edit, values, names))
+              BadRequest(select_activities(f, edit, values, names.toSeq))
           } getOrElse InternalServerError("Post: Invalid form on Select Activities page")
 
           case ValidForm(_, data) =>
@@ -100,10 +102,8 @@ class SelectBusinessTypeController @Inject()(
     }
   } yield {
     val allActivities = BusinessMatchingActivities.all
-    val existingActivityNames = activities.toSeq.sortBy(_.getMessage()) map {
-      _.getMessage()
-    }
-    val activityValues = (allActivities diff activities).toSeq.sortBy(_.getMessage()) map BusinessMatchingActivities.getValue
+    val existingActivityNames = addHelper.prefixedActivities(model)
+    val activityValues = (allActivities diff activities).toSeq.sortBy(_.getMessage(true)) map BusinessMatchingActivities.getValue
 
     (existingActivityNames, activityValues)
   }
