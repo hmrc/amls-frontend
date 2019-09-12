@@ -33,7 +33,7 @@ final case class Amp(
                      ) {
 
   /**
-    * Provides a means of setting data that will upddate the hasChanged flag
+    * Provides a means of setting data that will update the hasChanged flag
     *
     * Set data via this method and NOT directly in the constructor
     */
