@@ -66,6 +66,6 @@ class SendTheLargestAmountsOfMoneyController @Inject()(authAction: AuthAction,
   }
 
   def alignFormDataWithValidationErrors(form: InvalidForm): InvalidForm =
-    ControllerHelper.stripEmptyValuesFromFormWithArray(form, "countries")
+    ControllerHelper.stripEmptyValuesFromFormWithArray(form, "largestAmountsOfMoney", index => index / 2)
 
 }

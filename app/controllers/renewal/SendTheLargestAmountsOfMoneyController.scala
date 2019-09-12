@@ -61,7 +61,7 @@ class SendTheLargestAmountsOfMoneyController @Inject()(
   }
 
   def alignFormDataWithValidationErrors(form: InvalidForm): InvalidForm =
-    ControllerHelper.stripEmptyValuesFromFormWithArray(form, "largestAmountsOfMoney")
+    ControllerHelper.stripEmptyValuesFromFormWithArray(form, "largestAmountsOfMoney", index => index / 2)
 
 
   def redirectTo(edit:Boolean, renewal: Renewal) = edit match {

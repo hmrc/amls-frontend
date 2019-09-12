@@ -76,7 +76,7 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
   }
 
   def alignFormDataWithValidationErrors(form: InvalidForm): InvalidForm =
-    ControllerHelper.stripEmptyValuesFromFormWithArray(form, "countries")
+    ControllerHelper.stripEmptyValuesFromFormWithArray(form, "countries", index => index / 2)
 }
 
 
