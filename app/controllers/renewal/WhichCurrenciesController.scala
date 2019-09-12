@@ -24,7 +24,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.renewal.{Renewal, WhichCurrencies}
 import services.RenewalService
-import utils.AuthAction
+import utils.{AuthAction, ControllerHelper}
 import views.html.renewal.which_currencies
 
 import scala.concurrent.Future
@@ -49,7 +49,7 @@ class WhichCurrenciesController @Inject()(val authAction: AuthAction,
   def post(edit: Boolean = false) = authAction.async {
       implicit request =>
         Form2[WhichCurrencies](request.body) match {
-          case f: InvalidForm => Future.successful(BadRequest(which_currencies(f, edit)))
+          case f: InvalidForm => Future.successful(BadRequest(which_currencies(alignFormDataWithValidationErrors(f), edit)))
           case ValidForm(_, model) =>
             dataCacheConnector.fetchAll(request.credId).flatMap {
               optMap =>
@@ -69,6 +69,9 @@ class WhichCurrenciesController @Inject()(val authAction: AuthAction,
             }
         }
   }
+
+  def alignFormDataWithValidationErrors(form: InvalidForm): InvalidForm =
+    ControllerHelper.stripEmptyValuesFromFormWithArray(form, "currencies")
 
   def updateWhichCurrencies(oldRenewal: Renewal, whichCurrencies: WhichCurrencies) = {
     oldRenewal.whichCurrencies match {

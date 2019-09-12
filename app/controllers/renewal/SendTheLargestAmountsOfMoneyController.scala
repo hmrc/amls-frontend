@@ -22,7 +22,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.renewal.{Renewal, SendTheLargestAmountsOfMoney}
 import services.{AutoCompleteService, RenewalService}
-import utils.AuthAction
+import utils.{AuthAction, ControllerHelper}
 import views.html.renewal.send_largest_amounts_of_money
 
 import scala.concurrent.Future
@@ -51,7 +51,7 @@ class SendTheLargestAmountsOfMoneyController @Inject()(
     implicit request =>
       Form2[SendTheLargestAmountsOfMoney](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(send_largest_amounts_of_money(f, edit, autoCompleteService.getCountries)))
+          Future.successful(BadRequest(send_largest_amounts_of_money(alignFormDataWithValidationErrors(f), edit, autoCompleteService.getCountries)))
         case ValidForm(_, data) =>
           for {
             renewal <- renewalService.getRenewal(request.credId)
@@ -59,6 +59,10 @@ class SendTheLargestAmountsOfMoneyController @Inject()(
           } yield redirectTo(edit, renewal)
       }
   }
+
+  def alignFormDataWithValidationErrors(form: InvalidForm): InvalidForm =
+    ControllerHelper.stripEmptyValuesFromFormWithArray(form, "largestAmountsOfMoney")
+
 
   def redirectTo(edit:Boolean, renewal: Renewal) = edit match {
     case true if !mostTransactionsDataRequired(renewal)  => Redirect(routes.SummaryController.get())

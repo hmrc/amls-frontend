@@ -26,7 +26,7 @@ import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions}
 import services.businessmatching.ServiceFlow
 import services.{AutoCompleteService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.AuthAction
+import utils.{AuthAction, ControllerHelper}
 
 import scala.concurrent.Future
 
@@ -54,7 +54,7 @@ class MostTransactionsController @Inject()(authAction: AuthAction,
       implicit request =>
         Form2[MostTransactions](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.msb.most_transactions(f, edit, autoCompleteService.getCountries)))
+            Future.successful(BadRequest(views.html.msb.most_transactions(alignFormDataWithValidationErrors(f), edit, autoCompleteService.getCountries)))
           case ValidForm(_, data) =>
             cacheConnector.fetchAll(request.credId) flatMap { maybeCache =>
               val result = for {
@@ -75,6 +75,10 @@ class MostTransactionsController @Inject()(authAction: AuthAction,
             }
         }
   }
+
+  def alignFormDataWithValidationErrors(form: InvalidForm): InvalidForm =
+    ControllerHelper.stripEmptyValuesFromFormWithArray(form, "mostTransactionsCountries", index => index / 2)
+
 
   private def shouldAnswerCurrencyExchangeQuestions(msbServices: Set[BusinessMatchingMsbService],
                                                      register: ServiceChangeRegister,
