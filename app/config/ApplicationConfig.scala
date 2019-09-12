@@ -64,6 +64,10 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 
   def businessCustomerUrl = getConfigString("business-customer.url")
 
+  //TODO - Implement these endpoints as part of the wiring up ticket and move to application.conf once amp service added
+  def ampWhatYouNeedUrl = "http://localhost:9223/amls-art-market-participant-frontend/whatYouNeed"
+  def ampSummaryUrl = "http://localhost:9223/amls-art-market-participant-frontend/check-your-answers"
+
   private implicit lazy val app:Application = Play.current
   lazy val whitelist = Play.configuration.getStringSeq("whitelist") getOrElse Seq.empty
 

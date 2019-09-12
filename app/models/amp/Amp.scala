@@ -15,60 +15,95 @@
  */
 
 package models.amp
-import models.registrationprogress.Section
+import java.time.LocalDateTime
+
+import config.ApplicationConfig
+import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.api.libs.json._
+import play.api.mvc.Call
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 final case class Amp(
                        id: String,
-                       data: JsObject = Json.obj()
+                       data: JsObject = Json.obj(),
+                       lastUpdated: LocalDateTime = LocalDateTime.now,
+                       hasChanged: Boolean = false,
+                       hasAccepted: Boolean = false
                      ) {
 
-  //TODO add a setter for 'data' here. Check if it has changed and set a changed flag if different (as per hvd)
+  /**
+    * Provides a means of setting data that will upddate the hasChanged flag
+    *
+    * Set data via this method and NOT directly in the constructor
+    */
+  def data(p: JsObject): Amp =
+    this.copy(data = p, hasChanged = hasChanged || this.data != p, hasAccepted = hasAccepted && this.data == p)
 
-  val typeOfParticipantPath            = JsPath \ "typeOfParticipant"
-  val typeOfParticipantDetailPath      = JsPath \ "typeOfParticipantDetail"
-  val boughtOrSoldOverThresholdPath    = JsPath \ "boughtOrSoldOverThreshold"
-  val identifyLinkedTransactionsPath   = JsPath \ "identifyLinkedTransactions"
-  val dateTransactionOverThresholdPath = JsPath \ "dateTransactionOverThreshold"
-  val percentageExpectedTurnoverPath   = JsPath \ "percentageExpectedTurnover"
-
+  val typeOfParticipant            = JsPath \ "typeOfParticipant"
+  val typeOfParticipantDetail      = JsPath \ "typeOfParticipantDetail"
+  val boughtOrSoldOverThreshold    = JsPath \ "boughtOrSoldOverThreshold"
+  val identifyLinkedTransactions   = JsPath \ "identifyLinkedTransactions"
+  val dateTransactionOverThreshold = JsPath \ "dateTransactionOverThreshold"
+  val percentageExpectedTurnover   = JsPath \ "percentageExpectedTurnover"
+  val otherTypeOfParticipant       = "somethingelse"
 
   private def get[A](path: JsPath)(implicit rds: Reads[A]): Option[A] =
     Reads.optionNoError(Reads.at(path)).reads(data).getOrElse(None)
 
+  private def isDefinedAt(path: JsPath): Boolean = {
+    get[JsValue](path).isDefined
+  }
+
+  private def valueAt(path: JsPath): String = {
+    get[JsValue](path).getOrElse("").toString().toLowerCase()
+  }
+
   private def isTypeOfParticipantComplete: Boolean = {
-    get[JsValue](typeOfParticipantPath).isDefined &&
-      ((get[JsValue](typeOfParticipantPath).getOrElse(Seq()).toString().contains("somethingElse") &&
-        get[JsValue](typeOfParticipantDetailPath).isDefined) ||
-        (!get[JsValue](typeOfParticipantPath).getOrElse(Seq()).toString().contains("somethingElse")))
+    isDefinedAt(typeOfParticipant) &&
+      ((valueAt(typeOfParticipant).contains(otherTypeOfParticipant) &&
+        isDefinedAt(typeOfParticipantDetail)) ||
+        (!valueAt(typeOfParticipant).contains(otherTypeOfParticipant)))
   }
 
   private def isBoughtOrSoldOverThresholdComplete: Boolean = {
-    get[JsValue](boughtOrSoldOverThresholdPath).isDefined &&
-      ((get[JsValue](boughtOrSoldOverThresholdPath).getOrElse(false).toString() == "true" &&
-        get[JsValue](dateTransactionOverThresholdPath).isDefined) ||
-        (get[JsValue](boughtOrSoldOverThresholdPath).getOrElse(false).toString() == "false"))
+    isDefinedAt(boughtOrSoldOverThreshold) &&
+      ((valueAt(boughtOrSoldOverThreshold) == "true" &&
+        isDefinedAt(dateTransactionOverThreshold)) ||
+        (valueAt(boughtOrSoldOverThreshold) == "false"))
   }
 
   def isComplete: Boolean = {
     isTypeOfParticipantComplete &&
     isBoughtOrSoldOverThresholdComplete &&
-    get[JsValue](identifyLinkedTransactionsPath).isDefined &&
-    get[JsValue](percentageExpectedTurnoverPath).isDefined
+    isDefinedAt(identifyLinkedTransactions) &&
+    isDefinedAt(percentageExpectedTurnover)
   }
 }
 
 object Amp {
 
-  //TODO - Section def yet to be implemented
-  def section(implicit cache: CacheMap): Section = ???
+  val redirectCallType = "GET"
+  val key              = "amp"
 
-  val key = "amp"
+  private def generateRedirect(destinationUrl: String) = {
+    Call(redirectCallType, destinationUrl)
+  }
+
+  def section(implicit cache: CacheMap): Section = {
+    val notStarted = Section(key, NotStarted, false, generateRedirect(ApplicationConfig.ampWhatYouNeedUrl))
+    cache.getEntry[Amp](key).fold(notStarted) {
+      model =>
+        if (model.isComplete) {
+          Section(key, Completed, model.hasChanged, generateRedirect(ApplicationConfig.ampSummaryUrl))
+        } else {
+          Section(key, Started, model.hasChanged, generateRedirect(ApplicationConfig.ampWhatYouNeedUrl))
+        }
+    }
+  }
 
   implicit val mongoKey = new MongoKey[Amp] {
-    override def apply(): String = "amp"
+    override def apply(): String = key
   }
 
   implicit lazy val reads: Reads[Amp] = {
@@ -77,7 +112,10 @@ object Amp {
 
     (
       (__ \ "_id").read[String] and
-        (__ \ "data").read[JsObject]
+        (__ \ "data").read[JsObject] and
+        (__ \ "lastUpdated").read(MongoDateTimeFormats.localDateTimeRead) and
+        (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
+        (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false))
       ) (Amp.apply _)
   }
 
@@ -87,7 +125,10 @@ object Amp {
 
     (
       (__ \ "_id").write[String] and
-        (__ \ "data").write[JsObject]
+        (__ \ "data").write[JsObject] and
+        (__ \ "lastUpdated").write(MongoDateTimeFormats.localDateTimeWrite) and
+        (__ \ "hasChanged").write[Boolean] and
+        (__ \ "hasAccepted").write[Boolean]
       ) (unlift(Amp.unapply))
   }
 }
