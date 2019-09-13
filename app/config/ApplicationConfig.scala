@@ -64,9 +64,6 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 
   def businessCustomerUrl = getConfigString("business-customer.url")
 
-  def ampWhatYouNeedUrl = getConfigString("amls-art-market-participant-frontend.url") + "/whatYouNeed"
-  def ampSummaryUrl = getConfigString("amls-art-market-participant-frontend.url") + "/check-your-answers"
-
   private implicit lazy val app:Application = Play.current
   lazy val whitelist = Play.configuration.getStringSeq("whitelist") getOrElse Seq.empty
 

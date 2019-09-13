@@ -15,22 +15,22 @@
  */
 
 package models.amp
-import java.time.LocalDateTime
 
-import config.ApplicationConfig
+import java.time.LocalDateTime
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import play.api.Mode.Mode
+import play.api.{Configuration, Play}
 import play.api.libs.json._
 import play.api.mvc.Call
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.config.ServicesConfig
 
-final case class Amp(
-                       id: String,
-                       data: JsObject = Json.obj(),
-                       lastUpdated: LocalDateTime = LocalDateTime.now,
-                       hasChanged: Boolean = false,
-                       hasAccepted: Boolean = false
-                     ) {
+final case class Amp(id: String,
+                     data: JsObject = Json.obj(),
+                     lastUpdated: LocalDateTime = LocalDateTime.now,
+                     hasChanged: Boolean = false,
+                     hasAccepted: Boolean = false) {
 
   /**
     * Provides a means of setting data that will update the hasChanged flag
@@ -81,23 +81,25 @@ final case class Amp(
   }
 }
 
-object Amp {
+object Amp extends ServicesConfig {
 
-  val redirectCallType = "GET"
-  val key              = "amp"
+  val redirectCallType       = "GET"
+  val key                    = "amp"
+  lazy val ampWhatYouNeedUrl = s"${baseUrl("amls-art-market-participant-frontend")}/what-you-need"
+  lazy val ampSummeryUrl     = s"${baseUrl("amls-art-market-participant-frontend")}/check-your-answers"
 
   private def generateRedirect(destinationUrl: String) = {
     Call(redirectCallType, destinationUrl)
   }
 
   def section(implicit cache: CacheMap): Section = {
-    val notStarted = Section(key, NotStarted, false, generateRedirect(ApplicationConfig.ampWhatYouNeedUrl))
+    val notStarted = Section(key, NotStarted, false, generateRedirect(ampWhatYouNeedUrl))
     cache.getEntry[Amp](key).fold(notStarted) {
       model =>
         if (model.isComplete) {
-          Section(key, Completed, model.hasChanged, generateRedirect(ApplicationConfig.ampSummaryUrl))
+          Section(key, Completed, model.hasChanged, generateRedirect(ampSummeryUrl))
         } else {
-          Section(key, Started, model.hasChanged, generateRedirect(ApplicationConfig.ampWhatYouNeedUrl))
+          Section(key, Started, model.hasChanged, generateRedirect(ampWhatYouNeedUrl))
         }
     }
   }
@@ -131,4 +133,7 @@ object Amp {
         (__ \ "hasAccepted").write[Boolean]
       ) (unlift(Amp.unapply))
   }
+
+  override protected def mode: Mode = Play.current.mode
+  override protected def runModeConfiguration: Configuration = Play.current.configuration
 }
