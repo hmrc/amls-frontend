@@ -23,7 +23,7 @@ import javax.inject.Inject
 import models.moneyservicebusiness.{MoneyServiceBusiness, SendTheLargestAmountsOfMoney}
 import services.businessmatching.ServiceFlow
 import services.{AutoCompleteService, StatusService}
-import utils.AuthAction
+import utils.{AuthAction, ControllerHelper}
 import views.html.msb.send_largest_amounts_of_money
 
 import scala.concurrent.Future
@@ -51,7 +51,7 @@ class SendTheLargestAmountsOfMoneyController @Inject()(authAction: AuthAction,
     implicit request =>
       Form2[SendTheLargestAmountsOfMoney](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(send_largest_amounts_of_money(f, edit, autoCompleteService.getCountries)))
+          Future.successful(BadRequest(send_largest_amounts_of_money(alignFormDataWithValidationErrors(f), edit, autoCompleteService.getCountries)))
         case ValidForm(_, data) =>
           for {
             msb <-
@@ -64,4 +64,8 @@ class SendTheLargestAmountsOfMoneyController @Inject()(authAction: AuthAction,
           }
       }
   }
+
+  def alignFormDataWithValidationErrors(form: InvalidForm): InvalidForm =
+    ControllerHelper.stripEmptyValuesFromFormWithArray(form, "largestAmountsOfMoney", index => index / 2)
+
 }
