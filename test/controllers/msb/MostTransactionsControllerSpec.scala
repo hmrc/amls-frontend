@@ -125,8 +125,11 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
     "return a Bad request with errors on invalid submission" in new Fixture {
 
-      val result = controller.post()(request)
+      val newRequest = request.withFormUrlEncodedBody("mostTransactionsCountries[0]" -> "adsadsdsdsaads")
+
+      val result = controller.post()(newRequest)
       val document = Jsoup.parse(contentAsString(result))
+
 
       status(result) mustEqual BAD_REQUEST
 
