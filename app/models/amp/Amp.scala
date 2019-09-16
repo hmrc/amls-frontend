@@ -16,63 +16,124 @@
 
 package models.amp
 
-import config.ApplicationConfig
+import java.time.LocalDateTime
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import play.api.Mode.Mode
+import play.api.{Configuration, Play}
+import play.api.libs.json._
+import play.api.mvc.Call
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.config.ServicesConfig
 
-case class Amp(
-                hasChanged: Boolean = false,
-                hasAccepted: Boolean = false
-              ) {
+final case class Amp(id: String,
+                     data: JsObject = Json.obj(),
+                     lastUpdated: LocalDateTime = LocalDateTime.now,
+                     hasChanged: Boolean = false,
+                     hasAccepted: Boolean = false) {
 
-  //TODO: Implement the methods based on AMP frontend once confirmed and ready to sync
+  /**
+    * Provides a means of setting data that will update the hasChanged flag
+    *
+    * Set data via this method and NOT directly in the constructor
+    */
+  def data(p: JsObject): Amp =
+    this.copy(data = p, hasChanged = hasChanged || this.data != p, hasAccepted = hasAccepted && this.data == p)
 
-  def BoughtOrSoldOverThreshold(): Amp  = ???
-  def DateTransactionOverThreshold(): Amp   = ???
-  def IdentifyLinkedTransactionsView(): Amp   = ???
-  def PercentageExpectedTurnover(): Amp   = ???
-  def TypeOfParticipant(): Amp   = ???
+  val typeOfParticipant            = JsPath \ "typeOfParticipant"
+  val typeOfParticipantDetail      = JsPath \ "typeOfParticipantDetail"
+  val boughtOrSoldOverThreshold    = JsPath \ "boughtOrSoldOverThreshold"
+  val identifyLinkedTransactions   = JsPath \ "identifyLinkedTransactions"
+  val dateTransactionOverThreshold = JsPath \ "dateTransactionOverThreshold"
+  val percentageExpectedTurnover   = JsPath \ "percentageExpectedTurnover"
+  val otherTypeOfParticipant       = "somethingelse"
 
-  def isComplete: Boolean = this match {
-    case Amp(true, accepted) => accepted
-    case _ => false
+  private def get[A](path: JsPath)(implicit rds: Reads[A]): Option[A] =
+    Reads.optionNoError(Reads.at(path)).reads(data).getOrElse(None)
+
+  private def isDefinedAt(path: JsPath): Boolean = {
+    get[JsValue](path).isDefined
+  }
+
+  private def valueAt(path: JsPath): String = {
+    get[JsValue](path).getOrElse("").toString().toLowerCase()
+  }
+
+  private def isTypeOfParticipantComplete: Boolean = {
+    isDefinedAt(typeOfParticipant) &&
+      ((valueAt(typeOfParticipant).contains(otherTypeOfParticipant) &&
+        isDefinedAt(typeOfParticipantDetail)) ||
+        (!valueAt(typeOfParticipant).contains(otherTypeOfParticipant)))
+  }
+
+  private def isBoughtOrSoldOverThresholdComplete: Boolean = {
+    isDefinedAt(boughtOrSoldOverThreshold) &&
+      ((valueAt(boughtOrSoldOverThreshold) == "true" &&
+        isDefinedAt(dateTransactionOverThreshold)) ||
+        (valueAt(boughtOrSoldOverThreshold) == "false"))
+  }
+
+  def isComplete: Boolean = {
+    isTypeOfParticipantComplete &&
+    isBoughtOrSoldOverThresholdComplete &&
+    isDefinedAt(identifyLinkedTransactions) &&
+    isDefinedAt(percentageExpectedTurnover)
   }
 }
 
-object Amp {
+object Amp extends ServicesConfig {
 
-  import play.api.libs.functional.syntax._
-  import play.api.libs.json._
+  val redirectCallType       = "GET"
+  val key                    = "amp"
+  lazy val ampWhatYouNeedUrl = s"${baseUrl("amls-art-market-participant-frontend")}/what-you-need"
+  lazy val ampSummeryUrl     = s"${baseUrl("amls-art-market-participant-frontend")}/check-your-answers"
 
-  implicit val formatOption = Reads.optionWithNull[Amp]
+  private def generateRedirect(destinationUrl: String) = {
+    Call(redirectCallType, destinationUrl)
+  }
 
   def section(implicit cache: CacheMap): Section = {
-    val messageKey = "asp"
-    val notStarted = Section(messageKey, NotStarted, false, controllers.asp.routes.WhatYouNeedController.get())
+    val notStarted = Section(key, NotStarted, false, generateRedirect(ampWhatYouNeedUrl))
     cache.getEntry[Amp](key).fold(notStarted) {
       model =>
         if (model.isComplete) {
-          Section(messageKey, Completed, model.hasChanged, controllers.asp.routes.SummaryController.get())
+          Section(key, Completed, model.hasChanged, generateRedirect(ampSummeryUrl))
         } else {
-          Section(messageKey, Started, model.hasChanged, controllers.asp.routes.WhatYouNeedController.get())
+          Section(key, Started, model.hasChanged, generateRedirect(ampWhatYouNeedUrl))
         }
     }
   }
 
-  val key = "amp"
-
   implicit val mongoKey = new MongoKey[Amp] {
-    override def apply(): String = "amp"
+    override def apply(): String = key
   }
 
-  implicit val jsonWrites = Json.writes[Amp]
+  implicit lazy val reads: Reads[Amp] = {
 
-  implicit val jsonReads: Reads[Amp] = {
-      (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
-      (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false))
-    }.apply(Amp.apply _)
+    import play.api.libs.functional.syntax._
 
-  implicit def default(details: Option[Amp]): Amp =
-    details.getOrElse(Amp())
+    (
+      (__ \ "_id").read[String] and
+        (__ \ "data").read[JsObject] and
+        (__ \ "lastUpdated").read(MongoDateTimeFormats.localDateTimeRead) and
+        (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
+        (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false))
+      ) (Amp.apply _)
+  }
+
+  implicit lazy val writes: OWrites[Amp] = {
+
+    import play.api.libs.functional.syntax._
+
+    (
+      (__ \ "_id").write[String] and
+        (__ \ "data").write[JsObject] and
+        (__ \ "lastUpdated").write(MongoDateTimeFormats.localDateTimeWrite) and
+        (__ \ "hasChanged").write[Boolean] and
+        (__ \ "hasAccepted").write[Boolean]
+      ) (unlift(Amp.unapply))
+  }
+
+  override protected def mode: Mode = Play.current.mode
+  override protected def runModeConfiguration: Configuration = Play.current.configuration
 }
