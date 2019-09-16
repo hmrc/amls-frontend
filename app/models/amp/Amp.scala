@@ -26,7 +26,7 @@ import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.config.ServicesConfig
 
-final case class Amp(id: String,
+final case class Amp(_id: String,
                      data: JsObject = Json.obj(),
                      lastUpdated: LocalDateTime = LocalDateTime.now,
                      hasChanged: Boolean = false,

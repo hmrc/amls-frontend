@@ -21,11 +21,14 @@ import javax.inject.Inject
 import services.amp.AmpService
 import utils.AuthAction
 import play.api.libs.json._
+import play.api.mvc.Action
+
+
 
 class AmpController @Inject()(ampService: AmpService,
                               authAction: AuthAction) extends DefaultBaseController {
 
-  def get(credId: String) = authAction.async(parse.json) {
+  def get(credId: String) = Action.async {
     implicit request => {
       ampService.get(credId).map {
         _.map(Ok(_: JsValue)).getOrElse(NotFound)
@@ -33,7 +36,7 @@ class AmpController @Inject()(ampService: AmpService,
     }
   }
 
-  def set(credId: String) = authAction.async(parse.json) {
+  def set(credId: String) = Action.async(parse.json) {
     implicit request => {
       ampService.set(credId, request.body).map {
         r => {

@@ -19,7 +19,8 @@ package services.amp
 import connectors.DataCacheConnector
 import javax.inject.Inject
 import models.amp.Amp
-import play.api.libs.json.{JsValue, Json}
+import play.api.Logger
+import play.api.libs.json.{JsObject, JsValue, Json}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,8 +34,22 @@ class AmpService @Inject()(cacheConnector: DataCacheConnector)
       // TODO expected type might be not right atm, need to be converted
     } yield Some(Json.toJson(r))
 
-  def set(credId: String, body: JsValue)(implicit hc: HeaderCarrier) =
+  def set(credId: String, body: JsValue)(implicit hc: HeaderCarrier) = {
+    Logger.debug("services.amp.AmpService.set - credId: " + credId)
+
+    val jsonObject: JsObject = body.as[JsObject]
+    Logger.debug("services.amp.AmpService.set - body: " + jsonObject)
+
+    val ampDataId = jsonObject.value("_id").toString()
+    val ampData = jsonObject.value("data").as[JsObject]
+
     for {
-      result <- cacheConnector.save[Amp](credId, Amp.key, body.asInstanceOf[Amp])
+      existing <- cacheConnector.fetch[Amp](credId, Amp.key)
+      result   <-cacheConnector.save[Amp](
+        credId,
+        Amp.key,
+        existing.getOrElse(Amp(ampDataId)).data(ampData)
+      )
     } yield result
+  }
 }
