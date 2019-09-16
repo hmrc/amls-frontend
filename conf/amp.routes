@@ -1,0 +1,3 @@
+
+GET         /amp      @controllers.amp.AmpController.get(credId: String)
+POST        /amp      @controllers.amp.AmpController.set(credId: String)
