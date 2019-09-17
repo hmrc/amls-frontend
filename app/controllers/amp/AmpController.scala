@@ -23,8 +23,6 @@ import utils.AuthAction
 import play.api.libs.json._
 import play.api.mvc.Action
 
-
-
 class AmpController @Inject()(ampService: AmpService,
                               authAction: AuthAction) extends DefaultBaseController {
 
@@ -39,8 +37,8 @@ class AmpController @Inject()(ampService: AmpService,
   def set(credId: String) = Action.async(parse.json) {
     implicit request => {
       ampService.set(credId, request.body).map {
-        r => {
-          Ok(Json.toJson(r))
+        _ => {
+          Ok(Json.obj("_id" -> credId))
         }
       }
     }
