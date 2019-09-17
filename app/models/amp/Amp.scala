@@ -26,7 +26,7 @@ import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.config.ServicesConfig
 
-final case class Amp(id: String,
+final case class Amp(_id: String,
                      data: JsObject = Json.obj(),
                      lastUpdated: LocalDateTime = LocalDateTime.now,
                      hasChanged: Boolean = false,
@@ -85,8 +85,8 @@ object Amp extends ServicesConfig {
 
   val redirectCallType       = "GET"
   val key                    = "amp"
-  lazy val ampWhatYouNeedUrl = s"${baseUrl("amls-art-market-participant-frontend")}amls-art-market-participant-frontend/what-you-need"
-  lazy val ampSummeryUrl     = s"${baseUrl("amls-art-market-participant-frontend")}amls-art-market-participant-frontend/check-your-answers"
+  lazy val ampWhatYouNeedUrl = s"${baseUrl("amls-art-market-participant-frontend")}/amls-art-market-participant-frontend/what-you-need"
+  lazy val ampSummeryUrl     = s"${baseUrl("amls-art-market-participant-frontend")}/amls-art-market-participant-frontend/check-your-answers"
 
   private def generateRedirect(destinationUrl: String) = {
     Call(redirectCallType, destinationUrl)
