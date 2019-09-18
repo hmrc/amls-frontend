@@ -27,10 +27,16 @@ import scala.concurrent.{ExecutionContext, Future}
 class AmpService @Inject()(cacheConnector: DataCacheConnector)
                           (implicit ec: ExecutionContext){
 
-  def get(credId: String)(implicit hc: HeaderCarrier): Future[Option[JsValue]] =
-    for {
+  def get(credId: String)(implicit hc: HeaderCarrier): Future[Option[JsValue]] = {
+    val section = for {
       r <- cacheConnector.fetch[Amp](credId, Amp.key)
-    } yield Some(Json.toJson(r))
+    } yield r
+
+    section map {
+      case Some(amp) => Some(Json.toJson(amp))
+      case _ => None
+    }
+  }
 
   def set(credId: String, body: JsValue)(implicit hc: HeaderCarrier) = {
     val jsonObject: JsObject = body.as[JsObject]

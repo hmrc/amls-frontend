@@ -33,13 +33,12 @@ import play.api.test.FakeRequest
 
 import scala.concurrent.Future
 
-
 class AmpControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   val dateVal = LocalDateTime.now
 
   val completeData = Json.obj(
-    "typeOfParticipant"     -> Seq("artGalleryOwner"),
+    "typeOfParticipant"             -> Seq("artGalleryOwner"),
     "boughtOrSoldOverThreshold"     -> true,
     "dateTransactionOverThreshold"  -> LocalDate.now,
     "identifyLinkedTransactions"    -> true,
@@ -47,7 +46,7 @@ class AmpControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
   )
 
   val completeJson = Json.obj(
-    "_id"     -> "someid",
+    "_id"            -> "someid",
     "data"           -> completeData,
     "lastUpdated"    -> Json.obj("$date" -> dateVal.atZone(ZoneOffset.UTC).toInstant.toEpochMilli),
     "hasChanged"     -> false,
