@@ -66,7 +66,7 @@ class ActivityStartDateController @Inject()(override val messagesApi: MessagesAp
     for {
       _ <- updateDataStrict[TradingPremises](credId, index) { tp =>
         val ytp = tp.yourTradingPremises.fold[Option[YourTradingPremises]](None)(x => Some(x.copy(startDate = Some(data.startDate))))
-        tp.copy(yourTradingPremises = ytp)
+        tp.copy(yourTradingPremises = ytp, hasChanged = true)
       }
     } yield edit match {
       case true => Redirect(routes.DetailedAnswersController.get(index))

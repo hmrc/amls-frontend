@@ -58,6 +58,11 @@ form .page-header h1 {
   text-transform: none;
 }
 
+.error-page-margin {
+  margin-top: 30px;
+  margin-bottom: .55556em;
+}
+
 @media screen and (min-width: 641px) {
   .page-header .heading-secondary {
     font-size: 27px;

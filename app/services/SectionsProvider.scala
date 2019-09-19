@@ -63,7 +63,7 @@ class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnecto
         case AccountancyServices =>
           m + Asp.section + Supervision.section
         case ArtMarketParticipant =>
-          m + Amp.section + Supervision.section
+          m + Amp.section
         case EstateAgentBusinessService =>
           m + EstateAgentBusiness.section
         case HighValueDealing =>
