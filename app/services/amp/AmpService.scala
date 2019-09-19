@@ -28,11 +28,9 @@ class AmpService @Inject()(cacheConnector: DataCacheConnector)
                           (implicit ec: ExecutionContext){
 
   def get(credId: String)(implicit hc: HeaderCarrier): Future[Option[JsValue]] = {
-    val section = for {
+    for {
       r <- cacheConnector.fetch[Amp](credId, Amp.key)
-    } yield r
-
-    section map {
+    } yield r match {
       case Some(amp) => Some(Json.toJson(amp))
       case _ => None
     }
@@ -44,10 +42,7 @@ class AmpService @Inject()(cacheConnector: DataCacheConnector)
 
     for {
       existing <- cacheConnector.fetch[Amp](credId, Amp.key)
-      result   <- cacheConnector.save[Amp](
-        credId,
-        Amp.key,
-        existing.getOrElse(Amp(credId)).data(ampData)
+      result   <- cacheConnector.save[Amp](credId, Amp.key, existing.getOrElse(Amp(credId)).data(ampData)
       )
     } yield result
   }
