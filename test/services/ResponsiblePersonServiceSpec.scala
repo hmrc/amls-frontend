@@ -17,15 +17,11 @@
 package services
 
 import generators.ResponsiblePersonGenerator
-import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
 import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import org.scalacheck.Gen
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.play.PlaySpec
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks, StatusConstants}
-import org.mockito.Mockito.verify
-import org.mockito.Matchers.{any, eq => eqTo}
 import ResponsiblePeopleService._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -35,16 +31,19 @@ class ResponsiblePersonServiceSpec extends AmlsSpec with ResponsiblePersonGenera
   trait Fixture extends DependencyMocks {
 
     // scalastyle:off magic.number
-    val responsiblePeople = Gen.listOfN(5, responsiblePersonGen).sample.get
+    val responsiblePeople: List[ResponsiblePerson] = Gen.listOfN(5, responsiblePersonGen).sample.get
+
+    val service = new ResponsiblePeopleService(mockCacheConnector)
 
     mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
 
-    val service = new ResponsiblePeopleService(mockCacheConnector)
   }
 
   "getAll" must {
     "simply return all the people" in new Fixture {
-      await(service.getAll) mustBe responsiblePeople
+      val result = service.getAll("123123")
+
+      await(result) mustEqual responsiblePeople
     }
   }
 

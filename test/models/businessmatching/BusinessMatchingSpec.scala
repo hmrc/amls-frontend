@@ -23,7 +23,6 @@ import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.AmlsSpec
 
 class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
@@ -359,7 +358,6 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
 
       "return `Started` section when there is a section which isn't completed" in {
         implicit val cache = mock[CacheMap]
-        implicit val ac = mock[AuthContext]
         when {
           cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any())
         } thenReturn Some(BusinessMatching())
@@ -368,7 +366,6 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
 
       "return `Completed` section when there is a section which is completed" in {
         implicit val cache = mock[CacheMap]
-        implicit val ac = mock[AuthContext]
 
         when {
           cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any())

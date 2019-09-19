@@ -17,6 +17,7 @@
 package controllers.renewal
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.renewal.{CETransactionsInLast12Months, Renewal}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -25,7 +26,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -39,7 +40,7 @@ class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
     val controller = new CETransactionsInLast12MonthsController (
       dataCacheConnector = mockDataCacheConnector,
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       renewalService = mockRenewalService
     )
   }
@@ -50,8 +51,8 @@ class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
     "load the page 'How many currency exchange transactions'" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[Renewal](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[Renewal](any(), any())
+        (any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -60,8 +61,8 @@ class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
     "load the page 'How many currency exchange transactions' with pre populated data" in new Fixture  {
 
-      when(controller.dataCacheConnector.fetch[Renewal](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Renewal(
+      when(controller.dataCacheConnector.fetch[Renewal](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(Renewal(
         ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("12345678963"))))))
 
       val result = controller.get()(request)
@@ -76,10 +77,10 @@ class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
         "ceTransaction" -> ""
       )
 
-      when(controller.dataCacheConnector.fetch[Renewal](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[Renewal](any(), any())
+        (any(), any())).thenReturn(Future.successful(None))
 
-      when(mockRenewalService.updateRenewal(any())(any(),any(), any()))
+      when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
@@ -93,10 +94,10 @@ class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
         "ceTransaction" -> "12345678963"
       )
 
-      when(controller.dataCacheConnector.fetch[Renewal](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[Renewal](any(), any())
+        (any(), any())).thenReturn(Future.successful(None))
 
-      when(mockRenewalService.updateRenewal(any())(any(),any(), any()))
+      when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
@@ -119,10 +120,10 @@ class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
         "ceTransaction" -> "12345678963"
       )
 
-      when(controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))
-        (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
+      when(controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))
+        (any(), any())).thenReturn(Future.successful(Some(incomingModel)))
 
-      when(mockRenewalService.updateRenewal(any())(any(),any(), any()))
+      when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)

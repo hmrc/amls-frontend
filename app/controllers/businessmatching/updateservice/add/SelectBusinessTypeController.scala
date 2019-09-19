@@ -19,7 +19,8 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
+import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import jto.validation.forms.UrlFormEncoded
@@ -31,9 +32,7 @@ import models.responsiblepeople.ResponsiblePerson
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
+import utils.{AuthAction, RepeatingSection}
 import views.html.businessmatching.updateservice.add.select_activities
 import services.ResponsiblePeopleService.ResponsiblePeopleListHelpers
 
@@ -41,11 +40,12 @@ import scala.concurrent.Future
 
 @Singleton
 class SelectBusinessTypeController @Inject()(
-                                            val authConnector: AuthConnector,
+                                            authAction: AuthAction,
                                             implicit val dataCacheConnector: DataCacheConnector,
                                             val businessMatchingService: BusinessMatchingService,
-                                            val router: Router[AddBusinessTypeFlowModel]
-                                          ) extends BaseController with RepeatingSection {
+                                            val router: Router[AddBusinessTypeFlowModel],
+                                            val addHelper: AddBusinessTypeHelper
+                                          ) extends DefaultBaseController with RepeatingSection {
 
   implicit val activityReader: Rule[UrlFormEncoded, BusinessActivity] =
     FormTypes.businessActivityRule("error.required.bm.register.service.single") map {
@@ -56,34 +56,32 @@ class SelectBusinessTypeController @Inject()(
     Map("businessActivities[]" -> Seq(BusinessMatchingActivities.getValue(a)))
   }
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
         (for {
           //Ensure that responsible people can be populated as required
-          responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key)) orElse OptionT.none
-          model <- OptionT(dataCacheConnector.update[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key)(model => edit match {
+          responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key)) orElse OptionT.none
+          model <- OptionT(dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key)(model => edit match {
             case false => model.getOrElse(AddBusinessTypeFlowModel()).fitAndProperFromResponsiblePeople(responsiblePeople.exceptInactive)
             case _ => model.getOrElse(AddBusinessTypeFlowModel())
           }))
-          (names, values) <- getFormData
+          (names, values) <- getFormData(request.credId)
         } yield {
           val form = model.activity.fold[Form2[BusinessActivity]](EmptyForm)(a => Form2(a))
-          Ok(select_activities(form, edit, values, names))
+          Ok(select_activities(form, edit, values, names.toSeq))
         }) getOrElse InternalServerError("Get: Unable to show Select Activities page. Failed to retrieve data")
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request =>
         Form2[BusinessActivity](request.body) match {
-          case f: InvalidForm => getFormData map {
+          case f: InvalidForm => getFormData(request.credId) map {
             case (names, values) =>
-              BadRequest(select_activities(f, edit, values, names))
+              BadRequest(select_activities(f, edit, values, names.toSeq))
           } getOrElse InternalServerError("Post: Invalid form on Select Activities page")
 
           case ValidForm(_, data) =>
-            dataCacheConnector.update[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key) {
+            dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key) {
               model =>
                 model.getOrElse(AddBusinessTypeFlowModel()) match {
                   case m if !m.activity.contains(data) =>
@@ -91,23 +89,21 @@ class SelectBusinessTypeController @Inject()(
                   case m => m.activity(data)
                 }
             } flatMap {
-              case Some(model) => router.getRoute(SelectBusinessTypesPageId, model, edit)
+              case Some(model) => router.getRoute(request.credId, SelectBusinessTypesPageId, model, edit)
               case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: SelectActivitiesController"))
             }
         }
   }
 
-  private def getFormData(implicit ac: AuthContext, hc: HeaderCarrier) = for {
-    model <- businessMatchingService.getModel
+  private def getFormData(credId: String)(implicit hc: HeaderCarrier) = for {
+    model <- businessMatchingService.getModel(credId)
     activities <- OptionT.fromOption[Future](model.activities) map {
       _.businessActivities
     }
   } yield {
     val allActivities = BusinessMatchingActivities.all
-    val existingActivityNames = activities.toSeq.sortBy(_.getMessage()) map {
-      _.getMessage()
-    }
-    val activityValues = (allActivities diff activities).toSeq.sortBy(_.getMessage()) map BusinessMatchingActivities.getValue
+    val existingActivityNames = addHelper.prefixedActivities(model)
+    val activityValues = (allActivities diff activities).toSeq.sortBy(_.getMessage(true)) map BusinessMatchingActivities.getValue
 
     (existingActivityNames, activityValues)
   }

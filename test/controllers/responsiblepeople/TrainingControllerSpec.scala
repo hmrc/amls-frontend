@@ -18,6 +18,7 @@ package controllers.responsiblepeople
 
 import config.AppConfig
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{PersonName, ResponsiblePerson, TrainingNo, TrainingYes}
 import org.jsoup.Jsoup
@@ -31,8 +32,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils._
 
 import scala.concurrent.Future
 
@@ -47,7 +47,7 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
 
     lazy val defaultBuilder = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
 
     val builder = defaultBuilder
@@ -71,7 +71,7 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
     "get is called" must {
 
       "display the page with pre populated data (training is set to Yes)" in new Fixture {
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, training = Some(TrainingYes("test")))))))
 
         val result = controller.get(recordId)(request)
@@ -83,7 +83,7 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
       }
 
       "display the page with pre populated data (training is set to No)" in new Fixture {
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, training = Some(TrainingNo))))))
 
         val result = controller.get(recordId)(request)
@@ -95,7 +95,7 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
       }
 
       "display the page without pre populated data" in new Fixture {
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName)))))
 
         val result = controller.get(recordId)(request)
@@ -108,7 +108,7 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
       }
 
       "respond with NOT_FOUND when there is no personName" in new Fixture {
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
         val result = controller.get(recordId)(request)
@@ -124,7 +124,7 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
           "information" -> "test"
         )
 
-        when(controller.dataCacheConnector.fetchAll(any(), any()))
+        when(controller.dataCacheConnector.fetchAll(any())(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
@@ -144,13 +144,13 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
 
             val testCacheMap = CacheMap("", Map())
 
-            when(controller.dataCacheConnector.fetchAll(any(), any()))
+            when(controller.dataCacheConnector.fetchAll(any())(any()))
               .thenReturn(Future.successful(Some(mockCacheMap)))
 
             when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
               .thenReturn(Some(Seq(ResponsiblePerson())))
 
-            when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+            when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
               .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(recordId, false)(newRequest)
@@ -166,7 +166,7 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
               "information" -> "I do not remember when I did the training"
             )
 
-            when(controller.dataCacheConnector.fetchAll(any(), any()))
+            when(controller.dataCacheConnector.fetchAll(any())(any()))
               .thenReturn(Future.successful(Some(emptyCache)))
 
             val result = controller.post(recordId, true, Some(flowFromDeclaration))(newRequest)
@@ -180,8 +180,8 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
         val newRequest = request.withFormUrlEncodedBody(
           "training" -> "not a boolean value"
         )
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName)))))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName)))))
 
         val result = controller.post(recordId)(newRequest)
         status(result) must be(BAD_REQUEST)

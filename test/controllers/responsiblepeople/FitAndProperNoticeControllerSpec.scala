@@ -17,7 +17,8 @@
 package controllers.responsiblepeople
 
 import config.AppConfig
-import connectors.{DataCacheConnector, KeystoreConnector}
+import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatest.concurrent.ScalaFutures
@@ -26,8 +27,7 @@ import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocks}
 
 class FitAndProperNoticeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
@@ -38,7 +38,7 @@ class FitAndProperNoticeControllerSpec extends AmlsSpec with MockitoSugar with S
     lazy val mockAppConfig = mock[AppConfig]
     lazy val defaultBuilder = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
       .overrides(bind[AppConfig].to(mockAppConfig))
 

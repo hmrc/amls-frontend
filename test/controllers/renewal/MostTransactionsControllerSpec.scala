@@ -18,6 +18,7 @@ package controllers.renewal
 
 import cats.implicits._
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businessmatching._
 import models.renewal.{MostTransactions, Renewal}
@@ -45,17 +46,17 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
     val emptyCache = CacheMap("", Map.empty)
     val mockRenewalService = mock[RenewalService]
 
-    val controller = new MostTransactionsController(self.authConnector, self.cache, self.mockRenewalService, mockAutoComplete)
+    val controller = new MostTransactionsController(SuccessfulAuthAction, self.cache, self.mockRenewalService, mockAutoComplete)
   }
 
   trait FormSubmissionFixture extends Fixture {
     def formData(valid: Boolean) = if (valid) "mostTransactionsCountries[0]" -> "GB" else "mostTransactionsCountries[0]" -> ""
     def formRequest(valid: Boolean) = request.withFormUrlEncodedBody(formData(valid))
 
-    when(mockRenewalService.getRenewal(any(), any(), any()))
+    when(mockRenewalService.getRenewal(any())(any(), any()))
       .thenReturn(Future.successful(None))
 
-    when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+    when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
       .thenReturn(Future.successful(emptyCache))
 
     def post(edit: Boolean = false, valid: Boolean = true)(block: Result => Unit) =
@@ -77,13 +78,13 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       "mostTransactionsCountries[]" -> "GB"
     )
 
-    when(cache.fetchAll(any(), any()))
+    when(cache.fetchAll(any())(any()))
             .thenReturn(Future.successful(Some(cacheMap)))
 
     when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
             .thenReturn(Some(incomingModel))
 
-    when(cache.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
+    when(cache.save[Renewal](any(), eqTo(Renewal.key), eqTo(outgoingModel))(any(), any()))
             .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
     def setupBusinessMatching(activities: Set[BusinessActivity] = Set(), msbServices: Set[BusinessMatchingMsbService] = Set()) = when {
@@ -95,7 +96,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
     "show an empty form on get with no data in store" in new Fixture {
 
-      when(cache.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any()))
+      when(cache.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any()))
         .thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
@@ -118,7 +119,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
         )
       )
 
-      when(cache.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any()))
+      when(cache.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any()))
         .thenReturn(Future.successful(Some(model)))
 
       val result = controller.get()(request)
@@ -133,7 +134,11 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
     "return a Bad request with errors on invalid submission" in new Fixture {
 
-      val result = controller.post()(request)
+      val newRequest = request.withFormUrlEncodedBody(
+        "mostTransactionsCountries[0]" -> "GBasdadsdas"
+      )
+
+      val result = controller.post()(newRequest)
       val document = Jsoup.parse(contentAsString(result))
 
       status(result) mustEqual BAD_REQUEST
@@ -232,7 +237,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
       val incomingModel = Renewal()
 
-      when(cache.fetchAll(any(), any()))
+      when(cache.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(cacheMap)))
 
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -241,8 +246,8 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
         .thenReturn(Some(incomingModel))
 
-      when(cache.save[Renewal](eqTo(Renewal.key), any())
-        (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+      when(cache.save[Renewal](any(), eqTo(Renewal.key), any())
+        (any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
 
       a[Exception] must be thrownBy {

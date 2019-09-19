@@ -17,6 +17,7 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.TradingPremisesSection
 import models.tradingpremises._
 import org.jsoup.Jsoup
@@ -24,25 +25,21 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import play.api.test.FakeApplication
-import utils.AmlsSpec
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture  {
     self => val request = addToken(authRequest)
 
     val cache: DataCacheConnector = mock[DataCacheConnector]
 
-    val controller = new BusinessStructureController(self.cache, self.authConnector, messagesApi)
+    val controller = new BusinessStructureController(self.cache, SuccessfulAuthAction, messagesApi)
   }
 
   "BusinessStructureController" must {
@@ -50,8 +47,8 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
     val mockCacheMap = mock[CacheMap]
 
     "Load Business Structure page" in new Fixture {
-      when(cache.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(cache.fetch[Seq[TradingPremises]](any(), any())
+        (any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get(1)(request)
       val document = Jsoup.parse(contentAsString(result))
@@ -68,8 +65,8 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
       val model = TradingPremises(
         businessStructure = Some(SoleProprietor)
       )
-      when(cache.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+      when(cache.fetch[Seq[TradingPremises]](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(Seq(model))))
 
       val result = controller.get(1)(request)
       val document = Jsoup.parse(contentAsString(result))
@@ -106,10 +103,10 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
         .thenReturn(Some(Seq(model)))
 
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+      when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.post(1, false)(newRequest)
@@ -130,10 +127,10 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
         .thenReturn(Some(Seq(model)))
 
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+      when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.post(1, false)(newRequest)
@@ -153,10 +150,10 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
         .thenReturn(Some(Seq(model)))
 
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+      when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.post(1, false)(newRequest)
@@ -176,10 +173,10 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
         .thenReturn(Some(Seq(model)))
 
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+      when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.post(1, false)(newRequest)
@@ -199,10 +196,10 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
         .thenReturn(Some(Seq(model, model)))
 
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+      when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.post(1, false)(newRequest)
@@ -223,10 +220,10 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
         .thenReturn(Some(Seq(model)))
 
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+      when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.post(1, false)(newRequest)
@@ -246,10 +243,10 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
         .thenReturn(Some(Seq(model)))
 
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+      when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.post(1,edit = true)(newRequest)
@@ -267,10 +264,10 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
         .thenReturn(Some(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse)))
 
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+      when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.post(1)(newRequest)
@@ -280,10 +277,11 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
 
       verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
         any(),
+        any(),
         meq(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse.copy(
           hasChanged = true,
           businessStructure = Some(LimitedLiabilityPartnership)
-        ))))(any(), any(), any())
+        ))))(any(), any())
     }
 
   }

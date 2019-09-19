@@ -16,7 +16,7 @@
 
 @import config.{ApplicationConfig => appConfig, CachedStaticHtmlPartialProvider}
 @import layouts.{govuk_template => hmrcGovUkTemplate}
-@import uk.gov.hmrc.play.views.html.{layouts => uiLayouts}
+@import uk.gov.hmrc.play.views.html.{layouts => uiLayouts, helpers => uiHelpers}
 
 @(
     title: String,
@@ -117,7 +117,7 @@
 }
 
 @getHelpForm = {
-    @config.CachedStaticHtmlPartialProvider.getPartialContent(appConfig.reportAProblemUrl)
+    @{uiHelpers.reportAProblemLink(config.ApplicationConfig.reportAProblemPartialUrl, config.ApplicationConfig.reportAProblemNonJSUrl)}
 }
 
 

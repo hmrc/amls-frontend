@@ -16,10 +16,11 @@
 
 package controllers.msb
 
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessActivities, BusinessMatching, BusinessMatchingMsbServices, ForeignExchange, MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import models.moneyservicebusiness._
-import models.status.{NotCompleted, SubmissionDecisionApproved}
+import models.status.NotCompleted
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -31,7 +32,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class UsesForeignCurrenciesControllerSpec extends AmlsSpec
                                     with MockitoSugar
@@ -43,24 +44,25 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val request = addToken(authRequest)
+    implicit val ec = app.injector.instanceOf[ExecutionContext]
 
-    when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+    when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
       .thenReturn(Future.successful(None))
 
-    when(mockCacheConnector.save[MoneyServiceBusiness](any(), any())(any(), any(), any()))
+    when(mockCacheConnector.save[MoneyServiceBusiness](any(), any(), any())(any(), any()))
       .thenReturn(Future.successful(CacheMap("TESTID", Map())))
 
     val controller = new UsesForeignCurrenciesController(dataCacheConnector = mockCacheConnector,
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       statusService = mockStatusService,
       serviceFlow = mockServiceFlow)
 
-    mockIsNewActivity(false)
+    mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, Some(ServiceChangeRegister.key))
 
     val cacheMap = mock[CacheMap]
 
-    when(controller.dataCacheConnector.fetchAll(any(), any()))
+    when(controller.dataCacheConnector.fetchAll(any())(any()))
       .thenReturn(Future.successful(Some(cacheMap)))
     val msbServices = Some(BusinessMatchingMsbServices(Set()))
     when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key))
@@ -72,10 +74,11 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
   trait Fixture2 extends AuthorisedFixture with DependencyMocks with MoneyServiceBusinessTestData {
     self =>
     val request = addToken(authRequest)
-    val controller = new UsesForeignCurrenciesController(self.authConnector, mockCacheConnector, mockStatusService, mockServiceFlow)
+    val controller = new UsesForeignCurrenciesController(SuccessfulAuthAction, mockCacheConnector, mockStatusService, mockServiceFlow)
+    implicit val ec = app.injector.instanceOf[ExecutionContext]
 
     when {
-      mockStatusService.isPreSubmission(any(), any(), any())
+      mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
     } thenReturn Future.successful(true)
 
     val emptyCache = CacheMap("", Map.empty)
@@ -101,10 +104,10 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
         msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
       )))
 
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
       .thenReturn(Future.successful(Some(mockCacheMap)))
 
-    when(controller.dataCacheConnector.save(eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
+    when(controller.dataCacheConnector.save(any(), eqTo(MoneyServiceBusiness.key), any())(any(), any()))
       .thenReturn(Future.successful(mockCacheMap))
 
     mockCacheGetEntry[ServiceChangeRegister](None, ServiceChangeRegister.key)
@@ -115,18 +118,16 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
     "get is called" should {
       "succeed" when {
         "status is pre-submission" in new Fixture {
-          when(controller.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(NotCompleted))
+          mockApplicationStatus(NotCompleted)
 
           val resp = controller.get(false).apply(request)
           status(resp) must be(200)
         }
 
         "status is approved but the service has just been added" in new Fixture {
-          when(controller.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionDecisionApproved))
+          mockApplicationStatus(NotCompleted)
 
-          mockIsNewActivity(true, Some(MoneyServiceBusinessActivity))
+          mockIsNewActivityNewAuth(true, Some(MoneyServiceBusinessActivity))
 
           val resp = controller.get(false).apply(request)
           status(resp) must be(200)
@@ -142,10 +143,9 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
             None,
             Some(true))))
 
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(NotCompleted))
+        mockApplicationStatus(NotCompleted)
 
-        when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+        when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
           .thenReturn(Future.successful(Some(MoneyServiceBusiness(whichCurrencies = Some(currentModel)))))
 
         val result = controller.get()(request)
@@ -173,7 +173,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
             status(result) must be(SEE_OTHER)
 
             val captor = ArgumentCaptor.forClass(classOf[MoneyServiceBusiness])
-            verify(controller.dataCacheConnector).save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), captor.capture())(any(), any(), any())
+            verify(controller.dataCacheConnector).save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), captor.capture())(any(), any())
             captor.getValue match {
               case result: MoneyServiceBusiness => result must be(outgoingModel)
             }
@@ -189,7 +189,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
             status(result) must be(SEE_OTHER)
 
             val captor = ArgumentCaptor.forClass(classOf[MoneyServiceBusiness])
-            verify(controller.dataCacheConnector).save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), captor.capture())(any(), any(), any())
+            verify(controller.dataCacheConnector).save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), captor.capture())(any(), any())
             captor.getValue match {
               case result: MoneyServiceBusiness => result must be(completeMsb)
             }

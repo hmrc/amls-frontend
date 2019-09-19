@@ -18,7 +18,7 @@ package controllers.tradingpremises
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.businessmatching._
@@ -30,24 +30,22 @@ import play.api.mvc.Result
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{DateOfChangeHelper, RepeatingSection}
+import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 import views.html.tradingpremises._
 
 import scala.concurrent.Future
 
 class WhatDoesYourBusinessDoController @Inject () (
                                                     val dataCacheConnector: DataCacheConnector,
-                                                    val authConnector: AuthConnector,
+                                                    val authAction: AuthAction,
                                                     val statusService: StatusService
-                                                  ) extends RepeatingSection with BaseController with FormHelpers with DateOfChangeHelper {
+                                                  ) extends RepeatingSection with DefaultBaseController with FormHelpers with DateOfChangeHelper {
 
 
 
-  private def data(index: Int, edit: Boolean)(implicit ac: AuthContext, hc: HeaderCarrier)
+  private def data(credId: String, index: Int, edit: Boolean)(implicit hc: HeaderCarrier)
   : Future[Either[Result, (CacheMap, Set[BusinessActivity])]] = {
-    dataCacheConnector.fetchAll map {
+    dataCacheConnector.fetchAll(credId).map {
       cache =>
         (for {
           c: CacheMap <- cache
@@ -68,15 +66,15 @@ class WhatDoesYourBusinessDoController @Inject () (
   }
 
   // scalastyle:off cyclomatic.complexity
-  def get(index: Int, edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      data(index, edit) flatMap {
-        case Right((c, activities)) =>
+  def get(index: Int, edit: Boolean = false) = authAction.async {
+    implicit request =>
+      data(request.credId, index, edit) flatMap {
+        case Right((_, activities)) =>
           if (activities.size == 1) {
             // If there is only one activity in the data from the pre-reg,
             // then save that and redirect immediately without showing the
             // 'what does your business do' page.
-              updateDataStrict[TradingPremises](index) { tp =>
+              updateDataStrict[TradingPremises](request.credId, index) { tp =>
                 Some(tp.whatDoesYourBusinessDoAtThisAddress(WhatDoesYourBusinessDo(activities)))
               }.map {
                 _ =>
@@ -91,15 +89,14 @@ class WhatDoesYourBusinessDoController @Inject () (
               }
           } else {
             val ba = BusinessActivities(activities)
-            Future.successful {
-              getData[TradingPremises](c, index) match {
+
+              getData[TradingPremises](request.credId, index).map(tp => { tp match {
                 case Some(TradingPremises(_,_, _, _,_,_,Some(wdbd),_,_,_,_,_,_,_,_)) =>
                   Ok(what_does_your_business_do(Form2[WhatDoesYourBusinessDo](wdbd), ba, edit, index))
                 case Some(TradingPremises(_,_,  _,_,_,_, None, _,_,_,_,_,_,_,_)) =>
                   Ok(what_does_your_business_do(EmptyForm, ba, edit, index))
                 case _ => NotFound(notFoundView)
-              }
-            }
+              }})
           }
         case Left(result) => Future.successful(result)
       }
@@ -113,17 +110,17 @@ class WhatDoesYourBusinessDoController @Inject () (
         && redirectToDateOfChange(tradingPremises, data, status) && edit) {
         Redirect(routes.WhatDoesYourBusinessDoController.dateOfChange(index))
       } else {
-        data.activities.contains(MoneyServiceBusiness) match {
+        data.activities.contains(MoneyServiceBusiness)  match {
           case true => Redirect(routes.MSBServicesController.get(index, edit, modelHasChanged(tradingPremises, data)))
           case _ => Redirect(routes.DetailedAnswersController.get(index))
         }
       }
   }
 
-  def post(index: Int, edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      data(index, edit) flatMap {
-        case Right((c, activities)) =>
+  def post(index: Int, edit: Boolean = false) = authAction.async {
+    implicit request =>
+      data(request.credId, index, edit) flatMap {
+        case Right((_, activities)) =>
           Form2[WhatDoesYourBusinessDo](request.body) match {
             case f: InvalidForm =>
               val ba = BusinessActivities(activities)
@@ -132,8 +129,8 @@ class WhatDoesYourBusinessDoController @Inject () (
               }
             case ValidForm(_, data) => {
               for {
-                tradingPremises <- getData[TradingPremises](index)
-                _ <- updateDataStrict[TradingPremises](index) {
+                tradingPremises <- getData[TradingPremises](request.credId, index)
+                _ <- updateDataStrict[TradingPremises](request.credId, index) {
                   case tp if data.activities.contains(MoneyServiceBusiness) =>
                     tp.whatDoesYourBusinessDoAtThisAddress(data)
                   case tp if !data.activities.contains(MoneyServiceBusiness) =>
@@ -152,7 +149,7 @@ class WhatDoesYourBusinessDoController @Inject () (
                       tp.endDate
                     )
                 }
-                status <- statusService.getStatus
+                status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
               } yield redirectBasedOnstatus(status, tradingPremises, data, edit, index)
             }.recoverWith{
               case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
@@ -162,29 +159,28 @@ class WhatDoesYourBusinessDoController @Inject () (
       }
   }
 
-  def dateOfChange(index: Int) = Authorised {
-    implicit authContext => implicit request =>
-      Ok(views.html.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)),
-        "summary.tradingpremises", routes.WhatDoesYourBusinessDoController.saveDateOfChange(index)))
+  def dateOfChange(index: Int) = authAction.async {
+    implicit request =>
+      Future(Ok(views.html.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)),
+        "summary.tradingpremises", routes.WhatDoesYourBusinessDoController.saveDateOfChange(index))))
   }
 
-  def saveDateOfChange(index: Int) = Authorised.async {
-    implicit authContext =>
-      implicit request =>
-        getData[TradingPremises](index) flatMap { tradingPremises =>
-          Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDateFormFields(tradingPremises.startDate)) match {
-            case form: InvalidForm =>
-              Future.successful(BadRequest(views.html.date_of_change(
-                form.withMessageFor(DateOfChange.errorPath, tradingPremises.startDateValidationMessage),
-                "summary.tradingpremises", routes.WhatDoesYourBusinessDoController.saveDateOfChange(index))))
-            case ValidForm(_, dateOfChange) =>
-              for {
-                _ <- updateDataStrict[TradingPremises](index) { tradingPremises =>
-                  tradingPremises.whatDoesYourBusinessDoAtThisAddress(tradingPremises.whatDoesYourBusinessDoAtThisAddress.get.copy(dateOfChange = Some(dateOfChange)))
-                }
-              } yield Redirect(routes.DetailedAnswersController.get(index))
-          }
+  def saveDateOfChange(index: Int) = authAction.async {
+    implicit request =>
+      getData[TradingPremises](request.credId, index) flatMap { tradingPremises =>
+        Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDateFormFields(tradingPremises.startDate)) match {
+          case form: InvalidForm =>
+            Future.successful(BadRequest(views.html.date_of_change(
+              form.withMessageFor(DateOfChange.errorPath, tradingPremises.startDateValidationMessage),
+              "summary.tradingpremises", routes.WhatDoesYourBusinessDoController.saveDateOfChange(index))))
+          case ValidForm(_, dateOfChange) =>
+            for {
+              _ <- updateDataStrict[TradingPremises](request.credId, index) { tradingPremises =>
+                tradingPremises.whatDoesYourBusinessDoAtThisAddress(tradingPremises.whatDoesYourBusinessDoAtThisAddress.get.copy(dateOfChange = Some(dateOfChange)))
+              }
+            } yield Redirect(routes.DetailedAnswersController.get(index))
         }
+    }
   }
 
   def modelHasChanged(tradingPremises: TradingPremises, model: WhatDoesYourBusinessDo) =

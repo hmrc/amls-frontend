@@ -18,19 +18,19 @@ package controllers.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._
+import controllers.actions.SuccessfulAuthAction
 import generators.businessmatching.BusinessMatchingGenerator
-import models.businessmatching.BusinessType.LPrLLP
 import models.businessmatching._
 import models.businessmatching.updateservice._
 import models.status.NotCompleted
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.Matchers.any
 import org.mockito.Mockito._
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -43,7 +43,7 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
 
     val controller = new SummaryController (
       dataCache = mockCacheConnector,
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService
     )
@@ -59,7 +59,7 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
     mockApplicationStatus(NotCompleted)
 
     def mockGetModel(model: Option[BusinessMatching]) = when {
-      controller.businessMatchingService.getModel(any(), any(), any())
+      controller.businessMatchingService.getModel(any())(any(), any())
     } thenReturn {
       if (model.isDefined) {
         OptionT.some[Future, BusinessMatching](model)
@@ -69,7 +69,7 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
     }
 
     def mockUpdateModel = when {
-      controller.businessMatchingService.updateModel(any())(any(), any(), any())
+      controller.businessMatchingService.updateModel(any(), any())(any(), any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
   }
 
@@ -129,7 +129,7 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
           redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
 
           val captor = ArgumentCaptor.forClass(classOf[BusinessMatching])
-          verify(mockBusinessMatchingService).updateModel(captor.capture())(any(), any(), any())
+          verify(mockBusinessMatchingService).updateModel(any(), captor.capture())(any(), any())
           captor.getValue.hasAccepted mustBe true
           captor.getValue.preAppComplete mustBe true
         }

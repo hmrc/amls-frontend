@@ -21,13 +21,12 @@ import models.flowmanagement.ChangeSubSectorFlowModel
 import play.api.mvc.Result
 import services.flowmanagement.PageRouter
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.{ExecutionContext, Future}
 
 class NoPsrNumberPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
-  override def getPageRoute(model: ChangeSubSectorFlowModel, edit: Boolean)
-                           (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+
+  override def getRoute(credId: String, model: ChangeSubSectorFlowModel, edit: Boolean)
+                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
 
     routes.SummaryController.get()
 

@@ -23,7 +23,7 @@
         <h2 class="heading-medium" id="error-summary-heading">@Messages("err.summary")</h2>
         <ul class="error-summary-list">
             @form.errors.map { case (path, errors) =>
-                <li role="tooltip" class="validation-summary-message">
+                <li class="validation-summary-message">
                     @if(path.path.nonEmpty) {
                         <a href="#@form(path).id">@errors.toMessage</a>
                     } else {

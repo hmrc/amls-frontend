@@ -18,24 +18,23 @@ package controllers.businessactivities
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities._
 import services.StatusService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
+import utils.{AuthAction, ControllerHelper}
 import views.html.businessactivities._
 
 import scala.concurrent.Future
 
 class ExpectedBusinessTurnoverController @Inject() (val dataCacheConnector: DataCacheConnector,
                                                     implicit val statusService: StatusService,
-                                                    override val authConnector: AuthConnector
-                                                   ) extends BaseController {
+                                                    val authAction: AuthAction
+                                                   ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
         response =>
           val form: Form2[ExpectedBusinessTurnover] = (for {
             businessActivities <- response
@@ -45,15 +44,15 @@ class ExpectedBusinessTurnoverController @Inject() (val dataCacheConnector: Data
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request =>
       Form2[ExpectedBusinessTurnover](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(expected_business_turnover(f, edit)))
         case ValidForm(_, data) =>
           for {
-            businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key,
+            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
               businessActivities.expectedBusinessTurnover(data)
             )
           } yield edit match {
@@ -62,5 +61,4 @@ class ExpectedBusinessTurnoverController @Inject() (val dataCacheConnector: Data
           }
       }
     }
-  }
 }

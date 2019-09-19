@@ -18,6 +18,7 @@ package controllers.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.{BusinessMatching, CompanyRegistrationNumber}
 import models.status.NotCompleted
 import org.jsoup.Jsoup
@@ -32,17 +33,18 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, CacheMocks, StatusMocks}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 
 class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with StatusMocks with CacheMocks {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
+    implicit val ec = app.injector.instanceOf[ExecutionContext]
 
 
     val controller = new CompanyRegistrationNumberController(
-      self.authConnector,
+      authAction = SuccessfulAuthAction,
       mockCacheConnector,
       statusService = mockStatusService,
       mock[BusinessMatchingService]
@@ -57,7 +59,7 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
     mockApplicationStatus(NotCompleted)
 
     when {
-      controller.businessMatchingService.getModel(any(), any(), any())
+      controller.businessMatchingService.getModel(any())(any(), any())
     } thenReturn OptionT.some[Future, BusinessMatching](businessMatching)
 
     val emptyCache = CacheMap("", Map.empty)
@@ -67,7 +69,7 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
 
     "on get() display company registration number page" in new Fixture {
       when {
-        controller.businessMatchingService.getModel(any(), any(), any())
+        controller.businessMatchingService.getModel(any())(any(), any())
       } thenReturn OptionT.some[Future, BusinessMatching](None)
 
 
@@ -110,11 +112,11 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
         "companyRegistrationNumber" -> "12345678"
       )
 
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(businessMatching)))
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(businessMatching)))
 
-      when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[BusinessMatching](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(validRequest)
       status(result) must be(SEE_OTHER)
@@ -127,11 +129,11 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
         "companyRegistrationNumber" -> "12345678"
       )
 
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(businessMatching)))
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(businessMatching)))
 
-      when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[BusinessMatching](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(false)(validRequest)
       status(result) must be(SEE_OTHER)

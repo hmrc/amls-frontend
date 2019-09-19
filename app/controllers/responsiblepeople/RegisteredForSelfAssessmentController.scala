@@ -18,24 +18,23 @@ package controllers.responsiblepeople
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms._
 import models.responsiblepeople.{ResponsiblePerson, SaRegistered}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople._
 
 import scala.concurrent.Future
 
 class RegisteredForSelfAssessmentController @Inject () (
                                                        val dataCacheConnector: DataCacheConnector,
-                                                       val authConnector: AuthConnector
-                                                       ) extends RepeatingSection with BaseController {
+                                                       authAction: AuthAction
+                                                       ) extends RepeatingSection with DefaultBaseController {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) =
-    Authorised.async {
-      implicit authContext => implicit request =>
-        getData[ResponsiblePerson](index) map {
+    authAction.async {
+      implicit request =>
+        getData[ResponsiblePerson](request.credId, index) map {
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_, Some(person),_,_,_,_,_,_,_,_,_,_))
           => Ok(registered_for_self_assessment(Form2[SaRegistered](person), edit, index, flow, personName.titleName))
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
@@ -46,16 +45,16 @@ class RegisteredForSelfAssessmentController @Inject () (
     }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
-    Authorised.async {
-      implicit authContext => implicit request =>
+    authAction.async {
+      implicit request =>
         Form2[SaRegistered](request.body) match {
           case f: InvalidForm =>
-            getData[ResponsiblePerson](index) map { rp =>
+            getData[ResponsiblePerson](request.credId, index) map { rp =>
               BadRequest(registered_for_self_assessment(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
             for {
-              _ <- updateDataStrict[ResponsiblePerson](index) { rp =>
+              _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
                 rp.saRegistered(data)
               }
             } yield {

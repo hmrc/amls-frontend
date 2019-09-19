@@ -17,6 +17,7 @@
 package controllers.businessmatching
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
@@ -38,7 +39,7 @@ class BusinessTypeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
     val controller = new BusinessTypeController (
       dataCache = mock[DataCacheConnector],
-      authConnector = self.authConnector
+      authAction = SuccessfulAuthAction
     )
   }
 
@@ -48,7 +49,7 @@ class BusinessTypeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
     "display business Types Page" in new Fixture {
 
-      when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
 
@@ -59,7 +60,7 @@ class BusinessTypeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
-      when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
+      when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any())).thenReturn(
         Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
 
       val result = controller.get()(request)
@@ -72,7 +73,7 @@ class BusinessTypeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LPrLLP),
         Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
-      when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
+      when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any())).thenReturn(
         Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
 
       val result = controller.get()(request)
@@ -85,7 +86,7 @@ class BusinessTypeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.UnincorporatedBody),
         Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
-      when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
+      when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any())).thenReturn(
         Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
 
       val result = controller.get()(request)
@@ -98,7 +99,7 @@ class BusinessTypeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LPrLLP),
         Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
-      when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
+      when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any())).thenReturn(
         Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
 
       val result = controller.get()(request)
@@ -111,7 +112,7 @@ class BusinessTypeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
         Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
-      when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
+      when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any())).thenReturn(
         Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
 
       val result = controller.get()(request)
@@ -129,11 +130,11 @@ class BusinessTypeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
         Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
-      when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
+      when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any())).thenReturn(
         Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
 
-      when(controller.dataCache.save[BusinessMatching](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCache.save[BusinessMatching](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -147,11 +148,11 @@ class BusinessTypeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         "businessType" -> "01"
       )
 
-      when(controller.dataCache.fetch[BusinessMatching](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCache.fetch[BusinessMatching](any(), any())
+        (any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCache.save[BusinessMatching](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCache.save[BusinessMatching](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -165,11 +166,11 @@ class BusinessTypeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         "businessType" -> "11"
       )
 
-      when(controller.dataCache.fetch[BusinessMatching](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCache.fetch[BusinessMatching](any(), any())
+        (any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCache.save[BusinessMatching](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCache.save[BusinessMatching](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -181,11 +182,11 @@ class BusinessTypeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       val newRequest = request.withFormUrlEncodedBody(
       )
 
-      when(controller.dataCache.fetch[BusinessMatching](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCache.fetch[BusinessMatching](any(), any())
+        (any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCache.save[BusinessMatching](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCache.save[BusinessMatching](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)

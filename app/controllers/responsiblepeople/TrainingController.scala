@@ -18,30 +18,27 @@ package controllers.responsiblepeople
 
 import config.AppConfig
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms._
 import javax.inject.Inject
-import models.businessmatching.BusinessMatching
 import models.responsiblepeople.{ResponsiblePerson, Training}
 import play.api.i18n.MessagesApi
 import play.api.mvc.Result
-import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
 class TrainingController @Inject()(
                                     override val messagesApi: MessagesApi,
                                     val dataCacheConnector: DataCacheConnector,
-                                    val authConnector: AuthConnector,
+                                    authAction: AuthAction,
                                     val appConfig: AppConfig
-                                  ) extends RepeatingSection with BaseController {
+                                  ) extends RepeatingSection with DefaultBaseController {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) =
-    Authorised.async {
-      implicit authContext => implicit request =>
-        getData[ResponsiblePerson](index) map {
+    authAction.async {
+      implicit request =>
+        getData[ResponsiblePerson](request.credId, index) map {
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,Some(training),_,_,_,_,_,_,_))
           => Ok(views.html.responsiblepeople.training(Form2[Training](training), edit, index, flow, personName.titleName))
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
@@ -52,16 +49,16 @@ class TrainingController @Inject()(
     }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
-    Authorised.async {
-      implicit authContext => implicit request => {
+    authAction.async {
+      implicit request => {
         Form2[Training](request.body) match {
           case f: InvalidForm =>
-            getData[ResponsiblePerson](index) map { rp =>
+            getData[ResponsiblePerson](request.credId, index) map { rp =>
               BadRequest(views.html.responsiblepeople.training(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
             for {
-              _ <- fetchAllAndUpdateStrict[ResponsiblePerson](index) { (_, rp) =>
+              _ <- fetchAllAndUpdateStrict[ResponsiblePerson](request.credId, index) { (_, rp) =>
                 rp.training(data)
               }
             } yield identifyRoutingTarget(index, edit, flow)

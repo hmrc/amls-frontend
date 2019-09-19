@@ -19,33 +19,30 @@ package controllers.businessmatching.updateservice.remove
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessActivity, BusinessMatching}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.businessmatching.updateservice.remove.unable_to_remove_activity
 
 import scala.concurrent.Future
 
 @Singleton
-class UnableToRemoveBusinessTypesController @Inject()(
-                                          val authConnector: AuthConnector,
-                                          val dataCacheConnector: DataCacheConnector
-                                          ) extends BaseController {
+class UnableToRemoveBusinessTypesController @Inject()(authAction: AuthAction,
+                                                      val dataCacheConnector: DataCacheConnector
+                                                     ) extends DefaultBaseController {
 
-  def get = Authorised.async{
-    implicit authContext =>
+  def get = authAction.async {
       implicit request =>
-      getBusinessActivity.map {
-        case activity => Ok(unable_to_remove_activity(activity.getMessage(true)))
+      getBusinessActivity(request.credId) map {
+        case activity => Ok(unable_to_remove_activity(activity))
       } getOrElse (InternalServerError("Get: Unable to show Unable to Remove Activities page"))
   }
 
-  private def getBusinessActivity(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, BusinessActivity] = for {
-    model <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
-    activities <- OptionT.fromOption[Future](model.activities)
-  } yield activities.businessActivities.head
+  private def getBusinessActivity(credId: String)(implicit hc: HeaderCarrier) = for {
+    model <- OptionT(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
+    activities <- OptionT.fromOption[Future](model.alphabeticalBusinessActivitiesLowerCase(false))
+  } yield activities.head
 
 }

@@ -16,6 +16,7 @@
 
 package controllers.tcsp
 
+import controllers.actions.SuccessfulAuthAction
 import generators.AmlsReferenceNumberGenerator
 import models.tcsp.{ServicesOfAnotherTCSPYes, Tcsp}
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -31,7 +32,7 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
     self => val request = addToken(authRequest)
 
     val controller = new ServicesOfAnotherTCSPController (
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       dataCacheConnector = mockCacheConnector
     )
   }
@@ -173,7 +174,8 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.SummaryController.get().url))
 
-        verify(controller.dataCacheConnector).save(any(),eqTo(Tcsp(doesServicesOfAnotherTCSP = Some(false), hasChanged = true)))(any(),any(),any())
+        verify(controller.dataCacheConnector).save(any(), any(),eqTo(Tcsp(doesServicesOfAnotherTCSP = Some(false), hasChanged = true)))(any(),any())
+
 
       }
     }

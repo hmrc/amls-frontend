@@ -16,6 +16,7 @@
 
 package controllers.msb
 
+import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity, _}
@@ -30,27 +31,31 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
+    implicit val ec = app.injector.instanceOf[ExecutionContext]
+
     val controller = new MostTransactionsController(
-      self.authConnector,
+      SuccessfulAuthAction,
       mockCacheConnector,
       mockStatusService,
       mockServiceFlow,
       mockAutoComplete
     )
 
+
+
     mockCacheFetch[ServiceChangeRegister](None, None)
     mockCacheGetEntry[ServiceChangeRegister](Some(ServiceChangeRegister()), ServiceChangeRegister.key)
     mockApplicationStatus(NotCompleted)
 
     when {
-      mockStatusService.isPreSubmission(any(), any(), any())
+      mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
     } thenReturn Future.successful(true)
   }
 
@@ -58,7 +63,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
     "show an empty form on get with no data in store" in new Fixture {
 
-      mockIsNewActivity(false)
+      mockIsNewActivityNewAuth(false)
       mockApplicationStatus(NotCompleted)
       mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
 
@@ -82,7 +87,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
         )
       )
 
-      mockIsNewActivity(false)
+      mockIsNewActivityNewAuth(false)
       mockApplicationStatus(NotCompleted)
       mockCacheFetch[MoneyServiceBusiness](Some(model), Some(MoneyServiceBusiness.key))
 
@@ -100,7 +105,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       "application is in variation and a service has just been added" in new Fixture {
         mockApplicationStatus(SubmissionDecisionApproved)
         mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
-        mockIsNewActivity(true, Some(MoneyServiceBusinessActivity))
+        mockIsNewActivityNewAuth(true, Some(MoneyServiceBusinessActivity))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -110,7 +115,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       "application is in variation mode and no service has been added" in new Fixture {
         mockApplicationStatus(SubmissionDecisionApproved)
         mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
-        mockIsNewActivity(false)
+        mockIsNewActivityNewAuth(false)
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -120,8 +125,11 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
     "return a Bad request with errors on invalid submission" in new Fixture {
 
-      val result = controller.post()(request)
+      val newRequest = request.withFormUrlEncodedBody("mostTransactionsCountries[0]" -> "adsadsdsdsaads")
+
+      val result = controller.post()(newRequest)
       val document = Jsoup.parse(contentAsString(result))
+
 
       status(result) mustEqual BAD_REQUEST
 
@@ -182,7 +190,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
         )
 
         when {
-          mockStatusService.isPreSubmission(any(), any(), any())
+          mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
         } thenReturn Future.successful(false)
 
         mockCacheFetchAll
@@ -214,7 +222,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
         )
 
         when {
-          mockStatusService.isPreSubmission(any(), any(), any())
+          mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
         } thenReturn Future.successful(false)
 
         mockCacheFetchAll
@@ -275,7 +283,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
         )
 
         when {
-          mockStatusService.isPreSubmission(any(), any(), any())
+          mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
         } thenReturn Future.successful(false)
 
         mockCacheFetchAll
@@ -315,7 +323,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key))
       
       when {
-        mockStatusService.isPreSubmission(any(), any(), any())
+        mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
       } thenReturn Future.successful(false)
 
       val result = controller.post()(newRequest)

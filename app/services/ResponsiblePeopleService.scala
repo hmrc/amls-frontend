@@ -23,7 +23,6 @@ import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
 import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{RepeatingSection, StatusConstants}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -31,8 +30,8 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class ResponsiblePeopleService @Inject()(val dataCacheConnector: DataCacheConnector) extends RepeatingSection {
 
-  def getAll(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext) =
-    dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key) map {
+  def getAll(credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext) =
+    dataCacheConnector.fetch[Seq[ResponsiblePerson]](credId, ResponsiblePerson.key) map {
       _.getOrElse(Seq.empty)
     }
 

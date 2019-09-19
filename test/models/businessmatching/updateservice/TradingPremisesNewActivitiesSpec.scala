@@ -32,7 +32,7 @@ class TradingPremisesNewActivitiesSpec extends PlaySpec with MustMatchers {
         "return a valid form model" in {
           val formData = Map(
             "tradingPremisesNewActivities" -> Seq("true"),
-            "businessActivities" -> Seq("04")
+            "businessActivities" -> Seq("05")
           )
 
           val result = AreNewActivitiesAtTradingPremises.formReads.validate(formData)

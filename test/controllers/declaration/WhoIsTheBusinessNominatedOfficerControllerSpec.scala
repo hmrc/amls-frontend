@@ -17,6 +17,7 @@
 package controllers.declaration
 
 import connectors.{AmlsConnector, DataCacheConnector}
+import controllers.actions.SuccessfulAuthAction
 import models.declaration.BusinessNominatedOfficer
 import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import models.responsiblepeople._
@@ -28,8 +29,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.StatusService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
+import utils._
 
 class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with MockitoSugar {
 
@@ -39,7 +39,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
     lazy val defaultBuilder = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[AmlsConnector].to(mock[AmlsConnector]))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
       .overrides(bind[StatusService].to(mockStatusService))

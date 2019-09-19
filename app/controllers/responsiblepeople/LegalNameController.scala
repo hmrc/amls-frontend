@@ -17,25 +17,22 @@
 package controllers.responsiblepeople
 
 import javax.inject.{Inject, Singleton}
-
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{PreviousName, ResponsiblePerson}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.legal_name
 
 import scala.concurrent.Future
 
 @Singleton
 class LegalNameController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                    val authConnector: AuthConnector) extends RepeatingSection with BaseController {
+                                    authAction: AuthAction) extends RepeatingSection with DefaultBaseController {
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext =>
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>
-        getData[ResponsiblePerson](index) map {
+        getData[ResponsiblePerson](request.credId, index) map {
           case Some(ResponsiblePerson(Some(personName), Some(previous), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
           => Ok(legal_name(Form2[PreviousName](previous), edit, index, flow, personName.titleName))
           case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
@@ -45,22 +42,21 @@ class LegalNameController @Inject()(val dataCacheConnector: DataCacheConnector,
         }
   }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext =>
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request => {
         Form2[PreviousName](request.body) match {
           case f: InvalidForm =>
-            getData[ResponsiblePerson](index) map { rp =>
+            getData[ResponsiblePerson](request.credId, index) map { rp =>
               BadRequest(views.html.responsiblepeople.legal_name(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
             for {
               _ <- {
                 data.hasPreviousName match {
-                  case Some(true) => updateDataStrict[ResponsiblePerson](index) { rp =>
+                  case Some(true) => updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
                     rp.legalName(data)
                   }
-                  case Some(false) => updateDataStrict[ResponsiblePerson](index) { rp =>
+                  case Some(false) => updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
                     rp.legalName(PreviousName(Some(false), None, None, None)).copy(legalNameChangeDate = None)
                   }
                 }

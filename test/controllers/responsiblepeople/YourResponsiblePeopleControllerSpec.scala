@@ -17,12 +17,13 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.AuthorisedFixture
@@ -36,7 +37,7 @@ class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar {
 
       val controller = new YourResponsiblePeopleController (
         dataCacheConnector = mock[DataCacheConnector],
-        authConnector = self.authConnector
+        authAction = SuccessfulAuthAction
         )
     }
 
@@ -44,8 +45,8 @@ class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar {
 
       "load the your answers page when section data is available" in new Fixture {
         val model = ResponsiblePerson(None, None)
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(Seq(model))))
         val result = controller.get()(request)
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
@@ -57,8 +58,8 @@ class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar {
         val rp1 = ResponsiblePerson(Some(PersonName("firstName1", Some("middleName"), "lastName1")))
         val rp2 = ResponsiblePerson(Some(PersonName("firstName2", None, "lastName2")))
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(rp2, rp1))))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(Seq(rp2, rp1))))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -75,8 +76,8 @@ class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar {
         val rp1 = ResponsiblePerson(Some(PersonName("firstName1", Some("middleName"), "lastName1")))
         val rp2 = ResponsiblePerson(Some(PersonName("firstName2", None, "lastName2")))
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(rp2, rp1))))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(Seq(rp2, rp1))))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -88,8 +89,8 @@ class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar {
       }
 
       "redirect to the main AMLS summary page when section data is unavailable" in new Fixture {
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+          (any(), any())).thenReturn(Future.successful(None))
         val result = controller.get()(request)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))

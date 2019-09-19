@@ -29,7 +29,6 @@ import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import services.ConfirmationService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.StatusConstants
 
 class ResponsiblePeopleRowsSpec extends PlaySpec
@@ -50,7 +49,6 @@ class ResponsiblePeopleRowsSpec extends PlaySpec
       mock[DataCacheConnector]
     )
   }
-    implicit val authContext = mock[AuthContext]
     implicit val headerCarrier = HeaderCarrier()
     val subscriptionResponse = SubscriptionResponse(
       etmpFormBundleNumber = "",

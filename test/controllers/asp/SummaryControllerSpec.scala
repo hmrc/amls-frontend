@@ -16,6 +16,7 @@
 
 package controllers.asp
 
+import controllers.actions.SuccessfulAuthAction
 import models.asp.Asp
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
@@ -23,7 +24,7 @@ import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
@@ -31,12 +32,13 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
     self =>
     val request = addToken(authRequest)
 
-    val controller = new SummaryController(mockCacheConnector, mockServiceFlow, mockStatusService, self.authConnector)
+    implicit val ec = app.injector.instanceOf[ExecutionContext]
+    val controller = new SummaryController(mockCacheConnector, mockServiceFlow, mockStatusService, authAction = SuccessfulAuthAction)
 
     mockCacheSave[Asp]
 
     when {
-      mockStatusService.isPreSubmission(any(), any(), any())
+      mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
     } thenReturn Future.successful(true)
   }
 
@@ -72,7 +74,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
 
-      verify(mockCacheConnector).save[Asp](eqTo(Asp.key), eqTo(model.copy(hasAccepted = true)))(any(), any(), any())
+      verify(mockCacheConnector).save[Asp](any(), eqTo(Asp.key), eqTo(model.copy(hasAccepted = true)))(any(), any())
     }
   }
 }

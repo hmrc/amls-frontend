@@ -17,16 +17,14 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople._
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo}
 import org.scalatest.concurrent.ScalaFutures
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils._
 
 
 class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
@@ -36,7 +34,7 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
     val RecordId = 1
 
     val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
       .build()
 

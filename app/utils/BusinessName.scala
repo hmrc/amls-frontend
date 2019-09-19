@@ -23,7 +23,6 @@ import models.businessmatching.BusinessMatching
 import play.api.Logger
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -31,18 +30,18 @@ object BusinessName {
 
   private val warn: String => Unit = msg => Logger.warn(s"[BusinessName] $msg")
 
-  def getNameFromCache(implicit hc: HeaderCarrier, ac: AuthContext, cache: DataCacheConnector, ec: ExecutionContext): OptionT[Future, String] =
+  def getNameFromCache(credId: String)(implicit hc: HeaderCarrier,  cache: DataCacheConnector, ec: ExecutionContext): OptionT[Future, String] =
     for {
-      bm <- OptionT(cache.fetch[BusinessMatching](BusinessMatching.key))
+      bm <- OptionT(cache.fetch[BusinessMatching](credId, BusinessMatching.key))
       rd <- OptionT.fromOption[Future](bm.reviewDetails)
     } yield {
       Logger.debug(s"Found business name in cache: ${rd.businessName}")
       rd.businessName
     }
 
-  def getNameFromAmls(safeId: String)
-                     (implicit hc: HeaderCarrier, ac: AuthContext, amls: AmlsConnector, ec: ExecutionContext, dc: DataCacheConnector) = {
-    OptionT(amls.registrationDetails(safeId) map { r =>
+  def getNameFromAmls(accountTypeId: (String, String), safeId: String)
+                     (implicit hc: HeaderCarrier,  amls: AmlsConnector, ec: ExecutionContext, dc: DataCacheConnector) = {
+    OptionT(amls.registrationDetails(accountTypeId, safeId) map { r =>
       Option(r.companyName)
     } recover {
       case ex =>
@@ -51,20 +50,17 @@ object BusinessName {
     })
   }
 
-  def getName(safeId: Option[String])
-             (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext, cache: DataCacheConnector, amls: AmlsConnector) =
-    safeId.fold(getNameFromCache)(v => getNameFromAmls(v) orElse getNameFromCache)
+  def getName(credId: String, safeId: Option[String], accountTypeId: (String, String))
+             (implicit hc: HeaderCarrier, ec: ExecutionContext, cache: DataCacheConnector, amls: AmlsConnector) =
+    safeId.fold(getNameFromCache(credId))(v => getNameFromAmls(accountTypeId, v) orElse getNameFromCache(credId))
 
-  def getBusinessNameFromAmls()(implicit hc: HeaderCarrier,
-                                context: AuthContext,
-                                amls: AmlsConnector,
-                                ec: ExecutionContext,
-                                dc: DataCacheConnector,
-                                statusService: StatusService) = {
+  def getBusinessNameFromAmls(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)
+                             (implicit hc: HeaderCarrier, amls: AmlsConnector, ec: ExecutionContext,
+                              dc: DataCacheConnector, statusService: StatusService) = {
     for {
-      (_, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus)
+      (_, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus(amlsRegistrationNumber, accountTypeId, cacheId))
       businessName <- detailedStatus.fold[OptionT[Future, String]](OptionT.some("")) { r =>
-        BusinessName.getName(r.safeId)
+        BusinessName.getName(cacheId, r.safeId, accountTypeId)
       } orElse OptionT.some("")
     } yield businessName
   }

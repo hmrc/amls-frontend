@@ -1,1 +1,0 @@
- + [AMLS-5186] - 'HVD: application can be submitted with missing payment date'

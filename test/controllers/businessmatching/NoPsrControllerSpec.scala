@@ -16,15 +16,13 @@
 
 package controllers.businessmatching
 
+import controllers.actions.SuccessfulAuthAction
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
-import play.api.http.Status
 import play.api.i18n.Messages
-import play.api.mvc.Result
 import play.api.test.Helpers._
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
-import play.api.mvc.Results.Ok
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 //noinspection ScalaStyle
 class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
@@ -36,7 +34,7 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
     val request = addToken(authRequest)
 
     val controller = new NoPsrController(
-      self.authConnector,
+      SuccessfulAuthAction,
       mockStatusService
     )
   }

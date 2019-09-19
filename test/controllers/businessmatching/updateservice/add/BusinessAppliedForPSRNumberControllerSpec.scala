@@ -16,6 +16,7 @@
 
 package controllers.businessmatching.updateservice.add
 
+import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
@@ -24,16 +25,13 @@ import models.status.SubmissionDecisionApproved
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
-import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
-
-import scala.concurrent.Future
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
   with MockitoSugar
@@ -51,7 +49,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
     val controller = new BusinessAppliedForPSRNumberController(
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[AddBusinessTypeFlowModel]
     )
@@ -110,7 +108,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
             val result = controller.post(false)(newRequest)
 
             status(result) must be(SEE_OTHER)
-            controller.router.verify(PsrNumberPageId, flowModel)
+            controller.router.verify("internalId", PsrNumberPageId, flowModel)
 
           }
         }
@@ -128,7 +126,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
             val result = controller.post(false)(newRequest)
 
             status(result) must be(SEE_OTHER)
-            controller.router.verify(PsrNumberPageId,
+            controller.router.verify("internalId", PsrNumberPageId,
               AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789"))))
 
           }
@@ -148,7 +146,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
             val result = controller.post(true)(newRequest)
 
             status(result) must be(SEE_OTHER)
-            controller.router.verify(PsrNumberPageId,
+            controller.router.verify("internalId", PsrNumberPageId,
               AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo)), true)
 
           }
@@ -167,7 +165,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
             val result = controller.post(true)(newRequest)
 
             status(result) must be(SEE_OTHER)
-            controller.router.verify(PsrNumberPageId,
+            controller.router.verify("internalId", PsrNumberPageId,
               AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789"))), true)
 
           }

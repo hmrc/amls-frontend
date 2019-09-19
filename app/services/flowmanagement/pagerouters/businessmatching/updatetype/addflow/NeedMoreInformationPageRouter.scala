@@ -24,16 +24,14 @@ import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.PageRouter
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.{ExecutionContext, Future}
 
 
 @Singleton
 class NeedMoreInformationPageRouter extends PageRouter[AddBusinessTypeFlowModel] {
 
-  override def getPageRoute(model: AddBusinessTypeFlowModel = new AddBusinessTypeFlowModel(), edit: Boolean = false)
-                           (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+  override def getRoute(credId: String, model: AddBusinessTypeFlowModel = new AddBusinessTypeFlowModel(), edit: Boolean = false)
+                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
 
     Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
 

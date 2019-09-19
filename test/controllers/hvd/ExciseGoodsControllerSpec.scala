@@ -16,6 +16,7 @@
 
 package controllers.hvd
 
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.HighValueDealing
 import models.hvd.{ExciseGoods, Hvd}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
@@ -30,16 +31,14 @@ class ExciseGoodsControllerSpec extends AmlsSpec {
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
-    val controller = new ExciseGoodsController(
-      mockCacheConnector,
-      mockStatusService,
-      self.authConnector,
-      mockServiceFlow
-    )
+    val controller = new ExciseGoodsController(mockCacheConnector,
+                                                mockStatusService,
+                                                SuccessfulAuthAction,
+                                                mockServiceFlow)
 
     mockCacheFetch[Hvd](None)
     mockCacheSave[Hvd]
-    mockIsNewActivity(false)
+    mockIsNewActivityNewAuth(false)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -47,6 +46,7 @@ class ExciseGoodsControllerSpec extends AmlsSpec {
   "ExciseGoodsController" must {
 
     "successfully load UI for the first time" in new Fixture {
+
       val result = controller.get()(request)
       status(result) must be(OK)
 
@@ -160,7 +160,7 @@ class ExciseGoodsControllerSpec extends AmlsSpec {
           val newRequest = request.withFormUrlEncodedBody("exciseGoods" -> "true")
 
           mockApplicationStatus(SubmissionDecisionApproved)
-          mockIsNewActivity(true, Some(HighValueDealing))
+          mockIsNewActivityNewAuth(true, Some(HighValueDealing))
 
           val result = controller.post()(newRequest)
 

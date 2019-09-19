@@ -17,30 +17,32 @@
 package controllers.businessactivities
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businessactivities._
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
-import models.status.{SubmissionDecisionApproved, NotCompleted}
+import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
+import utils.AmlsSpec
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
+    implicit val ec = app.injector.instanceOf[ExecutionContext]
 
     val controller = new SummaryController (
       dataCache = mock[DataCacheConnector],
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       statusService = mock[StatusService]
     )
 
@@ -72,10 +74,10 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
     "load the summary page when section data is available" in new Fixture {
 
       val model = BusinessActivities(None)
-      when(controller.statusService.getStatus(any(), any(), any()))
+      when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
-      when(controller.dataCache.fetchAll(any(), any()))
+      when(controller.dataCache.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -90,10 +92,10 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
 
-      when(controller.statusService.getStatus(any(), any(), any()))
+      when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
-      when(controller.dataCache.fetchAll(any(), any()))
+      when(controller.dataCache.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -108,7 +110,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
     "show edit link for involved in other, turnover expected from activities and amls turnover expected page" when {
       "application in variation mode" in new Fixture {
-        when(controller.dataCache.fetchAll(any(), any()))
+        when(controller.dataCache.fetchAll(any())(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -118,7 +120,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
           .thenReturn(Some(completeModel))
 
 
-        when(controller.statusService.getStatus(any(), any(), any()))
+        when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
         val result = controller.get()(request)
@@ -133,7 +135,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
     "show edit link" when {
       "application not in variation mode" in new Fixture {
-        when(controller.dataCache.fetchAll(any(), any()))
+        when(controller.dataCache.fetchAll(any())(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -142,7 +144,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
         when(mockCacheMap.getEntry[BusinessActivities](eqTo(BusinessActivities.key))(any()))
           .thenReturn(Some(completeModel))
 
-        when(controller.statusService.getStatus(any(), any(), any()))
+        when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(NotCompleted))
 
         val result = controller.get()(request)
@@ -158,7 +160,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
     "pre load Business matching business activities data in " +
       "'How much total net profit does your business expect in the next 12 months, from the following activities?'" in new Fixture {
 
-      when(controller.dataCache.fetchAll(any(), any()))
+      when(controller.dataCache.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -167,7 +169,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       when(mockCacheMap.getEntry[BusinessActivities](eqTo(BusinessActivities.key))(any()))
         .thenReturn(Some(completeModel))
 
-      when(controller.statusService.getStatus(any(), any(), any()))
+      when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
       val result = controller.get()(request)
@@ -188,10 +190,10 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
         val newRequest = request.withFormUrlEncodedBody( "hasAccepted" -> "true")
 
-        when(controller.dataCache.fetch[BusinessActivities](any())(any(), any(), any()))
+        when(controller.dataCache.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(completeModel.copy(hasAccepted = false))))
 
-        when(controller.dataCache.save[BusinessActivities](eqTo(BusinessActivities.key), any())(any(), any(), any()))
+        when(controller.dataCache.save[BusinessActivities](any(), eqTo(BusinessActivities.key), any())(any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)

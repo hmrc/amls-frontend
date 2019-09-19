@@ -16,6 +16,7 @@
 
 package controllers.businessmatching.updateservice.remove
 
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.{BusinessActivities, BusinessMatching, MoneyServiceBusiness}
 import play.api.i18n.Messages
 import play.api.test.Helpers.{contentAsString, status}
@@ -30,7 +31,7 @@ class UnableToRemoveBusinessTypesControllerSpec extends AmlsSpec {
     val request = addToken(authRequest)
 
     val controller = new UnableToRemoveBusinessTypesController(
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       dataCacheConnector = mockCacheConnector
     )
   }
@@ -49,7 +50,7 @@ class UnableToRemoveBusinessTypesControllerSpec extends AmlsSpec {
           val result = controller.get()(request)
 
           status(result) mustBe OK
-          contentAsString(result) must include(Messages("businessmatching.updateservice.removeactivitiesinformation.heading", Messages("businessmatching.registerservices.servicename.lbl.05.phrased")))
+          contentAsString(result) must include(Messages("businessmatching.updateservice.removeactivitiesinformation.heading", Messages("businessmatching.registerservices.servicename.lbl.06.phrased")))
         }
       }
     }

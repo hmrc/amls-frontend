@@ -19,6 +19,7 @@ package controllers.businessmatching
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import forms.{EmptyForm, Form2}
 import generators.ResponsiblePersonGenerator
 import models.businessactivities.{AccountantForAMLSRegulations, BusinessActivities, TaxMatters, WhoIsYourAccountant}
@@ -39,7 +40,7 @@ import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -79,22 +80,22 @@ class RegisterServicesControllerSpec extends AmlsSpec
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[BusinessMatchingService].to(businessMatchingService))
       .overrides(bind[StatusService].to(statusService))
-      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
       .build()
 
     val controller = app.injector.instanceOf[RegisterServicesController]
 
     when {
-      controller.statusService.isPreSubmission(any(), any(), any())
+      controller.statusService.isPreSubmission(Some(any()), any(), any())(any(), any())
     } thenReturn Future.successful(true)
 
     when {
-      controller.businessMatchingService.updateModel(any())(any(),any(),any())
+      controller.businessMatchingService.updateModel(any(), any())(any(),any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
 
     when {
-      controller.businessMatchingService.clearSection(any())(any(),any())
+      controller.businessMatchingService.clearSection(any(), any())(any())
     } thenReturn Future.successful(mockCacheMap)
 
     val responsiblePerson = responsiblePersonGen.sample.get.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = None))
@@ -120,7 +121,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
       "display the view" which {
         "shows empty fields" in new Fixture {
 
-          when(controller.businessMatchingService.getModel(any(),any(),any()))
+          when(controller.businessMatchingService.getModel(any())(any(),any()))
             .thenReturn(OptionT.some[Future, BusinessMatching](BusinessMatching()))
 
           val result = controller.get()(request)
@@ -131,7 +132,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
         "populates fields" in new Fixture {
 
           when {
-            controller.businessMatchingService.getModel(any(), any(), any())
+            controller.businessMatchingService.getModel(any())(any(), any())
           } thenReturn OptionT.some[Future, BusinessMatching](businessMatching1)
 
           val result = controller.get()(request)
@@ -155,10 +156,10 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
             val newRequest = request.withFormUrlEncodedBody(
               "businessActivities" -> "01",
-              "businessActivities" -> "02",
-              "businessActivities" -> "03")
+              "businessActivities" -> "03",
+              "businessActivities" -> "04")
 
-            when(controller.businessMatchingService.getModel(any(), any(), any()))
+            when(controller.businessMatchingService.getModel(any())(any(), any()))
               .thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
             val result = controller.post()(newRequest)
@@ -173,10 +174,10 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
             val newRequest = request.withFormUrlEncodedBody(
               "businessActivities" -> "01",
-              "businessActivities" -> "02",
-              "businessActivities" -> "03")
+              "businessActivities" -> "03",
+              "businessActivities" -> "04")
 
-            when(controller.businessMatchingService.getModel(any(), any(), any()))
+            when(controller.businessMatchingService.getModel(any())(any(), any()))
               .thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
             val result = controller.post(true)(newRequest)
@@ -192,10 +193,10 @@ class RegisterServicesControllerSpec extends AmlsSpec
             val bm = BusinessMatching(None, Some(businessActivities))
 
             val newRequest = request.withFormUrlEncodedBody(
-              "businessActivities[0]" -> "04",
-              "businessActivities[1]" -> "05")
+              "businessActivities[0]" -> "05",
+              "businessActivities[1]" -> "06")
 
-            when(controller.businessMatchingService.getModel(any(), any(), any()))
+            when(controller.businessMatchingService.getModel(any())(any(), any()))
               .thenReturn(OptionT.some[Future, BusinessMatching](bm))
 
             val result = controller.post(true)(newRequest)
@@ -214,7 +215,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val newRequest = request.withFormUrlEncodedBody(
             "businessActivities" -> "11")
 
-          when(controller.businessMatchingService.getModel(any(), any(), any()))
+          when(controller.businessMatchingService.getModel(any())(any(), any()))
             .thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
@@ -235,9 +236,9 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
           val newRequest = request.withFormUrlEncodedBody(
             "businessActivities" -> "01",
-            "businessActivities" -> "04")
+            "businessActivities" -> "05")
 
-          when(controller.businessMatchingService.getModel(any(), any(), any()))
+          when(controller.businessMatchingService.getModel(any())(any(), any()))
             .thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           mockCacheFetch(Some(businessActivities), Some(BusinessActivities.key))
@@ -246,7 +247,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           status(result) must be(SEE_OTHER)
 
           val captor = ArgumentCaptor.forClass(classOf[BusinessActivities])
-          verify(controller.dataCacheConnector).save(eqTo(BusinessActivities.key), captor.capture())(any(), any(), any())
+          verify(controller.dataCacheConnector).save(any(), eqTo(BusinessActivities.key), captor.capture())(any(), any())
 
           captor.getValue.accountantForAMLSRegulations mustBe None
           captor.getValue.whoIsYourAccountant mustBe None
@@ -261,9 +262,9 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
           val newRequest = request.withFormUrlEncodedBody(
             "businessActivities" -> "01",
-            "businessActivities" -> "04")
+            "businessActivities" -> "05")
 
-          when(controller.businessMatchingService.getModel(any(), any(), any()))
+          when(controller.businessMatchingService.getModel(any())(any(), any()))
             .thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           mockCacheFetch[BusinessActivities](None, Some(BusinessActivities.key))
@@ -272,7 +273,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           status(result) must be(SEE_OTHER)
 
           verify(controller.dataCacheConnector, times(0))
-            .save(eqTo(BusinessActivities.key), any())(any(), any(), any())
+            .save(any(), eqTo(BusinessActivities.key), any())(any(), any())
 
         }
       }
@@ -340,53 +341,53 @@ class RegisterServicesControllerSpec extends AmlsSpec
       "Do nothing to non-existing supervision section data" when {
         "ASP, TCSP not selected" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "02")
+          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "03")
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(eqTo(Supervision.key), any())(any(), any(), any())
+          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any(), any())
         }
 
         "ASP added, TCSP not selected" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices))), preAppComplete = true)
           val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "01")
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(eqTo(Supervision.key), any())(any(), any(), any())
+          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any(), any())
         }
 
         "TCSP added, ASP not selected" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "06")
+          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "07")
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(eqTo(Supervision.key), any())(any(), any(), any())
+          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any(), any())
         }
 
         "ASP, TCSP added" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices))), preAppComplete = true)
           val newRequest = request.withFormUrlEncodedBody(
             "businessActivities" -> "01",
-            "businessActivities" -> "06"
+            "businessActivities" -> "07"
           )
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(eqTo(Supervision.key), any())(any(), any(), any())
+          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any(), any())
         }
       }
 
@@ -394,44 +395,44 @@ class RegisterServicesControllerSpec extends AmlsSpec
         "ASP deselected, TCSP not selected" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, AccountancyServices))), preAppComplete = true)
           val newRequest = request.withFormUrlEncodedBody(
-            "businessActivities" -> "02"
+            "businessActivities" -> "03"
           )
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(1)).save(eqTo(Supervision.key), any())(any(), any(), any())
+          verify(controller.dataCacheConnector, times(1)).save(any(), eqTo(Supervision.key), any())(any(), any())
         }
 
         "TCSP deselected, ASP not selected" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, TrustAndCompanyServices))), preAppComplete = true)
           val newRequest = request.withFormUrlEncodedBody(
-            "businessActivities" -> "02"
+            "businessActivities" -> "03"
           )
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(1)).save(eqTo(Supervision.key), any())(any(), any(), any())
+          verify(controller.dataCacheConnector, times(1)).save(any(), eqTo(Supervision.key), any())(any(), any())
 
         }
 
         "ASP, TCSP deselected" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, AccountancyServices, TrustAndCompanyServices))), preAppComplete = true)
           val newRequest = request.withFormUrlEncodedBody(
-            "businessActivities" -> "02"
+            "businessActivities" -> "03"
           )
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(1)).save(eqTo(Supervision.key), any())(any(), any(), any())
+          verify(controller.dataCacheConnector, times(1)).save(any(), eqTo(Supervision.key), any())(any(), any())
         }
 
        }
@@ -441,15 +442,15 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, AccountancyServices))), preAppComplete = true)
           val newRequest = request.withFormUrlEncodedBody(
             "businessActivities" -> "01",
-            "businessActivities" -> "02"
+            "businessActivities" -> "03"
           )
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(eqTo(Supervision.key), any())(any(), any(), any())
+          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any(), any())
 
         }
 
@@ -457,78 +458,78 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, AccountancyServices, TrustAndCompanyServices))), preAppComplete = true)
           val newRequest = request.withFormUrlEncodedBody(
             "businessActivities" -> "01",
-            "businessActivities" -> "02"
+            "businessActivities" -> "03"
           )
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(eqTo(Supervision.key), any())(any(), any(), any())
+          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any(), any())
 
         }
 
         "TCSP selected, ASP not selected" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, TrustAndCompanyServices))), preAppComplete = true)
           val newRequest = request.withFormUrlEncodedBody(
-            "businessActivities" -> "06",
-            "businessActivities" -> "02"
+            "businessActivities" -> "07",
+            "businessActivities" -> "03"
           )
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(eqTo(Supervision.key), any())(any(), any(), any())
+          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any(), any())
 
         }
 
         "TCSP selected, ASP deselected" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, AccountancyServices, TrustAndCompanyServices))), preAppComplete = true)
           val newRequest = request.withFormUrlEncodedBody(
-            "businessActivities" -> "06",
-            "businessActivities" -> "02"
+            "businessActivities" -> "07",
+            "businessActivities" -> "03"
           )
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(eqTo(Supervision.key), any())(any(), any(), any())
+          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any(), any())
         }
 
         "ASP, TCSP selected" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, AccountancyServices, TrustAndCompanyServices))), preAppComplete = true)
           val newRequest = request.withFormUrlEncodedBody(
             "businessActivities" -> "01",
-            "businessActivities" -> "06",
-            "businessActivities" -> "02"
+            "businessActivities" -> "07",
+            "businessActivities" -> "03"
           )
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(eqTo(Supervision.key), any())(any(), any(), any())
+          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any(), any())
 
         }
 
         "ASP deselected, TCSP added" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, AccountancyServices))), preAppComplete = true)
           val newRequest = request.withFormUrlEncodedBody(
-            "businessActivities" -> "06",
-            "businessActivities" -> "02"
+            "businessActivities" -> "07",
+            "businessActivities" -> "03"
           )
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(eqTo(Supervision.key), any())(any(), any(), any())
+          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any(), any())
 
         }
 
@@ -536,15 +537,15 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, TrustAndCompanyServices))), preAppComplete = true)
           val newRequest = request.withFormUrlEncodedBody(
             "businessActivities" -> "01",
-            "businessActivities" -> "02"
+            "businessActivities" -> "03"
           )
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(eqTo(Supervision.key), any())(any(), any(), any())
+          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any(), any())
 
         }
       }
@@ -553,124 +554,124 @@ class RegisterServicesControllerSpec extends AmlsSpec
       "Do nothing to non-existing section data" when {
         "ASP is not selected, and was not previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set())), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "02")
+          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "03")
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.businessMatchingService, times(0)).clearSection(eqTo(AccountancyServices))(any(), any())
+          verify(controller.businessMatchingService, times(0)).clearSection(any(), eqTo(AccountancyServices))(any())
         }
 
         "EAB is not selected, and was not previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set())), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "02")
+          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "03")
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.businessMatchingService, times(0)).clearSection(eqTo(EstateAgentBusinessService))(any(), any())
+          verify(controller.businessMatchingService, times(0)).clearSection(any(), eqTo(EstateAgentBusinessService))(any())
         }
 
         "HVD is not selected, and was not previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set())), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "02")
+          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "03")
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.businessMatchingService, times(0)).clearSection(eqTo(HighValueDealing))(any(), any())
+          verify(controller.businessMatchingService, times(0)).clearSection(any(), eqTo(HighValueDealing))(any())
         }
 
         "MSB is not selected, and was not previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set())), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "02")
+          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "03")
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.businessMatchingService, times(0)).clearSection(eqTo(MoneyServiceBusiness))(any(), any())
+          verify(controller.businessMatchingService, times(0)).clearSection(any(), eqTo(MoneyServiceBusiness))(any())
         }
 
         "TCSP is not selected, and was not previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set())), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "02")
+          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "03")
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.businessMatchingService, times(0)).clearSection(eqTo(TrustAndCompanyServices))(any(), any())
+          verify(controller.businessMatchingService, times(0)).clearSection(any(), eqTo(TrustAndCompanyServices))(any())
         }
       }
 
       "Remove existing section data " when {
         "ASP is not selected, but was previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(AccountancyServices))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "02")
+          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "03")
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.businessMatchingService, times(1)).clearSection(eqTo(AccountancyServices))(any(), any())
+          verify(controller.businessMatchingService, times(1)).clearSection(any(), eqTo(AccountancyServices))(any())
         }
 
         "EAB is not selected, but was previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(EstateAgentBusinessService))), preAppComplete = true)
           val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "02")
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.businessMatchingService, times(1)).clearSection(eqTo(EstateAgentBusinessService))(any(), any())
+          verify(controller.businessMatchingService, times(1)).clearSection(any(), eqTo(EstateAgentBusinessService))(any())
         }
 
         "HVD is not selected, but was previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(HighValueDealing))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "02")
+          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "03")
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.businessMatchingService, times(1)).clearSection(eqTo(HighValueDealing))(any(), any())
+          verify(controller.businessMatchingService, times(1)).clearSection(any(), eqTo(HighValueDealing))(any())
         }
 
         "MSB is not selected, but was previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(MoneyServiceBusiness))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "02")
+          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "03")
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.businessMatchingService, times(1)).clearSection(eqTo(MoneyServiceBusiness))(any(), any())
+          verify(controller.businessMatchingService, times(1)).clearSection(any(), eqTo(MoneyServiceBusiness))(any())
         }
 
         "TCSP is not selected, but was previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(TrustAndCompanyServices))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "02")
+          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "03")
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.businessMatchingService, times(1)).clearSection(eqTo(TrustAndCompanyServices))(any(), any())
+          verify(controller.businessMatchingService, times(1)).clearSection(any(), eqTo(TrustAndCompanyServices))(any())
         }
       }
 
@@ -679,60 +680,60 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(AccountancyServices))), preAppComplete = true)
           val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "01")
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.businessMatchingService, times(0)).clearSection(eqTo(AccountancyServices))(any(), any())
+          verify(controller.businessMatchingService, times(0)).clearSection(any(), eqTo(AccountancyServices))(any())
         }
 
         "EAB is selected and was previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(EstateAgentBusinessService))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "03")
+          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "04")
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.businessMatchingService, times(0)).clearSection(eqTo(EstateAgentBusinessService))(any(), any())
+          verify(controller.businessMatchingService, times(0)).clearSection(any(), eqTo(EstateAgentBusinessService))(any())
         }
 
         "HVD is selected and was previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(HighValueDealing))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "04")
+          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "05")
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.businessMatchingService, times(0)).clearSection(eqTo(HighValueDealing))(any(), any())
+          verify(controller.businessMatchingService, times(0)).clearSection(any(), eqTo(HighValueDealing))(any())
         }
 
         "MSB is selected and was previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(MoneyServiceBusiness))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "05")
+          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "06")
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.businessMatchingService, times(0)).clearSection(eqTo(MoneyServiceBusiness))(any(), any())
+          verify(controller.businessMatchingService, times(0)).clearSection(any(), eqTo(MoneyServiceBusiness))(any())
         }
 
         "TCSP is selected and was previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(TrustAndCompanyServices))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "06")
+          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "07")
 
-          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.businessMatchingService, times(0)).clearSection(eqTo(TrustAndCompanyServices))(any(), any())
+          verify(controller.businessMatchingService, times(0)).clearSection(any(), eqTo(TrustAndCompanyServices))(any())
         }
       }
     }
@@ -768,11 +769,11 @@ class RegisterServicesControllerSpec extends AmlsSpec
       "status is post-submission" in new Fixture {
 
         when {
-          controller.businessMatchingService.getModel(any(),any(),any())
+          controller.businessMatchingService.getModel(any())(any(),any())
         } thenReturn OptionT.some[Future, BusinessMatching](businessMatching1)
 
         when {
-          controller.statusService.isPreSubmission(any(),any(),any())
+          controller.statusService.isPreSubmission(Some(any()), any(), any())(any(),any())
         } thenReturn Future.successful(false)
 
         val result = controller.post()(request.withFormUrlEncodedBody(
@@ -782,9 +783,9 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         status(result) must be(SEE_OTHER)
 
-        verify(controller.businessMatchingService).updateModel(eqTo(businessMatching1.activities(
+        verify(controller.businessMatchingService).updateModel(any(), eqTo(businessMatching1.activities(
           BMBusinessActivities(activityData1, Some(Set(HighValueDealing, TelephonePaymentService)))
-        )))(any(),any(),any())
+        )))(any(),any())
 
       }
     }
@@ -792,11 +793,11 @@ class RegisterServicesControllerSpec extends AmlsSpec
       "status is pre-submisson" in new Fixture {
 
         when {
-          controller.businessMatchingService.getModel(any(),any(),any())
+          controller.businessMatchingService.getModel(any())(any(),any())
         } thenReturn OptionT.some[Future, BusinessMatching](businessMatching1)
 
         when {
-          controller.statusService.isPreSubmission(any(),any(),any())
+          controller.statusService.isPreSubmission(Some(any()), any(), any())(any(),any())
         } thenReturn Future.successful(true)
 
         val result = controller.post()(request.withFormUrlEncodedBody(
@@ -806,9 +807,9 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         status(result) must be(SEE_OTHER)
 
-        verify(controller.businessMatchingService).updateModel(eqTo(businessMatching1.activities(
+        verify(controller.businessMatchingService).updateModel(any(), eqTo(businessMatching1.activities(
           BMBusinessActivities(Set(HighValueDealing, TelephonePaymentService))
-        )))(any(),any(),any())
+        )))(any(),any())
 
       }
     }
@@ -818,7 +819,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
         val responsiblePersonNotAccepted = responsiblePerson.copy(hasAccepted = false)
 
         when {
-          controller.businessMatchingService.getModel(any(),any(),any())
+          controller.businessMatchingService.getModel(any())(any(),any())
         } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(None, Some(BMBusinessActivities(Set(HighValueDealing)))))
 
         mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(responsiblePerson, responsiblePerson)), Some(ResponsiblePerson.key))
@@ -830,9 +831,10 @@ class RegisterServicesControllerSpec extends AmlsSpec
         status(result) must be(SEE_OTHER)
 
         verify(mockCacheConnector).save[Seq[ResponsiblePerson]](
+          any(),
           eqTo(ResponsiblePerson.key),
           eqTo(Seq(responsiblePersonNotAccepted, responsiblePersonNotAccepted))
-        )(any(),any(),any())
+        )(any(),any())
 
       }
     }
@@ -840,7 +842,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
       "fitAndProper is required" in new Fixture {
 
         when {
-          controller.businessMatchingService.getModel(any(),any(),any())
+          controller.businessMatchingService.getModel(any())(any(),any())
         } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(None, Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness)))))
 
         val result = controller.post()(request.withFormUrlEncodedBody(
@@ -849,7 +851,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         status(result) must be(SEE_OTHER)
 
-        verify(mockCacheConnector).fetch[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any(), any(), any())
+        verify(mockCacheConnector).fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any(), any())
 
       }
     }
@@ -906,8 +908,8 @@ class RegisterServicesControllerSpec extends AmlsSpec
     "sortActivities" must {
       "return activities in alphabetical order mapped to values" when {
         "given values in numerical order" in new Fixture {
-          val activities = Set("01", "02", "03", "04", "05", "06", "07")
-          val sortedActivities = Seq("01", "02", "03", "04", "05", "07", "06")
+          val activities = Set("01", "02", "03", "04", "05", "06", "07", "08")
+          val sortedActivities = Seq("01", "02", "03", "04", "05", "06", "08", "07")
 
           val sortActivities = PrivateMethod[Seq[String]]('sortActivities)
 

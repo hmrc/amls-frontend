@@ -16,6 +16,7 @@
 
 package controllers.tradingpremises
 
+import controllers.actions.SuccessfulAuthAction
 import generators.tradingpremises.TradingPremisesGenerator
 import models.TradingPremisesSection
 import models.tradingpremises.{AgentPartnership, TradingPremises}
@@ -26,7 +27,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
@@ -36,7 +37,7 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
     val request = addToken(authRequest)
 
-    val controller = new AgentPartnershipController(mockCacheConnector, self.authConnector, messagesApi)
+    val controller = new AgentPartnershipController(mockCacheConnector, SuccessfulAuthAction, messagesApi)
 
     mockCacheFetchAll
     mockCacheGetEntry[Seq[TradingPremises]](Some(Seq(tradingPremisesGen.sample.get)), TradingPremises.key)
@@ -47,7 +48,7 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
     "get is called" must {
       "display agent partnership Page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
 
         val result = controller.get(1)(request)
@@ -63,7 +64,7 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
       "display main Summary Page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(agentPartnership = Some(AgentPartnership("test")))))))
 
         val result = controller.get(1)(request)
@@ -78,7 +79,7 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
       }
       "respond with NOT_FOUND" when {
         "there is no data at all at that index" in new Fixture {
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
             .thenReturn(Future.successful(None))
 
           val result = controller.get(1)(request)
@@ -106,7 +107,7 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
             "agentPartnership" -> "text"
           )
 
-          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(1)(newRequest)
@@ -120,7 +121,7 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
             "agentPartnership" -> "text"
           )
 
-          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(1, true)(newRequest)
@@ -148,7 +149,7 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse, TradingPremises())))
 
-        when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(mockCacheMap))
 
         val result = controller.post(1)(newRequest)
@@ -158,12 +159,13 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
         verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
           any(),
+          any(),
           meq(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse.copy(
             hasChanged = true,
             agentPartnership = Some(AgentPartnership("text")),
             agentName = None,
             agentCompanyDetails = None
-          ), TradingPremises())))(any(), any(), any())
+          ), TradingPremises())))(any(), any())
       }
     }
 

@@ -28,21 +28,19 @@ import play.api.mvc.Results.{InternalServerError, Redirect}
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ChangeBusinessTypeRouter @Inject()(val businessMatchingService: BusinessMatchingService
                                         ) extends Router[ChangeBusinessType] {
 
-  override def getRoute(pageId: PageId, model: ChangeBusinessType, edit: Boolean = false)
-                       (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = model match {
+  override def getRoute(credId: String, pageId: PageId, model: ChangeBusinessType, edit: Boolean = false)
+                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = model match {
 
     case Add => Future.successful(Redirect(addRoutes.SelectBusinessTypeController.get()))
     case Remove => {
       for {
-        model <- businessMatchingService.getModel
+        model <- businessMatchingService.getModel(credId)
         activities <- OptionT.fromOption[Future](model.activities) map {
           _.businessActivities
         }

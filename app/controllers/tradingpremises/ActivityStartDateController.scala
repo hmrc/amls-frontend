@@ -17,30 +17,24 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms._
 import javax.inject.{Inject, Singleton}
 import models.tradingpremises._
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Request, Result}
+import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
-
-import scala.concurrent.Future
+import utils.{AuthAction, RepeatingSection}
 
 
 @Singleton
 class ActivityStartDateController @Inject()(override val messagesApi: MessagesApi,
-                                            val authConnector: AuthConnector,
-                                            val dataCacheConnector: DataCacheConnector) extends RepeatingSection with BaseController {
+                                            val authAction: AuthAction,
+                                            val dataCacheConnector: DataCacheConnector) extends RepeatingSection with DefaultBaseController {
 
-  def get(index: Int, edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
-      implicit request =>
-
-        getData[TradingPremises](index) map {
+  def get(index: Int, edit: Boolean = false) = authAction.async {
+    implicit request =>
+        getData[TradingPremises](request.credId, index) map {
           case Some(tpSection) =>
             tpSection.yourTradingPremises match {
               case Some(YourTradingPremises(_, tradingPremisesAddress, _, None, _)) =>
@@ -55,26 +49,24 @@ class ActivityStartDateController @Inject()(override val messagesApi: MessagesAp
         }
   }
 
-  def post(index: Int, edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(index: Int, edit: Boolean = false) = authAction.async {
       implicit request =>
         Form2[ActivityStartDate](request.body) match {
           case f: InvalidForm =>
-            handleInvalidForm(index, edit, f)
+            handleInvalidForm(request.credId, index, edit, f)
           case ValidForm(_, data) =>
-            handleValidForm(index, edit, data)
+            handleValidForm(request.credId, index, edit, data)
 
         }
   }
 
-  private def handleValidForm(index: Int, edit: Boolean, data: ActivityStartDate)
-                             (implicit user: AuthContext,
-                              hc: HeaderCarrier,
+  private def handleValidForm(credId: String, index: Int, edit: Boolean, data: ActivityStartDate)
+                             (implicit hc: HeaderCarrier,
                               request: Request[_]) = {
     for {
-      _ <- updateDataStrict[TradingPremises](index) { tp =>
+      _ <- updateDataStrict[TradingPremises](credId, index) { tp =>
         val ytp = tp.yourTradingPremises.fold[Option[YourTradingPremises]](None)(x => Some(x.copy(startDate = Some(data.startDate))))
-        tp.copy(yourTradingPremises = ytp)
+        tp.copy(yourTradingPremises = ytp, hasChanged = true)
       }
     } yield edit match {
       case true => Redirect(routes.DetailedAnswersController.get(index))
@@ -82,12 +74,11 @@ class ActivityStartDateController @Inject()(override val messagesApi: MessagesAp
     }
   }
 
-  private def handleInvalidForm(index: Int, edit: Boolean, f: InvalidForm)
-                               (implicit user: AuthContext,
-                                hc: HeaderCarrier,
+  private def handleInvalidForm(credId: String, index: Int, edit: Boolean, f: InvalidForm)
+                               (implicit hc: HeaderCarrier,
                                 request: Request[_]) = {
     for {
-      tp <- getData[TradingPremises](index)
+      tp <- getData[TradingPremises](credId, index)
     } yield tp.flatMap(_.yourTradingPremises) match {
       case Some(ytp) =>
         BadRequest(views.html.tradingpremises.activity_start_date(f, index, edit, ytp.tradingPremisesAddress))

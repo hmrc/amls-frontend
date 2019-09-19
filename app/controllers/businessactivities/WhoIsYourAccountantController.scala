@@ -18,25 +18,26 @@ package controllers.businessactivities
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, UkAccountantsAddress, WhoIsYourAccountant}
 import services.AutoCompleteService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 
 import scala.concurrent.Future
 
 class WhoIsYourAccountantController @Inject() ( val dataCacheConnector: DataCacheConnector,
                                                 val autoCompleteService: AutoCompleteService,
-                                                override val authConnector: AuthConnector
-                                              )extends BaseController {
+                                                val authAction: AuthAction
+                                              )extends DefaultBaseController {
 
   //Joe - cannot seem to provide a default for UK/Non UK without providing defaults for other co-products
   private val defaultValues = WhoIsYourAccountant("", None, UkAccountantsAddress("","", None, None, ""))
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
         response =>
           val form = (for {
             businessActivities <- response
@@ -48,15 +49,15 @@ class WhoIsYourAccountantController @Inject() ( val dataCacheConnector: DataCach
       }
   }
 
-  def post(edit : Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+  def post(edit : Boolean = false) = authAction.async {
+    implicit request =>
       Form2[WhoIsYourAccountant](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.businessactivities.who_is_your_accountant(f, edit, autoCompleteService.getCountries)))
         case ValidForm(_, data) => {
           for {
-            businessActivity <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key,
+            businessActivity <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
               businessActivity.whoIsYourAccountant(Some(data))
             )
           } yield if (edit) {

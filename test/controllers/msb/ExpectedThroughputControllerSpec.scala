@@ -16,6 +16,7 @@
 
 package controllers.msb
 
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import models.moneyservicebusiness.{ExpectedThroughput, MoneyServiceBusiness}
@@ -40,11 +41,11 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
 
     val controller = new ExpectedThroughputController(
       dataCacheConnector = mockCacheConnector,
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       statusService = mockStatusService,
       serviceFlow = mockServiceFlow)
 
-    mockIsNewActivity(false)
+    mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, None)
   }
 
@@ -54,11 +55,10 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
 
     "on get display the Throughput Expected In next 12Months page" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
+        (any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(NotCompleted))
+      mockApplicationStatus(NotCompleted)
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -67,11 +67,10 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
 
     "on get display the Expected throughput page with pre populated data" in new Fixture {
 
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(NotCompleted))
+      mockApplicationStatus(NotCompleted)
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(MoneyServiceBusiness(Some(ExpectedThroughput.First)))))
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(MoneyServiceBusiness(Some(ExpectedThroughput.First)))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -81,13 +80,12 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
     }
 
     "on get display the Throughput Expected In next 12Months page when approved and the service has just been added" in new Fixture {
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
+        (any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(SubmissionDecisionApproved))
+      mockApplicationStatus(SubmissionDecisionApproved)
 
-      mockIsNewActivity(true, Some(MoneyServiceBusinessActivity))
+      mockIsNewActivityNewAuth(true, Some(MoneyServiceBusinessActivity))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -99,11 +97,11 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
       val newRequest = request.withFormUrlEncodedBody(
       )
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
+        (any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -116,11 +114,11 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
         "throughput" -> "01"
       )
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
+        (any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -133,11 +131,11 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
         "throughput" -> "01"
       )
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
+        (any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)

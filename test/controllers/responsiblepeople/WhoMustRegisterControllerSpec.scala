@@ -16,9 +16,10 @@
 
 package controllers.responsiblepeople
 
+import controllers.actions.SuccessfulAuthAction
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.AuthorisedFixture
@@ -29,7 +30,7 @@ class WhoMustRegisterControllerSpec extends AmlsSpec with MockitoSugar with Scal
     self => val request = addToken(authRequest)
 
     val controller = new WhoMustRegisterController (
-      authConnector = self.authConnector
+      authAction = SuccessfulAuthAction
     )
   }
   "WhoMustRegisterController" must {

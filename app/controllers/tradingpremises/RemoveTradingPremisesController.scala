@@ -18,28 +18,25 @@ package controllers.tradingpremises
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.status._
 import models.tradingpremises.{ActivityEndDate, TradingPremises}
 import services.StatusService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{RepeatingSection, StatusConstants}
+import utils.{AuthAction, RepeatingSection, StatusConstants}
 import views.html.tradingpremises.remove_trading_premises
-
-import scala.concurrent.Future
 
 class RemoveTradingPremisesController @Inject () (
                                                    val dataCacheConnector: DataCacheConnector,
-                                                   val authConnector: AuthConnector,
+                                                   val authAction: AuthAction,
                                                    val statusService: StatusService
-                                                 ) extends RepeatingSection with BaseController {
+                                                 ) extends RepeatingSection with DefaultBaseController {
 
-  def get(index: Int, complete: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+  def get(index: Int, complete: Boolean = false) = authAction.async {
+    implicit request =>
       for {
-        tp <- getData[TradingPremises](index)
-        status <- statusService.getStatus
+        tp <- getData[TradingPremises](request.credId, index)
+        status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
       } yield (tp, status) match {
 
         case (Some(_), SubmissionDecisionApproved | ReadyForRenewal(_) | RenewalSubmitted(_)) =>
@@ -67,25 +64,24 @@ class RemoveTradingPremisesController @Inject () (
       }
   }
 
-  def remove(index: Int, complete: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+  def remove(index: Int, complete: Boolean = false) = authAction.async {
+    implicit request =>
 
-      def removeWithoutDate = removeDataStrict[TradingPremises](index) map { _ =>
+      def removeWithoutDate = removeDataStrict[TradingPremises](request.credId, index) map { _ =>
         Redirect(routes.YourTradingPremisesController.get())
       }
 
-      statusService.getStatus flatMap {
-        case NotCompleted | SubmissionReady => removeDataStrict[TradingPremises](index) map { _ =>
+      statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId).flatMap {
+        case NotCompleted | SubmissionReady => removeDataStrict[TradingPremises](request.credId, index) map { _ =>
           Redirect(routes.YourTradingPremisesController.get(complete))
         }
         case SubmissionReadyForReview => for {
-          _ <- updateDataStrict[TradingPremises](index) { tp =>
+          _ <- updateDataStrict[TradingPremises](request.credId, index) { tp =>
             tp.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
-
           }
         } yield Redirect(routes.YourTradingPremisesController.get(complete))
         case _ =>
-          getData[TradingPremises](index) flatMap { premises =>
+          getData[TradingPremises](request.credId, index) flatMap { premises =>
             premises.lineId match {
               case Some(tp) =>
                 val extraFields = Map(
@@ -94,7 +90,7 @@ class RemoveTradingPremisesController @Inject () (
                 Form2[ActivityEndDate](request.body.asFormUrlEncoded.get ++ extraFields) match {
                   case f: InvalidForm =>
                     for {
-                      tp <- getData[TradingPremises](index)
+                      tp <- getData[TradingPremises](request.credId, index)
                     } yield (tp) match {
                       case (Some(_)) =>
                         BadRequest(
@@ -110,13 +106,12 @@ class RemoveTradingPremisesController @Inject () (
                     }
                   case ValidForm(_, data) => {
                     for {
-                      _ <- updateDataStrict[TradingPremises](index) { tp =>
+                      _ <- updateDataStrict[TradingPremises](request.credId, index) { tp =>
                         tp.copy(status = Some(StatusConstants.Deleted), endDate = Some(data), hasChanged = true)
                       }
                     } yield Redirect(routes.YourTradingPremisesController.get(complete))
                   }
                 }
-
               case _ => removeWithoutDate
             }
           }

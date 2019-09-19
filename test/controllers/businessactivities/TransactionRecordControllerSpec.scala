@@ -16,19 +16,15 @@
 
 package controllers.businessactivities
 
-import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.businessactivities._
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo, any}
+import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
-import play.api.i18n.Messages
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-
-import scala.concurrent.Future
 
 class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
 
@@ -36,7 +32,7 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
     self =>
 
     val request = addToken(authRequest)
-    val controller = new TransactionRecordController(self.authConnector, mockCacheConnector)
+    val controller = new TransactionRecordController(SuccessfulAuthAction, mockCacheConnector)
 
     mockCacheSave[BusinessActivities]
   }
@@ -152,7 +148,7 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
         status(result) must be(SEE_OTHER)
         redirectLocation(result) mustBe Some(routes.IdentifySuspiciousActivityController.get().url)
 
-        verify(mockCacheConnector).save[BusinessActivities](
+        verify(mockCacheConnector).save[BusinessActivities](any(),
           eqTo(BusinessActivities.key),
           eqTo(BusinessActivities(
             transactionRecord = Some(false),
@@ -160,7 +156,7 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
             hasChanged = true,
             hasAccepted = false
           )
-        ))(any(), any(), any())
+        ))(any(), any())
       }
 
       "respond with BAD_REQUEST when given invalid data" in new Fixture {

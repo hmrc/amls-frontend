@@ -17,6 +17,7 @@
 package controllers.estateagentbusiness
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.estateagentbusiness._
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -31,14 +32,14 @@ import utils.{AmlsSpec, AuthorisedFixture}
 import scala.concurrent.Future
 
 
-class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures{
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
     val controller = new PenalisedByProfessionalController (
       dataCacheConnector = mock[DataCacheConnector],
-      authConnector = self.authConnector
+      authAction = SuccessfulAuthAction
     )
   }
 
@@ -47,8 +48,8 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
   "PenalisedByProfessionalController" must {
 
     "on get display the Penalised By Professional Body page" in new Fixture {
-      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any(), any())
+        ( any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
       contentAsString(result) must include(Messages("estateagentbusiness.penalisedbyprofessional.title"))
@@ -57,8 +58,8 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
 
   "on get display the Penalised By Professional Body page with pre populated data" in new Fixture {
 
-    when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
-      (any(), any(), any())).thenReturn(Future.successful(Some(EstateAgentBusiness(None, None,Some(ProfessionalBodyYes("details"))))))
+    when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any(), any())
+      (any(), any())).thenReturn(Future.successful(Some(EstateAgentBusiness(None, None,Some(ProfessionalBodyYes("details"))))))
 
     val result = controller.get()(request)
     status(result) must be(OK)
@@ -73,11 +74,11 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
       "professionalBody" -> "details"
     )
 
-    when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
-      (any(), any(), any())).thenReturn(Future.successful(None))
+    when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any(), any())
+      (any(), any())).thenReturn(Future.successful(None))
 
-    when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
-      (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+    when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any(), any())
+      ( any(), any())).thenReturn(Future.successful(emptyCache))
 
     val result = controller.post()(newRequest)
     status(result) must be(SEE_OTHER)
@@ -104,11 +105,11 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
       "professionalBody" -> "details"
      )
 
-     when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
-       (any(), any(), any())).thenReturn(Future.successful(None))
+     when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any(), any())
+       ( any(), any())).thenReturn(Future.successful(None))
 
-     when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
-       (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+     when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any(), any())
+       (any(), any())).thenReturn(Future.successful(emptyCache))
 
      val result = controller.post(true)(newRequest)
      status(result) must be(SEE_OTHER)

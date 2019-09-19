@@ -16,8 +16,9 @@
 
 package controllers.renewal
 
+import controllers.actions.SuccessfulAuthAction
 import models.registrationprogress.{Completed, NotStarted, Section}
-import models.renewal.{InvolvedInOtherYes, Renewal}
+import models.renewal.Renewal
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
@@ -25,7 +26,7 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.RenewalService
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -36,7 +37,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
     val renewalService = mock[RenewalService]
 
-    val controller = new WhatYouNeedController(self.authConnector, renewalService)
+    val controller = new WhatYouNeedController(SuccessfulAuthAction, renewalService)
   }
   "WhatYouNeedController" must {
 
@@ -45,7 +46,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       "load the page" in new Fixture {
 
         when {
-          renewalService.getSection(any(), any(), any())
+          renewalService.getSection(any())(any(), any())
         } thenReturn Future.successful(Section("renewal", NotStarted, Renewal().hasChanged, controllers.renewal.routes.SummaryController.get()))
 
         val result = controller.get(request)
@@ -61,7 +62,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       "redirect to progress page if renewal has been started" in new Fixture {
 
         when {
-          renewalService.getSection(any(), any(), any())
+          renewalService.getSection(any())(any(), any())
         } thenReturn Future.successful(Section("renewal", Completed, Renewal().hasChanged, controllers.renewal.routes.SummaryController.get()))
 
         val result = controller.get(request)

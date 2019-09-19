@@ -17,24 +17,24 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching.{MoneyServiceBusiness => _, _}
 import models.moneyservicebusiness._
 import play.api.mvc.Result
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.msb.identify_linked_transactions
 
 import scala.concurrent.Future
 
 class IdentifyLinkedTransactionsController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                                      val authConnector: AuthConnector
-                                                     ) extends BaseController {
+                                                      authAction: AuthAction
+                                                     ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
         response =>
           val form: Form2[IdentifyLinkedTransactions] = (for {
             msb <- response
@@ -55,13 +55,13 @@ class IdentifyLinkedTransactionsController @Inject() (val dataCacheConnector: Da
         Redirect(routes.SummaryController.get())
     }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request => {
       Form2[IdentifyLinkedTransactions](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(identify_linked_transactions(f, edit)))
         case ValidForm(_, data) =>
-          dataCacheConnector.fetchAll flatMap {
+          dataCacheConnector.fetchAll(request.credId) flatMap {
             optMap =>
               val result = for {
                 cache <- optMap
@@ -69,7 +69,7 @@ class IdentifyLinkedTransactionsController @Inject() (val dataCacheConnector: Da
                 bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
                 services <- bm.msbServices
               } yield {
-                dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
+                dataCacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
                   msb.identifyLinkedTransactions(data)
                 ) map {
                   _ => routing(services.msbServices, msb, edit)

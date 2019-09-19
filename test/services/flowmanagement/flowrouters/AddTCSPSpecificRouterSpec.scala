@@ -24,9 +24,8 @@ import play.api.mvc.Results.Redirect
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.flowrouters.businessmatching.AddBusinessTypeRouter
-import services.flowmanagement.pagerouters._
 import services.flowmanagement.pagerouters.addflow._
-import services.flowmanagement.pagerouters.removeflow._
+
 import utils.{AmlsSpec, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -64,7 +63,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
       "the user is on the 'What Type of business ....' page (SelectActivitiesPageId)" when {
         "TCSP is selected" in new Fixture {
 
-          val result = await(router.getRoute(SelectBusinessTypesPageId, model))
+          val result = await(router.getRoute("internalId", SelectBusinessTypesPageId, model))
 
           result mustBe Redirect(addRoutes.FitAndProperController.get(false))
         }
@@ -78,7 +77,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
             val model = AddBusinessTypeFlowModel(
               activity = Some(TrustAndCompanyServices),
               fitAndProper = Some(true))
-            val result = await(router.getRoute(FitAndProperPageId, model))
+            val result = await(router.getRoute("internalId", FitAndProperPageId, model))
 
             result mustBe Redirect(addRoutes.WhichFitAndProperController.get(false))
           }
@@ -93,7 +92,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
             val model = AddBusinessTypeFlowModel(
               activity = Some(TrustAndCompanyServices),
               fitAndProper = Some(false))
-            val result = await(router.getRoute(FitAndProperPageId, model))
+            val result = await(router.getRoute("internalId", FitAndProperPageId, model))
 
             result mustBe Redirect(addRoutes.TradingPremisesController.get(false))
           }
@@ -104,7 +103,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
     "return the 'trading-premises' page (TradingPremisesController)" when {
       "the user is on the 'Which Fit and Proper' page (WhichFitAndProperPageId)" when {
         "TCSP is the Business Activity" in new Fixture {
-          val result = await(router.getRoute(WhichFitAndProperPageId, model))
+          val result = await(router.getRoute("internalId", WhichFitAndProperPageId, model))
 
           result mustBe Redirect(addRoutes.TradingPremisesController.get(false))
         }
@@ -119,7 +118,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
               activity = Some(TrustAndCompanyServices),
               areNewActivitiesAtTradingPremises = Some(true))
 
-            val result = await(router.getRoute(TradingPremisesPageId, model))
+            val result = await(router.getRoute("internalId", TradingPremisesPageId, model))
 
             result mustBe Redirect(addRoutes.WhichTradingPremisesController.get(false))
           }
@@ -135,7 +134,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
               activity = Some(TrustAndCompanyServices),
               areNewActivitiesAtTradingPremises = Some(false))
 
-            val result = await(router.getRoute(TradingPremisesPageId, model))
+            val result = await(router.getRoute("internalId", TradingPremisesPageId, model))
 
             result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
           }
@@ -146,7 +145,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
     "return the 'update_services_summary' page (UpdateServicesSummaryController)" when {
       "the user is on the 'Which Trading Premises' page (WhichTradingPremisesPageId)" when {
         "TCSP is the Business Activity" in new Fixture {
-          val result = await(router.getRoute(WhichTradingPremisesPageId, model))
+          val result = await(router.getRoute("internalId", WhichTradingPremisesPageId, model))
 
           result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
@@ -164,7 +163,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
           val model = AddBusinessTypeFlowModel(
             activity = Some(TrustAndCompanyServices),
             fitAndProper = Some(true))
-          val result = await(router.getRoute(FitAndProperPageId, model, edit = true))
+          val result = await(router.getRoute("internalId", FitAndProperPageId, model, edit = true))
 
           result mustBe Redirect(addRoutes.WhichFitAndProperController.get(true))
         }
@@ -178,7 +177,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
           val model = AddBusinessTypeFlowModel(
             activity = Some(TrustAndCompanyServices),
             fitAndProper = Some(false))
-          val result = await(router.getRoute(FitAndProperPageId, model, edit = true))
+          val result = await(router.getRoute("internalId", FitAndProperPageId, model, edit = true))
 
           result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
@@ -193,7 +192,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
             activity = Some(TrustAndCompanyServices),
             fitAndProper = Some(true),
             responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(0, 1, 2, 3))))
-          val result = await(router.getRoute(WhichFitAndProperPageId, model, edit = true))
+          val result = await(router.getRoute("internalId", WhichFitAndProperPageId, model, edit = true))
 
           result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
@@ -207,7 +206,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
           val model = AddBusinessTypeFlowModel(
             activity = Some(TrustAndCompanyServices),
             areNewActivitiesAtTradingPremises = Some(true))
-          val result = await(router.getRoute(TradingPremisesPageId, model, edit = true))
+          val result = await(router.getRoute("internalId", TradingPremisesPageId, model, edit = true))
 
           result mustBe Redirect(addRoutes.WhichTradingPremisesController.get(true))
         }
@@ -221,7 +220,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
           val model = AddBusinessTypeFlowModel(
             activity = Some(TrustAndCompanyServices),
             areNewActivitiesAtTradingPremises = Some(false))
-          val result = await(router.getRoute(TradingPremisesPageId, model, edit = true))
+          val result = await(router.getRoute("internalId", TradingPremisesPageId, model, edit = true))
 
           result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
@@ -236,7 +235,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
             activity = Some(TrustAndCompanyServices),
             areNewActivitiesAtTradingPremises = Some(true),
             tradingPremisesActivities = Some(TradingPremisesActivities(Set(0, 1, 2, 3))))
-          val result = await(router.getRoute(WhichTradingPremisesPageId, model, edit = true))
+          val result = await(router.getRoute("internalId", WhichTradingPremisesPageId, model, edit = true))
 
           result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }

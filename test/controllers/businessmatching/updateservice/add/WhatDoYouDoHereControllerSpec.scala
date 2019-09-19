@@ -18,6 +18,7 @@ package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
+import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
@@ -45,7 +46,7 @@ class WhatDoYouDoHereControllerSpec extends AmlsSpec with MoneyServiceBusinessTe
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
     val controller = new WhatDoYouDoHereController(
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       dataCacheConnector = mockCacheConnector,
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,
@@ -56,13 +57,13 @@ class WhatDoYouDoHereControllerSpec extends AmlsSpec with MoneyServiceBusinessTe
     val cacheMapT = OptionT.some[Future, CacheMap](mockCacheMap)
 
     when {
-      controller.businessMatchingService.getModel(any(), any(), any())
+      controller.businessMatchingService.getModel(any())(any(), any())
     } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
       activities = Some(BusinessActivities(Set(AccountancyServices)))
     ))
 
     when {
-      controller.businessMatchingService.updateModel(any())(any(), any(), any())
+      controller.businessMatchingService.updateModel(any(), any())(any(), any())
     } thenReturn cacheMapT
   }
 
@@ -102,7 +103,7 @@ class WhatDoYouDoHereControllerSpec extends AmlsSpec with MoneyServiceBusinessTe
         ))
 
         status(result) mustBe SEE_OTHER
-        controller.router.verify(WhatDoYouDoHerePageId,
+        controller.router.verify("internalId", WhatDoYouDoHerePageId,
           AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
             subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
             tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
@@ -121,7 +122,7 @@ class WhatDoYouDoHereControllerSpec extends AmlsSpec with MoneyServiceBusinessTe
         ))
 
         status(result) mustBe SEE_OTHER
-        controller.router.verify(WhatDoYouDoHerePageId,
+        controller.router.verify("internalId", WhatDoYouDoHerePageId,
           AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
             subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
             tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),

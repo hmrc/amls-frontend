@@ -16,6 +16,7 @@
 
 package controllers.hvd
 
+import controllers.actions.SuccessfulAuthAction
 import models.hvd._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -34,7 +35,7 @@ class CashPaymentOverTenThousandEurosControllerSpec extends AmlsSpec with Mockit
 
   trait Fixture extends AuthorisedFixture  with DependencyMocks{
     self => val request = addToken(authRequest)
-    val controller = new CashPaymentController(mockCacheConnector, authConnector = self.authConnector)
+    val controller = new CashPaymentController(mockCacheConnector, authAction = SuccessfulAuthAction)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -45,7 +46,7 @@ class CashPaymentOverTenThousandEurosControllerSpec extends AmlsSpec with Mockit
 
       "load the Cash Payment Over Ten Thousand Euros page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -60,7 +61,7 @@ class CashPaymentOverTenThousandEurosControllerSpec extends AmlsSpec with Mockit
         val firstDate = Some(CashPaymentFirstDate(new LocalDate(1990, 2, 24)))
         val activities = Hvd(cashPayment = Some(CashPayment(CashPaymentOverTenThousandEuros(true), firstDate)))
 
-        when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(activities)))
 
         val result = controller.get()(request)
@@ -77,7 +78,7 @@ class CashPaymentOverTenThousandEurosControllerSpec extends AmlsSpec with Mockit
         val cashPayment = Some(CashPayment(CashPaymentOverTenThousandEuros(false), None))
         val activities = Hvd(cashPayment = cashPayment)
 
-        when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(activities)))
 
         val result = controller.get()(request)
@@ -99,10 +100,10 @@ class CashPaymentOverTenThousandEurosControllerSpec extends AmlsSpec with Mockit
           "paymentDate.year" -> "1999"
         )
 
-        when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save[Hvd](any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(true)(newRequest)
@@ -118,10 +119,10 @@ class CashPaymentOverTenThousandEurosControllerSpec extends AmlsSpec with Mockit
           "paymentDate.year" -> "1999"
         )
 
-        when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save[Hvd](any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
@@ -132,10 +133,10 @@ class CashPaymentOverTenThousandEurosControllerSpec extends AmlsSpec with Mockit
       "successfully redirect to the Linked Cash Payments page on selection of 'No' when edit mode is off" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody("acceptedAnyPayment" -> "false")
 
-        when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save[Hvd](any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
@@ -147,10 +148,10 @@ class CashPaymentOverTenThousandEurosControllerSpec extends AmlsSpec with Mockit
         val newRequest = request.withFormUrlEncodedBody(
           "acceptedAnyPayment" -> "false"
         )
-        when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save[Hvd](any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(true)(newRequest)
@@ -161,7 +162,7 @@ class CashPaymentOverTenThousandEurosControllerSpec extends AmlsSpec with Mockit
       "show invalid data error" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody()
-        when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.post()(newRequest)

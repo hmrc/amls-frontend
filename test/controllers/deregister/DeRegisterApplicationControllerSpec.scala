@@ -18,6 +18,7 @@ package controllers.deregister
 
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
+import controllers.actions.SuccessfulAuthAction
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.{AccountancyServices, BusinessActivities, BusinessActivity, BusinessMatching}
 import models.deregister.DeRegisterSubscriptionResponse
@@ -49,28 +50,28 @@ class DeRegisterApplicationControllerSpec extends AmlsSpec with MustMatchers wit
     val dataCache = mock[DataCacheConnector]
     val enrolments = mock[AuthEnrolmentsService]
     val amlsConnector = mock[AmlsConnector]
-    val controller = new DeRegisterApplicationController(self.authConnector, dataCache, statusService, enrolments, amlsConnector)
+    val controller = new DeRegisterApplicationController(SuccessfulAuthAction, dataCache, statusService, enrolments, amlsConnector)
 
     when {
-      dataCache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+      dataCache.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any())
     } thenReturn Future.successful(BusinessMatching(reviewDetails.some, activities.some).some)
 
     when {
-      amlsConnector.registrationDetails(eqTo(safeId))(any(), any(), any())
+      amlsConnector.registrationDetails(any(), eqTo(safeId))(any(), any())
     } thenReturn Future.successful(RegistrationDetails(businessName, isIndividual = false))
 
     when(activities.businessActivities).thenReturn(Set[BusinessActivity](AccountancyServices))
 
     when {
-      enrolments.amlsRegistrationNumber(any(), any(), any())
+      enrolments.amlsRegistrationNumber(Some(any()), Some(any()))(any(), any())
     } thenReturn Future.successful(applicationReference.some)
 
     when {
-      amlsConnector.deregister(any(), any())(any(), any(), any())
+      amlsConnector.deregister(any(), any(), any())(any(), any())
     } thenReturn Future.successful(DeRegisterSubscriptionResponse("Some date"))
 
     when {
-      controller.statusService.getSafeIdFromReadStatus(any())(any(), any(), any())
+      controller.statusService.getSafeIdFromReadStatus(any(), any())(any(), any())
     } thenReturn Future.successful(Some(safeId))
 
 

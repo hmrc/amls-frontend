@@ -22,15 +22,14 @@ import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import services.flowmanagement.PageRouter
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class NeedToUpdatePageRouter extends PageRouter[RemoveBusinessTypeFlowModel] {
 
-  override def getPageRoute(model: RemoveBusinessTypeFlowModel  = new RemoveBusinessTypeFlowModel(), edit: Boolean = false)
-                           (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext ): Future[Result] = {
+
+  override def getRoute(credId: String, model: RemoveBusinessTypeFlowModel  = new RemoveBusinessTypeFlowModel(), edit: Boolean = false)
+                       (implicit hc: HeaderCarrier, ec: ExecutionContext ): Future[Result] = {
 
     Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
 

@@ -16,16 +16,16 @@
 
 package controllers.renewal
 
-import javax.inject.{Inject, Singleton}
-import cats.implicits._
 import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.EmptyForm
+import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
 import models.renewal.Renewal
 import services.{ProgressService, RenewalService, SectionsProvider}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.renewal.summary
 
 import scala.concurrent.Future
@@ -35,22 +35,21 @@ import scala.concurrent.Future
 class SummaryController @Inject()
 (
   val dataCacheConnector: DataCacheConnector,
-  val authConnector: AuthConnector,
+  val authAction: AuthAction,
   val renewalService: RenewalService,
   val progressService: ProgressService,
   val sectionsProvider: SectionsProvider
-) extends BaseController {
+) extends DefaultBaseController {
 
-  def get = Authorised.async {
-    implicit authContext =>
+  def get = authAction.async {
       implicit request =>
-        dataCacheConnector.fetchAll flatMap {
+        dataCacheConnector.fetchAll(request.credId) flatMap {
           optionalCache =>
             (for {
               cache <- OptionT.fromOption[Future](optionalCache)
               businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
               renewal <- OptionT.fromOption[Future](cache.getEntry[Renewal](Renewal.key))
-              renewalSection <- OptionT.liftF(renewalService.getSection)
+              renewalSection <- OptionT.liftF(renewalService.getSection(request.credId))
             } yield {
               val variationSections = sectionsProvider.sections(cache).filter(_.name != BusinessMatching.messageKey)
               val canSubmit = renewalService.canSubmit(renewalSection, variationSections)
@@ -59,10 +58,10 @@ class SummaryController @Inject()
         }
   }
 
-  def post = Authorised.async {
-    implicit authContext => implicit request => (for {
-      renewal <- OptionT(dataCacheConnector.fetch[Renewal](Renewal.key))
-      _ <- OptionT.liftF(dataCacheConnector.save[Renewal](Renewal.key, renewal.copy(hasAccepted = true)))
+  def post = authAction.async {
+    implicit request => (for {
+      renewal <- OptionT(dataCacheConnector.fetch[Renewal](request.credId, Renewal.key))
+      _ <- OptionT.liftF(dataCacheConnector.save[Renewal](request.credId, Renewal.key, renewal.copy(hasAccepted = true)))
     } yield Redirect(controllers.renewal.routes.RenewalProgressController.get)) getOrElse InternalServerError("Could not update renewal")
   }
 }

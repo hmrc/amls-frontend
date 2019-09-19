@@ -16,6 +16,7 @@
 
 package controllers.tcsp
 
+import controllers.actions.SuccessfulAuthAction
 import models.tcsp.{ServicesOfAnotherTCSPYes, Tcsp}
 import org.jsoup.Jsoup
 import org.scalatest.mock.MockitoSugar
@@ -28,7 +29,7 @@ class AnotherTCSPSupervisionControllerSpec extends AmlsSpec with MockitoSugar {
     self => val request = addToken(authRequest)
 
     val controller = new AnotherTCSPSupervisionController(
-      authConnector = self.authConnector,
+      SuccessfulAuthAction,
       dataCacheConnector = mockCacheConnector
     )
   }

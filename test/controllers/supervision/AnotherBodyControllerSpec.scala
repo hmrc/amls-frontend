@@ -16,6 +16,7 @@
 
 package controllers.supervision
 
+import controllers.actions.SuccessfulAuthAction
 import models.supervision._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -31,7 +32,7 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     self =>
     val request = addToken(authRequest)
 
-    val controller = new AnotherBodyController(mockCacheConnector, authConnector = self.authConnector)
+    val controller = new AnotherBodyController(mockCacheConnector, authAction = SuccessfulAuthAction)
   }
 
   "AnotherBodyControllerController" must {

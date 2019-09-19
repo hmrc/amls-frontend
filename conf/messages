@@ -115,9 +115,11 @@ error.submission.wrong_credentials.content = Your account doesn’t have enough 
 ########################################################################################################################
 ####  Business Matching ####
 error.required.bm.register.service = Select one or more options to show what you need to register
-error.required.bm.register.service.single = Select the type of business you need to register
-error.required.bm.remove.service = You must have at least one business type selected.
-error.required.bm.remove.leave.one = You must leave at least one business type unselected.
+error.required.bm.register.service.single = Select which service you need to register
+error.required.bm.remove.service = Select which service you need to remove
+error.required.bm.remove.service.multiple = Select which services you need to remove
+error.required.bm.remove.leave.twobusinesses = You cannot remove both of your registered services
+error.required.bm.remove.leave.one = You cannot remove all of your registered services
 error.required.bm.registration.number = Enter a valid company registration number
 error.invalid.bm.registration.number = Enter a valid company registration number
 error.required.bm.businesstype.type = Enter your type of business, such as association, charity, or trust
@@ -842,10 +844,10 @@ confirmation.payment.lede = You have submitted
 confirmation.payment.reference_header = Payment reference: {0}
 confirmation.payment.info.hmrc_review = HMRC will review your application when we receive your payment. It can take up to 45 days to review your application, or request further information.
 confirmation.payment.info.hmrc_review2 = You can sign into this service at any time to see the status of your application. We’ll email you when we’ve made a decision. You’ll need to sign in to see the decision.
-confirmation.payment.renewal.info.hmrc_review = HMRC will review your application when we receive your payment. It can take more than 45 days to review your application or request further information.
-confirmation.payment.renewal.info.hmrc_review2 = You can continue to trade while your renewal is being reviewed.
-confirmation.payment.renewal.info.hmrc_review3 = We’ll email you when we have made a decision. You’ll need to sign into your anti-money laundering supervision account to see the decision.
-confirmation.payment.renewal.info.hmrc_review4 = You can sign into your account at any time to see your application status.
+confirmation.payment.renewal.info.hmrc_review = HMRC will review your application when we receive your payment.
+confirmation.payment.renewal.info.hmrc_review2 = You can continue to trade while your application is being reviewed.
+confirmation.payment.renewal.info.hmrc_review3 = We’ll email you when we have made a decision.
+confirmation.payment.renewal.info.hmrc_review4 = You can sign into your account at any time to check your application status.
 confirmation.payment.info.heading.keep_up_to_date = Keep your information up to date
 confirmation.payment.info.keep_up_to_date = If any of your information changes, you’ll need to sign in to update your details within 30 days of the change. For example, you’ll need to update if:
 confirmation.payment.info.keep_up_to_date.item1 = a responsible person leaves your business
@@ -1197,35 +1199,40 @@ businessmatching.registerservices.details = What these services mean
 
 businessmatching.registerservices.existing = You’ve told us your business already does:
 businessmatching.registerservices.servicename.lbl.01 = Accountancy service provider
-businessmatching.registerservices.servicename.lbl.02 = Bill payment service provider
-businessmatching.registerservices.servicename.lbl.03 = Estate agency business
-businessmatching.registerservices.servicename.lbl.04 = High value dealer
-businessmatching.registerservices.servicename.lbl.05 = Money service business
-businessmatching.registerservices.servicename.lbl.06 = Trust or company service provider
-businessmatching.registerservices.servicename.lbl.07 = Telecommunications, digital and IT payment service provider
+businessmatching.registerservices.servicename.lbl.02 = Art market participant
+businessmatching.registerservices.servicename.lbl.03 = Bill payment service provider
+businessmatching.registerservices.servicename.lbl.04 = Estate agency business
+businessmatching.registerservices.servicename.lbl.05 = High value dealer
+businessmatching.registerservices.servicename.lbl.06 = Money service business
+businessmatching.registerservices.servicename.lbl.07 = Trust or company service provider
+businessmatching.registerservices.servicename.lbl.08 = Telecommunications, digital and IT payment service provider
 
 businessactivities.registerservices.servicename.lbl.01 = accountancy service provider
-businessactivities.registerservices.servicename.lbl.02 = bill payment service provider
-businessactivities.registerservices.servicename.lbl.03 = estate agency business
-businessactivities.registerservices.servicename.lbl.04 = high value dealer
-businessactivities.registerservices.servicename.lbl.05 = money service business
-businessactivities.registerservices.servicename.lbl.06 = trust or company service provider
-businessactivities.registerservices.servicename.lbl.07 = telecommunications, digital and IT payment service provider
+businessactivities.registerservices.servicename.lbl.02 = art market participant
+businessactivities.registerservices.servicename.lbl.03 = bill payment service provider
+businessactivities.registerservices.servicename.lbl.04 = estate agency business
+businessactivities.registerservices.servicename.lbl.04.agent = estate agent
+businessactivities.registerservices.servicename.lbl.05 = high value dealer
+businessactivities.registerservices.servicename.lbl.06 = money service business
+businessactivities.registerservices.servicename.lbl.07 = trust or company service provider
+businessactivities.registerservices.servicename.lbl.08 = telecommunications, digital and IT payment service provider
 
 businessmatching.registerservices.servicename.lbl.01.phrased = accountancy services
-businessmatching.registerservices.servicename.lbl.02.phrased = bill payment services
-businessmatching.registerservices.servicename.lbl.03.phrased = estate agency services
-businessmatching.registerservices.servicename.lbl.04.phrased = high value dealing
-businessmatching.registerservices.servicename.lbl.05.phrased = money service business
-businessmatching.registerservices.servicename.lbl.06.phrased = trust or company services
-businessmatching.registerservices.servicename.lbl.07.phrased = telecommunications, digital and IT payment services
-businessmatching.registerservices.servicename.details.01 = Accountancy service providers supply professional bookkeeping services, accounts preparation and signing, or tax advice.
-businessmatching.registerservices.servicename.details.02 = Bill payment service providers work on behalf of businesses to handle household bill payments from customers.
-businessmatching.registerservices.servicename.details.03 = Estate agency businesses introduce people who want to buy or sell property, and facilitate the purchase or sale of property.
-businessmatching.registerservices.servicename.details.04 = High value dealers accept cash payments of €10,000 or more (or equivalent in any currency) in exchange for goods. Estate agents are not classed as high value dealers.
-businessmatching.registerservices.servicename.details.05 = Money service businesses exchange currency, transmit money, or cash cheques for their customers.
-businessmatching.registerservices.servicename.details.06 = Telecommunications, digital and IT payment service providers work on behalf of businesses to handle payments made with phones, computers, smart TVs, and other similar devices.
-businessmatching.registerservices.servicename.details.07 = Trust or company service providers form companies. They also provide other services such as acting - or arranging for another person to act - in a certain role in a company.
+businessmatching.registerservices.servicename.lbl.02.phrased = art market participant
+businessmatching.registerservices.servicename.lbl.03.phrased = bill payment services
+businessmatching.registerservices.servicename.lbl.04.phrased = estate agency services
+businessmatching.registerservices.servicename.lbl.05.phrased = high value dealing
+businessmatching.registerservices.servicename.lbl.06.phrased = money service business
+businessmatching.registerservices.servicename.lbl.07.phrased = trust or company services
+businessmatching.registerservices.servicename.lbl.08.phrased = telecommunications, digital and IT payment services
+businessmatching.registerservices.servicename.details.01 = They provide services like professional bookkeeping, accounts preparation and signing, and tax advice.
+businessmatching.registerservices.servicename.details.02 = They facilitate and engage in the buying or selling of art for €10,000 or more. Roles include gallery owners, art dealers, art agents, and art auctioneers.
+businessmatching.registerservices.servicename.details.03 = They handle payments for utility and other household bills on behalf of customers.
+businessmatching.registerservices.servicename.details.04 = They introduce and act on instructions from people who want to buy or sell property. They also secure the purchase or sale of property.
+businessmatching.registerservices.servicename.details.05 = They accept or make cash payments of €10,000 or more (or equivalent) in exchange for goods. This includes when a customer deposits cash directly into a bank account. Estate agents are not classed as high value dealers.
+businessmatching.registerservices.servicename.details.06 = They exchange currency, transmit money, or cash cheques for their customers.
+businessmatching.registerservices.servicename.details.07 = They form companies, and supply services like providing a business or correspondence address. They also act, or arrange for another person to act, in a certain role. For example, a director in a company or a trustee of an express trust.
+businessmatching.registerservices.servicename.details.08 = They act as a link between customers and suppliers. They handle payments made through devices like mobile phones, computers, and smart TVs.
 businessmatching.registrationnumber.title = What is your company registration number?
 businessmatching.registrationnumber.lbl = Company registration number
 businessmatching.typeofbusiness.title = What type of unincorporated association or trust are you registering?
@@ -1280,14 +1287,20 @@ businessmatching.updateservice.changeservices.choice.remove = Remove business ty
 
 businessmatching.updateservice.removeactivitiesinformation.title = Unable to remove services
 businessmatching.updateservice.removeactivitiesinformation.heading = Unable to remove {0}
-businessmatching.updateservice.removeactivitiesinformation.info.3 = You need to add a new service before you can remove the one you are currently registered for.
+businessmatching.updateservice.removeactivitiesinformation.info.3 = You need to add a new service before you can remove the one you’re currently registered for.
 businessmatching.updateservice.removeactivitiesinformation.info.1.all = You need to add a new service before you remove the services you are currently registered for.
-businessmatching.updateservice.removeactivitiesinformation.info.2 = If you want to de-register your business for anti-money laundering supervision, you can do this from your registration status page.
+businessmatching.updateservice.removeactivitiesinformation.info.2 = If you no longer need to be registered with HMRC under the Money Laundering Regulations, you can de-register your business. You can do this from your registration page.
 
-businessmatching.updateservice.removeactivities.title = What type of business do you need to remove?
-businessmatching.updateservice.removeactivities.heading = What type of business do you need to remove?
-businessmatching.updateservice.removeactivities.summary = You can remove one (or more) of your business types here.
-businessmatching.updateservice.removeactivities.list.heading = Leave at least one business type. For anti-money laundering supervision one business type (or more) must be registered with us.
+businessmatching.updateservice.removeactivities.heading = Which service do you need to remove?
+businessmatching.updateservice.removeactivities.title.twobusinesses = Which service do you need to remove?
+businessmatching.updateservice.removeactivities.heading.twobusinesses = Which service do you need to remove?
+businessmatching.updateservice.removeactivities.title.multibusinesses = Which services do you need to remove?
+businessmatching.updateservice.removeactivities.heading.multibusinesses = Which services do you need to remove?
+
+businessmatching.updateservice.removeactivities.summary.twobusinesses = If you no longer want to be registered with HMRC for one of your services, you can remove it.
+businessmatching.updateservice.removeactivities.list.heading.twobusinesses = If you want to remove both services, you’ll need to de-register with HMRC under the Money Laundering Regulations. You can do this from your registration page.
+businessmatching.updateservice.removeactivities.summary.multibusinesses = If you no longer want to be registered with HMRC for one or more of your services, you can remove them.
+businessmatching.updateservice.removeactivities.list.heading.multibusinesses = If you want to remove all services, you’ll need to de-register with HMRC under the Money Laundering Regulations. You can do this from your registration page.
 businessmatching.updateservice.removeactivities.button = Continue
 
 businessmatching.updateservice.updateotherinformation.heading = We need you to update other information
@@ -1316,19 +1329,18 @@ businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredin
 businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.2 = You can apply for a PSR reference number from the Financial Conduct Authority (FCA).
 businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.button.text = Return to about your business
 
-businessmatching.updateservice.selectactivities.title = What type of business do you need to register?
-businessmatching.updateservice.selectactivities.heading = What type of business do you need to register?
-businessmatching.updateservice.selectactivities.hint = You can only add one type of business at a time
-businessmatching.updateservice.selectactivities.currentactivities.hint = You’ve told us your business type is:
-businessmatching.updateservice.selectactivities.currentactivities.hint.plural = You’ve told us your business types are:
+businessmatching.updateservice.selectactivities.title = Which service do you need to register?
+businessmatching.updateservice.selectactivities.heading = Which service do you need to register?
+businessmatching.updateservice.selectactivities.hint = You can only add one service at a time.
+businessmatching.updateservice.selectactivities.currentactivities.hint = You have registered as
+businessmatching.updateservice.selectactivities.currentactivities.hint.plural = You have registered the following services:
 
 businessmatching.updateservice.tradingpremises.title = Will you do these activities from any of your registered trading premises?
 businessmatching.updateservice.tradingpremises.heading = Will you do {0} activities from any of your registered trading premises?
-businessmatching.updateservice.tradingpremises.summary = Will you do {0} from any of your registered trading premises?
+businessmatching.updateservice.tradingpremises.summary = Will you do {0} activities from any of your registered trading premises?
 
 businessmatching.updateservice.currenttradingpremises.title = Will you still do this activity from all of your registered trading premises?
 businessmatching.updateservice.currenttradingpremises.heading = Will you still do {0} from all of your registered trading premises?
-
 
 businessmatching.updateservice.whichtradingpremises.title = Which premises will you do these activities from?
 businessmatching.updateservice.whichtradingpremises.heading = Which premises will you do {0} activities from?
@@ -1342,7 +1354,6 @@ businessmatching.updateservice.whatdoyoudohere.list.lbl.02 = Currency exchange
 businessmatching.updateservice.whatdoyoudohere.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
 businessmatching.updateservice.whatdoyoudohere.list.lbl.04 = Cheque cashing (scrap metal dealers)
 businessmatching.updateservice.whatdoyoudohere.list.lbl.05 = Foreign exchange
-
 
 businessmatching.updateservice.addmoreactivities.title = Do you want to add another type of business?
 businessmatching.updateservice.addmoreactivities.heading = Do you want to add another type of business?
@@ -1745,9 +1756,11 @@ responsiblepeople.whomustregister.nopeople = You currently have no responsible p
 responsiblepeople.registeredforvat.title = Is this person registered for VAT with that business?
 responsiblepeople.registeredforvat.heading = Is {0} registered for VAT with that business?
 responsiblepeople.registeredforvat.lbl.vatNumber = VAT registration number
-responsiblepeople.experiencetraining.heading = Does {0} have previous experience in these services?
+responsiblepeople.experiencetraining.heading = Does {0} have experience as {1}?
+responsiblepeople.experiencetraining.heading.multiple = Does {0} have experience in the services you’re registering?
 responsiblepeople.experiencetraining.title = Does this person have previous experience in these services?
-responsiblepeople.experiencetraining.businessactivities = These services include:
+responsiblepeople.experiencetraining.businessactivities = You’re registering the following services:
+responsiblepeople.experiencetraining.cya = You’re registering the following services:
 responsiblepeople.experiencetraining.information.lbl = Describe {0}’s previous experience, including dates and duration
 responsiblepeople.training.heading = Has {0} had training in anti-money laundering or counter-terrorism funding?
 responsiblepeople.training.title = Has this person had training in anti-money laundering or counter-terrorism funding?
@@ -2068,7 +2081,7 @@ hvd.expect.to.receive.title = How do you expect to receive cash payments of €1
 
 hvd.excise.goods.title = Will you be buying or selling duty-suspended excise goods?
 
-hvd.percentage.title = What percentage of your turnover do you expect to come from cash payments of over €10,000?
+hvd.percentage.title = What percentage of your turnover do you expect to come from cash payments of €10,000 or more?
 hvd.percentage.text = If you do not use euros you’ll need to convert the amount to the currency you use.
 hvd.percentage.lbl.01 = 0% to 20%
 hvd.percentage.lbl.02 = 21% to 40%

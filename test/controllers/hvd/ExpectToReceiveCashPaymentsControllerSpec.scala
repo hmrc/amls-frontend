@@ -16,6 +16,7 @@
 
 package controllers.hvd
 
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.HighValueDealing
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.hvd.Hvd
@@ -32,17 +33,15 @@ class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSug
     self =>
     val request = addToken(authRequest)
 
-    val controller = new ExpectToReceiveCashPaymentsController(
-      self.authConnector,
-      mockCacheConnector,
-      mockStatusService,
-      mockServiceFlow
-    )
+    val controller = new ExpectToReceiveCashPaymentsController(SuccessfulAuthAction,
+                                                               mockCacheConnector,
+                                                               mockStatusService,
+                                                               mockServiceFlow)
 
     mockCacheFetch[Hvd](None, Some(Hvd.key))
     mockCacheSave[Hvd]
     mockApplicationStatus(SubmissionReady)
-    mockIsNewActivity(false)
+    mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, Some(ServiceChangeRegister.key))
   }
 
@@ -63,7 +62,7 @@ class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSug
       "display the view when supervised, but in the new service flow" in new Fixture {
 
         mockApplicationStatus(SubmissionDecisionApproved)
-        mockIsNewActivity(true, Some(HighValueDealing))
+        mockIsNewActivityNewAuth(true, Some(HighValueDealing))
 
         val result = controller.get()(request)
 

@@ -17,6 +17,7 @@
 package controllers.renewal
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.{BusinessActivities, _}
 import models.renewal._
 import org.jsoup.Jsoup
@@ -45,7 +46,7 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
     val cacheMap = mock[CacheMap]
 
     lazy val controller = new TotalThroughputController(
-      self.authConnector,
+      SuccessfulAuthAction,
       renewalService,
       dataCacheConnector
     )
@@ -59,11 +60,11 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
     val cache = mock[CacheMap]
 
     when {
-      renewalService.updateRenewal(any())(any(), any(), any())
+      renewalService.updateRenewal(any(),any())(any(), any())
     } thenReturn Future.successful(cache)
 
     when {
-      dataCacheConnector.fetchAll(any(), any())
+      dataCacheConnector.fetchAll(any())(any())
     } thenReturn Future.successful(Some(cache))
 
     setupBusinessMatching(Set(HighValueDealing, MoneyServiceBusiness))
@@ -79,7 +80,7 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
   "The MSB throughput controller" must {
     "return the view with an empty form when no data exists yet" in new Fixture {
 
-      when(renewalService.getRenewal(any(), any(), any()))
+      when(renewalService.getRenewal(any())(any(), any()))
         .thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
@@ -102,7 +103,7 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
 
     "return the view with prepopulated data" in new Fixture {
 
-      when(renewalService.getRenewal(any(), any(), any()))
+      when(renewalService.getRenewal(any())(any(), any()))
         .thenReturn(Future.successful(Some(Renewal(totalThroughput = Some(TotalThroughput("01"))))))
 
       val result = controller.get()(request)
@@ -131,13 +132,13 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
           "throughput" -> "01"
       )
 
-      when(dataCacheConnector.fetchAll(any(), any()))
+      when(dataCacheConnector.fetchAll(any())(any()))
               .thenReturn(Future.successful(Some(cacheMap)))
 
       when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
               .thenReturn(Some(incomingModel))
 
-      when(dataCacheConnector.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
+      when(dataCacheConnector.save[Renewal](any(), eqTo(Renewal.key), eqTo(outgoingModel))(any(), any()))
               .thenReturn(Future.successful(new CacheMap("", Map.empty)))
   }
 
@@ -207,7 +208,7 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
       post() { result =>
         result.header.status mustBe SEE_OTHER
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
-        verify(renewalService).updateRenewal(captor.capture())(any(), any(), any())
+        verify(renewalService).updateRenewal(any(), captor.capture())(any(), any())
         captor.getValue.totalThroughput mustBe Some(TotalThroughput("01"))
       }
     }

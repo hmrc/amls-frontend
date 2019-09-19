@@ -16,27 +16,14 @@
 
 package controllers.bankdetails
 
-import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.bankdetails._
-import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
+import models.status.{SubmissionDecisionApproved, SubmissionReady}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.mockito.ArgumentCaptor
-import org.mockito.Matchers._
-import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import play.api.inject.bind
-import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
-import services.StatusService
-import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
-import uk.gov.hmrc.play.audit.model.DataEvent
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
-
-import scala.concurrent.Future
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
 
@@ -44,15 +31,11 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
 
     val request = addToken(authRequest)
 
-    val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthConnector].to(self.authConnector))
-      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
-      .overrides(bind[StatusService].to(mockStatusService))
-      .overrides(bind[AuditConnector].to(mock[AuditConnector]))
-      .build()
-
-    lazy val controller = injector.instanceOf[BankAccountNameController]
-
+    val controller = new BankAccountNameController(
+      SuccessfulAuthAction,
+      mockCacheConnector,
+      mockStatusService
+    )
   }
 
   val fieldElements = Array("accountName")
@@ -199,6 +182,5 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
         }
       }
     }
-
   }
 }

@@ -16,12 +16,13 @@
 
 package controllers.businessactivities
 
+import controllers.actions.SuccessfulAuthAction
 import generators.businessmatching.BusinessActivitiesGenerator
-import models.businessactivities.{BusinessActivities, DigitalSpreadsheet, Paper, TransactionTypes, DigitalSoftware}
+import models.businessactivities.{BusinessActivities, DigitalSoftware, DigitalSpreadsheet, Paper, TransactionTypes}
 import org.jsoup.Jsoup
 import play.api.test.Helpers._
 import org.scalatest.MustMatchers
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import org.mockito.ArgumentCaptor
 import org.mockito.Mockito.{never, verify}
 import org.mockito.Matchers.{any, eq => eqTo}
@@ -32,7 +33,7 @@ class TransactionTypesControllerSpec extends AmlsSpec
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(authRequest)
-    val controller = new TransactionTypesController(self.authConnector, mockCacheConnector)
+    val controller = new TransactionTypesController(SuccessfulAuthAction, mockCacheConnector)
 
     mockCacheSave[BusinessActivities]
     mockCacheFetch(Some(BusinessActivities()))
@@ -77,7 +78,7 @@ class TransactionTypesControllerSpec extends AmlsSpec
         redirectLocation(result) mustBe Some(controllers.businessactivities.routes.IdentifySuspiciousActivityController.get().url)
 
         val captor = ArgumentCaptor.forClass(classOf[BusinessActivities])
-        verify(mockCacheConnector).save[BusinessActivities](eqTo(BusinessActivities.key), captor.capture())(any(), any(), any())
+        verify(mockCacheConnector).save[BusinessActivities](any(), eqTo(BusinessActivities.key), captor.capture())(any(), any())
 
         captor.getValue.transactionRecordTypes mustBe
           Some(TransactionTypes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("example software"))))
@@ -105,7 +106,7 @@ class TransactionTypesControllerSpec extends AmlsSpec
         status(result) mustBe BAD_REQUEST
         contentAsString(result) must include(messages("businessactivities.do.keep.records"))
 
-        verify(mockCacheConnector, never).save[BusinessActivities](any(), any())(any(), any(), any())
+        verify(mockCacheConnector, never).save[BusinessActivities](any(), any(), any())(any(), any())
       }
     }
   }

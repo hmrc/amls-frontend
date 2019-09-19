@@ -16,6 +16,7 @@
 
 package controllers.msb
 
+import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businessmatching._
 import models.businessmatching.updateservice.ServiceChangeRegister
@@ -30,19 +31,20 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val request = addToken(authRequest)
-    val controller = new SendMoneyToOtherCountryController(mockCacheConnector, self.authConnector, mockStatusService)
+    val controller = new SendMoneyToOtherCountryController(mockCacheConnector, SuccessfulAuthAction, mockStatusService)
+    implicit val ec = app.injector.instanceOf[ExecutionContext]
 
     mockCacheGetEntry[ServiceChangeRegister](None, ServiceChangeRegister.key)
 
     when {
-      mockStatusService.isPreSubmission(any(), any(), any())
+      mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
     } thenReturn Future.successful(true)
 
     val emptyCache = CacheMap("", Map.empty)
@@ -52,8 +54,8 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
     "load the page 'Do you send money to other countries?'" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
+        (any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -62,8 +64,8 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
     "load the page 'Do you send money to other countries?' with pre populated data" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(MoneyServiceBusiness(
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(MoneyServiceBusiness(
         sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true))))))
 
       val result = controller.get()(request)
@@ -92,8 +94,8 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -119,7 +121,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
           CurrencyExchange
         )
       ))
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
@@ -129,8 +131,8 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -170,7 +172,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
         hasChanged = true
       )
 
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
@@ -179,8 +181,8 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(false)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -206,7 +208,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
         hasChanged = true
       )
 
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
@@ -216,8 +218,8 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(false)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -262,7 +264,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
         mockCacheSave[MoneyServiceBusiness]
 
         when {
-          controller.statusService.isPreSubmission(any(), any(), any())
+          controller.statusService.isPreSubmission(any(), any(), any())(any(), any())
         } thenReturn Future.successful(false)
       }
 
@@ -314,7 +316,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
         mockCacheSave[MoneyServiceBusiness]
 
         when {
-          controller.statusService.isPreSubmission(any(), any(), any())
+          controller.statusService.isPreSubmission(any(), any(), any())(any(), any())
         } thenReturn Future.successful(false)
       }
 
@@ -354,7 +356,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
         )
 
         when {
-          controller.statusService.isPreSubmission(any(), any(), any())
+          controller.statusService.isPreSubmission(any(), any(), any())(any(), any())
         } thenReturn Future.successful(false)
 
         mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
@@ -386,7 +388,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
           )
         )
       )
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
@@ -395,8 +397,8 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(false)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -422,7 +424,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
           )
         )
       )
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
@@ -431,8 +433,8 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -450,14 +452,14 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
       val outgoingModel = incomingModel.copy(
         sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false))
       )
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(incomingModel))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
+        (any(), any())).thenReturn(Future.successful(emptyCache))
     }
 
     "on valid post where the value is false in edit mode (CE)" in new FalseInEditModeFixture {
@@ -513,7 +515,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
         hasChanged = true
       )
 
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -522,8 +524,8 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
       when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(incomingModel))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
 
       a[Exception] must be thrownBy {

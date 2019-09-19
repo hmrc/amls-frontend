@@ -26,65 +26,50 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import uk.gov.hmrc.domain.Org
 import uk.gov.hmrc.http.{HeaderCarrier, HttpGet}
-import uk.gov.hmrc.play.frontend.auth.connectors.domain._
-import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser, Principal}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience with AmlsReferenceNumberGenerator {
 
-  val connector = new FeeConnector(
-    http = mock[HttpGet],
-    appConfig = mock[AppConfig]
-  )
+  trait Fixture {
+    val connector = new FeeConnector(
+      http = mock[HttpGet],
+      appConfig = mock[AppConfig])
 
-  val safeId = "SAFEID"
+    val safeId = "SAFEID"
+    val accountTypeId = ("org", "id")
 
-  implicit val hc = HeaderCarrier()
-  implicit val ac = AuthContext(
-    LoggedInUser(
-      "UserName",
-      None,
-      None,
-      None,
-      CredentialStrength.Weak,
-      ConfidenceLevel.L50, ""),
-    Principal(
-      None,
-      Accounts(org = Some(OrgAccount("Link", Org("TestOrgRef"))))),
-    None,
-    None,
-    None, None)
+    implicit val hc = HeaderCarrier()
+
+    when {
+      connector.feePaymentUrl
+    } thenReturn "/amls/feePaymentUrl"
+  }
+
 
   "FeeConnector" must {
 
     val feeResponse = FeeResponse(
-      SubscriptionResponseType,
-      amlsRegistrationNumber,
-      150.00,
-      Some(100.0),
-      None,
-      300.0,
-      550.0,
-      Some("XA000000000000"),
-      None,
-      new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC)
-    )
+      responseType = SubscriptionResponseType,
+      amlsReferenceNumber = amlsRegistrationNumber,
+      registrationFee = 150.00,
+      fpFee = Some(100.0),
+      approvalCheckFee = None,
+      premiseFee = 300.0,
+      totalFees = 550.0,
+      paymentReference = Some("XA000000000000"),
+      difference = None,
+      createdAt = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC))
 
-    "successfully receive feeResponse" in {
-
-      when {
-        connector.feePaymentUrl
-      } thenReturn "/amls/feePaymentUrl"
+    "successfully receive feeResponse" in new Fixture {
 
       when {
-        connector.http.GET[FeeResponse](eqTo(s"${connector.feePaymentUrl}/org/TestOrgRef/$amlsRegistrationNumber"))(any(),any(), any())
+        connector.http.GET[FeeResponse](eqTo(s"${connector.feePaymentUrl}/org/id/$amlsRegistrationNumber"))(any(),any(), any())
       } thenReturn Future.successful(feeResponse)
 
-      whenReady(connector.feeResponse(amlsRegistrationNumber)){
+      whenReady(connector.feeResponse(amlsRegistrationNumber, accountTypeId)){
         _ mustBe feeResponse
       }
     }

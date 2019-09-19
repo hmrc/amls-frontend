@@ -21,33 +21,30 @@ import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
 import javax.inject.{Inject, Singleton}
 import services.{PaymentsService, StatusService}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
-class RetryPaymentController @Inject()(
-                                            val authConnector: AuthConnector,
-                                            private[controllers] implicit val dataCacheConnector: DataCacheConnector,
-                                            private[controllers] implicit val amlsConnector: AmlsConnector,
-                                            private[controllers] implicit val statusService: StatusService,
-                                            private[controllers] val paymentsService: PaymentsService
-                                          ) extends BaseController {
+class RetryPaymentController @Inject()(authAction: AuthAction,
+                                       private[controllers] implicit val dataCacheConnector: DataCacheConnector,
+                                       private[controllers] implicit val amlsConnector: AmlsConnector,
+                                       private[controllers] implicit val statusService: StatusService,
+                                       private[controllers] val paymentsService: PaymentsService) extends DefaultBaseController {
 
-  def retryPayment = Authorised.async {
-    implicit authContext =>
+  def retryPayment = authAction.async {
       implicit request =>
         val result = for {
           form <- OptionT.fromOption[Future](request.body.asFormUrlEncoded)
           paymentRef <- OptionT.fromOption[Future](form("paymentRef").headOption)
-          oldPayment <- OptionT(amlsConnector.getPaymentByPaymentReference(paymentRef))
+          oldPayment <- OptionT(amlsConnector.getPaymentByPaymentReference(paymentRef, request.accountTypeId))
           nextUrl <- OptionT.liftF(paymentsService.paymentsUrlOrDefault(
             paymentRef,
             oldPayment.amountInPence.toDouble / 100,
             controllers.routes.PaymentConfirmationController.paymentConfirmation(paymentRef).url,
             oldPayment.amlsRefNo,
-            oldPayment.safeId))
+            oldPayment.safeId, request.accountTypeId))
         } yield Redirect(nextUrl.value)
 
         result getOrElse InternalServerError("Unable to retry payment due to a failure")
