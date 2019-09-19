@@ -29,6 +29,7 @@ import models.flowmanagement.AddBusinessTypeFlowModel
 import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import models.tradingpremises.TradingPremises
+import play.api.i18n.Messages
 import services.{ResponsiblePeopleService, TradingPremisesService}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, RepeatingSection, StatusConstants}
@@ -144,5 +145,12 @@ class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
 
   def clearFlowModel(credId: String)(implicit hc: HeaderCarrier): OptionT[Future, AddBusinessTypeFlowModel] =
     OptionT(dataCacheConnector.update[AddBusinessTypeFlowModel](credId, AddBusinessTypeFlowModel.key)(_ => AddBusinessTypeFlowModel()))
+
+  def prefixedActivities(businessMatching: BusinessMatching)(implicit messages: Messages) =
+    businessMatching.prefixedAlphabeticalBusinessTypes(true) match {
+    case Some(activities) if activities.size == 1 => Set(activities.head)
+    case Some(_) => businessMatching.alphabeticalBusinessActivitiesLowerCase().getOrElse(Set.empty[String]).toSet
+    case _ => Set.empty[String]
+  }
 
 }

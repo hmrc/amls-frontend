@@ -102,12 +102,12 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
           document.select("input[value=07]").hasAttr("checked") must be(false)
 
           html must include(Messages("businessactivities.registerservices.servicename.lbl.01"))
-          html must include(Messages("businessactivities.registerservices.servicename.lbl.02"))
           html must include(Messages("businessactivities.registerservices.servicename.lbl.03"))
           html must include(Messages("businessactivities.registerservices.servicename.lbl.04"))
           html must include(Messages("businessactivities.registerservices.servicename.lbl.05"))
           html must include(Messages("businessactivities.registerservices.servicename.lbl.06"))
           html must include(Messages("businessactivities.registerservices.servicename.lbl.07"))
+          html must include(Messages("businessactivities.registerservices.servicename.lbl.08"))
 
         }
 

@@ -16,11 +16,14 @@
 
 @import include._
 @import utils.Strings._
-@import config.{ApplicationConfig => appConfig, CachedStaticHtmlPartialProvider}
+@import config.{ApplicationConfig => appConfig}
+@import uk.gov.hmrc.play.views.html.{helpers => uiHelpers}
 
-@(errorMessage: String)(implicit request: Request[_], m: Messages,partialProvider: CachedStaticHtmlPartialProvider)
+@(errorMessage: String)(implicit request: Request[_], m: Messages)
 
-@getHelpForm = @{partialProvider.getPartialContent(appConfig.reportAProblemUrl)}
+@getHelpForm = {
+    @{uiHelpers.reportAProblemLink(config.ApplicationConfig.reportAProblemPartialUrl, config.ApplicationConfig.reportAProblemNonJSUrl)}
+}
 
 @header = {
     @heading("error.submission.duplicate.title")

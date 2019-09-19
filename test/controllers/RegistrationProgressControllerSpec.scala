@@ -328,8 +328,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
             Seq(
               "businessmatching.registerservices.servicename.lbl.01",
-              "businessmatching.registerservices.servicename.lbl.02",
-              "businessmatching.registerservices.servicename.lbl.03"
+              "businessmatching.registerservices.servicename.lbl.03",
+              "businessmatching.registerservices.servicename.lbl.04"
             ) foreach { msg =>
               contentAsString(responseF) must include(Messages(msg))
             }

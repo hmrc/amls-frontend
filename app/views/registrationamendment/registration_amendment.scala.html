@@ -49,7 +49,7 @@
     </div>
 
     @* Sidebar *@
-    @services_sidebar(canEditPreApplication, displayLink = true, businessName, serviceNames)
+    @services_sidebar(canEditPreApplication, displayLink = true, businessName, serviceNames.toList.sorted)
 
     <div class="grid-layout grid-layout--stacked">
         <h2 class="heading-medium">Sections</h2>

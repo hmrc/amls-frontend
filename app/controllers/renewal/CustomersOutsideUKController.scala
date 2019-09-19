@@ -23,7 +23,7 @@ import javax.inject.{Inject, Singleton}
 import models.businessmatching._
 import models.renewal.{CustomersOutsideUK, Renewal}
 import services.{AutoCompleteService, RenewalService}
-import utils.AuthAction
+import utils.{AuthAction, ControllerHelper}
 import views.html.renewal._
 
 import scala.concurrent.Future
@@ -51,7 +51,7 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
       implicit request =>
         Form2[CustomersOutsideUK](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(customers_outside_uk(f, edit, autoCompleteService.getCountries)))
+            Future.successful(BadRequest(customers_outside_uk(alignFormDataWithValidationErrors(f), edit, autoCompleteService.getCountries)))
           case ValidForm(_, data) => {
             dataCacheConnector.fetchAll(request.credId).flatMap { optionalCache =>
               (for {
@@ -75,6 +75,8 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
         }
   }
 
+  def alignFormDataWithValidationErrors(form: InvalidForm): InvalidForm =
+    ControllerHelper.stripEmptyValuesFromFormWithArray(form, "countries", index => index / 2)
 }
 
 

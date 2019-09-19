@@ -80,7 +80,7 @@
     </div>
 
     <div class="grid-layout grid-layout--stacked">
-        @services_sidebar(canEditPreApplication = false, displayLink = false, businessName, serviceNames)
+        @services_sidebar(canEditPreApplication = false, displayLink = false, businessName, serviceNames.toList.sorted)
     </div>
 
     <div class="grid-layout grid-layout--stacked">

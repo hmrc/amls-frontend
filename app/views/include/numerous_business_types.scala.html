@@ -14,17 +14,14 @@
  * limitations under the License.
  *@
 
-@import include.main
-@import include._
+@import include.forms2._
 
-@(title: String, text: String, message: String)(implicit request: Request[_],m:Messages)
-@header = {
- <h1 class="heading-xlarge error-page-margin">@Messages(text)</h1>
-}
+@(existingActivities: Seq[String])(implicit m: Messages)
 
-@main(
- title = title,
- heading = header
-) {
- <p>@message</p>
-}
+  @if(existingActivities.size == 2) {
+      <p>@Messages("businessmatching.updateservice.removeactivities.summary.twobusinesses")</p>
+      <p>@Messages("businessmatching.updateservice.removeactivities.list.heading.twobusinesses")</p>
+  } else {
+      <p>@Messages("businessmatching.updateservice.removeactivities.summary.multibusinesses")</p>
+      <p>@Messages("businessmatching.updateservice.removeactivities.list.heading.multibusinesses")</p>
+  }

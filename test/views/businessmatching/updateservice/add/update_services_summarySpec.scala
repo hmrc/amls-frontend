@@ -73,7 +73,7 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers with Updat
 
         def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
 
-        doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.02"))
+        doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.03"))
       }
 
       "show EstateAgentBusinessService if present" in new ViewFixture {
@@ -81,7 +81,7 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers with Updat
 
         def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
 
-        doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.03"))
+        doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.04"))
       }
 
       "show HighValueDealing if present" in new ViewFixture {
@@ -89,7 +89,7 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers with Updat
 
         def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
 
-        doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.04"))
+        doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.05"))
       }
 
       "show MoneyServiceBusiness if present" in new ViewFixture {
@@ -97,7 +97,7 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers with Updat
 
         def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
 
-        doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.05"))
+        doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.06"))
       }
 
       "show TrustAndCompanyServices if present" in new ViewFixture {
@@ -105,7 +105,7 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers with Updat
 
         def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
 
-        doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.06"))
+        doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.07"))
       }
 
       "show TelephonePaymentService if present" in new ViewFixture {
@@ -113,7 +113,7 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers with Updat
 
         def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
 
-        doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.07"))
+        doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.08"))
       }
     }
   }
@@ -255,7 +255,7 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers with Updat
 
     "for have any of your responsible people have passed the HMRC fit and proper test" must {
       "have a question title" in new MSBViewFixture {
-        doc.body().text must include(Messages("businessmatching.updateservice.fitandproper.heading", Messages("businessmatching.registerservices.servicename.lbl.05")))
+        doc.body().text must include(Messages("businessmatching.updateservice.fitandproper.heading", Messages("businessmatching.registerservices.servicename.lbl.06")))
         doc.getElementById("fit-and-proper").text mustBe Messages("lbl.yes")
       }
 
@@ -314,7 +314,7 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers with Updat
 
   "for will you do this business type at trading premises" must {
     "have a question title" in new MSBViewFixture {
-      doc.body().text must include(Messages("businessmatching.updateservice.tradingpremises.summary", Messages("businessmatching.registerservices.servicename.lbl.05.phrased")))
+      doc.body().text must include(Messages("businessmatching.updateservice.tradingpremises.summary", Messages("businessmatching.registerservices.servicename.lbl.06.phrased")))
     }
 
     "show edit link" in new MSBViewFixture {
@@ -333,7 +333,7 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers with Updat
 
   "if doing business type at trading premises, for which premises will you do this business type from" must {
     "have a question title" in new MSBAllViewFixture {
-      doc.body().text must include(Messages("businessmatching.updateservice.whichtradingpremises.summary", Messages("businessmatching.registerservices.servicename.lbl.05.phrased")))
+      doc.body().text must include(Messages("businessmatching.updateservice.whichtradingpremises.summary", Messages("businessmatching.registerservices.servicename.lbl.06.phrased")))
     }
 
     "show edit link" in new MSBAllViewFixture {

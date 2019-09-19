@@ -181,7 +181,9 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
 
     "return a bad request" when {
       "the form fails validation" in new FormSubmissionFixture {
-        val result = controller.post()(request)
+        val newRequest = request.withFormUrlEncodedBody("currencies[0]" -> "1dfasdffds")
+
+        val result = controller.post()(newRequest)
 
         status(result) mustBe BAD_REQUEST
         verify(renewalService, never()).updateRenewal(any(),any())(any(), any())

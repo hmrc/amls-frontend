@@ -36,6 +36,8 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   private def getConfigString(key: String) = getConfString(key, throw new Exception(s"Could not find config '$key'"))
   private def getConfigInt(key: String) = getConfInt(key, throw new Exception(s"Could not find config '$key'"))
 
+  val contactFormServiceIdentifier = "AMLS"
+
   lazy val contactHost = baseUrl("contact-frontend")
   lazy val authHost = baseUrl("auth")
   lazy val assetsPrefix = getConfigString(s"assets.url") + getConfigString(s"assets.version")
@@ -46,7 +48,8 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   lazy val betaFeedbackUrl = (if (env == "Prod") "" else contactHost) + getConfigString("contact-frontend.beta-feedback-url.authenticated")
   lazy val betaFeedbackUnauthenticatedUrl = (if (env == "Prod") "" else contactHost) + getConfigString("contact-frontend.beta-feedback-url.unauthenticated")
 
-  lazy val reportAProblemUrl = contactHost + getConfigString("contact-frontend.report-a-problem-url")
+  val reportAProblemPartialUrl = s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
+  val reportAProblemNonJSUrl = s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
 
   lazy val loginUrl = getConfigString("login.url")
   lazy val logoutUrl = getConfigString("logout.url")

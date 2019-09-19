@@ -36,13 +36,13 @@ class UnableToRemoveBusinessTypesController @Inject()(authAction: AuthAction,
   def get = authAction.async {
       implicit request =>
       getBusinessActivity(request.credId) map {
-        case activity => Ok(unable_to_remove_activity(activity.getMessage(true)))
+        case activity => Ok(unable_to_remove_activity(activity))
       } getOrElse (InternalServerError("Get: Unable to show Unable to Remove Activities page"))
   }
 
-  private def getBusinessActivity(credId: String)(implicit hc: HeaderCarrier): OptionT[Future, BusinessActivity] = for {
+  private def getBusinessActivity(credId: String)(implicit hc: HeaderCarrier) = for {
     model <- OptionT(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
-    activities <- OptionT.fromOption[Future](model.activities)
-  } yield activities.businessActivities.head
+    activities <- OptionT.fromOption[Future](model.alphabeticalBusinessActivitiesLowerCase(false))
+  } yield activities.head
 
 }

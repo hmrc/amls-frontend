@@ -51,8 +51,7 @@ class WhichCurrenciesController @Inject() (authAction: AuthAction,
     implicit request => {
       Form2[WhichCurrencies](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.msb.which_currencies(
-            alignFormDataWithValidationErrors(f), edit)))
+          Future.successful(BadRequest(views.html.msb.which_currencies(alignFormDataWithValidationErrors(f), edit)))
         case ValidForm(_, data: WhichCurrencies) =>
               for {
                 msb <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)

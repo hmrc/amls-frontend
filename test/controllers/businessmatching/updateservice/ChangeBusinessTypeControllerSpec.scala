@@ -48,7 +48,8 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
       mockCacheConnector,
       bmService,
       createRouter[ChangeBusinessType],
-      mock[RemoveBusinessTypeHelper]
+      mock[RemoveBusinessTypeHelper],
+      mock[AddBusinessTypeHelper]
     )
 
     val businessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
@@ -64,13 +65,16 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
     when {
       controller.helper.removeFlowData(any())(any(), any())
     } thenReturn OptionT.some[Future, RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel())
-
   }
 
   "ChangeServicesController" when {
 
     "get is called" must {
       "return OK with change_services view" in new Fixture {
+
+        when {
+          controller.addHelper.prefixedActivities(any())(any())
+        } thenReturn Set.empty[String]
 
         val result = controller.get()(request)
 
@@ -80,6 +84,11 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
       }
 
       "return OK with change_services view - no activities" in new Fixture {
+
+        when {
+          controller.addHelper.prefixedActivities(any())(any())
+        } thenReturn Set.empty[String]
+
         when {
           bmService.getRemainingBusinessActivities(any())(any(), any())
         } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set.empty)
@@ -118,6 +127,10 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
 
       "return BAD_REQUEST" when {
         "request is invalid" in new Fixture {
+          when {
+            controller.addHelper.prefixedActivities(any())(any())
+          } thenReturn Set.empty[String]
+
           val result = controller.post()(request)
           status(result) must be(BAD_REQUEST)
         }

@@ -80,16 +80,16 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
         val result = controller.get()(request)
 
-        val expectedSpecialCase: String = Messages("businessmatching.registerservices.servicename.lbl.07")
+        val expectedSpecialCase: String = Messages("businessmatching.registerservices.servicename.lbl.08")
 
         status(result) must be(OK)
         contentAsString(result) must include(s"an ${Messages("businessmatching.registerservices.servicename.lbl.01").toLowerCase}")
-        contentAsString(result) must include(s"a ${Messages("businessmatching.registerservices.servicename.lbl.02").toLowerCase}")
-        contentAsString(result) must include(s"an ${Messages("businessmatching.registerservices.servicename.lbl.03").toLowerCase}")
-        contentAsString(result) must include(s"a ${Messages("businessmatching.registerservices.servicename.lbl.04").toLowerCase}")
+        contentAsString(result) must include(s"a ${Messages("businessmatching.registerservices.servicename.lbl.03").toLowerCase}")
+        contentAsString(result) must include(s"an ${Messages("businessmatching.registerservices.servicename.lbl.04").toLowerCase}")
         contentAsString(result) must include(s"a ${Messages("businessmatching.registerservices.servicename.lbl.05").toLowerCase}")
-        contentAsString(result) must include(s"a ${expectedSpecialCase(0).toLower}")
         contentAsString(result) must include(s"a ${Messages("businessmatching.registerservices.servicename.lbl.06").toLowerCase}")
+        contentAsString(result) must include(s"a ${expectedSpecialCase(0).toLower}")
+        contentAsString(result) must include(s"a ${Messages("businessmatching.registerservices.servicename.lbl.07").toLowerCase}")
       }
   }
 

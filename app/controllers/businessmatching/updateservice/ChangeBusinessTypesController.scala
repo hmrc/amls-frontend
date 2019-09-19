@@ -39,7 +39,8 @@ class ChangeBusinessTypesController @Inject()(authAction: AuthAction,
                                               implicit val dataCacheConnector: DataCacheConnector,
                                               val businessMatchingService: BusinessMatchingService,
                                               val router: Router[ChangeBusinessType],
-                                              val helper: RemoveBusinessTypeHelper) extends AmlsBaseController(ds) with RepeatingSection {
+                                              val helper: RemoveBusinessTypeHelper,
+                                              val addHelper: AddBusinessTypeHelper) extends AmlsBaseController(ds) with RepeatingSection {
 
   def get() = authAction.async {
       implicit request =>
@@ -71,7 +72,8 @@ class ChangeBusinessTypesController @Inject()(authAction: AuthAction,
     businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
     remainingActivities <- businessMatchingService.getRemainingBusinessActivities(credId)
   } yield {
-    val existing = businessMatching.activities.fold(Set.empty[String])(_.businessActivities.map(_.getMessage()))
+    val existing = addHelper.prefixedActivities(businessMatching)
+
     val existingSorted = SortedSet[String]() ++ existing
     val remainingActivitiesSorted = SortedSet[String]() ++ remainingActivities
 

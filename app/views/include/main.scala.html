@@ -16,7 +16,7 @@
 
 @import config.{ApplicationConfig => appConfig, CachedStaticHtmlPartialProvider}
 @import layouts.{govuk_template => hmrcGovUkTemplate}
-@import uk.gov.hmrc.play.views.html.{layouts => uiLayouts}
+@import uk.gov.hmrc.play.views.html.{layouts => uiLayouts, helpers => uiHelpers}
 
 @(
     title: String,
@@ -31,7 +31,7 @@
     userLoggedIn : Boolean = true,
     heading: Html = HtmlFormat.empty,
     showGetHelpForm: Boolean = true
-)(mainContent: Html = HtmlFormat.empty)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
+)(mainContent: Html = HtmlFormat.empty)(implicit request: Request[_],m:Messages)
 
 @styles = {
     <link href="@routes.Assets.versioned("jquery-ui.css")" rel="stylesheet"/>
@@ -103,7 +103,10 @@
     )
 }
 
-@getHelpForm = @{partialProvider.getPartialContent(appConfig.reportAProblemUrl)}
+@getHelpForm = {
+    @{uiHelpers.reportAProblemLink(config.ApplicationConfig.reportAProblemPartialUrl, config.ApplicationConfig.reportAProblemNonJSUrl)}
+}
+
 
 @content = {
     <main id="wrapper" role="main">

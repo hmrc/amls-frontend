@@ -48,7 +48,8 @@ class SelectBusinessTypeControllerSpec extends AmlsSpec {
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       businessMatchingService = mockBusinessMatchingService,
-      router = createRouter[AddBusinessTypeFlowModel]
+      router = createRouter[AddBusinessTypeFlowModel],
+      addHelper = mock[AddBusinessTypeHelper]
     )
 
     when {
@@ -65,6 +66,10 @@ class SelectBusinessTypeControllerSpec extends AmlsSpec {
 
     mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(responsiblePersonGen.sample.get)), Some(ResponsiblePerson.key))
     mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel())
+
+    when {
+      controller.addHelper.prefixedActivities(any())(any())
+    } thenReturn Set.empty[String]
   }
 
   "SelectActivitiesController" when {

@@ -20,7 +20,7 @@
 @import utils.HtmlElementHelpers._
 
 
-@(f: forms.Form2[_], existing: Set[String])(implicit request: Request[_], m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
+@(f: forms.Form2[_], existing: List[String])(implicit request: Request[_], m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
 
 @header = {
     @components.back_link()

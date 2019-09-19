@@ -24,7 +24,7 @@ import models.businessmatching._
 import models.renewal.{MostTransactions, Renewal}
 import play.api.mvc.Result
 import services.{AutoCompleteService, RenewalService}
-import utils.AuthAction
+import utils.{AuthAction, ControllerHelper}
 
 import scala.concurrent.Future
 
@@ -52,7 +52,7 @@ class MostTransactionsController @Inject()(val authAction: AuthAction,
       implicit request =>
         Form2[MostTransactions](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.renewal.most_transactions(f, edit, autoCompleteService.getCountries)))
+            Future.successful(BadRequest(views.html.renewal.most_transactions(alignFormDataWithValidationErrors(f), edit, autoCompleteService.getCountries)))
           case ValidForm(_, data) =>
             cache.fetchAll(request.credId).flatMap {
               optMap =>
@@ -73,6 +73,10 @@ class MostTransactionsController @Inject()(val authAction: AuthAction,
             }
         }
   }
+
+  def alignFormDataWithValidationErrors(form: InvalidForm): InvalidForm =
+    ControllerHelper.stripEmptyValuesFromFormWithArray(form, "mostTransactionsCountries", index => index / 2)
+
 
   private def redirectTo(services: Set[BusinessMatchingMsbService], businessActivities: Set[BusinessActivity]): Result = {
       (services, businessActivities) match {

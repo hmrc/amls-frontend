@@ -21,7 +21,6 @@ import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, Unincorpora
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.api.i18n.Messages
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.ControllerHelper
 
 case class BusinessMatching(
                              reviewDetails: Option[ReviewDetails] = None,
@@ -112,12 +111,13 @@ case class BusinessMatching(
     activities map { a =>
       a.businessActivities.map {
         case AccountancyServices => Messages("businessmatching.registerservices.servicename.lbl.01")
-        case BillPaymentServices => Messages("businessmatching.registerservices.servicename.lbl.02")
-        case EstateAgentBusinessService => Messages("businessmatching.registerservices.servicename.lbl.03")
-        case HighValueDealing => Messages("businessmatching.registerservices.servicename.lbl.04")
-        case MoneyServiceBusiness => Messages("businessmatching.registerservices.servicename.lbl.05")
-        case TrustAndCompanyServices => Messages("businessmatching.registerservices.servicename.lbl.06")
-        case TelephonePaymentService => Messages("businessmatching.registerservices.servicename.lbl.07")
+        case ArtMarketParticipant => Messages("businessmatching.registerservices.servicename.lbl.02")
+        case BillPaymentServices => Messages("businessmatching.registerservices.servicename.lbl.03")
+        case EstateAgentBusinessService => Messages("businessmatching.registerservices.servicename.lbl.04")
+        case HighValueDealing => Messages("businessmatching.registerservices.servicename.lbl.05")
+        case MoneyServiceBusiness => Messages("businessmatching.registerservices.servicename.lbl.06")
+        case TrustAndCompanyServices => Messages("businessmatching.registerservices.servicename.lbl.07")
+        case TelephonePaymentService => Messages("businessmatching.registerservices.servicename.lbl.08")
       }.toList.sorted
     }
   }
@@ -126,13 +126,14 @@ case class BusinessMatching(
     activities map { a =>
       a.businessActivities.map {
         case AccountancyServices => Messages("businessactivities.registerservices.servicename.lbl.01")
-        case BillPaymentServices => Messages("businessactivities.registerservices.servicename.lbl.02")
-        case EstateAgentBusinessService if estateAgent => Messages("businessactivities.registerservices.servicename.lbl.03.agent")
-        case EstateAgentBusinessService => Messages("businessactivities.registerservices.servicename.lbl.03")
-        case HighValueDealing => Messages("businessactivities.registerservices.servicename.lbl.04")
-        case MoneyServiceBusiness => Messages("businessactivities.registerservices.servicename.lbl.05")
-        case TrustAndCompanyServices => Messages("businessactivities.registerservices.servicename.lbl.06")
-        case TelephonePaymentService => Messages("businessactivities.registerservices.servicename.lbl.07")
+        case ArtMarketParticipant => Messages("businessactivities.registerservices.servicename.lbl.02")
+        case BillPaymentServices => Messages("businessactivities.registerservices.servicename.lbl.03")
+        case EstateAgentBusinessService if estateAgent => Messages("businessactivities.registerservices.servicename.lbl.04.agent")
+        case EstateAgentBusinessService => Messages("businessactivities.registerservices.servicename.lbl.04")
+        case HighValueDealing => Messages("businessactivities.registerservices.servicename.lbl.05")
+        case MoneyServiceBusiness => Messages("businessactivities.registerservices.servicename.lbl.06")
+        case TrustAndCompanyServices => Messages("businessactivities.registerservices.servicename.lbl.07")
+        case TelephonePaymentService => Messages("businessactivities.registerservices.servicename.lbl.08")
       }.toList.sorted
     }
   }
