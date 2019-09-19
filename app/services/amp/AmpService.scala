@@ -42,8 +42,7 @@ class AmpService @Inject()(cacheConnector: DataCacheConnector)
 
     for {
       existing <- cacheConnector.fetch[Amp](credId, Amp.key)
-      result   <- cacheConnector.save[Amp](credId, Amp.key, existing.getOrElse(Amp(credId)).data(ampData)
-      )
+      result   <- cacheConnector.save[Amp](credId, Amp.key, existing.getOrElse(Amp(credId)).data(ampData))
     } yield result
   }
 }
