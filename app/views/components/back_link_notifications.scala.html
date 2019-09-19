@@ -16,8 +16,10 @@
 
 @()(implicit messages: Messages)
 
-@components.back_link()
+<div class="js-visible">
+ <a id="back-link" class="link-back" href="javascript:history.back()">@messages("site.back")</a>
+</div>
 
 <noscript>
- <a href="@controllers.routes.NotificationController.getMessages().url" class="link-back">Back</a>
+ <a href="@controllers.routes.NotificationController.getMessages().url" id="back-link" class="link-back">Back</a>
 </noscript>
