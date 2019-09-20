@@ -24,8 +24,8 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AmpService @Inject()(cacheConnector: DataCacheConnector)
-                          (implicit ec: ExecutionContext){
+class AmpCacheService @Inject()(cacheConnector: DataCacheConnector)
+                               (implicit ec: ExecutionContext){
 
   def get(credId: String)(implicit hc: HeaderCarrier): Future[Option[JsValue]] = {
     for {

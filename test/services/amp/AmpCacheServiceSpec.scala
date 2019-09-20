@@ -39,7 +39,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AmpServiceSpec extends AmlsSpec with MockitoSugar
+class AmpCacheServiceSpec extends AmlsSpec with MockitoSugar
   with ScalaFutures
   with IntegrationPatience {
 
@@ -67,7 +67,7 @@ class AmpServiceSpec extends AmlsSpec with MockitoSugar
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val request = addToken(authRequest)
-    val svc = new AmpService(mockCacheConnector)
+    val svc = new AmpCacheService(mockCacheConnector)
   }
 
   "get" when {

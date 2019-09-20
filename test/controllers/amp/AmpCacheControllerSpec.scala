@@ -25,7 +25,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers._
-import services.amp.AmpService
+import services.amp.AmpCacheService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
 import org.mockito.Matchers._
@@ -33,7 +33,7 @@ import play.api.test.FakeRequest
 
 import scala.concurrent.Future
 
-class AmpControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class AmpCacheControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   val dateVal = LocalDateTime.now
 
@@ -55,22 +55,22 @@ class AmpControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self =>
-    val request      = addToken(authRequest)
-    val ampService   = mock[AmpService]
-    val controller   = app.injector.instanceOf[AmpController]
-    val mockCacheMap = mock[CacheMap]
-    val credId       = "someId"
+    val request         = addToken(authRequest)
+    val ampCacheService = mock[AmpCacheService]
+    val controller      = app.injector.instanceOf[AmpCacheController]
+    val mockCacheMap    = mock[CacheMap]
+    val credId          = "someId"
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .overrides(bind[AmpService].to(ampService))
+      .overrides(bind[AmpCacheService].to(ampCacheService))
       .build()
   }
 
   "get returns 200" when {
     "no amp section in cache" in new Fixture {
-      when(ampService.get(any())(any())).thenReturn(Future.successful(Some(Json.obj())))
+      when(ampCacheService.get(any())(any())).thenReturn(Future.successful(Some(Json.obj())))
 
       val result = controller.get(credId)(request)
       status(result) must be(OK)
@@ -80,7 +80,7 @@ class AmpControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
     }
 
     "amp section in cache" in new Fixture {
-      when(ampService.get(any())(any())).thenReturn(Future.successful(Some(completeJson)))
+      when(ampCacheService.get(any())(any())).thenReturn(Future.successful(Some(completeJson)))
 
       val result = controller.get(credId)(request)
       status(result) must be(OK)
@@ -96,7 +96,7 @@ class AmpControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
         .withHeaders(CONTENT_TYPE -> "application/json")
         .withBody[JsValue](completeJson)
 
-      when(ampService.set(any(), any())(any())).thenReturn(Future.successful(mockCacheMap))
+      when(ampCacheService.set(any(), any())(any())).thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.set(credId)(postRequest)
       status(result) must be(OK)
