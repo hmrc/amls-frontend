@@ -33,7 +33,7 @@ import play.api.test.FakeRequest
 
 import scala.concurrent.Future
 
-class AmpCacheControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class AmpControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   val dateVal = LocalDateTime.now
 
@@ -57,7 +57,7 @@ class AmpCacheControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
     self =>
     val request         = addToken(authRequest)
     val ampCacheService = mock[AmpCacheService]
-    val controller      = app.injector.instanceOf[AmpCacheController]
+    val controller      = app.injector.instanceOf[AmpController]
     val mockCacheMap    = mock[CacheMap]
     val credId          = "someId"
 

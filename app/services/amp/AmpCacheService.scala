@@ -29,8 +29,8 @@ class AmpCacheService @Inject()(cacheConnector: DataCacheConnector)
 
   def get(credId: String)(implicit hc: HeaderCarrier): Future[Option[JsValue]] = {
     for {
-      r <- cacheConnector.fetch[Amp](credId, Amp.key)
-    } yield r match {
+      amp <- cacheConnector.fetch[Amp](credId, Amp.key)
+    } yield amp match {
       case Some(amp) => Some(Json.toJson(amp))
       case _ => None
     }

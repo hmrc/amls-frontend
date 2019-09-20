@@ -16,15 +16,21 @@
 
 package controllers.amp
 
+import cats.data.OptionT
+import cats.implicits._
+import connectors.DataCacheConnector
 import controllers.DefaultBaseController
 import javax.inject.Inject
-import services.amp.AmpCacheService
-import utils.AuthAction
+import models.amp.Amp
 import play.api.libs.json._
 import play.api.mvc.Action
+import services.amp.AmpCacheService
+import utils.AuthAction
 
-class AmpCacheController @Inject()(ampCacheService: AmpCacheService,
-                                   authAction     : AuthAction) extends DefaultBaseController {
+
+class AmpController @Inject()(ampCacheService: AmpCacheService,
+                              authAction     : AuthAction,
+                              cacheConnector : DataCacheConnector) extends DefaultBaseController {
 
   def get(credId: String) = Action.async {
     implicit request => {
@@ -42,5 +48,13 @@ class AmpCacheController @Inject()(ampCacheService: AmpCacheService,
         }
       }
     }
+  }
+
+  def accept = authAction.async {
+    implicit request =>
+      (for {
+        amp <- OptionT(cacheConnector.fetch[Amp](request.credId, Amp.key))
+        _ <- OptionT.liftF(cacheConnector.save[Amp](request.credId, Amp.key, amp.copy(hasAccepted = true)))
+      } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Could not update AMP")
   }
 }

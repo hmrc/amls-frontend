@@ -1,3 +1,3 @@
 
-GET         /get/:credId       @controllers.amp.AmpCacheController.get(credId: String)
-PUT         /set/:credId       @controllers.amp.AmpCacheController.set(credId: String)
+GET         /get/:credId       @controllers.amp.AmpController.get(credId: String)
+PUT         /set/:credId       @controllers.amp.AmpController.set(credId: String)
