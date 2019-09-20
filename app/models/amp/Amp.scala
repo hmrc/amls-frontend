@@ -51,33 +51,29 @@ final case class Amp(_id: String,
   private def get[A](path: JsPath)(implicit rds: Reads[A]): Option[A] =
     Reads.optionNoError(Reads.at(path)).reads(data).getOrElse(None)
 
-  private def isDefinedAt(path: JsPath): Boolean = {
-    get[JsValue](path).isDefined
-  }
-
   private def valueAt(path: JsPath): String = {
-    get[JsValue](path).getOrElse("").toString().toLowerCase()
+    get[JsValue](path).getOrElse("null").toString().toLowerCase()
   }
 
   private def isTypeOfParticipantComplete: Boolean = {
-    isDefinedAt(typeOfParticipant) &&
+    valueAt(typeOfParticipant) != "null" &&
       ((valueAt(typeOfParticipant).contains(otherTypeOfParticipant) &&
-        isDefinedAt(typeOfParticipantDetail)) ||
+        valueAt(typeOfParticipantDetail) != "null") ||
         (!valueAt(typeOfParticipant).contains(otherTypeOfParticipant)))
   }
 
   private def isBoughtOrSoldOverThresholdComplete: Boolean = {
-    isDefinedAt(boughtOrSoldOverThreshold) &&
+    valueAt(boughtOrSoldOverThreshold) != "null" &&
       ((valueAt(boughtOrSoldOverThreshold) == "true" &&
-        isDefinedAt(dateTransactionOverThreshold)) ||
+        valueAt(dateTransactionOverThreshold) != "null") ||
         (valueAt(boughtOrSoldOverThreshold) == "false"))
   }
 
   def isComplete: Boolean = {
     isTypeOfParticipantComplete &&
     isBoughtOrSoldOverThresholdComplete &&
-    isDefinedAt(identifyLinkedTransactions) &&
-    isDefinedAt(percentageExpectedTurnover)
+    valueAt(identifyLinkedTransactions) != "null" &&
+    valueAt(percentageExpectedTurnover) != "null"
   }
 }
 
@@ -96,7 +92,7 @@ object Amp extends ServicesConfig {
     val notStarted = Section(key, NotStarted, false, generateRedirect(ampWhatYouNeedUrl))
     cache.getEntry[Amp](key).fold(notStarted) {
       model =>
-        if (model.isComplete) {
+        if (model.isComplete && model.hasAccepted) {
           Section(key, Completed, model.hasChanged, generateRedirect(ampSummeryUrl))
         } else {
           Section(key, Started, model.hasChanged, generateRedirect(ampWhatYouNeedUrl))
