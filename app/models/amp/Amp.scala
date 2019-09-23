@@ -47,33 +47,34 @@ final case class Amp(_id: String,
   val dateTransactionOverThreshold = JsPath \ "dateTransactionOverThreshold"
   val percentageExpectedTurnover   = JsPath \ "percentageExpectedTurnover"
   val otherTypeOfParticipant       = "somethingelse"
+  val notPresent                   = "null"
 
   private def get[A](path: JsPath)(implicit rds: Reads[A]): Option[A] =
     Reads.optionNoError(Reads.at(path)).reads(data).getOrElse(None)
 
   private def valueAt(path: JsPath): String = {
-    get[JsValue](path).getOrElse("null").toString().toLowerCase()
+    get[JsValue](path).getOrElse(notPresent).toString().toLowerCase()
   }
 
   private def isTypeOfParticipantComplete: Boolean = {
-    valueAt(typeOfParticipant) != "null" &&
+    valueAt(typeOfParticipant) != notPresent &&
       ((valueAt(typeOfParticipant).contains(otherTypeOfParticipant) &&
-        valueAt(typeOfParticipantDetail) != "null") ||
+        valueAt(typeOfParticipantDetail) != notPresent) ||
         (!valueAt(typeOfParticipant).contains(otherTypeOfParticipant)))
   }
 
   private def isBoughtOrSoldOverThresholdComplete: Boolean = {
-    valueAt(boughtOrSoldOverThreshold) != "null" &&
+    valueAt(boughtOrSoldOverThreshold) != notPresent &&
       ((valueAt(boughtOrSoldOverThreshold) == "true" &&
-        valueAt(dateTransactionOverThreshold) != "null") ||
+        valueAt(dateTransactionOverThreshold) != notPresent) ||
         (valueAt(boughtOrSoldOverThreshold) == "false"))
   }
 
   def isComplete: Boolean = {
     isTypeOfParticipantComplete &&
     isBoughtOrSoldOverThresholdComplete &&
-    valueAt(identifyLinkedTransactions) != "null" &&
-    valueAt(percentageExpectedTurnover) != "null"
+    valueAt(identifyLinkedTransactions) != notPresent &&
+    valueAt(percentageExpectedTurnover) != notPresent
   }
 }
 
