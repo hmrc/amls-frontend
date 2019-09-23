@@ -74,8 +74,6 @@ object EstateAgentBusiness {
 
   val key = "estate-agent-business"
 
-  implicit val formatOption = Reads.optionWithNull[EstateAgentBusiness]
-
   implicit val reads: Reads[EstateAgentBusiness] = (
     __.read(Reads.optionNoError[Services]) and
       __.read(Reads.optionNoError[RedressScheme]) and
@@ -97,6 +95,8 @@ object EstateAgentBusiness {
           _ ++ _
         } + ("hasChanged" -> JsBoolean(model.hasChanged)) + ("hasAccepted" -> JsBoolean(model.hasAccepted))
     }
+
+  implicit val formatOption = Reads.optionWithNull[EstateAgentBusiness]
 
   implicit def default(aboutYou: Option[EstateAgentBusiness]): EstateAgentBusiness =
     aboutYou.getOrElse(EstateAgentBusiness())

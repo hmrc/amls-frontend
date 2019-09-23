@@ -55,8 +55,6 @@ object ViewResponse {
 
   implicit val jsonWrites = Json.writes[ViewResponse]
 
-  implicit val formatOption = Reads.optionWithNull[ViewResponse]
-
   def constructReads(
                  etmpFormBundleNumber:String,
                  businessMatchingSection: BusinessMatching,
@@ -118,5 +116,7 @@ object ViewResponse {
       (__ \ "hvdSection").readNullable[Hvd] and
       (__ \ "supervisionSection").readNullable[Supervision]
   }.apply(ViewResponse.constructReads _)
+
+  implicit val formatOption = Reads.optionWithNull[ViewResponse]
 
 }
