@@ -44,7 +44,6 @@ object Asp {
   import play.api.libs.functional.syntax._
   import play.api.libs.json._
 
-  implicit val formatOption = Reads.optionWithNull[Asp]
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "asp"
@@ -73,6 +72,8 @@ object Asp {
       (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
       (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false))
   }.apply(Asp.apply _)
+
+  implicit val formatOption = Reads.optionWithNull[Asp]
 
   implicit def default(details: Option[Asp]): Asp =
     details.getOrElse(Asp())
