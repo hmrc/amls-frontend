@@ -80,8 +80,6 @@ object Supervision {
 
   val key = "supervision"
 
-  implicit val formatOption = Reads.optionWithNull[Supervision]
-
   implicit val mongoKey = new MongoKey[Supervision] {
     override def apply(): String = "supervision"
   }
@@ -106,6 +104,8 @@ object Supervision {
   }
 
   implicit val writes: Writes[Supervision] = Json.writes[Supervision]
+
+  implicit val formatOption = Reads.optionWithNull[Supervision]
 
   implicit def default(supervision: Option[Supervision]): Supervision =
     supervision.getOrElse(Supervision())
