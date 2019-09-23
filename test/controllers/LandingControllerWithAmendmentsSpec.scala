@@ -19,6 +19,7 @@ package controllers
 import connectors.DataCacheConnector
 import controllers.actions.{SuccessfulAuthAction, SuccessfulAuthActionNoAmlsRefNo}
 import generators.StatusGenerator
+import models.amp.Amp
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
@@ -146,6 +147,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                           cacheMap: CacheMap = mock[CacheMap]): CacheMap = {
 
       val testASP = Asp(hasChanged = hasChanged)
+      val testAMP = Amp("someid", hasChanged = hasChanged)
       val testBusinessDetails = BusinessDetails(hasChanged = hasChanged)
       val testBankDetails = Seq(BankDetails(hasChanged = hasChanged))
       val testBusinessActivities = BusinessActivities(hasChanged = hasChanged)
@@ -160,6 +162,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       val testRenewal = Renewal(hasChanged = hasChanged)
 
       when(cacheMap.getEntry[Asp](Asp.key)).thenReturn(Some(testASP))
+      when(cacheMap.getEntry[Amp](Amp.key)).thenReturn(Some(testAMP))
       when(cacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(testBusinessDetails))
       when(cacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any())).thenReturn(Some(testBankDetails))
       when(cacheMap.getEntry[BusinessActivities](BusinessActivities.key)).thenReturn(Some(testBusinessActivities))

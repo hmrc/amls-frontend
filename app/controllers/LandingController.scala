@@ -24,6 +24,7 @@ import config.ApplicationConfig
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models._
+import models.amp.Amp
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
@@ -219,6 +220,9 @@ class LandingController @Inject()(val landingService: LandingService,
   private def dataHasChanged(cacheMap: CacheMap) = {
     Seq(
       cacheMap.getEntry[Asp](Asp.key).fold(false) {
+        _.hasChanged
+      },
+      cacheMap.getEntry[Amp](Amp.key).fold(false) {
         _.hasChanged
       },
       cacheMap.getEntry[BusinessDetails](BusinessDetails.key).fold(false) {
