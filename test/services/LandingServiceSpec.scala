@@ -90,7 +90,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
   val credId = "internalId"
 
   val ampSection = Amp(
-    id = credId,
+    _id = credId,
     data = Json.obj(
       "typeOfParticipant"     -> Seq("artGalleryOwner"),
       "boughtOrSoldOverThreshold"     -> true,
