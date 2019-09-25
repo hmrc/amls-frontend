@@ -74,6 +74,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
       aspSection = None,
       msbSection = None,
       hvdSection = None,
+      ampSection = None,
       supervisionSection = None
     )
 

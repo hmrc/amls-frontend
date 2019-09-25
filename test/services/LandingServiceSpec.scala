@@ -16,8 +16,11 @@
 
 package services
 
+import java.time.{LocalDate, LocalDateTime}
+
 import connectors._
 import models._
+import models.amp.Amp
 import models.asp.{Accountancy, Asp, BookKeeping, ServicesOfBusiness}
 import models.bankdetails.BankDetails
 import models.businessactivities.{CustomersOutsideUK => BACustomersOutsideUK, InvolvedInOtherYes => BAInvolvedInOtherYes, _}
@@ -38,7 +41,7 @@ import models.tradingpremises.TradingPremises
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import play.api.libs.json.Writes
+import play.api.libs.json.{Json, Writes}
 import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -86,6 +89,19 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
   val credId = "internalId"
 
+  val ampSection = Amp(
+    id = credId,
+    data = Json.obj(
+      "typeOfParticipant"     -> Seq("artGalleryOwner"),
+      "boughtOrSoldOverThreshold"     -> true,
+      "dateTransactionOverThreshold"  -> LocalDate.now,
+      "identifyLinkedTransactions"    -> true,
+      "percentageExpectedTurnover"    -> "fortyOneToSixty"
+    ),
+    lastUpdated = LocalDateTime.now,
+    hasAccepted = false,
+    hasChanged = false
+  )
 
   def setUpMockView[T](mock: DataCacheConnector, result: CacheMap, key: String, section: T) = {
     when {
@@ -146,6 +162,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       aspSection = aspSection,
       msbSection = Some(msbSection),
       hvdSection = Some(hvdSection),
+      ampSection = Some(ampSection),
       supervisionSection = None
     )
 
@@ -214,6 +231,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       aspSection = aspSection,
       msbSection = Some(msbSection),
       hvdSection = Some(hvdSection),
+      ampSection = Some(ampSection),
       supervisionSection = None
     )
 
@@ -304,6 +322,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       aspSection = None,
       msbSection = None,
       hvdSection = None,
+      ampSection = None,
       supervisionSection = None
     )
 
@@ -435,6 +454,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       aspSection = aspSection,
       msbSection = Some(msbSection),
       hvdSection = Some(hvdSection),
+      ampSection = Some(ampSection),
       supervisionSection = None
     )
 
