@@ -15,6 +15,8 @@
 ->          /renewal                                                                  renewal.Routes
 ->          /business-matching                                                        businessMatching.Routes
 
+GET         /amp/accept                                                               @controllers.amp.AmpController.accept()
+
 GET         /assets/countries                                                         @controllers.AssetsController.countries()
 GET         /assets/*file                                                             controllers.Assets.versioned(path="/public", file: Asset)
 

@@ -25,7 +25,7 @@ import play.api.mvc.Call
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 
-final case class Amp(id: String,
+final case class Amp(_id: String,
                      data: JsObject = Json.obj(),
                      lastUpdated: LocalDateTime = LocalDateTime.now,
                      hasChanged: Boolean = false,
@@ -46,42 +46,38 @@ final case class Amp(id: String,
   val dateTransactionOverThreshold = JsPath \ "dateTransactionOverThreshold"
   val percentageExpectedTurnover   = JsPath \ "percentageExpectedTurnover"
   val otherTypeOfParticipant       = "somethingelse"
+  val notPresent                   = "null"
 
   private def get[A](path: JsPath)(implicit rds: Reads[A]): Option[A] =
     Reads.optionNoError(Reads.at(path)).reads(data).getOrElse(None)
 
-  private def isDefinedAt(path: JsPath): Boolean = {
-    get[JsValue](path).isDefined
-  }
-
   private def valueAt(path: JsPath): String = {
-    get[JsValue](path).getOrElse("").toString().toLowerCase()
+    get[JsValue](path).getOrElse(notPresent).toString().toLowerCase()
   }
 
   private def isTypeOfParticipantComplete: Boolean = {
-    isDefinedAt(typeOfParticipant) &&
+    valueAt(typeOfParticipant) != notPresent &&
       ((valueAt(typeOfParticipant).contains(otherTypeOfParticipant) &&
-        isDefinedAt(typeOfParticipantDetail)) ||
+        valueAt(typeOfParticipantDetail) != notPresent) ||
         (!valueAt(typeOfParticipant).contains(otherTypeOfParticipant)))
   }
 
   private def isBoughtOrSoldOverThresholdComplete: Boolean = {
-    isDefinedAt(boughtOrSoldOverThreshold) &&
+    valueAt(boughtOrSoldOverThreshold) != notPresent &&
       ((valueAt(boughtOrSoldOverThreshold) == "true" &&
-        isDefinedAt(dateTransactionOverThreshold)) ||
+        valueAt(dateTransactionOverThreshold) != notPresent) ||
         (valueAt(boughtOrSoldOverThreshold) == "false"))
   }
 
   def isComplete: Boolean = {
     isTypeOfParticipantComplete &&
     isBoughtOrSoldOverThresholdComplete &&
-    isDefinedAt(identifyLinkedTransactions) &&
-    isDefinedAt(percentageExpectedTurnover)
+    valueAt(identifyLinkedTransactions) != notPresent &&
+    valueAt(percentageExpectedTurnover) != notPresent
   }
 }
 
 object Amp  {
-
   val redirectCallType       = "GET"
   val key                    = "amp"
 
@@ -93,7 +89,7 @@ object Amp  {
     val notStarted = Section(key, NotStarted, false, generateRedirect(ApplicationConfig.ampWhatYouNeedUrl))
     cache.getEntry[Amp](key).fold(notStarted) {
       model =>
-        if (model.isComplete) {
+        if (model.isComplete && model.hasAccepted) {
           Section(key, Completed, model.hasChanged, generateRedirect(ApplicationConfig.ampSummeryUrl))
         } else {
           Section(key, Started, model.hasChanged, generateRedirect(ApplicationConfig.ampWhatYouNeedUrl))
