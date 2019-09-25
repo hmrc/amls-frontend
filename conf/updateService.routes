@@ -22,8 +22,8 @@ POST        /new-service-information                                   @controll
 GET         /check-your-answers                                        @controllers.businessmatching.updateservice.add.AddBusinessTypeSummaryController.get()
 POST        /check-your-answers                                        @controllers.businessmatching.updateservice.add.AddBusinessTypeSummaryController.post()
 
-GET         /sub-services                                              @controllers.businessmatching.updateservice.add.SubSectorsController.get(edit: Boolean ?= false)
-POST        /sub-services                                              @controllers.businessmatching.updateservice.add.SubSectorsController.post(edit: Boolean ?= false)
+GET         /money-service-business-activities                         @controllers.businessmatching.updateservice.add.SubSectorsController.get(edit: Boolean ?= false)
+POST        /money-service-business-activities                         @controllers.businessmatching.updateservice.add.SubSectorsController.post(edit: Boolean ?= false)
 
 GET         /psr-registration                                          @controllers.businessmatching.updateservice.add.BusinessAppliedForPSRNumberController.get(edit: Boolean ?= false)
 POST        /psr-registration                                          @controllers.businessmatching.updateservice.add.BusinessAppliedForPSRNumberController.post(edit: Boolean ?= false)
@@ -31,8 +31,8 @@ POST        /psr-registration                                          @controll
 GET         /what-do-you-do-here                                       @controllers.businessmatching.updateservice.add.WhatDoYouDoHereController.get(edit: Boolean ?= false)
 POST        /what-do-you-do-here                                       @controllers.businessmatching.updateservice.add.WhatDoYouDoHereController.post(edit: Boolean ?= false)
 
-GET         /no-psr                                                    @controllers.businessmatching.updateservice.add.NoPsrController.get()
-POST        /no-psr                                                    @controllers.businessmatching.updateservice.add.NoPsrController.post()
+GET         /no-psr-number                                             @controllers.businessmatching.updateservice.add.NoPsrController.get()
+POST        /no-psr-number                                             @controllers.businessmatching.updateservice.add.NoPsrController.post()
 
 GET         /remove-services                                           @controllers.businessmatching.updateservice.remove.RemoveBusinessTypesController.get(edit: Boolean ?= false)
 POST        /remove-services                                           @controllers.businessmatching.updateservice.remove.RemoveBusinessTypesController.post(edit: Boolean ?= false)

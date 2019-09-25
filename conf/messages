@@ -1312,9 +1312,9 @@ businessmatching.updateservice.updateotherinformation.text = As a result some se
 
 
 #   Add route Start  ###################################################################################################
-businessmatching.updateservice.msb.services.title = Which money service business activities does your business carry out?
-businessmatching.updateservice.msb.services.heading = Which money service business activities does your business carry out?
-businessmatching.updateservice.msb.services.list.heading = Choose at least one
+businessmatching.updateservice.msb.services.title = Which money service business activities will you do?
+businessmatching.updateservice.msb.services.heading = Which money service business activities will you do?
+businessmatching.updateservice.msb.services.list.heading = Select all that apply.
 businessmatching.updateservice.msb.services.list.lbl.01 = Transmitting money
 businessmatching.updateservice.msb.services.list.lbl.02 = Currency exchange
 businessmatching.updateservice.msb.services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
@@ -1325,8 +1325,8 @@ businessmatching.updateservice.psr.number.title = Does your business have a Paym
 businessmatching.updateservice.psr.number.lbl = PSR registration number
 businessmatching.updateservice.psr.number.hint = It’s 6 numbers, like 123456. You received it when you registered with the Financial Conduct Authority (FCA).
 
-businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.heading = You cannot continue with your change
-businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title = You cannot continue with your change
+businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.heading = You’ll need a Payment Services Regulations (PSR) number to continue with your update
+businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title = You’ll need a Payment Services Regulations (PSR) number to continue with your update
 businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.1 = Your business must have a Payment Services Regulations (PSR) reference number to include a money service business as part of your anti-money laundering supervision.
 businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.2 = You can apply for a PSR reference number from the Financial Conduct Authority (FCA).
 businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.button.text = Return to about your business
@@ -1360,11 +1360,11 @@ businessmatching.updateservice.whatdoyoudohere.list.lbl.05 = Foreign exchange
 businessmatching.updateservice.addmoreactivities.title = Do you want to add another type of business?
 businessmatching.updateservice.addmoreactivities.heading = Do you want to add another type of business?
 
-businessmatching.updateservice.fitandproper.title = Have any of your responsible people passed the HMRC Money Laundering Regulations fit and proper test?
-businessmatching.updateservice.fitandproper.heading = Have any of your responsible people passed the HMRC Money Laundering Regulations fit and proper test?
+businessmatching.updateservice.fitandproper.title = Have any of your responsible people passed HMRC’s fit and proper test?
+businessmatching.updateservice.fitandproper.heading = Have any of your responsible people passed HMRC’s fit and proper test?
 businessmatching.updateservice.fitandproper.info = You’ll need to pay £100 for each responsible person that hasn’t passed the test.
-businessmatching.updateservice.fitandproper.info.no.fees = You’ll need to pay a fee for each responsible person that hasn’t passed the test.
-businessmatching.updateservice.fitandproper.text.info = The fit and proper test
+businessmatching.updateservice.fitandproper.info.no.fees = You’ll need to pay a fee for each responsible person who has not passed the fit and proper test.
+businessmatching.updateservice.fitandproper.text.info = What the fit and proper test is
 businessmatching.updateservice.fitandproper.text.info.line1 = The responsible people in your business need to pass a fit and proper test. If anyone has already passed the test before, they don’t need to do it again.
 businessmatching.updateservice.fitandproper.text.info.line2 = HMRC will perform the tests by checking their records against the information you’ve given. You don’t need to take any further action.
 
