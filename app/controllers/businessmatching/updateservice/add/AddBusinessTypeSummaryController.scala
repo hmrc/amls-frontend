@@ -24,13 +24,16 @@ import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement.{AddBusinessTypeFlowModel, AddBusinessTypeSummaryPageId}
+import models.tradingpremises.TradingPremises
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import services.{StatusService, TradingPremisesService}
-import utils.{AuthAction, RepeatingSection}
+import uk.gov.hmrc.http.HeaderCarrier
+import utils.{AuthAction, RepeatingSection, StatusConstants}
 import views.html.businessmatching.updateservice.add.update_services_summary
+import scala.concurrent.duration._
 
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
 
 @Singleton
 class AddBusinessTypeSummaryController @Inject()(
@@ -44,10 +47,13 @@ class AddBusinessTypeSummaryController @Inject()(
                                                ) extends DefaultBaseController with RepeatingSection {
 
   def get() = authAction.async {
-      implicit request =>
-        OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key)) collect {
-          case model if model != AddBusinessTypeFlowModel() => Ok(update_services_summary(EmptyForm, model))
-        } getOrElse Redirect(controllers.businessmatching.routes.SummaryController.get())
+    implicit request =>
+      (for {
+        flowModel: AddBusinessTypeFlowModel <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key))
+        filteredTPs: Seq[(TradingPremises, Int)] <- filteredTps(request.credId, flowModel)
+      } yield {
+        Ok(update_services_summary(EmptyForm, flowModel, filteredTPs))
+      }) getOrElse Redirect(controllers.businessmatching.routes.SummaryController.get())
   }
 
   def post() = authAction.async {
@@ -67,5 +73,24 @@ class AddBusinessTypeSummaryController @Inject()(
         } yield {
           route
         }) getOrElse InternalServerError("Could not fetch the flow model")
+  }
+
+  private def getModelAndTp(credId: String, abtfm: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier) = for {
+    tradingPremises <- OptionT.liftF(tradingPremises(credId))
+    indexes: Set[Int] <- OptionT.fromOption[Future](abtfm.tradingPremisesActivities.map(tpa => tpa.index))
+  } yield (indexes, tradingPremises)
+
+  private def tradingPremises(credId: String)(implicit hc: HeaderCarrier): Future[Seq[(TradingPremises, Int)]] =
+    getData[TradingPremises](credId).map {
+      _.zipWithIndex.filterNot { case (tp, _) =>
+        tp.status.contains(StatusConstants.Deleted) | !tp.isComplete
+      }
+    }
+
+  def filteredTps(credId: String, abtfm: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier) = {
+  for {
+      (index: Set[Int], tps: Seq[(TradingPremises, Int)]) <- getModelAndTp(credId, abtfm)
+      filteredTps <- OptionT.pure[Future, Seq[(TradingPremises, Int)]](tps.filter { ele => index.contains(ele._2)})
+    } yield filteredTps
   }
 }

@@ -22,21 +22,25 @@ import connectors.DataCacheConnector
 import controllers.DefaultBaseController
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
+import models.businessmatching.updateservice.TradingPremisesActivities
 import models.businessmatching.{BusinessActivities, BusinessActivity}
+import models.flowmanagement.AddBusinessTypeFlowModel
+import models.tradingpremises.TradingPremises
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
-import utils.AuthAction
+import uk.gov.hmrc.http.HeaderCarrier
+import utils.{AuthAction, RepeatingSection, StatusConstants}
 import views.html.businessmatching.summary
 
 import scala.concurrent.Future
 
 @Singleton
 class SummaryController @Inject()(
-                                   val dataCache: DataCacheConnector,
+                                   val dataCacheConnector: DataCacheConnector,
                                    authAction: AuthAction,
                                    val statusService: StatusService,
                                    val businessMatchingService: BusinessMatchingService
-                                 ) extends DefaultBaseController {
+                                 ) extends DefaultBaseController with RepeatingSection {
 
   def get() = authAction.async {
       implicit request =>
@@ -76,5 +80,4 @@ class SummaryController @Inject()(
         } yield Redirect(controllers.routes.RegistrationProgressController.get())
       } getOrElse InternalServerError("Unable to update business matching")
   }
-
 }

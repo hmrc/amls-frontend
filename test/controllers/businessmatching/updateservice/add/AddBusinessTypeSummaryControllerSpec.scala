@@ -29,7 +29,8 @@ import models.flowmanagement.{AddBusinessTypeFlowModel, AddBusinessTypeSummaryPa
 import models.responsiblepeople.ResponsiblePerson
 import models.status.SubmissionDecisionApproved
 import models.supervision.Supervision
-import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
+import models.tradingpremises.{Address, TradingPremises, WhatDoesYourBusinessDo, YourTradingPremises}
+import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import org.scalacheck.Gen

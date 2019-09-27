@@ -1333,7 +1333,7 @@ businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.button.tex
 
 businessmatching.updateservice.selectactivities.title = Which service do you need to register?
 businessmatching.updateservice.selectactivities.heading = Which service do you need to register?
-businessmatching.updateservice.selectactivities.hint = You can only add one service at a time.
+businessmatching.updateservice.selectactivities.hint = Select all that apply.
 businessmatching.updateservice.selectactivities.currentactivities.hint = You have registered as
 businessmatching.updateservice.selectactivities.currentactivities.hint.plural = You have registered the following services:
 
@@ -1345,12 +1345,12 @@ businessmatching.updateservice.currenttradingpremises.title = Will you still do 
 businessmatching.updateservice.currenttradingpremises.heading = Will you still do {0} from all of your registered trading premises?
 
 businessmatching.updateservice.whichtradingpremises.title = Which premises will you do these activities from?
-businessmatching.updateservice.whichtradingpremises.heading = Which premises will you do {0} activities from?
+businessmatching.updateservice.whichtradingpremises.heading = Which premises will you do {0} activities at?
 businessmatching.updateservice.whichtradingpremises.summary = Which premises will you do {0} from?
 
-businessmatching.updateservice.whatdoyoudohere.title = Which services does your business provide at these premises?
-businessmatching.updateservice.whatdoyoudohere.heading = Which services does your business provide at these premises?
-businessmatching.updateservice.whatdoyoudohere.list.heading = Choose at least one
+businessmatching.updateservice.whatdoyoudohere.title = Which money service business activities will you do at these premises?
+businessmatching.updateservice.whatdoyoudohere.heading = Which money service business activities will you do at these premises?
+businessmatching.updateservice.whatdoyoudohere.list.heading = Select all that apply.
 businessmatching.updateservice.whatdoyoudohere.list.lbl.01 = Transmitting money
 businessmatching.updateservice.whatdoyoudohere.list.lbl.02 = Currency exchange
 businessmatching.updateservice.whatdoyoudohere.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
@@ -1365,12 +1365,11 @@ businessmatching.updateservice.fitandproper.heading = Have any of your responsib
 businessmatching.updateservice.fitandproper.info = You’ll need to pay £100 for each responsible person that hasn’t passed the test.
 businessmatching.updateservice.fitandproper.info.no.fees = You’ll need to pay a fee for each responsible person who has not passed the fit and proper test.
 businessmatching.updateservice.fitandproper.text.info = What the fit and proper test is
-businessmatching.updateservice.fitandproper.text.info.line1 = The responsible people in your business need to pass a fit and proper test. If anyone has already passed the test before, they don’t need to do it again.
-businessmatching.updateservice.fitandproper.text.info.line2 = HMRC will perform the tests by checking their records against the information you’ve given. You don’t need to take any further action.
+businessmatching.updateservice.fitandproper.text.info.line1 = HMRC carries out the test as part of the registration process. We use the information you have provided in your application to check that your responsible people meet the requirements of the Money Laundering Regulations.
 
-businessmatching.updateservice.whichfitandproper.title = Which of your responsible people have passed the HMRC Money Laundering Regulations fit and proper test?
-businessmatching.updateservice.whichfitandproper.heading = Which of your responsible people have passed the HMRC Money Laundering Regulations fit and proper test?
-businessmatching.updateservice.whichfitandproper.hint = Select all the responsible people that have passed the HMRC fit and proper test, you will be charged a fee for each person that has not.
+businessmatching.updateservice.whichfitandproper.title = Which of your responsible people have passed HMRC’s fit and proper test?
+businessmatching.updateservice.whichfitandproper.heading = Which of your responsible people have passed HMRC’s fit and proper test?
+businessmatching.updateservice.whichfitandproper.hint = Select all that apply.
 businessmatching.updateservice.whichfitandproper.text.info = The fit and proper test
 businessmatching.updateservice.whichfitandproper.text.info.line1 = The responsible people in your business need to pass a fit and proper test. If anyone has already passed the test before, they don’t need to do it again.
 businessmatching.updateservice.whichfitandproper.text.info.line2 = HMRC will perform the tests by checking their records against the information you’ve given. You don’t need to take any further action.

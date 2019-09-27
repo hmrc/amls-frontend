@@ -7,14 +7,14 @@ POST        /register-services                                         @controll
 GET         /trading-premises                                          @controllers.businessmatching.updateservice.add.TradingPremisesController.get(edit: Boolean ?= false)
 POST        /trading-premises                                          @controllers.businessmatching.updateservice.add.TradingPremisesController.post(edit: Boolean ?= false)
 
-GET         /which-trading-premises                                    @controllers.businessmatching.updateservice.add.WhichTradingPremisesController.get(edit: Boolean ?= false)
-POST        /which-trading-premises                                    @controllers.businessmatching.updateservice.add.WhichTradingPremisesController.post(edit: Boolean ?= false)
+GET         /activities-at-trading-premises                            @controllers.businessmatching.updateservice.add.WhichTradingPremisesController.get(edit: Boolean ?= false)
+POST        /activities-at-trading-premises                            @controllers.businessmatching.updateservice.add.WhichTradingPremisesController.post(edit: Boolean ?= false)
 
 GET         /fit-and-proper                                            @controllers.businessmatching.updateservice.add.FitAndProperController.get(edit: Boolean ?= false)
 POST        /fit-and-proper                                            @controllers.businessmatching.updateservice.add.FitAndProperController.post(edit: Boolean ?= false)
 
-GET         /which-fit-and-proper                                      @controllers.businessmatching.updateservice.add.WhichFitAndProperController.get(edit: Boolean ?= false)
-POST        /which-fit-and-proper                                      @controllers.businessmatching.updateservice.add.WhichFitAndProperController.post(edit: Boolean ?= false)
+GET         /which-responsible-people-fit-and-proper                   @controllers.businessmatching.updateservice.add.WhichFitAndProperController.get(edit: Boolean ?= false)
+POST        /which-responsible-people-fit-and-proper                   @controllers.businessmatching.updateservice.add.WhichFitAndProperController.post(edit: Boolean ?= false)
 
 GET         /new-service-information                                   @controllers.businessmatching.updateservice.add.NeedMoreInformationController.get()
 POST        /new-service-information                                   @controllers.businessmatching.updateservice.add.NeedMoreInformationController.post()
@@ -28,8 +28,8 @@ POST        /money-service-business-activities                         @controll
 GET         /psr-registration                                          @controllers.businessmatching.updateservice.add.BusinessAppliedForPSRNumberController.get(edit: Boolean ?= false)
 POST        /psr-registration                                          @controllers.businessmatching.updateservice.add.BusinessAppliedForPSRNumberController.post(edit: Boolean ?= false)
 
-GET         /what-do-you-do-here                                       @controllers.businessmatching.updateservice.add.WhatDoYouDoHereController.get(edit: Boolean ?= false)
-POST        /what-do-you-do-here                                       @controllers.businessmatching.updateservice.add.WhatDoYouDoHereController.post(edit: Boolean ?= false)
+GET         /money-service-business-activities-at-trading-premises     @controllers.businessmatching.updateservice.add.WhatDoYouDoHereController.get(edit: Boolean ?= false)
+POST        /money-service-business-activities-at-trading-premises     @controllers.businessmatching.updateservice.add.WhatDoYouDoHereController.post(edit: Boolean ?= false)
 
 GET         /no-psr-number                                             @controllers.businessmatching.updateservice.add.NoPsrController.get()
 POST        /no-psr-number                                             @controllers.businessmatching.updateservice.add.NoPsrController.post()

@@ -21,7 +21,8 @@
 @import controllers.businessmatching.updateservice.add.routes
 @import models.flowmanagement.AddBusinessTypeFlowModel
 
-@(f: forms.Form2[_], flowModel: AddBusinessTypeFlowModel)(implicit request: Request[_],messages:Messages)
+@import models.tradingpremises.TradingPremises
+@(f: forms.Form2[_], flowModel: AddBusinessTypeFlowModel, tradingPremises: Seq[(TradingPremises, Int)])(implicit request: Request[_],messages:Messages)
 
 @header = {
     @heading("title.cya", "summary.updateservice")
@@ -43,7 +44,7 @@
     @if(flowModel.activity.equals(Some(MoneyServiceBusiness))) {
         @flowModel.subSectors.map { services =>
             @checkYourAnswers(
-                question = Messages("businessmatching.services.title"),
+                question = Messages("businessmatching.updateservice.msb.services.title"),
                 editUrl = routes.SubSectorsController.get(true).toString,
                 allowEdit = true,
                 editLinkTag="msbservices-edit"
@@ -124,15 +125,15 @@
 
     @if(flowModel.areNewActivitiesAtTradingPremises.contains(true)) {
         @checkYourAnswers(
-            question = Messages("businessmatching.updateservice.whichtradingpremises.summary", flowModel.activity.map(a => a.getMessage(true)).getOrElse("")),
+            question = Messages("businessmatching.updateservice.whichtradingpremises.heading", flowModel.activity.map(a => a.getMessage(true)).getOrElse("")),
             editUrl = routes.WhichTradingPremisesController.get().url,
             editLinkTag = "whichtradingpremises-edit"
         ) {
-            <p id="tp-premises-activities-count">
-                @(flowModel.tradingPremisesActivities map { tp =>
-                    Messages("businessmatching.updateservice.summary.whichtradingpremises.count", tp.index.size)
-                })
-            </p>
+            <ul id="tp-premises" class="trading-premises-list">
+                @tradingPremises.map { case (tp, index) =>
+                    <li> @tp.label </li>
+                }
+            </ul>
         }
 
             @flowModel.tradingPremisesMsbServices.map { tpMsbServices =>
