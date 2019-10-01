@@ -65,8 +65,8 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   lazy val timeout = getInt("timeout.seconds")
   lazy val timeoutCountdown = getInt("timeout.countdown")
 
-  lazy val ampWhatYouNeedUrl = s"${baseUrl("amls-art-market-participant-frontend")}/anti-money-laundering/art-market-participant/what-you-need"
-  lazy val ampSummeryUrl     = s"${baseUrl("amls-art-market-participant-frontend")}/anti-money-laundering/art-market-participant/check-your-answers"
+  lazy val ampWhatYouNeedUrl = s"${getConfString("amls-art-market-participant-frontend.url", "")}/what-you-need"
+  lazy val ampSummeryUrl     = s"${getConfString("amls-art-market-participant-frontend.url", "")}/check-your-answers"
 
   def businessCustomerUrl = getConfigString("business-customer.url")
 
