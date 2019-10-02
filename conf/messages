@@ -679,7 +679,7 @@ status.deregister.body-content = De-register your business if you no longer want
   We’ll delete any information you have provided. We won’t refund any fees you have paid.\n\
   You mustn’t carry out activities covered by the Money Laundering Regulations if you aren’t supervised.
 status.deregister.services = Your services
-status.deregister.button.change = Change
+status.deregister.button.change = Add or remove services
 status.deregister.regnumber = Registration number:
 status.deregister.visuallyhidden.change = Change your registered services
 
