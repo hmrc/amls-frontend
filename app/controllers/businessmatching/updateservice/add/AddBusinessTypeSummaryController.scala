@@ -33,8 +33,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, RepeatingSection, StatusConstants}
 import views.html.businessmatching.updateservice.add.update_services_summary
 
-import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 
 @Singleton
 class AddBusinessTypeSummaryController @Inject()(
@@ -77,25 +76,28 @@ class AddBusinessTypeSummaryController @Inject()(
         }) getOrElse InternalServerError("Could not fetch the flow model")
   }
 
-  private def getTp(credId: String, abtfm: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier) = for {
-    tradingPremises <- OptionT.liftF(tradingPremises(credId))
-    indexes: Set[Int] <- OptionT.fromOption[Future](abtfm.tradingPremisesActivities.map(tpa => tpa.index))
-  } yield (indexes, tradingPremises)
+  private def getTp(credId: String, abtfm: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier) = {
+    for {
+      tradingPremises <- OptionT.liftF(tradingPremises(credId))
+      indexes: Set[Int] <- OptionT.fromOption[Future](abtfm.tradingPremisesActivities.map(tpa => tpa.index))
+    } yield (indexes, tradingPremises)
+  }
 
   private def getRp(credId: String, abtfm: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier) = {
     for {
       responsiblePeople <- OptionT.liftF(responsiblePeople(credId))
       indexes: Set[Int] <- OptionT.fromOption[Future](abtfm.responsiblePeople.map(rpf => rpf.index))
     } yield (indexes, responsiblePeople)
-
   }
 
-  private def tradingPremises(credId: String)(implicit hc: HeaderCarrier): Future[Seq[(TradingPremises, Int)]] =
+  private def tradingPremises(credId: String)(implicit hc: HeaderCarrier): Future[Seq[(TradingPremises, Int)]] = {
     getData[TradingPremises](credId).map {
       _.zipWithIndex.filterNot { case (tp, _) =>
         tp.status.contains(StatusConstants.Deleted) | !tp.isComplete
       }
     }
+  }
+
   private def responsiblePeople(credId: String)(implicit hc: HeaderCarrier): Future[Seq[(ResponsiblePerson, Int)]] = {
     getData[ResponsiblePerson](credId).map {
       _.zipWithIndex.filterNot { case (rp, _) =>
@@ -104,14 +106,14 @@ class AddBusinessTypeSummaryController @Inject()(
     }
   }
 
-  def filteredTps(credId: String, abtfm: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier) = {
-  for {
+  private def filteredTps(credId: String, abtfm: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier) = {
+    for {
       (index: Set[Int], tps: Seq[(TradingPremises, Int)]) <- getTp(credId, abtfm)
       filteredTps <- OptionT.pure[Future, Seq[(TradingPremises, Int)]](tps.filter { ele => index.contains(ele._2)})
     } yield filteredTps
   }
 
-  def filteredRps(credId: String, abtfm: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier) = {
+  private def filteredRps(credId: String, abtfm: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier) = {
     for {
       (index: Set[Int], rps: Seq[(ResponsiblePerson, Int)]) <- getRp(credId, abtfm)
       filteredRps <- OptionT.pure[Future, Seq[(ResponsiblePerson, Int)]](rps.filter { ele => index.contains(ele._2)})

@@ -23,7 +23,6 @@ import models.flowmanagement.AddBusinessTypeFlowModel
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
 import org.joda.time.LocalDate
-import utils.AmlsSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.add._
 

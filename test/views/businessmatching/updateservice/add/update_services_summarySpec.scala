@@ -17,14 +17,11 @@
 package views.businessmatching.updateservice.add
 
 import forms.EmptyForm
-import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, TradingPremisesActivities}
 import models.businessmatching._
 import models.flowmanagement.AddBusinessTypeFlowModel
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import utils.AmlsSpec
-import views.Fixture
 import views.html.businessmatching.updateservice.add._
 import utils.UpdateServicesSummaryFixtures
 
