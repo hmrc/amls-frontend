@@ -20,6 +20,7 @@ import config.ApplicationConfig
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models._
+import models.amp.Amp
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
@@ -57,6 +58,7 @@ class UpdateMongoCacheService @Inject()(http: HttpGet, val cacheConnector: DataC
       _ <- fn(credId, Asp.key, response.asp)
       _ <- fn(credId, MoneyServiceBusiness.key, response.msb)
       _ <- fn(credId, Hvd.key, response.hvd)
+      _ <- fn(credId, Amp.key, response.amp)
       _ <- fn(credId, Supervision.key, response.supervision)
       _ <- fn(credId, BusinessDetails.key, response.businessDetails)
       _ <- fn(credId, EstateAgentBusiness.key, response.estateAgencyBusiness)

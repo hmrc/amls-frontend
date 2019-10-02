@@ -118,5 +118,6 @@ object Amp  {
         (__ \ "hasAccepted").write[Boolean]
       ) (unlift(Amp.unapply))
   }
-  
+
+  implicit val formatOption = Reads.optionWithNull[Amp]
 }
