@@ -31,17 +31,17 @@ import utils.UpdateServicesSummaryFixtures
 class update_services_summarySpec  extends AmlsSpec with MustMatchers with UpdateServicesSummaryFixtures {
   "The update_services_summary view" must {
     "have the correct title" in new ViewFixture {
-      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(), Seq())
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(), Seq(), Seq())
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.updateservice"))
     }
 
     "have correct heading" in new ViewFixture {
-      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(), Seq())
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(), Seq(), Seq())
       heading.html must be(Messages("title.cya"))
     }
 
     "have correct subHeading" in new ViewFixture {
-      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(), Seq())
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(), Seq(), Seq())
       subHeading.html must include(Messages("summary.updateservice"))
     }
   }
@@ -49,7 +49,7 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers with Updat
   "for which business type you wish to register" must {
     "have a question title" in new ViewFixture {
       val addBusinessTypeFlowModel:AddBusinessTypeFlowModel  = AddBusinessTypeFlowModel(activity = Some(AccountancyServices))
-      def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq())
+      def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
 
       doc.body().text must include(Messages("businessmatching.updateservice.selectactivities.title"))
     }
@@ -62,7 +62,7 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers with Updat
       "show AccountancyServices if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(AccountancyServices))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq())
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.01"))
       }
@@ -71,7 +71,7 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers with Updat
       "show BillPaymentServices if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(BillPaymentServices))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq())
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.03"))
       }
@@ -79,7 +79,7 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers with Updat
       "show EstateAgentBusinessService if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(EstateAgentBusinessService))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq())
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.04"))
       }
@@ -87,7 +87,7 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers with Updat
       "show HighValueDealing if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(HighValueDealing))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq())
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.05"))
       }
@@ -95,7 +95,7 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers with Updat
       "show MoneyServiceBusiness if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq())
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.06"))
       }
@@ -103,7 +103,7 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers with Updat
       "show TrustAndCompanyServices if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq())
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.07"))
       }
@@ -111,7 +111,7 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers with Updat
       "show TelephonePaymentService if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(TelephonePaymentService))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq())
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.08"))
       }
@@ -264,9 +264,9 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers with Updat
       }
 
       "which responsible people have passed the HMRC fit and proper test" must {
-        "have a question title" in new MSBViewFixture {
+        "have a question title" in new MSBAllViewFixture {
           doc.body().text must include(Messages("businessmatching.updateservice.whichfitandproper.heading"))
-          doc.getElementById("fit-and-proper-count").text mustBe Messages("businessmatching.updateservice.summary.whichfitandproper.count", 1)
+          doc.getElementById("responsible-person").text mustBe Messages("Katie Test")
         }
 
         "show edit link" in new MSBViewFixture {
@@ -293,7 +293,7 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers with Updat
     "which responsible people have passed the HMRC fit and proper test" must {
       "have a question title" in new SimpleTCSPViewFixture {
         doc.body().text must include(Messages("businessmatching.updateservice.whichfitandproper.heading"))
-        doc.getElementById("fit-and-proper-count").text mustBe Messages("businessmatching.updateservice.summary.whichfitandproper.count.plural", 2)
+        doc.getElementById("responsible-person").text mustBe Messages("Katie Test David Test")
       }
 
       "show edit link" in new SimpleTCSPViewFixture {

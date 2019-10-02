@@ -101,7 +101,7 @@
                 editLinkTag = "whichfitandproper-edit"
             ) {
                 @if(responsiblePeople.size > 1) {
-                    <ul id="responsible-person" class="list list-bullet">
+                    <ul id="responsible-person" class="list list-bullet list-responsible-multiple">
                         @responsiblePeople.map { case (rp, index) =>
                             <li> @rp.personName.map { name => @name.fullName } </li>
                     }
