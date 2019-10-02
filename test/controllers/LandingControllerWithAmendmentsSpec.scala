@@ -146,7 +146,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                           cacheMap: CacheMap = mock[CacheMap]): CacheMap = {
 
       val testASP = Asp(hasChanged = hasChanged)
-      val testAMP = Amp("someid", hasChanged = hasChanged)
+      val testAMP = Amp(hasChanged = hasChanged)
       val testBusinessDetails = BusinessDetails(hasChanged = hasChanged)
       val testBankDetails = Seq(BankDetails(hasChanged = hasChanged))
       val testBusinessActivities = BusinessActivities(hasChanged = hasChanged)

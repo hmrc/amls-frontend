@@ -16,28 +16,15 @@
 
 package services.amp
 
-import java.time.{LocalDate, LocalDateTime, ZoneOffset}
+import java.time.{LocalDate, LocalDateTime}
 
-import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
 import models.amp.Amp
-import models.bankdetails._
-import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-import org.mockito.ArgumentCaptor
-import org.mockito.Matchers._
-import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
 import play.api.libs.json.Json
-import play.api.test.Helpers._
-import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
-import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 class AmpCacheServiceSpec extends AmlsSpec with MockitoSugar
   with ScalaFutures
@@ -54,15 +41,13 @@ class AmpCacheServiceSpec extends AmlsSpec with MockitoSugar
   )
 
   val completeJson = Json.obj(
-    "_id"            -> "someid",
     "data"           -> completeData,
-    "lastUpdated"    -> Json.obj("$date" -> dateVal.atZone(ZoneOffset.UTC).toInstant.toEpochMilli),
     "hasChanged"     -> false,
     "hasAccepted"    -> false
   )
 
   val credId        = "someId"
-  val completeModel = Amp("someid", completeData, dateVal)
+  val completeModel = Amp(completeData)
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
@@ -84,7 +69,6 @@ class AmpCacheServiceSpec extends AmlsSpec with MockitoSugar
     "cache data does not exist" when {
       "returns null" in new Fixture {
         mockCacheFetch[Amp](None, Some(Amp.key))
-
         whenReady(svc.get(credId)){ result =>
           result mustBe None
         }

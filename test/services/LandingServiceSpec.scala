@@ -16,7 +16,7 @@
 
 package services
 
-import java.time.{LocalDate, LocalDateTime}
+import java.time.LocalDate
 
 import connectors._
 import models._
@@ -90,7 +90,6 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
   val credId = "internalId"
 
   val ampSection = Amp(
-    _id = credId,
     data = Json.obj(
       "typeOfParticipant"     -> Seq("artGalleryOwner"),
       "boughtOrSoldOverThreshold"     -> true,
@@ -98,7 +97,6 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       "identifyLinkedTransactions"    -> true,
       "percentageExpectedTurnover"    -> "fortyOneToSixty"
     ),
-    lastUpdated = LocalDateTime.now,
     hasAccepted = false,
     hasChanged = false
   )
