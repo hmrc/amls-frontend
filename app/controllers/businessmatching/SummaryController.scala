@@ -18,29 +18,23 @@ package controllers.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._
-import connectors.DataCacheConnector
 import controllers.DefaultBaseController
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.updateservice.TradingPremisesActivities
 import models.businessmatching.{BusinessActivities, BusinessActivity}
-import models.flowmanagement.AddBusinessTypeFlowModel
-import models.tradingpremises.TradingPremises
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
-import uk.gov.hmrc.http.HeaderCarrier
-import utils.{AuthAction, RepeatingSection, StatusConstants}
+import utils.AuthAction
 import views.html.businessmatching.summary
 
 import scala.concurrent.Future
 
 @Singleton
 class SummaryController @Inject()(
-                                   val dataCacheConnector: DataCacheConnector,
                                    authAction: AuthAction,
                                    val statusService: StatusService,
                                    val businessMatchingService: BusinessMatchingService
-                                 ) extends DefaultBaseController with RepeatingSection {
+                                 ) extends DefaultBaseController {
 
   def get() = authAction.async {
       implicit request =>

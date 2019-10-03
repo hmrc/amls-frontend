@@ -24,8 +24,6 @@ import models.businessmatching._
 import models.businessmatching.updateservice._
 import models.flowmanagement.AddBusinessTypeFlowModel
 import models.status.NotCompleted
-import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{any, eq => eqTo}
@@ -45,7 +43,6 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
     val controller = new SummaryController (
-      dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction,
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService

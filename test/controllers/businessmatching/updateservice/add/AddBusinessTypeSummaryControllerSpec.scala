@@ -21,11 +21,13 @@ import cats.data.OptionT
 import cats.implicits._
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
+import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.businessmatching._
-import models.businessmatching.updateservice.{ServiceChangeRegister, TradingPremisesActivities}
+import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, ServiceChangeRegister, TradingPremisesActivities}
 import models.flowmanagement.{AddBusinessTypeFlowModel, AddBusinessTypeSummaryPageId}
+import models.moneyservicebusiness.MoneyServiceBusiness
 import models.responsiblepeople.ResponsiblePerson
 import models.status.SubmissionDecisionApproved
 import models.supervision.Supervision
@@ -47,7 +49,7 @@ import scala.concurrent.Future
 class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
   with MockitoSugar
   with TradingPremisesGenerator
-  with BusinessMatchingGenerator {
+  with BusinessMatchingGenerator with ResponsiblePersonGenerator {
 
   sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
@@ -68,13 +70,32 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
       tradingPremisesService = mockTradingPremisesService
     )
 
-    val flowModel = AddBusinessTypeFlowModel(
-      Some(HighValueDealing),
-      Some(true),
-      Some(TradingPremisesActivities(Set(0)))
+    val flowModel = AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices),
+        areNewActivitiesAtTradingPremises = Some(true),
+        tradingPremisesActivities = Some(TradingPremisesActivities(Set(1))),
+        addMoreActivities = None,
+        fitAndProper = Some(true),
+        responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1))),
+        hasChanged = true,
+        hasAccepted = false,
+        businessAppliedForPSRNumber = None,
+        subSectors = None,
+        tradingPremisesMsbServices = None
     )
 
-    mockCacheFetch(Some(flowModel))
+//    mockCacheFetch[AddBusinessTypeFlowModel](
+//      Some(AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices),
+//        areNewActivitiesAtTradingPremises = Some(false),
+//        tradingPremisesActivities = None,
+//        addMoreActivities = None,
+//        fitAndProper = Some(true),
+//        responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1))),
+//        hasChanged = true,
+//        hasAccepted = false)), Some(AddBusinessTypeFlowModel.key))
+
+    mockCacheFetch[AddBusinessTypeFlowModel](Some(flowModel))
+
+
     mockApplicationStatus(SubmissionDecisionApproved)
   }
 
@@ -83,6 +104,19 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
 
     "get is called" must {
       "return OK with update_service_summary view" in new Fixture {
+
+        val responsiblePeople: List[ResponsiblePerson] = Gen.listOfN(5, responsiblePersonGen).sample.get
+
+        val tradingPremises: Seq[TradingPremises] = Gen.listOfN(5, tradingPremisesGen).sample.get
+
+        //mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople))
+        when {
+          controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any())
+        } thenReturn Future.successful(Some(responsiblePeople))
+
+        when {
+          controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any())
+        } thenReturn Future.successful(Some(tradingPremises))
 
         val result = controller.get()(request)
 

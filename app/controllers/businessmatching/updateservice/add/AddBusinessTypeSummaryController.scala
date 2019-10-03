@@ -49,7 +49,7 @@ class AddBusinessTypeSummaryController @Inject()(
   def get() = authAction.async {
     implicit request =>
       (for {
-        flowModel: AddBusinessTypeFlowModel <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key))
+        flowModel <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key))
         filteredTPs: Seq[(TradingPremises, Int)] <- filteredTps(request.credId, flowModel)
         filteredRPs: Seq[(ResponsiblePerson, Int)] <- filteredRps(request.credId, flowModel)
       } yield {
@@ -76,17 +76,17 @@ class AddBusinessTypeSummaryController @Inject()(
         }) getOrElse InternalServerError("Could not fetch the flow model")
   }
 
-  private def getTp(credId: String, abtfm: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier) = {
+  private def getTp(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier) = {
     for {
       tradingPremises <- OptionT.liftF(tradingPremises(credId))
-      indexes: Set[Int] <- OptionT.fromOption[Future](abtfm.tradingPremisesActivities.map(tpa => tpa.index))
+      indexes: Set[Int] <- OptionT.fromOption[Future](model.tradingPremisesActivities.map(tpa => tpa.index))
     } yield (indexes, tradingPremises)
   }
 
-  private def getRp(credId: String, abtfm: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier) = {
+  private def getRp(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier) = {
     for {
       responsiblePeople <- OptionT.liftF(responsiblePeople(credId))
-      indexes: Set[Int] <- OptionT.fromOption[Future](abtfm.responsiblePeople.map(rpf => rpf.index))
+      indexes: Set[Int] <- OptionT.fromOption[Future](model.responsiblePeople.map(rpf => rpf.index))
     } yield (indexes, responsiblePeople)
   }
 
@@ -106,17 +106,17 @@ class AddBusinessTypeSummaryController @Inject()(
     }
   }
 
-  private def filteredTps(credId: String, abtfm: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier) = {
+  private def filteredTps(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier) = {
     for {
-      (index: Set[Int], tps: Seq[(TradingPremises, Int)]) <- getTp(credId, abtfm)
-      filteredTps <- OptionT.pure[Future, Seq[(TradingPremises, Int)]](tps.filter { ele => index.contains(ele._2)})
+      (index: Set[Int], tps: Seq[(TradingPremises, Int)]) <- getTp(credId, model)
+      filteredTps <- OptionT.pure[Future, Seq[(TradingPremises, Int)]](tps.filter { key => index.contains(key._2)})
     } yield filteredTps
   }
 
-  private def filteredRps(credId: String, abtfm: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier) = {
+  private def filteredRps(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier) = {
     for {
-      (index: Set[Int], rps: Seq[(ResponsiblePerson, Int)]) <- getRp(credId, abtfm)
-      filteredRps <- OptionT.pure[Future, Seq[(ResponsiblePerson, Int)]](rps.filter { ele => index.contains(ele._2)})
+      (index: Set[Int], rps: Seq[(ResponsiblePerson, Int)]) <- getRp(credId, model)
+      filteredRps <- OptionT.pure[Future, Seq[(ResponsiblePerson, Int)]](rps.filter { key => index.contains(key._2)})
     } yield filteredRps
   }
 }
