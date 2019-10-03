@@ -18,6 +18,7 @@ package controllers.responsiblepeople
 
 import com.google.inject.Inject
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
 import views.html.responsiblepeople._
 
@@ -25,7 +26,8 @@ import scala.concurrent.Future
 
 class WhoMustRegisterController @Inject () (
                                            authAction: AuthAction,
-                                           val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                           val ds: CommonPlayDependencies,
+                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(index : Int, flow: Option[String] = None) =
       authAction.async {

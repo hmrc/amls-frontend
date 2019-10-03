@@ -22,7 +22,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching._
 import models.renewal.{FXTransactionsInLast12Months, Renewal}
-import play.api.mvc.Result
+import play.api.mvc.{MessagesControllerComponents, Result}
 import services.RenewalService
 import utils.AuthAction
 import views.html.renewal.fx_transaction_in_last_12_months
@@ -32,7 +32,8 @@ import scala.concurrent.Future
 class FXTransactionsInLast12MonthsController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                        val authAction: AuthAction,
                                                        val ds: CommonPlayDependencies,
-                                                       val renewalService: RenewalService) extends AmlsBaseController(ds) {
+                                                       val renewalService: RenewalService,
+                                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

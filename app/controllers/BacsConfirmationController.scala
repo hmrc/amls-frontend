@@ -21,6 +21,7 @@ import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector, _}
 import javax.inject.{Inject, Singleton}
 import models.businessdetails.{BusinessDetails, PreviouslyRegisteredYes}
+import play.api.mvc.MessagesControllerComponents
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AuthAction, BusinessName}
 
@@ -33,7 +34,8 @@ class BacsConfirmationController @Inject()(authAction: AuthAction,
                                            private[controllers] implicit val amlsConnector: AmlsConnector,
                                            private[controllers] implicit val statusService: StatusService,
                                            private[controllers] val authenticator: AuthenticatorConnector,
-                                           private[controllers] val enrolmentService: AuthEnrolmentsService) extends AmlsBaseController(ds) {
+                                           private[controllers] val enrolmentService: AuthEnrolmentsService,
+                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def bacsConfirmation() = authAction.async {
       implicit request =>

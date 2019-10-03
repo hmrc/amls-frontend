@@ -21,7 +21,7 @@ import controllers.CommonPlayDependencies
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.bankdetails._
-import play.api.mvc.Request
+import play.api.mvc.{MessagesControllerComponents, Request}
 import services.StatusService
 import utils.AuthAction
 
@@ -31,7 +31,8 @@ import scala.concurrent.Future
 class BankAccountTypeController @Inject()(val authAction: AuthAction,
                                           val ds: CommonPlayDependencies,
                                           val dataCacheConnector: DataCacheConnector,
-                                          val statusService: StatusService) extends BankDetailsController(ds) {
+                                          val statusService: StatusService,
+                                          val mcc: MessagesControllerComponents) extends BankDetailsController(ds, mcc) {
 
   def get(index: Int, edit: Boolean = false) = authAction.async {
       implicit request => {

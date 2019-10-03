@@ -24,6 +24,7 @@ import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement.{AddBusinessTypeFlowModel, AddBusinessTypeSummaryPageId}
+import play.api.mvc.MessagesControllerComponents
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import services.{StatusService, TradingPremisesService}
@@ -41,7 +42,8 @@ class AddBusinessTypeSummaryController @Inject()(
                                                   val businessMatchingService: BusinessMatchingService,
                                                   val helper: AddBusinessTypeHelper,
                                                   val router: Router[AddBusinessTypeFlowModel],
-                                                  val tradingPremisesService: TradingPremisesService) extends AmlsBaseController(ds) with RepeatingSection {
+                                                  val tradingPremisesService: TradingPremisesService,
+                                                  val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get() = authAction.async {
       implicit request =>

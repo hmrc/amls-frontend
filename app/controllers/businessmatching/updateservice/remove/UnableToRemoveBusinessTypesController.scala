@@ -22,6 +22,7 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessActivity, BusinessMatching}
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
 import views.html.businessmatching.updateservice.remove.unable_to_remove_activity
@@ -31,7 +32,8 @@ import scala.concurrent.Future
 @Singleton
 class UnableToRemoveBusinessTypesController @Inject()(authAction: AuthAction,
                                                       val ds: CommonPlayDependencies,
-                                                      val dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
+                                                      val dataCacheConnector: DataCacheConnector,
+                                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
       implicit request =>

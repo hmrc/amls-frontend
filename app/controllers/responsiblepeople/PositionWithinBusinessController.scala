@@ -22,6 +22,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.responsiblepeople._
+import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.position_within_business
 
@@ -30,7 +31,8 @@ import scala.concurrent.Future
 class PositionWithinBusinessController @Inject () (
                                                   val dataCacheConnector: DataCacheConnector,
                                                   authAction: AuthAction,
-                                                  val ds: CommonPlayDependencies)extends AmlsBaseController(ds) with RepeatingSection {
+                                                  val ds: CommonPlayDependencies,
+                                                  val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
 
 

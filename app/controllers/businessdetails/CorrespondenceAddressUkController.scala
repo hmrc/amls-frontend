@@ -25,7 +25,7 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessdetails.{BusinessDetails, CorrespondenceAddress, CorrespondenceAddressUk}
-import play.api.mvc.Request
+import play.api.mvc.{MessagesControllerComponents, Request}
 import services.AutoCompleteService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
@@ -39,7 +39,8 @@ class CorrespondenceAddressUkController @Inject ()(val dataConnector: DataCacheC
                                                    val auditConnector: AuditConnector,
                                                    val autoCompleteService: AutoCompleteService,
                                                    val authAction: AuthAction,
-                                                   val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                                   val ds: CommonPlayDependencies,
+                                                   val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

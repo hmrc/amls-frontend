@@ -22,7 +22,7 @@ import forms._
 import javax.inject.{Inject, Singleton}
 import models.tradingpremises._
 import play.api.i18n.MessagesApi
-import play.api.mvc.Request
+import play.api.mvc.{MessagesControllerComponents, Request}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, RepeatingSection}
 
@@ -31,7 +31,8 @@ import utils.{AuthAction, RepeatingSection}
 class ActivityStartDateController @Inject()(override val messagesApi: MessagesApi,
                                             val authAction: AuthAction,
                                             val ds: CommonPlayDependencies,
-                                            val dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) with RepeatingSection {
+                                            val dataCacheConnector: DataCacheConnector,
+                                            val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false) = authAction.async {
     implicit request =>

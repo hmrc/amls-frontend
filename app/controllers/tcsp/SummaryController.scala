@@ -28,6 +28,7 @@ import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.HeaderCarrier
 import views.html.tcsp.summary
 import play.api.Logger
+import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
 
 class SummaryController @Inject()(
@@ -35,7 +36,8 @@ class SummaryController @Inject()(
                                   val authAction: AuthAction,
                                   val ds: CommonPlayDependencies,
                                   val serviceFlow: ServiceFlow,
-                                  val statusService: StatusService) extends AmlsBaseController(ds) {
+                                  val statusService: StatusService,
+                                  val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def sortProviders(data: Tcsp): List[String] = {
 

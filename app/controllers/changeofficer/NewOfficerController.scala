@@ -26,6 +26,7 @@ import javax.inject.Inject
 import models.changeofficer.{ChangeOfficer, NewOfficer, RoleInBusiness}
 import models.responsiblepeople.ResponsiblePerson.flowChangeOfficer
 import models.responsiblepeople.{NominatedOfficer, Positions, ResponsiblePerson}
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, RepeatingSection, StatusConstants}
 
@@ -33,7 +34,8 @@ import scala.concurrent.Future
 
 class NewOfficerController @Inject()(authAction: AuthAction,
                                      val ds: CommonPlayDependencies,
-                                     val cacheConnector: DataCacheConnector) extends AmlsBaseController(ds) with RepeatingSection {
+                                     val cacheConnector: DataCacheConnector,
+                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   override def dataCacheConnector: DataCacheConnector = cacheConnector
 

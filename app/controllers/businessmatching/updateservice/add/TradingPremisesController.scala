@@ -25,6 +25,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.flowmanagement.{AddBusinessTypeFlowModel, TradingPremisesPageId}
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
@@ -42,7 +43,8 @@ class TradingPremisesController @Inject()(
                                            val statusService: StatusService,
                                            val businessMatchingService: BusinessMatchingService,
                                            val helper: AddBusinessTypeHelper,
-                                           val router: Router[AddBusinessTypeFlowModel]) extends AmlsBaseController(ds) {
+                                           val router: Router[AddBusinessTypeFlowModel],
+                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   val fieldName = "tradingPremisesNewActivities"
   implicit val boolWrite = BooleanFormReadWrite.formWrites(fieldName)

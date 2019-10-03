@@ -26,6 +26,7 @@ import javax.inject.Inject
 import models.Country
 import models.responsiblepeople._
 import play.api.i18n.MessagesApi
+import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.person_residence_type
 
@@ -35,7 +36,8 @@ class PersonResidentTypeController @Inject()(override val messagesApi: MessagesA
                                              val dataCacheConnector: DataCacheConnector,
                                              authAction: AuthAction,
                                              val ds: CommonPlayDependencies,
-                                             val appConfig:AppConfig) extends AmlsBaseController(ds) with RepeatingSection {
+                                             val appConfig:AppConfig,
+                                             val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>

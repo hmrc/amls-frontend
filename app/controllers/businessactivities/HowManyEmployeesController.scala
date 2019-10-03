@@ -21,6 +21,7 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, EmployeeCount, HowManyEmployees}
+import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
 import views.html.businessactivities._
 
@@ -28,7 +29,8 @@ import scala.concurrent.Future
 
 class HowManyEmployeesController @Inject() (val dataCacheConnector: DataCacheConnector,
                                             val authAction: AuthAction,
-                                            val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                            val ds: CommonPlayDependencies,
+                                            val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def updateData(howManyEmployees: Option[HowManyEmployees], data: EmployeeCount): HowManyEmployees = {
     howManyEmployees.fold[HowManyEmployees](HowManyEmployees(employeeCount = Some(data.employeeCount)))(x =>

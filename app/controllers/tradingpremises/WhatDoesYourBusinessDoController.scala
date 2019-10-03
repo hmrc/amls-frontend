@@ -26,7 +26,7 @@ import models.status.SubmissionStatus
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import org.joda.time.LocalDate
 import play.api.Logger
-import play.api.mvc.Result
+import play.api.mvc.{MessagesControllerComponents, Result}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -39,7 +39,8 @@ class WhatDoesYourBusinessDoController @Inject () (
                                                     val dataCacheConnector: DataCacheConnector,
                                                     val authAction: AuthAction,
                                                     val ds: CommonPlayDependencies,
-                                                    val statusService: StatusService) extends AmlsBaseController(ds) with RepeatingSection with FormHelpers with DateOfChangeHelper {
+                                                    val statusService: StatusService,
+                                                    val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection with FormHelpers with DateOfChangeHelper {
 
   private def data(credId: String, index: Int, edit: Boolean)(implicit hc: HeaderCarrier)
   : Future[Either[Result, (CacheMap, Set[BusinessActivity])]] = {

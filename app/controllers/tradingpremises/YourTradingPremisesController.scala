@@ -25,6 +25,7 @@ import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview, SubmissionStatus}
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
@@ -36,8 +37,8 @@ import scala.concurrent.Future
 class YourTradingPremisesController @Inject()(val dataCacheConnector: DataCacheConnector,
                                               val statusService: StatusService,
                                               val authAction: AuthAction,
-                                              val ds: CommonPlayDependencies
-                                             ) extends AmlsBaseController(ds) with RepeatingSection {
+                                              val ds: CommonPlayDependencies,
+                                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   private def updateTradingPremises(tradingPremises: Option[Seq[TradingPremises]]) : Future[Option[Seq[TradingPremises]]] = {
     tradingPremises match {

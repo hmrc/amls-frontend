@@ -22,7 +22,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching._
 import models.renewal.{MostTransactions, Renewal}
-import play.api.mvc.Result
+import play.api.mvc.{MessagesControllerComponents, Result}
 import services.{AutoCompleteService, RenewalService}
 import utils.{AuthAction, ControllerHelper}
 
@@ -33,7 +33,8 @@ class MostTransactionsController @Inject()(val authAction: AuthAction,
                                            val ds: CommonPlayDependencies,
                                            val cache: DataCacheConnector,
                                            val renewalService: RenewalService,
-                                           val autoCompleteService: AutoCompleteService) extends AmlsBaseController(ds) {
+                                           val autoCompleteService: AutoCompleteService,
+                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

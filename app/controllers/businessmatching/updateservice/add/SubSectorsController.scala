@@ -25,6 +25,7 @@ import forms.{Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching._
 import models.flowmanagement.{AddBusinessTypeFlowModel, SubSectorsPageId}
+import play.api.mvc.MessagesControllerComponents
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import utils.AuthAction
@@ -39,7 +40,8 @@ class SubSectorsController @Inject()(authAction: AuthAction,
                                      implicit val dataCacheConnector: DataCacheConnector,
                                      val businessMatchingService: BusinessMatchingService,
                                      val router: Router[AddBusinessTypeFlowModel],
-                                     val config:AppConfig) extends AmlsBaseController(ds) {
+                                     val config:AppConfig,
+                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

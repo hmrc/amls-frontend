@@ -24,6 +24,7 @@ import models.businesscustomer.Address
 import models.businessmatching.BusinessMatching
 import models.tradingpremises._
 import play.api.i18n.MessagesApi
+import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, RepeatingSection, StatusConstants}
 import views.html.tradingpremises.is_residential
 
@@ -34,7 +35,8 @@ class  IsResidentialController @Inject()(
                                           override val messagesApi: MessagesApi,
                                           val authAction: AuthAction,
                                           val ds: CommonPlayDependencies,
-                                          val dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) with RepeatingSection {
+                                          val dataCacheConnector: DataCacheConnector,
+                                          val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false) = authAction.async{
       implicit request =>

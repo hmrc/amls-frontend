@@ -22,6 +22,7 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.Country
 import models.responsiblepeople.{CountryOfBirth, PersonResidenceType, ResponsiblePerson}
+import play.api.mvc.MessagesControllerComponents
 import services.AutoCompleteService
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.country_of_birth
@@ -32,7 +33,8 @@ import scala.concurrent.Future
 class CountryOfBirthController @Inject()(authAction: AuthAction,
                                          val ds: CommonPlayDependencies,
                                          val dataCacheConnector: DataCacheConnector,
-                                         val autoCompleteService: AutoCompleteService) extends AmlsBaseController(ds) with RepeatingSection {
+                                         val autoCompleteService: AutoCompleteService,
+                                         val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>

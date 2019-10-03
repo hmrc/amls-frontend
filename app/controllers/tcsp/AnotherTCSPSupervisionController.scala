@@ -21,13 +21,15 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.tcsp.{ServicesOfAnotherTCSP, Tcsp}
+import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
 
 import scala.concurrent.Future
 
 class AnotherTCSPSupervisionController @Inject()(val authAction: AuthAction,
                                                  val ds: CommonPlayDependencies,
-                                                 val dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
+                                                 val dataCacheConnector: DataCacheConnector,
+                                                 val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

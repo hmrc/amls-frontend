@@ -22,6 +22,7 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import models.SubmissionRequestStatus
+import play.api.mvc.MessagesControllerComponents
 import services.{AuthEnrolmentsService, FeeResponseService, StatusService}
 import utils.AuthAction
 
@@ -33,7 +34,8 @@ class BankDetailsController @Inject()(val dataCacheConnector: DataCacheConnector
                                       val ds: CommonPlayDependencies,
                                       val authEnrolmentsService: AuthEnrolmentsService,
                                       val feeResponseService: FeeResponseService,
-                                      val statusService: StatusService) extends AmlsBaseController(ds){
+                                      val statusService: StatusService,
+                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
 
   def get(isUK: Boolean = true) = authAction.async {

@@ -24,13 +24,15 @@ import controllers.changeofficer.routes._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.changeofficer.{StillEmployed, StillEmployedNo, StillEmployedYes}
+import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
 
 import scala.concurrent.Future
 
 class StillEmployedController @Inject()(authAction: AuthAction,
                                         val ds: CommonPlayDependencies,
-                                        implicit val dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
+                                        implicit val dataCacheConnector: DataCacheConnector,
+                                        val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
      implicit request =>

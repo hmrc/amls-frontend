@@ -23,6 +23,7 @@ import javax.inject.Inject
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessMatching, BusinessMatchingMsbService, ForeignExchange}
 import models.moneyservicebusiness._
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.HeaderCarrier
@@ -34,7 +35,8 @@ class UsesForeignCurrenciesController @Inject()(authAction: AuthAction,
                                                 val ds: CommonPlayDependencies,
                                                 implicit val dataCacheConnector: DataCacheConnector,
                                                 implicit val statusService: StatusService,
-                                                implicit val serviceFlow: ServiceFlow) extends AmlsBaseController(ds) {
+                                                implicit val serviceFlow: ServiceFlow,
+                                                val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request => {

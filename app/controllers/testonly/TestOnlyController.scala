@@ -25,6 +25,7 @@ import javax.inject.{Inject, Singleton}
 import models.businessmatching.HighValueDealing
 import models.tradingpremises._
 import play.api.libs.json.Json
+import play.api.mvc.MessagesControllerComponents
 import services.UpdateMongoCacheService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
@@ -41,7 +42,8 @@ class TestOnlyController @Inject()(implicit val dataCacheConnector: DataCacheCon
                                    val amlsConnector: AmlsConnector,
                                    val authAction: AuthAction,
                                    val ds: CommonPlayDependencies,
-                                   val customerCache: BusinessCustomerSessionCache) extends AmlsBaseController(ds) {
+                                   val customerCache: BusinessCustomerSessionCache,
+                                   val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
 
   def dropMongoCache = authAction.async {

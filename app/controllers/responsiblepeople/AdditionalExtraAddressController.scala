@@ -25,7 +25,7 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople._
-import play.api.mvc.{AnyContent, Request}
+import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import services.AutoCompleteService
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
@@ -40,7 +40,8 @@ class AdditionalExtraAddressController @Inject() (
                                                    authAction: AuthAction,
                                                    val ds: CommonPlayDependencies,
                                                    auditConnector: AuditConnector,
-                                                   autoCompleteService: AutoCompleteService) extends AmlsBaseController(ds) with RepeatingSection {
+                                                   autoCompleteService: AutoCompleteService,
+                                                   val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
 
   final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None)

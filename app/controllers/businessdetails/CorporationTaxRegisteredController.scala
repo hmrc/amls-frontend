@@ -24,10 +24,10 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.businessdetails.{BusinessDetails, CorporationTaxRegistered, CorporationTaxRegisteredYes}
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany}
-import play.api.mvc.{Request, Result}
+import play.api.mvc.{MessagesControllerComponents, Request, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthAction}
+import utils.AuthAction
 import utils.ControllerHelper
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -39,7 +39,8 @@ import scala.concurrent.Future
 class CorporationTaxRegisteredController @Inject () (val dataCacheConnector: DataCacheConnector,
                                                      val businessMatchingConnector: BusinessMatchingConnector,
                                                      val authAction: AuthAction,
-                                                     val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                                     val ds: CommonPlayDependencies,
+                                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   val failedResult = InternalServerError("Failed to update the business corporation tax number")
 

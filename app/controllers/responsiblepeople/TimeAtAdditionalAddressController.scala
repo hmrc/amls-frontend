@@ -22,7 +22,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ThreeYearsPlus}
 import models.responsiblepeople._
-import play.api.mvc.{AnyContent, Request}
+import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.time_at_additional_address
 
@@ -31,7 +31,8 @@ import scala.concurrent.Future
 class TimeAtAdditionalAddressController @Inject () (
                                                    val dataCacheConnector: DataCacheConnector,
                                                    authAction: AuthAction,
-                                                   val ds: CommonPlayDependencies) extends AmlsBaseController(ds) with RepeatingSection {
+                                                   val ds: CommonPlayDependencies,
+                                                   val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None)
 

@@ -23,7 +23,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, _}
 import models.businessmatching.BusinessMatching
 import models.responsiblepeople.ResponsiblePerson
-import play.api.mvc.{AnyContent, Request, Result}
+import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 
@@ -34,7 +34,8 @@ class FitAndProperController @Inject()(
                                         val dataCacheConnector: DataCacheConnector,
                                         authAction: AuthAction,
                                         val ds: CommonPlayDependencies,
-                                        appConfig: AppConfig) extends AmlsBaseController(ds) with RepeatingSection {
+                                        appConfig: AppConfig,
+                                        val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   val FIELDNAME = "hasAlreadyPassedFitAndProper"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(FIELDNAME)

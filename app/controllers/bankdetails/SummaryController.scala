@@ -20,6 +20,7 @@ import connectors.DataCacheConnector
 import controllers.CommonPlayDependencies
 import javax.inject.{Inject, Singleton}
 import models.bankdetails.BankDetails
+import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
 
 import scala.concurrent.Future
@@ -27,7 +28,8 @@ import scala.concurrent.Future
 @Singleton
 class SummaryController @Inject()(val dataCacheConnector: DataCacheConnector,
                                   val authAction: AuthAction,
-                                  val ds: CommonPlayDependencies) extends BankDetailsController(ds) {
+                                  val ds: CommonPlayDependencies,
+                                  val mcc: MessagesControllerComponents) extends BankDetailsController(ds, mcc) {
 
   def get(index: Int) = authAction.async {
     implicit request =>

@@ -24,7 +24,7 @@ import javax.inject.{Inject, Singleton}
 import models.FeeResponse
 import models.payments.WaysToPay._
 import models.payments.{CreateBacsPaymentRequest, WaysToPay}
-import play.api.mvc.Result
+import play.api.mvc.{MessagesControllerComponents, Result}
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, AuthorisedRequest}
@@ -38,7 +38,8 @@ class WaysToPayController @Inject()(
                                      val statusService: StatusService,
                                      val paymentsService: PaymentsService,
                                      val authEnrolmentsService: AuthEnrolmentsService,
-                                     val feeResponseService: FeeResponseService) extends AmlsBaseController(ds) {
+                                     val feeResponseService: FeeResponseService,
+                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
       implicit request =>

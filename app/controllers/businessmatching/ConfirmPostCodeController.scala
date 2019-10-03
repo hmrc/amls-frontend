@@ -22,6 +22,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.{BusinessMatching, ConfirmPostcode}
+import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
 import views.html.businessmatching.confirm_postcode
 
@@ -30,7 +31,8 @@ import scala.concurrent.Future
 @Singleton
 class ConfirmPostCodeController @Inject()(authAction: AuthAction,
                                           val ds: CommonPlayDependencies,
-                                          val dataCacheConnector: DataCacheConnector)() extends AmlsBaseController(ds) {
+                                          val dataCacheConnector: DataCacheConnector,
+                                          val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
 
   def get() = authAction.async {

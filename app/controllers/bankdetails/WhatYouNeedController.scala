@@ -23,13 +23,14 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import models.bankdetails.BankDetails
 import models.bankdetails.BankDetails.Filters._
-import play.api.mvc.Call
+import play.api.mvc.{Call, MessagesControllerComponents}
 import utils.AuthAction
 import views.html.bankdetails._
 
 class WhatYouNeedController @Inject()(val authAction: AuthAction,
                                       val ds: CommonPlayDependencies,
-                                      dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
+                                      dataCacheConnector: DataCacheConnector,
+                                      val mcc: MessagesControllerComponents) extends AmlsBaseController(ds, mcc) {
 
   def get = authAction.async {
       implicit request =>

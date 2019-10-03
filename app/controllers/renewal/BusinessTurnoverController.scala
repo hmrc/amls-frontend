@@ -21,6 +21,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.renewal.{BusinessTurnover, Renewal}
+import play.api.mvc.MessagesControllerComponents
 import services.RenewalService
 import utils.AuthAction
 import views.html.renewal.business_turnover
@@ -31,7 +32,8 @@ import scala.concurrent.Future
 class BusinessTurnoverController @Inject()(val dataCacheConnector: DataCacheConnector,
                                            val authAction: AuthAction,
                                            val ds: CommonPlayDependencies,
-                                           val renewalService: RenewalService) extends AmlsBaseController(ds) {
+                                           val renewalService: RenewalService,
+                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

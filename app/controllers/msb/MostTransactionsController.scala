@@ -23,6 +23,7 @@ import javax.inject.{Inject, Singleton}
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessMatching, BusinessMatchingMsbService, CurrencyExchange, ForeignExchange}
 import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions}
+import play.api.mvc.MessagesControllerComponents
 import services.businessmatching.ServiceFlow
 import services.{AutoCompleteService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -36,7 +37,8 @@ class MostTransactionsController @Inject()(authAction: AuthAction,
                                            implicit val cacheConnector: DataCacheConnector,
                                            implicit val statusService: StatusService,
                                            implicit val serviceFlow: ServiceFlow,
-                                           val autoCompleteService: AutoCompleteService) extends AmlsBaseController(ds) {
+                                           val autoCompleteService: AutoCompleteService,
+                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

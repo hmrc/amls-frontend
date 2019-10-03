@@ -21,6 +21,7 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
+import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, RepeatingSection}
 import views.html.responsiblepeople.person_name
 
@@ -28,7 +29,8 @@ import scala.concurrent.Future
 
 class PersonNameController @Inject () ( val dataCacheConnector: DataCacheConnector,
                                         authAction: AuthAction,
-                                        val ds: CommonPlayDependencies) extends AmlsBaseController(ds) with RepeatingSection {
+                                        val ds: CommonPlayDependencies,
+                                        val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>

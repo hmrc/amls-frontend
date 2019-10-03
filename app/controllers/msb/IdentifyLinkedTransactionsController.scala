@@ -22,7 +22,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching.{MoneyServiceBusiness => _, _}
 import models.moneyservicebusiness._
-import play.api.mvc.Result
+import play.api.mvc.{MessagesControllerComponents, Result}
 import utils.AuthAction
 import views.html.msb.identify_linked_transactions
 
@@ -30,7 +30,8 @@ import scala.concurrent.Future
 
 class IdentifyLinkedTransactionsController @Inject() (val dataCacheConnector: DataCacheConnector,
                                                       authAction: AuthAction,
-                                                      val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                                      val ds: CommonPlayDependencies,
+                                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

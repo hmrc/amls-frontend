@@ -23,6 +23,7 @@ import javax.inject.Inject
 import models.DateOfChange
 import models.businessdetails.BusinessDetails
 import models.estateagentbusiness.EstateAgentBusiness
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
 import views.html.date_of_change
@@ -31,7 +32,8 @@ import scala.concurrent.Future
 
 class ServicesDateOfChangeController  @Inject()( val dataCacheConnector: DataCacheConnector,
                                                  val authAction: AuthAction,
-                                                 val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                                 val ds: CommonPlayDependencies,
+                                                 val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
       implicit request =>

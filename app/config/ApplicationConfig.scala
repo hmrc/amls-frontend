@@ -19,19 +19,16 @@ package config
 import javax.inject.Inject
 import play.api.Mode.Mode
 import play.api.{Application, Configuration, Environment, Play}
-import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 
-trait ApplicationConfig {
+trait BaseApplicationConfig {
 
   def refreshProfileToggle: Boolean
 
   def frontendBaseUrl: String
 }
 
-object ApplicationConfig extends ApplicationConfig with ServicesConfig {
-
-  override protected def mode: Mode = Play.current.mode
-  override protected def runModeConfiguration: Configuration = Play.current.configuration
+class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode) extends ServicesConfig(configuration, runMode) with BaseApplicationConfig {
 
   private def getConfigString(key: String) = getConfString(key, throw new Exception(s"Could not find config '$key'"))
   private def getConfigInt(key: String) = getConfInt(key, throw new Exception(s"Could not find config '$key'"))
@@ -45,8 +42,8 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   lazy val analyticsToken = Some(getConfigString(s"analytics.token"))
   lazy val analyticsHost = getConfigString(s"analytics.host")
 
-  lazy val betaFeedbackUrl = (if (env == "Prod") "" else contactHost) + getConfigString("contact-frontend.beta-feedback-url.authenticated")
-  lazy val betaFeedbackUnauthenticatedUrl = (if (env == "Prod") "" else contactHost) + getConfigString("contact-frontend.beta-feedback-url.unauthenticated")
+  lazy val betaFeedbackUrl = (if (runMode.env == "Prod") "" else contactHost) + getConfigString("contact-frontend.beta-feedback-url.authenticated")
+  lazy val betaFeedbackUnauthenticatedUrl = (if (runMode.env == "Prod") "" else contactHost) + getConfigString("contact-frontend.beta-feedback-url.unauthenticated")
 
   val reportAProblemPartialUrl = s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
   val reportAProblemNonJSUrl = s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
@@ -68,7 +65,7 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   def businessCustomerUrl = getConfigString("business-customer.url")
 
   private implicit lazy val app:Application = Play.current
-  lazy val whitelist = Play.configuration.getStringSeq("whitelist") getOrElse Seq.empty
+  //lazy val whitelist = Play.configuration.getStringSeq("whitelist") getOrElse Seq.empty
 
   lazy val ggUrl = baseUrl("government-gateway")
 
@@ -94,12 +91,9 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   }
 }
 
-class AppConfig @Inject()(val environment: Environment, val runModeConfiguration: Configuration, baseConfig: Configuration)
-  extends ApplicationConfig with ServicesConfig {
+class AppConfig @Inject()(configuration: Configuration, runMode: RunMode) extends ServicesConfig(configuration, runMode) with BaseApplicationConfig {
 
   private def getConfigString(key: String) = getConfString(key, throw new Exception(s"Could not find config '$key'"))
-
-  override protected def mode: Mode = environment.mode
 
   def amlsUrl = baseUrl("amls")
 
@@ -129,9 +123,9 @@ class AppConfig @Inject()(val environment: Environment, val runModeConfiguration
 
   def ggAuthUrl = baseUrl("government-gateway-authentication")
 
-  val mongoEncryptionEnabled = baseConfig.getBoolean("appCache.mongo.encryptionEnabled") getOrElse true
-  val mongoAppCacheEnabled = baseConfig.getBoolean("appCache.mongo.enabled") getOrElse false
-  val cacheExpiryInSeconds = baseConfig.getInt("appCache.expiryInSeconds") getOrElse 60
+  val mongoEncryptionEnabled = getConfBool("appCache.mongo.encryptionEnabled", true)
+  val mongoAppCacheEnabled = getConfBool("appCache.mongo.enabled", false)
+  val cacheExpiryInSeconds = getConfInt("appCache.expiryInSeconds", 60)
 
   override def refreshProfileToggle: Boolean = getConfBool("feature-toggle.refresh-profile", false)
 
@@ -145,5 +139,5 @@ class AppConfig @Inject()(val environment: Environment, val runModeConfiguration
 
   val testOnlyStubsUrl = baseUrl("test-only") + getConfigString("test-only.get-base-url")
 
-  def whitelist = baseConfig.getStringSeq("whitelist") getOrElse Seq.empty
+  //def whitelist = getStringSeq("whitelist") getOrElse Seq.empty
 }

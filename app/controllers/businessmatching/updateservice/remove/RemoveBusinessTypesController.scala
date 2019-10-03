@@ -25,6 +25,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, WhatBusinessTypesToRemovePageId}
+import play.api.mvc.MessagesControllerComponents
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
@@ -40,7 +41,8 @@ class RemoveBusinessTypesController @Inject()(
                                                val dataCacheConnector: DataCacheConnector,
                                                val businessMatchingService: BusinessMatchingService,
                                                val removeBusinessTypeHelper: RemoveBusinessTypeHelper,
-                                               val router: Router[RemoveBusinessTypeFlowModel]) extends AmlsBaseController(ds) {
+                                               val router: Router[RemoveBusinessTypeFlowModel],
+                                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   import models.businessmatching.BusinessActivities._
 

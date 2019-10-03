@@ -23,7 +23,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.responsiblepeople.{NonUKPassport, ResponsiblePerson}
 import play.api.i18n.MessagesApi
-import play.api.mvc.{AnyContent, Request}
+import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.person_non_uk_passport
@@ -34,7 +34,8 @@ class PersonNonUKPassportController @Inject()(override val messagesApi: Messages
                                               val dataCacheConnector: DataCacheConnector,
                                               authAction: AuthAction,
                                               val ds: CommonPlayDependencies,
-                                              val appConfig:AppConfig) extends AmlsBaseController(ds) with RepeatingSection {
+                                              val appConfig:AppConfig,
+                                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
 
   def get(index:Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {

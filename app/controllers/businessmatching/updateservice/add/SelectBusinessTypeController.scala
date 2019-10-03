@@ -29,6 +29,7 @@ import models.FormTypes
 import models.businessmatching.{BusinessActivity, BusinessActivities => BusinessMatchingActivities}
 import models.flowmanagement.{AddBusinessTypeFlowModel, SelectBusinessTypesPageId}
 import models.responsiblepeople.ResponsiblePerson
+import play.api.mvc.MessagesControllerComponents
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
@@ -45,7 +46,8 @@ class SelectBusinessTypeController @Inject()(
                                             implicit val dataCacheConnector: DataCacheConnector,
                                             val businessMatchingService: BusinessMatchingService,
                                             val router: Router[AddBusinessTypeFlowModel],
-                                            val addHelper: AddBusinessTypeHelper) extends AmlsBaseController(ds) with RepeatingSection {
+                                            val addHelper: AddBusinessTypeHelper,
+                                            val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   implicit val activityReader: Rule[UrlFormEncoded, BusinessActivity] =
     FormTypes.businessActivityRule("error.required.bm.register.service.single") map {

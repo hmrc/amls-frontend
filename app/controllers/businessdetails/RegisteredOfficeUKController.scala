@@ -23,7 +23,7 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import models.businessdetails.{BusinessDetails, RegisteredOffice}
-import play.api.mvc.Request
+import play.api.mvc.{MessagesControllerComponents, Request}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
@@ -37,7 +37,8 @@ class RegisteredOfficeUKController @Inject ()(
                                               val statusService: StatusService,
                                               val auditConnector: AuditConnector,
                                               val authAction: AuthAction,
-                                              val ds: CommonPlayDependencies) extends AmlsBaseController(ds) with DateOfChangeHelper {
+                                              val ds: CommonPlayDependencies,
+                                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

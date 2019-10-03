@@ -25,7 +25,7 @@ import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Write}
 import models.FormTypes
 import models.bankdetails.BankDetails
-import play.api.mvc.{Action, AnyContent, Request, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, StatusConstants}
@@ -37,7 +37,8 @@ class BankAccountNameController @Inject()(
                                            val authAction: AuthAction,
                                            val ds: CommonPlayDependencies,
                                            val dataCacheConnector: DataCacheConnector,
-                                           val statusService: StatusService) extends BankDetailsController(ds) {
+                                           val statusService: StatusService,
+                                           val mcc: MessagesControllerComponents) extends BankDetailsController(ds, mcc) {
 
   implicit def write: Write[String, UrlFormEncoded] = Write { data =>
     Map("accountName" -> Seq(data))

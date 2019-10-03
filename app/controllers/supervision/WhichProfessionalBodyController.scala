@@ -21,6 +21,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.supervision.{ProfessionalBodies, Supervision}
+import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
 import views.html.supervision.which_professional_body
 
@@ -29,7 +30,8 @@ import scala.concurrent.Future
 class WhichProfessionalBodyController @Inject()(
                                                val dataCacheConnector: DataCacheConnector,
                                                val authAction: AuthAction,
-                                               val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                               val ds: CommonPlayDependencies,
+                                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

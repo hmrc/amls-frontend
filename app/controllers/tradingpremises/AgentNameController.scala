@@ -25,6 +25,7 @@ import models.status.SubmissionDecisionApproved
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import play.api.libs.json.Format
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.HeaderCarrier
@@ -38,7 +39,8 @@ class AgentNameController @Inject()(
                                      val dataCacheConnector: DataCacheConnector,
                                      val authAction: AuthAction,
                                      val ds: CommonPlayDependencies,
-                                     val statusService: StatusService) extends AmlsBaseController(ds) with RepeatingSection with DateOfChangeHelper with FormHelpers {
+                                     val statusService: StatusService,
+                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
 
   def get(index: Int, edit: Boolean = false) = authAction.async {
       implicit request =>

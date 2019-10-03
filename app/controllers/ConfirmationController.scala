@@ -25,7 +25,7 @@ import models.confirmation.{BreakdownRow, Currency}
 import models.status._
 import models.{FeeResponse, SubmissionRequestStatus}
 import play.api.Logger
-import play.api.mvc.{AnyContent, Request, Result}
+import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
 import services.{AuthEnrolmentsService, FeeResponseService, StatusService, _}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, BusinessName}
@@ -44,7 +44,8 @@ class ConfirmationController @Inject()(authAction: AuthAction,
                                        private[controllers] val authenticator: AuthenticatorConnector,
                                        private[controllers] val feeResponseService: FeeResponseService,
                                        private[controllers] val enrolmentService: AuthEnrolmentsService,
-                                       private[controllers] val confirmationService: ConfirmationService) extends AmlsBaseController(ds) {
+                                       private[controllers] val confirmationService: ConfirmationService,
+                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   val prefix = "[ConfirmationController]"
 

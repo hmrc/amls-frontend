@@ -21,6 +21,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import javax.inject.Inject
 import models.tcsp.{ProvidedServices, Tcsp}
+import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
 import views.html.tcsp.provided_services
 
@@ -28,7 +29,8 @@ import scala.concurrent.Future
 
 class ProvidedServicesController @Inject() (val dataCacheConnector: DataCacheConnector,
                                             val authAction: AuthAction,
-                                            val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                            val ds: CommonPlayDependencies,
+                                            val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

@@ -21,6 +21,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import javax.inject.Inject
 import models.hvd.{Hvd, PercentageOfCashPaymentOver15000}
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import utils.AuthAction
@@ -32,7 +33,8 @@ class PercentageOfCashPaymentOver15000Controller @Inject() (val authAction: Auth
                                                             val ds: CommonPlayDependencies,
                                                             implicit val dataCacheConnector: DataCacheConnector,
                                                             implicit val serviceFlow: ServiceFlow,
-                                                            implicit val statusService: StatusService) extends AmlsBaseController(ds) {
+                                                            implicit val statusService: StatusService,
+                                                            val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

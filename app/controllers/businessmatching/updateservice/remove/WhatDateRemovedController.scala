@@ -26,6 +26,7 @@ import jto.validation.Write
 import jto.validation.forms.UrlFormEncoded
 import models.DateOfChange
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, _}
+import play.api.mvc.MessagesControllerComponents
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
@@ -38,7 +39,8 @@ class WhatDateRemovedController @Inject()(
                                            authAction: AuthAction,
                                            val ds: CommonPlayDependencies,
                                            val dataCacheConnector: DataCacheConnector,
-                                           val router: Router[RemoveBusinessTypeFlowModel]) extends AmlsBaseController(ds) {
+                                           val router: Router[RemoveBusinessTypeFlowModel],
+                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   implicit val dateWrites: Write[DateOfChange, UrlFormEncoded] =
     Write {

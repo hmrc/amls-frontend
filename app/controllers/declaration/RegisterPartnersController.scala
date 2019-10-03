@@ -26,7 +26,7 @@ import models.declaration.BusinessPartners
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{Partner, Positions, ResponsiblePerson}
 import models.status.{RenewalSubmitted, _}
-import play.api.mvc.{AnyContent, Request, Result}
+import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
 import services.{ProgressService, StatusService}
 import utils.DeclarationHelper._
 import utils.AuthAction
@@ -39,7 +39,8 @@ class RegisterPartnersController @Inject()(authAction: AuthAction,
                                            val ds: CommonPlayDependencies,
                                            val dataCacheConnector: DataCacheConnector,
                                            implicit val statusService: StatusService,
-                                           implicit val progressService: ProgressService) extends AmlsBaseController(ds) {
+                                           implicit val progressService: ProgressService,
+                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
   def get() = authAction.async {
     implicit request => {
 

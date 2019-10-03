@@ -21,6 +21,7 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.tradingpremises.{AgentRemovalReason, TradingPremises}
+import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, RepeatingSection}
 import views.html.tradingpremises.remove_agent_premises_reasons
 
@@ -29,7 +30,8 @@ import scala.concurrent.Future
 class RemoveAgentPremisesReasonsController @Inject () (
                                                       val dataCacheConnector: DataCacheConnector,
                                                       val authAction: AuthAction,
-                                                      val ds: CommonPlayDependencies)extends AmlsBaseController(ds) with RepeatingSection {
+                                                      val ds: CommonPlayDependencies,
+                                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, complete: Boolean = false) = authAction.async {
       implicit request =>

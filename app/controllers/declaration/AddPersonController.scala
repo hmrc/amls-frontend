@@ -25,7 +25,7 @@ import models.businessmatching.{BusinessMatching, BusinessType}
 import models.declaration.AddPerson
 import models.declaration.release7._
 import models.status._
-import play.api.mvc.{AnyContent, Request, Result}
+import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
 import services.StatusService
 import utils.{AuthAction, ControllerHelper}
 
@@ -34,7 +34,8 @@ import scala.concurrent.Future
 class AddPersonController @Inject () (val dataCacheConnector: DataCacheConnector,
                                       val statusService: StatusService,
                                       authAction: AuthAction,
-                                      val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                      val ds: CommonPlayDependencies,
+                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
 
   def get() = authAction.async {

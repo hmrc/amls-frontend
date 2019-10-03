@@ -23,6 +23,7 @@ import forms._
 import models.businessactivities.{BusinessActivities, _}
 import models.businessmatching._
 import play.api.i18n.Messages
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import utils.{AuthAction, ControllerHelper}
 import views.html.businessactivities._
@@ -32,7 +33,8 @@ import scala.concurrent.Future
 class InvolvedInOtherController @Inject() ( val dataCacheConnector: DataCacheConnector,
                                             implicit val statusService: StatusService,
                                             val authAction: AuthAction,
-                                            val ds: CommonPlayDependencies)extends AmlsBaseController(ds) {
+                                            val ds: CommonPlayDependencies,
+                                            val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

@@ -18,6 +18,7 @@ package controllers.businessdetails
 
 import com.google.inject.Inject
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
 import views.html.businessdetails._
 
@@ -25,7 +26,8 @@ import scala.concurrent.Future
 
 class WhatYouNeedController @Inject () (
                                          val authAction: AuthAction,
-                                         val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                         val ds: CommonPlayDependencies,
+                                         val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
     implicit request =>

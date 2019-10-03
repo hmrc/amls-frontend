@@ -21,6 +21,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.supervision._
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthAction
@@ -30,7 +31,8 @@ import scala.concurrent.Future
 
 class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                 val authAction: AuthAction,
-                                                val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                                val ds: CommonPlayDependencies,
+                                                val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

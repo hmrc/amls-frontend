@@ -25,11 +25,13 @@ import controllers.changeofficer.Helpers._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.changeofficer._
 import models.responsiblepeople.{ResponsiblePerson, ResponsiblePersonEndDate}
+import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, RepeatingSection, StatusConstants}
 
 class RemoveResponsiblePersonController @Inject()(authAction: AuthAction,
                                                   val ds: CommonPlayDependencies,
-                                                  implicit val dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) with RepeatingSection {
+                                                  implicit val dataCacheConnector: DataCacheConnector,
+                                                  val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get() = authAction.async {
      implicit request => {

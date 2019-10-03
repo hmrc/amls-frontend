@@ -25,6 +25,7 @@ import javax.inject.Inject
 import models.businessmatching._
 import models.businessmatching.updateservice.ChangeBusinessType
 import models.flowmanagement.ChangeBusinessTypesPageId
+import play.api.mvc.MessagesControllerComponents
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
@@ -40,7 +41,8 @@ class ChangeBusinessTypesController @Inject()(authAction: AuthAction,
                                               val businessMatchingService: BusinessMatchingService,
                                               val router: Router[ChangeBusinessType],
                                               val helper: RemoveBusinessTypeHelper,
-                                              val addHelper: AddBusinessTypeHelper) extends AmlsBaseController(ds) with RepeatingSection {
+                                              val addHelper: AddBusinessTypeHelper,
+                                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get() = authAction.async {
       implicit request =>

@@ -22,6 +22,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, _}
 import javax.inject.Inject
 import models.responsiblepeople.ResponsiblePerson
+import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 
 import scala.concurrent.Future
@@ -30,7 +31,8 @@ class ApprovalCheckController @Inject()(
                                          val dataCacheConnector: DataCacheConnector,
                                          authAction: AuthAction,
                                          val ds: CommonPlayDependencies,
-                                         appConfig: AppConfig) extends AmlsBaseController(ds) with RepeatingSection {
+                                         appConfig: AppConfig,
+                                         val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   val FIELD_NAME = "hasAlreadyPaidApprovalCheck"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(FIELD_NAME)

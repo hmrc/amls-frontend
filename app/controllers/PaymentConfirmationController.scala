@@ -28,6 +28,7 @@ import models.renewal.Renewal
 import models.status._
 import models.{FeeResponse, ReadStatusResponse}
 import play.api.Logger
+import play.api.mvc.MessagesControllerComponents
 import services.{AuthEnrolmentsService, FeeResponseService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -45,7 +46,8 @@ class PaymentConfirmationController @Inject()(authAction: AuthAction,
                                               private[controllers] implicit val statusService: StatusService,
                                               private[controllers] val feeResponseService: FeeResponseService,
                                               private[controllers] val enrolmentService: AuthEnrolmentsService,
-                                              private[controllers] val auditConnector: AuditConnector) extends AmlsBaseController(ds) {
+                                              private[controllers] val auditConnector: AuditConnector,
+                                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   val prefix = "[PaymentConfirmationController]"
 

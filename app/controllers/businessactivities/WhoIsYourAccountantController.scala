@@ -21,8 +21,8 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, UkAccountantsAddress, WhoIsYourAccountant}
+import play.api.mvc.MessagesControllerComponents
 import services.AutoCompleteService
-
 import utils.AuthAction
 
 import scala.concurrent.Future
@@ -30,7 +30,8 @@ import scala.concurrent.Future
 class WhoIsYourAccountantController @Inject() ( val dataCacheConnector: DataCacheConnector,
                                                 val autoCompleteService: AutoCompleteService,
                                                 val authAction: AuthAction,
-                                                val ds: CommonPlayDependencies)extends AmlsBaseController(ds) {
+                                                val ds: CommonPlayDependencies,
+                                                val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   //Joe - cannot seem to provide a default for UK/Non UK without providing defaults for other co-products
   private val defaultValues = WhoIsYourAccountant("", None, UkAccountantsAddress("","", None, None, ""))

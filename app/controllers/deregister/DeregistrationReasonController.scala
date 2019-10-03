@@ -25,6 +25,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.{BusinessMatching, HighValueDealing}
 import models.deregister.{DeRegisterSubscriptionRequest, DeregistrationReason}
 import org.joda.time.LocalDate
+import play.api.mvc.MessagesControllerComponents
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AckRefGenerator, AuthAction}
 import views.html.deregister.deregistration_reason
@@ -36,7 +37,8 @@ class DeregistrationReasonController @Inject()(authAction: AuthAction,
                                                val dataCacheConnector: DataCacheConnector,
                                                amls: AmlsConnector,
                                                enrolments: AuthEnrolmentsService,
-                                               statusService: StatusService) extends AmlsBaseController(ds) {
+                                               statusService: StatusService,
+                                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get = {
     authAction.async {

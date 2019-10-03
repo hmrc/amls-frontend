@@ -22,6 +22,7 @@ import forms._
 import javax.inject.{Inject, Singleton}
 import models.tradingpremises._
 import play.api.i18n.MessagesApi
+import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, RepeatingSection}
 
 import scala.concurrent.Future
@@ -30,7 +31,8 @@ import scala.concurrent.Future
 class AgentPartnershipController @Inject()(val dataCacheConnector: DataCacheConnector,
                                            val authAction: AuthAction,
                                            val ds: CommonPlayDependencies,
-                                           override val messagesApi: MessagesApi) extends AmlsBaseController(ds) with RepeatingSection {
+                                           override val messagesApi: MessagesApi,
+                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
     def get(index: Int, edit: Boolean = false) = authAction.async {
       implicit request =>

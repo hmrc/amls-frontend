@@ -22,6 +22,7 @@ import javax.inject.{Inject, Singleton}
 import models.status._
 import models.{SubmissionResponse, SubscriptionResponse}
 import play.api.Logger
+import play.api.mvc.MessagesControllerComponents
 import services.{RenewalService, StatusService, SubmissionService}
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
 import utils.AuthAction
@@ -35,7 +36,8 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
                                      val renewalService: RenewalService,
                                      val authenticator: AuthenticatorConnector,
                                      authAction: AuthAction,
-                                     val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                     val ds: CommonPlayDependencies,
+                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   private def handleRenewalAmendment(credId: String, amlsRegistrationNumber: Option[String], accountTypeId: (String, String))
                                     (implicit headerCarrier: HeaderCarrier) = {

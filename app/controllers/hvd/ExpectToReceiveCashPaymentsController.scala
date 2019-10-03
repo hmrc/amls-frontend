@@ -22,6 +22,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import jto.validation.{Path, ValidationError}
 import models.hvd.{Hvd, PaymentMethods}
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import utils.AuthAction
@@ -34,7 +35,8 @@ class ExpectToReceiveCashPaymentsController @Inject()( val authAction: AuthActio
                                                        val ds: CommonPlayDependencies,
                                                        implicit val cacheConnector: DataCacheConnector,
                                                        implicit val statusService: StatusService,
-                                                       implicit val serviceFlow: ServiceFlow) extends AmlsBaseController(ds) {
+                                                       implicit val serviceFlow: ServiceFlow,
+                                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

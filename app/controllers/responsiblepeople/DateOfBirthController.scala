@@ -23,6 +23,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.responsiblepeople.{DateOfBirth, ResponsiblePerson}
 import play.api.i18n.MessagesApi
+import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.date_of_birth
 
@@ -33,7 +34,8 @@ class DateOfBirthController @Inject()(
                                        val dataCacheConnector: DataCacheConnector,
                                        authAction: AuthAction,
                                        val ds: CommonPlayDependencies,
-                                       val appConfig: AppConfig) extends AmlsBaseController(ds) with RepeatingSection {
+                                       val appConfig: AppConfig,
+                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>

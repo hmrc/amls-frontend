@@ -18,13 +18,13 @@ package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
-
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
 import models.flowmanagement.{AddBusinessTypeFlowModel, AddMoreBusinessTypesPageId}
+import play.api.mvc.MessagesControllerComponents
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, BooleanFormReadWrite}
@@ -38,7 +38,8 @@ class AddMoreBusinessTypesController @Inject()(
                                                 authAction: AuthAction,
                                                 val ds: CommonPlayDependencies,
                                                 implicit val dataCacheConnector: DataCacheConnector,
-                                                val router: Router[AddBusinessTypeFlowModel]) extends AmlsBaseController(ds) {
+                                                val router: Router[AddBusinessTypeFlowModel],
+                                                val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   val fieldName = "addmoreactivities"
 

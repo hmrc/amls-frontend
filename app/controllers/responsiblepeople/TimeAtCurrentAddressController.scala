@@ -23,7 +23,7 @@ import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ThreeYearsPlus}
 import models.responsiblepeople.{ResponsiblePerson, _}
 import models.status.SubmissionStatus
-import play.api.mvc.{AnyContent, Request}
+import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import services.StatusService
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.time_at_address
@@ -34,7 +34,8 @@ class TimeAtCurrentAddressController @Inject () (
                                                 val dataCacheConnector: DataCacheConnector,
                                                 authAction: AuthAction,
                                                 val ds: CommonPlayDependencies,
-                                                val statusService: StatusService)extends AmlsBaseController(ds) with RepeatingSection {
+                                                val statusService: StatusService,
+                                                val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   final val DefaultAddressHistory = ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), None)
 

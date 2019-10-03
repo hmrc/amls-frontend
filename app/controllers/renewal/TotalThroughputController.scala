@@ -24,7 +24,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching._
 import models.renewal.{Renewal, TotalThroughput}
-import play.api.mvc.Result
+import play.api.mvc.{MessagesControllerComponents, Result}
 import services.RenewalService
 import utils.AuthAction
 import views.html.renewal.total_throughput
@@ -34,7 +34,8 @@ import scala.concurrent.Future
 class TotalThroughputController @Inject()(val authAction: AuthAction,
                                           val ds: CommonPlayDependencies,
                                           renewals: RenewalService,
-                                          dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
+                                          dataCacheConnector: DataCacheConnector,
+                                          val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

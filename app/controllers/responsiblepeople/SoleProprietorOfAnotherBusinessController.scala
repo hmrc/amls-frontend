@@ -20,6 +20,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.responsiblepeople.{ResponsiblePerson, SoleProprietorOfAnotherBusiness, VATRegistered}
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.sole_proprietor
@@ -30,7 +31,8 @@ import scala.concurrent.Future
 class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                           authAction: AuthAction,
                                                           val ds: CommonPlayDependencies,
-                                                          val statusService: StatusService) extends AmlsBaseController(ds) with RepeatingSection {
+                                                          val statusService: StatusService,
+                                                          val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request => {

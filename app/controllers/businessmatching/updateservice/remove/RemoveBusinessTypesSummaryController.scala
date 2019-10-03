@@ -24,6 +24,7 @@ import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
 import forms.EmptyForm
 import javax.inject.Inject
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, RemoveBusinessTypesSummaryPageId}
+import play.api.mvc.MessagesControllerComponents
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
@@ -35,7 +36,8 @@ class RemoveBusinessTypesSummaryController @Inject()(authAction: AuthAction,
                                                      val ds: CommonPlayDependencies,
                                                      val dataCacheConnector: DataCacheConnector,
                                                      val helper: RemoveBusinessTypeHelper,
-                                                     val router: Router[RemoveBusinessTypeFlowModel]) extends AmlsBaseController(ds) {
+                                                     val router: Router[RemoveBusinessTypeFlowModel],
+                                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
       implicit request => {

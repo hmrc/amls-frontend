@@ -22,6 +22,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.asp.{Asp, ServicesOfBusiness}
 import models.businessmatching.AccountancyServices
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import utils.{AuthAction, DateOfChangeHelper}
@@ -33,7 +34,8 @@ class ServicesOfBusinessController @Inject()(val dataCacheConnector: DataCacheCo
                                              val statusService: StatusService,
                                              authAction: AuthAction,
                                              val ds: CommonPlayDependencies,
-                                             val serviceFlow: ServiceFlow) extends AmlsBaseController(ds) with DateOfChangeHelper {
+                                             val serviceFlow: ServiceFlow,
+                                             val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

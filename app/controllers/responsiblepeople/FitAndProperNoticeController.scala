@@ -20,6 +20,7 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import javax.inject.{Inject, Singleton}
+import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, RepeatingSection}
 
 import scala.concurrent.Future
@@ -27,7 +28,8 @@ import scala.concurrent.Future
 @Singleton
 class FitAndProperNoticeController @Inject()(val dataCacheConnector: DataCacheConnector,
                                              authAction: AuthAction,
-                                             val ds: CommonPlayDependencies) extends AmlsBaseController(ds) with RepeatingSection {
+                                             val ds: CommonPlayDependencies,
+                                             val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request =>

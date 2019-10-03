@@ -21,7 +21,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.responsiblepeople.{NewHomeDateOfChange, ResponsiblePerson}
-import play.api.mvc.{AnyContent, Request}
+import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.new_home_date_of_change
 
@@ -30,7 +30,8 @@ import scala.concurrent.Future
 @Singleton
 class NewHomeAddressDateOfChangeController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                      authAction: AuthAction,
-                                                     val ds: CommonPlayDependencies) extends AmlsBaseController(ds) with RepeatingSection {
+                                                     val ds: CommonPlayDependencies,
+                                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int) = authAction.async {
       implicit request =>

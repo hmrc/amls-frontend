@@ -22,6 +22,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople._
 import play.api.i18n.MessagesApi
+import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.moved_address
 
@@ -32,7 +33,8 @@ import scala.concurrent.Future
 class MovedAddressController @Inject()(override val messagesApi: MessagesApi,
                                        val dataCacheConnector: DataCacheConnector,
                                        authAction: AuthAction,
-                                       val ds: CommonPlayDependencies) extends AmlsBaseController(ds) with RepeatingSection {
+                                       val ds: CommonPlayDependencies,
+                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
 
   def get(index: Int) = authAction.async {

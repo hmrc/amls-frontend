@@ -24,6 +24,7 @@ import models.DateOfChange
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ThreeYearsPlus, ZeroToFiveMonths}
 import models.responsiblepeople._
 import org.joda.time.{LocalDate, Months}
+import play.api.mvc.MessagesControllerComponents
 import services.AutoCompleteService
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople
@@ -34,7 +35,8 @@ import scala.concurrent.Future
 class NewHomeAddressController @Inject()(authAction: AuthAction,
                                          val ds: CommonPlayDependencies,
                                          val dataCacheConnector: DataCacheConnector,
-                                         val autoCompleteService: AutoCompleteService) extends AmlsBaseController(ds) with RepeatingSection {
+                                         val autoCompleteService: AutoCompleteService,
+                                         val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   final val DefaultAddressHistory = NewHomeAddress(PersonAddressUK("", "", None, None, ""))
 

@@ -18,15 +18,21 @@ package controllers
 
 import com.google.inject.Inject
 import config.{AppConfig, CachedStaticHtmlPartialProvider}
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.Request
+import play.api.i18n.{I18nSupport, Lang, Messages, MessagesApi}
+import play.api.mvc.{MessagesControllerComponents, Request}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import utils.ControllerHelper
 
-abstract class AmlsBaseController(val cpd: CommonPlayDependencies) extends FrontendController with I18nSupport {
+import scala.concurrent.ExecutionContext
+
+abstract class AmlsBaseController(val cpd: CommonPlayDependencies, override val controllerComponents: MessagesControllerComponents) extends FrontendController(controllerComponents) with I18nSupport {
 
   override implicit val messagesApi: MessagesApi = cpd.messagesApi
   implicit val partialProvider: CachedStaticHtmlPartialProvider = cpd.partialProvider
+
+  implicit val lang: Lang = Lang.defaultLang
+
+  implicit val ec: ExecutionContext = controllerComponents.executionContext
 
   val messages: MessagesApi = messagesApi
 

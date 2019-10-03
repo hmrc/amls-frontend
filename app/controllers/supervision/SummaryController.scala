@@ -23,13 +23,15 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.EmptyForm
 import javax.inject.Inject
 import models.supervision.Supervision
+import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
 import utils.ControllerHelper
 import views.html.supervision.summary
 
 class SummaryController  @Inject() (val dataCacheConnector: DataCacheConnector,
                                     val authAction: AuthAction,
-                                    val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                    val ds: CommonPlayDependencies,
+                                    val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
     implicit request =>

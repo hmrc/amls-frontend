@@ -24,6 +24,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawalReason}
 import org.joda.time.LocalDate
+import play.api.mvc.MessagesControllerComponents
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AckRefGenerator, AuthAction}
 import views.html.withdrawal.withdrawal_reason
@@ -36,7 +37,8 @@ class WithdrawalReasonController @Inject()(
                                             val amls: AmlsConnector,
                                             enrolments: AuthEnrolmentsService,
                                             statusService: StatusService,
-                                            cacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
+                                            cacheConnector: DataCacheConnector,
+                                            val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
     implicit request =>

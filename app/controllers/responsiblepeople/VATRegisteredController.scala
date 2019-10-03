@@ -21,6 +21,7 @@ import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.responsiblepeople.{ResponsiblePerson, VATRegistered}
+import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople._
 
@@ -29,7 +30,8 @@ import scala.concurrent.Future
 class VATRegisteredController @Inject () (
                                          val dataCacheConnector: DataCacheConnector,
                                          authAction: AuthAction,
-                                         val ds: CommonPlayDependencies) extends AmlsBaseController(ds) with RepeatingSection {
+                                         val ds: CommonPlayDependencies,
+                                         val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
 
 

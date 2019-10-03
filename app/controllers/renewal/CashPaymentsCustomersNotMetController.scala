@@ -22,6 +22,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.renewal.{CashPayments, CashPaymentsCustomerNotMet, Renewal}
+import play.api.mvc.MessagesControllerComponents
 import services.RenewalService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
@@ -33,7 +34,8 @@ import scala.concurrent.Future
 class CashPaymentsCustomersNotMetController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                       val authAction: AuthAction,
                                                       val ds: CommonPlayDependencies,
-                                                      val renewalService: RenewalService) extends AmlsBaseController(ds) {
+                                                      val renewalService: RenewalService,
+                                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

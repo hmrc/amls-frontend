@@ -23,6 +23,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.payments.TypeOfBank
+import play.api.mvc.MessagesControllerComponents
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -36,7 +37,8 @@ class TypeOfBankController @Inject()(
                                       val auditConnector: AuditConnector,
                                       val authEnrolmentsService: AuthEnrolmentsService,
                                       val feeResponseService: FeeResponseService,
-                                      val paymentsService: PaymentsService) extends AmlsBaseController(ds) {
+                                      val paymentsService: PaymentsService,
+                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
       implicit request =>

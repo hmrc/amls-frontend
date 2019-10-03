@@ -23,6 +23,7 @@ import controllers.CommonPlayDependencies
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.bankdetails.{Account, BankDetails}
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, StatusConstants}
@@ -34,7 +35,8 @@ class BankAccountIsUKController @Inject()(val dataCacheConnector: DataCacheConne
                                           val authAction: AuthAction,
                                           val ds: CommonPlayDependencies,
                                           val auditConnector: AuditConnector,
-                                          val statusService: StatusService) extends BankDetailsController(ds) {
+                                          val statusService: StatusService,
+                                          val mcc: MessagesControllerComponents) extends BankDetailsController(ds, mcc) {
 
   def get(index: Int, edit: Boolean = false) = authAction.async{
       implicit request =>

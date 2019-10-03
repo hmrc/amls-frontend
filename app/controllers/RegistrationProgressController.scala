@@ -24,7 +24,7 @@ import models.businessmatching.{BusinessActivity, BusinessMatching}
 import models.registrationprogress.{Completed, Section}
 import models.renewal.Renewal
 import models.status._
-import play.api.mvc.{AnyContent, Request}
+import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import services.businessmatching.{BusinessMatchingService, ServiceFlow}
 import services.{AuthEnrolmentsService, ProgressService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -45,7 +45,8 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
                                                protected[controllers] val progressService: ProgressService,
                                                protected[controllers] val sectionsProvider: SectionsProvider,
                                                protected[controllers] val businessMatchingService: BusinessMatchingService,
-                                               protected[controllers] val serviceFlow: ServiceFlow) extends AmlsBaseController(ds) {
+                                               protected[controllers] val serviceFlow: ServiceFlow,
+                                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
       implicit request =>

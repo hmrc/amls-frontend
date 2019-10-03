@@ -25,6 +25,7 @@ import models.businessmatching.BusinessMatching
 import models.registrationprogress.Completed
 import models.status.{ReadyForRenewal, RenewalSubmitted}
 import play.api.i18n.MessagesApi
+import play.api.mvc.MessagesControllerComponents
 import services.businessmatching.BusinessMatchingService
 import services.{ProgressService, RenewalService, SectionsProvider, StatusService}
 import utils.{AuthAction, ControllerHelper}
@@ -41,7 +42,8 @@ class RenewalProgressController @Inject()(val authAction: AuthAction,
                                           val sectionsProvider: SectionsProvider,
                                           val renewals: RenewalService,
                                           val businessMatchingService: BusinessMatchingService,
-                                          val statusService: StatusService) extends AmlsBaseController(ds) {
+                                          val statusService: StatusService,
+                                          val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
       implicit request =>

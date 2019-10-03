@@ -21,12 +21,14 @@ import controllers.CommonPlayDependencies
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import models.bankdetails.BankDetails
+import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, StatusConstants}
 
 @Singleton
 class RemoveBankDetailsController @Inject()(val authAction: AuthAction,
                                             val ds: CommonPlayDependencies,
-                                            val dataCacheConnector: DataCacheConnector) extends BankDetailsController(ds) {
+                                            val dataCacheConnector: DataCacheConnector,
+                                            val mcc: MessagesControllerComponents) extends BankDetailsController(ds, mcc) {
 
   def get(index: Int) = authAction.async {
       implicit request =>

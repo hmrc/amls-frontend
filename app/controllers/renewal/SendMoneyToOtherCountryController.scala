@@ -24,6 +24,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching._
 import models.renewal.{Renewal, SendMoneyToOtherCountry}
+import play.api.mvc.MessagesControllerComponents
 import services.RenewalService
 import utils.AuthAction
 import views.html.renewal.send_money_to_other_country
@@ -33,7 +34,8 @@ import scala.concurrent.Future
 class SendMoneyToOtherCountryController @Inject()(val authAction: AuthAction,
                                                   val ds: CommonPlayDependencies,
                                                   val dataCacheConnector: DataCacheConnector,
-                                                  renewalService: RenewalService) extends AmlsBaseController(ds) {
+                                                  renewalService: RenewalService,
+                                                  val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

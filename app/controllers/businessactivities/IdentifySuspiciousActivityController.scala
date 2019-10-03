@@ -21,6 +21,7 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import models.businessactivities.{BusinessActivities, _}
+import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
 import views.html.businessactivities._
 
@@ -28,7 +29,8 @@ import scala.concurrent.Future
 
 class IdentifySuspiciousActivityController @Inject() ( val dataCacheConnector: DataCacheConnector,
                                                        val authAction: AuthAction,
-                                                       val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                                       val ds: CommonPlayDependencies,
+                                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

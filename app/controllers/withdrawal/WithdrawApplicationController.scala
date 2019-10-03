@@ -22,6 +22,7 @@ import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import models.businessmatching.BusinessMatching
+import play.api.mvc.MessagesControllerComponents
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AuthAction, BusinessName}
 import views.html.withdrawal.withdraw_application
@@ -34,7 +35,8 @@ class WithdrawApplicationController @Inject()(
                                                implicit val amls: AmlsConnector,
                                                implicit val dc: DataCacheConnector,
                                                enrolments: AuthEnrolmentsService,
-                                               implicit val statusService: StatusService) extends AmlsBaseController(ds) {
+                                               implicit val statusService: StatusService,
+                                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
       implicit request =>

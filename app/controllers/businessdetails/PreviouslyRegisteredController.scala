@@ -23,7 +23,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.businessdetails._
 import models.businessmatching.BusinessType._
 import models.businessmatching.{BusinessMatching, BusinessType}
-import play.api.mvc.Result
+import play.api.mvc.{MessagesControllerComponents, Result}
 import utils.{AuthAction, ControllerHelper}
 import views.html.businessdetails._
 
@@ -32,7 +32,8 @@ import scala.concurrent.Future
 class PreviouslyRegisteredController @Inject () (
                                                   val dataCacheConnector: DataCacheConnector,
                                                   val authAction: AuthAction,
-                                                  val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                                  val ds: CommonPlayDependencies,
+                                                  val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

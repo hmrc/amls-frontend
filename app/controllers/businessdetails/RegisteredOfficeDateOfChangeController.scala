@@ -23,6 +23,7 @@ import forms.{Form2, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.businessdetails.{BusinessDetails, RegisteredOfficeNonUK, RegisteredOfficeUK}
 import org.joda.time.LocalDate
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import utils.{AuthAction, DateOfChangeHelper}
 
@@ -32,7 +33,8 @@ class RegisteredOfficeDateOfChangeController @Inject () (
                                                           val dataCacheConnector: DataCacheConnector,
                                                           val statusService: StatusService,
                                                           val authAction: AuthAction,
-                                                          val ds: CommonPlayDependencies) extends AmlsBaseController(ds) with DateOfChangeHelper {
+                                                          val ds: CommonPlayDependencies,
+                                                          val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
 
 
 

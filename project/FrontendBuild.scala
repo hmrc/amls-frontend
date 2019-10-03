@@ -12,16 +12,16 @@ private object AppDependencies {
   import play.sbt.PlayImport._
   import play.core.PlayVersion
 
-  private val playPartialsVersion = "6.9.0-play-25"
-  private val httpCachingClientVersion = "8.5.0-play-25"
-  private val playWhitelistFilterVersion = "3.1.0-play-25"
-  private val validationVersion = "2.0.1"
+  private val playPartialsVersion = "6.9.0-play-26"
+  private val httpCachingClientVersion = "8.5.0-play-26"
+  private val playWhitelistFilterVersion = "3.1.0-play-26"
+  private val validationVersion = "2.1.1"
   private val flexmarkVersion = "0.19.1"
   private val okHttpVersion = "3.9.1"
-  private val jsonEncryptionVersion = "4.4.0-play-25"
-  private val playReactivemongoVersion = "7.20.0-play-25"
-  private val authVersion = "2.27.0-play-25"
-  private val domain = "5.6.0-play-25"
+  private val jsonEncryptionVersion = "4.4.0-play-26"
+  private val playReactivemongoVersion = "7.20.0-play-26"
+  private val authVersion = "2.27.0-play-26"
+  private val domain = "5.6.0-play-26"
 
   private val playJars = ExclusionRule(organization = "com.typesafe.play")
 
@@ -34,16 +34,16 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "json-encryption" % jsonEncryptionVersion,
     "uk.gov.hmrc" %% "simple-reactivemongo" % playReactivemongoVersion,
     "uk.gov.hmrc" %% "auth-client" % authVersion,
-    "uk.gov.hmrc" %% "play-ui" % "8.0.0-play-25",
-    "uk.gov.hmrc" %% "bootstrap-play-25" % "4.16.0",
-    "uk.gov.hmrc" %% "govuk-template" % "5.38.0-play-25",
+    "uk.gov.hmrc" %% "play-ui" % "8.0.0-play-26",
+    "uk.gov.hmrc" %% "bootstrap-play-26" % "0.46.0",
+    "uk.gov.hmrc" %% "govuk-template" % "5.38.0-play-26",
 
     "io.github.jto" %% "validation-core"      % validationVersion excludeAll playJars,
     "io.github.jto" %% "validation-playjson"  % validationVersion excludeAll playJars,
     "io.github.jto" %% "validation-form"      % validationVersion excludeAll playJars,
 
     "com.vladsch.flexmark" % "flexmark-all" % flexmarkVersion,
-    "com.beachape" %% "enumeratum-play" % "1.5.10",
+    "com.beachape" %% "enumeratum-play" % "1.5.16",
     "com.squareup.okhttp3" % "mockwebserver" % okHttpVersion
   )
 

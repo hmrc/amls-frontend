@@ -23,6 +23,7 @@ import javax.inject.Inject
 import models.DateOfChange
 import models.businessdetails.BusinessDetails
 import models.hvd.Hvd
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
 import utils.{DateOfChangeHelper, RepeatingSection}
@@ -32,7 +33,8 @@ import scala.concurrent.Future
 
 class HvdDateOfChangeController @Inject() ( val dataCacheConnector: DataCacheConnector,
                                             val authAction: AuthAction,
-                                            val ds: CommonPlayDependencies) extends AmlsBaseController(ds) with RepeatingSection with DateOfChangeHelper {
+                                            val ds: CommonPlayDependencies,
+                                            val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper {
 
   def get(redirect: String) = authAction.async {
       implicit request =>

@@ -22,6 +22,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import models.businessdetails.BusinessDetails
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import utils.AuthAction
 import views.html.businessdetails._
@@ -31,7 +32,8 @@ class SummaryController @Inject () (
                                      val dataCache: DataCacheConnector,
                                      val statusService: StatusService,
                                      val authAction: AuthAction,
-                                     val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                     val ds: CommonPlayDependencies,
+                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
     implicit request =>

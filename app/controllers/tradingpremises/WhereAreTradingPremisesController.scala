@@ -28,7 +28,7 @@ import models.DateOfChange
 import models.status.SubmissionStatus
 import models.tradingpremises._
 import org.joda.time.LocalDate
-import play.api.mvc.Request
+import play.api.mvc.{MessagesControllerComponents, Request}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
@@ -42,7 +42,8 @@ class WhereAreTradingPremisesController @Inject () (
                                                      val statusService: StatusService,
                                                      val auditConnector: AuditConnector,
                                                      val authAction: AuthAction,
-                                                     val ds: CommonPlayDependencies)extends AmlsBaseController(ds) with RepeatingSection with DateOfChangeHelper with FormHelpers {
+                                                     val ds: CommonPlayDependencies,
+                                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
 
 
 

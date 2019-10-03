@@ -22,6 +22,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.status._
 import models.tradingpremises.{ActivityEndDate, TradingPremises}
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import utils.{AuthAction, RepeatingSection, StatusConstants}
 import views.html.tradingpremises.remove_trading_premises
@@ -30,7 +31,8 @@ class RemoveTradingPremisesController @Inject () (
                                                    val dataCacheConnector: DataCacheConnector,
                                                    val authAction: AuthAction,
                                                    val ds: CommonPlayDependencies,
-                                                   val statusService: StatusService) extends AmlsBaseController(ds) with RepeatingSection {
+                                                   val statusService: StatusService,
+                                                   val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, complete: Boolean = false) = authAction.async {
     implicit request =>

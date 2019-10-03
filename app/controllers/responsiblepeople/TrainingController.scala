@@ -23,7 +23,7 @@ import forms._
 import javax.inject.Inject
 import models.responsiblepeople.{ResponsiblePerson, Training}
 import play.api.i18n.MessagesApi
-import play.api.mvc.Result
+import play.api.mvc.{MessagesControllerComponents, Result}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 
 import scala.concurrent.Future
@@ -33,7 +33,8 @@ class TrainingController @Inject()(
                                     val dataCacheConnector: DataCacheConnector,
                                     authAction: AuthAction,
                                     val ds: CommonPlayDependencies,
-                                    val appConfig: AppConfig) extends AmlsBaseController(ds) with RepeatingSection {
+                                    val appConfig: AppConfig,
+                                    val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) =
     authAction.async {

@@ -22,6 +22,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.supervision._
 import org.joda.time.LocalDate
+import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
 import views.html.supervision.supervision_end
 
@@ -29,7 +30,8 @@ import scala.concurrent.Future
 
 class SupervisionEndController @Inject()(val dataCacheConnector: DataCacheConnector,
                                          val authAction: AuthAction,
-                                         val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                         val ds: CommonPlayDependencies,
+                                         val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

@@ -21,6 +21,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.moneyservicebusiness.{MoneyServiceBusiness, SendTheLargestAmountsOfMoney}
+import play.api.mvc.MessagesControllerComponents
 import services.businessmatching.ServiceFlow
 import services.{AutoCompleteService, StatusService}
 import utils.{AuthAction, ControllerHelper}
@@ -33,7 +34,8 @@ class SendTheLargestAmountsOfMoneyController @Inject()(authAction: AuthAction,
                                                        implicit val cacheConnector: DataCacheConnector,
                                                        implicit val statusService: StatusService,
                                                        implicit val serviceFlow: ServiceFlow,
-                                                       val autoCompleteService: AutoCompleteService) extends AmlsBaseController(ds) {
+                                                       val autoCompleteService: AutoCompleteService,
+                                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

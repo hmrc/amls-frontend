@@ -25,7 +25,7 @@ import models.declaration.BusinessNominatedOfficer
 import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import models.responsiblepeople.{NominatedOfficer, Positions, ResponsiblePerson}
 import models.status._
-import play.api.mvc.{AnyContent, Request, Result}
+import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
@@ -40,7 +40,8 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
                                                              authAction: AuthAction,
                                                              val ds: CommonPlayDependencies,
                                                              val statusService: StatusService,
-                                                             config: AppConfig) extends AmlsBaseController(ds) {
+                                                             config: AppConfig,
+                                                             val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def businessNominatedOfficerView(amlsRegistrationNo: Option[String],
                                    accountTypeId: (String, String),

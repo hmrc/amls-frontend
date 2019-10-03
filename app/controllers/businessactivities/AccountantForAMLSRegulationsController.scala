@@ -21,6 +21,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import com.google.inject.Inject
 import models.businessactivities.{AccountantForAMLSRegulations, BusinessActivities}
+import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
 import views.html.businessactivities._
 
@@ -28,7 +29,8 @@ import scala.concurrent.Future
 
 class AccountantForAMLSRegulationsController @Inject() (val dataCacheConnector: DataCacheConnector,
                                                         val authAction: AuthAction,
-                                                        val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                                        val ds: CommonPlayDependencies,
+                                                        val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

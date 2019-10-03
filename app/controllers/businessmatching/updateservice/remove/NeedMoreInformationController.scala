@@ -23,6 +23,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessActivity
 import models.flowmanagement.{NeedToUpdatePageId, RemoveBusinessTypeFlowModel}
+import play.api.mvc.MessagesControllerComponents
 import services.flowmanagement.Router
 import utils.AuthAction
 import views.html.businessmatching.updateservice.remove.need_more_information
@@ -33,7 +34,8 @@ import scala.concurrent.Future
 class NeedMoreInformationController @Inject()(authAction: AuthAction,
                                               val ds: CommonPlayDependencies,
                                               implicit val dataCacheConnector: DataCacheConnector,
-                                              val router: Router[RemoveBusinessTypeFlowModel]) extends AmlsBaseController(ds) {
+                                              val router: Router[RemoveBusinessTypeFlowModel],
+                                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
       implicit request =>

@@ -24,6 +24,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Singleton
 import models.businessmatching.BusinessMatching
 import models.tradingpremises.TradingPremises
+import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.tradingpremises.summary_details
 
@@ -32,7 +33,8 @@ import scala.concurrent.Future
 @Singleton
 class DetailedAnswersController @Inject()(val authAction: AuthAction,
                                           val ds: CommonPlayDependencies,
-                                          val dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) with RepeatingSection {
+                                          val dataCacheConnector: DataCacheConnector,
+                                          val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int) = authAction.async {
     implicit request =>

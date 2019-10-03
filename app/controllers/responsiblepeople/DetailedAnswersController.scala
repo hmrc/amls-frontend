@@ -27,7 +27,7 @@ import models.businessmatching.BusinessType.Partnership
 import models.responsiblepeople.ResponsiblePerson
 import models.responsiblepeople.ResponsiblePerson.{flowChangeOfficer, flowFromDeclaration}
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved}
-import play.api.mvc.Request
+import play.api.mvc.{MessagesControllerComponents, Request}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -40,7 +40,8 @@ class DetailedAnswersController @Inject () (
                                              authAction: AuthAction,
                                              val ds: CommonPlayDependencies,
                                              val statusService: StatusService,
-                                             val config: AppConfig) extends AmlsBaseController(ds) with RepeatingSection {
+                                             val config: AppConfig,
+                                             val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   private def showHideAddressMove(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String, lineId: Option[Int])
                                  (implicit headerCarrier: HeaderCarrier): Future[Boolean] = {

@@ -26,7 +26,7 @@ import models.declaration.release7.RoleWithinBusinessRelease7
 import models.responsiblepeople.{PositionWithinBusiness, ResponsiblePerson}
 import models.status._
 import play.api.i18n.Messages
-import play.api.mvc.{Action, AnyContent, Request, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
@@ -39,7 +39,8 @@ class WhoIsRegisteringController @Inject () (authAction: AuthAction,
                                              val dataCacheConnector: DataCacheConnector,
                                              val statusService: StatusService,
                                              val renewalService: RenewalService,
-                                             val amlsConnector: AmlsConnector) extends AmlsBaseController(ds) {
+                                             val amlsConnector: AmlsConnector,
+                                             val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
     implicit request =>

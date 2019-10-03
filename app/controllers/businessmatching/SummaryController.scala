@@ -23,6 +23,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessActivities, BusinessActivity}
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import utils.AuthAction
@@ -36,7 +37,8 @@ class SummaryController @Inject()(
                                    authAction: AuthAction,
                                    val ds: CommonPlayDependencies,
                                    val statusService: StatusService,
-                                   val businessMatchingService: BusinessMatchingService) extends AmlsBaseController(ds) {
+                                   val businessMatchingService: BusinessMatchingService,
+                                   val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
       implicit request =>

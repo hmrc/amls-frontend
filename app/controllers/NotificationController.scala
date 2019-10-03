@@ -25,7 +25,7 @@ import models.notifications.ContactType._
 import models.notifications._
 import models.status.{SubmissionDecisionRejected, SubmissionStatus}
 import play.api.i18n.Messages
-import play.api.mvc.{Request, Result}
+import play.api.mvc.{MessagesControllerComponents, Request, Result}
 import play.twirl.api.Template4
 import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, NotificationService, StatusService}
@@ -43,7 +43,8 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
                                        val ds: CommonPlayDependencies,
                                        val amlsNotificationService: NotificationService,
                                        implicit val amlsConnector: AmlsConnector,
-                                       implicit val dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
+                                       implicit val dataCacheConnector: DataCacheConnector,
+                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def getMessages = authAction.async {
       implicit request =>

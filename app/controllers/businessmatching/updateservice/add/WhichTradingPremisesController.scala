@@ -27,6 +27,7 @@ import models.businessmatching.BusinessActivities
 import models.businessmatching.updateservice.TradingPremisesActivities
 import models.flowmanagement.{AddBusinessTypeFlowModel, WhichTradingPremisesPageId}
 import models.tradingpremises.TradingPremises
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
@@ -45,7 +46,8 @@ class WhichTradingPremisesController @Inject()(
                                                 val statusService: StatusService,
                                                 val businessMatchingService: BusinessMatchingService,
                                                 val helper: AddBusinessTypeHelper,
-                                                val router: Router[AddBusinessTypeFlowModel]) extends AmlsBaseController(ds) with RepeatingSection {
+                                                val router: Router[AddBusinessTypeFlowModel],
+                                                val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

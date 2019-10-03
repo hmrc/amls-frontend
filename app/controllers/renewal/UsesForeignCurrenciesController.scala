@@ -24,6 +24,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching._
 import models.renewal._
+import play.api.mvc.MessagesControllerComponents
 import services.RenewalService
 import utils.AuthAction
 import views.html.renewal.uses_foreign_currencies
@@ -33,7 +34,8 @@ import scala.concurrent.Future
 class UsesForeignCurrenciesController @Inject()(val authAction: AuthAction,
                                                 val ds: CommonPlayDependencies,
                                                 renewalService: RenewalService,
-                                                dataCacheConnector: DataCacheConnector) extends AmlsBaseController(ds) {
+                                                dataCacheConnector: DataCacheConnector,
+                                                val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

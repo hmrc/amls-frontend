@@ -23,6 +23,7 @@ import javax.inject.Inject
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessMatching, BusinessMatchingMsbService, CurrencyExchange, ForeignExchange}
 import models.moneyservicebusiness.{MoneyServiceBusiness, SendMoneyToOtherCountry}
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
@@ -33,7 +34,8 @@ import scala.concurrent.Future
 class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                   authAction: AuthAction,
                                                   val ds: CommonPlayDependencies,
-                                                  val statusService: StatusService) extends AmlsBaseController(ds) {
+                                                  val statusService: StatusService,
+                                                  val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

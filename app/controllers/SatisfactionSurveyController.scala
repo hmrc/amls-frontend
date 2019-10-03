@@ -21,6 +21,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.SatisfactionSurvey
 import play.api.Logger
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.AuthAction
 
@@ -29,7 +30,8 @@ import scala.concurrent.Future
 @Singleton
 class SatisfactionSurveyController @Inject()(val auditConnector: AuditConnector,
                                              authAction: AuthAction,
-                                             val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                             val ds: CommonPlayDependencies,
+                                             val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

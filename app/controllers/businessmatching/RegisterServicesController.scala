@@ -27,6 +27,7 @@ import models.businessactivities.BusinessActivities
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
 import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -42,7 +43,8 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
                                            val statusService: StatusService,
                                            val dataCacheConnector: DataCacheConnector,
                                            val businessMatchingService: BusinessMatchingService,
-                                           val appConfig:AppConfig)() extends AmlsBaseController(ds) with RepeatingSection {
+                                           val appConfig:AppConfig,
+                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

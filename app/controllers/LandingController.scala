@@ -40,7 +40,7 @@ import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import play.api.Logger
-import play.api.mvc.{Action, Call, Request, Result}
+import play.api.mvc.{Action, Call, MessagesControllerComponents, Request, Result}
 import services.{AuthEnrolmentsService, LandingService, StatusService}
 import uk.gov.hmrc.auth.core.User
 import uk.gov.hmrc.http.HeaderCarrier
@@ -57,7 +57,8 @@ class LandingController @Inject()(val landingService: LandingService,
                                   val cacheConnector: DataCacheConnector,
                                   authAction: AuthAction,
                                   val ds: CommonPlayDependencies,
-                                  val statusService: StatusService) extends AmlsBaseController(ds) {
+                                  val statusService: StatusService,
+                                  val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   private lazy val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role()).absoluteUrl, "utf-8")
   def signoutUrl = s"${ApplicationConfig.logoutUrl}?continue=$unauthorisedUrl"

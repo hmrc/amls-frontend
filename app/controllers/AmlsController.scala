@@ -23,7 +23,8 @@ import utils.AuthAction
 import scala.concurrent.Future
 
 class AmlsController @Inject()(authAction: AuthAction,
-                               val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                               val ds: CommonPlayDependencies,
+                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   val unauthorised = Action {
     implicit request =>

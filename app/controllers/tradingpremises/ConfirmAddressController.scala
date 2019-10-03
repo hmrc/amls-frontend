@@ -26,6 +26,7 @@ import models.businesscustomer.{ReviewDetails, Address => BCAddress}
 import models.businessmatching.BusinessMatching
 import models.tradingpremises.{Address, ConfirmAddress, TradingPremises, YourTradingPremises}
 import play.api.i18n.MessagesApi
+import play.api.mvc.MessagesControllerComponents
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AuthAction, BusinessName, RepeatingSection}
 
@@ -39,7 +40,8 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
                                          val ds: CommonPlayDependencies,
                                          enrolments: AuthEnrolmentsService,
                                          implicit val statusService: StatusService,
-                                         implicit val amlsConnector: AmlsConnector) extends AmlsBaseController(ds) with RepeatingSection {
+                                         implicit val amlsConnector: AmlsConnector,
+                                         val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def getAddress(businessMatching: BusinessMatching): Option[BCAddress] =
     businessMatching.reviewDetails.fold[Option[BCAddress]](None)(r => Some(r.businessAddress))

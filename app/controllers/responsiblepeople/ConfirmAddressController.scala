@@ -24,13 +24,15 @@ import models.businesscustomer.{Address => BusinessCustomerAddress}
 import models.businessmatching.BusinessMatching
 import models.responsiblepeople._
 import play.api.i18n.MessagesApi
+import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.confirm_address
 
 class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
                                          val dataCacheConnector: DataCacheConnector,
                                          authAction: AuthAction,
-                                         val ds: CommonPlayDependencies) extends AmlsBaseController(ds) with RepeatingSection {
+                                         val ds: CommonPlayDependencies,
+                                         val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int) = authAction.async {
       implicit request =>

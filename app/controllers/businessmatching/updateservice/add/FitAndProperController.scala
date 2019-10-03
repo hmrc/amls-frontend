@@ -23,6 +23,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement.{AddBusinessTypeFlowModel, FitAndProperPageId}
+import play.api.mvc.MessagesControllerComponents
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, BooleanFormReadWrite, RepeatingSection}
@@ -36,7 +37,8 @@ class FitAndProperController @Inject()(
                                         authAction: AuthAction,
                                         val ds: CommonPlayDependencies,
                                         implicit val dataCacheConnector: DataCacheConnector,
-                                        val router: Router[AddBusinessTypeFlowModel]) extends AmlsBaseController(ds) with RepeatingSection {
+                                        val router: Router[AddBusinessTypeFlowModel],
+                                        val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   val NAME = "passedFitAndProper"
 

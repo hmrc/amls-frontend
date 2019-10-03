@@ -21,7 +21,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.hvd._
-import play.api.mvc.Call
+import play.api.mvc.{Call, MessagesControllerComponents}
 import utils.AuthAction
 import views.html.hvd.cash_payment
 
@@ -29,7 +29,8 @@ import scala.concurrent.Future
 
 class CashPaymentController @Inject() (val dataCacheConnector: DataCacheConnector,
                                        val authAction: AuthAction,
-                                       val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                       val ds: CommonPlayDependencies,
+                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) =
     authAction.async {

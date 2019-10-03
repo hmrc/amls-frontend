@@ -21,6 +21,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import javax.inject.Inject
 import models.asp.Asp
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import utils.AuthAction
@@ -30,7 +31,8 @@ class SummaryController @Inject()(val dataCache: DataCacheConnector,
                                   val serviceFlow: ServiceFlow,
                                   val statusService: StatusService,
                                   authAction: AuthAction,
-                                  val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                  val ds: CommonPlayDependencies,
+                                  val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
       implicit request =>

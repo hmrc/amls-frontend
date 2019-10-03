@@ -24,6 +24,7 @@ import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement.{AddBusinessTypeFlowModel, NoPSRPageId}
+import play.api.mvc.MessagesControllerComponents
 import services.flowmanagement.Router
 import utils.AuthAction
 import views.html.businessmatching.updateservice.add.cannot_add_services
@@ -36,7 +37,8 @@ class NoPsrController @Inject()(
                                  val ds: CommonPlayDependencies,
                                  implicit val dataCacheConnector: DataCacheConnector,
                                  val helper: AddBusinessTypeHelper,
-                                 val router: Router[AddBusinessTypeFlowModel]) extends AmlsBaseController(ds) {
+                                 val router: Router[AddBusinessTypeFlowModel],
+                                 val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
       implicit request =>

@@ -25,7 +25,7 @@ import models.responsiblepeople.ResponsiblePerson
 import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 import org.joda.time.LocalDate
 import play.api.i18n.Messages
-import play.api.mvc.{AnyContent, Request}
+import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import services.StatusService
 import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 
@@ -35,7 +35,8 @@ class CurrentAddressDateOfChangeController @Inject () (
                                                       val dataCacheConnector: DataCacheConnector,
                                                       authAction: AuthAction,
                                                       val ds: CommonPlayDependencies,
-                                                      statusService: StatusService) extends AmlsBaseController(ds) with RepeatingSection with DateOfChangeHelper with FormHelpers {
+                                                      statusService: StatusService,
+                                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
 
   def get(index: Int, edit: Boolean) = authAction {
     implicit request =>

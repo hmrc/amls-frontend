@@ -22,6 +22,7 @@ import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import models.businessmatching.BusinessMatching
+import play.api.mvc.MessagesControllerComponents
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AuthAction, BusinessName}
 import views.html.deregister.deregister_application
@@ -33,7 +34,8 @@ class DeRegisterApplicationController @Inject() (authAction: AuthAction,
                                                  implicit val cache: DataCacheConnector,
                                                  implicit val statusService: StatusService,
                                                  enrolments: AuthEnrolmentsService,
-                                                 implicit val amls: AmlsConnector) extends AmlsBaseController(ds) {
+                                                 implicit val amls: AmlsConnector,
+                                                 val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
         implicit request =>

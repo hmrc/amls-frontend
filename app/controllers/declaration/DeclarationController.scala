@@ -21,7 +21,7 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.declaration.AddPerson
 import models.status.{ReadyForRenewal, SubmissionReadyForReview}
-import play.api.mvc.Result
+import play.api.mvc.{MessagesControllerComponents, Result}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
@@ -31,7 +31,8 @@ import scala.concurrent.Future
 class DeclarationController @Inject () (val dataCacheConnector: DataCacheConnector,
                                         val statusService: StatusService,
                                         authAction: AuthAction,
-                                        val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                        val ds: CommonPlayDependencies,
+                                        val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   lazy val defaultView = declarationView("declaration.declaration.title", "submit.registration", isAmendment = false)
 

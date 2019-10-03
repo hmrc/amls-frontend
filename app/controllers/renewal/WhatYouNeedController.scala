@@ -19,6 +19,7 @@ package controllers.renewal
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
 import models.registrationprogress.{NotStarted, Section, Started}
+import play.api.mvc.MessagesControllerComponents
 import services.RenewalService
 import utils.AuthAction
 import views.html.renewal._
@@ -26,7 +27,8 @@ import views.html.renewal._
 @Singleton
 class WhatYouNeedController @Inject()(val authAction: AuthAction,
                                       val ds: CommonPlayDependencies,
-                                      renewalService: RenewalService) extends AmlsBaseController(ds) {
+                                      renewalService: RenewalService,
+                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
     implicit request =>

@@ -25,6 +25,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businesscustomer.Address
 import models.businessdetails.{BusinessDetails, ConfirmRegisteredOffice, RegisteredOffice, RegisteredOfficeUK}
 import models.businessmatching.BusinessMatching
+import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
 import views.html.businessdetails._
 
@@ -33,7 +34,8 @@ import scala.concurrent.Future
 
 class ConfirmRegisteredOfficeController @Inject () (val dataCache: DataCacheConnector,
                                                     val authAction: AuthAction,
-                                                    val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                                    val ds: CommonPlayDependencies,
+                                                    val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
 
   def updateBMAddress(bm: BusinessMatching): Option[RegisteredOffice] = {

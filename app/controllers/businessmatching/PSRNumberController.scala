@@ -25,6 +25,7 @@ import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import javax.inject.Inject
 import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
 import models.flowmanagement.{ChangeSubSectorFlowModel, PsrNumberPageId}
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
@@ -37,7 +38,8 @@ class PSRNumberController @Inject()(authAction: AuthAction,
                                     val statusService: StatusService,
                                     val businessMatchingService: BusinessMatchingService,
                                     val router: Router[ChangeSubSectorFlowModel],
-                                    val helper: ChangeSubSectorHelper) extends AmlsBaseController(ds) {
+                                    val helper: ChangeSubSectorHelper,
+                                    val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

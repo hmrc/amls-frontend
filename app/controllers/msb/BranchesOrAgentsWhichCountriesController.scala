@@ -21,6 +21,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.moneyservicebusiness.{BranchesOrAgents, BranchesOrAgentsHasCountries, BranchesOrAgentsWhichCountries, MoneyServiceBusiness}
+import play.api.mvc.MessagesControllerComponents
 import services.AutoCompleteService
 import utils.ControllerHelper
 import utils.AuthAction
@@ -30,7 +31,8 @@ import scala.concurrent.Future
 class BranchesOrAgentsWhichCountriesController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                          authAction: AuthAction,
                                                          val ds: CommonPlayDependencies,
-                                                         val autoCompleteService: AutoCompleteService) extends AmlsBaseController(ds) {
+                                                         val autoCompleteService: AutoCompleteService,
+                                                         val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

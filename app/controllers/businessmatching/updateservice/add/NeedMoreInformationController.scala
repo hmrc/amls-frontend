@@ -24,6 +24,7 @@ import javax.inject.{Inject, Singleton}
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BillPaymentServices, TelephonePaymentService}
 import models.flowmanagement.{AddBusinessTypeFlowModel, NeedMoreInformationPageId}
+import play.api.mvc.MessagesControllerComponents
 import services.flowmanagement.Router
 import utils.AuthAction
 import views.html.businessmatching.updateservice.add.new_service_information
@@ -34,7 +35,8 @@ import scala.concurrent.Future
 class NeedMoreInformationController @Inject()(authAction: AuthAction,
                                               val ds: CommonPlayDependencies,
                                               implicit val dataCacheConnector: DataCacheConnector,
-                                              val router: Router[AddBusinessTypeFlowModel]) extends AmlsBaseController(ds) {
+                                              val router: Router[AddBusinessTypeFlowModel],
+                                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
       implicit request =>

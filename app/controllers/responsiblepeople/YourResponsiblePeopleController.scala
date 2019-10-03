@@ -20,13 +20,15 @@ import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.responsiblepeople.ResponsiblePerson
+import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, RepeatingSection}
 import views.html.responsiblepeople.your_responsible_people
 
 class YourResponsiblePeopleController @Inject () (
                                                  val dataCacheConnector: DataCacheConnector,
                                                  authAction: AuthAction,
-                                                 val ds: CommonPlayDependencies) extends AmlsBaseController(ds) with RepeatingSection {
+                                                 val ds: CommonPlayDependencies,
+                                                 val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get() =
       authAction.async {

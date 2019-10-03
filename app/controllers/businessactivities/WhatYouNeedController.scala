@@ -18,6 +18,7 @@ package controllers.businessactivities
 
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import uk.gov.hmrc.auth.core.AuthConnector
 import utils.AuthAction
@@ -26,7 +27,8 @@ import views.html.businessactivities._
 class WhatYouNeedController @Inject()(val authConnector: AuthConnector,
                                       statusService: StatusService,
                                       authAction: AuthAction,
-                                      val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                      val ds: CommonPlayDependencies,
+                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 import scala.concurrent.Future
 
   def get = authAction.async {

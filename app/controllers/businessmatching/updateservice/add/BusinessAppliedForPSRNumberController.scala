@@ -24,6 +24,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching._
 import models.flowmanagement.{AddBusinessTypeFlowModel, PsrNumberPageId}
+import play.api.mvc.MessagesControllerComponents
 import services.flowmanagement.Router
 import utils.AuthAction
 import views.html.businessmatching.updateservice.add.business_applied_for_psr_number
@@ -35,7 +36,8 @@ class BusinessAppliedForPSRNumberController @Inject()(
                                                        authAction: AuthAction,
                                                        val ds: CommonPlayDependencies,
                                                        implicit val dataCacheConnector: DataCacheConnector,
-                                                       val router: Router[AddBusinessTypeFlowModel]) extends AmlsBaseController(ds) {
+                                                       val router: Router[AddBusinessTypeFlowModel],
+                                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

@@ -25,6 +25,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
 import models.flowmanagement._
+import play.api.mvc.MessagesControllerComponents
 import services.ResponsiblePeopleService._
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
@@ -44,7 +45,8 @@ class WhichFitAndProperController @Inject()(
                                              val businessMatchingService: BusinessMatchingService,
                                              val responsiblePeopleService: ResponsiblePeopleService,
                                              val helper: AddBusinessTypeHelper,
-                                             val router: Router[AddBusinessTypeFlowModel]) extends AmlsBaseController(ds) with RepeatingSection {
+                                             val router: Router[AddBusinessTypeFlowModel],
+                                             val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

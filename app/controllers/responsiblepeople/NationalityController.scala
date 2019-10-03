@@ -21,6 +21,7 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{Nationality, ResponsiblePerson}
+import play.api.mvc.MessagesControllerComponents
 import services.AutoCompleteService
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.nationality
@@ -31,7 +32,8 @@ class NationalityController @Inject () (
                                        val dataCacheConnector: DataCacheConnector,
                                        authAction: AuthAction,
                                        val ds: CommonPlayDependencies,
-                                       val autoCompleteService: AutoCompleteService) extends AmlsBaseController(ds) with RepeatingSection {
+                                       val autoCompleteService: AutoCompleteService,
+                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {

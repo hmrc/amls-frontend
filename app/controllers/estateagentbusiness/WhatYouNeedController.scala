@@ -18,13 +18,15 @@ package controllers.estateagentbusiness
 
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
+import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
 import views.html.estateagentbusiness._
 
 import scala.concurrent.Future
 
 class WhatYouNeedController  @Inject()(authAction: AuthAction,
-                                       val ds: CommonPlayDependencies) extends AmlsBaseController(ds) {
+                                       val ds: CommonPlayDependencies,
+                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async { implicit request =>
       Future.successful(Ok(what_you_need()))

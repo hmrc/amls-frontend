@@ -43,15 +43,17 @@ final case class AuthorisedRequest[A](request: Request[A],
 
 final case class enrolmentNotFound(msg: String = "enrolmentNotFound") extends AuthorisationException(msg)
 
-class DefaultAuthAction @Inject() (val authConnector: AuthConnector)
-                                  (implicit ec: ExecutionContext) extends AuthAction with AuthorisedFunctions {
+class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
+                                   applicationConfig: ApplicationConfig,
+                                   val parser: BodyParsers.Default)
+                                  (implicit val executionContext: ExecutionContext) extends AuthAction with AuthorisedFunctions {
 
   private val amlsKey = "HMRC-MLR-ORG"
   private val amlsNumberKey = "MLRRefNumber"
   private lazy val unauthorisedUrl = URLEncoder.encode(
     ReturnLocation(controllers.routes.AmlsController.unauthorised_role()).absoluteUrl, "utf-8"
   )
-  def signoutUrl = s"${ApplicationConfig.logoutUrl}?continue=$unauthorisedUrl"
+  def signoutUrl = s"${applicationConfig.logoutUrl}?continue=$unauthorisedUrl"
 
   override final protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] = {
 
@@ -156,4 +158,4 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector)
 }
 
 @com.google.inject.ImplementedBy(classOf[DefaultAuthAction])
-trait AuthAction extends ActionRefiner[Request, AuthorisedRequest] with ActionBuilder[AuthorisedRequest]
+trait AuthAction extends ActionRefiner[Request, AuthorisedRequest] with ActionBuilder[AuthorisedRequest, AnyContent]
