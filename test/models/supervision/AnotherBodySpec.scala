@@ -149,7 +149,7 @@ class AnotherBodySpec extends PlaySpec with MockitoSugar {
     
     "fail when missing all data" in {
       Json.fromJson[AnotherBody](Json.obj()) must
-        be(JsError((JsPath \ "anotherBody") -> play.api.data.validation.ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "anotherBody") -> play.api.libs.json.JsonValidationError("error.path.missing")))
     }
   }
 

@@ -22,6 +22,7 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessActivity, BusinessMatching}
+import play.api.i18n.Messages
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
@@ -42,7 +43,7 @@ class UnableToRemoveBusinessTypesController @Inject()(authAction: AuthAction,
       } getOrElse (InternalServerError("Get: Unable to show Unable to Remove Activities page"))
   }
 
-  private def getBusinessActivity(credId: String)(implicit hc: HeaderCarrier) = for {
+  private def getBusinessActivity(credId: String)(implicit hc: HeaderCarrier, messages: Messages) = for {
     model <- OptionT(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
     activities <- OptionT.fromOption[Future](model.alphabeticalBusinessActivitiesLowerCase(false))
   } yield activities.head

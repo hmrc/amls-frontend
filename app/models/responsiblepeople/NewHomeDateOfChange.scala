@@ -21,6 +21,8 @@ import jto.validation.{From, Path, Rule, Write}
 import models.FormTypes._
 import org.joda.time.{DateTimeFieldType, LocalDate}
 import play.api.libs.json._
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 
 case class NewHomeDateOfChange (dateOfChange: Option[LocalDate])
 

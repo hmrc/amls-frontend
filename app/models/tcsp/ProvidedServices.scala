@@ -134,7 +134,7 @@ object ProvidedServices {
             case "08" =>
               (JsPath \ "details").read[String].map (Other.apply  _) map identity[TcspService]
             case _ =>
-              Reads(_ => JsError((JsPath \ "services") -> play.api.data.validation.ValidationError("error.invalid")))
+              Reads(_ => JsError((JsPath \ "services") -> play.api.libs.json.JsonValidationError("error.invalid")))
           }.foldLeft[Reads[Set[TcspService]]](
             Reads[Set[TcspService]](_ => JsSuccess(Set.empty))
          ){

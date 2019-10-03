@@ -142,15 +142,15 @@ class WithdrawalReasonSpec extends PlaySpec with MustMatchers with MockitoSugar 
     "throw error" when {
       "enum value is invalid" in {
         Json.fromJson[WithdrawalReason](Json.obj("withdrawalReason" -> "10")) must
-          be(JsError(JsPath -> play.api.data.validation.ValidationError("error.invalid")))
+          be(JsError(JsPath -> play.api.libs.json.JsonValidationError("error.invalid")))
       }
       "enum is missing" in {
         Json.fromJson[WithdrawalReason](Json.obj()) must
-          be(JsError(JsPath \ "withdrawalReason" -> play.api.data.validation.ValidationError("error.path.missing")))
+          be(JsError(JsPath \ "withdrawalReason" -> play.api.libs.json.JsonValidationError("error.path.missing")))
       }
       "other reason is missing" in {
         Json.fromJson[WithdrawalReason](Json.obj("withdrawalReason" -> "Other, please specify")) must
-          be(JsError(JsPath \ "specifyOtherReason" -> play.api.data.validation.ValidationError("error.path.missing")))
+          be(JsError(JsPath \ "specifyOtherReason" -> play.api.libs.json.JsonValidationError("error.path.missing")))
       }
     }
 

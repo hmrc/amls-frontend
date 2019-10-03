@@ -110,7 +110,7 @@ class WhoIsRegisteringController @Inject () (authAction: AuthAction,
         Future.successful(status(who_is_registering_this_registration(form, rp)))
     }
 
-  def updateFormErrors(f: InvalidForm, status: SubmissionStatus, renewal: Boolean): InvalidForm = {
+  def updateFormErrors(f: InvalidForm, status: SubmissionStatus, renewal: Boolean)(implicit messages: Messages): InvalidForm = {
     val common = "error.required.declaration.who.is.declaring.this"
     status match {
       case SubmissionReadyForReview | SubmissionDecisionApproved | ReadyForRenewal(_) =>

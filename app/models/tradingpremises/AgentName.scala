@@ -24,6 +24,8 @@ import models.FormTypes._
 import org.joda.time.LocalDate
 import play.api.libs.json._
 import typeclasses.MongoKey
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 
 case class AgentName(agentName: String,
                      dateOfChange: Option[DateOfChange] = None,

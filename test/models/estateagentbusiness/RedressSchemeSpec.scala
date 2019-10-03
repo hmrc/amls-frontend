@@ -159,7 +159,7 @@ class RedressSchemeSpec extends PlaySpec with MockitoSugar {
                             )
 
         Json.fromJson[RedressScheme](json) must
-          be(JsError((JsPath \"propertyRedressSchemeOther") -> play.api.data.validation.ValidationError("error.path.missing")))
+          be(JsError((JsPath \"propertyRedressSchemeOther") -> play.api.libs.json.JsonValidationError("error.path.missing")))
       }
 
       "fail to validate when invalid option is passed" in {
@@ -169,7 +169,7 @@ class RedressSchemeSpec extends PlaySpec with MockitoSugar {
         )
 
         Json.fromJson[RedressScheme](json) must
-          be(JsError((JsPath) -> play.api.data.validation.ValidationError("error.invalid")))
+          be(JsError((JsPath) -> play.api.libs.json.JsonValidationError("error.invalid")))
       }
 
 

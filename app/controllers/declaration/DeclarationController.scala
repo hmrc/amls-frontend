@@ -27,6 +27,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
 
 import scala.concurrent.Future
+import play.api.libs
 
 class DeclarationController @Inject () (val dataCacheConnector: DataCacheConnector,
                                         val statusService: StatusService,

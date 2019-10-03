@@ -20,7 +20,7 @@ import cats.data.Validated.{Invalid, Valid}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.Path
-import play.api.data.validation.ValidationError
+import play.api.libs.json.JsonValidationError
 import play.api.libs.json._
 
 class CorporationTaxRegisteredSpec extends PlaySpec with MockitoSugar {

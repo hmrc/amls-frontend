@@ -33,6 +33,9 @@ case class YourTradingPremises(
                               )
 
 object YourTradingPremises {
+  
+  import play.api.libs.json.JodaWrites._
+  import play.api.libs.json.JodaReads._
 
   val maxLengthPremisesTradingName = 120
   val premisesTradingNameType = FormTypes.notEmptyStrip andThen

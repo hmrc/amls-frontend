@@ -23,12 +23,12 @@ import play.api.{Configuration, Logger, Play}
 import play.api.libs.json.Json
 import play.api.mvc.Request
 import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
-import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import uk.gov.hmrc.http.NotFoundException
+import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 import uk.gov.hmrc.play.bootstrap.filters.frontend.crypto.SessionCookieCrypto
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.http.ws.WSHttp
@@ -70,8 +70,10 @@ object BusinessMatchingReviewDetails {
 }
 
 class BusinessMatchingConnector @Inject()(val http: HttpClient,
-                                          hc: AmlsHeaderCarrierForPartialsConverter
-                                          ) extends ServicesConfig {
+                                          hc: AmlsHeaderCarrierForPartialsConverter,
+                                          val configuration: Configuration,
+                                          val runMode: RunMode
+                                          ) extends ServicesConfig(configuration, runMode) {
 
   import hc._
 
@@ -95,7 +97,4 @@ class BusinessMatchingConnector @Inject()(val http: HttpClient,
         Future.failed(ex)
     }
   }
-
-  override protected def mode: Mode = Play.current.mode
-  override protected def runModeConfiguration: Configuration = Play.current.configuration
 }

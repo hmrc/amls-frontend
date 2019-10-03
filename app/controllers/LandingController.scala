@@ -20,7 +20,6 @@ import java.net.URLEncoder
 
 import audit.ServiceEntrantEvent
 import cats.data.Validated.{Invalid, Valid}
-import config.ApplicationConfig
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models._
@@ -40,7 +39,7 @@ import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import play.api.Logger
-import play.api.mvc.{Action, Call, MessagesControllerComponents, Request, Result}
+import play.api.mvc.{Call, MessagesControllerComponents, Request, Result}
 import services.{AuthEnrolmentsService, LandingService, StatusService}
 import uk.gov.hmrc.auth.core.User
 import uk.gov.hmrc.http.HeaderCarrier
@@ -61,7 +60,7 @@ class LandingController @Inject()(val landingService: LandingService,
                                   val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   private lazy val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role()).absoluteUrl, "utf-8")
-  def signoutUrl = s"${ApplicationConfig.logoutUrl}?continue=$unauthorisedUrl"
+  def signoutUrl = s"${appConfig.logoutUrl}?continue=$unauthorisedUrl"
 
   private def isAuthorised(implicit headerCarrier: HeaderCarrier) =
     headerCarrier.authorization.isDefined
@@ -112,7 +111,7 @@ class LandingController @Inject()(val landingService: LandingService,
             }
           case (None, None) =>
             Logger.debug("LandingController:getWithoutAmendments - (None, None)")
-            Future.successful(Redirect(Call("GET", ApplicationConfig.businessCustomerUrl)))
+            Future.successful(Redirect(Call("GET", appConfig.businessCustomerUrl)))
           case (_, Some(amlsRef)) =>
             Logger.debug("LandingController:getWithoutAmendments: " + amlsRef)
             Future.successful(Redirect(controllers.routes.StatusController.get()))

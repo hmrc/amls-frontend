@@ -17,33 +17,28 @@
 package config
 
 import com.google.inject.Inject
-import play.api.Mode.Mode
-import play.api.{Configuration, Environment}
+import play.api.Configuration
 import uk.gov.hmrc.http.cache.client.SessionCache
+import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import uk.gov.hmrc.play.config.{AppName, ServicesConfig}
 
-class AmlsSessionCache @Inject()( environment: Environment,
-                                  override val runModeConfiguration: Configuration,
-                                  override val appNameConfiguration: Configuration,
-                                  httpClient: HttpClient) extends SessionCache with AppName with ServicesConfig {
+class AmlsSessionCache @Inject()(val configuration: Configuration,
+                                 val runMode: RunMode,
+                                 val httpClient: HttpClient) extends ServicesConfig(configuration, runMode) with SessionCache {
 
   override def http = httpClient
   override def defaultSource = getConfString("amls-frontend.cache", "amls-frontend")
   override def baseUri = baseUrl("cachable.session-cache")
   override def domain = getConfString("cachable.session-cache.domain", throw new Exception(s"Could not find config 'cachable.session-cache.domain'"))
-  override protected def mode: Mode = environment.mode
 }
 
-class BusinessCustomerSessionCache @Inject()(environment: Environment,
-                                             override val runModeConfiguration: Configuration,
-                                             override val appNameConfiguration: Configuration,
-                                             httpClient: HttpClient) extends SessionCache with AppName with ServicesConfig{
+class BusinessCustomerSessionCache @Inject()(val configuration: Configuration,
+                                             val runMode: RunMode,
+                                             val httpClient: HttpClient) extends ServicesConfig(configuration, runMode) with SessionCache {
   override def http = httpClient
   override def defaultSource: String = getConfString("cachable.session-cache.review-details.cache","business-customer-frontend")
   override def baseUri = baseUrl("cachable.session-cache")
   override def domain = getConfString("cachable.session-cache.domain", throw new Exception(s"Could not find config 'cachable.session-cache.domain'"))
-  override protected def mode: Mode = environment.mode
 }
 
 

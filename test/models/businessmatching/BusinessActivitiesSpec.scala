@@ -161,7 +161,7 @@ class BusinessActivitiesSpec extends AmlsSpec with MockitoSugar {
 
         "fail when on invalid data" in {
           Json.fromJson[BusinessActivities](Json.obj("businessActivity" -> "01")) must
-            be(JsError((JsPath \ "businessActivities") -> play.api.data.validation.ValidationError("error.path.missing")))
+            be(JsError((JsPath \ "businessActivities") -> play.api.libs.json.JsonValidationError("error.path.missing")))
         }
       }
 
@@ -192,7 +192,7 @@ class BusinessActivitiesSpec extends AmlsSpec with MockitoSugar {
 
         "fail given invalid data" in {
           Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("01"),  "additionalActivities" -> Seq("11"))) must
-            be(JsError((JsPath \ "additionalActivities") -> play.api.data.validation.ValidationError("error.invalid")))
+            be(JsError((JsPath \ "additionalActivities") -> play.api.libs.json.JsonValidationError("error.invalid")))
         }
       }
 
@@ -225,7 +225,7 @@ class BusinessActivitiesSpec extends AmlsSpec with MockitoSugar {
 
         "fail given invalid data" in {
           Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("01"),  "removeActivities" -> Seq("11"))) must
-            be(JsError((JsPath \ "removeActivities") -> play.api.data.validation.ValidationError("error.invalid")))
+            be(JsError((JsPath \ "removeActivities") -> play.api.libs.json.JsonValidationError("error.invalid")))
         }
       }
 
@@ -284,7 +284,7 @@ class BusinessActivitiesSpec extends AmlsSpec with MockitoSugar {
 
     "throw error for invalid data" in {
       Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq(JsString("20")))) must
-        be(JsError(JsPath \ "businessActivities", play.api.data.validation.ValidationError("error.invalid")))
+        be(JsError(JsPath \ "businessActivities", play.api.libs.json.JsonValidationError("error.invalid")))
     }
   }
 

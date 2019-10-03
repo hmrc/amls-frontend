@@ -44,7 +44,9 @@ private object AppDependencies {
 
     "com.vladsch.flexmark" % "flexmark-all" % flexmarkVersion,
     "com.beachape" %% "enumeratum-play" % "1.5.16",
-    "com.squareup.okhttp3" % "mockwebserver" % okHttpVersion
+    "com.squareup.okhttp3" % "mockwebserver" % okHttpVersion,
+    "com.typesafe.play" %% "play-json" % "2.6.13",
+    "com.typesafe.play" %% "play-json-joda" % "2.6.13"
   )
 
   trait ScopeDependencies {

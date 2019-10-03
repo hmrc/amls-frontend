@@ -99,7 +99,7 @@ class SupervisionEndReasonsSpec extends PlaySpec with MockitoSugar {
 
     "fail when data is missing" in {
       Json.fromJson[SupervisionEndReasons](Json.obj()) must
-        be(JsError((JsPath \ "supervisionEndingReason") -> play.api.data.validation.ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "supervisionEndingReason") -> play.api.libs.json.JsonValidationError("error.path.missing")))
     }
   }
 }

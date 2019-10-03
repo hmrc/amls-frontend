@@ -41,7 +41,7 @@ import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class UpdateMongoCacheService @Inject()(http: HttpClient, val cacheConnector: DataCacheConnector) {
+class UpdateMongoCacheService @Inject()(http: HttpClient, val cacheConnector: DataCacheConnector, val applicationConfig: ApplicationConfig) {
 
   def update(credId: String, response: UpdateMongoCacheResponse)
             (implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Any] = {
@@ -73,7 +73,7 @@ class UpdateMongoCacheService @Inject()(http: HttpClient, val cacheConnector: Da
   }
 
   def getMongoCacheData(fileName: String)(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Option[UpdateMongoCacheResponse]] = {
-    val requestUrl = s"${ApplicationConfig.mongoCacheUpdateUrl}$fileName"
+    val requestUrl = s"${applicationConfig.mongoCacheUpdateUrl}$fileName"
 
     http.GET[UpdateMongoCacheResponse](requestUrl)
       .map { r =>

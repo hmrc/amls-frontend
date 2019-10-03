@@ -29,6 +29,7 @@ import models.FormTypes
 import models.businessmatching.{BusinessActivity, BusinessActivities => BusinessMatchingActivities}
 import models.flowmanagement.{AddBusinessTypeFlowModel, SelectBusinessTypesPageId}
 import models.responsiblepeople.ResponsiblePerson
+import play.api.i18n.Messages
 import play.api.mvc.MessagesControllerComponents
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
@@ -97,7 +98,7 @@ class SelectBusinessTypeController @Inject()(
         }
   }
 
-  private def getFormData(credId: String)(implicit hc: HeaderCarrier) = for {
+  private def getFormData(credId: String)(implicit hc: HeaderCarrier, messages: Messages) = for {
     model <- businessMatchingService.getModel(credId)
     activities <- OptionT.fromOption[Future](model.activities) map {
       _.businessActivities

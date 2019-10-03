@@ -91,7 +91,7 @@ class SupervisionStartSpec extends PlaySpec with MockitoSugar {
 
     "fail when data is missing" in {
       Json.fromJson[SupervisionStart](Json.obj()) must
-        be(JsError((JsPath \ "supervisionStartDate") -> play.api.data.validation.ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "supervisionStartDate") -> play.api.libs.json.JsonValidationError("error.path.missing")))
     }
   }
 }

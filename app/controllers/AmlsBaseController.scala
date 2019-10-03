@@ -17,18 +17,20 @@
 package controllers
 
 import com.google.inject.Inject
-import config.{AppConfig, CachedStaticHtmlPartialProvider}
-import play.api.i18n.{I18nSupport, Lang, Messages, MessagesApi}
+import config.{AppConfig, ApplicationConfig, CachedStaticHtmlPartialProvider}
+import play.api.i18n.{I18nSupport, Lang, Messages, MessagesApi, MessagesImpl, MessagesProvider}
 import play.api.mvc.{MessagesControllerComponents, Request}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import utils.ControllerHelper
 
 import scala.concurrent.ExecutionContext
 
-abstract class AmlsBaseController(val cpd: CommonPlayDependencies, override val controllerComponents: MessagesControllerComponents) extends FrontendController(controllerComponents) with I18nSupport {
+abstract class AmlsBaseController(val cpd: CommonPlayDependencies, override val controllerComponents: MessagesControllerComponents) extends FrontendController(controllerComponents) {
 
   override implicit val messagesApi: MessagesApi = cpd.messagesApi
   implicit val partialProvider: CachedStaticHtmlPartialProvider = cpd.partialProvider
+
+  implicit val appConfig = cpd.amlsConfig
 
   implicit val lang: Lang = Lang.defaultLang
 
@@ -36,9 +38,13 @@ abstract class AmlsBaseController(val cpd: CommonPlayDependencies, override val 
 
   val messages: MessagesApi = messagesApi
 
-  def notFoundView(implicit request: Request[_]) = ControllerHelper.notFoundView(request, partialProvider)
+  implicit val messagesProvider: MessagesProvider = {
+    MessagesImpl(lang, messagesApi)
+  }
+
+  def notFoundView(implicit request: Request[_], partialProvider: CachedStaticHtmlPartialProvider, messages: play.api.i18n.Messages) = ControllerHelper.notFoundView
 }
 
-class CommonPlayDependencies @Inject()(val amlsConfig: AppConfig,
+class CommonPlayDependencies @Inject()(val amlsConfig: ApplicationConfig,
                                        val messagesApi: MessagesApi,
                                        val partialProvider: CachedStaticHtmlPartialProvider)

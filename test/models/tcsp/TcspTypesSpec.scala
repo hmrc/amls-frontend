@@ -73,7 +73,7 @@ class TcspTypesSpec extends PlaySpec {
     }
 
     "Json Validation" must {
-      import play.api.data.validation.ValidationError
+      import play.api.libs.json.JsonValidationError
 
       "successfully validate given values with option Trust or company formation agent etc" in {
         val json = Json.obj(

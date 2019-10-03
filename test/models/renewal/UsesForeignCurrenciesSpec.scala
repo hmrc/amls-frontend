@@ -85,12 +85,12 @@ class UsesForeignCurrenciesSpec extends AmlsSpec with CharacterSets {
 
       "fail when on path is missing" in {
         Json.fromJson[UsesForeignCurrencies](Json.obj()) must
-          be(JsError((JsPath \"foreignCurrencies") -> play.api.data.validation.ValidationError("error.path.missing")))
+          be(JsError((JsPath \"foreignCurrencies") -> play.api.libs.json.JsonValidationError("error.path.missing")))
       }
 
       "fail when on invalid data" in {
         Json.fromJson[UsesForeignCurrencies](Json.obj("foreignCurrencies" -> "")) must
-          be(JsError((JsPath \ "foreignCurrencies") -> play.api.data.validation.ValidationError("error.expected.jsboolean")))
+          be(JsError((JsPath \ "foreignCurrencies") -> play.api.libs.json.JsonValidationError("error.expected.jsboolean")))
       }
 
       "write valid data in using json write" in {

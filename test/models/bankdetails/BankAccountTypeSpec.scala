@@ -94,7 +94,7 @@ class BankAccountTypeSpec extends PlaySpec with MockitoSugar {
 
     "fail Json read on invalid data" in  {
       Json.fromJson[BankAccountType](Json.obj("bankAccountType" ->"10")) must
-        be (JsError(JsPath, play.api.data.validation.ValidationError("error.invalid")))
+        be (JsError(JsPath, play.api.libs.json.JsonValidationError("error.invalid")))
     }
 
     "write correct Json value" in  {

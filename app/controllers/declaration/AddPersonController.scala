@@ -25,6 +25,7 @@ import models.businessmatching.{BusinessMatching, BusinessType}
 import models.declaration.AddPerson
 import models.declaration.release7._
 import models.status._
+import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
 import services.StatusService
 import utils.{AuthAction, ControllerHelper}
@@ -71,7 +72,7 @@ class AddPersonController @Inject () (val dataCacheConnector: DataCacheConnector
     }
   }
 
-  def updateFormErrors(f: InvalidForm, businessType: Option[BusinessType]): InvalidForm = {
+  def updateFormErrors(f: InvalidForm, businessType: Option[BusinessType])(implicit messages: Messages): InvalidForm = {
     val message = businessType match {
       case Some(bt) => BusinessType.errorMessageFor(bt)
       case _ => throw new IllegalArgumentException("[Controllers][AddPersonController] business type is not known")

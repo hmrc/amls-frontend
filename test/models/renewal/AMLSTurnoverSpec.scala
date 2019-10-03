@@ -137,7 +137,7 @@ class AMLSTurnoverSpec extends PlaySpec with MockitoSugar {
 
     "throw error for invalid data" in {
       Json.fromJson[AMLSTurnover](Json.obj("turnover" -> "20")) must
-        be(JsError(JsPath, play.api.data.validation.ValidationError("error.invalid")))
+        be(JsError(JsPath, play.api.libs.json.JsonValidationError("error.invalid")))
     }
   }
 }

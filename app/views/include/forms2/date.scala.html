@@ -28,7 +28,7 @@
     legendHidden: Boolean = false,
     heading: String = "",
     section: String = "",
-    supportingContent: Html = HtmlFormat.empty
+    supportingContent: Html = play.twirl.api.HtmlFormat.empty
 )(implicit lang:Lang,  m: Messages)
 
 @field = @{ f(p) }

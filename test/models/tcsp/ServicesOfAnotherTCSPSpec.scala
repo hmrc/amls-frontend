@@ -113,7 +113,7 @@ class ServicesOfAnotherTCSPSpec extends PlaySpec with MockitoSugar {
     }
 
     "JSON validation" when {
-      import play.api.data.validation.ValidationError
+      import play.api.libs.json.JsonValidationError
 
       "successfully validate given an enum value" in {
 

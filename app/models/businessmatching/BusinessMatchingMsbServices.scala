@@ -73,7 +73,7 @@ object BusinessMatchingMsbService {
     case JsString("03") => JsSuccess(ChequeCashingNotScrapMetal)
     case JsString("04") => JsSuccess(ChequeCashingScrapMetal)
     case JsString("05") => JsSuccess(ForeignExchange)
-    case _ => JsError((JsPath \ "services") -> play.api.data.validation.ValidationError("error.invalid"))
+    case _ => JsError((JsPath \ "services") -> play.api.libs.json.JsonValidationError("error.invalid"))
   }
 
   implicit val jsonW = Writes[BusinessMatchingMsbService] {

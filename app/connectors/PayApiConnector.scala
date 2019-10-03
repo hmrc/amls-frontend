@@ -25,16 +25,17 @@ import play.api.libs.json.{JsSuccess, Json}
 import play.api.{Configuration, Logger, Play}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import uk.gov.hmrc.play.config.ServicesConfig
 import utils.HttpResponseHelper
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class PayApiConnector @Inject()(
                                  http: HttpClient,
-                                 auditConnector: AuditConnector
-                               ) extends HttpResponseHelper with ServicesConfig {
+                                 auditConnector: AuditConnector,
+                                 val configuration: Configuration,
+                                 val runMode: RunMode) extends ServicesConfig(configuration, runMode) with HttpResponseHelper  {
 
   lazy val payBaseUrl = s"${baseUrl("pay-api")}/pay-api"
   private val logDebug = (msg: String) => Logger.debug(s"[PayApiConnector] $msg")
@@ -56,7 +57,4 @@ class PayApiConnector @Inject()(
         None
     }
   }
-
-  override protected def mode: Mode = Play.current.mode
-  override protected def runModeConfiguration: Configuration = Play.current.configuration
 }

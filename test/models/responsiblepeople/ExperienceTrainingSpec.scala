@@ -145,7 +145,7 @@ class ExperienceTrainingSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("experienceTraining" -> true)
 
       Json.fromJson[ExperienceTraining](json) must
-        be(JsError((JsPath \ "experienceInformation") -> play.api.data.validation.ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "experienceInformation") -> play.api.libs.json.JsonValidationError("error.path.missing")))
     }
 
     "write the correct value for Yes" in {

@@ -158,7 +158,7 @@ object ControllerHelper {
 
   def rpTitleName(rp:Option[ResponsiblePerson]):String = rp.fold("")(_.personName.fold("")(_.titleName))
 
-  def notFoundView(implicit request: Request[_], partialProvider: CachedStaticHtmlPartialProvider) = {
+  def notFoundView(implicit request: Request[_], partialProvider: CachedStaticHtmlPartialProvider, messages: Messages) = {
     views.html.error(Messages("error.not-found.title"),
       Messages("error.not-found.heading"),
       Messages("error.not-found.message"))

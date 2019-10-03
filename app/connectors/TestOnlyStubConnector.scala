@@ -18,18 +18,17 @@ package connectors
 
 import config.AppConfig
 import javax.inject.Inject
-import play.api.Mode.Mode
-import play.api.{Configuration, Environment}
+import play.api.Configuration
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import uk.gov.hmrc.play.config.ServicesConfig
 
 import scala.concurrent.ExecutionContext
 
 class TestOnlyStubConnector @Inject()(val http: HttpClient,
                                       applicationConfig: AppConfig,
-                                      override val runModeConfiguration: Configuration,
-                                      environment: Environment) extends ServicesConfig {
+                                      val configuration: Configuration,
+                                      val runMode: RunMode) extends ServicesConfig(configuration, runMode) {
 
   lazy val baseUrl = applicationConfig.testOnlyStubsUrl
 
@@ -37,6 +36,4 @@ class TestOnlyStubConnector @Inject()(val http: HttpClient,
     val requestUrl = s"$baseUrl/clearstate"
     http.DELETE[HttpResponse](requestUrl)
   }
-
-  override protected def mode: Mode = environment.mode
 }
