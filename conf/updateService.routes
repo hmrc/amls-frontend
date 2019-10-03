@@ -1,5 +1,5 @@
-GET         /add-more-activities                                       @controllers.businessmatching.updateservice.add.AddMoreBusinessTypesController.get()
-POST        /add-more-activities                                       @controllers.businessmatching.updateservice.add.AddMoreBusinessTypesController.post()
+GET         /add-another-service                                       @controllers.businessmatching.updateservice.add.AddMoreBusinessTypesController.get()
+POST        /add-another-service                                       @controllers.businessmatching.updateservice.add.AddMoreBusinessTypesController.post()
 
 GET         /register-services                                         @controllers.businessmatching.updateservice.add.SelectBusinessTypeController.get(edit: Boolean ?= false)
 POST        /register-services                                         @controllers.businessmatching.updateservice.add.SelectBusinessTypeController.post(edit: Boolean ?= false)

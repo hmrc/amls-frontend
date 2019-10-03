@@ -30,17 +30,17 @@
     heading = header
 ) {
 
-    @panel(
-        gutter = true,
-        wide = true,
-        jsHidden = false
-    ) {
-        <p>@messages("businessmatching.updateservice.newserviceinformation.info.1")</p>
-        <p>@bulletedList(activities)</p>
+    @if(activities.size == 1) {
+        <p>@Messages("businessmatching.updateservice.newserviceinformation.info.1", activities.mkString(" "))</p>
+    } else {
+        <p>@Messages("businessmatching.updateservice.newserviceinformation.info.2")</p>
+
+        @bulletedList(activities)
+
+        <p>@Messages("businessmatching.updateservice.newserviceinformation.info.3")</p>
+
+        <p>@Messages("businessmatching.updateservice.newserviceinformation.info.4")</p>
     }
-
-    <p>@messages("businessmatching.updateservice.newserviceinformation.info.2")</p>
-
 
     @form(EmptyForm, controllers.businessmatching.updateservice.add.routes.NeedMoreInformationController.post()) {
         @submit(false, Some("Continue"), false, buttonId = Some("newserviceinfo-submit"))
