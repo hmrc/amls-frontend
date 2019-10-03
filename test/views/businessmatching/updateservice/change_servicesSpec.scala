@@ -63,15 +63,6 @@ class change_servicesSpec extends AmlsSpec with MustMatchers {
       Option(doc.getElementById("button-continue")).isDefined mustBe true
     }
 
-//    "show the correct business type text for only one existing service" in new ViewFixture {
-//      doc.body().text() must include(Messages("businessmatching.updateservice.selectactivities.currentactivities.hint"))
-//    }
-//
-//    "show the correct business type text for more than one existing service" in new MultipleViewFixture {
-//      doc.body().text() must include(Messages("businessmatching.updateservice.selectactivities.currentactivities.hint.plural"))
-//    }
-
-
     "show errors in the correct locations" in new ViewFixture {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
