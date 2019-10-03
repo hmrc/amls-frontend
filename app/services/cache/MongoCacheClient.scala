@@ -23,7 +23,7 @@ import org.joda.time.{DateTime, DateTimeZone}
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
-import play.modules.reactivemongo.MongoDbConnection
+import play.modules.reactivemongo.{MongoDbConnection, ReactiveMongoComponent}
 import reactivemongo.api.DefaultDB
 import reactivemongo.api.commands.WriteResult
 import reactivemongo.api.indexes.{Index, IndexType}
@@ -86,9 +86,9 @@ class CryptoCache(cache: Cache, crypto: CompositeSymmetricCrypto) extends Cache(
 /**
   * An injectible factory for creating new MongoCacheClients
   */
-class MongoCacheClientFactory @Inject()(config: AppConfig, applicationCrypto: ApplicationCrypto) {
-  class DbConnection extends MongoDbConnection
-  def createClient: MongoCacheClient = new MongoCacheClient(config, new DbConnection().db, applicationCrypto)
+class MongoCacheClientFactory @Inject()(config: AppConfig, applicationCrypto: ApplicationCrypto, component: ReactiveMongoComponent) {
+  //class DbConnection extends MongoDbConnection
+  def createClient: MongoCacheClient = new MongoCacheClient(config, component.mongoConnector.db, applicationCrypto)
 }
 
 /**
