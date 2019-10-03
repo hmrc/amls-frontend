@@ -34,7 +34,6 @@ class PersonNonUKPassportController @Inject()(override val messagesApi: Messages
                                               val dataCacheConnector: DataCacheConnector,
                                               authAction: AuthAction,
                                               val ds: CommonPlayDependencies,
-                                              val appConfig:AppConfig,
                                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
 

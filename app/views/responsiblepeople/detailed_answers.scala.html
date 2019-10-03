@@ -16,7 +16,7 @@
 
 @import include._
 @import forms2._
-@import config.CachedStaticHtmlPartialProvider
+@import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 @import models.responsiblepeople._
 @import controllers.responsiblepeople.routes._
 @import utils.DateHelper
@@ -30,7 +30,7 @@
     rpName: String = "",
     flow: Option[String] = None,
     showApprovalSection: Boolean = false,
-    businessMatching: BusinessMatching)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang)
+    businessMatching: BusinessMatching)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
 
 @detailedAnswers[T](
     question: String = "",

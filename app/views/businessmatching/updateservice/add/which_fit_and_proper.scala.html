@@ -16,11 +16,11 @@
 
 @import include._
 @import forms2._
-@import config.CachedStaticHtmlPartialProvider
+@import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 @import utils.HtmlElementHelpers._
 @import models.responsiblepeople.ResponsiblePerson
 
-@(f: forms.Form2[_], edit: Boolean, responsiblePeople: Seq[(ResponsiblePerson, Int)])(implicit request: Request[_], m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
+@(f: forms.Form2[_], edit: Boolean, responsiblePeople: Seq[(ResponsiblePerson, Int)])(implicit request: Request[_], m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()

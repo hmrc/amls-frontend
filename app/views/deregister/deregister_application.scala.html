@@ -19,10 +19,10 @@
 @import include._
 @import utils.Strings._
 @import forms2._
-@import config.CachedStaticHtmlPartialProvider
+@import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 @import forms.EmptyForm
 
-@(businessName: String, activities: Set[String], regNumber: String)(implicit request: Request[_], messages: Messages,partialProvider: CachedStaticHtmlPartialProvider)
+@(businessName: String, activities: Set[String], regNumber: String)(implicit request: Request[_], messages: Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @heading("status.deregister.title", "summary.status")

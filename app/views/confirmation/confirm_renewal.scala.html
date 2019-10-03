@@ -17,9 +17,9 @@
 @import include._
 @import models.confirmation._
 @import views.html.confirmation.{breakdown => breakdown_display}
-@import config.CachedStaticHtmlPartialProvider
+@import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 
-@(paymentReference: Option[String], total: Currency, breakdown: Seq[BreakdownRow], amountToPay: Currency, paymentsUrl: String)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
+@(paymentReference: Option[String], total: Currency, breakdown: Seq[BreakdownRow], amountToPay: Currency, paymentsUrl: String)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
 
 @main(
     title = Messages("confirmation.renewal.title")

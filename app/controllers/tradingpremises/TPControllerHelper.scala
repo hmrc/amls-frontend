@@ -16,9 +16,9 @@
 
 package controllers.tradingpremises
 
-import config.CachedStaticHtmlPartialProvider
+import config.{ApplicationConfig, CachedStaticHtmlPartialProvider}
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
-import play.api.i18n.Messages
+import play.api.i18n.{Lang, Messages}
 import play.api.mvc.{AnyContent, Request, Results}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{ControllerHelper, StatusConstants}
@@ -26,7 +26,7 @@ import utils.{ControllerHelper, StatusConstants}
 object TPControllerHelper {
 
   def redirectToNextPage(maybeCache: Option[CacheMap], index: Int, edit: Boolean)
-                        (implicit request: Request[AnyContent],partialProvider: CachedStaticHtmlPartialProvider, messages: Messages) = {
+                        (implicit request: Request[AnyContent],partialProvider: CachedStaticHtmlPartialProvider, messages: Messages, lang: Lang, appConfig: ApplicationConfig) = {
     maybeCache map { cache =>
 
       val maybeTradingPremises = for {

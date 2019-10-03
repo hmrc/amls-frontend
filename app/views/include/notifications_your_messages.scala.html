@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import config.{ApplicationConfig => appConfig, CachedStaticHtmlPartialProvider}
+@import config.{ApplicationConfig, CachedStaticHtmlPartialProvider}
 @import layouts.{govuk_template => hmrcGovUkTemplate}
 @import uk.gov.hmrc.play.views.html.{layouts => uiLayouts, helpers => uiHelpers}
 
@@ -30,7 +30,7 @@
     nameBusiness : Option[String] = None,
     userLoggedIn : Boolean = true,
     heading: Html = play.twirl.api.HtmlFormat.empty
-)(mainContent: Html = play.twirl.api.HtmlFormat.empty)(implicit request: Request[_],m:Messages)
+)(mainContent: Html = play.twirl.api.HtmlFormat.empty)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @styles = {
     <link href="@routes.Assets.versioned("jquery-ui.css")" rel="stylesheet"/>
@@ -85,7 +85,7 @@
 }
 
 @getHelpForm = {
-    @{uiHelpers.reportAProblemLink(config.ApplicationConfig.reportAProblemPartialUrl, config.ApplicationConfig.reportAProblemNonJSUrl)}
+    @{uiHelpers.reportAProblemLink(appConfig.reportAProblemPartialUrl, appConfig.reportAProblemNonJSUrl)}
 }
 
 @content = {

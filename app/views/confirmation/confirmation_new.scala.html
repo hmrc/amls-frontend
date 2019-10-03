@@ -16,11 +16,11 @@
 
 @import include._
 @import forms2._
-@import config.CachedStaticHtmlPartialProvider
+@import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 @import models.confirmation._
 @import config.ApplicationConfig
 
-@(paymentReference: Option[String], total: Currency, maybeBreakdownRows: Option[Seq[BreakdownRow]], paymentsUrl: String)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
+@(paymentReference: Option[String], total: Currency, maybeBreakdownRows: Option[Seq[BreakdownRow]], paymentsUrl: String)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @heading("confirmation.header", "submit.registration")

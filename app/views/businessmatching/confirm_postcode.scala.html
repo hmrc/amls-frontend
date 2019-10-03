@@ -18,10 +18,10 @@
 @import include.{main, heading}
 @import include.forms2._
 @import models.businessdetails._
-@import config.CachedStaticHtmlPartialProvider
+@import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 
 
-@(f: Form2[_])(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang)
+@(f: Form2[_])(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @errorSummary(f)

@@ -34,7 +34,7 @@ class WhatYouNeedController @Inject()(val authAction: AuthAction,
 
   def get = authAction.async {
       implicit request =>
-        val view = what_you_need.apply(_: Call)(request, implicitly, implicitly)
+        val view = what_you_need.apply(_: Call)
 
         val result = for {
             bankDetails <- OptionT(dataCacheConnector.fetch[Seq[BankDetails]](request.credId, BankDetails.key))

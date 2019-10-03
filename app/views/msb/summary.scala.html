@@ -16,14 +16,14 @@
 
 @import include._
 @import forms2._
-@import config.CachedStaticHtmlPartialProvider
+@import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 @import models.moneyservicebusiness._
 @import models.businessmatching._
 @import models.Country
 @import forms.EmptyForm
 @import models.businessmatching.updateservice.ServiceChangeRegister
 
-@(model: MoneyServiceBusiness, bmMsbServices: Option[BusinessMatchingMsbServices], register: ServiceChangeRegister)(implicit request: Request[_], m: Messages, lang: Lang,partialProvider: CachedStaticHtmlPartialProvider)
+@(model: MoneyServiceBusiness, bmMsbServices: Option[BusinessMatchingMsbServices], register: ServiceChangeRegister)(implicit request: Request[_], m: Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
 @heading("title.cya", "summary.msb")

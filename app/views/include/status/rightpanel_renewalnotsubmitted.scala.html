@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@(endDate: String)(implicit request: Request[_],m:Messages)
+@(endDate: String)(implicit request: Request[_],m:Messages, lang: Lang)
 <h2 class="heading-medium no-margin">@Messages("status.renewalnotsubmitted.description")</h2>
 <p>@Messages("status.renewalnotsubmitted.description2")</p>
 <p>@Messages("status.renewalnotsubmitted.description3", endDate)</p>

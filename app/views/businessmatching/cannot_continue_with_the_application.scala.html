@@ -14,11 +14,11 @@
  * limitations under the License.
  *@
 
+@import config.{ApplicationConfig, CachedStaticHtmlPartialProvider}
 @import include._
-@import forms2._
-@import config.CachedStaticHtmlPartialProvider
-@import config.{ApplicationConfig => appConfig}
-@()(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
+@import include.forms2._
+
+@()(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()

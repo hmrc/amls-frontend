@@ -18,9 +18,9 @@
 @import include.{main, heading}
 @import include.forms2._
 @import models.businessdetails._
-@import config.CachedStaticHtmlPartialProvider
+@import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 
-@(f: Form2[_],index: Int, edit: Boolean)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang)
+@(f: Form2[_],index: Int, edit: Boolean)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()

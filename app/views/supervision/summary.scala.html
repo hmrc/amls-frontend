@@ -16,13 +16,13 @@
 
 @import include._
 @import forms2._
-@import config.CachedStaticHtmlPartialProvider
+@import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 @import models.supervision._
 @import utils._
 @import config.ApplicationConfig
 @import org.joda.time._
 
-@(f: forms.Form2[_], model: Supervision)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang)
+@(f: forms.Form2[_], model: Supervision)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @heading("title.cya", "summary.supervision")

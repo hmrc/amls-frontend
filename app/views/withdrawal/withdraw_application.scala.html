@@ -19,10 +19,10 @@
 @import utils.DateHelper
 @import utils.Strings._
 @import forms2._
-@import config.CachedStaticHtmlPartialProvider
+@import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 
 @import forms.EmptyForm
-@(businessName: String, processingDate: LocalDateTime)(implicit messages: Messages, request: Request[_],partialProvider: CachedStaticHtmlPartialProvider)
+@(businessName: String, processingDate: LocalDateTime)(implicit messages: Messages, request: Request[_],partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
   @heading("status.withdraw.title", "summary.status")

@@ -16,10 +16,10 @@
 
 @import include._
 @import include.forms2._
-@import config.CachedStaticHtmlPartialProvider
+@import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 @import forms.Form2
 
-@(f: Form2[_])(implicit m: Messages, request: Request[_],partialProvider: CachedStaticHtmlPartialProvider)
+@(f: Form2[_])(implicit m: Messages, request: Request[_],partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()

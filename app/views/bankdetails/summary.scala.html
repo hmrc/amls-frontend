@@ -14,16 +14,13 @@
  * limitations under the License.
  *@
 
-@import include._
-@import forms2._
-@import config.CachedStaticHtmlPartialProvider
-@import models.bankdetails._
-@import utils.StatusConstants
-@import models.status._
-@import config.ApplicationConfig
+@import config.{ApplicationConfig, CachedStaticHtmlPartialProvider}
 @import forms.EmptyForm
+@import include._
+@import models.bankdetails._
+@import include.forms2._
 
-@(bankDetails: BankDetails, index: Integer)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang)
+@(bankDetails: BankDetails, index: Integer)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @heading("title.cya", "summary.bankdetails")

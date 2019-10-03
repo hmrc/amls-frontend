@@ -18,13 +18,13 @@ package config
 
 import com.google.inject.Inject
 import play.api.Configuration
-import play.api.i18n.MessagesApi
+import play.api.i18n.{Lang, MessagesApi}
 import play.api.mvc.Request
 import uk.gov.hmrc.play.bootstrap.http.FrontendErrorHandler
 
 class AmlsErrorHandler @Inject()(val messagesApi: MessagesApi, val configuration: Configuration)
-                                (implicit val partialProvider: CachedStaticHtmlPartialProvider) extends FrontendErrorHandler {
+                                (implicit val partialProvider: CachedStaticHtmlPartialProvider, appConfig: ApplicationConfig) extends FrontendErrorHandler {
 
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit request: Request[_]) =
-    views.html.error(pageTitle, heading, message)
+    views.html.error(pageTitle, heading, message)(implicitly, implicitly, Lang.defaultLang, implicitly)
 }

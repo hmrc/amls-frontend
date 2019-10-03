@@ -14,12 +14,11 @@
  * limitations under the License.
  *@
 
-@import include._
-@import forms2._
 @import config.CachedStaticHtmlPartialProvider
-@import models.businessmatching.{BusinessType, BusinessMatching}
+@import include._
+@import include.forms2._
 
-@(f: forms.Form2[_], id:String)(implicit lang:Lang, m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
+@(f: forms.Form2[_], id:String)(implicit  m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang)
 
 @checkbox(
     f = f("positions[]"),

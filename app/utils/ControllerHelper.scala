@@ -16,8 +16,7 @@
 
 package utils
 
-import cats.implicits._
-import config.CachedStaticHtmlPartialProvider
+import config.{ApplicationConfig, CachedStaticHtmlPartialProvider}
 import connectors.DataCacheConnector
 import forms.InvalidForm
 import models.businessactivities.{BusinessActivities => BA}
@@ -28,9 +27,7 @@ import models.responsiblepeople.ResponsiblePerson.filter
 import models.responsiblepeople.{NonUKResidence, ResponsiblePerson}
 import models.status._
 import models.supervision.{AnotherBody, AnotherBodyNo, AnotherBodyYes, Supervision}
-import play.api.Play.current
-import play.api.i18n.Messages
-import play.api.i18n.Messages.Implicits._
+import play.api.i18n.{Lang, Messages}
 import play.api.mvc.Request
 import services.StatusService
 import services.businessmatching.ServiceFlow
@@ -158,7 +155,7 @@ object ControllerHelper {
 
   def rpTitleName(rp:Option[ResponsiblePerson]):String = rp.fold("")(_.personName.fold("")(_.titleName))
 
-  def notFoundView(implicit request: Request[_], partialProvider: CachedStaticHtmlPartialProvider, messages: Messages) = {
+  def notFoundView(implicit request: Request[_], partialProvider: CachedStaticHtmlPartialProvider, messages: Messages, lang: Lang, appConfig: ApplicationConfig) = {
     views.html.error(Messages("error.not-found.title"),
       Messages("error.not-found.heading"),
       Messages("error.not-found.message"))

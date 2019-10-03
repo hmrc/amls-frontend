@@ -17,11 +17,11 @@
 @import forms.Form2
 @import include._
 @import include.forms2._
-@import config.CachedStaticHtmlPartialProvider
+@import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 @import models.tradingpremises._
 @import models.businessmatching._
 
-@(f:Form2[_], model : BusinessActivities, edit: Boolean, index: Int)(implicit lang:Lang,  m: Messages, request: Request[_],partialProvider: CachedStaticHtmlPartialProvider)
+@(f:Form2[_], model : BusinessActivities, edit: Boolean, index: Int)(implicit   m: Messages, request: Request[_],partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()

@@ -21,7 +21,7 @@
     status: Status,
     hasChanged: Boolean,
     call: Call
-)(implicit request: Request[_],m:Messages, lang: Lang)
+)(implicit request: Request[_],m:Messages)
 @getStatusId(name:String) = {@Messages(s"progress.${name}.name").replaceAll(" ", "-").concat("-status").toLowerCase}
 
 @progressText = {

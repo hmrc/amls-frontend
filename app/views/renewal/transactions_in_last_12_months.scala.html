@@ -18,10 +18,10 @@
 @import models.renewal.TransactionsInLast12Months
 @import include._
 @import forms2._
-@import config.CachedStaticHtmlPartialProvider
+@import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 @import utils.HtmlElementHelpers._
 
-@(f: Form2[TransactionsInLast12Months], edit: Boolean)(implicit messages: Messages, request: Request[_],partialProvider: CachedStaticHtmlPartialProvider)
+@(f: Form2[TransactionsInLast12Months], edit: Boolean)(implicit messages: Messages, request: Request[_],partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()

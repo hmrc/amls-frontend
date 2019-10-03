@@ -20,9 +20,9 @@
 @import config.ApplicationConfig
 @import org.joda.time.LocalDate
 @import utils.DateHelper
-@import config.CachedStaticHtmlPartialProvider
+@import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 
-@(regNo: String, businessName: Option[String], endDate: Option[LocalDate], renewalFlow: Boolean, name: Option[String], activities: Set[String])(implicit request: Request[_], m: Messages,partialProvider: CachedStaticHtmlPartialProvider)
+@(regNo: String, businessName: Option[String], endDate: Option[LocalDate], renewalFlow: Boolean, name: Option[String], activities: Set[String])(implicit request: Request[_], m: Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
 
 @main2(title = Messages("status.submissiondecisionsupervised.heading") + " - Your registration", showURRBanner = true) {
 

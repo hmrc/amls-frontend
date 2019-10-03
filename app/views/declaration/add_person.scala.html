@@ -17,10 +17,10 @@
 @import forms.Form2
 @import include._
 @import include.forms2._
-@import config.CachedStaticHtmlPartialProvider
+@import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 @import models.businessmatching.{BusinessType, BusinessMatching}
 
-@(title: String, subtitle: String, businessType: Option[BusinessType], f: Form2[_])(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang)
+@(title: String, subtitle: String, businessType: Option[BusinessType], f: Form2[_])(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
 
 @target = @{
     s"""${f("other").id}-fieldset"""

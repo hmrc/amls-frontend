@@ -19,9 +19,9 @@
 @import models.flowmanagement.RemoveBusinessTypeFlowModel
 @import controllers.businessmatching.updateservice.remove.routes
 @import utils.DateHelper
-@import config.CachedStaticHtmlPartialProvider
+@import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 
-@(f: forms.Form2[_], model: RemoveBusinessTypeFlowModel)(implicit m: Messages, r: Request[_],partialProvider: CachedStaticHtmlPartialProvider)
+@(f: forms.Form2[_], model: RemoveBusinessTypeFlowModel)(implicit m: Messages, r: Request[_],partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
 @heading(

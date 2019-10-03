@@ -16,10 +16,10 @@
 
 @import include._
 @import include.forms2._
-@import config.CachedStaticHtmlPartialProvider
+@import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 @import models.confirmation.{ BreakdownRow, Currency }
 
-@(feeTotal: Currency, rows: Seq[BreakdownRow])(implicit request: Request[_], m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
+@(feeTotal: Currency, rows: Seq[BreakdownRow])(implicit request: Request[_], m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @heading("fee.guidance", "submit.registration")

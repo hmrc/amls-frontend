@@ -18,10 +18,10 @@
 @import include.{main, heading, registered_office_helper}
 @import include.forms2._
 @import models.businessdetails._
-@import config.CachedStaticHtmlPartialProvider
+@import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 @import play.api.i18n.Messages
 
-@(f: Form2[_], model: RegisteredOffice, edit: Boolean = false)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider)
+@(f: Form2[_], model: RegisteredOffice, edit: Boolean = false)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()

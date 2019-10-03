@@ -32,7 +32,6 @@ import scala.concurrent.Future
 class KnownByController @Inject()(val dataCacheConnector: DataCacheConnector,
                                   authAction: AuthAction,
                                   val ds: CommonPlayDependencies,
-                                  val appConfig: AppConfig,
                                   val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {

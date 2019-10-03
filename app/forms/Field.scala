@@ -35,10 +35,10 @@ sealed trait Field {
   def hasErrors: Boolean =
     errors.nonEmpty
 
-  def error(implicit lang: Lang): String =
+  def error(implicit lang: Lang = Lang.defaultLang): String =
     errors.toMessage
 
-  def rpError(implicit lang: Lang): String =
+  def rpError(implicit lang: Lang = Lang.defaultLang): String =
     errors.headOption.map(_.message)
 
 }

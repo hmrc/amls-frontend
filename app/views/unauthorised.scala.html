@@ -14,15 +14,11 @@
  * limitations under the License.
  *@
 
-@import play.api.i18n.Messages
-@import play.api.Play.current
-@import play.api.i18n.Messages.Implicits._
-@import config.CachedStaticHtmlPartialProvider
+@import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 
-@()(implicit request: Request[_],partialProvider: CachedStaticHtmlPartialProvider)
-@import config.{ApplicationConfig => appConfig}
-@import uk.gov.hmrc.play.views.html._
+@()(implicit request: Request[_],partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig, messagesProvider: MessagesProvider)
 @import include.main
+
 @main(title = Messages("unauthorised.title")) {
 
 <h1 class="heading-xlarge">@Messages("unauthorised.title")</h1>

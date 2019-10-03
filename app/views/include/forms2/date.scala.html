@@ -29,7 +29,7 @@
     heading: String = "",
     section: String = "",
     supportingContent: Html = play.twirl.api.HtmlFormat.empty
-)(implicit lang:Lang,  m: Messages)
+)(implicit m: Messages, lang: Lang)
 
 @field = @{ f(p) }
 

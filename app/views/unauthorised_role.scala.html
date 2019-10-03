@@ -17,9 +17,10 @@
 @import play.api.i18n.Messages
 @import play.api.Play.current
 @import play.api.i18n.Messages.Implicits._
-@import config.CachedStaticHtmlPartialProvider
+@import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 
-@()(implicit request: Request[_],partialProvider: CachedStaticHtmlPartialProvider)
+@import config.ApplicationConfig
+@()(implicit request: Request[_],partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
 @import config.{ApplicationConfig => appConfig}
 @import uk.gov.hmrc.play.views.html._
 @import include.main
