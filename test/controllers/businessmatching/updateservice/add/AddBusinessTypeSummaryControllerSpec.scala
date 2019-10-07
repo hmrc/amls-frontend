@@ -27,12 +27,10 @@ import generators.tradingpremises.TradingPremisesGenerator
 import models.businessmatching._
 import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, ServiceChangeRegister, TradingPremisesActivities}
 import models.flowmanagement.{AddBusinessTypeFlowModel, AddBusinessTypeSummaryPageId}
-import models.moneyservicebusiness.MoneyServiceBusiness
 import models.responsiblepeople.ResponsiblePerson
 import models.status.SubmissionDecisionApproved
 import models.supervision.Supervision
-import models.tradingpremises.{Address, TradingPremises, WhatDoesYourBusinessDo, YourTradingPremises}
-import org.joda.time.LocalDate
+import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import org.scalacheck.Gen
@@ -83,18 +81,7 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
         tradingPremisesMsbServices = None
     )
 
-//    mockCacheFetch[AddBusinessTypeFlowModel](
-//      Some(AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices),
-//        areNewActivitiesAtTradingPremises = Some(false),
-//        tradingPremisesActivities = None,
-//        addMoreActivities = None,
-//        fitAndProper = Some(true),
-//        responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1))),
-//        hasChanged = true,
-//        hasAccepted = false)), Some(AddBusinessTypeFlowModel.key))
-
     mockCacheFetch[AddBusinessTypeFlowModel](Some(flowModel))
-
 
     mockApplicationStatus(SubmissionDecisionApproved)
   }
@@ -105,18 +92,17 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
     "get is called" must {
       "return OK with update_service_summary view" in new Fixture {
 
-        val responsiblePeople: List[ResponsiblePerson] = Gen.listOfN(5, responsiblePersonGen).sample.get
+        val responsiblePeople: Seq[ResponsiblePerson] = Gen.listOfN(5, responsiblePersonGen).sample.get
 
         val tradingPremises: Seq[TradingPremises] = Gen.listOfN(5, tradingPremisesGen).sample.get
 
-        //mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople))
         when {
-          controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any())
-        } thenReturn Future.successful(Some(responsiblePeople))
+          controller.helper.filteredTps(any(), eqTo(flowModel))(any())
+        } thenReturn OptionT.fromOption[Future](Some(tradingPremises.zipWithIndex))
 
         when {
-          controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any())
-        } thenReturn Future.successful(Some(tradingPremises))
+          controller.helper.filteredRps(any(), eqTo(flowModel))(any())
+        } thenReturn OptionT.fromOption[Future](Some(responsiblePeople.zipWithIndex))
 
         val result = controller.get()(request)
 
