@@ -1,4 +1,3 @@
-import play.routes.compiler.StaticRoutesGenerator
 import play.sbt.routes.RoutesKeys._
 import sbt.Keys._
 import sbt.Tests.{Group, SubProcess}
@@ -9,16 +8,13 @@ import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 trait MicroService {
 
   import com.typesafe.sbt.digest.Import.digest
-  import com.typesafe.sbt.web.Import.pipelineStages
-  import com.typesafe.sbt.web.Import.Assets
-
+  import com.typesafe.sbt.web.Import.{Assets, pipelineStages}
   import uk.gov.hmrc._
-  import DefaultBuildSettings.{scalaSettings, defaultSettings, addTestReportOption}
+  import DefaultBuildSettings.{addTestReportOption, defaultSettings, scalaSettings}
   import TestPhases._
-  import uk.gov.hmrc.SbtAutoBuildPlugin
+  import uk.gov.hmrc.{SbtArtifactory, SbtAutoBuildPlugin}
   import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
   import uk.gov.hmrc.versioning.SbtGitVersioning
-  import uk.gov.hmrc.SbtArtifactory
   import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
   val appName: String
@@ -43,6 +39,7 @@ trait MicroService {
 
   lazy val microservice = Project(appName, file("."))
     .enablePlugins(Seq(play.sbt.PlayScala,SbtAutoBuildPlugin, SbtDistributablesPlugin, SbtGitVersioning, SbtArtifactory) ++ plugins : _*)
+    //.enablePlugins(PlayNettyServer)
     .settings(majorVersion := 4)
     .settings(playSettings ++ scoverageSettings : _*)
     .settings(scalaSettings: _*)
@@ -69,6 +66,7 @@ trait MicroService {
     .settings(
       resolvers += Resolver.bintrayRepo("hmrc", "releases"),
       resolvers += Resolver.jcenterRepo
+      //PlayKeys.devSettings += "play.server.provider" -> "play.core.server.NettyServerProvider"
     )
 }
 

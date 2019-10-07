@@ -24,7 +24,7 @@ import services.flowmanagement.flowrouters.businessmatching.{AddBusinessTypeRout
 
 class Module extends AbstractModule {
 
-  def configure() = {
+  override def configure() = {
     bind(new TypeLiteral[Router[AddBusinessTypeFlowModel]] {}).to(classOf[AddBusinessTypeRouter])
     bind(new TypeLiteral[Router[ChangeBusinessType]] {}).to(classOf[ChangeBusinessTypeRouter])
     bind(new TypeLiteral[Router[RemoveBusinessTypeFlowModel]] {}).to(classOf[RemoveBusinessTypeRouter])
