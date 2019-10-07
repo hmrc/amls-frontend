@@ -1385,6 +1385,9 @@ businessmatching.updateservice.newserviceinformation.info.1 = You’ll need to c
 businessmatching.updateservice.newserviceinformation.info.2 = You’ll need to complete the following sections:
 businessmatching.updateservice.newserviceinformation.info.3 = You may need to update your trading premises and responsible people because of new information you have provided.
 businessmatching.updateservice.newserviceinformation.info.4 = You may need to update other information about your business.
+businessmatching.updateservice.newserviceinformation.info.asp = You’ll need to complete the accountancy service provider and supervision details sections.
+businessmatching.updateservice.newserviceinformation.info.tcsp = You’ll need to complete the trust or company service provider and supervision details sections.
+businessmatching.updateservice.newserviceinformation.info.supervision = supervision details
 
 businessmatching.updateservice.summary.whichtradingpremises.count = You’ve chosen {0} trading premises
 businessmatching.updateservice.summary.whichtradingpremises.activities.count = You’ve chosen {0} activities at your trading premises

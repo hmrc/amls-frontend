@@ -29,29 +29,23 @@
     title = messages("businessmatching.updateservice.updateotherinformation.title") + " - " + Messages("summary.updateservice"),
     heading = header
 ) {
-    @if(activities.contains("Accountancy service provider") && (activities.size == 1)) {
-        <p>@Messages("businessmatching.updateservice.updateotherinformation.information.1", activities.mkString(" ")).toLowerCase</p>
-        <p>@Messages("businessmatching.updateservice.updateotherinformation.information.2")</p>
-        <p>@Messages("businessmatching.updateservice.updateotherinformation.information.3")</p>
-    } else {
-        <p>@Messages("businessmatching.updateservice.updateotherinformation.information.0")</p>
+    @activities match {
+        case list if list.contains("Accountancy service provider") && (list.size == 1) => {
+            <p>@Messages("businessmatching.updateservice.updateotherinformation.information.1", activities.mkString(" ")).toLowerCase</p>
+            <p>@Messages("businessmatching.updateservice.updateotherinformation.information.2")</p>
+            <p>@Messages("businessmatching.updateservice.updateotherinformation.information.3")</p>
+        }
+        case list if list.contains("Accountancy service provider") && (list.size > 1) => {
+            <p>@Messages("businessmatching.updateservice.updateotherinformation.information.0")</p>
                 <ul class="list list-bullet">
-                    @activities.toList.sorted.map { ba =>
-                    <li>@Character.toLowerCase(ba.charAt(0))@ba.substring(1)</li>
-                    }
+                     @activities.toList.sorted.map { ba =>
+                         <li>@Character.toLowerCase(ba.charAt(0))@ba.substring(1)</li>
+            }
                 </ul>
-                <p>@Messages("businessmatching.updateservice.updateotherinformation.information.2")</p>
-                <p>@Messages("businessmatching.updateservice.updateotherinformation.information.3")</p>
+            <p>@Messages("businessmatching.updateservice.updateotherinformation.information.2")</p>
+            <p>@Messages("businessmatching.updateservice.updateotherinformation.information.3")</p>
+        }
     }
-
-@*    @if(!activities.contains("Accountancy service provider") && (activities.size == 1)) {*@
-@*        <p>@Messages("businessmatching.updateservice.updateotherinformation.information.1", activities.mkString(" "))</p>*@
-@*        <p>@Messages("businessmatching.updateservice.updateotherinformation.information.3")</p>*@
-@*    } else {*@
-@*        <p>@bulletedList(activities)</p>*@
-@*        <p>@Messages("businessmatching.updateservice.updateotherinformation.information.3")</p>*@
-@*    }*@
-
 
     @form(EmptyForm, controllers.businessmatching.updateservice.add.routes.NeedMoreInformationController.post()) {
         @submit(false, Some("Continue"), false, buttonId = Some("removeserviceinfo-submit"))
