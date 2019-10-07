@@ -46,7 +46,7 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
       val controller = new PositionWithinBusinessStartDateController (
         dataCacheConnector = mock[DataCacheConnector],
-        authAction = SuccessfulAuthAction, ds = commonDependencies)
+        authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
 
       object DefaultValues {
         val noNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant), startDate)

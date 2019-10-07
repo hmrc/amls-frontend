@@ -37,7 +37,7 @@ class BusinessServicesControllerSpec extends AmlsSpec with MockitoSugar {
       mockCacheConnector,
       mockStatusService,
       mockServiceFlow,
-      SuccessfulAuthAction, ds = commonDependencies)
+      SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   "BusinessServicesController" when {

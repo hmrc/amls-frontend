@@ -64,7 +64,8 @@ class ConfirmationControllerSpec extends AmlsSpec
       enrolmentService = mock[AuthEnrolmentsService],
       feeResponseService = mock[FeeResponseService],
       authenticator = mock[AuthenticatorConnector],
-      confirmationService = mock[ConfirmationService])
+      confirmationService = mock[ConfirmationService],
+      cc = mockMcc)
 
     val amlsRegistrationNumber = "amlsRefNumber"
 

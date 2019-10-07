@@ -33,7 +33,8 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
 
     val controller = new ServicesOfAnotherTCSPController (
       authAction = SuccessfulAuthAction, ds = commonDependencies,
-      dataCacheConnector = mockCacheConnector
+      dataCacheConnector = mockCacheConnector,
+      cc = mockMcc
     )
   }
 

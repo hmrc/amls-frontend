@@ -44,7 +44,7 @@ class CashPaymentsCustomersNotMetControllerSpec extends AmlsSpec {
     val controller = new CashPaymentsCustomersNotMetController (
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
-      renewalService = mockRenewalService
+      renewalService = mockRenewalService, cc = mockMcc
     )
 
     when(mockRenewalService.getRenewal(any())(any(), any()))

@@ -39,7 +39,7 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
 
     val cache: DataCacheConnector = mock[DataCacheConnector]
 
-    val controller = new BusinessStructureController(self.cache, SuccessfulAuthAction, ds = commonDependencies, messagesApi)
+    val controller = new BusinessStructureController(self.cache, SuccessfulAuthAction, ds = commonDependencies, messagesApi, cc = mockMcc)
   }
 
   "BusinessStructureController" must {

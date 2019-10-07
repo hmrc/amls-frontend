@@ -48,7 +48,8 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
       auditConnector = mock[AuditConnector],
       authEnrolmentsService = mock[AuthEnrolmentsService],
       feeResponseService = mock[FeeResponseService],
-      paymentsService = mock[PaymentsService]
+      paymentsService = mock[PaymentsService],
+      cc = mockMcc
     )
 
     val paymentRef = paymentRefGen.sample.get

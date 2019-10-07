@@ -44,7 +44,7 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
 
     val controller = new RegisteredOfficeIsUKController(
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction, ds = commonDependencies)
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
 
     when(controller.dataCacheConnector.fetch[BusinessDetails](any(), any())(any(), any()))
       .thenReturn(Future.successful(None))

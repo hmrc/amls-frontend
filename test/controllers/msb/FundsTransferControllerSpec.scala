@@ -36,7 +36,7 @@ class FundsTransferControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
-    val controller = new FundsTransferController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies)
+    val controller = new FundsTransferController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   val emptyCache = CacheMap("", Map.empty)

@@ -35,7 +35,7 @@ class CashPaymentOverTenThousandEurosControllerSpec extends AmlsSpec with Mockit
 
   trait Fixture extends AuthorisedFixture  with DependencyMocks{
     self => val request = addToken(authRequest)
-    val controller = new CashPaymentController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies)
+    val controller = new CashPaymentController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   val emptyCache = CacheMap("", Map.empty)

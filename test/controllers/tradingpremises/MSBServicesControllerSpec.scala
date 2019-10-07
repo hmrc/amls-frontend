@@ -44,8 +44,10 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
 
     val controller = new MSBServicesController (
       dataCacheConnector = cache,
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
-      statusService = mock[StatusService]
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      statusService = mock[StatusService],
+      cc = mockMcc
     )
 
     val mockCacheMap = mock[CacheMap]

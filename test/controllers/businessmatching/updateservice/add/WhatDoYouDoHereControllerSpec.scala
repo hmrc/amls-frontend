@@ -51,7 +51,8 @@ class WhatDoYouDoHereControllerSpec extends AmlsSpec with MoneyServiceBusinessTe
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,
       helper = mockUpdateServiceHelper,
-      router = createRouter[AddBusinessTypeFlowModel]
+      router = createRouter[AddBusinessTypeFlowModel],
+      cc = mockMcc
     )
 
     val cacheMapT = OptionT.some[Future, CacheMap](mockCacheMap)

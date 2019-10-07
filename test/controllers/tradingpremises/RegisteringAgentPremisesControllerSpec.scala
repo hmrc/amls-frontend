@@ -39,7 +39,8 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
     val controller = new RegisteringAgentPremisesController (
       mock[DataCacheConnector],
       SuccessfulAuthAction, ds = commonDependencies,
-      messagesApi)
+      messagesApi,
+      cc = mockMcc)
   }
 
   val emptyCache = CacheMap("", Map.empty)

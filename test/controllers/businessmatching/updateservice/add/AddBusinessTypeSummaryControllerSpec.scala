@@ -64,7 +64,8 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
       businessMatchingService = mockBusinessMatchingService,
       helper = mockUpdateServiceHelper,
       router = createRouter[AddBusinessTypeFlowModel],
-      tradingPremisesService = mockTradingPremisesService
+      tradingPremisesService = mockTradingPremisesService,
+      cc = mockMcc
     )
 
     val flowModel = AddBusinessTypeFlowModel(

@@ -33,7 +33,7 @@ class TransactionTypesControllerSpec extends AmlsSpec
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(authRequest)
-    val controller = new TransactionTypesController(SuccessfulAuthAction, ds = commonDependencies, mockCacheConnector)
+    val controller = new TransactionTypesController(SuccessfulAuthAction, ds = commonDependencies, mockCacheConnector, mockMcc)
 
     mockCacheSave[BusinessActivities]
     mockCacheFetch(Some(BusinessActivities()))

@@ -47,7 +47,8 @@ class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       authEnrolmentsService = mock[AuthEnrolmentsService],
       feeResponseService = mock[FeeResponseService],
-      statusService = mockStatusService
+      statusService = mockStatusService,
+      cc = mockMcc
     )
 
     val submissionStatus = SubmissionReadyForReview

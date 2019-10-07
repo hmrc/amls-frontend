@@ -42,7 +42,7 @@ class WithdrawalReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
     val authService = mock[AuthEnrolmentsService]
     val statusService = mock[StatusService]
 
-    lazy val controller = new WithdrawalReasonController(SuccessfulAuthAction, ds = commonDependencies, amlsConnector, authService, statusService, mockCacheConnector)
+    lazy val controller = new WithdrawalReasonController(SuccessfulAuthAction, ds = commonDependencies, amlsConnector, authService, statusService, mockCacheConnector, cc = mockMcc)
 
     val amlsRegistrationNumber = "XA1234567890L"
 

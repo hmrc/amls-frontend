@@ -44,7 +44,7 @@ class DeregistrationReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
     val dataCacheConnector = mock[DataCacheConnector]
     val statusService = mock[StatusService]
 
-    lazy val controller = new DeregistrationReasonController(SuccessfulAuthAction, ds = commonDependencies, dataCacheConnector, amlsConnector, authService, statusService)
+    lazy val controller = new DeregistrationReasonController(SuccessfulAuthAction, ds = commonDependencies, dataCacheConnector, amlsConnector, authService, statusService, mockMcc)
 
     val amlsRegistrationNumber = "XA1234567890L"
 

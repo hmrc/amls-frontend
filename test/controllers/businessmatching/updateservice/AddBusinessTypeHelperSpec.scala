@@ -55,7 +55,8 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
       mockCacheConnector,
       tradingPremisesService,
       responsiblePeopleService,
-      mockAppConfig
+      mockAppConfig,
+      cc = mockMcc
     )
 
     val businessActivitiesSection = BABusinessActivities(

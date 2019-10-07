@@ -53,7 +53,8 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
       SuccessfulAuthAction, ds = commonDependencies,
       enrolments,
       statusService,
-      amls
+      amls,
+      cc = mockMcc
     )
 
     when {

@@ -56,7 +56,8 @@ class RetryPaymentControllerSpec extends AmlsSpec
       dataCacheConnector = mock[DataCacheConnector],
       amlsConnector = mock[AmlsConnector],
       paymentsService = mock[PaymentsService],
-      ds = commonDependencies)
+      ds = commonDependencies,
+      cc = mockMcc)
 
     val response = subscriptionResponseGen(hasFees = true).sample.get
 

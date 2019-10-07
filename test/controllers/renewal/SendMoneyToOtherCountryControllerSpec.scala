@@ -49,7 +49,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
     val controller = new SendMoneyToOtherCountryController(
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
-      renewalService = mockRenewalService
+      renewalService = mockRenewalService, cc = mockMcc
     )
 
     when {

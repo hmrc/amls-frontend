@@ -50,7 +50,7 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
 
     val controller = new ExperienceTrainingController (
       dataCacheConnector = dataCacheConnector,
-      authAction = SuccessfulAuthAction, ds = commonDependencies)
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   val emptyCache = CacheMap("", Map.empty)

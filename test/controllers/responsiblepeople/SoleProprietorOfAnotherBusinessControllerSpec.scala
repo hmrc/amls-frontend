@@ -46,7 +46,8 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
     val controller = new SoleProprietorOfAnotherBusinessController(
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
-      statusService = mock[StatusService])
+      statusService = mock[StatusService],
+      cc = mockMcc)
   }
 
   val emptyCache = CacheMap("", Map.empty)

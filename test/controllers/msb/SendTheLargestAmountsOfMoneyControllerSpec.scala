@@ -40,7 +40,8 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
       mockCacheConnector,
       mockStatusService,
       mockServiceFlow,
-      mockAutoComplete
+      mockAutoComplete,
+      cc = mockMcc
     )
 
     mockCacheFetch[ServiceChangeRegister](None, None)

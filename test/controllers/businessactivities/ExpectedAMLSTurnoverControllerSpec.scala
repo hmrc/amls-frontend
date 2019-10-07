@@ -47,7 +47,8 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
     val controller = new ExpectedAMLSTurnoverController (
       dataCacheConnector = mock[DataCacheConnector],
       SuccessfulAuthAction, ds = commonDependencies,
-      statusService = mock[StatusService]
+      statusService = mock[StatusService],
+      cc = mockMcc
     )
 
     val mockCache = mock[CacheMap]

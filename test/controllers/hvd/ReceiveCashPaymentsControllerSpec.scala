@@ -37,7 +37,8 @@ class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
       SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
       mockServiceFlow,
-      mockStatusService
+      mockStatusService,
+      cc = mockMcc
     )
 
     mockCacheFetch[Hvd](None, Some(Hvd.key))

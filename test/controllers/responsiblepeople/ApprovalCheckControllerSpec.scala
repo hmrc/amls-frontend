@@ -28,7 +28,7 @@
  import play.api.test.Helpers._
  import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocks}
 
- class ApprovalCheckControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+ class vApprovalCheckControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
    trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(authRequest)
      lazy val defaultBuilder = new GuiceApplicationBuilder()

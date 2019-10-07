@@ -61,7 +61,8 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
       auditConnector = auditConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = statusService,
-      autoCompleteService = autoCompleteService
+      autoCompleteService = autoCompleteService,
+      cc = mockMcc
     )
 
     when {

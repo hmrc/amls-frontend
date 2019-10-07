@@ -50,7 +50,8 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       amlsConnector = mock[AmlsConnector],
       statusService = mock[StatusService],
-      renewalService = mock[RenewalService]
+      renewalService = mock[RenewalService],
+      cc = mockMcc
     )
 
     val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None,

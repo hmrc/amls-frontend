@@ -35,7 +35,8 @@ class WhatDateRemovedControllerSpec extends AmlsSpec {
     val controller = new WhatDateRemovedController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
-      router = createRouter[RemoveBusinessTypeFlowModel]
+      router = createRouter[RemoveBusinessTypeFlowModel],
+      cc = mockMcc
     )
   }
 

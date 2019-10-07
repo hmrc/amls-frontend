@@ -32,7 +32,8 @@ class UnableToRemoveBusinessTypesControllerSpec extends AmlsSpec {
 
     val controller = new UnableToRemoveBusinessTypesController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
-      dataCacheConnector = mockCacheConnector
+      dataCacheConnector = mockCacheConnector,
+      cc = mockMcc
     )
   }
 

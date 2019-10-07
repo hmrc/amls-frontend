@@ -43,7 +43,8 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
       mockCacheConnector,
       SuccessfulAuthAction, ds = commonDependencies,
       mock[AuditConnector],
-      mockStatusService
+      mockStatusService,
+      mockMcc
     )
 
   }

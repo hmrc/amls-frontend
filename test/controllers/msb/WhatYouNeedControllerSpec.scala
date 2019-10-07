@@ -38,7 +38,8 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     val controller = new WhatYouNeedController(
       SuccessfulAuthAction, ds = commonDependencies,
       mockStatusService,
-      mockCacheConnector)
+      mockCacheConnector,
+      cc = mockMcc)
 
     mockCacheFetch[ServiceChangeRegister](None)
     mockCacheFetchAll

@@ -37,7 +37,7 @@ class WhatYouNeedControllerSpec
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val request = addToken(authRequest)
-    val controller = new WhatYouNeedController(SuccessfulAuthAction, ds = commonDependencies, mockCacheConnector)
+    val controller = new WhatYouNeedController(SuccessfulAuthAction, ds = commonDependencies, mockCacheConnector, mockMcc)
 
     def assertHref(url: String)(implicit doc: Document) = {
       doc.getElementById("bankwhatyouneed-button").attr("href") mustBe url

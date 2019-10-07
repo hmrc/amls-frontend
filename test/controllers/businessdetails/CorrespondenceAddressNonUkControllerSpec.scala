@@ -50,7 +50,7 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
       dataConnector = mock[DataCacheConnector],
       auditConnector = mock[AuditConnector],
       autoCompleteService = mock[AutoCompleteService],
-      authAction = SuccessfulAuthAction, ds = commonDependencies)
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
 
     when {
       controller.autoCompleteService.getCountries

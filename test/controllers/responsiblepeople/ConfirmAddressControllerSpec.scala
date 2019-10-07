@@ -40,7 +40,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar {
     self =>
     val request = addToken(authRequest)
     val dataCache: DataCacheConnector = mock[DataCacheConnector]
-    val controller = new ConfirmAddressController(messagesApi, self.dataCache, SuccessfulAuthAction, ds = commonDependencies)
+    val controller = new ConfirmAddressController(messagesApi, self.dataCache, SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
 
     def setupCacheMap(cachedResponsiblePerson: Option[Seq[ResponsiblePerson]],
                       cachedBusinessMatching: Option[BusinessMatching] = None

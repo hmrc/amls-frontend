@@ -104,7 +104,8 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       ds = commonDependencies,
       amlsNotificationService = mockNotificationService,
       amlsConnector = mockAmlsConnector,
-      dataCacheConnector = mockCacheConnector)
+      dataCacheConnector = mockCacheConnector,
+      cc = mockMcc)
 
     val controllerWithFailedAuthAction = new NotificationController(
       authEnrolmentsService = mockAuthEnrolmentsService,
@@ -114,7 +115,8 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       amlsNotificationService = mockNotificationService,
       amlsConnector = mockAmlsConnector,
       dataCacheConnector = mockCacheConnector,
-      ds = commonDependencies)
+      ds = commonDependencies,
+      cc = mockMcc)
 
     val mockBusinessMatching = mock[BusinessMatching]
     val mockReviewDetails = mock[ReviewDetails]

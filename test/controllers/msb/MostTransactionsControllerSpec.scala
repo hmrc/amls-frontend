@@ -41,12 +41,13 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
     implicit val ec = app.injector.instanceOf[ExecutionContext]
 
     val controller = new MostTransactionsController(
-      SuccessfulAuthAction, ds = commonDependencies,
+      SuccessfulAuthAction,
+      ds = commonDependencies,
       mockCacheConnector,
       mockStatusService,
       mockServiceFlow,
-      mockAutoComplete
-    )
+      mockAutoComplete,
+      cc = mockMcc)
 
 
 

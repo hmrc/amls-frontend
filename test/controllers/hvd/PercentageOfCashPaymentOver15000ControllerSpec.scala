@@ -39,10 +39,13 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
     self =>
     val request = addToken(authRequest)
 
-    val controller = new PercentageOfCashPaymentOver15000Controller(SuccessfulAuthAction, ds = commonDependencies,
-                                                                    mockCacheConnector,
-                                                                    mockServiceFlow,
-                                                                    mockStatusService)
+    val controller =
+      new PercentageOfCashPaymentOver15000Controller(SuccessfulAuthAction,
+        ds = commonDependencies,
+        mockCacheConnector,
+        mockServiceFlow,
+        mockStatusService,
+        cc = mockMcc)
 
     mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, None)

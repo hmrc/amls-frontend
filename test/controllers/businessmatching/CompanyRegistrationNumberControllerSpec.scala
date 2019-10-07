@@ -47,7 +47,8 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
       statusService = mockStatusService,
-      mock[BusinessMatchingService]
+      mock[BusinessMatchingService],
+      cc = mockMcc
     )
 
     val businessMatching = BusinessMatching(companyRegistrationNumber = Some(CompanyRegistrationNumber("12345678")))

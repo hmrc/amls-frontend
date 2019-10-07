@@ -43,7 +43,7 @@ class TimeAtAdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
     val timeAtAdditionalAddressController = new TimeAtAdditionalAddressController (
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction, ds = commonDependencies)
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   val emptyCache = CacheMap("", Map.empty)

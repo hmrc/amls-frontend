@@ -33,7 +33,7 @@ class BusinessUseAnIPSPControllerSpec  extends AmlsSpec {
   trait Fixture extends AuthorisedFixture with DependencyMocks{
     self => val request = addToken(authRequest)
 
-    val controller = new BusinessUseAnIPSPController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies)
+    val controller = new BusinessUseAnIPSPController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   val emptyCache = CacheMap("", Map.empty)

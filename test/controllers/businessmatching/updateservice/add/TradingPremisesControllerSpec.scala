@@ -42,7 +42,8 @@ class TradingPremisesControllerSpec extends AmlsSpec with BusinessMatchingGenera
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,
       helper = mockUpdateServiceHelper,
-      router = createRouter[AddBusinessTypeFlowModel]
+      router = createRouter[AddBusinessTypeFlowModel],
+      cc = mockMcc
     )
 
     mockCacheFetch(Some(AddBusinessTypeFlowModel(Some(HighValueDealing))))

@@ -95,7 +95,8 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       auditConnector = mock[AuditConnector],
       cacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService],
-      ds = commonDependencies
+      ds = commonDependencies,
+      cc = mockMcc
     )
 
     when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any()))
@@ -255,8 +256,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       auditConnector = mock[AuditConnector],
       cacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService],
-      ds = commonDependencies
-    )
+      ds = commonDependencies, cc = mockMcc)
 
     when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any()))
       .thenReturn(Future.successful(mock[CacheMap]))

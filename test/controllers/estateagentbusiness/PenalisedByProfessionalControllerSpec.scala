@@ -39,7 +39,7 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
 
     val controller = new PenalisedByProfessionalController (
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction, ds = commonDependencies)
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   val emptyCache = CacheMap("", Map.empty)

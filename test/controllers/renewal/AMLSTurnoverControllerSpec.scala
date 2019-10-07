@@ -46,7 +46,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
-      renewalService = mockRenewalService
+      renewalService = mockRenewalService, cc = mockMcc
     )
 
     val businessMatching = BusinessMatching(

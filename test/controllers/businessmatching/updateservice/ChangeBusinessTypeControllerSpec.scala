@@ -49,7 +49,8 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
       bmService,
       createRouter[ChangeBusinessType],
       mock[RemoveBusinessTypeHelper],
-      mock[AddBusinessTypeHelper]
+      mock[AddBusinessTypeHelper],
+      cc = mockMcc
     )
 
     val businessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))

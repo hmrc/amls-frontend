@@ -42,7 +42,8 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     val declarationController = new DeclarationController (
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mock[DataCacheConnector],
-      statusService = mockStatusService
+      statusService = mockStatusService,
+      cc = mockMcc
     )
     val response = SubscriptionResponse(
       etmpFormBundleNumber = "",

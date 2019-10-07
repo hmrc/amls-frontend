@@ -52,7 +52,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
     val controller = new InvolvedInOtherController(
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
-      renewalService = mockRenewalService
+      renewalService = mockRenewalService, cc = mockMcc
     )
   }
 

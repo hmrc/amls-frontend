@@ -38,7 +38,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val request = addToken(authRequest)
-    val controller = new SendMoneyToOtherCountryController(mockCacheConnector, SuccessfulAuthAction, ds = commonDependencies, mockStatusService)
+    val controller = new SendMoneyToOtherCountryController(mockCacheConnector, SuccessfulAuthAction, ds = commonDependencies, mockStatusService, mockMcc)
     implicit val ec = app.injector.instanceOf[ExecutionContext]
 
     mockCacheGetEntry[ServiceChangeRegister](None, ServiceChangeRegister.key)

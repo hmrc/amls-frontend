@@ -43,7 +43,7 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
       dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mockStatusService,
-      serviceFlow = mockServiceFlow)
+      serviceFlow = mockServiceFlow, cc = mockMcc)
 
     mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, None)

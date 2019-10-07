@@ -43,7 +43,8 @@ class AddMoreBusinessTypesControllerSpec extends AmlsSpec with BusinessMatchingG
     val controller = new AddMoreBusinessTypesController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
-      router = createRouter[AddBusinessTypeFlowModel]
+      router = createRouter[AddBusinessTypeFlowModel],
+      cc = mockMcc
     )
 
     val BusinessActivitiesModel = BusinessActivities(Set(BillPaymentServices, TelephonePaymentService))

@@ -42,7 +42,8 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       helper = mockUpdateServiceHelper,
-      router = createRouter[AddBusinessTypeFlowModel]
+      router = createRouter[AddBusinessTypeFlowModel],
+      cc = mockMcc
     )
   }
 

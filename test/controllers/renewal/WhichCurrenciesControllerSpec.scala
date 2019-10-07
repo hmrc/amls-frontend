@@ -43,7 +43,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
     val dataCacheConnector = mock[DataCacheConnector]
     val cacheMap = mock[CacheMap]
 
-    lazy val controller = new WhichCurrenciesController(SuccessfulAuthAction, ds = commonDependencies, renewalService, dataCacheConnector)
+    lazy val controller = new WhichCurrenciesController(SuccessfulAuthAction, ds = commonDependencies, renewalService, dataCacheConnector, cc = mockMcc)
 
     when {
       renewalService.getRenewal(any())(any(), any())

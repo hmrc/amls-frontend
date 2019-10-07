@@ -33,7 +33,7 @@ class StillEmployedControllerSpec extends AmlsSpec {
 
     val cache = mock[DataCacheConnector]
 
-    val controller = new StillEmployedController(SuccessfulAuthAction, commonDependencies, cache)
+    val controller = new StillEmployedController(SuccessfulAuthAction, commonDependencies, cache, mockMcc)
 
     val nominatedOfficer = ResponsiblePerson(
       personName = Some(PersonName("firstName", None, "lastName")),

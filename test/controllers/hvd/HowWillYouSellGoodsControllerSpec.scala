@@ -35,8 +35,10 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
     val controller = new HowWillYouSellGoodsController(
       mockCacheConnector,
       mockStatusService,
-      SuccessfulAuthAction, ds = commonDependencies,
-      mockServiceFlow
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      mockServiceFlow,
+      cc = mockMcc
     )
 
     mockCacheFetch[Hvd](None)

@@ -38,7 +38,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
     self => val request = addToken(authRequest)
     implicit val ec = app.injector.instanceOf[ExecutionContext]
 
-    val controller = new SummaryController(SuccessfulAuthAction, ds = commonDependencies, mockCacheConnector, mockStatusService, mockServiceFlow)
+    val controller = new SummaryController(SuccessfulAuthAction, ds = commonDependencies, mockCacheConnector, mockStatusService, mockServiceFlow, mockMcc)
 
     val completeModel = MoneyServiceBusiness(
       throughput = Some(ExpectedThroughput.Second),

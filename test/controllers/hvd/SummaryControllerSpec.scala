@@ -44,10 +44,14 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
 
     implicit val headerCarrier = HeaderCarrier()
 
-    lazy val controller = new SummaryController(authAction = SuccessfulAuthAction, ds = commonDependencies,
-                                                mockCacheConnector,
-                                                mockStatusService,
-                                                mockServiceFlow)
+    lazy val controller =
+      new SummaryController(
+        authAction = SuccessfulAuthAction,
+        ds = commonDependencies,
+        mockCacheConnector,
+        mockStatusService,
+        mockServiceFlow,
+        cc = mockMcc)
 
     val day = 15
     val month = 2

@@ -54,7 +54,8 @@ class WhichTradingPremisesControllerSpec extends AmlsSpec
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,
       helper = mockUpdateServiceHelper,
-      router = createRouter[AddBusinessTypeFlowModel]
+      router = createRouter[AddBusinessTypeFlowModel],
+      cc = mockMcc
     )
   }
 

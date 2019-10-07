@@ -37,7 +37,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
     val renewalService = mock[RenewalService]
 
-    val controller = new WhatYouNeedController(SuccessfulAuthAction, ds = commonDependencies, renewalService)
+    val controller = new WhatYouNeedController(SuccessfulAuthAction, ds = commonDependencies, renewalService, cc = mockMcc)
   }
   "WhatYouNeedController" must {
 

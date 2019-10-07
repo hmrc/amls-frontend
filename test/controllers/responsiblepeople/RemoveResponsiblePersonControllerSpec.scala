@@ -50,7 +50,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
     val controller = new RemoveResponsiblePersonController (
       dataCacheConnector = mock[DataCacheConnector],
       statusService =  mock[StatusService],
-      authAction = SuccessfulAuthAction, ds = commonDependencies)
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   "RemoveResponsiblePersonController" when {

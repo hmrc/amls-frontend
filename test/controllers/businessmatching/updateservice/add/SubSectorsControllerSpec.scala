@@ -54,7 +54,8 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
       dataCacheConnector = mockCacheConnector,
       businessMatchingService = mockBusinessMatchingService,
       router = createRouter[AddBusinessTypeFlowModel],
-      config = config
+      config = config,
+      cc = mockMcc
     )
 
 

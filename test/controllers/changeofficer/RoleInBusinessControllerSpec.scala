@@ -43,7 +43,7 @@ class RoleInBusinessControllerSpec extends AmlsSpec{
 
     val cache = mock[DataCacheConnector]
 
-    lazy val controller = new RoleInBusinessController(SuccessfulAuthAction, commonDependencies, cache)
+    lazy val controller = new RoleInBusinessController(SuccessfulAuthAction, commonDependencies, cache, mockMcc)
 
     val nominatedOfficer = ResponsiblePerson(
       personName = Some(PersonName("firstName", None, "lastName")),

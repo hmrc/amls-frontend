@@ -35,7 +35,8 @@ class NeedMoreInformationControllerSpec extends AmlsSpec {
     val controller = new NeedMoreInformationController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
-      router = createRouter[RemoveBusinessTypeFlowModel]
+      router = createRouter[RemoveBusinessTypeFlowModel],
+      cc = mockMcc
     )
   }
 

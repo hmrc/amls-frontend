@@ -41,7 +41,7 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
     val controller = new TaxMattersController (
       dataCacheConnector = mock[DataCacheConnector],
-      SuccessfulAuthAction, ds = commonDependencies)
+      SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   "TaxMattersController" when {

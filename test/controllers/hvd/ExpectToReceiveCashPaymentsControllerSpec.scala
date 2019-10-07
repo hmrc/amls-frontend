@@ -33,10 +33,14 @@ class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSug
     self =>
     val request = addToken(authRequest)
 
-    val controller = new ExpectToReceiveCashPaymentsController(SuccessfulAuthAction, ds = commonDependencies,
-                                                               mockCacheConnector,
-                                                               mockStatusService,
-                                                               mockServiceFlow)
+    val controller =
+      new ExpectToReceiveCashPaymentsController(
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+        mockCacheConnector,
+        mockStatusService,
+        mockServiceFlow,
+        cc = mockMcc)
 
     mockCacheFetch[Hvd](None, Some(Hvd.key))
     mockCacheSave[Hvd]

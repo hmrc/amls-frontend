@@ -40,7 +40,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
     val controller = new ConfirmRegisteredOfficeController (
       dataCache = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction, ds = commonDependencies)
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   private val ukAddress = RegisteredOfficeUK("line1", "line2", Some("line3"), Some("line4"), "AA1 1AA")

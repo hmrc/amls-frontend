@@ -41,7 +41,7 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with OneAppPerSuite wit
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new AgentCompanyDetailsController (mock[DataCacheConnector], SuccessfulAuthAction, ds = commonDependencies, messagesApi)
+    val controller = new AgentCompanyDetailsController (mock[DataCacheConnector], SuccessfulAuthAction, ds = commonDependencies, messagesApi, cc = mockMcc)
   }
 
   "AgentCompanyDetailsController" when {

@@ -40,7 +40,7 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
 
     val controller = new RemoveAgentPremisesReasonsController (
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction, ds = commonDependencies)
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
 
     val tradingPremises = TradingPremises()
     val cache = CacheMap("", Map.empty[String, JsValue])

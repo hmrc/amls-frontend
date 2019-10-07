@@ -41,7 +41,8 @@ class CETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       statusService = mockStatusService,
-      serviceFlow = mockServiceFlow)
+      serviceFlow = mockServiceFlow,
+      cc = mockMcc)
 
     mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, None)

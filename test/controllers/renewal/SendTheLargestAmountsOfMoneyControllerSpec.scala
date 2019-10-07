@@ -52,7 +52,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
     val controller = new SendTheLargestAmountsOfMoneyController(
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
-      renewalService = mockRenewalService,
+      renewalService = mockRenewalService, cc = mockMcc,
       autoCompleteService = mockAutoComplete
     )
   }

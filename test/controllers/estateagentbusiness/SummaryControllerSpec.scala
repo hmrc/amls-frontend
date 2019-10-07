@@ -39,7 +39,8 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       mock[DataCacheConnector],
       SuccessfulAuthAction, ds = commonDependencies,
       mock[StatusService],
-      mock[ServiceFlow])
+      mock[ServiceFlow],
+      cc = mockMcc)
 
     val model = EstateAgentBusiness(None, None)
 

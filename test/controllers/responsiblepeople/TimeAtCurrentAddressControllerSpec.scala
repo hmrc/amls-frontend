@@ -44,7 +44,8 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
     val timeAtAddressController = new TimeAtCurrentAddressController (
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
-      statusService = mock[StatusService]
+      statusService = mock[StatusService],
+      cc = mockMcc
       )
   }
 

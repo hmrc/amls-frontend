@@ -43,8 +43,10 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
 
     val controller = new AgentNameController(
       mockCacheConnector,
-      SuccessfulAuthAction, ds = commonDependencies,
-      mockStatusService
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      mockStatusService,
+      cc = mockMcc
     )
 
     mockCacheFetchAll

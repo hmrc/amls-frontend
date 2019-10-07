@@ -45,15 +45,17 @@ trait MicroService {
     .settings(scalaSettings: _*)
     .settings(publishingSettings: _*)
     .settings(defaultSettings(): _*)
-    .settings(scalaVersion := "2.11.11")
+    .settings(scalaVersion := "2.11.12")
     .settings(routesImport += "models.notifications.ContactType._")
     .settings(routesImport += "utils.Binders._")
     .settings(
       libraryDependencies ++= appDependencies,
+      autoScalaLibrary := false,
       retrieveManaged := true,
       evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
       routesGenerator := InjectedRoutesGenerator,
-      pipelineStages in Assets := Seq(digest)
+      pipelineStages in Assets := Seq(digest),
+      scalacOptions += "-target:jvm-1.8"
     )
     .configs(IntegrationTest)
     .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)

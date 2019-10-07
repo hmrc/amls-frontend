@@ -52,7 +52,8 @@ class RemoveBusinessTypesSummaryControllerSpec extends AmlsSpec with TitleValida
       SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
       removeServiceHelper,
-      router
+      router,
+      cc = mockMcc
     )
   }
 

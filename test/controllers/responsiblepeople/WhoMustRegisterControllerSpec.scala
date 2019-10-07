@@ -30,7 +30,7 @@ class WhoMustRegisterControllerSpec extends AmlsSpec with MockitoSugar with Scal
     self => val request = addToken(authRequest)
 
     val controller = new WhoMustRegisterController (
-      authAction = SuccessfulAuthAction, ds = commonDependencies)
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
   "WhoMustRegisterController" must {
 

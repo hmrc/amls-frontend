@@ -40,7 +40,8 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
     lazy val controller = new OnlyOffTheShelfCompsSoldController(
       SuccessfulAuthAction,
       commonDependencies,
-      cache)
+      cache,
+      cc = mockMcc)
 
     val tcsp = Tcsp(
       Some(TcspTypes(Set(

@@ -32,7 +32,7 @@ class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with Scala
     self =>
     val request = addToken(authRequest)
 
-    val controller = new SupervisionEndController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies)
+    val controller = new SupervisionEndController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   "SupervisionEndController" must {

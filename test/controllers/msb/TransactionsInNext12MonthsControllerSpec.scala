@@ -41,7 +41,8 @@ class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSuga
       SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
       mockStatusService,
-      mockServiceFlow
+      mockServiceFlow,
+      cc = mockMcc
     )
 
     mockIsNewActivityNewAuth(false)

@@ -39,7 +39,7 @@ class PenalisedUnderEstateAgentsActControllerSpec extends AmlsSpec with MockitoS
 
     val controller = new PenalisedUnderEstateAgentsActController (
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction, ds = commonDependencies)
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   val emptyCache = CacheMap("", Map.empty)

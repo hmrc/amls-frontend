@@ -40,7 +40,8 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
     val controller = new BusinessFranchiseController (
       dataCacheConnector = mock[DataCacheConnector],
       SuccessfulAuthAction,
-      ds = commonDependencies)
+      ds = commonDependencies,
+      cc = mockMcc)
   }
 
   val emptyCache = CacheMap("", Map.empty)

@@ -42,7 +42,8 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Respons
     val controller = new FitAndProperController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
-      router = createRouter[AddBusinessTypeFlowModel]
+      router = createRouter[AddBusinessTypeFlowModel],
+      cc = mockMcc
     )
 
     mockCacheFetch(Some(AddBusinessTypeFlowModel(Some(HighValueDealing))))

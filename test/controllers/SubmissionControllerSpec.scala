@@ -48,7 +48,8 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       mock[RenewalService],
       mock[AuthenticatorConnector],
       SuccessfulAuthAction,
-      commonDependencies
+      commonDependencies,
+      mockMcc
     )
   }
 

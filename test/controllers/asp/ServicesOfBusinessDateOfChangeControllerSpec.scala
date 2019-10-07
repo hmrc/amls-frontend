@@ -39,7 +39,7 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
     self =>
     val request = addToken(authRequest)
 
-    val controller = new ServicesOfBusinessDateOfChangeController(mockCacheConnector, SuccessfulAuthAction, ds = commonDependencies)
+    val controller = new ServicesOfBusinessDateOfChangeController(mockCacheConnector, SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   "ServicesDateOfChangeController" must {

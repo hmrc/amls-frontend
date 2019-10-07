@@ -44,7 +44,7 @@ class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar w
 
     mockCacheSave[Asp]
 
-    val controller = new OtherBusinessTaxMattersController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies)
+    val controller = new OtherBusinessTaxMattersController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
 
     val newRequest = request.withFormUrlEncodedBody(
       "otherBusinessTaxMatters" -> "true"

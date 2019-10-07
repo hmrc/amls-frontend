@@ -58,7 +58,8 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
       businessMatchingService = mockBusinessMatchingService,
       responsiblePeopleService = mockRPService,
       helper = mockUpdateServiceHelper,
-      router = createRouter[AddBusinessTypeFlowModel]
+      router = createRouter[AddBusinessTypeFlowModel],
+      cc = mockMcc
     )
 
     val responsiblePeople: List[ResponsiblePerson] = (responsiblePeopleGen(2).sample.get :+

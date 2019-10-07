@@ -25,6 +25,7 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.MessagesApi
 import play.api.inject.bind
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
+import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
 import play.api.{Application, Mode}
 import play.filters.csrf.CSRF.Token
@@ -49,6 +50,8 @@ trait AmlsSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with MustM
   implicit val headerCarrier = HeaderCarrier()
 
   implicit val partialsProvider = app.injector.instanceOf(classOf[CachedStaticHtmlPartialProvider])
+
+  val mockMcc = mock[MessagesControllerComponents]
 
   def addToken[T](fakeRequest: FakeRequest[T]) = {
     val csrfConfig     = app.injector.instanceOf[CSRFConfigProvider].get

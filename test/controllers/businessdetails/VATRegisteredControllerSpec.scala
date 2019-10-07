@@ -41,7 +41,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
     val controller = new VATRegisteredController (
       dataCacheConnector = mockCacheConnector,
-      authAction = SuccessfulAuthAction, ds = commonDependencies)
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   "BusinessRegisteredForVATController" when {

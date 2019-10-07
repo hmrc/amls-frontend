@@ -51,7 +51,8 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
     val addPersonController = new AddPersonController (
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction, ds = commonDependencies,
-      statusService = mockStatusService
+      statusService = mockStatusService,
+      cc = mockMcc
     )
 
     val emptyCache = CacheMap("", Map.empty)

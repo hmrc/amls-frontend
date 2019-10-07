@@ -59,7 +59,8 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
     val whatDoesYourBusinessDoController = new WhatDoesYourBusinessDoController (
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
-      statusService = mock[StatusService]
+      statusService = mock[StatusService],
+      cc = mockMcc
     )
 
     val businessMatchingActivitiesAll = BusinessMatchingActivities(

@@ -41,7 +41,8 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
     val controller = new ExpectedBusinessTurnoverController (
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction, ds = commonDependencies,
-      statusService = mock[StatusService]
+      statusService = mock[StatusService],
+      cc = mockMcc
     )
   }
 

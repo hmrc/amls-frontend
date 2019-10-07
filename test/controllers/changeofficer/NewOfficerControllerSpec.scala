@@ -50,7 +50,7 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
 
     val cache = mock[DataCacheConnector]
 
-    val controller = new NewOfficerController(SuccessfulAuthAction, commonDependencies, cache)
+    val controller = new NewOfficerController(SuccessfulAuthAction, commonDependencies, cache, mockMcc)
 
     lazy val responsiblePeople = Gen.listOf(completeResponsiblePersonGen).sample.get
     lazy val emptyPerson = new ResponsiblePerson()

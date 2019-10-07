@@ -40,7 +40,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with  MockitoS
     val controller = new RegisteredOfficeDateOfChangeController (
       dataCacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService],
-      authAction = SuccessfulAuthAction, ds = commonDependencies)
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   val emptyCache = CacheMap("", Map.empty)

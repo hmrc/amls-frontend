@@ -53,7 +53,8 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
-      auditConnector = mock[AuditConnector]
+      auditConnector = mock[AuditConnector],
+      cc = mockMcc
       )
 
     when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())).thenReturn(Future.successful(SubmissionDecisionRejected))

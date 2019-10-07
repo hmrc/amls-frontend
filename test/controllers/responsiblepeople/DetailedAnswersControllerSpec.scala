@@ -44,7 +44,8 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
-      config = mock[AppConfig]
+      config = mock[AppConfig],
+      cc = mockMcc
       )
 
     val businessMatching = BusinessMatching()

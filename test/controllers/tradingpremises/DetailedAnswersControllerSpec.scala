@@ -51,7 +51,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
     self =>
     val request = addToken(authRequest)
 
-    val controller = new DetailedAnswersController(SuccessfulAuthAction, ds = commonDependencies, mockDataCacheConnector)
+    val controller = new DetailedAnswersController(SuccessfulAuthAction, ds = commonDependencies, mockDataCacheConnector, cc = mockMcc)
 
     when(statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
 

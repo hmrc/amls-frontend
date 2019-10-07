@@ -27,7 +27,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends AuthorisedFixture  with DependencyMocks{
     self => val request = addToken(authRequest)
 
-    val controller = new WhatYouNeedController(authAction = SuccessfulAuthAction, ds = commonDependencies)
+    val controller = new WhatYouNeedController(authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   "WhatYouNeedController" must {

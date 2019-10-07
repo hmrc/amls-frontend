@@ -34,8 +34,10 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
     val request = addToken(authRequest)
 
     val controller = new NoPsrController(
-      SuccessfulAuthAction, ds = commonDependencies,
-      mockStatusService
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      mockStatusService,
+      cc = mockMcc
     )
   }
 

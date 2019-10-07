@@ -39,7 +39,7 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
       mockCacheConnector,
       SuccessfulAuthAction,
       commonDependencies,
-      commonDependencies.amlsConfig)
+      cc = mockMcc)
   }
 
   "The KnownByController" when {

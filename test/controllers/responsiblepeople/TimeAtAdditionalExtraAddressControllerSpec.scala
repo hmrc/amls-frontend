@@ -43,7 +43,7 @@ class TimeAtAdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSu
 
     val timeAtAdditionalExtraAddressController = new TimeAtAdditionalExtraAddressController (
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction, ds = commonDependencies)
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   val mockCacheMap = mock[CacheMap]

@@ -45,7 +45,8 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
       dataCache = mockCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mockStatusService,
-      businessMatchingService = mockBusinessMatchingService
+      businessMatchingService = mockBusinessMatchingService,
+      cc = mockMcc
     )
 
     when {

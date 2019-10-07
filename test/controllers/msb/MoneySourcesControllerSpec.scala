@@ -56,7 +56,7 @@ class MoneySourcesControllerSpec extends AmlsSpec
     val controller = new MoneySourcesController(dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mockStatusService,
-      serviceFlow = mockServiceFlow)
+      serviceFlow = mockServiceFlow, cc = mockMcc)
 
     mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, Some(ServiceChangeRegister.key))

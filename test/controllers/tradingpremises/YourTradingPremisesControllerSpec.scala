@@ -52,7 +52,7 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
     val ytpController = new YourTradingPremisesController(
       mockDataCacheConnector,
       mockStatusService,
-      SuccessfulAuthAction, ds = commonDependencies)
+      SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
 
     when(ytpController.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
 

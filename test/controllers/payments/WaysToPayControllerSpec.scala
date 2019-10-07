@@ -50,7 +50,8 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
       statusService = mock[StatusService],
       paymentsService = mock[PaymentsService],
       authEnrolmentsService = mock[AuthEnrolmentsService],
-      feeResponseService = mock[FeeResponseService]
+      feeResponseService = mock[FeeResponseService],
+      cc = mockMcc
     )
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))

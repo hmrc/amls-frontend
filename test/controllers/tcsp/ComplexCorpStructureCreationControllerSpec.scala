@@ -39,7 +39,7 @@ class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSu
 
     val cache = mock[DataCacheConnector]
 
-    lazy val controller = new ComplexCorpStructureCreationController(SuccessfulAuthAction, commonDependencies, cache)
+    lazy val controller = new ComplexCorpStructureCreationController(SuccessfulAuthAction, commonDependencies, cache, cc = mockMcc)
 
     val tcsp = Tcsp(
       Some(TcspTypes(Set(

@@ -46,7 +46,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
     val emptyCache = CacheMap("", Map.empty)
     val mockRenewalService = mock[RenewalService]
 
-    val controller = new MostTransactionsController(SuccessfulAuthAction, ds = commonDependencies, self.cache, self.mockRenewalService, mockAutoComplete)
+    val controller = new MostTransactionsController(SuccessfulAuthAction, ds = commonDependencies, self.cache, self.mockRenewalService, mockAutoComplete, cc = mockMcc)
   }
 
   trait FormSubmissionFixture extends Fixture {

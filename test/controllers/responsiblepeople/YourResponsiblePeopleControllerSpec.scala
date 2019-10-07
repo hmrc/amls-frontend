@@ -37,7 +37,7 @@ class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar {
 
       val controller = new YourResponsiblePeopleController (
         dataCacheConnector = mock[DataCacheConnector],
-        authAction = SuccessfulAuthAction, ds = commonDependencies)
+        authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
     }
 
     "Get" must {

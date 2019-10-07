@@ -49,7 +49,8 @@ class SelectBusinessTypeControllerSpec extends AmlsSpec {
       dataCacheConnector = mockCacheConnector,
       businessMatchingService = mockBusinessMatchingService,
       router = createRouter[AddBusinessTypeFlowModel],
-      addHelper = mock[AddBusinessTypeHelper]
+      addHelper = mock[AddBusinessTypeHelper],
+      cc = mockMcc
     )
 
     when {

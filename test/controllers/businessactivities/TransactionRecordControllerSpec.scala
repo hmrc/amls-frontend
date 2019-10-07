@@ -32,7 +32,7 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
     self =>
 
     val request = addToken(authRequest)
-    val controller = new TransactionRecordController(SuccessfulAuthAction, ds = commonDependencies, mockCacheConnector)
+    val controller = new TransactionRecordController(SuccessfulAuthAction, ds = commonDependencies, mockCacheConnector, mockMcc)
 
     mockCacheSave[BusinessActivities]
   }

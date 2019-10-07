@@ -53,7 +53,8 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
       dataCacheConnector = mockCacheConnector,
       businessMatchingService = mockBusinessMatchingService,
       removeBusinessTypeHelper = mockRemoveBusinessTypeHelper,
-      router = createRouter[RemoveBusinessTypeFlowModel]
+      router = createRouter[RemoveBusinessTypeFlowModel],
+      cc = mockMcc
     )
 
     when {

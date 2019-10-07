@@ -52,7 +52,8 @@ class SummaryControllerSpec extends AmlsSpec {
       mockCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       mock[ServiceFlow],
-      mockStatusService
+      mockStatusService,
+      cc = mockMcc
     )
 
     when {

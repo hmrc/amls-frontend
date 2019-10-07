@@ -40,7 +40,8 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
       mockCacheConnector,
       mockStatusService,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
-      mockServiceFlow
+      mockServiceFlow,
+      mockMcc
     )
 
     mockCacheFetch[Asp](None)

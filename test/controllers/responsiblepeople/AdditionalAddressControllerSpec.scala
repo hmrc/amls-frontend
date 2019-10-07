@@ -59,7 +59,8 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar {
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       auditConnector = auditConnector,
-      autoCompleteService = autoCompleteService
+      autoCompleteService = autoCompleteService,
+      cc = mockMcc
     )
 
     when {

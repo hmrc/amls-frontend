@@ -44,7 +44,7 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
 
     val controller = new ContactingYouPhoneController (
       dataCache = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction, ds = commonDependencies)
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   val emptyCache = CacheMap("", Map.empty)

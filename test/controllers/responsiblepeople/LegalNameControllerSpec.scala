@@ -33,7 +33,7 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
     val request = addToken(self.authRequest)
     val RecordId = 1
 
-    lazy val controller = new LegalNameController(mockCacheConnector, SuccessfulAuthAction, commonDependencies)
+    lazy val controller = new LegalNameController(mockCacheConnector, SuccessfulAuthAction, commonDependencies, cc = mockMcc)
 
   }
 

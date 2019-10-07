@@ -53,7 +53,8 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
       mock[BusinessMatchingService],
       mockStatusService,
       mock[ChangeSubSectorHelper],
-      config
+      config,
+      cc = mockMcc
     )
 
     val cacheMapT = OptionT.some[Future, CacheMap](mockCacheMap)

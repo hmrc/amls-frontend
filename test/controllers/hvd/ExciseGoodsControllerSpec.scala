@@ -33,8 +33,10 @@ class ExciseGoodsControllerSpec extends AmlsSpec {
 
     val controller = new ExciseGoodsController(mockCacheConnector,
                                                 mockStatusService,
-                                                SuccessfulAuthAction, ds = commonDependencies,
-                                                mockServiceFlow)
+                                                SuccessfulAuthAction,
+                                                ds = commonDependencies,
+                                                mockServiceFlow,
+                                                cc = mockMcc)
 
     mockCacheFetch[Hvd](None)
     mockCacheSave[Hvd]
