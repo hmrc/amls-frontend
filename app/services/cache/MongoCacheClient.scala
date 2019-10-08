@@ -22,8 +22,9 @@ import javax.inject.Inject
 import org.joda.time.{DateTime, DateTimeZone}
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.libs.functional.FunctionalBuilder
 import play.api.libs.json._
-import play.modules.reactivemongo.ReactiveMongoComponent
+import play.modules.reactivemongo.{MongoDbConnection, ReactiveMongoComponent}
 import reactivemongo.api.DefaultDB
 import reactivemongo.api.commands.WriteResult
 import reactivemongo.api.indexes.{Index, IndexType}
@@ -62,9 +63,29 @@ case class Cache(id: String, data: Map[String, JsValue], lastUpdated: DateTime =
   }
 }
 
-object Cache {
-  implicit val dateFormat = ReactiveMongoFormats.dateTimeFormats
-  implicit val format = Json.format[Cache]
+object Cache extends JodaReads with JodaWrites {
+  import play.api.libs.functional.syntax._
+  import play.api.libs.json.Reads._
+  import play.api.libs.json.OWrites._
+  import play.api.libs.json._
+
+  val datedCacheMapReads: Reads[Cache] =
+    ((JsPath \ "id").read[String] and
+      (JsPath \ "data").read[Map[String, JsValue]] and
+      (JsPath \ "lastUpdated").read[DateTime]) { (id, data, lastUpdated) =>
+      new Cache(id, data, lastUpdated)
+    }
+  val writeBuilder: FunctionalBuilder[OWrites]#CanBuild3[String, Map[String, JsValue], DateTime] =
+    (JsPath \ "id").write[String] and
+      (JsPath \ "data").write[Map[String, JsValue]] and
+      (JsPath \ "lastUpdated").write[DateTime]
+
+  val datedCacheMapWrites: OWrites[Cache] =
+    writeBuilder.apply { datedCacheMap: Cache =>
+      (datedCacheMap.id, datedCacheMap.data, datedCacheMap.lastUpdated)
+    }
+
+  implicit val formats: OFormat[Cache] = OFormat(datedCacheMapReads, datedCacheMapWrites)
 
   def apply(cacheMap: CacheMap): Cache = Cache(cacheMap.id, cacheMap.data)
 
@@ -95,8 +116,8 @@ class MongoCacheClientFactory @Inject()(config: AppConfig, applicationCrypto: Ap
   * Implements a client which utilises the GOV UK cache repository to store cached data in Mongo.
   * @param appConfig The application configuration
   */
-class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCrypto: ApplicationCrypto)
-  extends ReactiveRepository[Cache, BSONObjectID]("app-cache", db, Cache.format)
+class MongoCacheClient(appConfig: AppConfig, mongo: () => DefaultDB, applicationCrypto: ApplicationCrypto)
+  extends ReactiveRepository[Cache, BSONObjectID]("app-cache", mongo, Cache.formats)
     with Conversions
     with CacheOps {
 
@@ -110,6 +131,8 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
   val cacheExpiryInSeconds: Int = appConfig.cacheExpiryInSeconds
 
   createIndex("lastUpdated", "cacheExpiry", cacheExpiryInSeconds)
+
+  import reactivemongo.play.json.ImplicitBSONHandlers._
 
   /**
     * Inserts data into the cache with the specified key. If the data does not exist, it will be created.

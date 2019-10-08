@@ -123,7 +123,7 @@ class AppConfig @Inject()(configuration: Configuration, runMode: RunMode) extend
 
   def ggAuthUrl = baseUrl("government-gateway-authentication")
 
-  val mongoEncryptionEnabled = getConfBool("appCache.mongo.encryptionEnabled", true)
+  def mongoEncryptionEnabled = getConfBool("appCache.mongo.encryptionEnabled", true)
   val mongoAppCacheEnabled = getConfBool("appCache.mongo.enabled", false)
   val cacheExpiryInSeconds = getConfInt("appCache.expiryInSeconds", 60)
 

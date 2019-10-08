@@ -16,13 +16,13 @@
 
 package utils
 
-import config.CachedStaticHtmlPartialProvider
+import config.{ApplicationConfig, CachedStaticHtmlPartialProvider}
 import connectors.KeystoreConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.i18n.MessagesApi
+import play.api.i18n.{Lang, MessagesApi}
 import play.api.inject.bind
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import play.api.mvc.MessagesControllerComponents
@@ -50,6 +50,9 @@ trait AmlsSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with MustM
   implicit val headerCarrier = HeaderCarrier()
 
   implicit val partialsProvider = app.injector.instanceOf(classOf[CachedStaticHtmlPartialProvider])
+
+  implicit val lang = mock[Lang]
+  implicit val appConfig = mock[ApplicationConfig]
 
   val mockMcc = mock[MessagesControllerComponents]
 

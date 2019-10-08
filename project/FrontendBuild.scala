@@ -1,10 +1,15 @@
 import sbt._
 
 object FrontendBuild extends Build with MicroService {
+  import sbt.Keys._
 
   val appName = "amls-frontend"
 
   override lazy val appDependencies: Seq[ModuleID] = AppDependencies()
+  override lazy val playSettings : Seq[Setting[_]] = Seq(
+    dependencyOverrides += "com.typesafe.play" %% "play-json" % "2.6.13",
+    dependencyOverrides += "com.typesafe.play" %% "play-json-joda" % "2.6.13"
+  )
 }
 
 private object AppDependencies {
@@ -32,11 +37,12 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "http-caching-client" % httpCachingClientVersion,
     "uk.gov.hmrc" %% "play-whitelist-filter" % playWhitelistFilterVersion,
     "uk.gov.hmrc" %% "json-encryption" % jsonEncryptionVersion,
-    "uk.gov.hmrc" %% "simple-reactivemongo" % playReactivemongoVersion, // excludeAll ExclusionRule("com.typesafe.play", "play-iteratees_2.11"),
+    "uk.gov.hmrc" %% "simple-reactivemongo" % playReactivemongoVersion excludeAll(ExclusionRule("com.typesafe.play", "play-iteratees_2.11")), // excludeAll ExclusionRule("com.typesafe.play", "play-iteratees_2.11"),
     "uk.gov.hmrc" %% "auth-client" % authVersion,
     "uk.gov.hmrc" %% "play-ui" % "8.0.0-play-26",
-    "uk.gov.hmrc" %% "bootstrap-play-26" % "1.1.0",
+    "uk.gov.hmrc" %% "bootstrap-play-26" % "0.45.0",
     "uk.gov.hmrc" %% "govuk-template" % "5.38.0-play-26",
+    "uk.gov.hmrc" %% "http-verbs" % "9.8.0-play-26",
 
     "io.github.jto" %% "validation-core"      % validationVersion, // excludeAll playJars,
     "io.github.jto" %% "validation-playjson"  % validationVersion,// excludeAll playJars,
@@ -45,8 +51,9 @@ private object AppDependencies {
     "com.vladsch.flexmark" % "flexmark-all" % flexmarkVersion,
     "com.beachape" %% "enumeratum-play" % "1.5.10",
     "com.squareup.okhttp3" % "mockwebserver" % okHttpVersion,
-    "com.typesafe.play" %% "play-json" % "2.7.1",// excludeAll playJars,
-    "com.typesafe.play" %% "play-json-joda" % "2.7.1" // excludeAll playJars
+    "com.typesafe.play" %% "play-json" % "2.6.13",// excludeAll playJars,
+    "com.typesafe.play" %% "play-json-joda" % "2.6.13", // excludeAll playJars
+    "org.julienrf" %% "play-json-derived-codecs" % "3.3"
   )
 
   trait ScopeDependencies {

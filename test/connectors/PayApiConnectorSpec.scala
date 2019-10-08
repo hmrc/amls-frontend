@@ -21,6 +21,7 @@ import models.payments.{CreatePaymentRequest, CreatePaymentResponse, NextUrl}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent._
+import play.api.Configuration
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.libs.json.Json
@@ -28,6 +29,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.bootstrap.config.RunMode
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import utils.AmlsSpec
 
@@ -57,7 +59,7 @@ class PayApiConnectorSpec extends AmlsSpec with ScalaFutures with IntegrationPat
 
     val auditConnector = mock[AuditConnector]
 
-    lazy val connector = new PayApiConnector(http, auditConnector)
+    lazy val connector = new PayApiConnector(http, auditConnector, mock[Configuration], mock[RunMode])
   }
 
   "The Pay-API connector" when {
