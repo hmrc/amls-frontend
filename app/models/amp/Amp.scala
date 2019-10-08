@@ -16,8 +16,6 @@
 
 package models.amp
 
-import java.time.LocalDateTime
-
 import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.api.libs.json._
@@ -25,9 +23,7 @@ import play.api.mvc.Call
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 
-final case class Amp(_id: String,
-                     data: JsObject = Json.obj(),
-                     lastUpdated: LocalDateTime = LocalDateTime.now,
+final case class Amp(data: JsObject = Json.obj(),
                      hasChanged: Boolean = false,
                      hasAccepted: Boolean = false) {
 
@@ -106,9 +102,7 @@ object Amp  {
     import play.api.libs.functional.syntax._
 
     (
-      (__ \ "_id").read[String] and
         (__ \ "data").read[JsObject] and
-        (__ \ "lastUpdated").read(MongoDateTimeFormats.localDateTimeRead) and
         (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
         (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false))
       ) (Amp.apply _)
@@ -119,12 +113,11 @@ object Amp  {
     import play.api.libs.functional.syntax._
 
     (
-      (__ \ "_id").write[String] and
         (__ \ "data").write[JsObject] and
-        (__ \ "lastUpdated").write(MongoDateTimeFormats.localDateTimeWrite) and
         (__ \ "hasChanged").write[Boolean] and
         (__ \ "hasAccepted").write[Boolean]
       ) (unlift(Amp.unapply))
   }
-  
+
+  implicit val formatOption = Reads.optionWithNull[Amp]
 }

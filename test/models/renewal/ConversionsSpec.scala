@@ -29,7 +29,7 @@ class ConversionsSpec extends WordSpec with MustMatchers {
     val businessActivities = BusinessActivities()
     val msbSection = MoneyServiceBusiness()
     val hvdSection = Hvd()
-    val subscriptionRequest = SubscriptionRequest(None, None, None, None, None, None, Some(businessActivities), None, None, None, Some(msbSection), Some(hvdSection), None)
+    val subscriptionRequest = SubscriptionRequest(None, None, None, None, None, None, Some(businessActivities), None, None, None, Some(msbSection), Some(hvdSection), None, None)
   }
 
   "The renewal converter" must {
