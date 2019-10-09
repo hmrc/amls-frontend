@@ -50,7 +50,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
   val cacheMap = mock[CacheMap]
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
 
     val controller = new StatusController (

@@ -29,7 +29,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class BusinessServicesControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
@@ -74,7 +74,7 @@ class BusinessServicesControllerSpec extends AmlsSpec with MockitoSugar {
 
         "redirect to PenalisedUnderEstateAgentsActController" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "services[0]" -> "02",
             "services[1]" -> "08"
           )
@@ -100,7 +100,7 @@ class BusinessServicesControllerSpec extends AmlsSpec with MockitoSugar {
 
             "edit is true" in new Fixture {
 
-              val newRequest = request.withFormUrlEncodedBody(
+              val newRequest = requestWithUrlEncodedBody(
                 "services[1]" -> "02",
                 "services[0]" -> "01",
                 "services[2]" -> "03"
@@ -121,7 +121,7 @@ class BusinessServicesControllerSpec extends AmlsSpec with MockitoSugar {
 
             "edit is false" in new Fixture {
 
-              val newRequest = request.withFormUrlEncodedBody(
+              val newRequest = requestWithUrlEncodedBody(
                 "services[0]" -> "01",
                 "services[1]" -> "02",
                 "services[2]" -> "03"
@@ -151,7 +151,7 @@ class BusinessServicesControllerSpec extends AmlsSpec with MockitoSugar {
 
               "status is approved" in new Fixture {
 
-                val newRequest = request.withFormUrlEncodedBody(
+                val newRequest = requestWithUrlEncodedBody(
                   "services[0]" -> "01",
                   "services[1]" -> "02",
                   "services[2]" -> "07"
@@ -172,7 +172,7 @@ class BusinessServicesControllerSpec extends AmlsSpec with MockitoSugar {
 
               "status is ready for renewal" in new Fixture {
 
-                val newRequest = request.withFormUrlEncodedBody(
+                val newRequest = requestWithUrlEncodedBody(
                   "services[0]" -> "01",
                   "services[1]" -> "02",
                   "services[2]" -> "07"
@@ -199,7 +199,7 @@ class BusinessServicesControllerSpec extends AmlsSpec with MockitoSugar {
           "edit is true" when {
             "status is pre-approved" in new Fixture {
 
-              val newRequest = request.withFormUrlEncodedBody(
+              val newRequest = requestWithUrlEncodedBody(
                 "services[1]" -> "02",
                 "services[2]" -> "07"
               )
@@ -228,7 +228,7 @@ class BusinessServicesControllerSpec extends AmlsSpec with MockitoSugar {
 
         "respond with BAD_REQUEST" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "services" -> "0299999"
           )
 

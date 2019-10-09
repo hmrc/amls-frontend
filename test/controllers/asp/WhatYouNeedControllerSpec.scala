@@ -26,7 +26,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with OneAppPerSuite {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 

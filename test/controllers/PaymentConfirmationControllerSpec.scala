@@ -51,10 +51,10 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
   with PaymentGenerator
   with SubscriptionResponseGenerator {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val baseUrl = "http://localhost"
-    val request = addToken(authRequest).copyFakeRequest(uri = baseUrl)
+    val request = addToken(authRequest.copyFakeRequest(uri = baseUrl))
 
     val controller = new PaymentConfirmationController(
       authAction = SuccessfulAuthAction,
@@ -325,7 +325,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
           controller.amlsConnector.refreshPaymentStatus(any(), any())(any(), any())
         } thenReturn Future.successful(paymentStatus)
 
-        val failedRequest = addToken(authRequest).copyFakeRequest(uri = baseUrl + "?paymentStatus=Failed")
+        val failedRequest = addToken(authRequest.copyFakeRequest(uri = baseUrl + "?paymentStatus=Failed"))
         val result = controller.paymentConfirmation(payment.reference)(failedRequest)
 
         status(result) mustBe OK
@@ -350,7 +350,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
           controller.amlsConnector.refreshPaymentStatus(any(), any())(any(), any())
         } thenReturn Future.successful(paymentStatus)
 
-        val cancelledRequest = request.copyFakeRequest(uri = baseUrl + "?paymentStatus=Cancelled")
+        val cancelledRequest = addToken(authRequest.copyFakeRequest(uri = baseUrl + "?paymentStatus=Cancelled"))
         val result = controller.paymentConfirmation(payment.reference)(cancelledRequest)
 
         status(result) mustBe OK
@@ -378,7 +378,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
           controller.amlsConnector.getPaymentByAmlsReference(any(), any())(any(), any())
         } thenReturn Future.successful(Some(payment))
 
-        val cancelledRequest = request.copyFakeRequest(uri = baseUrl + "?paymentStatus=Cancelled")
+        val cancelledRequest = addToken(authRequest.copyFakeRequest(uri = baseUrl + "?paymentStatus=Cancelled"))
         val result = controller.paymentConfirmation(payment.reference)(cancelledRequest)
 
         status(result) mustBe OK

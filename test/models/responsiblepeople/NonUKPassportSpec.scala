@@ -116,7 +116,7 @@ class NonUKPassportSpec extends PlaySpec {
       "Read the json and return NonUKPassport" in {
         val model = NonUKPassportYes("21321313213132132")
         NonUKPassport.jsonReads.reads(NonUKPassport.jsonWrites.writes(model)) must
-          be(JsSuccess(model, JsPath \ "nonUKPassportNumber"))
+          be(JsSuccess(model, JsPath))
       }
 
       "Read the json and return error if passport number is missing" in {

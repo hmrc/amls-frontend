@@ -21,14 +21,14 @@ import jto.validation.{Path, ValidationError}
 import models.businessdetails.{PreviouslyRegistered, PreviouslyRegisteredYes}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
 
-class previously_registeredSpec extends AmlsSpec with MustMatchers  {
+class previously_registeredSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "previously_registered view" must {

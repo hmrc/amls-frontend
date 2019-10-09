@@ -39,7 +39,7 @@ import scala.concurrent.Future
 
 class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val autoCompleteService = mock[AutoCompleteService]
@@ -137,7 +137,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
     "fail submission on error" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody()
+      val newRequest = requestWithUrlEncodedBody("" -> "")
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName)))))
@@ -153,7 +153,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
     "submit with valid nationality data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "nationality" -> "01"
       )
 
@@ -172,7 +172,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
     "submit with valid nationality data (with other country)" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "nationality" -> "02",
         "otherCountry" -> "GB"
       )
@@ -192,7 +192,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
     "submit with valid data in edit mode" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "nationality" -> "02",
         "otherCountry" -> "GB"
       )
@@ -219,7 +219,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
     "load NotFound page on exception" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "nationality" -> "01"
       )
 

@@ -25,7 +25,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class AnotherTCSPSupervisionControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
 
     val controller = new AnotherTCSPSupervisionController(
@@ -73,7 +73,7 @@ class AnotherTCSPSupervisionControllerSpec extends AmlsSpec with MockitoSugar {
             mockCacheFetch[Tcsp](None)
             mockCacheSave[Tcsp]
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "servicesOfAnotherTCSP" -> "true",
               "mlrRefNumber" -> "12345678"
             )
@@ -89,7 +89,7 @@ class AnotherTCSPSupervisionControllerSpec extends AmlsSpec with MockitoSugar {
             mockCacheFetch[Tcsp](None)
             mockCacheSave[Tcsp]
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "servicesOfAnotherTCSP" -> "true",
               "mlrRefNumber" -> "12345678"
             )
@@ -107,7 +107,7 @@ class AnotherTCSPSupervisionControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with BAD_REQUEST" when {
         "invalid data" in new Fixture {
 
-          val newRequestInvalid = request.withFormUrlEncodedBody(
+          val newRequestInvalid = requestWithUrlEncodedBody(
             "servicesOfAnotherTCSP" -> "true",
             "mlrRefNumber" -> "adbg1233"
           )

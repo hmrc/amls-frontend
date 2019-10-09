@@ -38,7 +38,7 @@ class CashPaymentsCustomersNotMetControllerSpec extends AmlsSpec {
   val doNotreceiveCashPayments = CashPayments(CashPaymentsCustomerNotMet(false), None)
 
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new CashPaymentsCustomersNotMetController (
@@ -101,7 +101,7 @@ class CashPaymentsCustomersNotMetControllerSpec extends AmlsSpec {
 
       "a valid request is made" must {
         "redirect to summary page if false is passed in the form" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "receiveCashPayments" -> "false"
           )
 
@@ -114,7 +114,7 @@ class CashPaymentsCustomersNotMetControllerSpec extends AmlsSpec {
 
       "a valid request is made" must {
         "redirect to HowCashPaymentsReceivedController if true is passed in the form" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "receiveCashPayments" -> "true"
           )
 

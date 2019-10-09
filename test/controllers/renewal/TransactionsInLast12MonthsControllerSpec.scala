@@ -39,7 +39,7 @@ import scala.concurrent.Future
 
 class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val renewalService = mock[RenewalService]
     val request = addToken(authRequest)
@@ -57,7 +57,7 @@ class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSuga
 
   trait FormSubmissionFixture extends Fixture {
     def formData(valid: Boolean) = if (valid) {"txnAmount" -> "1500"} else {"txnAmount" -> "abc"}
-    def formRequest(valid: Boolean) = request.withFormUrlEncodedBody(formData(valid))
+    def formRequest(valid: Boolean) = requestWithUrlEncodedBody(formData(valid))
 
     val cache = mock[CacheMap]
 

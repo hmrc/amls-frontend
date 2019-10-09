@@ -41,7 +41,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec
                                     with IntegrationPatience
                                     with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
@@ -71,7 +71,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec
   }
 
   trait DealsInForeignCurrencyFixture extends Fixture {
-    val newRequest = request.withFormUrlEncodedBody(
+    val newRequest = requestWithUrlEncodedBody(
       "currencies[0]" -> "USD",
       "currencies[1]" -> "GBP",
       "currencies[2]" -> "BOB"
@@ -136,7 +136,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec
       }
       "data is invalid" should {
         "return bad request" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             ("IncorrectData1", "IncorrectData2")
           )
 

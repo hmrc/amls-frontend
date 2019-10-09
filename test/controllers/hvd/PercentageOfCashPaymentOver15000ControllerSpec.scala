@@ -35,7 +35,7 @@ import scala.concurrent.Future
 
 class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
@@ -99,7 +99,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
 
     "on post with invalid data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
       )
 
       when(controller.dataCacheConnector.fetch[Hvd](any(), any())
@@ -115,7 +115,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
 
     "on post with valid data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "percentage" -> "01"
       )
 
@@ -132,7 +132,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
 
     "on post with valid data in edit mode" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "percentage" -> "01"
       )
 

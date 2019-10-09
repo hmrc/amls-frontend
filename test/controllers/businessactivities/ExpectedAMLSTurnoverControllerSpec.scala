@@ -38,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val request = addToken(authRequest)
     implicit val ec = app.injector.instanceOf[ExecutionContext]
@@ -167,7 +167,7 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
     "post is called" must {
       "on post with valid data" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "expectedAMLSTurnover" -> "01"
         )
 
@@ -184,7 +184,7 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
 
       "on post with valid data in edit mode" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "expectedAMLSTurnover" -> "01"
         )
 

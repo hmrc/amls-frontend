@@ -36,7 +36,7 @@ import scala.concurrent.Future
 
 class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
 
     val controller = new VATRegisteredController (
@@ -88,7 +88,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
             mockCacheGetEntry(Some(BusinessMatching(Some(partnership))), BusinessMatching.key)
             mockCacheUpdate(Some(BusinessDetails.key), BusinessDetails())
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "registeredForVAT" -> "true",
               "vrnNumber" -> "123456789"
             )
@@ -108,7 +108,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
             mockCacheGetEntry(Some(BusinessMatching(Some(llp))), BusinessMatching.key)
             mockCacheUpdate(Some(BusinessDetails.key), BusinessDetails())
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "registeredForVAT" -> "true",
               "vrnNumber" -> "123456789"
             )
@@ -126,7 +126,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
             mockCacheGetEntry(Some(BusinessMatching(Some(details))), BusinessMatching.key)
             mockCacheUpdate(Some(BusinessDetails.key), BusinessDetails())
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "registeredForVAT" -> "true",
               "vrnNumber" -> "123456789"
             )
@@ -140,7 +140,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
         "redirect to SummaryController" when {
           "in edit" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "registeredForVAT" -> "true",
               "vrnNumber" -> "123456789"
             )
@@ -162,7 +162,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
       "with invalid data" must {
         "respond with BAD_REQUEST" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "registeredForVATYes" -> "1234567890"
           )
 

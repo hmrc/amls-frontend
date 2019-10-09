@@ -31,7 +31,7 @@ import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocks}
 
 class RegisterResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]

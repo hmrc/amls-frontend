@@ -25,13 +25,13 @@ import org.jsoup.select.Elements
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 import views.html.include.forms2._
 
-class submitSpec extends AmlsSpec with MustMatchers {
+class submitSpec extends AmlsViewSpec with MustMatchers {
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
   "submit" must {
     "show the submit button" in {

@@ -31,7 +31,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class ChangeSubSectorHelperSpec extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val helper = new ChangeSubSectorHelper(
       SuccessfulAuthAction,

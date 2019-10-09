@@ -34,7 +34,7 @@ import scala.concurrent.Future
 
 class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
 
     lazy val defaultBuilder = new GuiceApplicationBuilder()
@@ -92,7 +92,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       "respond with NOT_FOUND" when {
         "the index is out of bounds" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "hasAlreadyPassedFitAndProper" -> "true"
           )
 
@@ -111,7 +111,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "hasAlreadyPassedFitAndProper" -> "invalid"
           )
 
@@ -128,7 +128,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       "respond with SEE_OTHER" when {
         "given valid data and edit = false, and redirect to the DetailedAnswersController" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "hasAlreadyPassedFitAndProper" -> "true"
           )
 
@@ -145,7 +145,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         "routes correctly" when {
           "given edit = true" when {
             "given fit and proper true, and redirect to the DetailedAnswersController" in new Fixture {
-              val newRequest = request.withFormUrlEncodedBody(
+              val newRequest = requestWithUrlEncodedBody(
                 "hasAlreadyPassedFitAndProper" -> "true"
               )
 
@@ -162,7 +162,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
             "given fit and proper false" when {
               "given some business matching" when {
                 "given TrustAndCompanyServices, and redirect to the DetailedAnswersController" in new Fixture {
-                  val newRequest = request.withFormUrlEncodedBody(
+                  val newRequest = requestWithUrlEncodedBody(
                     "hasAlreadyPassedFitAndProper" -> "false"
                   )
 
@@ -177,7 +177,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
                 }
 
                 "given MoneyServiceBusiness, and redirect to the DetailedAnswersController" in new Fixture {
-                  val newRequest = request.withFormUrlEncodedBody(
+                  val newRequest = requestWithUrlEncodedBody(
                     "hasAlreadyPassedFitAndProper" -> "false"
                   )
 
@@ -192,7 +192,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
                 }
 
                 "given NOT TrustAndCompanyServices or MoneyServiceBusiness, and redirect to the ApprovalCheckController" in new Fixture {
-                  val newRequest = request.withFormUrlEncodedBody(
+                  val newRequest = requestWithUrlEncodedBody(
                     "hasAlreadyPassedFitAndProper" -> "false"
                   )
 
@@ -211,7 +211,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
           "given edit = false" when {
             "given fit and proper true, and redirect to the DetailedAnswersController" in new Fixture {
-              val newRequest = request.withFormUrlEncodedBody(
+              val newRequest = requestWithUrlEncodedBody(
                 "hasAlreadyPassedFitAndProper" -> "true"
               )
 
@@ -228,7 +228,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
             "given fit and proper false" when {
               "given some business matching" when {
                 "given TrustAndCompanyServices, and redirect to the DetailedAnswersController" in new Fixture {
-                  val newRequest = request.withFormUrlEncodedBody(
+                  val newRequest = requestWithUrlEncodedBody(
                     "hasAlreadyPassedFitAndProper" -> "false"
                   )
 
@@ -243,7 +243,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
                 }
 
                 "given MoneyServiceBusiness, and redirect to the DetailedAnswersController" in new Fixture {
-                  val newRequest = request.withFormUrlEncodedBody(
+                  val newRequest = requestWithUrlEncodedBody(
                     "hasAlreadyPassedFitAndProper" -> "false"
                   )
 
@@ -258,7 +258,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
                 }
 
                 "given NOT TrustAndCompanyServices or MoneyServiceBusiness, and redirect to the ApprovalCheckController" in new Fixture {
-                  val newRequest = request.withFormUrlEncodedBody(
+                  val newRequest = requestWithUrlEncodedBody(
                     "hasAlreadyPassedFitAndProper" -> "false"
                   )
 

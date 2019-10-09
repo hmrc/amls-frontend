@@ -37,7 +37,7 @@ import scala.concurrent.Future
 
 class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val dataCacheConnector = mock[DataCacheConnector]
@@ -71,9 +71,10 @@ class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with Scal
     }
 
     "update ReviewDetails with valid input post code" in new Fixture {
-      val postRequest = request.withFormUrlEncodedBody {
+      val postRequest = requestWithUrlEncodedBody(
         "postCode" -> "BB1 1BB"
-      }
+      )
+
       when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
         (any(), any())).thenReturn(Future.successful(Some(businessMatching)))
 
@@ -87,9 +88,9 @@ class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with Scal
     }
 
     "update ReviewDetails as none when business matching-> reviewDetails is empty" in new Fixture {
-      val postRequest = request.withFormUrlEncodedBody {
+      val postRequest = requestWithUrlEncodedBody(
         "postCode" -> "BB1 1BB"
-      }
+      )
       when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
         (any(), any())).thenReturn(Future.successful(Some(businessMatching.copy(reviewDetails = None))))
 
@@ -104,9 +105,9 @@ class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
     "throw validation error on invalid field" in new Fixture {
 
-      val postRequest = request.withFormUrlEncodedBody {
+      val postRequest = requestWithUrlEncodedBody(
         "postCode" -> "AA1111AA"
-      }
+      )
       val result = controller.post()(postRequest)
       status(result) must be(BAD_REQUEST)
     }

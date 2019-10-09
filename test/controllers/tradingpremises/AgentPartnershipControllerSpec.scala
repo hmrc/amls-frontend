@@ -33,7 +33,7 @@ import scala.concurrent.Future
 
 class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with TradingPremisesGenerator{
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
@@ -92,7 +92,7 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
     "post is called" must {
       "respond with NOT_FOUND" when {
         "there is no data at all at that index" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "agentPartnership" -> "text"
           )
 
@@ -103,7 +103,7 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
       "respond with SEE_OTHER" when {
         "edit is false and given valid data" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "agentPartnership" -> "text"
           )
 
@@ -117,7 +117,7 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
         "edit is true and given valid data" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "agentPartnership" -> "text"
           )
 
@@ -134,7 +134,7 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "agentPartnership" -> ""
           )
 
@@ -145,7 +145,7 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
       }
       "set the hasChanged flag to true" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody("agentPartnership" -> "text")
+        val newRequest = requestWithUrlEncodedBody("agentPartnership" -> "text")
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse, TradingPremises())))
 

@@ -233,7 +233,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
       val jsonObj = Json.obj("postCode" -> "AA1 1AA")
 
       Json.fromJson[RegisteredOffice](jsonObj) must be
-      JsSuccess(data, JsPath \ "postCode")
+      JsSuccess(data, JsPath)
     }
 
     "write correct value to json with date of change" in {

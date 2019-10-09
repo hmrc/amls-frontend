@@ -21,14 +21,14 @@ import jto.validation.{Path, ValidationError}
 import models.moneyservicebusiness.ExpectedThroughput
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
 
-class expected_throughputSpec extends AmlsSpec with MustMatchers {
+class expected_throughputSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "expected_throughput view" must {

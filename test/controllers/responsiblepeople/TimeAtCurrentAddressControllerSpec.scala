@@ -38,7 +38,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
   val mockDataCacheConnector = mock[DataCacheConnector]
   val RecordId = 1
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val timeAtAddressController = new TimeAtCurrentAddressController (
@@ -121,7 +121,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with SEE_OTHER" when {
         "a time at address has been selected" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "timeAtAddress" -> "04"
           )
           val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
@@ -145,7 +145,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with BAD_REQUEST" when {
         "no time has been selected" in new Fixture {
 
-          val requestWithMissingParams = request.withFormUrlEncodedBody(
+          val requestWithMissingParams = requestWithUrlEncodedBody(
             "timeAtAddress" -> ""
           )
 
@@ -163,7 +163,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with NOT_FOUND" when {
         "given an out of bounds index" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "timeAtAddress" -> "01"
           )
           val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
@@ -191,7 +191,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
             "redirect to the AdditionalAddressController" when {
               "there is no additional address already saved" in new Fixture {
 
-                val requestWithParams = request.withFormUrlEncodedBody(
+                val requestWithParams = requestWithUrlEncodedBody(
                   "timeAtAddress" -> "01"
                 )
                 val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
@@ -215,7 +215,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
             "redirect to the DetailedAnswersController" when {
               "there is an additional address already saved" in new Fixture {
 
-                val requestWithParams = request.withFormUrlEncodedBody(
+                val requestWithParams = requestWithUrlEncodedBody(
                   "timeAtAddress" -> "01"
                 )
                 val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
@@ -245,7 +245,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
           "time at address is OneToThreeYears" must {
             "redirect to the correct location" in new Fixture {
 
-              val requestWithParams = request.withFormUrlEncodedBody(
+              val requestWithParams = requestWithUrlEncodedBody(
                 "timeAtAddress" -> "03"
               )
               val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
@@ -269,7 +269,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
           "time at address is ThreeYearsPlus" must {
             "redirect to the correct location" in new Fixture {
 
-              val requestWithParams = request.withFormUrlEncodedBody(
+              val requestWithParams = requestWithUrlEncodedBody(
                 "timeAtAddress" -> "04"
               )
               val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
@@ -303,7 +303,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
           "time at address is less than 1 year" must {
             "redirect to the correct location" in new Fixture {
 
-              val requestWithParams = request.withFormUrlEncodedBody(
+              val requestWithParams = requestWithUrlEncodedBody(
                 "timeAtAddress" -> "01"
               )
 
@@ -323,7 +323,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
           "time at address is OneToThreeYears" must {
             "redirect to the correct location" in new Fixture {
 
-              val requestWithParams = request.withFormUrlEncodedBody(
+              val requestWithParams = requestWithUrlEncodedBody(
                 "timeAtAddress" -> "03"
               )
 
@@ -343,7 +343,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
           "time at address is ThreeYearsPlus" must {
             "redirect to the correct location" in new Fixture {
 
-              val requestWithParams = request.withFormUrlEncodedBody(
+              val requestWithParams = requestWithUrlEncodedBody(
                 "timeAtAddress" -> "04"
               )
 
@@ -368,7 +368,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
           "editing an existing address and the address has not changed" when {
             "time at address is less than 1 year" must {
               "redirect to the additional address controller" in new Fixture {
-                val requestWithParams = request.withFormUrlEncodedBody(
+                val requestWithParams = requestWithUrlEncodedBody(
                   "timeAtAddress" -> "01"
                 )
 
@@ -397,7 +397,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
             "time at address is more than 1 year" must {
               "redirect to the detailed answers controller" in new Fixture {
-                val requestWithParams = request.withFormUrlEncodedBody(
+                val requestWithParams = requestWithUrlEncodedBody(
                   "timeAtAddress" -> "03"
                 )
 
@@ -434,7 +434,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
             "time at address is less than 1 year" must {
               "redirect to the additional address controller" in new Fixture {
-                val requestWithParams = request.withFormUrlEncodedBody(
+                val requestWithParams = requestWithUrlEncodedBody(
                   "timeAtAddress" -> "01"
                 )
 
@@ -453,7 +453,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
             }
             "time at address is more than 1 year" must {
               "redirect to the PositionWithinBusinessController" in new Fixture {
-                val requestWithParams = request.withFormUrlEncodedBody(
+                val requestWithParams = requestWithUrlEncodedBody(
                   "timeAtAddress" -> "03"
                 )
 
@@ -474,7 +474,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
           "editing a previously added responsible person (therefore edit is true)" when {
             "time at address is less than 1 year" must {
               "redirect to the additional address controller" in new Fixture {
-                val requestWithParams = request.withFormUrlEncodedBody(
+                val requestWithParams = requestWithUrlEncodedBody(
                   "timeAtAddress" -> "01"
                 )
 
@@ -503,7 +503,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
             }
             "time at address is more than 1 year" must {
               "redirect to the DetailedAnswersController" in new Fixture {
-                val requestWithParams = request.withFormUrlEncodedBody(
+                val requestWithParams = requestWithUrlEncodedBody(
                   "timeAtAddress" -> "03"
                 )
 

@@ -39,7 +39,7 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
   val contactingYou = Some(ContactingYou(Some("+44 (0)123 456-7890"), Some("test@test.com")))
   val businessDetailsWithData = BusinessDetails(contactingYou = contactingYou)
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new ContactingYouPhoneController (
@@ -79,7 +79,7 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
 
       "on post of valid data" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "phoneNumber" -> "+44 (0)123 456-7890"
         )
 
@@ -97,7 +97,7 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
 
       "on post of incomplete data" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "phoneNumber" -> ""
         )
 

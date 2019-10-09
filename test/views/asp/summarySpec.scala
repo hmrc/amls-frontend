@@ -21,7 +21,7 @@ import models.asp._
 import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.MustMatchers
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import play.api.i18n.Messages
 import views.{Fixture, HtmlAssertions}
 
@@ -29,14 +29,14 @@ import scala.collection.JavaConversions._
 
 
 
-class summarySpec extends AmlsSpec
+class summarySpec extends AmlsViewSpec
         with MustMatchers
 
         with HtmlAssertions
         with TableDrivenPropertyChecks {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "summary view" must {

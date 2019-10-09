@@ -121,7 +121,7 @@ class WithdrawalReasonSpec extends PlaySpec with MustMatchers with MockitoSugar 
 
     "validate given an enum value and string" in {
       Json.fromJson[WithdrawalReason](Json.obj("withdrawalReason" -> "Other, please specify", "specifyOtherReason" -> "reason")) must
-        be(JsSuccess(WithdrawalReason.Other("reason"), JsPath \ "specifyOtherReason"))
+        be(JsSuccess(WithdrawalReason.Other("reason"), JsPath))
     }
 
     "write the correct value" when {

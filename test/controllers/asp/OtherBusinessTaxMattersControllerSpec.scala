@@ -36,7 +36,7 @@ class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar w
 
   val emptyCache = CacheMap("", Map.empty)
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
@@ -46,7 +46,7 @@ class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar w
 
     val controller = new OtherBusinessTaxMattersController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
 
-    val newRequest = request.withFormUrlEncodedBody(
+    val newRequest = requestWithUrlEncodedBody(
       "otherBusinessTaxMatters" -> "true"
     )
   }
@@ -81,7 +81,7 @@ class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar w
       }
 
       "on post with invalid boolean data" in new Fixture {
-        val newRequestInvalid = request.withFormUrlEncodedBody("otherBusinessTaxMatters" -> "invalidBoolean")
+        val newRequestInvalid = requestWithUrlEncodedBody("otherBusinessTaxMatters" -> "invalidBoolean")
         val result = controller.post()(newRequestInvalid)
 
         status(result) must be(BAD_REQUEST)
@@ -90,7 +90,7 @@ class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar w
       }
 
       "On post with missing boolean data" in new Fixture {
-        val newRequestInvalid = request.withFormUrlEncodedBody("otherBusinessTaxMatters" -> "")
+        val newRequestInvalid = requestWithUrlEncodedBody("otherBusinessTaxMatters" -> "")
         val result = controller.post()(newRequestInvalid)
 
         status(result) must be(BAD_REQUEST)

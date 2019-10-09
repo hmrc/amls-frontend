@@ -88,7 +88,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar {
     "post is called" must {
       "Redirect to NewOfficerController" in new TestFixture {
 
-        val result = controller.post()(request.withFormUrlEncodedBody(
+        val result = controller.post()(requestWithUrlEncodedBody(
           "date.day" -> "10",
           "date.month" -> "11",
           "date.year" -> "2001"
@@ -99,7 +99,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar {
 
       }
       "return BAD_REQUEST for invalid form" in new TestFixture {
-        val result = controller.post()(request.withFormUrlEncodedBody(
+        val result = controller.post()(requestWithUrlEncodedBody(
           "date.day" -> "a",
           "date.month" -> "b",
           "date.year" -> "c"
@@ -126,7 +126,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar {
               dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(),any())( any(), any())
             } thenReturn Future.successful(None)
 
-            val result = controller.post()(request.withFormUrlEncodedBody(
+            val result = controller.post()(requestWithUrlEncodedBody(
               "date.day" -> "a",
               "date.month" -> "b",
               "date.year" -> "c"
@@ -142,7 +142,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar {
 
   it must {
     "save the responsible person as deleted given an end date" in new TestFixture {
-      val result = controller.post()(request.withFormUrlEncodedBody(
+      val result = controller.post()(requestWithUrlEncodedBody(
         "date.day" -> "10",
         "date.month" -> "11",
         "date.year" -> "2001"

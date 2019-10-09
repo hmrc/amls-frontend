@@ -38,7 +38,7 @@ import scala.concurrent.Future
 
 class AgentCompanyDetailsControllerSpec extends AmlsSpec with OneAppPerSuite with MockitoSugar with ScalaFutures with TradingPremisesGenerator{
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new AgentCompanyDetailsController (mock[DataCacheConnector], SuccessfulAuthAction, ds = commonDependencies, messagesApi, cc = mockMcc)
@@ -88,7 +88,7 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with OneAppPerSuite wit
     "post is called" must {
       "respond with NOT_FOUND" when {
         "there is no data at all at that index" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "agentCompanyName" -> "text",
             "companyRegistrationNumber" -> "12345678"
           )
@@ -107,7 +107,7 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with OneAppPerSuite wit
       "respond with SEE_OTHER" when {
         "edit is false and given valid data" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "agentCompanyName" -> "text",
             "companyRegistrationNumber" -> "12345678"
           )
@@ -127,7 +127,7 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with OneAppPerSuite wit
 
         "edit is true and given valid data" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "agentCompanyName" -> "text",
             "companyRegistrationNumber" -> "12345678"
           )
@@ -151,7 +151,7 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with OneAppPerSuite wit
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "agentCompanyName" -> "11111111111" * 40
           )
 
@@ -162,7 +162,7 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with OneAppPerSuite wit
         }
 
         "given missing mandatory field" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "agentCompanyName" -> " "
           )
 
@@ -174,7 +174,7 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with OneAppPerSuite wit
 
       "set the hasChanged flag to true" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody("agentCompanyName" -> "text", "companyRegistrationNumber" -> "12345678")
+        val newRequest = requestWithUrlEncodedBody("agentCompanyName" -> "text", "companyRegistrationNumber" -> "12345678")
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse, TradingPremises())))

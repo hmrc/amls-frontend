@@ -34,7 +34,7 @@ import org.mockito.Matchers.{eq => eqTo}
 
 class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with DependencyMocks {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
 
     val request = addToken(authRequest)

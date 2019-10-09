@@ -40,7 +40,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
     reset(dataCacheConnector)
   }
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new LettersAddressController (
@@ -85,7 +85,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
     "Post" must {
       "remove the data for following questions and successfully redirect to the page on selection of 'Yes' [this is letters address]" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "lettersAddress" -> "true"
         )
 
@@ -118,7 +118,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
       }
 
       "keep the data and successfully redirect to the page on selection of Option 'No' [this is not letters address]" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "lettersAddress" -> "false"
         )
 
@@ -147,7 +147,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
       }
 
       "on post invalid data" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
         )
 
         when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(),any()))
@@ -160,7 +160,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
       }
 
       "on post with invalid data show error" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "lettersAddress" -> ""
         )
         when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(),any()))
@@ -173,7 +173,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
       }
 
       "on post with no data" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
         )
 
         when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(),any()))

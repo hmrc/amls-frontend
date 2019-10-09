@@ -28,7 +28,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
@@ -96,7 +96,7 @@ class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with Scala
       val start = Some(SupervisionStart(new LocalDate(1990, 2, 24))) //scalastyle:off magic.number
       val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24))) //scalastyle:off magic.number
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "anotherBody" -> "true",
         "endDate.day" -> "24",
         "endDate.month" -> "2",
@@ -118,7 +118,7 @@ class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with Scala
       val start = Some(SupervisionStart(new LocalDate(1990, 2, 24))) //scalastyle:off magic.number
       val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24))) //scalastyle:off magic.number
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "anotherBody" -> "true",
         "endDate.day" -> "24",
         "endDate.month" -> "2",
@@ -145,7 +145,7 @@ class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with Scala
         Some(ProfessionalBodyYes("details"))
       )))
 
-      val newRequest = request.withFormUrlEncodedBody()
+      val newRequest = requestWithUrlEncodedBody("" -> "")
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)

@@ -50,9 +50,9 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
   val dateTime = new DateTime(1479730062573L, DateTimeZone.UTC)
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
 
-    val request = authRequest
+    val request = addToken(authRequest)
 
     val registrationDate = LocalDateTime.now()
     val statusResponse = ReadStatusResponse(registrationDate, "", None, None, None, None, renewalConFlag = false, safeId = Some("X123456789123"))

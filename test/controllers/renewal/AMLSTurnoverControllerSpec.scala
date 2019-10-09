@@ -36,7 +36,7 @@ import scala.concurrent.Future
 
 class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
@@ -246,7 +246,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
           "in edit mode" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "turnover" -> "01"
             )
 
@@ -268,7 +268,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
           }
 
           "it does not have business type of ASP, HVD or MSB" in new Fixture {
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "turnover" -> "01"
             )
 
@@ -291,7 +291,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
         "go to renewal CustomerOutsideIsUKController" when {
           "it has business type of HVD and not (ASP or MSB)" in new Fixture {
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "turnover" -> "01"
             )
 
@@ -315,7 +315,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         "go to the renewal TotalThroughput page" when {
 
           "it has a business type of MSB but not ASP" in new Fixture {
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "turnover" -> "01"
             )
 

@@ -35,7 +35,7 @@ import scala.concurrent.Future
 
 class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new ConfirmRegisteredOfficeController (
@@ -99,7 +99,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
       "successfully redirect to the page on selection of 'Yes' [this is registered address]" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "isRegOfficeOrMainPlaceOfBusiness" -> "true"
         )
 
@@ -123,7 +123,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
       "successfully redirect to the page on selection of Option 'No' [this is not registered address]" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "isRegOfficeOrMainPlaceOfBusiness" -> "false"
         )
 
@@ -149,7 +149,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
       "on post invalid data" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
         )
         when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(),any()))
           .thenReturn(Future.successful(Some(bm)))
@@ -160,7 +160,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
       }
 
       "on post with invalid data show error" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "isRegOfficeOrMainPlaceOfBusiness" -> ""
         )
         when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(),any()))

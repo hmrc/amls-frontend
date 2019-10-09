@@ -30,7 +30,7 @@ import scala.concurrent.Future
 
 class BusinessUseAnIPSPControllerSpec  extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks{
+  trait Fixture extends DependencyMocks{
     self => val request = addToken(authRequest)
 
     val controller = new BusinessUseAnIPSPController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
@@ -74,7 +74,7 @@ class BusinessUseAnIPSPControllerSpec  extends AmlsSpec {
 
     "on post with valid data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "useAnIPSP" -> "true",
         "name" -> "name",
         "referenceNumber" -> "123456789123456"
@@ -93,7 +93,7 @@ class BusinessUseAnIPSPControllerSpec  extends AmlsSpec {
 
     "on post with valid data in edit mode with next page's data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "useAnIPSP" -> "false"
       )
 
@@ -118,7 +118,7 @@ class BusinessUseAnIPSPControllerSpec  extends AmlsSpec {
 
     "on post with valid data in edit mode without next page's data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "useAnIPSP" -> "false"
       )
 

@@ -33,7 +33,7 @@ class FitAndProperNoticeControllerSpec extends AmlsSpec with MockitoSugar with S
 
   val recordId = 1
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
     lazy val mockAppConfig = mock[AppConfig]
     lazy val defaultBuilder = new GuiceApplicationBuilder()

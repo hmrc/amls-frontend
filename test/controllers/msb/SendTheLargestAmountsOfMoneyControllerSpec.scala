@@ -32,7 +32,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSugar with PatienceConfiguration with IntegrationPatience {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
 
     val controller = new SendTheLargestAmountsOfMoneyController(
@@ -104,7 +104,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
 
     "on post with valid data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "largestAmountsOfMoney[0]" -> "GS"
       )
 
@@ -118,7 +118,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
 
     "on post with valid data in edit mode when the next page's data is in the store" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "largestAmountsOfMoney[0]" -> "GB"
       )
 
@@ -144,7 +144,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
 
     "on post with valid data in edit mode when the next page's data isn't in the store" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "largestAmountsOfMoney[0]" -> "GB"
       )
 
@@ -164,7 +164,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
 
     "on post with invalid data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "largestAmountsOfMoney[0]" -> ""
       )
 

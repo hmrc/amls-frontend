@@ -47,7 +47,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
   val mockCacheMap = mock[CacheMap]
   val statusService = mock[StatusService]
 
-  trait Fixture extends AuthorisedFixture  {
+  trait Fixture  {
     self =>
     val request = addToken(authRequest)
 
@@ -95,7 +95,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
 
           val emptyCache = CacheMap("", Map.empty)
 
-          val newRequest = request.withFormUrlEncodedBody( "hasAccepted" -> "true")
+          val newRequest = requestWithUrlEncodedBody( "hasAccepted" -> "true")
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises =  Some(ytpModel), hasAccepted = true)))))

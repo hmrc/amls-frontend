@@ -45,8 +45,10 @@ import scala.concurrent.Future
 
 class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerator {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
+
+    val mockAppConfig = mock[ApplicationConfig]
 
     val request = addToken(authRequest)
 
@@ -199,7 +201,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       }
 
       "redirect to the sign-out page when the user role is not USER" in new Fixture {
-        val expectedLocation = s"${ApplicationConfig.logoutUrl}?continue=${
+        val expectedLocation = s"${mockAppConfig.logoutUrl}?continue=${
           URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role).absoluteUrl, "utf-8")}"
 
         val result = controllerNoUserRole.get()(request)
@@ -250,7 +252,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
 
           val result = controllerNoAmlsNumber.get()(request)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(ApplicationConfig.businessCustomerUrl)
+          redirectLocation(result) mustBe Some(appConfig.businessCustomerUrl)
         }
       }
 

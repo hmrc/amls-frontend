@@ -57,13 +57,13 @@ class ConfirmPostcodeSpec extends PlaySpec with MockitoSugar {
         val postCode = ConfirmPostcode("AA11AA")
         val jsonConfirmPostcode = Json.obj("postCode" -> "AA11AA")
         val fromJson = Json.fromJson[ConfirmPostcode](jsonConfirmPostcode)
-        fromJson must be(JsSuccess(postCode, JsPath \ "postCode"))
+        fromJson must be(JsSuccess(postCode, JsPath))
       }
 
       "read write json successfully" in {
         val postCode = ConfirmPostcode("AA11AA")
         ConfirmPostcode.format.reads(ConfirmPostcode.format.writes(postCode)) must
-          be(JsSuccess(postCode, JsPath \ "postCode"))
+          be(JsSuccess(postCode, JsPath))
       }
 
     }

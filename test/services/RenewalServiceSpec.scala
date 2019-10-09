@@ -38,7 +38,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
   implicit val hc = HeaderCarrier()
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
 
     val dataCache = mock[DataCacheConnector]
 

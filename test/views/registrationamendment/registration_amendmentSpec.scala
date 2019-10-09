@@ -21,13 +21,13 @@ import models.registrationprogress.{Completed, Section, Started}
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.mvc.Call
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class registration_amendmentSpec extends AmlsSpec with MockitoSugar with AddressGenerator {
+class registration_amendmentSpec extends AmlsViewSpec with MockitoSugar with AddressGenerator {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     val sections = Seq(
       Section("section1", Completed, true, mock[Call])

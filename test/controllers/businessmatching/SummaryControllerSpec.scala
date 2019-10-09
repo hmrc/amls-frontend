@@ -37,7 +37,7 @@ import scala.concurrent.Future
 
 class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  sealed trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
@@ -118,7 +118,7 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
         "updates the hasAccepted flag on the model" in new Fixture {
 
           val model = businessMatchingGen.sample.get.copy(hasAccepted = false)
-          val postRequest = request.withFormUrlEncodedBody()
+          val postRequest = requestWithUrlEncodedBody("" -> "")
 
           mockGetModel(Some(model))
           mockUpdateModel
@@ -137,7 +137,7 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
       }
 
       "return Internal Server Error if the business matching model can't be updated" in new Fixture {
-        val postRequest = request.withFormUrlEncodedBody()
+        val postRequest = requestWithUrlEncodedBody("" -> "")
 
         mockGetModel(None)
 

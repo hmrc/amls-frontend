@@ -28,7 +28,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
 
     val controller = new PenalisedByProfessionalController (
@@ -68,7 +68,7 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
 
   "on post with valid data" in new Fixture {
 
-    val newRequest = request.withFormUrlEncodedBody(
+    val newRequest = requestWithUrlEncodedBody(
       "penalised" -> "true",
       "professionalBody" -> "details"
     )
@@ -82,7 +82,7 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
 
   "on post with invalid data" in new Fixture {
 
-    val newRequest = request.withFormUrlEncodedBody(
+    val newRequest = requestWithUrlEncodedBody(
       "penalisedYes" -> "details"
     )
 
@@ -95,7 +95,7 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
 
    "on post with valid data in edit mode" in new Fixture {
 
-     val newRequest = request.withFormUrlEncodedBody(
+     val newRequest = requestWithUrlEncodedBody(
        "penalised" -> "true",
        "professionalBody" -> "details"
      )

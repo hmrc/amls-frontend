@@ -36,7 +36,7 @@ import scala.concurrent.Future
 
 class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures{
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new TaxMattersController (
@@ -83,7 +83,7 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
     "post is called" must {
       "redirect to Check Your Answers on post with valid data" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "manageYourTaxAffairs" -> "true"
         )
 
@@ -105,7 +105,7 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
               accountantsTradingName = None,
               address = UkAccountantsAddress("", "", None, None, "")))))))
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "manageYourTaxAffairs" -> "grrrrr"
         )
 
@@ -117,7 +117,7 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
       "redirect to Check Your Answers on post with valid data in edit mode" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "manageYourTaxAffairs" -> "true"
         )
 

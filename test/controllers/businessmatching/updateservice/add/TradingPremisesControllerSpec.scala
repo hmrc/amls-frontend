@@ -29,7 +29,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class TradingPremisesControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
+  sealed trait Fixture extends DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
@@ -73,7 +73,7 @@ class TradingPremisesControllerSpec extends AmlsSpec with BusinessMatchingGenera
 
             mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel())
 
-            val result = controller.post()(request.withFormUrlEncodedBody(
+            val result = controller.post()(requestWithUrlEncodedBody(
               "tradingPremisesNewActivities" -> "true"
             ))
 
@@ -89,7 +89,7 @@ class TradingPremisesControllerSpec extends AmlsSpec with BusinessMatchingGenera
             "an activity that generates a section has been chosen" in new Fixture {
               mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel(Some(HighValueDealing)))
 
-              val result = controller.post()(request.withFormUrlEncodedBody(
+              val result = controller.post()(requestWithUrlEncodedBody(
                 "tradingPremisesNewActivities" -> "false"
               ))
 

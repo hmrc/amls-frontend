@@ -37,7 +37,7 @@ import scala.concurrent.Future
 
 class WhatDoYouDoHereControllerSpec extends AmlsSpec with MoneyServiceBusinessTestData with BusinessMatchingGenerator {
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
+  sealed trait Fixture extends DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
@@ -89,7 +89,7 @@ class WhatDoYouDoHereControllerSpec extends AmlsSpec with MoneyServiceBusinessTe
 
       "return a bad request when no data has been posted" in new Fixture {
 
-        val result = controller.post()(request.withFormUrlEncodedBody())
+        val result = controller.post()(requestWithUrlEncodedBody("" -> ""))
 
         status(result) mustBe BAD_REQUEST
       }
@@ -99,7 +99,7 @@ class WhatDoYouDoHereControllerSpec extends AmlsSpec with MoneyServiceBusinessTe
           subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
           hasChanged = true))
 
-        val result = controller.post()(request.withFormUrlEncodedBody(
+        val result = controller.post()(requestWithUrlEncodedBody(
           "msbServices[]" -> "01"
         ))
 
@@ -117,7 +117,7 @@ class WhatDoYouDoHereControllerSpec extends AmlsSpec with MoneyServiceBusinessTe
           hasChanged = true)
         )
 
-        val result = controller.post()(request.withFormUrlEncodedBody(
+        val result = controller.post()(requestWithUrlEncodedBody(
           "msbServices[]" -> "03",
           "msbServices[]" -> "04"
         ))

@@ -31,7 +31,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePersonGenerator with BusinessMatchingGenerator {
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
+  sealed trait Fixture extends DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
@@ -73,7 +73,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Respons
 
             mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel())
 
-            val result = controller.post()(request.withFormUrlEncodedBody(
+            val result = controller.post()(requestWithUrlEncodedBody(
               "passedFitAndProper" -> "true"
             ))
 
@@ -88,7 +88,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Respons
               "an activity that generates a section has been chosen" in new Fixture {
                 mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel(Some(TrustAndCompanyServices)))
 
-                val result = controller.post()(request.withFormUrlEncodedBody(
+                val result = controller.post()(requestWithUrlEncodedBody(
                   "passedFitAndProper" -> "false"
                 ))
 

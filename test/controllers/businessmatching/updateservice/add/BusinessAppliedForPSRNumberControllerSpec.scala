@@ -40,7 +40,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
 
   val emptyCache = CacheMap("", Map.empty)
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
@@ -102,7 +102,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
 
             mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), flowModel)
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "appliedFor" -> "false"
             )
 
@@ -119,7 +119,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
             mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key),
               AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789"))))
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "appliedFor" -> "true",
               "regNumber" -> "123789"
             )
@@ -140,7 +140,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
             mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key),
               AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo)))
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "appliedFor" -> "false"
             )
 
@@ -158,7 +158,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
             mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key),
               AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789"))))
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "appliedFor" -> "true",
               "regNumber" -> "123789"
             )
@@ -177,7 +177,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
         "return an error" in new Fixture {
           mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key),
             AddBusinessTypeFlowModel())
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "appliedFor" -> "true",
             "regNumber" -> ""
           )

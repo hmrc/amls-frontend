@@ -42,7 +42,7 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
 
   def getMessage(service: BusinessActivity): String = Messages("businessactivities.registerservices.servicename.lbl." + BusinessMatchingActivities.getValue(service))
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val dataCacheConnector = mock[DataCacheConnector]
@@ -82,7 +82,7 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
         val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
-        val newRequest = request.withFormUrlEncodedBody("activities[0]" -> "01")
+        val newRequest = requestWithUrlEncodedBody("activities[0]" -> "01")
 
         val RecordId = 1
         val result = controller.get(RecordId)(request)
@@ -140,7 +140,7 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
 
 
     "on post with valid data and training selected yes" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "experienceTraining" -> "true",
         "experienceInformation" -> "I do not remember when I did the training"
       )
@@ -165,7 +165,7 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
     }
 
     "on post with valid data and training selected no" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "experienceTraining" -> "false"
       )
 
@@ -189,7 +189,7 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
     }
 
     "on post with invalid data" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "experienceTraining" -> "not a boolean value"
       )
       val mockCacheMap = mock[CacheMap]
@@ -221,7 +221,7 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "experienceTraining" -> "true",
         "experienceInformation" -> "I do not remember when I did the training"
       )

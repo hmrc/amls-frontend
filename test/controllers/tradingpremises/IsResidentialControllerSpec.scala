@@ -32,7 +32,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
 
 class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar with PrivateMethodTester {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
@@ -109,7 +109,7 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
       "on valid request" must {
 
         "redirect to WhatDoesYourBusinessDoController" in new Fixture {
-          val postRequest = request.withFormUrlEncodedBody(
+          val postRequest = requestWithUrlEncodedBody(
             "isResidential" -> "true"
           )
 
@@ -125,7 +125,7 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
         }
 
         "redirect to DetailedAnswersController in edit mode" in new Fixture {
-          val postRequest = request.withFormUrlEncodedBody(
+          val postRequest = requestWithUrlEncodedBody(
             "isResidential" -> "false"
           )
 
@@ -150,7 +150,7 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
 
       "on invalid request" must {
         "respond with BAD_REQUEST" in new Fixture {
-          val postRequest = request.withFormUrlEncodedBody(
+          val postRequest = requestWithUrlEncodedBody(
             "isResidential" -> ""
           )
 
@@ -235,7 +235,7 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
   it must {
 
     "save an updated Trading Premises model" in new Fixture {
-      val postRequest = request.withFormUrlEncodedBody(
+      val postRequest = requestWithUrlEncodedBody(
         "isResidential" -> "true"
       )
 

@@ -259,7 +259,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
         "isIBAN" -> true
       )
 
-      Account.jsonReads.reads(jsObject) must be(JsSuccess(NonUKIBANNumber("IB12345678"), JsPath \ "IBANNumber"))
+      Account.jsonReads.reads(jsObject) must be(JsSuccess(NonUKIBANNumber("IB12345678"), JsPath))
     }
 
     "JSON Read is successful for Non UKAccount with Account Number" in {
@@ -269,7 +269,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
         "isIBAN" -> false
       )
 
-      Account.jsonReads.reads(jsObject) must be(JsSuccess(NonUKAccountNumber("12345"), JsPath \ "nonUKAccountNumber"))
+      Account.jsonReads.reads(jsObject) must be(JsSuccess(NonUKAccountNumber("12345"), JsPath))
     }
 
     "JSON Write is successful for Non UK Account Number" in {

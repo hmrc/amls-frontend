@@ -28,7 +28,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with AmlsReferenceNumberGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
 
     val controller = new ServicesOfAnotherTCSPController (
@@ -74,7 +74,7 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
               mockCacheFetch[Tcsp](Some(Tcsp(servicesOfAnotherTCSP = Some(ServicesOfAnotherTCSPYes(amlsRegistrationNumber)))))
               mockCacheSave[Tcsp]
 
-              val newRequest = request.withFormUrlEncodedBody(
+              val newRequest = requestWithUrlEncodedBody(
                 "servicesOfAnotherTCSP" -> "true"
               )
 
@@ -91,7 +91,7 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
               mockCacheFetch[Tcsp](None)
               mockCacheSave[Tcsp]
 
-              val newRequest = request.withFormUrlEncodedBody(
+              val newRequest = requestWithUrlEncodedBody(
                 "servicesOfAnotherTCSP" -> "false"
               )
 
@@ -111,7 +111,7 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
             mockCacheFetch[Tcsp](None)
             mockCacheSave[Tcsp]
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "servicesOfAnotherTCSP" -> "true"
             )
 
@@ -127,7 +127,7 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
               mockCacheFetch[Tcsp](None)
               mockCacheSave[Tcsp]
 
-              val newRequest = request.withFormUrlEncodedBody(
+              val newRequest = requestWithUrlEncodedBody(
                 "servicesOfAnotherTCSP" -> "true"
               )
 
@@ -145,7 +145,7 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
       "respond with BAD_REQUEST" when {
         "invalid data" in new Fixture {
 
-          val newRequestInvalid = request.withFormUrlEncodedBody(
+          val newRequestInvalid = requestWithUrlEncodedBody(
             "servicesOfAnotherTCSP" -> ""
           )
 
@@ -166,7 +166,7 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
         mockCacheFetch[Tcsp](Some(Tcsp(doesServicesOfAnotherTCSP = Some(true), servicesOfAnotherTCSP = Some(ServicesOfAnotherTCSPYes(amlsRegistrationNumber)))))
         mockCacheSave[Tcsp]
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "servicesOfAnotherTCSP" -> "false"
         )
 

@@ -121,7 +121,7 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
       controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any())
     } thenReturn Future.successful(cacheMap)
 
-    lazy val controller = new NewOfficerController(SuccessfulAuthAction, commonDependencies, dataCacheConnector)
+    lazy val controller = new NewOfficerController(SuccessfulAuthAction, commonDependencies, dataCacheConnector, mockMcc)
   }
 
   trait TestFixtureForDeleteOldOfficer extends TestFixtureForChangeNominatedOfficer {
@@ -153,7 +153,7 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
       )
     )))
 
-    override lazy val controller = new NewOfficerController(SuccessfulAuthAction, commonDependencies, dataCacheConnector)
+    override lazy val controller = new NewOfficerController(SuccessfulAuthAction, commonDependencies, dataCacheConnector, mockMcc)
   }
 
   "The NewOfficerController" when {
@@ -221,7 +221,7 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
           dataCacheConnector.save[ChangeOfficer](any(), any(), any())(any(), any())
         } thenReturn Future.successful(mock[CacheMap])
 
-        val result = controller.post()(request.withFormUrlEncodedBody("person" -> "testName"))
+        val result = controller.post()(requestWithUrlEncodedBody("person" -> "testName"))
 
 
         status(result) mustBe (SEE_OTHER)
@@ -248,7 +248,7 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
           cache.save[ChangeOfficer](any(), any(), any())(any(), any())
         } thenReturn Future.successful(mock[CacheMap])
 
-        val result = controller.post()(request.withFormUrlEncodedBody("person" -> "someoneElse"))
+        val result = controller.post()(requestWithUrlEncodedBody("person" -> "someoneElse"))
         status(result) mustBe (SEE_OTHER)
 
         redirectLocation(result) mustBe Some(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false, Some(flowChangeOfficer)).url)

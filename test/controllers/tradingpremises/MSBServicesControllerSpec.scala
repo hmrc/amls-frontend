@@ -37,7 +37,7 @@ import scala.concurrent.Future
 
 class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val cache: DataCacheConnector = mock[DataCacheConnector]
@@ -113,7 +113,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
 
       "the index is out of bounds" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "msbServices[0]" -> "01"
         )
 
@@ -146,7 +146,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
 
     "return a Bad Request with errors on invalid submission" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "msbServices[0]" -> "invalid"
       )
 
@@ -163,7 +163,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
 
       "on valid submission" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "msbServices[0]" -> "01"
         )
 
@@ -199,7 +199,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
           ))
         )
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "msbServices[0]" -> "01",
           "msbServices[1]" -> "02",
           "msbServices[2]" -> "03",
@@ -232,7 +232,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
           ))
         )
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "msbServices[1]" -> "02",
           "msbServices[2]" -> "03",
           "msbServices[3]" -> "04"
@@ -264,7 +264,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
               ))
             )
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "msbServices[1]" -> "01",
               "msbServices[2]" -> "02",
               "msbServices[3]" -> id
@@ -289,7 +289,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
 
       "services have changed for a variation" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "msbServices[0]" -> "01",
           "msbServices[1]" -> "02"
         )
@@ -310,7 +310,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
 
       "the services have changed for a ready for renewal status" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "msbServices[0]" -> "01",
           "msbServices[1]" -> "02"
         )
@@ -331,7 +331,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
 
       "the MsbServices haven't changed, but a change from previous services page has been flagged" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "msbServices[0]" -> "01"
         )
 
@@ -361,7 +361,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
           ))
         )
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "msbServices[0]" -> "01",
           "msbServices[1]" -> "02"
         )
@@ -383,7 +383,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
 
     "set the hasChanged flag to true" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "msbServices[1]" -> "01",
         "msbServices[2]" -> "02",
         "msbServices[3]" -> "03"

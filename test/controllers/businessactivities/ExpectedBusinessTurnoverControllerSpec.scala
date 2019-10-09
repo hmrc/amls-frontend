@@ -34,7 +34,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
     implicit val ec = app.injector.instanceOf[ExecutionContext]
 
@@ -96,7 +96,7 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "expectedBusinessTurnover" -> ""
           )
 
@@ -108,7 +108,7 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
       "respond with SEE_OTHER" when {
         "edit is false and redirect to the ExpectedAMLSTurnoverController" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "expectedBusinessTurnover" -> "01"
           )
 
@@ -125,7 +125,7 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
 
         "edit is true and redirect to the SummaryController" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "expectedBusinessTurnover" -> "01"
           )
 

@@ -36,7 +36,7 @@ import scala.concurrent.Future
 
 class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
@@ -125,7 +125,7 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
         "go to CountryOfBirthController" when {
           "uk passport number is provided" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "ukPassport" -> "true",
               "ukPassportNumber" -> ukPassportNumber
             )
@@ -153,7 +153,7 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
         "go to PersonNonUKPassportController" when {
           "no uk passport" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "ukPassport" -> "false"
             )
 
@@ -177,7 +177,7 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
           }
 
           "existing data is present" in new Fixture {
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "ukPassport" -> "false"
             )
 
@@ -208,7 +208,7 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
         "go to PersonNonUKPassportController" when {
           "data is changed from uk passport to non uk passport" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "ukPassport" -> "false"
             )
 
@@ -237,7 +237,7 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
         "go to DetailedAnswersController" when {
           "uk passport" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "ukPassport" -> "true",
               "ukPassportNumber" -> ukPassportNumber
             )
@@ -267,7 +267,7 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
 
           "non uk passport has not been changed" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "ukPassport" -> "false"
             )
 
@@ -298,7 +298,7 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
       "given invalid data" must {
         "respond with BAD_REQUEST" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "ukPassport" -> "true",
             "ukPassportNumber" -> "abc"
           )
@@ -326,7 +326,7 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
       "Responsible Person cannot be found with given index" must {
         "respond with NOT_FOUND" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "ukPassport" -> "false"
           )
 
@@ -360,7 +360,7 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
 
         val dateOfBirth = DateOfBirth(LocalDate.parse("2000-01-01"))
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "ukPassport" -> "true",
           "ukPassportNumber" -> ukPassportNumber
         )

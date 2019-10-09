@@ -36,7 +36,7 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with Mockito
   val mockDataCacheConnector = mock[DataCacheConnector]
   val recordId = 1
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val timeAtAddressController = new TimeAtCurrentAddressController (
@@ -54,7 +54,7 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with Mockito
       "time at address is less than 1 year" must {
         "redirect to the AdditionalAddressController" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "timeAtAddress" -> "01"
           )
           val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA11AA")
@@ -79,7 +79,7 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with Mockito
       "time at address is more than 1 year" must {
         "redirect to the correct location" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "timeAtAddress" -> "03"
           )
           val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA11AA")

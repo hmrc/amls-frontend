@@ -37,7 +37,7 @@ import scala.concurrent.Future
 
 class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     implicit val request = addToken(authRequest)
     val renewalService = mock[RenewalService]
@@ -57,7 +57,7 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
     self =>
 
     val formData = "throughput" -> "01"
-    val formRequest = request.withFormUrlEncodedBody(formData)
+    val formRequest = requestWithUrlEncodedBody(formData)
     val cache = mock[CacheMap]
 
     when {
@@ -129,7 +129,7 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
               )
           ), hasChanged = true
       )
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
           "throughput" -> "01"
       )
 

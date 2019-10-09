@@ -35,7 +35,7 @@ trait ParagraphHelpers extends MustMatchers {
 }
 
 trait Fixture extends MustMatchers with ParagraphHelpers with TitleValidator {
-  implicit val request = FakeRequest()
+  //implicit val request = FakeRequest()
 
   def view: HtmlFormat.Appendable
   lazy val html = view.body

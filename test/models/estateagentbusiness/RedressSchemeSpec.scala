@@ -145,7 +145,7 @@ class RedressSchemeSpec extends PlaySpec with MockitoSugar {
                             "propertyRedressSchemeOther" -> "test")
 
         Json.fromJson[RedressScheme](json) must
-          be(JsSuccess(Other("test"), JsPath \ "propertyRedressSchemeOther"))
+          be(JsSuccess(Other("test"), JsPath))
 
         Json.fromJson[RedressScheme](Json.obj("isRedress"-> false)) must
           be(JsSuccess(RedressSchemedNo, JsPath))

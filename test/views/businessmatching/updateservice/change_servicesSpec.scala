@@ -20,21 +20,21 @@ import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class change_servicesSpec extends AmlsSpec with MustMatchers {
+class change_servicesSpec extends AmlsViewSpec with MustMatchers {
 
   val allowAdd = true
   val allowRemove = true
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
     def view = views.html.businessmatching.updateservice.change_services(EmptyForm, Set("ServiceOne"), allowAdd)
   }
 
   trait MultipleViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
     def view = views.html.businessmatching.updateservice.change_services(EmptyForm, Set("ServiceOne", "ServiceTwo"), allowAdd)
   }
 

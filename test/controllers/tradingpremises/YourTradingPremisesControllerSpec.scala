@@ -46,7 +46,7 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
   //val mockCacheMap = mock[CacheMap]
   val mockYtp = mock[TradingPremises]
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
 
     val ytpController = new YourTradingPremisesController(
@@ -168,7 +168,7 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
 
         val emptyCache = CacheMap("", Map.empty)
 
-        val newRequest = request.withFormUrlEncodedBody( "hasAccepted" -> "true")
+        val newRequest = requestWithUrlEncodedBody( "hasAccepted" -> "true")
 
         when(ytpController.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises =  Some(ytpModel), hasAccepted = true)))))

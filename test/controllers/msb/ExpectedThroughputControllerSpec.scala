@@ -35,7 +35,7 @@ import scala.concurrent.Future
 
 class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
@@ -94,7 +94,7 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
 
     "on post with invalid data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
       )
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
@@ -110,7 +110,7 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
 
     "on post with valid data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "throughput" -> "01"
       )
 
@@ -127,7 +127,7 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
 
     "on post with valid data in edit mode" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "throughput" -> "01"
       )
 

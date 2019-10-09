@@ -37,7 +37,7 @@ class TimeAtAdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSu
   val mockDataCacheConnector = mock[DataCacheConnector]
   val RecordId = 1
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val request = addToken(authRequest)
 
@@ -117,7 +117,7 @@ class TimeAtAdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSu
       "go to DetailedAnswersController" when {
         "edit is true" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "timeAtAddress" -> "02"
           )
 
@@ -140,7 +140,7 @@ class TimeAtAdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSu
       "go to PositionWithinBusinessController" when {
         "edit is false" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "timeAtAddress" -> "02"
           )
 
@@ -164,7 +164,7 @@ class TimeAtAdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSu
 
         "given an invalid form" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "timeAtAddress" -> ""
           )
 
@@ -185,7 +185,7 @@ class TimeAtAdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSu
 
       "respond with NOT_FOUND" when {
         "an addressExtraAddress is not stored for that index" in new Fixture {
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "timeAtAddress" -> "03"
           )
 

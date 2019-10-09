@@ -40,7 +40,7 @@ import scala.concurrent.Future
 
 class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePersonGenerator {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
       val request = addToken(authRequest)
 
@@ -133,7 +133,7 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
     "post is called" must {
       "respond with BAD_REQUEST" when {
         "the year field has too few digits" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody (
+          val newRequest = requestWithUrlEncodedBody(
             "startDate.day" -> "24",
             "startDate.month" -> "2",
             "startDate.year" -> "90")
@@ -160,7 +160,7 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
 
           "the year field has too many digits" in new Fixture {
-            val newRequest = request.withFormUrlEncodedBody (
+            val newRequest = requestWithUrlEncodedBody(
             "startDate.day" -> "24",
             "startDate.month" -> "2",
             "startDate.year" -> "19905")
@@ -183,7 +183,7 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
           "the date fields are empty" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody ("positions" -> "01", "startDate.day" -> "", "startDate.month" -> "", "startDate.year" -> "")
+            val newRequest = requestWithUrlEncodedBody("positions" -> "01", "startDate.day" -> "", "startDate.month" -> "", "startDate.year" -> "")
 
             val mockBusinessMatching: BusinessMatching = mock[BusinessMatching]
 
@@ -203,7 +203,7 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
       "when edit is false" must {
         "redirect to the 'Sole proprietor of another business?' page" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "positions" -> "04",
             "startDate.day" -> "24",
             "startDate.month" -> "2",
@@ -224,7 +224,7 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
       "when edit is true" must {
         "redirect to the 'Check your answers' page" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "positions" -> "04",
             "startDate.day" -> "24",
             "startDate.month" -> "2",

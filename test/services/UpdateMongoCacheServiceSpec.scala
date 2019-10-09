@@ -56,7 +56,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
   trait Fixture extends DependencyMocks {
 
     val http = mock[HttpClient]
-    val updateMongoCacheService = new UpdateMongoCacheService(http, mockCacheConnector)
+    val updateMongoCacheService = new UpdateMongoCacheService(http, mockCacheConnector, appConfig)
 
     val credId = "12341234"
 

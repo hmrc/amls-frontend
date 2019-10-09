@@ -68,7 +68,7 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
       "respond with BAD_REQUEST" when {
         "given invalid data" in new TestFixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "onlyOffTheShelfCompsSold" -> "invalid"
           )
 
@@ -125,7 +125,7 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
             when(cache.fetch[Tcsp](any(), any())(any(), any()))
               .thenReturn(Future.successful(Some(companyFormationAgentTcsp)))
 
-            val result = controller.post()(request.withFormUrlEncodedBody("onlyOffTheShelfCompsSold" -> "true"))
+            val result = controller.post()(requestWithUrlEncodedBody("onlyOffTheShelfCompsSold" -> "true"))
 
             status(result) mustBe SEE_OTHER
             verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any(), any())
@@ -150,7 +150,7 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
                 hasChanged = true
               )
 
-              val result = controller.post(true)(request.withFormUrlEncodedBody("onlyOffTheShelfCompsSold" -> "true"))
+              val result = controller.post(true)(requestWithUrlEncodedBody("onlyOffTheShelfCompsSold" -> "true"))
 
               status(result) mustBe SEE_OTHER
               verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any(), any())
@@ -174,7 +174,7 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
                 hasChanged = true
               )
 
-              val result = controller.post(false)(request.withFormUrlEncodedBody("onlyOffTheShelfCompsSold" -> "false"))
+              val result = controller.post(false)(requestWithUrlEncodedBody("onlyOffTheShelfCompsSold" -> "false"))
               status(result) mustBe SEE_OTHER
               verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any(), any())
               redirectLocation(result) mustBe Some(controllers.tcsp.routes.SummaryController.get().url)

@@ -32,7 +32,7 @@ import scala.concurrent.Future
 
 class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
     val controller = new EmployeeCountAMLSSupervisionController (
       dataCacheConnector = mock[DataCacheConnector],
@@ -74,7 +74,7 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
 
     "post is called" must {
       "respond with BAD_REQUEST when given invalid data" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "employeeCountAMLSSupervision" -> ""
         )
         val result = controller.post()(newRequest)
@@ -83,7 +83,7 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
 
       "redirect to the TransactionRecordController when given valid data and edit is false" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "employeeCountAMLSSupervision" -> "123"
         )
 
@@ -100,7 +100,7 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
 
       "redirect to the SummaryController when given valid data and edit is true" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "employeeCountAMLSSupervision" -> "12345"
         )
 

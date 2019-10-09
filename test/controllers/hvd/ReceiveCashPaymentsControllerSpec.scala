@@ -29,7 +29,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
@@ -75,7 +75,7 @@ class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
 
     "redirect to summary on edit" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "receivePayments" -> "false"
       )
 
@@ -87,7 +87,7 @@ class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
 
     "redirect to PercentageOfCashPaymentOver15000Controller on form equals no" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "receivePayments" -> "false"
       )
 
@@ -101,7 +101,7 @@ class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
     "redirect to ExpectToReceiveCashPaymentsController on form equals yes" when {
       "edit is true and hvd cashPaymentMethods is not defined" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "receivePayments" -> "true"
         )
 
@@ -113,7 +113,7 @@ class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
       }
       "edit is false" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "receivePayments" -> "true"
         )
 
@@ -135,7 +135,7 @@ class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
           cashPaymentMethods = Some(PaymentMethods(true, true, Some("")))
         )), Some(Hvd.key))
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "receivePayments" -> "false"
         )
 

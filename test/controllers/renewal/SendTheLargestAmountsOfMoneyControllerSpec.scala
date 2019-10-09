@@ -37,7 +37,7 @@ import scala.concurrent.Future
 
 class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSugar with PatienceConfiguration with IntegrationPatience {
 
-  trait Fixture extends AuthorisedFixture with AutoCompleteServiceMocks {
+  trait Fixture extends AutoCompleteServiceMocks {
     self =>
     val request = addToken(authRequest)
 
@@ -59,7 +59,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
 
   trait FormSubmissionFixture extends Fixture {
     def formData(valid: Boolean) = if (valid) "largestAmountsOfMoney[0]" -> "GB" else "largestAmountsOfMoney[0]" -> ""
-    def formRequest(valid: Boolean) = request.withFormUrlEncodedBody(formData(valid))
+    def formRequest(valid: Boolean) = requestWithUrlEncodedBody(formData(valid))
 
     when(mockRenewalService.getRenewal(any())(any(), any()))
       .thenReturn(Future.successful(None))
@@ -141,7 +141,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
 
       "given invalid data, must respond with BAD_REQUEST" in new FormSubmissionFixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "largestAmountsOfMoney[0]" -> ""
         )
 

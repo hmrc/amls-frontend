@@ -43,7 +43,7 @@ class MoneySourcesControllerSpec extends AmlsSpec
   with IntegrationPatience
   with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
@@ -77,7 +77,7 @@ class MoneySourcesControllerSpec extends AmlsSpec
 
     val request = addToken(authRequest)
 
-    val newRequest = request.withFormUrlEncodedBody(
+    val newRequest = requestWithUrlEncodedBody(
       "bankMoneySource" -> "Yes",
       "bankNames" -> "Bank names",
       "wholesalerMoneySource" -> "Yes",
@@ -95,7 +95,8 @@ class MoneySourcesControllerSpec extends AmlsSpec
     val controller = new MoneySourcesController(dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
-      serviceFlow = mock[ServiceFlow])
+      serviceFlow = mock[ServiceFlow],
+      cc = mockMcc)
 
     val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
 
@@ -172,7 +173,7 @@ class MoneySourcesControllerSpec extends AmlsSpec
 
       "data is invalid" should {
         "return bad request" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             ("IncorrectData1", "IncorrectData2")
           )
 

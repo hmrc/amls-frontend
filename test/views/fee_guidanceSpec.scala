@@ -22,12 +22,12 @@ import models.registrationprogress.{Completed, Section}
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.mvc.Call
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 
-class fee_guidanceSpec extends AmlsSpec with MockitoSugar {
+class fee_guidanceSpec extends AmlsViewSpec with MockitoSugar {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     val totalAmount = Currency(600)
 

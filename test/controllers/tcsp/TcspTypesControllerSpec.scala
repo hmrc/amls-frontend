@@ -30,7 +30,7 @@ import scala.concurrent.Future
 
 class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture  with DependencyMocks{
+  trait Fixture extends DependencyMocks{
     self => val request = addToken(authRequest)
 
     val controller = new TcspTypesController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
@@ -70,7 +70,7 @@ class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
 
       "successfully navigate to Which services does your business provide? page when the option Registered office is selected" in  new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "serviceProviders[0]" -> "01",
           "serviceProviders[1]" -> "02",
           "serviceProviders[2]" -> "03"
@@ -87,7 +87,7 @@ class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
 
       "successfully navigate to services of another tcsp page when other than Registered office option is selected " in  new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "serviceProviders[]" -> "01"
         )
 
@@ -102,7 +102,7 @@ class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
 
       "successfully navigate to next page while storing data in in mongoCache in edit mode" in  new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "serviceProviders[]" -> "01"
         )
 
@@ -119,7 +119,7 @@ class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
     "respond with BAD_REQUEST" when {
 
       "throw error an invalid data entry" in  new Fixture {
-        val newrequest = request.withFormUrlEncodedBody(
+        val newrequest = requestWithUrlEncodedBody(
           "serviceProviders[]" -> "06"
         )
 

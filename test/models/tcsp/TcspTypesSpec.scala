@@ -92,7 +92,7 @@ class TcspTypesSpec extends PlaySpec {
       "throw error message on reading invalid data" in {
 
         Json.fromJson[TcspTypes](Json.obj("serviceProviders" -> Seq("40"))) must
-          be(JsError((JsPath) \ "serviceProviders" -> ValidationError("error.invalid")))
+          be(JsError((JsPath) \ "serviceProviders" -> JsonValidationError("error.invalid")))
 
       }
     }

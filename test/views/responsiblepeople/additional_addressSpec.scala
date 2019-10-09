@@ -21,13 +21,13 @@ import jto.validation.{Path, ValidationError}
 import models.autocomplete.NameValuePair
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class additional_addressSpec extends AmlsSpec with MustMatchers {
+class additional_addressSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     val name = "firstName lastName"
 
@@ -41,7 +41,7 @@ class additional_addressSpec extends AmlsSpec with MustMatchers {
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.additional_address(form2, true, 1, None, name, countries)
+      def view = views.html.responsiblepeople.additional_address(form2, true, 1, None, name, countries)(requestWithToken, implicitly, implicitly, implicitly, implicitly)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
@@ -82,7 +82,7 @@ class additional_addressSpec extends AmlsSpec with MustMatchers {
           (Path \ "country") -> Seq(ValidationError("not a message Key 11"))
         ))
 
-      def view = views.html.responsiblepeople.additional_address(form2, true, 1, None, name, countries)
+      def view = views.html.responsiblepeople.additional_address(form2, true, 1, None, name, countries)(requestWithToken, implicitly, implicitly, implicitly, implicitly)
 
       errorSummary.html() must include("not a message Key 1")
       errorSummary.html() must include("not a message Key 2")

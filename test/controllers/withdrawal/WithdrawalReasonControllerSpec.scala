@@ -82,7 +82,7 @@ class WithdrawalReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
         "go to landing controller" which {
           "follows sending a withdrawal to amls" when {
             "withdrawalReason is selection without other reason" in new TestFixture {
-              val newRequest = request.withFormUrlEncodedBody(
+              val newRequest = requestWithUrlEncodedBody(
                 "withdrawalReason" -> "01"
               )
 
@@ -99,7 +99,7 @@ class WithdrawalReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
 
             "withdrawalReason is selection with other reason" in new TestFixture {
 
-              val newRequest = request.withFormUrlEncodedBody(
+              val newRequest = requestWithUrlEncodedBody(
                 "withdrawalReason" -> "04",
                 "specifyOtherReason" -> "reason"
               )
@@ -123,7 +123,7 @@ class WithdrawalReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
       "given invalid data" must {
         "return with BAD_REQUEST" in new TestFixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "withdrawalReason" -> "20"
           )
 
@@ -140,7 +140,7 @@ class WithdrawalReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
             authService.amlsRegistrationNumber(Some(any()), Some(any()))(any(), any())
           } thenReturn Future.successful(None)
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "withdrawalReason" -> "01"
           )
 

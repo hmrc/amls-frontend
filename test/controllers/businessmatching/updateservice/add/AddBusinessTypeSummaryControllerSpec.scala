@@ -48,7 +48,7 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
   with TradingPremisesGenerator
   with BusinessMatchingGenerator {
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
+  sealed trait Fixture extends DependencyMocks {
     self =>
 
     val request = addToken(authRequest)

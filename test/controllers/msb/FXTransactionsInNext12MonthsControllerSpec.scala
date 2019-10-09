@@ -33,7 +33,7 @@ import scala.concurrent.Future
 
 class FXTransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSugar {
 
-    trait Fixture extends AuthorisedFixture with DependencyMocks {
+    trait Fixture extends DependencyMocks {
         self =>
         val request = addToken(authRequest)
 
@@ -100,7 +100,7 @@ class FXTransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
         "Show error message when user has not filled the mandatory fields" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
                 "fxTransaction" -> ""
             )
 
@@ -117,7 +117,7 @@ class FXTransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
         }
 
         "Successfully save data in mongoCache and navigate to Summary page" in new Fixture {
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
                 "fxTransaction" -> "12345678963"
             )
 
@@ -144,7 +144,7 @@ class FXTransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
                 ), hasChanged = true
             )
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
                 "fxTransaction" -> "12345678963"
             )
 

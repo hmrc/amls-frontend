@@ -37,7 +37,7 @@ import scala.concurrent.Future
 
 class SelectBusinessTypeControllerSpec extends AmlsSpec {
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocks with ResponsiblePersonGenerator {
+  sealed trait Fixture extends DependencyMocks with ResponsiblePersonGenerator {
     self =>
 
     val request = addToken(authRequest)
@@ -88,7 +88,7 @@ class SelectBusinessTypeControllerSpec extends AmlsSpec {
     "post" must {
       "return a bad request when no data has been posted" in new Fixture {
 
-        val result = controller.post()(request.withFormUrlEncodedBody())
+        val result = controller.post()(requestWithUrlEncodedBody("" -> ""))
 
         status(result) mustBe BAD_REQUEST
       }
@@ -97,7 +97,7 @@ class SelectBusinessTypeControllerSpec extends AmlsSpec {
         mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel())
         mockCacheSave[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel(Some(HighValueDealing)), Some(AddBusinessTypeFlowModel.key))
 
-        val result = controller.post()(request.withFormUrlEncodedBody(
+        val result = controller.post()(requestWithUrlEncodedBody(
           "businessActivities[]" -> "04"
         ))
 

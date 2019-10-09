@@ -37,7 +37,7 @@ import scala.concurrent.Future
 
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val request = addToken(authRequest)
 

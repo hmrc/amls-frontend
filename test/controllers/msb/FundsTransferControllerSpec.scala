@@ -33,7 +33,7 @@ import scala.concurrent.Future
 
 class FundsTransferControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
 
     val controller = new FundsTransferController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
@@ -65,7 +65,7 @@ class FundsTransferControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
     }
 
     "on post with invalid data" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "transferWithoutFormalSystems" -> ""
       )
 
@@ -78,7 +78,7 @@ class FundsTransferControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
     "on post with valid data when user selects Yes" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "transferWithoutFormalSystems" -> "true"
       )
 
@@ -95,7 +95,7 @@ class FundsTransferControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
     "on post with valid data whe user selects No" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "transferWithoutFormalSystems" -> "false"
       )
 
@@ -112,7 +112,7 @@ class FundsTransferControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
     "on post with valid data in edit mode when the next page's data is in the store" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "transferWithoutFormalSystems" -> "true"
       )
 
@@ -141,7 +141,7 @@ class FundsTransferControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
     "on post with valid data in edit mode when the next page's data is not in the store" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "transferWithoutFormalSystems" -> "true"
       )
 

@@ -21,14 +21,14 @@ import jto.validation.{Path, ValidationError}
 import models.businessactivities.{UkAccountantsAddress, WhoIsYourAccountant}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.{AmlsSpec, AutoCompleteServiceMocks}
+import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
 
 
-class who_is_your_accountantSpec extends AmlsSpec with MustMatchers {
+class who_is_your_accountantSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "who_is_your_accountant view" must {

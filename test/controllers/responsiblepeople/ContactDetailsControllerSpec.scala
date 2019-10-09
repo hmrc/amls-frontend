@@ -33,7 +33,7 @@ import scala.concurrent.Future
 
 class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val request = addToken(authRequest)
 
@@ -97,7 +97,7 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
         "index of the responsible person is 1" must {
           "go to ConfirmAddressController" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "phoneNumber" -> "07000000000",
               "emailAddress" -> "test@test.com"
             )
@@ -116,7 +116,7 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
         "index of the responsible person is greater than 1" must {
           "go to CurrentAddressController" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "phoneNumber" -> "07000000000",
               "emailAddress" -> "test@test.com"
             )
@@ -135,7 +135,7 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
         "there is no responsible person for the index" must {
           "respond with NOT_FOUND" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "phoneNumber" -> "07000000000",
               "emailAddress" -> "test@test.com"
             )
@@ -153,7 +153,7 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
         "in edit mode" must {
           "go to DetailedAnswersController" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "phoneNumber" -> "07000000000",
               "emailAddress" -> "test@test.com"
             )
@@ -174,7 +174,7 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
       "given an invalid form" must {
         "respond with BAD_REQUEST" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "phoneNumber" -> "<070>00000000",
             "emailAddress" -> "test@test.com"
           )

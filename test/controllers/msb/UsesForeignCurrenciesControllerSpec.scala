@@ -41,7 +41,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
                                     with IntegrationPatience
                                     with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
     implicit val ec = app.injector.instanceOf[ExecutionContext]
@@ -74,7 +74,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
   trait Fixture2 extends AuthorisedFixture with DependencyMocks with MoneyServiceBusinessTestData {
     self =>
     val request = addToken(authRequest)
-    val controller = new UsesForeignCurrenciesController(SuccessfulAuthAction, ds = commonDependencies, mockCacheConnector, mockStatusService, mockServiceFlow)
+    val controller = new UsesForeignCurrenciesController(SuccessfulAuthAction, ds = commonDependencies, mockCacheConnector, mockStatusService, mockServiceFlow, mockMcc)
     implicit val ec = app.injector.instanceOf[ExecutionContext]
 
     when {
@@ -165,7 +165,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
       "data is valid" should {
           "clear the foreign currency data when not using foreign currencies" in new Fixture2 {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "usesForeignCurrencies" -> "false"
             )
 
@@ -181,7 +181,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
 
         "keep the foreign currency data when using foreign currencies" in new Fixture2 {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "usesForeignCurrencies" -> "true"
             )
 

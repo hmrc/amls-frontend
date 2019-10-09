@@ -36,7 +36,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
 
   val address = Address("1", "2", None, None, "AA1 1BB", None)
 
-  trait Fixture extends AuthorisedFixture  {
+  trait Fixture  {
     self =>
     val request = addToken(authRequest)
 
@@ -87,7 +87,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
 
     "POST:" must {
       "successfully redirect to next page on valid input" in new Fixture {
-        val postRequest = request.withFormUrlEncodedBody(
+        val postRequest = requestWithUrlEncodedBody(
           "startDate.day" -> "20",
           "startDate.month" -> "5",
           "startDate.year" -> "2014"
@@ -104,7 +104,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
       }
 
       "successfully redirect to next page on valid input in edit mode" in new Fixture {
-        val postRequest = request.withFormUrlEncodedBody(
+        val postRequest = requestWithUrlEncodedBody(
           "startDate.day" -> "20",
           "startDate.month" -> "5",
           "startDate.year" -> "2014"
@@ -128,7 +128,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
       }
 
       "throw error on missing required field" in new Fixture {
-        val postRequest = request.withFormUrlEncodedBody(
+        val postRequest = requestWithUrlEncodedBody(
           "startDate.day" -> "",
           "startDate.month" -> "5",
           "startDate.year" -> "2014"

@@ -117,7 +117,7 @@ class VATRegisteredSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("registeredForVAT" -> true, "vrnNumber" ->"12345678")
 
       Json.fromJson[VATRegistered](json) must
-        be(JsSuccess(VATRegisteredYes("12345678"), JsPath \ "vrnNumber"))
+        be(JsSuccess(VATRegisteredYes("12345678"), JsPath))
     }
 
     "fail to validate when given an empty `Yes` value" in {

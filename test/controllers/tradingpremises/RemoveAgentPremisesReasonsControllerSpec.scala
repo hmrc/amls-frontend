@@ -34,7 +34,7 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
 
   import models.tradingpremises.RemovalReasonConstants._
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     implicit val request = addToken(authRequest)
 
@@ -80,7 +80,7 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
 
       "return a bad request if there is a validation problem" in new Fixture {
 
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = requestWithUrlEncodedBody(
           "removalReason" -> Form.OTHER
         )
 
@@ -92,7 +92,7 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
 
       "save the reason data to mongoCache" in new Fixture {
 
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = requestWithUrlEncodedBody(
           "removalReason" -> Form.OTHER,
           "removalReasonOther" -> "Some reason"
         )
@@ -112,7 +112,7 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
 
       "redirect to the 'Remove trading premises' page" in new Fixture {
 
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = requestWithUrlEncodedBody(
           "removalReason" -> Form.OTHER,
           "removalReasonOther" -> "Some reason"
         )

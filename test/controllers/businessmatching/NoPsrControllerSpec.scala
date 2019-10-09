@@ -30,7 +30,7 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
   implicit val defaultPatience =
     PatienceConfig(timeout = Span(5, Seconds), interval = Span(500, Millis))
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
 
     val controller = new NoPsrController(

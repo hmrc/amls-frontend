@@ -23,8 +23,9 @@ import org.mockito.Mockito._
 import org.mockito.Matchers._
 import cats.implicits._
 import cats._
-import config.CachedStaticHtmlPartialProvider
+import config.{ApplicationConfig, CachedStaticHtmlPartialProvider}
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
+import play.api.i18n.{Lang, Messages}
 import play.api.mvc.Results._
 import play.api.test.FakeRequest
 import utils.StatusConstants
@@ -35,6 +36,9 @@ class TPControllerHelperSpec extends PlaySpec with MockitoSugar {
     implicit val request = FakeRequest()
     val cache = mock[CacheMap]
     implicit val partialProvider = mock[CachedStaticHtmlPartialProvider]
+    implicit val lang = mock[Lang]
+    implicit val messages = mock[Messages]
+    implicit val appConfig = mock[ApplicationConfig]
 
     def setUpTradingPremise(model: Option[TradingPremises]) = when {
       cache.getEntry[Seq[TradingPremises]](any())(any())

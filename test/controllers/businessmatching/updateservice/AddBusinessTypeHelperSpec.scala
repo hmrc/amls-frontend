@@ -43,7 +43,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
   with ResponsiblePersonGenerator
   with FutureAssertions {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
 
     val tradingPremisesService = mock[TradingPremisesService]
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
@@ -55,9 +55,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
       mockCacheConnector,
       tradingPremisesService,
       responsiblePeopleService,
-      mockAppConfig,
-      cc = mockMcc
-    )
+      mockAppConfig)
 
     val businessActivitiesSection = BABusinessActivities(
       involvedInOther = Some(InvolvedInOtherNo),

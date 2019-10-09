@@ -28,7 +28,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DateOfChangeHelper, DependencyMocks}
 
 class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
@@ -70,7 +70,7 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
   "redirect to next page" when {
     "submitted with valid data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
+      val newRequest = requestWithUrlEncodedBody("salesChannels" -> "Retail")
 
       mockApplicationStatus(SubmissionDecisionRejected)
 
@@ -81,7 +81,7 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
 
     "submitted with valid data in edit mode" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
+      val newRequest = requestWithUrlEncodedBody("salesChannels" -> "Retail")
 
       mockApplicationStatus(SubmissionDecisionRejected)
 
@@ -92,7 +92,7 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
   }
 
   "fail with validation error when mandatory field is missing" in new Fixture {
-    val newRequest = request.withFormUrlEncodedBody()
+    val newRequest = requestWithUrlEncodedBody("" -> "")
 
     val result = controller.post()(newRequest)
     status(result) must be(BAD_REQUEST)
@@ -106,7 +106,7 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
       val hvd = Hvd(howWillYouSellGoods = Some(HowWillYouSellGoods(Set(Wholesale))))
 
       "application is approved" in new Fixture with DateOfChangeHelper {
-        val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
+        val newRequest = requestWithUrlEncodedBody("salesChannels" -> "Retail")
         mockApplicationStatus(SubmissionDecisionApproved)
         mockCacheFetch(Some(hvd))
         val result = controller.post(false)(newRequest)
@@ -115,7 +115,7 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
       }
 
       "application is approved and in edit mode" in new Fixture with DateOfChangeHelper {
-        val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
+        val newRequest = requestWithUrlEncodedBody("salesChannels" -> "Retail")
         mockApplicationStatus(ReadyForRenewal(None))
         mockCacheFetch(Some(hvd))
         val result = controller.post(true)(newRequest)
@@ -124,7 +124,7 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
       }
 
       "application is ready for renewal" in new Fixture with DateOfChangeHelper {
-        val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
+        val newRequest = requestWithUrlEncodedBody("salesChannels" -> "Retail")
         mockApplicationStatus(ReadyForRenewal(None))
         mockCacheFetch(Some(hvd))
         val result = controller.post(false)(newRequest)
@@ -133,7 +133,7 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
       }
 
       "application is ready for renewal and in edit mode" in new Fixture with DateOfChangeHelper {
-        val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
+        val newRequest = requestWithUrlEncodedBody("salesChannels" -> "Retail")
         mockApplicationStatus(ReadyForRenewal(None))
         mockCacheFetch(Some(hvd))
         val result = controller.post(true)(newRequest)
@@ -147,7 +147,7 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
     "the status is approved" when {
       "the service has just been added" must {
         "redirect to the next page in the flow" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
+          val newRequest = requestWithUrlEncodedBody("salesChannels" -> "Retail")
 
           mockApplicationStatus(SubmissionDecisionApproved)
           mockIsNewActivityNewAuth(true, Some(HighValueDealing))

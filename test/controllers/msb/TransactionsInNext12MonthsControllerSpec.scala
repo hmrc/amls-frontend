@@ -33,7 +33,7 @@ import scala.concurrent.Future
 
 class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
@@ -96,7 +96,7 @@ class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSuga
 
     "Show error message when user has not filled the mandatory fields" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "txnAmount" -> ""
       )
 
@@ -114,7 +114,7 @@ class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSuga
 
     "on valid post" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "txnAmount" -> "12345678963"
       )
 
@@ -131,7 +131,7 @@ class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSuga
 
     "on valid post in edit mode with the next page's data in the store" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "txnAmount" -> "12345678963"
       )
 
@@ -158,7 +158,7 @@ class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSuga
 
     "on valid post in edit mode without the next page's data in the store" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "txnAmount" -> "12345678963"
       )
 

@@ -35,7 +35,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
 
     val request = addToken(authRequest)
 

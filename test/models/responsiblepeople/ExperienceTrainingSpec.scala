@@ -137,7 +137,7 @@ class ExperienceTrainingSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("experienceTraining" -> true, "experienceInformation" -> "0123456789")
 
       Json.fromJson[ExperienceTraining](json) must
-        be(JsSuccess(ExperienceTrainingYes("0123456789"), JsPath \ "experienceInformation"))
+        be(JsSuccess(ExperienceTrainingYes("0123456789"), JsPath))
     }
 
     "fail to validate when given an empty `Yes` value" in {

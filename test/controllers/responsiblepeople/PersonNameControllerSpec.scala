@@ -38,7 +38,7 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
   val mockDataCacheConnector = mock[DataCacheConnector]
   val RecordId = 1
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val personNameController = new PersonNameController (
@@ -106,7 +106,7 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
         "go to LegalNameController" when {
           "edit is false" in new Fixture {
 
-            val requestWithParams = request.withFormUrlEncodedBody(
+            val requestWithParams = requestWithUrlEncodedBody(
               "firstName" -> "first",
               "middleName" -> "middle",
               "lastName" -> "last"
@@ -126,7 +126,7 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
         "go to DetailedAnswersController" when {
           "edit is true" in new Fixture {
 
-            val requestWithParams = request.withFormUrlEncodedBody(
+            val requestWithParams = requestWithUrlEncodedBody(
               "firstName" -> "first",
               "middleName" -> "middle",
               "lastName" -> "last"
@@ -147,7 +147,7 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
       "form is invalid" must {
         "return BAD_REQUEST" in new Fixture {
 
-          val firstNameMissingInRequest = request.withFormUrlEncodedBody(
+          val firstNameMissingInRequest = requestWithUrlEncodedBody(
             "lastName" -> "last"
           )
 
@@ -164,7 +164,7 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
       "model cannot be found with given index" must {
         "return NOT_FOUND" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "firstName" -> "first",
             "lastName" -> "last"
           )

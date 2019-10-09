@@ -35,7 +35,7 @@ import scala.concurrent.Future
 
 class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
    val controller = new AccountantForAMLSRegulationsController(
@@ -86,7 +86,7 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
         "edit is true" must {
           "redirect to the WhoIsYourAccountantController when 'yes' is selected'" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody("accountantForAMLSRegulations" -> "true")
+            val newRequest = requestWithUrlEncodedBody("accountantForAMLSRegulations" -> "true")
 
             when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
               .thenReturn(Future.successful(None))
@@ -101,7 +101,7 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
 
           "successfully redirect to the SummaryController on selection of Option 'No'" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "accountantForAMLSRegulations" -> "false"
             )
             when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
@@ -118,7 +118,7 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
 
         "edit is false" must {
           "redirect to the WhoIsYourAccountantController on selection of 'Yes'" in new Fixture {
-            val newRequest = request.withFormUrlEncodedBody("accountantForAMLSRegulations" -> "true")
+            val newRequest = requestWithUrlEncodedBody("accountantForAMLSRegulations" -> "true")
 
             when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
               .thenReturn(Future.successful(None))
@@ -132,7 +132,7 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
           }
 
           "successfully redirect to the SummaryController on selection of Option 'No'" in new Fixture {
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "accountantForAMLSRegulations" -> "false"
             )
             when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
@@ -151,7 +151,7 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
       "respond with BAD_REQUEST" when {
         "no options are selected so that the request body is empty" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody()
+          val newRequest = requestWithUrlEncodedBody("" -> "")
 
           when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
             .thenReturn(Future.successful(None))
@@ -164,7 +164,7 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
 
         "given invalid json" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "WhatYouNeedController" -> ""
           )
 
@@ -180,7 +180,7 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
 
       "remove the answers to dependant questions" when {
         "user selected 'no'" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "accountantForAMLSRegulations" -> "false"
           )
 

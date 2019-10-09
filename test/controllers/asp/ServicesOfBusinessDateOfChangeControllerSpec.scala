@@ -35,7 +35,7 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
 
   val emptyCache = CacheMap("", Map.empty)
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
@@ -52,7 +52,7 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
 
     "submit with valid data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "dateOfChange.day" -> "24",
         "dateOfChange.month" -> "2",
         "dateOfChange.year" -> "1990"
@@ -77,7 +77,7 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
 
     "fail submission when invalid date is supplied" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "dateOfChange.day" -> "24",
         "dateOfChange.month" -> "2",
         "dateOfChange.year" -> "199000"
@@ -102,7 +102,7 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
 
     "fail submission when input date is before activity start date" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "dateOfChange.day" -> "24",
         "dateOfChange.month" -> "2",
         "dateOfChange.year" -> "1980"

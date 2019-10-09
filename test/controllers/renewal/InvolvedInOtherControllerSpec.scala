@@ -37,7 +37,7 @@ import scala.concurrent.Future
 
 class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with PrivateMethodTester {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val request = addToken(authRequest)
 
@@ -133,7 +133,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
       "when there is pre-existing Renewal Data" must {
         "redirect to BusinessTurnoverController with valid data with option yes" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "involvedInOther" -> "true",
             "details" -> "test"
           )
@@ -151,7 +151,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
         "redirect to AMLSTurnoverController with valid data with option no" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "involvedInOther" -> "false"
           )
 
@@ -169,7 +169,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
       "when there is no Renewal data at all yet" must {
         "redirect to BusinessTurnoverController with valid data with option yes" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "involvedInOther" -> "true",
             "details" -> "test"
           )
@@ -187,7 +187,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
         "redirect to AMLSTurnoverController with valid data with option no" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "involvedInOther" -> "false"
           )
 
@@ -204,7 +204,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
         "redirect to SummaryController with valid data with option no in edit mode" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "involvedInOther" -> "false"
           )
 
@@ -221,7 +221,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
         "redirect to BusinessTurnoverController with valid data in edit mode" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "involvedInOther" -> "true",
             "details" -> "test"
           )
@@ -249,7 +249,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
           when(mockDataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(businessMatching)))
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "involvedInOther" -> "test"
           )
 
@@ -266,7 +266,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
           when(mockDataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
             .thenReturn(Future.successful(None))
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "involvedInOther" -> "test"
           )
 
@@ -286,7 +286,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
           when(mockDataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(businessMatching)))
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "involvedInOther" -> "true",
             "details" -> ""
           )

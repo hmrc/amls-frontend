@@ -34,7 +34,7 @@ import scala.concurrent.Future
 
 class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val request = addToken(authRequest)
 
@@ -84,7 +84,7 @@ class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
       "on post with valid data" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "businessTurnover" -> "01"
         )
 
@@ -101,7 +101,7 @@ class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
       "on post with valid data in edit mode" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "businessTurnover" -> "01"
         )
 

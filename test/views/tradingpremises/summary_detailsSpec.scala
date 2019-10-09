@@ -24,12 +24,12 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import utils.{DateHelper, AmlsSpec}
+import utils.{DateHelper, AmlsViewSpec}
 import views.{Fixture, HtmlAssertions}
 
 import scala.collection.JavaConversions._
 
-sealed trait TestHelper extends AmlsSpec {
+sealed trait TestHelper extends AmlsViewSpec {
 
   val ytp = YourTradingPremises(
     "foo",
@@ -70,7 +70,7 @@ sealed trait TestHelper extends AmlsSpec {
   )
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(FakeRequest())
+    implicit val requestWithToken = addTokenForView()
   }
 }
 

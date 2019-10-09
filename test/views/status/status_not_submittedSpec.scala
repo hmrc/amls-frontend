@@ -20,13 +20,13 @@ import forms.EmptyForm
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import play.api.mvc.Call
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class status_not_submittedSpec extends AmlsSpec with MustMatchers {
+class status_not_submittedSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     val call = mock[Call]
   }

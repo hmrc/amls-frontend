@@ -83,14 +83,14 @@ class StillEmployedControllerSpec extends AmlsSpec {
       "respond with SEE_OTHER" when {
         "request is 'yes'" which {
           "redirects to RoleInBusinessController" in new TestFixture {
-            val result = controller.post()(request.withFormUrlEncodedBody("stillEmployed" -> "true"))
+            val result = controller.post()(requestWithUrlEncodedBody("stillEmployed" -> "true"))
             status(result) mustBe SEE_OTHER
             redirectLocation(result) mustBe Some(controllers.changeofficer.routes.RoleInBusinessController.get().url)
           }
         }
         "request is 'no'" which {
           "redirects to RemoveResponsiblePerson" in new TestFixture {
-            val result = controller.post()(request.withFormUrlEncodedBody("stillEmployed" -> "false"))
+            val result = controller.post()(requestWithUrlEncodedBody("stillEmployed" -> "false"))
             status(result) mustBe SEE_OTHER
             redirectLocation(result) mustBe Some(controllers.changeofficer.routes.RemoveResponsiblePersonController.get().url)
           }

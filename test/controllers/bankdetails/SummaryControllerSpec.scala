@@ -28,13 +28,13 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
     val controller = new SummaryController(
       dataCacheConnector = mockCacheConnector,
-      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      authAction = SuccessfulAuthAction, ds = commonDependencies, mcc = mockMcc)
   }
 
   "Get" must {

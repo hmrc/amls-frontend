@@ -90,7 +90,7 @@ class CompanyRegistrationNumberSpec extends PlaySpec with MockitoSugar {
         val companyRegistrationNumber = CompanyRegistrationNumber("12345678")
         val jsonCompanyRegistrationNumber = Json.obj("companyRegistrationNumber" -> "12345678")
         val fromJson = Json.fromJson[CompanyRegistrationNumber](jsonCompanyRegistrationNumber)
-        fromJson must be(JsSuccess(companyRegistrationNumber, JsPath \ "companyRegistrationNumber"))
+        fromJson must be(JsSuccess(companyRegistrationNumber, JsPath))
       }
 
       "validate model with valid numeric registration number" in {

@@ -38,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with StatusMocks with CacheMocks {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
     implicit val ec = app.injector.instanceOf[ExecutionContext]
 
@@ -94,7 +94,7 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
 
     "on post() give a bad request if invalid data sent" in new Fixture {
 
-        val invalidRequest = request.withFormUrlEncodedBody(
+        val invalidRequest = requestWithUrlEncodedBody(
           "companyRegistrationNumber" -> "INVALID_DATA"
         )
 
@@ -109,7 +109,7 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
 
     "on post() redirect correctly if valid data sent and edit is true" in new Fixture {
 
-      val validRequest = request.withFormUrlEncodedBody(
+      val validRequest = requestWithUrlEncodedBody(
         "companyRegistrationNumber" -> "12345678"
       )
 
@@ -126,7 +126,7 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
 
     "on post() redirect correctly if valid data sent and edit is false" in new Fixture {
 
-      val validRequest = request.withFormUrlEncodedBody(
+      val validRequest = requestWithUrlEncodedBody(
         "companyRegistrationNumber" -> "12345678"
       )
 

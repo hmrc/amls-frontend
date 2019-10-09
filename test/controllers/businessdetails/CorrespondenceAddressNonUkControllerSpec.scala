@@ -43,7 +43,7 @@ import scala.concurrent.Future
 
 class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new CorrespondenceAddressNonUkController (
@@ -113,7 +113,7 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
 
         val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, None, Some(CorrespondenceAddress(None, Some(address))))))
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "yourName" -> "Name",
           "businessName" -> "Business Name",
           "addressLineNonUK1" -> "Add Line 1",
@@ -147,7 +147,7 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
 
         val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, None, Some(CorrespondenceAddress(None, Some(address))))))
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "yourName" -> "Name",
           "businessName" -> "Business Name",
           "addressLineNonUK1" -> "Add Line 1",
@@ -185,7 +185,7 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
 
         val fetchResult = Future.successful(None)
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "yourName" -> "Name",
           "businessName" -> "Business Name",
           "addressLineNonUK1" -> "Add Line 1 & 3",
@@ -215,7 +215,7 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
 
       "an invalid form request is sent in the body" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "yourName" -> "Name",
           "businessName" -> "Business Name",
           "invalid" -> "AL"

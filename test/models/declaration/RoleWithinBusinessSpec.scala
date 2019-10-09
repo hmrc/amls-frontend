@@ -219,7 +219,7 @@ class RoleWithinBusinessSpec extends AmlsSpec with CharacterSets {
       )
 
       Json.fromJson[RoleWithinBusiness](json) must
-        be(JsSuccess(Other("any other value"), JsPath \ "roleWithinBusinessOther"))
+        be(JsSuccess(Other("any other value"), JsPath))
     }
 
     "Read the json and return error if an invalid value is found" in {

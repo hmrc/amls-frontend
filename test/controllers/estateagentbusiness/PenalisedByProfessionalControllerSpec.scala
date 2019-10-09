@@ -34,7 +34,7 @@ import scala.concurrent.Future
 
 class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures{
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new PenalisedByProfessionalController (
@@ -68,7 +68,7 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
 
   "on post with valid data" in new Fixture {
 
-    val newRequest = request.withFormUrlEncodedBody(
+    val newRequest = requestWithUrlEncodedBody(
       "penalised" -> "true",
       "professionalBody" -> "details"
     )
@@ -86,7 +86,7 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
 
   "on post with invalid data" in new Fixture {
 
-    val newRequest = request.withFormUrlEncodedBody(
+    val newRequest = requestWithUrlEncodedBody(
       "penalisedYes" -> "details"
     )
 
@@ -99,7 +99,7 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
 
    "on post with valid data in edit mode" in new Fixture {
 
-     val newRequest = request.withFormUrlEncodedBody(
+     val newRequest = requestWithUrlEncodedBody(
        "penalised" -> "true",
       "professionalBody" -> "details"
      )

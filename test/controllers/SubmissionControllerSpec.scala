@@ -39,7 +39,7 @@ import scala.concurrent.Future
 
 class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsReferenceNumberGenerator {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new SubmissionController (

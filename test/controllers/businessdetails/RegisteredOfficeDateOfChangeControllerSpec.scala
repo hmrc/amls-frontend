@@ -34,7 +34,7 @@ import scala.concurrent.Future
 
 class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with  MockitoSugar{
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new RegisteredOfficeDateOfChangeController (
@@ -53,7 +53,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with  MockitoS
   "handle the date of change form post" when {
     "given valid data for a UK address" in new Fixture {
 
-      val postRequest = request.withFormUrlEncodedBody(
+      val postRequest = requestWithUrlEncodedBody(
         "dateOfChange.year" -> "2010",
         "dateOfChange.month" -> "10",
         "dateOfChange.day" -> "01"
@@ -86,7 +86,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with  MockitoS
 
     "given valid data for a Non-UK address" in new Fixture {
 
-      val postRequest = request.withFormUrlEncodedBody(
+      val postRequest = requestWithUrlEncodedBody(
         "dateOfChange.year" -> "2005",
         "dateOfChange.month" -> "04",
         "dateOfChange.day" -> "26"
@@ -123,7 +123,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with  MockitoS
       when(controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any(), any())).
         thenReturn(Future.successful(Some(BusinessDetails())))
 
-      val postRequest = request.withFormUrlEncodedBody()
+      val postRequest = requestWithUrlEncodedBody("" -> "")
 
       val result = controller.post(postRequest)
 
@@ -132,7 +132,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with  MockitoS
 
     }
     "dateOfChange is earlier than Business Activities Start Date" in new Fixture {
-      val postRequest = request.withFormUrlEncodedBody(
+      val postRequest = requestWithUrlEncodedBody(
         "dateOfChange.year" -> "2010",
         "dateOfChange.month" -> "10",
         "dateOfChange.day" -> "01"

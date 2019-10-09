@@ -39,7 +39,7 @@ import scala.concurrent.Future
 
 class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val mockDataConnector = mock[DataCacheConnector]
@@ -112,7 +112,7 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
 
         val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, None, None, false, false)))
 
-        val newRequest = request.withFormUrlEncodedBody("isUK" -> "true")
+        val newRequest = requestWithUrlEncodedBody("isUK" -> "true")
 
         when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any(), any()))
           .thenReturn(fetchResult)
@@ -129,7 +129,7 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
 
         val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, None, None, false, false)))
 
-        val newRequest = request.withFormUrlEncodedBody("isUK" -> "false")
+        val newRequest = requestWithUrlEncodedBody("isUK" -> "false")
 
         when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any(), any()))
           .thenReturn(fetchResult)
@@ -146,7 +146,7 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
 
         val fetchResult = Future.successful(None)
 
-        val newRequest = request.withFormUrlEncodedBody( )
+        val newRequest = requestWithUrlEncodedBody( )
 
         when(controller.dataConnector.fetch[BusinessDetails](any(), any()) (any(), any())).thenReturn(fetchResult)
 

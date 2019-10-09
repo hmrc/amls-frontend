@@ -34,7 +34,7 @@ import scala.concurrent.Future
 
 class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures{
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new BusinessFranchiseController (
@@ -82,7 +82,7 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
       "respond with SEE_OTHER" when {
         "edit is false and given valid data" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "businessFranchise" -> "true",
             "franchiseName" -> "test test"
           )
@@ -99,7 +99,7 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
         }
 
         "edit is true and given valid data" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "businessFranchise" -> "true",
             "franchiseName" -> "test"
           )
@@ -118,7 +118,7 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
 
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "businessFranchise" -> "test"
           )
 

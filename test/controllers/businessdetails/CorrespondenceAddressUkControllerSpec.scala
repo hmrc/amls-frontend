@@ -42,7 +42,7 @@ import scala.concurrent.Future
 
 class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new CorrespondenceAddressUkController (
@@ -111,7 +111,7 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
 
         val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, Some(CorrespondenceAddressIsUk(true)), Some(CorrespondenceAddress(Some(address), None)))))
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "yourName" -> "Name",
           "businessName" -> "Business Name",
           "isUK"         -> "true",
@@ -149,7 +149,7 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
 
         val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, Some(CorrespondenceAddressIsUk(true)), Some(CorrespondenceAddress(Some(address), None)))))
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "yourName" -> "Name",
           "businessName" -> "Business Name",
           "isUK"         -> "true",
@@ -189,7 +189,7 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
 
         val fetchResult = Future.successful(None)
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "yourName" -> "Name",
           "businessName" -> "Business Name",
           "isUK"         -> "true",
@@ -220,7 +220,7 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
 
       "an invalid form request is sent in the body" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "yourName" -> "Name",
           "businessName" -> "Business Name",
           "invalid" -> "AA1 1AA"

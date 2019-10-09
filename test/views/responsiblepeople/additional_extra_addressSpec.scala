@@ -19,7 +19,7 @@ package views.responsiblepeople
 import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{PersonAddressUK, ResponsiblePersonAddress}
 import org.scalatest.MustMatchers
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import models.autocomplete.NameValuePair
@@ -27,10 +27,10 @@ import play.api.i18n.Messages
 import views.Fixture
 
 
-class additional_extra_addressSpec extends AmlsSpec with MustMatchers {
+class additional_extra_addressSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     val countries = Some(Seq(
       NameValuePair("Country 1", "country:1")

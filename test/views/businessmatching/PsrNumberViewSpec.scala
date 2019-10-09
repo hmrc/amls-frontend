@@ -20,13 +20,13 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class PsrNumberViewSpec extends AmlsSpec {
+class PsrNumberViewSpec extends AmlsViewSpec {
 
     trait ViewFixture extends Fixture {
-        implicit val requestWithToken = addToken(request)
+        implicit val requestWithToken = addTokenForView()
     }
 
     "psr_number view" must {

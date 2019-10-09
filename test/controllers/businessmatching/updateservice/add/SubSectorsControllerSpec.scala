@@ -39,7 +39,7 @@ import scala.concurrent.Future
 
 class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestData with BusinessMatchingGenerator {
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
+  sealed trait Fixture extends DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
@@ -145,7 +145,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
 
       "return a bad request when no data has been posted" in new Fixture {
 
-        val result = controller.post()(request.withFormUrlEncodedBody())
+        val result = controller.post()(requestWithUrlEncodedBody("" -> ""))
 
         status(result) mustBe BAD_REQUEST
       }
@@ -155,7 +155,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
           mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
             hasChanged = true))
 
-          val result = controller.post()(request.withFormUrlEncodedBody(
+          val result = controller.post()(requestWithUrlEncodedBody(
             "msbServices[]" -> "01"
           ))
 
@@ -174,7 +174,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
             hasChanged = true)
           )
 
-          val result = controller.post()(request.withFormUrlEncodedBody(
+          val result = controller.post()(requestWithUrlEncodedBody(
             "msbServices[]" -> "03",
             "msbServices[]" -> "04"
           ))
@@ -196,7 +196,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
             hasChanged = true)
           )
 
-          val result = controller.post()(request.withFormUrlEncodedBody(
+          val result = controller.post()(requestWithUrlEncodedBody(
             "msbServices[]" -> "03",
             "msbServices[]" -> "04"
           ))
@@ -218,7 +218,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
             hasChanged = true)
           )
 
-          val result = controller.post()(request.withFormUrlEncodedBody(
+          val result = controller.post()(requestWithUrlEncodedBody(
             "msbServices[]" -> "03",
             "msbServices[]" -> "04"
           ))
@@ -240,7 +240,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
             hasChanged = true)
           )
 
-          val result = controller.post()(request.withFormUrlEncodedBody(
+          val result = controller.post()(requestWithUrlEncodedBody(
             "msbServices[]" -> "03",
             "msbServices[]" -> "04"
           ))

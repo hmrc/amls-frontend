@@ -47,10 +47,10 @@ class BacsConfirmationControllerSpec extends AmlsSpec
   with PaymentGenerator
   with SubscriptionResponseGenerator {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val baseUrl = "http://localhost"
-    val request = addToken(authRequest).copyFakeRequest(uri = baseUrl)
+    val request = addToken(authRequest.copyFakeRequest(uri = baseUrl))
 
     val controller = new BacsConfirmationController(
       authAction = SuccessfulAuthAction,

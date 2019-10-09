@@ -31,7 +31,7 @@ import scala.concurrent.Future
 
 class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
 
     val controller = new BranchesOrAgentsController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, mockAutoComplete, mockMcc)
@@ -81,7 +81,7 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
         hasChanged = true
       )
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "hasCountries" -> "false"
       )
 
@@ -104,7 +104,7 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
         hasChanged = true
       )
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "hasCountries" -> "true"
       )
 
@@ -127,7 +127,7 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
         hasChanged = true
       )
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "hasCountries" -> "false"
       )
 
@@ -150,7 +150,7 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
         hasChanged = true
       )
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "hasCountries" -> "true"
       )
 

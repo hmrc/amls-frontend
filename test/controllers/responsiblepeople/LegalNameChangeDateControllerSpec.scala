@@ -88,7 +88,7 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures {
         "go to KnownByController" when {
           "edit is false" in new TestFixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "date.day" -> "1",
               "date.month" -> "12",
               "date.year" -> "1990"
@@ -106,7 +106,7 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures {
         "go to DetailedAnswersController" when {
           "edit is true" in new TestFixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "date.day" -> "1",
               "date.month" -> "12",
               "date.year" -> "1990"
@@ -125,7 +125,7 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures {
       "form is invalid" must {
         "return BAD_REQUEST" in new TestFixture {
 
-          val NameMissingInRequest = request.withFormUrlEncodedBody(
+          val NameMissingInRequest = requestWithUrlEncodedBody(
             "date.day" -> "1"
           )
 
@@ -142,7 +142,7 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures {
       "model cannot be found with given index" must {
         "return NOT_FOUND" in new TestFixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "date.day" -> "1",
             "date.month" -> "12",
             "date.year" -> "1990"

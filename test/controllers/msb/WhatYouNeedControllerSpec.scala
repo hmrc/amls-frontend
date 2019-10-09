@@ -31,7 +31,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
     implicit val ec = app.injector.instanceOf[ExecutionContext]

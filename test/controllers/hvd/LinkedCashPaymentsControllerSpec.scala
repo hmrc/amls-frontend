@@ -30,7 +30,7 @@ import scala.concurrent.Future
 
 class LinkedCashPaymentsControllerSpec extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture  with DependencyMocks{
+  trait Fixture extends DependencyMocks{
     self => val request = addToken(authRequest)
 
     val controller = new LinkedCashPaymentsController (mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
@@ -73,7 +73,7 @@ class LinkedCashPaymentsControllerSpec extends AmlsSpec {
 
     "successfully redirect to nex page when submitted with valida data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody("linkedCashPayments" -> "true")
+      val newRequest = requestWithUrlEncodedBody("linkedCashPayments" -> "true")
 
       when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
         .thenReturn(Future.successful(None))
@@ -88,7 +88,7 @@ class LinkedCashPaymentsControllerSpec extends AmlsSpec {
 
     "successfully redirect to nex page when submitted with valida data in edit mode" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody("linkedCashPayments" -> "false")
+      val newRequest = requestWithUrlEncodedBody("linkedCashPayments" -> "false")
 
       when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
         .thenReturn(Future.successful(None))
@@ -102,7 +102,7 @@ class LinkedCashPaymentsControllerSpec extends AmlsSpec {
     }
 
     "fail with validation error when mandatory field is missing" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
 
       )
       when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))

@@ -37,7 +37,7 @@ import scala.concurrent.Future
 
 class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
 
     val controller = new DetailedAnswersController (

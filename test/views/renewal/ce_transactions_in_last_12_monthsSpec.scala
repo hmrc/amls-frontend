@@ -21,13 +21,13 @@ import jto.validation.{Path, ValidationError}
 import models.renewal.CETransactionsInLast12Months
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class ce_transactions_in_last_12_monthsSpec extends AmlsSpec with MustMatchers  {
+class ce_transactions_in_last_12_monthsSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "ceTransactions view" must {

@@ -32,7 +32,7 @@ import scala.concurrent.Future
 
 class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
@@ -93,7 +93,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
 
     "Post:" must {
       "redirect to next page successfully for valid input" in new Fixture {
-        val postRequest = request.withFormUrlEncodedBody(
+        val postRequest = requestWithUrlEncodedBody(
           "dateOfChange.day" -> "20",
           "dateOfChange.month" -> "5",
           "dateOfChange.year" -> "2014"
@@ -109,7 +109,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
       }
 
       "fail validation on invalid input" in new Fixture {
-        val postRequest = request.withFormUrlEncodedBody(
+        val postRequest = requestWithUrlEncodedBody(
           "dateOfChange.month" -> "10",
           "dateOfChange.day" -> "01"
         )
@@ -126,7 +126,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
       }
 
       "fail validation when input data is before activity start date" in new Fixture {
-        val postRequest = request.withFormUrlEncodedBody(
+        val postRequest = requestWithUrlEncodedBody(
           "dateOfChange.year" -> "2010",
           "dateOfChange.month" -> "10",
           "dateOfChange.day" -> "01"
@@ -144,7 +144,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
       }
 
       "redirect to NotFound when index is out of range" in new Fixture {
-        val postRequest = request.withFormUrlEncodedBody(
+        val postRequest = requestWithUrlEncodedBody(
           "dateOfChange.year" -> "2010",
           "dateOfChange.month" -> "10",
           "dateOfChange.day" -> "01"

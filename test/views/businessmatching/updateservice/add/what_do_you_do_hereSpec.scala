@@ -36,15 +36,15 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.businessmatching.{BusinessMatchingMsbServices, TransmittingMoney}
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.add._
 
 
-class what_do_you_do_hereSpec extends AmlsSpec {
+class what_do_you_do_hereSpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     def view = what_do_you_do_here(EmptyForm, edit = false)
   }

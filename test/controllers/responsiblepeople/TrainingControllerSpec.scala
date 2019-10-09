@@ -40,7 +40,7 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
 
   val recordId = 1
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
 
     lazy val mockAppConfig = mock[AppConfig]
@@ -119,7 +119,7 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
     "post is called" when {
       "index is out of bounds, must respond with NOT_FOUND" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "training" -> "true",
           "information" -> "test"
         )
@@ -137,7 +137,7 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
       "given valid data" when {
         "edit is false" must {
           "redirect to FitAndProperNoticeController" in new Fixture {
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "training" -> "true",
               "information" -> "I do not remember when I did the training"
             )
@@ -161,7 +161,7 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
         "edit is true" must {
           "redirect to DetailedAnswersController" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "training" -> "true",
               "information" -> "I do not remember when I did the training"
             )
@@ -177,7 +177,7 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
       }
 
       "given invalid data, must respond with BAD_REQUEST" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "training" -> "not a boolean value"
         )
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())

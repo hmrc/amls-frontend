@@ -25,12 +25,12 @@ import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import play.api.mvc.Request
 import play.api.test.FakeRequest
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 
-class how_will_you_sell_goodsSpec extends AmlsSpec with MustMatchers with MockitoSugar {
+class how_will_you_sell_goodsSpec extends AmlsViewSpec with MustMatchers with MockitoSugar {
 
   trait HowWillYouSellGoodsViewFixture {
-    implicit val request : Request[_] = addToken(FakeRequest())
+    implicit val request : Request[_] = addTokenForView()
     val view = views.html.hvd.how_will_you_sell_goods(forms.Form2[HowWillYouSellGoods](HowWillYouSellGoods(Set(Retail))), false)
     lazy val html = view.body
     lazy val doc = Jsoup.parse(html)

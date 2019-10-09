@@ -23,19 +23,19 @@ import org.jsoup.nodes.Element
 import org.scalatest.MustMatchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 import forms.EmptyForm
 
 import scala.collection.JavaConversions._
 
 
-class summarySpec extends AmlsSpec
+class summarySpec extends AmlsViewSpec
   with MustMatchers
   with TableDrivenPropertyChecks {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     val defaultActivitiesUrl = controllers.businessmatching.routes.RegisterServicesController.get().url
   }

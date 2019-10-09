@@ -29,7 +29,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
@@ -81,7 +81,7 @@ class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSug
         "redirect to PercentageOfCashPaymentOver15000Controller" when {
           "edit is false" in new Fixture {
 
-            val result = controller.post()(request.withFormUrlEncodedBody("courier" -> "true"))
+            val result = controller.post()(requestWithUrlEncodedBody("courier" -> "true"))
 
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.PercentageOfCashPaymentOver15000Controller.get().url))
@@ -91,7 +91,7 @@ class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSug
         "redirect to SummaryController" when {
           "edit is true" in new Fixture {
 
-            val result = controller.post(true)(request.withFormUrlEncodedBody("courier" -> "true"))
+            val result = controller.post(true)(requestWithUrlEncodedBody("courier" -> "true"))
 
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.SummaryController.get().url))
@@ -110,7 +110,7 @@ class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSug
         "check that error message -no option selected- exists in the request" in new Fixture {
           val message = Messages("error.required.hvd.choose.option")
 
-          val result = controller.post(true)(request.withFormUrlEncodedBody())
+          val result = controller.post(true)(requestWithUrlEncodedBody("" -> ""))
 
           val content = contentAsString(result)
 

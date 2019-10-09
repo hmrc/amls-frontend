@@ -53,7 +53,7 @@ class AgentPartnershipSpec extends PlaySpec {
   "Json Validation" must {
     "Successfully read/write Json data" in {
       AgentPartnership.format.reads(AgentPartnership.format.writes(
-        AgentPartnership("test"))) must be(JsSuccess(AgentPartnership("test"), JsPath \ "agentPartnership"))
+        AgentPartnership("test"))) must be(JsSuccess(AgentPartnership("test"), JsPath))
     }
   }
 }

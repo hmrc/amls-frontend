@@ -28,7 +28,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class SupervisionEndReasonsControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture  with DependencyMocks{
+  trait Fixture extends DependencyMocks{
     self => val request = addToken(authRequest)
 
     val controller = new SupervisionEndReasonsController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
@@ -89,7 +89,7 @@ class SupervisionEndReasonsControllerSpec extends AmlsSpec with MockitoSugar wit
       val start = Some(SupervisionStart(new LocalDate(1990, 2, 24))) //scalastyle:off magic.number
       val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24))) //scalastyle:off magic.number
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "anotherBody" -> "true",
         "endingReason" -> "Reason")
 
@@ -109,7 +109,7 @@ class SupervisionEndReasonsControllerSpec extends AmlsSpec with MockitoSugar wit
       val start = Some(SupervisionStart(new LocalDate(1990, 2, 24))) //scalastyle:off magic.number
       val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24))) //scalastyle:off magic.number
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "anotherBody" -> "true",
         "endingReason" -> "Reason")
 
@@ -130,7 +130,7 @@ class SupervisionEndReasonsControllerSpec extends AmlsSpec with MockitoSugar wit
       val start = Some(SupervisionStart(new LocalDate(1990, 2, 24))) //scalastyle:off magic.number
       val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24))) //scalastyle:off magic.number
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "anotherBody" -> "true",
         "endingReason" -> "Reason")
 

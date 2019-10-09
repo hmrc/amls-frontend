@@ -38,7 +38,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
   val MSBOnlyModel = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness)))
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
 
     val helper = new RemoveBusinessTypeHelper(

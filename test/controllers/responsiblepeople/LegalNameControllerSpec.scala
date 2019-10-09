@@ -100,7 +100,7 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
         "go to LegalNameChangeDateController" when {
           "edit is false" in new TestFixture {
 
-            val requestWithParams = request.withFormUrlEncodedBody(
+            val requestWithParams = requestWithUrlEncodedBody(
               "hasPreviousName" -> "true",
               "firstName" -> "first",
               "middleName" -> "middle",
@@ -119,7 +119,7 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
         "go to DetailedAnswersController" when {
           "edit is true" in new TestFixture {
 
-            val requestWithParams = request.withFormUrlEncodedBody(
+            val requestWithParams = requestWithUrlEncodedBody(
               "hasPreviousName" -> "true",
               "firstName" -> "first",
               "middleName" -> "middle",
@@ -135,7 +135,7 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
 
           "edit is true and does not have previous names" in new TestFixture {
 
-            val requestWithParams = request.withFormUrlEncodedBody(
+            val requestWithParams = requestWithUrlEncodedBody(
               "hasPreviousName" -> "false"
             )
 
@@ -151,7 +151,7 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
       "form is invalid" must {
         "return BAD_REQUEST" in new TestFixture {
 
-          val NameMissingInRequest = request.withFormUrlEncodedBody(
+          val NameMissingInRequest = requestWithUrlEncodedBody(
             "hasPreviousName" -> "true"
           )
 
@@ -168,7 +168,7 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
       "model cannot be found with given index" must {
         "return NOT_FOUND" in new TestFixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "hasPreviousName" -> "true",
             "firstName" -> "first",
             "lastName" -> "last"

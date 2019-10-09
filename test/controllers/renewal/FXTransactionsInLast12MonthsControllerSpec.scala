@@ -33,7 +33,7 @@ import scala.concurrent.Future
 
 class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSugar  {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
@@ -82,7 +82,7 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
     "Show error message when user has not filled the mandatory fields" in new Fixture  {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "fxTransaction" -> ""
       )
 
@@ -100,7 +100,7 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
     }
 
     trait FlowFixture extends Fixture {
-      val newRequest = request.withFormUrlEncodedBody (
+      val newRequest = requestWithUrlEncodedBody(
         "fxTransaction" -> "12345678963"
       )
 

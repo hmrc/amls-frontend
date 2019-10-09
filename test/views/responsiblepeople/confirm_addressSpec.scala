@@ -22,13 +22,13 @@ import models.Country
 import models.businesscustomer.Address
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class confirm_addressSpec extends AmlsSpec with MustMatchers {
+class confirm_addressSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     val name = "firstName lastName"
     val address = Address("#11", "some building", Some("Some street"), Some("city"), None, Country("United Kingdome","UK"))

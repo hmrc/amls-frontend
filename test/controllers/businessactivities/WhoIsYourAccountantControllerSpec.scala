@@ -37,7 +37,7 @@ class WhoIsYourAccountantControllerSpec extends AmlsSpec
   with ScalaFutures
   with PrivateMethodTester {
 
-  trait Fixture extends AuthorisedFixture with AutoCompleteServiceMocks{
+  trait Fixture extends AutoCompleteServiceMocks{
     self =>
     val request = addToken(authRequest)
 
@@ -110,7 +110,7 @@ class WhoIsYourAccountantControllerSpec extends AmlsSpec
       "given invalid data" must {
         "respond with BAD_REQUEST" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "name" -> ""
           )
 
@@ -122,7 +122,7 @@ class WhoIsYourAccountantControllerSpec extends AmlsSpec
       "edit is true" must {
         "respond with SEE_OTHER and redirect to the SummaryController" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "name" -> "testName",
             "tradingName" -> "tradingName",
             "isUK" -> "true",
@@ -149,7 +149,7 @@ class WhoIsYourAccountantControllerSpec extends AmlsSpec
       "edit is false" must {
         "respond with SEE_OTHER and redirect to the TaxMattersController" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "name" -> "testName",
             "tradingName" -> "tradingName",
             "isUK" -> "true",

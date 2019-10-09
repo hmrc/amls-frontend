@@ -20,14 +20,14 @@ import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.add.add_more_activities
 
-class add_more_activitiesSpec extends AmlsSpec with MustMatchers  {
+class add_more_activitiesSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     def view = add_more_activities(EmptyForm, List.empty[String])
   }

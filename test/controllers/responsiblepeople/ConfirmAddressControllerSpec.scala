@@ -36,7 +36,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val request = addToken(authRequest)
     val dataCache: DataCacheConnector = mock[DataCacheConnector]
@@ -147,7 +147,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         "option is 'Yes' is selected confirming the mentioned address is the address" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "confirmAddress" -> "true"
           )
 
@@ -167,7 +167,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar {
         }
 
         "option is 'No' is selected confirming the mentioned address is the address" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "confirmAddress" -> "false"
           )
 
@@ -190,7 +190,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
       "throw error message on not selecting the option" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
         )
 
         setupCacheMap(

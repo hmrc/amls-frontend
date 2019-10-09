@@ -23,14 +23,14 @@ import org.openqa.selenium.WebElement
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
 
-class your_responsible_peopleSpec extends AmlsSpec with MustMatchers {
+class your_responsible_peopleSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   val completePersonName: Option[PersonName] = Some(PersonName("Katie", None, "Test"))

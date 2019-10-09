@@ -18,13 +18,15 @@ package views
 
 import org.jsoup.nodes.Element
 import org.scalatest.MustMatchers
-import play.api.i18n.Messages
-import scala.collection.JavaConversions._
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
+import org.scalatest.mock.MockitoSugar
+import play.api.i18n.{Messages, MessagesProvider}
 
-trait HtmlAssertions {
+import scala.collection.JavaConversions._
+
+trait HtmlAssertions extends MockitoSugar {
   self:MustMatchers =>
+
+  implicit val provider = mock[MessagesProvider]
 
   def checkListContainsItems(parent:Element, keysToFind:Set[String]) = {
     val texts = parent.select("li").toSet.map((el:Element) => el.text())

@@ -59,7 +59,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
   val businessCustomerUrl = "TestUrl"
 
-  trait Fixture extends AuthorisedFixture { self =>
+  trait Fixture { self =>
 
     val completeResponsiblePerson: ResponsiblePerson = ResponsiblePerson(
       personName = Some(PersonName("ANSTY", Some("EMIDLLE"), "DAVID")),
@@ -413,7 +413,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
           .thenReturn(Future.successful(rejectedStatusGen.sample.get, None))
 
-        val result: Future[Result] = controller.get()(request)
+        val result = controller.get()(request)
 
         status(result) must be(SEE_OTHER)
         redirectLocation(result) mustBe Some(controllers.routes.StatusController.get().url)
@@ -440,7 +440,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
           .thenReturn(Future.successful(activeStatusGen.sample.get, None))
 
-        val result: Future[Result] = controller.get()(request)
+        val result = controller.get()(request)
 
         status(result) must be(SEE_OTHER)
         redirectLocation(result) mustBe Some(controllers.routes.LoginEventController.get().url)
@@ -524,7 +524,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
                   .thenReturn(Some(List()))
 
-                val result = controller.get()(request.withHeaders("test-context" -> "ESCS"))
+                val result = controller.get()(requestWithHeaders("test-context" -> "ESCS"))
 
                 status(result) must be(SEE_OTHER)
                 redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
@@ -555,7 +555,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
                   .thenReturn(Some(Seq(inCompleteResponsiblePeople)))
 
-                val result = controller.get()(request.withHeaders("test-context" -> "ESCS"))
+                val result = controller.get()(requestWithHeaders(("test-context" -> "ESCS")))
 
                 status(result) must be(SEE_OTHER)
                 redirectLocation(result) must be(Some(controllers.routes.LoginEventController.get().url))

@@ -24,15 +24,15 @@ import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class remove_agent_premises_reasonsSpec extends AmlsSpec {
+class remove_agent_premises_reasonsSpec extends AmlsViewSpec {
 
   import models.tradingpremises.RemovalReasonConstants._
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "remove_agent_premises_reasons view" must {

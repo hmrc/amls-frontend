@@ -38,7 +38,7 @@ import scala.concurrent.Future
 class ResponsiblePersonAddControllerSpec extends AmlsSpec
   with MustMatchers with MockitoSugar with ScalaFutures with PropertyChecks {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new ResponsiblePeopleAddController (

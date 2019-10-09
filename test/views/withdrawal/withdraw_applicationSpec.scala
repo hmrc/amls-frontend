@@ -19,13 +19,13 @@ package views.withdrawal
 import org.joda.time.LocalDateTime
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
-import utils.{DateHelper, AmlsSpec}
+import utils.{DateHelper, AmlsViewSpec}
 import views.Fixture
 
-class withdraw_applicationSpec extends AmlsSpec with MockitoSugar {
+class withdraw_applicationSpec extends AmlsViewSpec with MockitoSugar {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     //noinspection ScalaStyle
     val date = new LocalDateTime(2001, 1, 1, 12, 0, 0)

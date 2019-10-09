@@ -33,7 +33,7 @@ import scala.concurrent.Future
 
 class TypeOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new TypeOfBusinessController (
@@ -74,7 +74,7 @@ class TypeOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
     "post with valid data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "typeOfBusiness" -> "text"
       )
 
@@ -91,7 +91,7 @@ class TypeOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
     "post with valid data in edit mode" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "typeOfBusiness" -> "text"
       )
 
@@ -109,7 +109,7 @@ class TypeOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
     "post with invalid data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "typeOfBusiness" -> "11"*40
       )
 
@@ -126,7 +126,7 @@ class TypeOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with Scala
     }
 
     "post with missing mandatory field" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
       )
 
       when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())

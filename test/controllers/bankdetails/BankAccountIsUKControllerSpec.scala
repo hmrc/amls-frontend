@@ -35,7 +35,7 @@ import scala.concurrent.Future
 
 class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
@@ -145,7 +145,7 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with SEE_OTHER" when {
         "given valid data in edit mode" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "isUK" -> "false",
             "nonUKAccountNumber" -> "1234567890123456789012345678901234567890",
             "isIBAN" -> "false"
@@ -163,7 +163,7 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
         }
         "given valid data when NOT in edit mode" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "isUK" -> "false",
             "nonUKAccountNumber" -> "1234567890123456789012345678901234567890",
             "isIBAN" -> "false"
@@ -186,7 +186,7 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with NOT_FOUND" when {
         "given an index out of bounds in edit mode" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "isUK" -> "false",
             "nonUKAccountNumber" -> "1234567890123456789012345678901234567890",
             "isIBAN" -> "false"
@@ -205,7 +205,7 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "isUK" -> "true"
           )
 
@@ -221,7 +221,7 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
 
     "an account is created" must {
       "send an audit event" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "isUK" -> "false",
           "nonUKAccountNumber" -> "1234567890123456789012345678901234567890",
           "isIBAN" -> "false"

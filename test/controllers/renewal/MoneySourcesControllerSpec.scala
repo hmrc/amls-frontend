@@ -36,7 +36,7 @@ import scala.concurrent.Future
 
 class MoneySourcesControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val renewalService = mock[RenewalService]
     val request = addToken(authRequest)
@@ -54,7 +54,7 @@ class MoneySourcesControllerSpec extends AmlsSpec with MockitoSugar {
   }
 
   trait FormSubmissionFixture extends Fixture {
-    val validFormRequest = request.withFormUrlEncodedBody(
+    val validFormRequest = requestWithUrlEncodedBody(
       "currencies[0]" -> "USD",
       "currencies[1]" -> "GBP",
       "currencies[2]" -> "BOB",

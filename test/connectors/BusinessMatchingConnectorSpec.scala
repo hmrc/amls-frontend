@@ -59,7 +59,7 @@ class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
       |}
     """.stripMargin
 
-  trait Fixture extends AuthorisedFixture { self =>
+  trait Fixture { self =>
 
     lazy val hc: AmlsHeaderCarrierForPartialsConverter = app.injector.instanceOf[AmlsHeaderCarrierForPartialsConverter]
 

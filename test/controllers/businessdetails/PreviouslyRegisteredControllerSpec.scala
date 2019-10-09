@@ -36,7 +36,7 @@ import utils.{AmlsSpec, AuthorisedFixture}
 import scala.concurrent.Future
 
 class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new PreviouslyRegisteredController (
@@ -70,7 +70,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
 
     "on post with valid data and businesstype is corporate" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "previouslyRegistered" -> "true",
         "prevMLRRegNo" -> "12345678"
       )
@@ -94,7 +94,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
 
     "on post with valid data and load confirm address page when businessType is SoleProprietor" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "previouslyRegistered" -> "true",
         "prevMLRRegNo" -> "12345678"
       )
@@ -118,7 +118,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
 
     "on post with valid data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "previouslyRegistered" -> "true",
         "prevMLRRegNo" -> "12345678"
       )
@@ -142,7 +142,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
 
     "on post with valid data in edit mode and load summary page" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "previouslyRegistered" -> "true",
         "prevMLRRegNo" -> "12345678"
       )
@@ -166,7 +166,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
 
     "on post with invalid data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "prevMLRRegNo" -> "12345678"
       )
 

@@ -27,19 +27,19 @@ import org.scalatest.MustMatchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
 import uk.gov.hmrc.domain.Nino
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.{Fixture, HtmlAssertions}
 
 import scala.collection.JavaConversions._
 
-class detailed_answersSpec extends AmlsSpec
+class detailed_answersSpec extends AmlsViewSpec
   with TableDrivenPropertyChecks
   with HtmlAssertions
   with MustMatchers
   with ResponsiblePeopleValues {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     val businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness))))
 

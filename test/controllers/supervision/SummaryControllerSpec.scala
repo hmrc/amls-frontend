@@ -31,7 +31,7 @@ import scala.concurrent.Future
 
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture  with DependencyMocks with SupervisionValues {
+  trait Fixture extends DependencyMocks with SupervisionValues {
     self => val request = addToken(authRequest)
 
     val controller = new SummaryController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)

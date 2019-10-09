@@ -41,7 +41,7 @@ import scala.concurrent.Future
 
 class RegisteredOfficeUKControllerSpec extends AmlsSpec with  MockitoSugar{
 
-  trait Fixture extends AuthorisedFixture with AutoCompleteServiceMocks {
+  trait Fixture extends AutoCompleteServiceMocks {
     self => val request = addToken(authRequest)
 
     val controller = new RegisteredOfficeUKController(
@@ -108,7 +108,7 @@ class RegisteredOfficeUKControllerSpec extends AmlsSpec with  MockitoSugar{
       when (controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "isUK"-> "true",
         "addressLine1"->"line1",
         "addressLine2"->"line2",
@@ -141,7 +141,7 @@ class RegisteredOfficeUKControllerSpec extends AmlsSpec with  MockitoSugar{
       when (controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "isUK"-> "true",
         "addressLine1"->"line1",
         "addressLine2"->"line2",
@@ -178,7 +178,7 @@ class RegisteredOfficeUKControllerSpec extends AmlsSpec with  MockitoSugar{
       when (controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "isUK"-> "true",
         "addressLine1"->"line1 &",
         "addressLine2"->"line2 *",
@@ -203,7 +203,7 @@ class RegisteredOfficeUKControllerSpec extends AmlsSpec with  MockitoSugar{
         when(controller.dataCacheConnector.fetch(any(), any())(any(), any())).thenReturn(Future.successful(None))
         when(controller.dataCacheConnector.save(any(), any(), any())(any(), any())).thenReturn(Future.successful(emptyCache))
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "isUK" -> "true",
           "addressLine2" -> "line2",
           "addressLine3" -> "",
@@ -227,7 +227,7 @@ class RegisteredOfficeUKControllerSpec extends AmlsSpec with  MockitoSugar{
         when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "isUK" -> "true",
           "addressLine1" -> "line1",
           "addressLine2" -> "line2",
@@ -250,7 +250,7 @@ class RegisteredOfficeUKControllerSpec extends AmlsSpec with  MockitoSugar{
         when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
           .thenReturn(Future.successful(ReadyForRenewal(None)))
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "isUK" -> "true",
           "addressLine1" -> "line1",
           "addressLine2" -> "line2",

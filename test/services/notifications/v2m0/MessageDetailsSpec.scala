@@ -37,7 +37,7 @@ class MessageDetailsSpec extends AmlsSpec with MockitoSugar {
 
   implicit val hc = HeaderCarrier()
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
 
     val accountTypeId = ("org", "id")
 

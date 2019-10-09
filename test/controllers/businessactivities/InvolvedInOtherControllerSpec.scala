@@ -38,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with PrivateMethodTester{
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
     implicit val ec = app.injector.instanceOf[ExecutionContext]
 
@@ -144,7 +144,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
         "edit is false" when {
           "involvedInOther is true and there is no existing BusinessActivities data" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "involvedInOther" -> "true",
               "details" -> "test"
             )
@@ -161,7 +161,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
           }
           "involvedInOther is true and there is existing BusinessActivities data" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "involvedInOther" -> "true",
               "details" -> "test"
             )
@@ -179,7 +179,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
           "involvedInOther is false and there is no existing BusinessActivities data" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "involvedInOther" -> "false"
             )
 
@@ -196,7 +196,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
           "involvedInOther is false and there is existing BusinessActivities data" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "involvedInOther" -> "false"
             )
 
@@ -214,7 +214,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
         "edit is true" when {
           "involvedInOther is true" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "involvedInOther" -> "true",
               "details" -> "test"
             )
@@ -232,7 +232,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
           "involvedInOther is false" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "involvedInOther" -> "false"
             )
 
@@ -255,7 +255,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
             .thenReturn(Future.successful(None))
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "involvedInOther" -> "test"
           )
 
@@ -274,7 +274,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(businessMatching)))
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "involvedInOther" -> "true",
             "details" -> ""
           )

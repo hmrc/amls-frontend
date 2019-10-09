@@ -27,7 +27,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
 
 class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
@@ -130,7 +130,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with OK and redirect to the bank account details page" when {
 
         "not editing and there is valid account type" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "bankAccountType" -> "01"
           )
 
@@ -145,7 +145,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
 
           "not editing and there is no bank account" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "bankAccountType" -> "04"
             )
 
@@ -159,7 +159,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
         }
 
         "editing and there is valid account type but no account details" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "bankAccountType" -> "01"
           )
 
@@ -173,7 +173,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
         }
 
         "editing and there is both a valid account type and valid account details" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "bankAccountType" -> "01"
           )
 
@@ -194,7 +194,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
 
       "respond with BAD_REQUEST" when {
         "there is invalid data" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "bankAccountType" -> "10"
           )
 
@@ -211,7 +211,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
 
       "respond with NOT_FOUND" when {
         "the given index is out of bounds" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "bankAccountType" -> "04"
           )
 

@@ -88,7 +88,7 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
         "redirect to PenalisedByProfessionalController" when {
           "not in edit mode" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "businessType[0]" -> "01",
               "businessType[1]" -> "02"
             )
@@ -102,7 +102,7 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
         "redirect to SummaryController" when {
           "in edit mode" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "businessType[0]" -> "01",
               "businessType[1]" -> "02"
             )
@@ -117,7 +117,7 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
       "invalid data" must {
         "respond with BAD_REQUEST" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody()
+          val newRequest = requestWithUrlEncodedBody("" -> "")
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -129,7 +129,7 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
   it must {
     "save the valid data to the supervision model" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "businessType[0]" -> "01",
         "businessType[1]" -> "02"
       )

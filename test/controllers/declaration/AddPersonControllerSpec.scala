@@ -43,7 +43,7 @@ import scala.concurrent.Future
 
 class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
@@ -87,7 +87,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
       "display the persons page" when {
         "status is pre-submission" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName",
             "roleWithinBusiness[]" -> "ExternalAccountant"
@@ -101,7 +101,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
 
         "status is pending" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName",
             "roleWithinBusiness[]" -> "ExternalAccountant"
@@ -116,7 +116,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
 
         "status is ready for renewal" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName",
             "roleWithinBusiness[]" -> "ExternalAccountant"
@@ -160,7 +160,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
       "redirect to a new place" when {
         "the role type selected is Director" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName",
             "positions" -> "02"
@@ -175,7 +175,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
       "redirect to DeclarationController when all the mandatory parameters supplied" when {
         "status is pending" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName",
             "positions" -> "08"
@@ -190,7 +190,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
 
         "status is pre-submission" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName",
             "positions" -> "08"
@@ -205,7 +205,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with BAD_REQUEST" when {
         "first name not supplied" in new Fixture {
 
-          val firstNameMissingInRequest = request.withFormUrlEncodedBody(
+          val firstNameMissingInRequest = requestWithUrlEncodedBody(
             "lastName" -> "lastName",
             "positions" -> "08"
           )
@@ -219,7 +219,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
 
         "last name not supplied" in new Fixture {
 
-          val lastNameNissingInRequest = request.withFormUrlEncodedBody(
+          val lastNameNissingInRequest = requestWithUrlEncodedBody(
             "firstName" -> "firstName",
             "positions" -> "08"
           )
@@ -237,7 +237,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
           when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
             (any(), any())).thenReturn(Future.successful(Some(bm)))
 
-          val roleMissingInRequest = request.withFormUrlEncodedBody(
+          val roleMissingInRequest = requestWithUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName"
           )
@@ -255,7 +255,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
           when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
             (any(), any())).thenReturn(Future.successful(Some(bm)))
 
-          val roleMissingInRequest = request.withFormUrlEncodedBody(
+          val roleMissingInRequest = requestWithUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName"
           )
@@ -273,7 +273,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
           when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
             (any(), any())).thenReturn(Future.successful(Some(bm)))
 
-          val roleMissingInRequest = request.withFormUrlEncodedBody(
+          val roleMissingInRequest = requestWithUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName"
           )
@@ -291,7 +291,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
           when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
             (any(), any())).thenReturn(Future.successful(Some(bm)))
 
-          val roleMissingInRequest = request.withFormUrlEncodedBody(
+          val roleMissingInRequest = requestWithUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName"
           )
@@ -309,7 +309,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
           when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
             (any(), any())).thenReturn(Future.successful(Some(bm)))
 
-          val roleMissingInRequest = request.withFormUrlEncodedBody(
+          val roleMissingInRequest = requestWithUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName"
           )
@@ -338,13 +338,14 @@ class AddPersonControllerWithoutAmendmentSpec extends AmlsSpec with MockitoSugar
   val userId = s"user-${UUID.randomUUID()}"
   val mockDataCacheConnector = mock[DataCacheConnector]
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
 
     val addPersonController = new AddPersonController (
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
-      statusService = mockStatusService
+      statusService = mockStatusService,
+      cc = mockMcc
     )
   }
 

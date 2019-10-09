@@ -102,7 +102,7 @@ class RoleInBusinessControllerSpec extends AmlsSpec{
           when(cache.save(any(), any(), any())(any(),any()))
             .thenReturn(Future.successful(mock[CacheMap]))
 
-          val result = controller.post()(request.withFormUrlEncodedBody("positions[]" -> "06"))
+          val result = controller.post()(requestWithUrlEncodedBody("positions[]" -> "06"))
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(routes.NewOfficerController.get().url)
@@ -116,7 +116,7 @@ class RoleInBusinessControllerSpec extends AmlsSpec{
           when(cache.save(any(), any(), any())(any(),any()))
             .thenReturn(Future.successful(mock[CacheMap]))
 
-          val result = controller.post()(request.withFormUrlEncodedBody("positions[]" -> ""))
+          val result = controller.post()(requestWithUrlEncodedBody("positions[]" -> ""))
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(routes.RemoveResponsiblePersonController.get().url)

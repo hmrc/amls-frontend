@@ -35,7 +35,7 @@ import scala.concurrent.Future
 
 class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val dataCacheConnector = mock[DataCacheConnector]
@@ -55,7 +55,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
 
     "submit with valid data" in new Fixture with DateOfChangeHelper {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "dateOfChange.day" -> "24",
         "dateOfChange.month" -> "2",
         "dateOfChange.year" -> "1990"
@@ -85,7 +85,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
 
       "dateOfChange is earlier than that in S4L" in new Fixture with DateOfChangeHelper {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "dateOfChange.day" -> "24",
           "dateOfChange.month" -> "1",
           "dateOfChange.year" -> "1990"
@@ -116,7 +116,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
 
       "dateOfChange is later than that in S4L" in new Fixture with DateOfChangeHelper {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "dateOfChange.day" -> "24",
           "dateOfChange.month" -> "1",
           "dateOfChange.year" -> "2001"
@@ -152,7 +152,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
 
       "invalid date is supplied" in new Fixture with DateOfChangeHelper {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "dateOfChange.day" -> "24",
           "dateOfChange.month" -> "2",
           "dateOfChange.year" -> "199000"
@@ -178,7 +178,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
 
       "input date is before activity start date" in new Fixture with DateOfChangeHelper {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "dateOfChange.day" -> "24",
           "dateOfChange.month" -> "2",
           "dateOfChange.year" -> "1980"

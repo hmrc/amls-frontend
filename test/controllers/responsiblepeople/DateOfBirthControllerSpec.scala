@@ -36,7 +36,7 @@ import scala.concurrent.Future
 
 class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
@@ -114,7 +114,7 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar {
       "edit is false" must {
         "go to PersonResidencyTypeController" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "dateOfBirth.day" -> "1",
             "dateOfBirth.month" -> "12",
             "dateOfBirth.year" -> "1990"
@@ -138,7 +138,7 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar {
       "edit is true" must {
         "go to DetailedAnswersController" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "dateOfBirth.day" -> "1",
             "dateOfBirth.month" -> "12",
             "dateOfBirth.year" -> "1990"
@@ -162,7 +162,7 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar {
       "given invalid data" must {
         "respond with BAD_REQUEST" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "nonUKPassport" -> "true"
           )
 
@@ -189,7 +189,7 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar {
       "Responsible Person cannot be found with given index" must {
         "respond with NOT_FOUND" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "dateOfBirth.day" -> "1",
             "dateOfBirth.month" -> "12",
             "dateOfBirth.year" -> "1990"

@@ -34,7 +34,7 @@ import scala.concurrent.Future
 
 class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val request = addToken(authRequest)
 
@@ -85,7 +85,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
 
       "respond with BAD_REQUEST when given invalid data" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
         )
 
         val result = controller.post()(newRequest)
@@ -96,7 +96,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
       "when edit is false" must {
         "redirect to the CashPaymentController" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "percentage" -> "01"
           )
 
@@ -115,7 +115,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
       "when edit is true" must {
         "redirect to the SummaryController" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "percentage" -> "01"
           )
 

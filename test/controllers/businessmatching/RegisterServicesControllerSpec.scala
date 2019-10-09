@@ -61,7 +61,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
     TelephonePaymentService
   )
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
@@ -154,7 +154,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
             val businessActivitiesWithData = BMBusinessActivities(businessActivities = activityData1)
             val businessMatchingWithData = BusinessMatching(None, Some(businessActivitiesWithData))
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "businessActivities" -> "01",
               "businessActivities" -> "03",
               "businessActivities" -> "04")
@@ -172,7 +172,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
             val businessActivitiesWithData = BMBusinessActivities(businessActivities = activityData2)
             val businessMatchingWithData = BusinessMatching(None, Some(businessActivitiesWithData))
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "businessActivities" -> "01",
               "businessActivities" -> "03",
               "businessActivities" -> "04")
@@ -192,7 +192,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
             val businessActivities = BMBusinessActivities(businessActivities = Set(HighValueDealing, MoneyServiceBusiness))
             val bm = BusinessMatching(None, Some(businessActivities))
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "businessActivities[0]" -> "05",
               "businessActivities[1]" -> "06")
 
@@ -212,7 +212,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val businessActivitiesWithData = BMBusinessActivities(businessActivities = activityData1)
           val businessMatchingWithData = BusinessMatching(None, Some(businessActivitiesWithData))
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "businessActivities" -> "11")
 
           when(controller.businessMatchingService.getModel(any())(any(), any()))
@@ -234,7 +234,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(HighValueDealing))), preAppComplete = true)
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "businessActivities" -> "01",
             "businessActivities" -> "05")
 
@@ -260,7 +260,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(HighValueDealing))), preAppComplete = false)
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "businessActivities" -> "01",
             "businessActivities" -> "05")
 
@@ -341,7 +341,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
       "Do nothing to non-existing supervision section data" when {
         "ASP, TCSP not selected" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "03")
+          val newRequest = requestWithUrlEncodedBody("businessActivities" -> "03")
 
           when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
@@ -353,7 +353,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         "ASP added, TCSP not selected" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "01")
+          val newRequest = requestWithUrlEncodedBody("businessActivities" -> "01")
 
           when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
@@ -365,7 +365,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         "TCSP added, ASP not selected" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "07")
+          val newRequest = requestWithUrlEncodedBody("businessActivities" -> "07")
 
           when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
@@ -377,7 +377,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         "ASP, TCSP added" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "businessActivities" -> "01",
             "businessActivities" -> "07"
           )
@@ -394,7 +394,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
       "Remove supervision section data" when {
         "ASP deselected, TCSP not selected" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, AccountancyServices))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "businessActivities" -> "03"
           )
 
@@ -408,7 +408,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         "TCSP deselected, ASP not selected" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, TrustAndCompanyServices))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "businessActivities" -> "03"
           )
 
@@ -423,7 +423,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         "ASP, TCSP deselected" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, AccountancyServices, TrustAndCompanyServices))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "businessActivities" -> "03"
           )
 
@@ -440,7 +440,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
       "Must not remove supervision section data" when {
         "ASP selected, TCSP not selected" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, AccountancyServices))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "businessActivities" -> "01",
             "businessActivities" -> "03"
           )
@@ -456,7 +456,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         "ASP selected, TCSP deselected" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, AccountancyServices, TrustAndCompanyServices))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "businessActivities" -> "01",
             "businessActivities" -> "03"
           )
@@ -472,7 +472,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         "TCSP selected, ASP not selected" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, TrustAndCompanyServices))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "businessActivities" -> "07",
             "businessActivities" -> "03"
           )
@@ -488,7 +488,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         "TCSP selected, ASP deselected" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, AccountancyServices, TrustAndCompanyServices))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "businessActivities" -> "07",
             "businessActivities" -> "03"
           )
@@ -503,7 +503,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         "ASP, TCSP selected" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, AccountancyServices, TrustAndCompanyServices))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "businessActivities" -> "01",
             "businessActivities" -> "07",
             "businessActivities" -> "03"
@@ -520,7 +520,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         "ASP deselected, TCSP added" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, AccountancyServices))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "businessActivities" -> "07",
             "businessActivities" -> "03"
           )
@@ -535,7 +535,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         "TCSP deselected, ASP added" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, TrustAndCompanyServices))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "businessActivities" -> "01",
             "businessActivities" -> "03"
           )
@@ -554,7 +554,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
       "Do nothing to non-existing section data" when {
         "ASP is not selected, and was not previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set())), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "03")
+          val newRequest = requestWithUrlEncodedBody("businessActivities" -> "03")
 
           when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
@@ -566,7 +566,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         "EAB is not selected, and was not previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set())), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "03")
+          val newRequest = requestWithUrlEncodedBody("businessActivities" -> "03")
 
           when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
@@ -578,7 +578,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         "HVD is not selected, and was not previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set())), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "03")
+          val newRequest = requestWithUrlEncodedBody("businessActivities" -> "03")
 
           when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
@@ -590,7 +590,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         "MSB is not selected, and was not previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set())), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "03")
+          val newRequest = requestWithUrlEncodedBody("businessActivities" -> "03")
 
           when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
@@ -602,7 +602,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         "TCSP is not selected, and was not previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set())), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "03")
+          val newRequest = requestWithUrlEncodedBody("businessActivities" -> "03")
 
           when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
@@ -616,7 +616,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
       "Remove existing section data " when {
         "ASP is not selected, but was previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(AccountancyServices))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "03")
+          val newRequest = requestWithUrlEncodedBody("businessActivities" -> "03")
 
           when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
@@ -628,7 +628,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         "EAB is not selected, but was previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(EstateAgentBusinessService))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "02")
+          val newRequest = requestWithUrlEncodedBody("businessActivities" -> "02")
 
           when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
@@ -640,7 +640,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         "HVD is not selected, but was previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(HighValueDealing))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "03")
+          val newRequest = requestWithUrlEncodedBody("businessActivities" -> "03")
 
           when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
@@ -652,7 +652,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         "MSB is not selected, but was previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(MoneyServiceBusiness))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "03")
+          val newRequest = requestWithUrlEncodedBody("businessActivities" -> "03")
 
           when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
@@ -664,7 +664,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         "TCSP is not selected, but was previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(TrustAndCompanyServices))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "03")
+          val newRequest = requestWithUrlEncodedBody("businessActivities" -> "03")
 
           when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
@@ -678,7 +678,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
       "Must not remove existing section data " when {
         "ASP is selected and was previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(AccountancyServices))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "01")
+          val newRequest = requestWithUrlEncodedBody("businessActivities" -> "01")
 
           when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
@@ -690,7 +690,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         "EAB is selected and was previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(EstateAgentBusinessService))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "04")
+          val newRequest = requestWithUrlEncodedBody("businessActivities" -> "04")
 
           when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
@@ -702,7 +702,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         "HVD is selected and was previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(HighValueDealing))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "05")
+          val newRequest = requestWithUrlEncodedBody("businessActivities" -> "05")
 
           when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
@@ -714,7 +714,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         "MSB is selected and was previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(MoneyServiceBusiness))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "06")
+          val newRequest = requestWithUrlEncodedBody("businessActivities" -> "06")
 
           when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
@@ -726,7 +726,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         "TCSP is selected and was previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(TrustAndCompanyServices))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "07")
+          val newRequest = requestWithUrlEncodedBody("businessActivities" -> "07")
 
           when(controller.businessMatchingService.getModel(any())(any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
@@ -776,7 +776,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           controller.statusService.isPreSubmission(Some(any()), any(), any())(any(),any())
         } thenReturn Future.successful(false)
 
-        val result = controller.post()(request.withFormUrlEncodedBody(
+        val result = controller.post()(requestWithUrlEncodedBody(
           "businessActivities[0]" -> BMBusinessActivities.getValue(HighValueDealing),
           "businessActivities[1]" -> BMBusinessActivities.getValue(TelephonePaymentService)
         ))
@@ -800,7 +800,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           controller.statusService.isPreSubmission(Some(any()), any(), any())(any(),any())
         } thenReturn Future.successful(true)
 
-        val result = controller.post()(request.withFormUrlEncodedBody(
+        val result = controller.post()(requestWithUrlEncodedBody(
           "businessActivities[0]" -> BMBusinessActivities.getValue(HighValueDealing),
           "businessActivities[1]" -> BMBusinessActivities.getValue(TelephonePaymentService)
         ))
@@ -824,7 +824,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(responsiblePerson, responsiblePerson)), Some(ResponsiblePerson.key))
 
-        val result = controller.post()(request.withFormUrlEncodedBody(
+        val result = controller.post()(requestWithUrlEncodedBody(
           "businessActivities[0]" -> BMBusinessActivities.getValue(TrustAndCompanyServices)
         ))
 
@@ -845,7 +845,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           controller.businessMatchingService.getModel(any())(any(),any())
         } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(None, Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness)))))
 
-        val result = controller.post()(request.withFormUrlEncodedBody(
+        val result = controller.post()(requestWithUrlEncodedBody(
           "businessActivities[0]" -> BMBusinessActivities.getValue(TrustAndCompanyServices)
         ))
 

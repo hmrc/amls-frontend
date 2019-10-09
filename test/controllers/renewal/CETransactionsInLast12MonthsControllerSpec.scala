@@ -32,7 +32,7 @@ import scala.concurrent.Future
 
 class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSugar  {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
@@ -73,7 +73,7 @@ class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
     "Show error message when user has not filled the mandatory fields" in new Fixture  {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "ceTransaction" -> ""
       )
 
@@ -90,7 +90,7 @@ class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
     }
 
     "Successfully save data in mongoCache and navigate to Next page" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody (
+      val newRequest = requestWithUrlEncodedBody(
         "ceTransaction" -> "12345678963"
       )
 
@@ -116,7 +116,7 @@ class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
         ), hasChanged = true
       )
 
-      val newRequest = request.withFormUrlEncodedBody (
+      val newRequest = requestWithUrlEncodedBody(
         "ceTransaction" -> "12345678963"
       )
 

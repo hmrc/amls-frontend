@@ -44,7 +44,7 @@ import scala.concurrent.Future
 class RemoveResponsiblePersonControllerSpec extends AmlsSpec
   with MustMatchers with MockitoSugar with ScalaFutures with PropertyChecks with NinoUtil with ResponsiblePersonGenerator {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new RemoveResponsiblePersonController (
@@ -357,7 +357,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
         "removing a responsible person from an application with status SubmissionDecisionApproved" in new Fixture {
 
           val emptyCache = CacheMap("", Map.empty)
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "endDate.day" -> "1",
             "endDate.month" -> "1",
             "endDate.year" -> "2006"
@@ -385,7 +385,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
         "removing a new incomplete responsible person from an application with status SubmissionDecisionApproved" in new Fixture {
 
           val emptyCache = CacheMap("", Map.empty)
-          val newRequest = request.withFormUrlEncodedBody()
+          val newRequest = requestWithUrlEncodedBody("" -> "")
 
           val people = Seq(
             responsiblePersonGen.sample.get.copy(lineId = None, positions = Some(positionsGen.sample.get.copy(startDate = None)))
@@ -414,7 +414,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
         "removing a responsible person from an application with no date" in new Fixture {
           val emptyCache = CacheMap("", Map.empty)
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "endDate.day" -> "",
             "endDate.month" -> "",
             "endDate.year" -> ""
@@ -438,7 +438,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
         "removing a responsible person from an application with no date" in new Fixture {
           val emptyCache = CacheMap("", Map.empty)
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "endDate.day" -> "",
             "endDate.month" -> "",
             "endDate.year" -> ""
@@ -460,7 +460,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
         "removing a responsible person from an application given a year which is too short" in new Fixture {
           val emptyCache = CacheMap("", Map.empty)
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "endDate.day" -> "24",
             "endDate.month" -> "2",
             "endDate.year" -> "16"
@@ -482,7 +482,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
         "removing a responsible person from an application given a year which is too long" in new Fixture {
           val emptyCache = CacheMap("", Map.empty)
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "endDate.day" -> "24",
             "endDate.month" -> "2",
             "endDate.year" -> "10166"
@@ -504,7 +504,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
         "removing a trading premises from an application with future date" in new Fixture {
           val emptyCache = CacheMap("", Map.empty)
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "endDate.day" -> "15",
             "endDate.month" -> "1",
             "endDate.year" -> "2020"
@@ -530,7 +530,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           val position = Positions(Set(InternalAccountant), Some(PositionStartDate(new LocalDate(1999, 5, 1))))
           val peopleList = Seq(CompleteResponsiblePeople1.copy(positions = Some(position)))
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "endDate.day" -> "15",
             "endDate.month" -> "1",
             "endDate.year" -> "1998"

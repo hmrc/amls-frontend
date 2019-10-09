@@ -21,13 +21,13 @@ import models.bankdetails._
 import org.scalatest.MustMatchers
 import org.scalatest.prop.PropertyChecks
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.{Fixture, HtmlAssertions}
 
-class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChecks with HtmlAssertions {
+class your_bank_accountsSpec extends AmlsViewSpec with PropertyChecks with HtmlAssertions {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     val completedModel1 = BankDetails(
       Some(PersonalAccount),

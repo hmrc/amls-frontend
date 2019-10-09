@@ -37,7 +37,7 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar with GeneratorD
 
   implicit val hc = HeaderCarrier()
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
 
     val amlsNotificationConnector = mock[AmlsNotificationConnector]
 

@@ -38,7 +38,7 @@ class NewHomeAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
   val RecordId = 1
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
@@ -93,7 +93,7 @@ class NewHomeAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         "all the mandatory UK parameters are supplied" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "true",
             "addressLine1" -> "Line 1",
             "addressLine2" -> "Line 2",
@@ -124,7 +124,7 @@ class NewHomeAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         "all the mandatory UK parameters are supplied and date of move is more then 6 months" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "true",
             "addressLine1" -> "Line 1",
             "addressLine2" -> "Line 2",
@@ -171,7 +171,7 @@ class NewHomeAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         "all the mandatory UK parameters are supplied and date of move is more then 3 years" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "true",
             "addressLine1" -> "Line 11",
             "addressLine2" -> "Line 21",
@@ -209,7 +209,7 @@ class NewHomeAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         "all the mandatory non-UK parameters are supplied" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "false",
             "addressLineNonUK1" -> "new address line1",
             "addressLineNonUK2" -> "new address line2",
@@ -258,7 +258,7 @@ class NewHomeAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         "given an invalid address" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "true",
             "addressLine1" -> "Line &1",
             "addressLine2" -> "Line *2",
@@ -273,7 +273,7 @@ class NewHomeAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         "isUK field is not supplied" in new Fixture {
 
-          val line1MissingRequest = request.withFormUrlEncodedBody()
+          val line1MissingRequest = requestWithUrlEncodedBody("" -> "")
 
           when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
@@ -286,7 +286,7 @@ class NewHomeAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         "the default fields for UK are not supplied" in new Fixture {
 
-          val requestWithMissingParams = request.withFormUrlEncodedBody(
+          val requestWithMissingParams = requestWithUrlEncodedBody(
             "isUK" -> "true",
             "addressLine1" -> "",
             "addressLine2" -> "",
@@ -301,7 +301,7 @@ class NewHomeAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         "the default fields for overseas are not supplied" in new Fixture {
 
-          val requestWithMissingParams = request.withFormUrlEncodedBody(
+          val requestWithMissingParams = requestWithUrlEncodedBody(
             "isUK" -> "false",
             "addressLineNonUK1" -> "",
             "addressLineNonUK2" -> "",
@@ -317,7 +317,7 @@ class NewHomeAddressControllerSpec extends AmlsSpec with MockitoSugar {
         "respond with NOT_FOUND" when {
           "given an out of bounds index" in new Fixture {
 
-            val requestWithParams = request.withFormUrlEncodedBody(
+            val requestWithParams = requestWithUrlEncodedBody(
               "isUK" -> "true",
               "addressLine1" -> "Line 1",
               "addressLine2" -> "Line 2",

@@ -46,7 +46,7 @@ class PSRNumberControllerSpec extends AmlsSpec
   with ScalaFutures
   with BusinessMatchingGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
@@ -126,7 +126,7 @@ class PSRNumberControllerSpec extends AmlsSpec
           controller.helper.updateSubSectors(any(), any())(any(), any())
         } thenReturn Future.successful((mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty))
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "appliedFor" -> "true",
           "regNumber" -> "123789"
         )
@@ -151,7 +151,7 @@ class PSRNumberControllerSpec extends AmlsSpec
 
         mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel.empty)
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "appliedFor" -> "false"
         )
 
@@ -162,7 +162,7 @@ class PSRNumberControllerSpec extends AmlsSpec
       }
 
       "respond with BAD_REQUEST when given invalid data" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "appliedFor" -> "true",
           "regNumber" -> ""
         )

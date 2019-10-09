@@ -37,7 +37,7 @@ import scala.concurrent.Future
 
 class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
 
     val controller = new ActivityStartDateController (
@@ -80,7 +80,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
       "successfully redirect to ConfirmRegisteredOfficeController if not org or partnership" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "startDate.day" -> "12",
           "startDate.month" -> "5",
           "startDate.year" -> "1999"
@@ -107,7 +107,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
       "successfully redirect to VATRegisteredController org or partnership" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "startDate.day" -> "12",
           "startDate.month" -> "5",
           "startDate.year" -> "1999"
@@ -134,7 +134,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
       }
 
       "show error with invalid" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "startDate.day" -> "",
           "startDate.month" -> "",
           "startDate.year" -> ""
@@ -149,7 +149,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
       }
 
       "show error with year field too short" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "startDate.day" -> "1",
           "startDate.month" -> "3",
           "startDate.year" -> "16"
@@ -163,7 +163,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
       }
 
       "show error with year field too long" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "startDate.day" -> "1",
           "startDate.month" -> "3",
           "startDate.year" -> "19782"

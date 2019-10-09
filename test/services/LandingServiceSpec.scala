@@ -509,8 +509,6 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         agentReferenceNumber = Some("test")
       )
 
-      implicit val r = FakeRequest()
-
       when {
         service.businessMatchingConnector.getReviewDetails(any())
       } thenReturn Future.successful(Some(model))

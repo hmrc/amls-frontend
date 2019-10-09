@@ -37,7 +37,7 @@ import scala.concurrent.Future
 
 class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with AutoCompleteServiceMocks {
+  trait Fixture extends AutoCompleteServiceMocks {
     self =>
     val request = addToken(authRequest)
 
@@ -51,7 +51,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait FormSubmissionFixture extends Fixture {
     def formData(valid: Boolean) = if (valid) "mostTransactionsCountries[0]" -> "GB" else "mostTransactionsCountries[0]" -> ""
-    def formRequest(valid: Boolean) = request.withFormUrlEncodedBody(formData(valid))
+    def formRequest(valid: Boolean) = requestWithUrlEncodedBody(formData(valid))
 
     when(mockRenewalService.getRenewal(any())(any(), any()))
       .thenReturn(Future.successful(None))
@@ -74,7 +74,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       ), hasChanged = true
     )
 
-    val newRequest = request.withFormUrlEncodedBody(
+    val newRequest = requestWithUrlEncodedBody(
       "mostTransactionsCountries[]" -> "GB"
     )
 
@@ -134,7 +134,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
     "return a Bad request with errors on invalid submission" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "mostTransactionsCountries[0]" -> "GBasdadsdas"
       )
 
@@ -231,7 +231,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
     }
 
     "throw exception when Msb services in Business Matching returns none" in new FormSubmissionFixture {
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "mostTransactionsCountries[]" -> "GB"
       )
 

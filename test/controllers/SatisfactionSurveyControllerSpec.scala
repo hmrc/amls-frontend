@@ -33,7 +33,7 @@ import scala.concurrent.Future
 
 class SatisfactionSurveyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new SatisfactionSurveyController (
@@ -63,7 +63,7 @@ class SatisfactionSurveyControllerSpec extends AmlsSpec with MockitoSugar with S
 
     "on post with valid data go to the status page with answers audited" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "satisfaction" -> "01",
         "details" -> ""
       )
@@ -80,7 +80,7 @@ class SatisfactionSurveyControllerSpec extends AmlsSpec with MockitoSugar with S
 
       when(controller.auditConnector.sendEvent(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.failed(new Exception()))
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "satisfaction" -> "01",
         "details" -> ""
       )

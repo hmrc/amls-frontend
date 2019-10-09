@@ -34,7 +34,7 @@ import scala.concurrent.Future
 
 class PenalisedUnderEstateAgentsActControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture  {
+  trait Fixture  {
     self => val request = addToken(authRequest)
 
     val controller = new PenalisedUnderEstateAgentsActController (
@@ -70,7 +70,7 @@ class PenalisedUnderEstateAgentsActControllerSpec extends AmlsSpec with MockitoS
 
     "on post capture the details provided by the user for penalised before" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "penalisedUnderEstateAgentsAct" -> "true",
         "penalisedUnderEstateAgentsActDetails" -> "Do not remember why penalised before"
       )
@@ -89,7 +89,7 @@ class PenalisedUnderEstateAgentsActControllerSpec extends AmlsSpec with MockitoS
 
     "on post with missing data remain on the same page and also retain the data supplied" in new Fixture {
 
-      val requestWithIncompleteData = request.withFormUrlEncodedBody(
+      val requestWithIncompleteData = requestWithUrlEncodedBody(
         "penalisedUnderEstateAgentsActDetails" -> "Do not remember why penalised before"
       )
 

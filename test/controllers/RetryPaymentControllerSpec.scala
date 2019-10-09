@@ -45,10 +45,10 @@ class RetryPaymentControllerSpec extends AmlsSpec
   with PaymentGenerator
   with SubscriptionResponseGenerator {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val baseUrl = "http://localhost"
-    val request = addToken(authRequest).copyFakeRequest(uri = baseUrl)
+    val request = addToken(authRequest.copyFakeRequest(uri = baseUrl))
 
     val controller = new RetryPaymentController(
       SuccessfulAuthAction,
@@ -152,7 +152,7 @@ class RetryPaymentControllerSpec extends AmlsSpec
         controller.paymentsService.paymentsUrlOrDefault(any(), any(), any(), any(), any(), any())(any(), any(), any())
       } thenReturn Future.successful(paymentResponse.nextUrl)
 
-      val result = controller.retryPayment()(request.withFormUrlEncodedBody(postData))
+      val result = controller.retryPayment()(requestWithUrlEncodedBody(postData))
 
       val expectedUrl: Option[String] = Some(paymentResponse.nextUrl.value)
       val actualUrl: Option[String] = redirectLocation(result)
@@ -169,7 +169,7 @@ class RetryPaymentControllerSpec extends AmlsSpec
         controller.amlsConnector.getPaymentByPaymentReference(eqTo(paymentReferenceNumber), any())(any(), any())
       } thenReturn Future.successful(None)
 
-      val result = controller.retryPayment()(request.withFormUrlEncodedBody(postData))
+      val result = controller.retryPayment()(requestWithUrlEncodedBody(postData))
 
       status(result) mustBe INTERNAL_SERVER_ERROR
     }

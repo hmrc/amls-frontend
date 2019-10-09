@@ -36,7 +36,7 @@ import scala.concurrent.Future
 
 class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new RemoveTradingPremisesController (
@@ -289,7 +289,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
         "removing a trading premises from an application with status SubmissionDecisionApproved" in new Fixture {
 
           val emptyCache = CacheMap("", Map.empty)
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "endDate.day" -> "1",
             "endDate.month" -> "1",
             "endDate.year" -> "2001"
@@ -340,7 +340,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
         "removing a trading premises from an application with no date" in new Fixture {
           val emptyCache = CacheMap("", Map.empty)
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "endDate.day" -> "",
             "endDate.month" -> "",
             "endDate.year" -> ""
@@ -360,7 +360,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
         "removing a trading premises from an application a year too great in length" in new Fixture {
           val emptyCache = CacheMap("", Map.empty)
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "endDate.day" -> "1",
             "endDate.month" -> "12",
             "endDate.year" -> "123456789"
@@ -381,7 +381,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
         "removing a trading premises from an application with future date" in new Fixture {
           val emptyCache = CacheMap("", Map.empty)
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "endDate.day" -> "15",
             "endDate.month" -> "1",
             "endDate.year" -> "2020"
@@ -405,7 +405,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
 
           val tradingPremisesEndDateList = Seq(completeTradingPremises1)
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "endDate.day" -> "15",
             "endDate.month" -> "1",
             "endDate.year" -> "1989"

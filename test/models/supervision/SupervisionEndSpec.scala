@@ -99,7 +99,7 @@ class SupervisionEndSpec extends PlaySpec with MockitoSugar {
 
       val expected = SupervisionEnd(end)
 
-      Json.fromJson[SupervisionEnd](input) must be (JsSuccess(expected, JsPath \ "supervisionEndDate"))
+      Json.fromJson[SupervisionEnd](input) must be (JsSuccess(expected, JsPath))
     }
 
     "fail when data is missing" in {

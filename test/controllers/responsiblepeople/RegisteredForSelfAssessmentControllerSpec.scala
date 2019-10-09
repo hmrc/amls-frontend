@@ -37,7 +37,7 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
 
   val recordId = 1
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new RegisteredForSelfAssessmentController (
@@ -91,7 +91,7 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
     "post is called" must {
 
       "respond with BAD_REQUEST when given invalid data" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "saRegistered" -> "test"
         )
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
@@ -103,7 +103,7 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
       }
 
       "respond with NOT_FOUND when the index is out of bounds" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "saRegistered" -> "true",
           "utrNumber" -> "0123456789"
         )
@@ -117,7 +117,7 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
 
       "when edit is false" must {
         "redirect to the ExperienceTrainingController" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "saRegistered" -> "true",
             "utrNumber" -> "0123456789"
           )
@@ -134,7 +134,7 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
       }
       "when edit is true" must {
         "on post with valid data in edit mode" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "saRegistered" -> "true",
             "utrNumber" -> "0123456789"
           )

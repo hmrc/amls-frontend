@@ -32,7 +32,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new WhatYouNeedController (

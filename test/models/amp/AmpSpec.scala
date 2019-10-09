@@ -17,8 +17,6 @@
 package models.amp
 import java.time.{LocalDate, LocalDateTime, ZoneOffset}
 
-import config.ApplicationConfig
-import models.amp.Amp.baseUrl
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -131,8 +129,8 @@ class AmpSpec extends AmlsSpec with AmpValues {
 
     "have a section function that" must {
       implicit val cache         = mock[CacheMap]
-      lazy val ampWhatYouNeedUrl = s"${baseUrl("amls-art-market-participant-frontend")}/amls-art-market-participant-frontend/what-you-need"
-      lazy val ampSummeryUrl     = s"${baseUrl("amls-art-market-participant-frontend")}/amls-art-market-participant-frontend/check-your-answers"
+      lazy val ampWhatYouNeedUrl = s"${appConfig.baseUrl("amls-art-market-participant-frontend")}/amls-art-market-participant-frontend/what-you-need"
+      lazy val ampSummeryUrl     = s"${appConfig.baseUrl("amls-art-market-participant-frontend")}/amls-art-market-participant-frontend/check-your-answers"
 
       "return a NotStarted Section when model is empty" in {
         val notStartedSection = Section("amp", NotStarted, false, Call("GET", ampWhatYouNeedUrl))

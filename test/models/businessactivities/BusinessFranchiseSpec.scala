@@ -137,7 +137,7 @@ class BusinessFranchiseSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("businessFranchise" -> true, "franchiseName" ->"test test")
 
       Json.fromJson[BusinessFranchise](json) must
-        be(JsSuccess(BusinessFranchiseYes("test test"), JsPath \ "franchiseName"))
+        be(JsSuccess(BusinessFranchiseYes("test test"), JsPath))
     }
 
     "fail to validate when given an empty `Yes` value" in {

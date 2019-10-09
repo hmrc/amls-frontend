@@ -25,7 +25,7 @@ import play.api.test.Helpers._
 
 class UnableToRemoveBusinessTypesControllerSpec extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
 
     val request = addToken(authRequest)

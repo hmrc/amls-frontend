@@ -37,7 +37,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
+  sealed trait Fixture extends DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
@@ -109,7 +109,7 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
       "verify the router is called correctly" when {
         "request is add" in new Fixture {
 
-          val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "add"))
+          val result = controller.post()(requestWithUrlEncodedBody("changeServices" -> "add"))
 
           status(result) must be(SEE_OTHER)
           controller.router.verify("internalId", ChangeBusinessTypesPageId, Add)
@@ -119,7 +119,7 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
       "verify the router is called correctly" when {
         "request is remove" in new Fixture {
 
-          val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "remove"))
+          val result = controller.post()(requestWithUrlEncodedBody("changeServices" -> "remove"))
 
           status(result) must be(SEE_OTHER)
           controller.router.verify("internalId", ChangeBusinessTypesPageId, Remove)
@@ -139,7 +139,7 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
 
       "return Internal Server Error if the business matching model can't be obtained" in new Fixture {
 
-        val postRequest = request.withFormUrlEncodedBody()
+        val postRequest = requestWithUrlEncodedBody("" -> "")
 
         mockCacheGetEntry[BusinessMatching](None, BusinessMatching.key)
 

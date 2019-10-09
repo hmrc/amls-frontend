@@ -32,7 +32,7 @@ import scala.concurrent.Future
 
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new SummaryController(
@@ -74,7 +74,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
         val emptyCache = CacheMap("", Map.empty)
 
-        val newRequest = request.withFormUrlEncodedBody( "hasAccepted" -> "true")
+        val newRequest = requestWithUrlEncodedBody( "hasAccepted" -> "true")
 
         when(controller.dataCache.fetch[EstateAgentBusiness](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(model.copy(hasAccepted = false))))

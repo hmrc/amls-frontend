@@ -40,7 +40,7 @@ import scala.concurrent.Future
 
 class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyServiceBusinessTestData with BusinessMatchingGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
@@ -132,7 +132,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
 
     "return a Bad Request with errors on invalid submission" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "msbServices[0]" -> "invalid"
       )
 
@@ -149,7 +149,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
 
       when(config.fxEnabledToggle) thenReturn true
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "msbServices[0]" -> "invalid"
       )
 
@@ -166,7 +166,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
 
       mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel())
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "msbServices[0]" -> "01"
       )
 
@@ -181,7 +181,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
 
       mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel(Some(Set(ChequeCashingNotScrapMetal))))
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "msbServices[1]" -> "02",
         "msbServices[2]" -> "03",
         "msbServices[3]" -> "04",
