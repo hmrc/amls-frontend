@@ -21,6 +21,7 @@ import cats.implicits._
 import com.google.inject.Inject
 import connectors.{AmlsConnector, BusinessMatchingConnector, DataCacheConnector, KeystoreConnector}
 import models._
+import models.amp.Amp
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.{BusinessActivities, ExpectedAMLSTurnover, ExpectedBusinessTurnover}
@@ -40,6 +41,7 @@ import models.tradingpremises.TradingPremises
 import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class LandingService @Inject() (val cacheConnector: DataCacheConnector,
@@ -150,7 +152,9 @@ class LandingService @Inject() (val cacheConnector: DataCacheConnector,
 
     val cachedHvd = cacheConnector.upsertNewAuth[Option[Hvd]](cachedMoneyServiceBusiness, Hvd.key, hvdSection(viewResponse))
 
-    val cachedSupervision = cacheConnector.upsertNewAuth[Option[Supervision]](cachedHvd, Supervision.key, supervisionSection(viewResponse))
+    val cachedAmp = cacheConnector.upsertNewAuth[Option[Amp]](cachedHvd, Amp.key, ampSection(viewResponse))
+
+    val cachedSupervision = cacheConnector.upsertNewAuth[Option[Supervision]](cachedAmp, Supervision.key, supervisionSection(viewResponse))
 
     val cachedSubscriptionResponse = cacheConnector.upsertNewAuth[Option[SubscriptionResponse]](cachedSupervision,
       SubscriptionResponse.key, subscriptionResponse)
@@ -208,6 +212,10 @@ class LandingService @Inject() (val cacheConnector: DataCacheConnector,
     } else {
       None
     }
+  }
+
+  private def ampSection(viewResponse: ViewResponse) = {
+    viewResponse.ampSection.map(amp => amp.copy(hasAccepted = true))
   }
 
   private def hvdSection(viewResponse: ViewResponse) = {

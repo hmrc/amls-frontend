@@ -21,6 +21,7 @@ import config.WSHttp
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
+import models.amp.Amp
 import models.businessdetails._
 import models.asp.{Accountancy, Asp, OtherBusinessTaxMattersNo, ServicesOfBusiness}
 import models.bankdetails.{BankDetails, PersonalAccount, UKAccount}
@@ -41,6 +42,7 @@ import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.verify
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
+import play.api.libs.json.Json
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
 
@@ -74,6 +76,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
       aspSection = None,
       msbSection = None,
       hvdSection = None,
+      ampSection = None,
       supervisionSection = None
     )
 
@@ -181,6 +184,16 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
       Some(LinkedCashPayments(false)),
       Some(DateOfChange(new LocalDate("2016-02-24"))))
 
+    val ampData = Json.obj(
+      "typeOfParticipant"     -> Seq("artGalleryOwner"),
+      "boughtOrSoldOverThreshold"     -> true,
+      "dateTransactionOverThreshold"  -> LocalDate.now,
+      "identifyLinkedTransactions"    -> true,
+      "percentageExpectedTurnover"    -> "fortyOneToSixty"
+    )
+
+    val amp = Amp(data = ampData)
+
     val supervision = Supervision(
       Some(AnotherBodyNo),
       Some(ProfessionalBodyMemberYes),
@@ -228,6 +241,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
       Some(asp),
       Some(msb),
       Some(hvd),
+      Some(amp),
       Some(supervision),
       Some(subscription),
       Some(amendVariationRenewalResponse))

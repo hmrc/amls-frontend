@@ -16,10 +16,11 @@
 
 package models
 
-import models.businessdetails.BusinessDetails
+import models.amp.Amp
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
+import models.businessdetails.BusinessDetails
 import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
 import models.estateagentbusiness.EstateAgentBusiness
@@ -29,10 +30,10 @@ import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import models.DataImport
-import play.api.libs.json._
-import scala.collection.Seq
 import play.api.libs.functional.syntax._
+import play.api.libs.json._
+
+import scala.collection.Seq
 
 case class UpdateMongoCacheResponse(dataImport: Option[DataImport],
                                     view: Option[ViewResponse],
@@ -48,6 +49,7 @@ case class UpdateMongoCacheResponse(dataImport: Option[DataImport],
                                     asp: Option[Asp],
                                     msb: Option[MoneyServiceBusiness],
                                     hvd: Option[Hvd],
+                                    amp: Option[Amp],
                                     supervision: Option[Supervision],
                                     Subscription: Option[SubscriptionResponse],
                                     amendVariationResponse: Option[AmendVariationRenewalResponse]
@@ -79,6 +81,7 @@ object UpdateMongoCacheResponse {
         (__ \ Asp.key).readNullable[Asp] ~
         (__ \ MoneyServiceBusiness.key).readNullable[MoneyServiceBusiness] ~
         (__ \ Hvd.key).readNullable[Hvd] ~
+        (__ \ Amp.key).readNullable[Amp] ~
         (__ \ Supervision.key).readNullable[Supervision] ~
         (__ \ SubscriptionResponse.key).readNullable[SubscriptionResponse] ~
         (__ \ AmendVariationRenewalResponse.key).readNullable[AmendVariationRenewalResponse]

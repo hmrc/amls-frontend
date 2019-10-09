@@ -679,7 +679,7 @@ status.deregister.body-content = De-register your business if you no longer want
   We’ll delete any information you have provided. We won’t refund any fees you have paid.\n\
   You mustn’t carry out activities covered by the Money Laundering Regulations if you aren’t supervised.
 status.deregister.services = Your services
-status.deregister.button.change = Change
+status.deregister.button.change = Add or remove services
 status.deregister.regnumber = Registration number:
 status.deregister.visuallyhidden.change = Change your registered services
 
@@ -1282,8 +1282,8 @@ businessmatching.updateservice.changeservices.title = What do you want to do?
 businessmatching.updateservice.changeservices.heading = What do you want to do?
 businessmatching.updateservice.changeservices.existing.multiple = You’ve told us your business types are
 businessmatching.updateservice.changeservices.existing.single = You’ve told us your business type is
-businessmatching.updateservice.changeservices.choice.add = Register another business type
-businessmatching.updateservice.changeservices.choice.remove = Remove business types
+businessmatching.updateservice.changeservices.choice.add = Register a service
+businessmatching.updateservice.changeservices.choice.remove = Remove a service
 
 #remove route
 
@@ -1793,7 +1793,7 @@ responsiblepeople.fit_and_proper.notice.text1 = HMRC checks that the responsible
 responsiblepeople.fit_and_proper.notice.heading1 = HMRC’s fit and proper test
 responsiblepeople.fit_and_proper.notice.text2 = The fit and proper test is for money service businesses and trust or company service providers. It is different to the test carried out by the Financial Conduct Authority.
 responsiblepeople.fit_and_proper.notice.heading2 = HMRC’s approval check
-responsiblepeople.fit_and_proper.notice.text3 = The approval check is for accountancy service providers, estate agent businesses, and high value dealers.
+responsiblepeople.fit_and_proper.notice.text3 = The approval check is for accountancy service providers, art market participants, estate agent businesses, and high value dealers.
 
 responsiblepeople.fit_and_proper.heading = Has {0} passed HMRC’s fit and proper test?
 responsiblepeople.fit_and_proper.title = Has this person passed the fit and proper test?
@@ -1802,7 +1802,7 @@ responsiblepeople.fit_and_proper.details2 = If a responsible person has already 
 
 responsiblepeople.approval_check.heading = Has HMRC charged your business or another business to do an approval check about {0}?
 responsiblepeople.approval_check.title = Has this person been charged for the approval check?
-responsiblepeople.approval_check.text.details = This is separate from HMRC’s fit and proper test. HMRC carries out the approval check as part of the registration process for accountancy service providers, estate agency businesses, and high value dealers.
+responsiblepeople.approval_check.text.details = This is separate from HMRC’s fit and proper test. HMRC carries out the approval check as part of the registration process for accountancy service providers, art market participants, estate agency businesses, and high value dealers.
 responsiblepeople.approval_check.text.details2 = If a responsible person has already passed the check, either in their current role or in a previous role, they do not need to pass it again.
 
 responsiblepeople.detailed_answers.title = Detailed answers

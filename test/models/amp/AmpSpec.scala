@@ -90,20 +90,18 @@ trait AmpValues {
   )
 
   val completeJson = Json.obj(
-    "_id"     -> "someid",
     "data"           -> completeData,
-    "lastUpdated"    -> Json.obj("$date" -> dateVal.atZone(ZoneOffset.UTC).toInstant.toEpochMilli),
     "hasChanged"     -> false,
     "hasAccepted"    -> true
   )
 
-  val completeModel                             = Amp("someid", completeData, dateVal, false, true)
-  val missingTypeOfParticipantModel             = Amp("someid", missingTypeOfParticipantData, dateVal)
-  val missingTypeOfParticipantDetailModel       = Amp("someid", missingTypeOfParticipantDetailData, dateVal)
-  val missingBoughtOrSoldOverTheThresholdModel  = Amp("someid", missingBoughtOrSoldOverThresholdData, dateVal)
-  val missingDateTransactionOverThresholdModel  = Amp("someid", missingDateTransactionOverThresholdData, dateVal)
-  val missingIdentifyLinkedTransactionsModel    = Amp("someid", missingIdentifyLinkedTransactionsData, dateVal)
-  val MissingPercentageExpectedTurnoverModel    = Amp("someid", MissingPercentageExpectedTurnoverData, dateVal)
+  val completeModel                             = Amp(completeData, false, true)
+  val missingTypeOfParticipantModel             = Amp(missingTypeOfParticipantData)
+  val missingTypeOfParticipantDetailModel       = Amp(missingTypeOfParticipantDetailData)
+  val missingBoughtOrSoldOverTheThresholdModel  = Amp(missingBoughtOrSoldOverThresholdData)
+  val missingDateTransactionOverThresholdModel  = Amp(missingDateTransactionOverThresholdData)
+  val missingIdentifyLinkedTransactionsModel    = Amp(missingIdentifyLinkedTransactionsData)
+  val MissingPercentageExpectedTurnoverModel    = Amp(MissingPercentageExpectedTurnoverData)
 }
 
 class AmpSpec extends AmlsSpec with AmpValues {
@@ -117,14 +115,14 @@ class AmpSpec extends AmlsSpec with AmpValues {
     "when setting new data" must {
       "return Amp with hasChanged true" in {
         val result = completeModel.data(newData)
-        result must be(Amp("someid", newData, dateVal, true, false))
+        result must be(Amp(newData, true, false))
       }
     }
 
     "when setting data that has not changed" must {
       "return Amp with hasChanged false" in {
         val result = completeModel.data(completeData)
-        result must be(Amp("someid", completeData, dateVal, false, true))
+        result must be(Amp(completeData,  false, true))
       }
     }
 
