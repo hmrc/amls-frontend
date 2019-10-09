@@ -1314,7 +1314,7 @@ businessmatching.updateservice.updateotherinformation.text = As a result some se
 #   Add route Start  ###################################################################################################
 businessmatching.updateservice.msb.services.title = Which money service business activities will you do?
 businessmatching.updateservice.msb.services.heading = Which money service business activities will you do?
-businessmatching.updateservice.msb.services.list.heading =
+businessmatching.updateservice.msb.services.list.heading = Select all that apply.
 businessmatching.updateservice.msb.services.list.lbl.01 = Cheque cashing (all businesses except scrap metal dealers)
 businessmatching.updateservice.msb.services.list.lbl.02 = Cheque cashing (scrap metal dealers)
 businessmatching.updateservice.msb.services.list.lbl.03 = Currency exchange
@@ -1350,7 +1350,7 @@ businessmatching.updateservice.whichtradingpremises.summary = Which premises wil
 
 businessmatching.updateservice.whatdoyoudohere.title = Which money service business activities will you do at these premises?
 businessmatching.updateservice.whatdoyoudohere.heading = Which money service business activities will you do at these premises?
-businessmatching.updateservice.whatdoyoudohere.list.heading = Select all that apply.
+businessmatching.updateservice.whatdoyoudohere.list.hint = Select all that apply.
 businessmatching.updateservice.whatdoyoudohere.list.lbl.01 = Cheque cashing (all businesses except scrap metal dealers)
 businessmatching.updateservice.whatdoyoudohere.list.lbl.02 = Cheque cashing (scrap metal dealers)
 businessmatching.updateservice.whatdoyoudohere.list.lbl.03 = Currency exchange
