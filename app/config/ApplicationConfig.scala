@@ -28,7 +28,7 @@ trait BaseApplicationConfig {
   def frontendBaseUrl: String
 }
 
-class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode) extends ServicesConfig(configuration, runMode) with BaseApplicationConfig {
+class ApplicationConfig @Inject()(val configuration: Configuration, val runMode: RunMode) extends ServicesConfig(configuration, runMode) with BaseApplicationConfig {
 
   private def getConfigString(key: String) = getConfString(key, throw new Exception(s"Could not find config '$key'"))
   private def getConfigInt(key: String) = getConfInt(key, throw new Exception(s"Could not find config '$key'"))
