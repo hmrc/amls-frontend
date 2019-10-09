@@ -2025,8 +2025,8 @@ msb.bank.names = Names of banks that supplied your foreign currency
 msb.wholesaler.names = Names of wholesalers that supplied your foreign currency
 msb.bank.names.hint = asd
 
-msb.services.title = Which money service business activities does your business carry out?
-msb.services.heading = Which money service business activities does your business carry out?
+msb.services.title = Which money service business activities will you do?
+msb.services.heading = Which money service business activities will you do?
 msb.services.list.heading = Select all that apply
 msb.services.list.lbl.01 = Transmitting money
 msb.services.list.lbl.02 = Currency exchange
