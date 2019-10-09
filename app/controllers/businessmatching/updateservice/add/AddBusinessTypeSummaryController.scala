@@ -50,8 +50,8 @@ class AddBusinessTypeSummaryController @Inject()(
     implicit request =>
       (for {
         flowModel <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key))
-        filteredTPs: Seq[(TradingPremises, Int)] <- helper.filteredTps(request.credId, flowModel)
-        filteredRPs: Seq[(ResponsiblePerson, Int)] <- helper.filteredRps(request.credId, flowModel)
+        filteredTPs: Seq[(TradingPremises, Int)] <- helper.filteredTps(request.credId, flowModel) orElse OptionT.pure[Future, Seq[(TradingPremises, Int)]](Seq())
+        filteredRPs: Seq[(ResponsiblePerson, Int)] <- helper.filteredRps(request.credId, flowModel) orElse OptionT.pure[Future, Seq[(ResponsiblePerson, Int)]](Seq())
       } yield {
         Ok(update_services_summary(EmptyForm, flowModel, filteredTPs, filteredRPs))
       }) getOrElse Redirect(controllers.businessmatching.routes.SummaryController.get())
