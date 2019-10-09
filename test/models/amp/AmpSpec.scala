@@ -24,7 +24,7 @@ import utils.AmlsSpec
 import org.mockito.Mockito._
 import play.api.mvc.Call
 
-trait AmpValues {
+trait AmpValues extends AmlsSpec {
 
   val dateVal = LocalDateTime.now
 
@@ -105,7 +105,7 @@ trait AmpValues {
   val MissingPercentageExpectedTurnoverModel    = Amp("someid", MissingPercentageExpectedTurnoverData, dateVal)
 }
 
-class AmpSpec extends AmlsSpec with AmpValues {
+class AmpSpec extends AmpValues {
   "Amp" must {
     "have a mongo key that" must {
       "be correctly set" in {
@@ -129,8 +129,8 @@ class AmpSpec extends AmlsSpec with AmpValues {
 
     "have a section function that" must {
       implicit val cache         = mock[CacheMap]
-      lazy val ampWhatYouNeedUrl = s"${appConfig.baseUrl("amls-art-market-participant-frontend")}/amls-art-market-participant-frontend/what-you-need"
-      lazy val ampSummeryUrl     = s"${appConfig.baseUrl("amls-art-market-participant-frontend")}/amls-art-market-participant-frontend/check-your-answers"
+      lazy val ampWhatYouNeedUrl = "https://localhost:9223/amls-art-market-participant-frontend/what-you-need"
+      lazy val ampSummaryUrl     = "https://localhost:9223/amls-art-market-participant-frontend/check-your-answers"
 
       "return a NotStarted Section when model is empty" in {
         val notStartedSection = Section("amp", NotStarted, false, Call("GET", ampWhatYouNeedUrl))
@@ -140,7 +140,7 @@ class AmpSpec extends AmlsSpec with AmpValues {
       }
 
       "return a Completed Section when model is complete" in {
-        val completedSection = Section("amp", Completed, false, Call("GET", ampSummeryUrl))
+        val completedSection = Section("amp", Completed, false, Call("GET", ampSummaryUrl))
 
         when(cache.getEntry[Amp]("amp")) thenReturn Some(completeModel)
         Amp.section must be(completedSection)

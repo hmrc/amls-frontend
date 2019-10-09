@@ -20,11 +20,12 @@ import java.time.LocalDateTime
 
 import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
-import play.api.Play
+import play.api.{Configuration, Play}
 import play.api.libs.json._
 import play.api.mvc.Call
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 
 final case class Amp(id: String,
                      data: JsObject = Json.obj(),
@@ -83,12 +84,10 @@ final case class Amp(id: String,
 
 object Amp {
 
-  val appConfig = Play.current.injector.instanceOf[ApplicationConfig]
-
   val redirectCallType       = "GET"
   val key                    = "amp"
-  lazy val ampWhatYouNeedUrl = s"${appConfig.baseUrl("amls-art-market-participant-frontend")}/amls-art-market-participant-frontend/what-you-need"
-  lazy val ampSummeryUrl     = s"${appConfig.baseUrl("amls-art-market-participant-frontend")}/amls-art-market-participant-frontend/check-your-answers"
+  lazy val ampWhatYouNeedUrl = "https://localhost:9223/amls-art-market-participant-frontend/what-you-need"
+  lazy val ampSummeryUrl     = "https://localhost:9223/amls-art-market-participant-frontend/check-your-answers"
 
   private def generateRedirect(destinationUrl: String) = {
     Call(redirectCallType, destinationUrl)

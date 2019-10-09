@@ -21,7 +21,8 @@ import config.{ApplicationConfig, CachedStaticHtmlPartialProvider}
 import connectors.KeystoreConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import org.scalatest.MustMatchers
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.{Lang, MessagesApi, MessagesProvider}
 import play.api.inject.bind
@@ -35,7 +36,7 @@ import play.filters.csrf.{CSRFConfigProvider, CSRFFilter}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
-trait AmlsSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with MustMatchers with AuthorisedFixture {
+trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with MustMatchers with AuthorisedFixture {
 
   protected val bindModules: Seq[GuiceableModule] = Seq(bind[KeystoreConnector].to(mock[KeystoreConnector]))
 
