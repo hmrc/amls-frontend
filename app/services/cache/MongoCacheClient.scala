@@ -16,7 +16,7 @@
 
 package services.cache
 
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.cache.Conversions
 import javax.inject.Inject
 import org.joda.time.{DateTime, DateTimeZone}
@@ -107,7 +107,7 @@ class CryptoCache(cache: Cache, crypto: CompositeSymmetricCrypto) extends Cache(
 /**
   * An injectible factory for creating new MongoCacheClients
   */
-class MongoCacheClientFactory @Inject()(config: AppConfig, applicationCrypto: ApplicationCrypto, component: ReactiveMongoComponent) {
+class MongoCacheClientFactory @Inject()(config: ApplicationConfig, applicationCrypto: ApplicationCrypto, component: ReactiveMongoComponent) {
   //class DbConnection extends MongoDbConnection
   def createClient: MongoCacheClient = new MongoCacheClient(config, component.mongoConnector.db, applicationCrypto)
 }
@@ -116,7 +116,7 @@ class MongoCacheClientFactory @Inject()(config: AppConfig, applicationCrypto: Ap
   * Implements a client which utilises the GOV UK cache repository to store cached data in Mongo.
   * @param appConfig The application configuration
   */
-class MongoCacheClient(appConfig: AppConfig, mongo: () => DefaultDB, applicationCrypto: ApplicationCrypto)
+class MongoCacheClient(appConfig: ApplicationConfig, mongo: () => DefaultDB, applicationCrypto: ApplicationCrypto)
   extends ReactiveRepository[Cache, BSONObjectID]("app-cache", mongo, Cache.formats)
     with Conversions
     with CacheOps {

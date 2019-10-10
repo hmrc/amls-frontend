@@ -16,7 +16,7 @@
 
 package connectors
 
-import config.AppConfig
+import config.ApplicationConfig
 import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
@@ -42,7 +42,7 @@ import scala.concurrent.Future
 class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience with AmlsReferenceNumberGenerator with PaymentGenerator {
 
   val amlsConnector = new AmlsConnector(http = mock[HttpClient],
-                                        appConfig = mock[AppConfig])
+                                        appConfig = mock[ApplicationConfig])
 
   val safeId = "SAFEID"
   val accountTypeId = ("org", "id")

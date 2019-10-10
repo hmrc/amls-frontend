@@ -16,7 +16,7 @@
 
 package services.businessmatching
 
-import config.AppConfig
+import config.ApplicationConfig
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.ViewResponse
@@ -50,8 +50,8 @@ class BusinessMatchingServiceSpec extends PlaySpec
   with BusinessMatchingGenerator {
 
   trait Fixture extends DependencyMocks {
-    val mockAppConfig = mock[AppConfig]
-    val service = new BusinessMatchingService(mockStatusService, mockCacheConnector, mockAppConfig)
+    val mockApplicationConfig = mock[ApplicationConfig]
+    val service = new BusinessMatchingService(mockStatusService, mockCacheConnector, mockApplicationConfig)
 
     val businessMatchingModel = businessMatchingGen.sample.get
 

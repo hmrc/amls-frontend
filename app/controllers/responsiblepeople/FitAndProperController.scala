@@ -16,11 +16,10 @@
 
 package controllers.responsiblepeople
 
-import javax.inject.{Inject, Singleton}
-import config.AppConfig
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, _}
+import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
 import models.responsiblepeople.ResponsiblePerson
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
@@ -34,7 +33,6 @@ class FitAndProperController @Inject()(
                                         val dataCacheConnector: DataCacheConnector,
                                         authAction: AuthAction,
                                         val ds: CommonPlayDependencies,
-                                        appConfig: AppConfig,
                                         val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   val FIELDNAME = "hasAlreadyPassedFitAndProper"

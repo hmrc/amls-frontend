@@ -30,11 +30,10 @@ import views.html.responsiblepeople.experience_training
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-class ExperienceTrainingController @Inject () (
-                                              val dataCacheConnector: DataCacheConnector,
-                                              authAction: AuthAction,
-                                              val ds: CommonPlayDependencies,
-                                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+class ExperienceTrainingController @Inject () (val dataCacheConnector: DataCacheConnector,
+                                               authAction: AuthAction,
+                                               val ds: CommonPlayDependencies,
+                                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>

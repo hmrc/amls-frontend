@@ -16,7 +16,7 @@
 
 package connectors
 
-import config.AppConfig
+import config.ApplicationConfig
 import generators.AmlsReferenceNumberGenerator
 import models.ResponseType.SubscriptionResponseType
 import models._
@@ -37,7 +37,7 @@ class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with
   trait Fixture {
     val connector = new FeeConnector(
       http = mock[HttpClient],
-      appConfig = mock[AppConfig])
+      appConfig = mock[ApplicationConfig])
 
     val safeId = "SAFEID"
     val accountTypeId = ("org", "id")

@@ -16,15 +16,15 @@
 
 package connectors
 
-import config.{AppConfig, ApplicationConfig}
-import org.mockito.Matchers.{any, eq => eqTo}
+import config.ApplicationConfig
+import org.mockito.Matchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
-import play.api.{Configuration, Environment}
+import org.scalatest.mockito.MockitoSugar
+import play.api.Configuration
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HttpDelete, HttpResponse}
+import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.play.bootstrap.config.RunMode
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import utils.AmlsSpec
@@ -41,7 +41,7 @@ class TestOnlyStubConnectorSpec extends AmlsSpec
   trait Fixture {
     val http = mock[HttpClient]
     val config = mock[ApplicationConfig]
-    val connector = new TestOnlyStubConnector(http, mock[AppConfig],  mock[Configuration], mock[RunMode])
+    val connector = new TestOnlyStubConnector(http, mock[ApplicationConfig],  mock[Configuration], mock[RunMode])
   }
 
   "The TestOnly Stub Connector" must {

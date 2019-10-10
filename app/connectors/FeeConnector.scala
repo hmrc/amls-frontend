@@ -16,7 +16,7 @@
 
 package connectors
 
-import config.AppConfig
+import config.ApplicationConfig
 import javax.inject.Inject
 import models._
 import play.api.Logger
@@ -28,7 +28,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class FeeConnector @Inject()(
                               private[connectors] val http: HttpClient,
-                              appConfig: AppConfig) {
+                              appConfig: ApplicationConfig) {
 
   val feePaymentUrl = appConfig.feePaymentUrl
 

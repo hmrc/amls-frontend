@@ -16,7 +16,7 @@
 
 package connectors
 
-import config.AppConfig
+import config.ApplicationConfig
 import generators.BaseGenerator
 import models.enrolment.{EnrolmentIdentifier, GovernmentGatewayEnrolment}
 import org.mockito.Matchers.{any, eq => eqTo}
@@ -37,7 +37,7 @@ class EnrolmentStubConnectorSpec extends AmlsSpec with BaseGenerator {
       List(EnrolmentIdentifier("MLRRefNumber", "AV23456789")), ""))
 
     val http = mock[HttpClient]
-    val config = mock[AppConfig]
+    val config = mock[ApplicationConfig]
     val connector = new EnrolmentStubConnector(http, config)
     val groupId = stringOfLengthGen(10).sample.get
 

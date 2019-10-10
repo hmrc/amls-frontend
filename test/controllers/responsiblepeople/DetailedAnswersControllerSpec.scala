@@ -16,7 +16,7 @@
 
 package controllers.responsiblepeople
 
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.BusinessMatching
@@ -44,7 +44,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
-      config = mock[AppConfig],
+      config = mock[ApplicationConfig],
       cc = mockMcc
       )
 

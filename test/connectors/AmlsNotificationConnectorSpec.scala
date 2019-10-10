@@ -16,7 +16,7 @@
 
 package connectors
 
-import config.AppConfig
+import config.ApplicationConfig
 import models.notifications._
 import org.joda.time.{DateTime, DateTimeZone}
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -40,7 +40,7 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
   implicit val hc = HeaderCarrier()
 
   private trait Fixture {
-    val connector = new AmlsNotificationConnector (mock[HttpClient], mock[AppConfig])
+    val connector = new AmlsNotificationConnector (mock[HttpClient], mock[ApplicationConfig])
   }
 
   "AmlsNotificationConnector" must {

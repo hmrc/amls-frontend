@@ -18,7 +18,7 @@ package controllers.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
@@ -41,7 +41,7 @@ class MsbSubSectorsController @Inject()(authAction: AuthAction,
                                         val businessMatchingService: BusinessMatchingService,
                                         val statusService:StatusService,
                                         val helper: ChangeSubSectorHelper,
-                                        val config: AppConfig,
+                                        val config: ApplicationConfig,
                                         val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {

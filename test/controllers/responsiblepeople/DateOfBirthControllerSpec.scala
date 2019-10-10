@@ -16,7 +16,7 @@
 
 package controllers.responsiblepeople
 
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople.ResponsiblePerson._
@@ -41,13 +41,13 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar {
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
 
-    val mockAppConfig = mock[AppConfig]
+    val mockApplicationConfig = mock[ApplicationConfig]
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .overrides(bind[AppConfig].to(mockAppConfig))
+      .overrides(bind[ApplicationConfig].to(mockApplicationConfig))
       .build()
 
     val controller = app.injector.instanceOf[DateOfBirthController]

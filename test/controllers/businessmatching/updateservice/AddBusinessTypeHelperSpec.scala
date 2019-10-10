@@ -17,7 +17,7 @@
 package controllers.businessmatching.updateservice
 
 import cats.implicits._
-import config.AppConfig
+import config.ApplicationConfig
 import controllers.actions.SuccessfulAuthAction
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessActivitiesGenerator
@@ -48,14 +48,14 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
     val tradingPremisesService = mock[TradingPremisesService]
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
     val responsiblePeopleService = mock[ResponsiblePeopleService]
-    val mockAppConfig = mock[AppConfig]
+    val mockApplicationConfig = mock[ApplicationConfig]
 
     val SUT = new AddBusinessTypeHelper(
       SuccessfulAuthAction,
       mockCacheConnector,
       tradingPremisesService,
       responsiblePeopleService,
-      mockAppConfig)
+      mockApplicationConfig)
 
     val businessActivitiesSection = BABusinessActivities(
       involvedInOther = Some(InvolvedInOtherNo),

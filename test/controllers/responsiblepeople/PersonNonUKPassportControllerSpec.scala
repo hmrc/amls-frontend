@@ -16,7 +16,7 @@
 
 package controllers.responsiblepeople
 
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople.ResponsiblePerson._
@@ -48,7 +48,7 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
       .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .build()
 
-    val mockApplicationConfig = mock[AppConfig]
+    val mockApplicationConfig = mock[ApplicationConfig]
     val controller = new PersonNonUKPassportController(messagesApi = messagesApi, dataCacheConnector, SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
 
     val emptyCache = CacheMap("", Map.empty)

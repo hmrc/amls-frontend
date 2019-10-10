@@ -19,7 +19,7 @@ package controllers.responsiblepeople
 import cats.data.OptionT
 import cats.implicits._
 import com.google.inject.Inject
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.businessmatching.BusinessMatching
@@ -40,7 +40,7 @@ class DetailedAnswersController @Inject () (
                                              authAction: AuthAction,
                                              val ds: CommonPlayDependencies,
                                              val statusService: StatusService,
-                                             val config: AppConfig,
+                                             val config: ApplicationConfig,
                                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   private def showHideAddressMove(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String, lineId: Option[Int])

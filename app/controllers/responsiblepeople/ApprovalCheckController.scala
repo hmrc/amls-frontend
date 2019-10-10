@@ -16,7 +16,7 @@
 
 package controllers.responsiblepeople
 
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, _}
@@ -31,7 +31,6 @@ class ApprovalCheckController @Inject()(
                                          val dataCacheConnector: DataCacheConnector,
                                          authAction: AuthAction,
                                          val ds: CommonPlayDependencies,
-                                         appConfig: AppConfig,
                                          val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   val FIELD_NAME = "hasAlreadyPaidApprovalCheck"

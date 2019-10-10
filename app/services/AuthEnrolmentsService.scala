@@ -16,7 +16,7 @@
 
 package services
 
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.{EnrolmentStubConnector, TaxEnrolmentsConnector}
 import javax.inject.Inject
 import models.enrolment.{AmlsEnrolmentKey, TaxEnrolment}
@@ -26,7 +26,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuthEnrolmentsService @Inject()(val enrolmentStore: TaxEnrolmentsConnector,
-                                      val config: AppConfig,
+                                      val config: ApplicationConfig,
                                       val stubConnector: EnrolmentStubConnector) {
 
   private val amlsKey = "HMRC-MLR-ORG"

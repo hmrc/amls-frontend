@@ -16,7 +16,7 @@
 
 package controllers.responsiblepeople
 
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._

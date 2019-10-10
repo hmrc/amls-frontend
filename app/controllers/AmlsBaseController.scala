@@ -17,8 +17,8 @@
 package controllers
 
 import com.google.inject.Inject
-import config.{AppConfig, ApplicationConfig, CachedStaticHtmlPartialProvider}
-import play.api.i18n.{I18nSupport, Lang, Messages, MessagesApi, MessagesImpl, MessagesProvider}
+import config.{ApplicationConfig, CachedStaticHtmlPartialProvider}
+import play.api.i18n.{Lang, MessagesApi, MessagesImpl, MessagesProvider}
 import play.api.mvc.{MessagesControllerComponents, Request}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import utils.ControllerHelper

@@ -16,7 +16,7 @@
 
 package connectors
 
-import config.AppConfig
+import config.ApplicationConfig
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -37,9 +37,9 @@ class AuthenticatorConnectorSpec extends AmlsSpec with ScalaFutures {
   trait TestFixture {
 
     val http = mock[HttpClient]
-    val appConfig = mock[AppConfig]
+    val appConfig = mock[ApplicationConfig]
 
-    lazy val connector = new AuthenticatorConnector(http, mock[Environment], mock[Configuration], appConfig)
+    lazy val connector = new AuthenticatorConnector(http, appConfig)
   }
 
   "The Authenticator connector" must {

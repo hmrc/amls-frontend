@@ -16,7 +16,7 @@
 
 package connectors.cache
 
-import config.AppConfig
+import config.ApplicationConfig
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.prop.PropertyChecks
@@ -52,7 +52,7 @@ class DataCacheConnectorSpec
 
     when(factory.createClient) thenReturn client
 
-    val appConfig = mock[AppConfig]
+    val appConfig = mock[ApplicationConfig]
 
     val dataCacheConnector = new MongoCacheConnector(factory) {
       override lazy val mongoCache: MongoCacheClient =  mock[MongoCacheClient]

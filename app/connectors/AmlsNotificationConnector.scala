@@ -16,7 +16,7 @@
 
 package connectors
 
-import config.AppConfig
+import config.ApplicationConfig
 import javax.inject.Inject
 import models.notifications.{NotificationDetails, NotificationRow}
 import play.api.Logger
@@ -29,7 +29,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 class AmlsNotificationConnector @Inject()(val http: HttpClient,
-                                          val appConfig: AppConfig) {
+                                          val appConfig: ApplicationConfig) {
 
   private[connectors] def baseUrl : String = appConfig.allNotificationsUrl
 

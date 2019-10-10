@@ -17,7 +17,7 @@
 package connectors
 
 import audit.{ESDeEnrolEvent, ESEnrolEvent, ESEnrolFailureEvent, ESRemoveKnownFactsEvent}
-import config.AppConfig
+import config.ApplicationConfig
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
 import javax.inject.Inject
 import models.enrolment.ErrorResponse._
@@ -31,7 +31,7 @@ import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TaxEnrolmentsConnector @Inject()(http: HttpClient, appConfig: AppConfig, audit: AuditConnector) {
+class TaxEnrolmentsConnector @Inject()(http: HttpClient, appConfig: ApplicationConfig, audit: AuditConnector) {
 
   lazy val baseUrl = if (appConfig.enrolmentStubsEnabled) {
     s"${appConfig.enrolmentStubsUrl}/tax-enrolments"

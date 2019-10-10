@@ -16,7 +16,7 @@
 
 package connectors
 
-import config.AppConfig
+import config.ApplicationConfig
 import javax.inject.{Inject, Singleton}
 import play.api.http.Status._
 import play.api.{Configuration, Environment, Logger}
@@ -27,9 +27,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AuthenticatorConnector @Inject()(http: HttpClient,
-                                       environment: Environment,
-                                       val runModeConfiguration: Configuration,
-                                       val appConfig: AppConfig) {
+                                       val appConfig: ApplicationConfig) {
 
   def refreshProfile(implicit hc: HeaderCarrier, ec: ExecutionContext) = {
 

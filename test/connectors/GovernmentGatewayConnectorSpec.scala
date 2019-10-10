@@ -16,7 +16,7 @@
 
 package connectors
 
-import config.AppConfig
+import config.ApplicationConfig
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator, GovernmentGatewayGenerator}
 import models.governmentgateway.EnrolmentRequest
@@ -47,7 +47,7 @@ class GovernmentGatewayConnectorSpec extends AmlsSpec
   trait Fixture extends DependencyMocks {
     val audit = mock[Audit]
 
-    val connector = new GovernmentGatewayConnector(mock[HttpClient], mock[AppConfig], mock[AuditConnector])
+    val connector = new GovernmentGatewayConnector(mock[HttpClient], mock[ApplicationConfig], mock[AuditConnector])
 
     val fn: DataEvent => Unit = d => {}
 

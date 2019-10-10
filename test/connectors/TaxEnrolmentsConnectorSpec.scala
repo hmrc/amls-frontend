@@ -16,7 +16,7 @@
 
 package connectors
 
-import config.AppConfig
+import config.ApplicationConfig
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
 import generators.auth.UserDetailsGenerator
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
@@ -46,7 +46,7 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
   trait Fixture {
 
     val http = mock[HttpClient]
-    val appConfig = mock[AppConfig]
+    val appConfig = mock[ApplicationConfig]
     val auditConnector = mock[AuditConnector]
     val groupIdentfier = stringOfLengthGen(10).sample.get
 

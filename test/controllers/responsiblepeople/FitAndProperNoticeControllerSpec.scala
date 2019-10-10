@@ -16,7 +16,7 @@
 
 package controllers.responsiblepeople
 
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import org.jsoup.Jsoup
@@ -35,12 +35,12 @@ class FitAndProperNoticeControllerSpec extends AmlsSpec with MockitoSugar with S
 
   trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
-    lazy val mockAppConfig = mock[AppConfig]
+    lazy val mockApplicationConfig = mock[ApplicationConfig]
     lazy val defaultBuilder = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
-      .overrides(bind[AppConfig].to(mockAppConfig))
+      .overrides(bind[ApplicationConfig].to(mockApplicationConfig))
 
     val builder = defaultBuilder
     lazy val app = builder.build()

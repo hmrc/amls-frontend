@@ -16,7 +16,7 @@
 
 package connectors
 
-import config.AppConfig
+import config.ApplicationConfig
 import javax.inject.Inject
 import models.deregister.{DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse}
 import models.payments._
@@ -32,7 +32,7 @@ import uk.gov.hmrc.play.http.ws.WSHttp
 import scala.concurrent.{ExecutionContext, Future}
 
 class AmlsConnector @Inject()(val http: HttpClient,
-                              val appConfig: AppConfig) {
+                              val appConfig: ApplicationConfig) {
 
   private[connectors] val url: String = appConfig.subscriptionUrl
 

@@ -16,7 +16,7 @@
 
 package controllers.declaration
 
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -40,7 +40,7 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
                                                              authAction: AuthAction,
                                                              val ds: CommonPlayDependencies,
                                                              val statusService: StatusService,
-                                                             config: AppConfig,
+                                                             config: ApplicationConfig,
                                                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def businessNominatedOfficerView(amlsRegistrationNo: Option[String],

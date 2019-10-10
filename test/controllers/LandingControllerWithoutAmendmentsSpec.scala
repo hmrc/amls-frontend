@@ -48,7 +48,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
   trait Fixture {
     self =>
 
-    val mockAppConfig = mock[ApplicationConfig]
+    val mockApplicationConfig = mock[ApplicationConfig]
 
     val request = addToken(authRequest)
 
@@ -201,7 +201,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       }
 
       "redirect to the sign-out page when the user role is not USER" in new Fixture {
-        val expectedLocation = s"${mockAppConfig.logoutUrl}?continue=${
+        val expectedLocation = s"${mockApplicationConfig.logoutUrl}?continue=${
           URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role).absoluteUrl, "utf-8")}"
 
         val result = controllerNoUserRole.get()(request)

@@ -18,7 +18,7 @@ package controllers.responsiblepeople
 
 import cats.data.OptionT
 import cats.implicits._
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}

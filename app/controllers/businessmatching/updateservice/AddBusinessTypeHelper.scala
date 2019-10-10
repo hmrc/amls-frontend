@@ -18,7 +18,7 @@ package controllers.businessmatching.updateservice
 
 import cats.data.OptionT
 import cats.implicits._
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models.businessactivities.BusinessActivities
@@ -42,7 +42,7 @@ class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
                                       implicit val dataCacheConnector: DataCacheConnector,
                                       val tradingPremisesService: TradingPremisesService,
                                       val responsiblePeopleService: ResponsiblePeopleService,
-                                      val appConfig:AppConfig) extends RepeatingSection {
+                                      val appConfig:ApplicationConfig) extends RepeatingSection {
 
   def updateBusinessActivities(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier): OptionT[Future, BusinessActivities] = {
     OptionT(dataCacheConnector.update[BusinessActivities](credId, BusinessActivities.key) {

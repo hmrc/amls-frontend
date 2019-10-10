@@ -18,7 +18,7 @@ package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
-import config.AppConfig
+import config.ApplicationConfig
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.businessmatching.BusinessMatchingGenerator
@@ -44,7 +44,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
 
     val request = addToken(authRequest)
 
-    val config = mock[AppConfig]
+    val config = mock[ApplicationConfig]
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]

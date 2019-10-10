@@ -18,7 +18,7 @@ package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, InvalidForm, ValidForm}
@@ -40,7 +40,7 @@ class SubSectorsController @Inject()(authAction: AuthAction,
                                      implicit val dataCacheConnector: DataCacheConnector,
                                      val businessMatchingService: BusinessMatchingService,
                                      val router: Router[AddBusinessTypeFlowModel],
-                                     val config:AppConfig,
+                                     val config:ApplicationConfig,
                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {

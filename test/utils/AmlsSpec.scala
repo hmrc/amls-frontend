@@ -19,8 +19,9 @@ package utils
 import akka.stream.Materializer
 import config.{ApplicationConfig, CachedStaticHtmlPartialProvider}
 import connectors.KeystoreConnector
+import org.mockito.Mockito.{reset, when}
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import org.scalatest.MustMatchers
+import org.scalatest.{BeforeAndAfter, MustMatchers}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
@@ -36,7 +37,7 @@ import play.filters.csrf.{CSRFConfigProvider, CSRFFilter}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
-trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with MustMatchers with AuthorisedFixture {
+trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with MustMatchers with AuthorisedFixture with  BeforeAndAfter {
 
   protected val bindModules: Seq[GuiceableModule] = Seq(bind[KeystoreConnector].to(mock[KeystoreConnector]))
 
@@ -61,6 +62,24 @@ trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with 
 
   val mockMcc = mock[MessagesControllerComponents]
 
+  before {
+    reset {
+      commonDependencies
+      messagesApi
+      messages
+      headerCarrier
+      partialsProvider
+      lang
+      appConfig
+      mat
+      messagesProvider
+      mockMcc
+    }
+  }
+
+  when(appConfig.mongoEncryptionEnabled).thenReturn(false)
+
+
   def addToken[T](fakeRequest: FakeRequest[T]) = {
     import play.api.test.CSRFTokenHelper._
 
@@ -68,7 +87,8 @@ trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with 
     val csrfFilter     = app.injector.instanceOf[CSRFFilter]
     val token          = csrfFilter.tokenProvider.generateToken
 
-    fakeRequest.withHeaders((csrfConfig.headerName, token)).withCSRFToken
+    //fakeRequest.withHeaders((csrfConfig.headerName, token)).withCSRFToken
+    CSRFRequest(fakeRequest.withHeaders((csrfConfig.headerName, token))).withCSRFToken
   }
 
   def addTokenForView[T]() = {

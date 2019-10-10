@@ -17,7 +17,7 @@
 package connectors
 
 import audit.EnrolEvent
-import config.AppConfig
+import config.ApplicationConfig
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
 import javax.inject.Inject
 import models.governmentgateway.EnrolmentRequest
@@ -32,7 +32,7 @@ import utils.AuditHelper
 import scala.concurrent.{ExecutionContext, Future}
 
 class GovernmentGatewayConnector @Inject()(val http: HttpClient,
-                                           val appConfig: AppConfig,
+                                           val appConfig: ApplicationConfig,
                                            val auditConnector: AuditConnector) {
 
   val audit: Audit = new Audit(AuditHelper.appName, auditConnector)

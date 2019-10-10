@@ -16,7 +16,7 @@
 
 package connectors
 
-import config.AppConfig
+import config.ApplicationConfig
 import javax.inject.Inject
 import play.api.Configuration
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
@@ -26,7 +26,7 @@ import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import scala.concurrent.ExecutionContext
 
 class TestOnlyStubConnector @Inject()(val http: HttpClient,
-                                      applicationConfig: AppConfig,
+                                      applicationConfig: ApplicationConfig,
                                       val configuration: Configuration,
                                       val runMode: RunMode) extends ServicesConfig(configuration, runMode) {
 

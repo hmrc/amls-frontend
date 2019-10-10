@@ -16,7 +16,7 @@
 
 package controllers.responsiblepeople
 
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople.ResponsiblePerson._
@@ -43,7 +43,7 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
   trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
 
-    lazy val mockAppConfig = mock[AppConfig]
+    lazy val mockApplicationConfig = mock[ApplicationConfig]
 
     lazy val defaultBuilder = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]

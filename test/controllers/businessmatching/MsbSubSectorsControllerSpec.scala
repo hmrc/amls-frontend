@@ -18,7 +18,7 @@ package controllers.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._
-import config.AppConfig
+import config.ApplicationConfig
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import generators.businessmatching.BusinessMatchingGenerator
@@ -44,7 +44,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
     self =>
     val request = addToken(authRequest)
 
-    val config = mock[AppConfig]
+    val config = mock[ApplicationConfig]
 
     val controller = new MsbSubSectorsController(
       SuccessfulAuthAction, ds = commonDependencies,
