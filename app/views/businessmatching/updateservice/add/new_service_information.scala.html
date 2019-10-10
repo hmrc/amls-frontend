@@ -59,7 +59,7 @@
             <p>@Messages("businessmatching.updateservice.newserviceinformation.info.4")</p>
         }
         case list if list.size == 1 => {
-            <p>@Messages("businessmatching.updateservice.newserviceinformation.info.1", activities.mkString(" ")).toLowerCase</p>
+            <p>@Messages("businessmatching.updateservice.newserviceinformation.info.1", (activities.mkString(" ")).toLowerCase)</p>
         }
     }
 
