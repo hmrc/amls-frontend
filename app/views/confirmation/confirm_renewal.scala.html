@@ -42,6 +42,12 @@
 
     @breakdown_display(total, breakdown, Messages("confirmation.renewal.summary"))
 
+    <div id="timelimit"><p>@Messages("confirmation.timelimit")</p></div>
+
+    @printLink(linkId = "confirmation-print",
+        gaTag = Some("fee-reference:click:print")
+    )
+
     <p><a id='continue-pay' class="button" href="@paymentsUrl">@Messages("button.continuetopayment")</a></p>
 
 }
