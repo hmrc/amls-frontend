@@ -64,9 +64,7 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
 
     val personName = Some(PersonName("firstname", None, "lastname"))
 
-    "get" must {
-
-      "load the page with the business activities" in new Fixture {
+    "on get load the page with the business activities" in new Fixture {
 
         val mockCacheMap = mock[CacheMap]
 
@@ -95,7 +93,6 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
 
         contentAsString(result) must include(Messages("responsiblepeople.experiencetraining.title"))
       }
-    }
 
     "on get display the page with pre populated data for the Yes Option" in new Fixture {
 

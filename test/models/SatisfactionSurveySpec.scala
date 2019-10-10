@@ -125,15 +125,15 @@ class SatisfactionSurveySpec extends PlaySpec with MockitoSugar {
 
     "successfully validate given feedback with details" in {
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "01", "details" ->"123")) must
-        be(JsSuccess(First(Some("123")), JsPath))
+        be(JsSuccess(First(Some("123")), JsPath \ "details"))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "02", "details" ->"123")) must
-        be(JsSuccess(Second(Some("123")), JsPath))
+        be(JsSuccess(Second(Some("123")), JsPath \ "details"))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "03", "details" ->"123")) must
-        be(JsSuccess(Third(Some("123")), JsPath))
+        be(JsSuccess(Third(Some("123")), JsPath \ "details"))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "04", "details" ->"123")) must
-        be(JsSuccess(Fourth(Some("123")), JsPath))
+        be(JsSuccess(Fourth(Some("123")), JsPath \ "details"))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "05", "details" ->"123")) must
-        be(JsSuccess(Fifth(Some("123")), JsPath))
+        be(JsSuccess(Fifth(Some("123")), JsPath \ "details"))
 
     }
 

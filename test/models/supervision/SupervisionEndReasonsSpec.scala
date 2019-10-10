@@ -94,7 +94,7 @@ class SupervisionEndReasonsSpec extends PlaySpec with MockitoSugar {
 
       val expected = SupervisionEndReasons(reason)
 
-      Json.fromJson[SupervisionEndReasons](input) must be (JsSuccess(expected, JsPath))
+      Json.fromJson[SupervisionEndReasons](input) must be (JsSuccess(expected, JsPath \ "supervisionEndingReason"))
     }
 
     "fail when data is missing" in {

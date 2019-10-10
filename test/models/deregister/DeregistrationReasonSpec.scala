@@ -141,7 +141,7 @@ class DeregistrationReasonSpec extends PlaySpec with MustMatchers with MockitoSu
 
     "validate given an enum value and string" in {
       Json.fromJson[DeregistrationReason](Json.obj("deregistrationReason" -> "Other, please specify", "specifyOtherReason" -> "reason")) must
-        be(JsSuccess(DeregistrationReason.Other("reason"), JsPath))
+        be(JsSuccess(DeregistrationReason.Other("reason"), JsPath \ "specifyOtherReason"))
     }
 
     "write the correct value" when {

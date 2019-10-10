@@ -162,7 +162,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("previouslyRegistered" -> true, "prevMLRRegNo" -> "12345678")
 
       Json.fromJson[PreviouslyRegistered](json) must
-        be(JsSuccess(PreviouslyRegisteredYes("12345678"), JsPath))
+        be(JsSuccess(PreviouslyRegisteredYes("12345678"), JsPath \ "prevMLRRegNo"))
     }
 
     "fail to validate when given an empty `Yes` value" in {

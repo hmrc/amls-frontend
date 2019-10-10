@@ -113,7 +113,7 @@ class InvolvedInOtherSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("involvedInOther" -> true, "details" ->"test")
 
       Json.fromJson[InvolvedInOther](json) must
-        be(JsSuccess(InvolvedInOtherYes("test"), JsPath))
+        be(JsSuccess(InvolvedInOtherYes("test"), JsPath \ "details"))
     }
 
     "fail to validate when given an empty `Yes` value" in {

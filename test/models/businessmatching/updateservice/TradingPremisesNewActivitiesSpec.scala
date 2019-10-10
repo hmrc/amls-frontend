@@ -81,7 +81,7 @@ class TradingPremisesNewActivitiesSpec extends PlaySpec with MustMatchers {
           val json = Json.obj("tradingPremisesNewActivities" -> true, "businessActivities" -> "04")
 
           Json.fromJson[AreNewActivitiesAtTradingPremises](json) must
-            be(JsSuccess(NewActivitiesAtTradingPremisesYes(HighValueDealing), JsPath))
+            be(JsSuccess(NewActivitiesAtTradingPremisesYes(HighValueDealing), JsPath \ "businessActivities"))
         }
 
     }

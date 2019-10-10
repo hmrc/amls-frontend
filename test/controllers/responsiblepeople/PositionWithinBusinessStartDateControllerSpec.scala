@@ -70,15 +70,15 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
   private val startDate: Option[PositionStartDate] = Some(PositionStartDate(new LocalDate()))
 
+  val pageTitle = "When did this person start their role in the business? - " +
+    Messages("summary.responsiblepeople") + " - " +
+    Messages("title.amls") + " - " + Messages("title.gov")
+
+  val pageHeader = "When did firstname lastname start their role in the business?"
+
+  val personName = Some(PersonName("firstname", None, "lastname"))
+
   "PositionWithinBusinessStartDateController" when {
-
-    val pageTitle = "When did this person start their role in the business? - " +
-      Messages("summary.responsiblepeople") + " - " +
-      Messages("title.amls") + " - " + Messages("title.gov")
-
-    val pageHeader = "When did firstname lastname start their role in the business?"
-
-    val personName = Some(PersonName("firstname", None, "lastname"))
 
     "get is called" must {
 

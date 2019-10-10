@@ -95,7 +95,7 @@ class ServicesOfBusinessSpec extends PlaySpec with MockitoSugar {
 
       "successfully validate json write" in {
 
-        val json = Json.obj("services" -> Set("01","02","03","04","05"))
+        val json = Json.obj("services" -> Seq("04","05","03","02","01"))
         Json.toJson(ServicesOfBusiness(businessServices)) must be(json)
       }
     }

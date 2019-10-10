@@ -25,8 +25,6 @@ import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 class ProfessionalBodySpec extends PlaySpec with MockitoSugar {
 
   "Form Validation" must {
-
-
     "pass validation" when {
       "given a valid enum value" in {
 
@@ -136,7 +134,7 @@ class ProfessionalBodySpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("penalised" -> true, "professionalBody" ->"details")
 
       Json.fromJson[ProfessionalBody](json) must
-        be(JsSuccess(ProfessionalBodyYes("details"), JsPath))
+        be(JsSuccess(ProfessionalBodyYes("details"), JsPath \ "professionalBody"))
     }
 
     "fail to validate when given an empty `Yes` value" in {

@@ -16,13 +16,16 @@
 
 package models
 
-import connectors.KeystoreConnector
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
 import utils.AmlsSpec
-import play.api.inject.bind
+import org.mockito.Mockito.reset
 
-class ReturnNameValuePairSpec extends AmlsSpec with OneAppPerSuite {
+class ReturnNameValuePairSpec extends AmlsSpec with GuiceOneAppPerSuite {
+
+  reset {
+    appConfig
+  }
 
   implicit override lazy val app = new GuiceApplicationBuilder()
     .configure("microservice.services.amls-frontend.public.host" -> "somehost:9000")

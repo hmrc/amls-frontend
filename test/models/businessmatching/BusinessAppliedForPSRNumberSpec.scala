@@ -96,7 +96,7 @@ class BusinessAppliedForPSRNumberSpec extends PlaySpec {
 
       "Successfully read and write data:option yes" in {
         BusinessAppliedForPSRNumber.jsonReads.reads(BusinessAppliedForPSRNumber.jsonWrites.writes(BusinessAppliedForPSRNumberYes("123456"))) must
-          be(JsSuccess(BusinessAppliedForPSRNumberYes("123456"), JsPath))
+          be(JsSuccess(BusinessAppliedForPSRNumberYes("123456"), JsPath \ "regNumber"))
       }
 
       "Successfully read and write data:option No" in {
