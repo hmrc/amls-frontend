@@ -24,6 +24,7 @@ import views.html.businessactivities._
 import javax.inject.Inject
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import utils.BooleanFormReadWrite._
 
 import scala.concurrent.Future

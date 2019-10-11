@@ -27,6 +27,7 @@ import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.msb.send_money_to_other_country
 
 import scala.concurrent.Future

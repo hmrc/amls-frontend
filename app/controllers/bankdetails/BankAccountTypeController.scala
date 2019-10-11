@@ -24,6 +24,7 @@ import models.bankdetails._
 import play.api.mvc.{MessagesControllerComponents, Request}
 import services.StatusService
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 

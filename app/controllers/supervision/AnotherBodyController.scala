@@ -24,6 +24,7 @@ import models.supervision.{AnotherBody, AnotherBodyNo, AnotherBodyYes, Supervisi
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.supervision.another_body
 
 import scala.concurrent.Future

@@ -19,6 +19,7 @@ package controllers
 import javax.inject.{Inject, Singleton}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.login_event
 
 import scala.concurrent.Future

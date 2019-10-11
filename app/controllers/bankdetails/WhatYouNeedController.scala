@@ -25,6 +25,7 @@ import models.bankdetails.BankDetails
 import models.bankdetails.BankDetails.Filters._
 import play.api.mvc.{Call, MessagesControllerComponents}
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.bankdetails._
 
 class WhatYouNeedController @Inject()(val authAction: AuthAction,

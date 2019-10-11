@@ -19,6 +19,7 @@ package controllers
 import javax.inject.Inject
 import play.api.mvc._
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 

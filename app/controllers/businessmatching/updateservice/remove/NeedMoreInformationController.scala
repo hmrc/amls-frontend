@@ -26,6 +26,7 @@ import models.flowmanagement.{NeedToUpdatePageId, RemoveBusinessTypeFlowModel}
 import play.api.mvc.MessagesControllerComponents
 import services.flowmanagement.Router
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.businessmatching.updateservice.remove.need_more_information
 
 import scala.concurrent.Future

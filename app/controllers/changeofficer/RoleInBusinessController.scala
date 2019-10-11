@@ -28,6 +28,7 @@ import models.changeofficer.{ChangeOfficer, Role, RoleInBusiness}
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 

@@ -23,6 +23,7 @@ import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionRea
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class RegisterResponsiblePersonController @Inject()(val dataCacheConnector: DataCacheConnector,

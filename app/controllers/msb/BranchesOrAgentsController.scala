@@ -24,6 +24,7 @@ import models.moneyservicebusiness.{BranchesOrAgents, BranchesOrAgentsHasCountri
 import play.api.mvc.{Call, MessagesControllerComponents}
 import services.AutoCompleteService
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 

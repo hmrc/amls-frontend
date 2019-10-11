@@ -27,6 +27,7 @@ import models.flowmanagement.{AddBusinessTypeFlowModel, PsrNumberPageId}
 import play.api.mvc.MessagesControllerComponents
 import services.flowmanagement.Router
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.businessmatching.updateservice.add.business_applied_for_psr_number
 
 import scala.concurrent.Future

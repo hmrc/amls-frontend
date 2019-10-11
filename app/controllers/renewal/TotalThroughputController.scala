@@ -27,6 +27,7 @@ import models.renewal.{Renewal, TotalThroughput}
 import play.api.mvc.{MessagesControllerComponents, Result}
 import services.RenewalService
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.renewal.total_throughput
 
 import scala.concurrent.Future

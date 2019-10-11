@@ -22,13 +22,17 @@ import models.registrationprogress.{NotStarted, Section, Started}
 import play.api.mvc.MessagesControllerComponents
 import services.RenewalService
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.renewal._
+
+import scala.concurrent.ExecutionContext
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class WhatYouNeedController @Inject()(val authAction: AuthAction,
                                       val ds: CommonPlayDependencies,
                                       renewalService: RenewalService,
-                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                      val cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
     implicit request =>

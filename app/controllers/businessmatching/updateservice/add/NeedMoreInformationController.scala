@@ -27,16 +27,18 @@ import models.flowmanagement.{AddBusinessTypeFlowModel, NeedMoreInformationPageI
 import play.api.mvc.MessagesControllerComponents
 import services.flowmanagement.Router
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.businessmatching.updateservice.add.new_service_information
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
+import ExecutionContext.Implicits.global
 
 @Singleton
 class NeedMoreInformationController @Inject()(authAction: AuthAction,
                                               val ds: CommonPlayDependencies,
                                               implicit val dataCacheConnector: DataCacheConnector,
                                               val router: Router[AddBusinessTypeFlowModel],
-                                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                              val cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
       implicit request =>

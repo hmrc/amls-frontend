@@ -22,6 +22,7 @@ import javax.inject.{Inject, Singleton}
 import models.bankdetails.BankDetails
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 

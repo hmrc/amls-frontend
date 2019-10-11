@@ -23,6 +23,7 @@ import javax.inject.Inject
 import models.hvd.{CashPayment, CashPaymentFirstDate, CashPaymentOverTenThousandEuros, Hvd}
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.hvd.cash_payment_first_date
 
 import scala.concurrent.Future

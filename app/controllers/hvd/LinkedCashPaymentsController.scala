@@ -23,6 +23,7 @@ import javax.inject.Inject
 import models.hvd.{Hvd, LinkedCashPayments}
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.hvd.linked_cash_payments
 
 import scala.concurrent.Future

@@ -25,6 +25,7 @@ import models.SubmissionRequestStatus
 import play.api.mvc.MessagesControllerComponents
 import services.{AuthEnrolmentsService, FeeResponseService, StatusService}
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

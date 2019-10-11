@@ -23,6 +23,7 @@ import javax.inject.Inject
 import models.moneyservicebusiness.{FundsTransfer, MoneyServiceBusiness}
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.msb._
 
 import scala.concurrent.Future

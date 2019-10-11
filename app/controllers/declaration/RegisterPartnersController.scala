@@ -30,6 +30,7 @@ import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
 import services.{ProgressService, StatusService}
 import utils.DeclarationHelper._
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.declaration.register_partners
 
 import scala.concurrent.Future

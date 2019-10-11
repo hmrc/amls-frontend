@@ -24,6 +24,7 @@ import models.renewal.{CETransactionsInLast12Months, Renewal}
 import play.api.mvc.MessagesControllerComponents
 import services.RenewalService
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.renewal.ce_transactions_in_last_12_months
 
 import scala.concurrent.Future

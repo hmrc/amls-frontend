@@ -25,6 +25,7 @@ import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.msb.transactions_in_next_12_months
 
 import scala.concurrent.Future

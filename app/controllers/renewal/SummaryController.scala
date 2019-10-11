@@ -27,6 +27,7 @@ import models.renewal.Renewal
 import play.api.mvc.MessagesControllerComponents
 import services.{ProgressService, RenewalService, SectionsProvider}
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.renewal.summary
 
 import scala.concurrent.Future

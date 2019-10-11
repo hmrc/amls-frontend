@@ -18,67 +18,53 @@ package utils
 
 import akka.stream.Materializer
 import config.{ApplicationConfig, CachedStaticHtmlPartialProvider}
-import connectors.KeystoreConnector
-import org.mockito.Mockito.{reset, when}
-import controllers.{AmlsBaseController, CommonPlayDependencies}
-import org.scalatest.{BeforeAndAfter, MustMatchers}
+import controllers.CommonPlayDependencies
+import org.mockito.Mockito.when
+import org.scalatest.MustMatchers
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.i18n.{Lang, MessagesApi, MessagesProvider}
-import play.api.inject.bind
-import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
-import play.api.libs.typedmap.TypedKey
+import play.api.i18n.{Lang, MessagesApi, MessagesImpl, MessagesProvider}
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
-import play.api.{Application, Mode}
-import play.filters.csrf.CSRF.{Token, TokenInfo, TokenProvider}
 import play.filters.csrf.{CSRFConfigProvider, CSRFFilter}
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
-trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with MustMatchers with AuthorisedFixture with  BeforeAndAfter {
+import scala.concurrent.ExecutionContext
 
-  protected val bindModules: Seq[GuiceableModule] = Seq(bind[KeystoreConnector].to(mock[KeystoreConnector]))
+trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with ScalaFutures with MustMatchers {
 
-  implicit override lazy val app: Application = new GuiceApplicationBuilder()
-    .disable[com.kenshoo.play.metrics.PlayModule]
-    .bindings(bindModules:_*).in(Mode.Test)
-    .build()
+  var authConnector = mock[AuthConnector]
 
-  val commonDependencies = app.injector.instanceOf(classOf[CommonPlayDependencies])
+  val authRequest = FakeRequest().withSession(
+    SessionKeys.sessionId -> "SessionId",
+    SessionKeys.token -> "Token",
+    SessionKeys.userId -> "Test User",
+    SessionKeys.authToken -> ""
+  )
 
-  implicit lazy val messagesApi = app.injector.instanceOf(classOf[MessagesApi])
-  implicit lazy val messages = messagesApi.preferred(FakeRequest())
+  import play.api.test.CSRFTokenHelper._
 
-  implicit val headerCarrier = HeaderCarrier()
-
-  implicit val partialsProvider = app.injector.instanceOf(classOf[CachedStaticHtmlPartialProvider])
-
-  implicit val lang = mock[Lang]
+  implicit val requestWithToken = CSRFRequest(FakeRequest()).withCSRFToken
+  val messagesApi = app.injector.instanceOf[MessagesApi]
+  implicit val messages = messagesApi.preferred(requestWithToken)
+  implicit val partialProvider = mock[CachedStaticHtmlPartialProvider]
+  implicit val lang = Lang.defaultLang
   implicit val appConfig = mock[ApplicationConfig]
+
+  val commonDependencies = new CommonPlayDependencies(appConfig, messagesApi, partialProvider)
+
+  implicit val messagesProvider: MessagesProvider = MessagesImpl(lang, messagesApi)
   implicit val mat = mock[Materializer]
-  implicit val messagesProvider = mock[MessagesProvider]
 
   val mockMcc = mock[MessagesControllerComponents]
 
-  before {
-    reset {
-      commonDependencies
-      messagesApi
-      messages
-      headerCarrier
-      partialsProvider
-      lang
-      appConfig
-      mat
-      messagesProvider
-      mockMcc
-    }
-  }
+  implicit val ec: ExecutionContext = mock[ExecutionContext]
+  implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
 
   when(appConfig.mongoEncryptionEnabled).thenReturn(false)
-
 
   def addToken[T](fakeRequest: FakeRequest[T]) = {
     import play.api.test.CSRFTokenHelper._

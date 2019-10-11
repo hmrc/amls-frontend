@@ -28,6 +28,7 @@ import play.api.mvc.{MessagesControllerComponents, Request, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import utils.ControllerHelper
 
 import scala.concurrent.ExecutionContext.Implicits.global

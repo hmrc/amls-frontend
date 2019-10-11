@@ -25,6 +25,7 @@ import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
+import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import utils._
@@ -34,12 +35,13 @@ class NeedMoreInformationControllerSpec extends AmlsSpec with MockitoSugar with 
   sealed trait Fixture extends DependencyMocks {
     self =>
 
-    val request = addToken(authRequest)
+    val request = requestWithToken
     val mockBusinessMatchingService = mock[BusinessMatchingService]
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
     val controller = new NeedMoreInformationController(
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[AddBusinessTypeFlowModel],
       cc = mockMcc

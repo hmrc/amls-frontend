@@ -27,6 +27,7 @@ import models.renewal.{MoneySources, Renewal}
 import play.api.mvc.{MessagesControllerComponents, Result}
 import services.RenewalService
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.renewal.money_sources
 
 import scala.concurrent.Future

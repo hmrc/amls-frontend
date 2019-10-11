@@ -20,7 +20,7 @@ import controllers.actions.SuccessfulAuthAction
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved, SubmissionReadyForReview}
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
@@ -28,11 +28,11 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture extends DependencyMocks {
-    self =>
+    self => val request = addToken(authRequest)
 
-    val request = addToken(authRequest)
     val controller = new WhatYouNeedController(
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       statusService = mockStatusService,
       authConnector = mock[AuthConnector],
       cc = mockMcc)

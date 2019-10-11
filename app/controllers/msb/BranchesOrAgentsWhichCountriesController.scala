@@ -25,6 +25,7 @@ import play.api.mvc.MessagesControllerComponents
 import services.AutoCompleteService
 import utils.ControllerHelper
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 

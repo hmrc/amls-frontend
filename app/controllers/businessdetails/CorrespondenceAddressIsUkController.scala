@@ -24,6 +24,7 @@ import models.businessdetails.{BusinessDetails, CorrespondenceAddress, Correspon
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.businessdetails._
 
 import scala.concurrent.Future

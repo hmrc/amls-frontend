@@ -24,6 +24,7 @@ import models.businessmatching.BusinessType._
 import models.businessmatching.{BusinessMatching, BusinessType}
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.businessmatching._
 
 import scala.concurrent.Future

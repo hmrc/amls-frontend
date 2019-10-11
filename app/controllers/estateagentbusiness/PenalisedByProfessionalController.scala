@@ -23,6 +23,7 @@ import javax.inject.Inject
 import models.estateagentbusiness.{EstateAgentBusiness, ProfessionalBody}
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.estateagentbusiness._
 
 import scala.concurrent.Future

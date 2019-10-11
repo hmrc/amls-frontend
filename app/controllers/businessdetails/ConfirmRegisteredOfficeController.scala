@@ -27,6 +27,7 @@ import models.businessdetails.{BusinessDetails, ConfirmRegisteredOffice, Registe
 import models.businessmatching.BusinessMatching
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.businessdetails._
 
 import scala.concurrent.ExecutionContext.Implicits.global

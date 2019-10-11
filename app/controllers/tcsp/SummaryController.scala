@@ -30,6 +30,7 @@ import views.html.tcsp.summary
 import play.api.Logger
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class SummaryController @Inject()(
                                   val dataCache: DataCacheConnector,

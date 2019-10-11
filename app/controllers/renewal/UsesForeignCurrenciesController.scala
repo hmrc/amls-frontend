@@ -27,6 +27,7 @@ import models.renewal._
 import play.api.mvc.MessagesControllerComponents
 import services.RenewalService
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.renewal.uses_foreign_currencies
 
 import scala.concurrent.Future

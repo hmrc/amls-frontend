@@ -23,6 +23,7 @@ import javax.inject.Inject
 import models.businessmatching.{BusinessMatching, TypeOfBusiness}
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.businessmatching.type_of_business
 
 import scala.concurrent.Future

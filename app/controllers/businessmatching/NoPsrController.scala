@@ -22,6 +22,7 @@ import models.status.{NotCompleted, SubmissionReady}
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class NoPsrController @Inject()(val authAction: AuthAction,
                                 val ds: CommonPlayDependencies,
