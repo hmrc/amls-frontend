@@ -49,7 +49,7 @@ class ApplicationConfig @Inject()(val configuration: Configuration, val runMode:
   val reportAProblemNonJSUrl = s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
 
   lazy val loginUrl = getConfigString("login.url")
-  lazy val logoutUrl = getConfigString("logout.url")
+  def logoutUrl = getConfigString("logout.url")
   lazy val loginContinue = getConfigString("login.continue")
 
   //lazy val amlsUrl = baseUrl("amls")

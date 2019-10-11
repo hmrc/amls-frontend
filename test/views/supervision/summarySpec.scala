@@ -21,17 +21,17 @@ import models.supervision._
 import org.joda.time.LocalDate
 import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.MustMatchers
-import utils.AmlsViewSpec
 import play.api.i18n.Messages
-import views.{Fixture, HtmlAssertions}
+import play.api.test.FakeRequest
+import utils.AmlsSummaryViewSpec
+import views.Fixture
 
 import scala.collection.JavaConversions._
 
-class summarySpec extends AmlsViewSpec with MustMatchers with TableDrivenPropertyChecks with HtmlAssertions {
+class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks{
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken = addTokenForView(FakeRequest())
 
     val start = Some(SupervisionStart(new LocalDate(1990, 2, 24)))  //scalastyle:off magic.number
     val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24)))//scalastyle:off magic.number

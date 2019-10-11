@@ -21,22 +21,19 @@ import models.hvd.PercentageOfCashPaymentOver15000.Third
 import models.hvd._
 import org.joda.time.LocalDate
 import org.jsoup.nodes.Element
-import org.scalatest.MustMatchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
-import utils.AmlsViewSpec
-import views.{Fixture, HtmlAssertions}
+import play.api.test.FakeRequest
+import utils.AmlsSummaryViewSpec
+import views.Fixture
 
 import scala.collection.JavaConversions._
 
 
-class summarySpec extends AmlsViewSpec
-  with MustMatchers
-  with TableDrivenPropertyChecks
-  with HtmlAssertions{
+class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken = addTokenForView(FakeRequest())
   }
 
   "summary view" must {
@@ -65,20 +62,21 @@ class summarySpec extends AmlsViewSpec
       "Other: Other Product"
     )
 
-    val sectionChecks = Table[String, Element=>Boolean](
-      ("title key", "check"),
-      ("hvd.cash.payment.title",checkElementTextIncludes(_, "lbl.yes")),
-      ("hvd.cash.payment.date.title",checkElementTextIncludes(_, "20 June 2012")),
-      ("hvd.products.title", checkListContainsItems(_, fullProductSet)),
-      ("hvd.excise.goods.title", checkElementTextIncludes(_, "lbl.yes")),
-      ("hvd.how-will-you-sell-goods.title", checkListContainsItems(_, Set("Retail", "Auction", "Wholesale"))),
-      ("hvd.percentage.title", checkElementTextIncludes(_, "hvd.percentage.lbl.03")),
-      ("hvd.receiving.title", checkElementTextIncludes(_, "lbl.yes")),
-      ("hvd.receiving.expect.to.receive", checkElementTextIncludes(_, "hvd.receiving.option.01", "hvd.receiving.option.02", "Other payment method")),
-      ("hvd.identify.linked.cash.payment.title", checkElementTextIncludes(_, "lbl.yes"))
-    )
-
     "include the provided data" in new ViewFixture {
+
+      val sectionChecks = Table[String, Element=>Boolean](
+        ("title key", "check"),
+        ("hvd.cash.payment.title",checkElementTextIncludes(_, "lbl.yes")),
+        ("hvd.cash.payment.date.title",checkElementTextIncludes(_, "20 June 2012")),
+        ("hvd.products.title", checkListContainsItems(_, fullProductSet)),
+        ("hvd.excise.goods.title", checkElementTextIncludes(_, "lbl.yes")),
+        ("hvd.how-will-you-sell-goods.title", checkListContainsItems(_, Set("Retail", "Auction", "Wholesale"))),
+        ("hvd.percentage.title", checkElementTextIncludes(_, "hvd.percentage.lbl.03")),
+        ("hvd.receiving.title", checkElementTextIncludes(_, "lbl.yes")),
+        ("hvd.receiving.expect.to.receive", checkElementTextIncludes(_, "hvd.receiving.option.01", "hvd.receiving.option.02", "Other payment method")),
+        ("hvd.identify.linked.cash.payment.title", checkElementTextIncludes(_, "lbl.yes"))
+      )
+
       def view = {
         val testdata = Hvd(
           cashPayment = Some(CashPayment(

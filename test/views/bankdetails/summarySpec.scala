@@ -16,28 +16,21 @@
 
 package views.bankdetails
 
-import forms.EmptyForm
 import models.bankdetails._
-import models.status._
-import org.jsoup.nodes.Element
-import org.scalacheck.Gen
-import org.scalatest.MustMatchers
 import org.scalatest.prop.PropertyChecks
 import play.api.i18n.Messages
-import utils.{AmlsViewSpec, StatusConstants}
-import views.{Fixture, HtmlAssertions}
+import play.api.test.FakeRequest
+import utils.AmlsSummaryViewSpec
+import views.Fixture
 
-import scala.collection.JavaConversions._
-
-class summarySpec extends AmlsViewSpec with MustMatchers with PropertyChecks with HtmlAssertions {
+class summarySpec extends AmlsSummaryViewSpec with PropertyChecks {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken = addTokenForView(FakeRequest())
 
     val toHide = 6
 
     val accountName = "Account Name"
-
   }
 
   "summary view" must {

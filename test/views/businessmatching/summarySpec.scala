@@ -26,13 +26,11 @@ import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
 import forms.EmptyForm
+import org.mockito.Mockito.when
 
 import scala.collection.JavaConversions._
 
-
-class summarySpec extends AmlsViewSpec
-  with MustMatchers
-  with TableDrivenPropertyChecks {
+class summarySpec extends AmlsViewSpec with MustMatchers with TableDrivenPropertyChecks {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addTokenForView()

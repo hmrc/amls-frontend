@@ -20,20 +20,17 @@ import forms.EmptyForm
 import models.businessactivities._
 import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.MustMatchers
-import utils.AmlsViewSpec
 import play.api.i18n.Messages
-import views.{Fixture, HtmlAssertions}
+import play.api.test.FakeRequest
+import utils.AmlsSummaryViewSpec
+import views.Fixture
 
 import scala.collection.JavaConversions._
 
-class summarySpec extends AmlsViewSpec
-  with MustMatchers
-  with HtmlAssertions
-  with TableDrivenPropertyChecks {
+class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken = addTokenForView(FakeRequest())
   }
 
   "summary view" must {
@@ -53,29 +50,29 @@ class summarySpec extends AmlsViewSpec
 
     }
 
-    val sectionChecks = Table[String, Element => Boolean](
-      ("title key", "check"),
-      ("businessactivities.confirm-activities.title",checkElementTextIncludes(_, "OtherActivities")),
-      ("businessactivities.business-turnover.title",checkElementTextIncludes(_, "businessactivities.turnover.lbl.01")),
-      ("businessactivities.turnover.title",checkElementTextIncludes(_, "businessactivities.business-turnover.lbl.01")),
-      ("businessactivities.businessfranchise.title",checkElementTextIncludes(_, "FranchiseName")),
-      ("businessactivities.employees.line1.cya",checkElementTextIncludes(_, "123")),
-      ("businessactivities.employees.line2.cya",checkElementTextIncludes(_, "456")),
-      ("businessactivities.keep.customer.records.title", checkElementTextIncludes(_, "lbl.yes")),
-      ("businessactivities.do.keep.records",
-        checkElementTextIncludes(_, "businessactivities.transactiontype.lbl.01", "businessactivities.transactiontype.lbl.02", "businessactivities.transactiontype.lbl.03", "SoftwareName")),
-      ("businessactivities.identify-suspicious-activity.title",checkElementTextIncludes(_, "lbl.yes")),
-      ("businessactivities.ncaRegistered.title",checkElementTextIncludes(_, "lbl.yes")),
-      ("businessactivities.riskassessment.policy.title", checkElementTextIncludes(_, "lbl.yes")),
-      ("businessactivities.document.riskassessment.policy.title",
-        checkElementTextIncludes(_, "businessactivities.RiskAssessmentType.lbl.01", "businessactivities.RiskAssessmentType.lbl.02")),
-      ("businessactivities.accountantForAMLSRegulations.title",checkElementTextIncludes(_, "lbl.yes")),
-      ("businessactivities.whoisyouraccountant.title",
-        checkElementTextIncludes(_, "AccountantName","tradingName","line1","line2","line3","line4","AB12CD")),
-      ("businessactivities.tax.matters.summary.title",checkElementTextIncludes(_, "AccountantName", "lbl.yes"))
-    )
-
     "include the provided data" in new ViewFixture {
+
+      val sectionChecks = Table[String, Element => Boolean](
+        ("title key", "check"),
+        ("businessactivities.confirm-activities.title",checkElementTextIncludes(_, "OtherActivities")),
+        ("businessactivities.business-turnover.title",checkElementTextIncludes(_, "businessactivities.turnover.lbl.01")),
+        ("businessactivities.turnover.title",checkElementTextIncludes(_, "businessactivities.business-turnover.lbl.01")),
+        ("businessactivities.businessfranchise.title",checkElementTextIncludes(_, "FranchiseName")),
+        ("businessactivities.employees.line1.cya",checkElementTextIncludes(_, "123")),
+        ("businessactivities.employees.line2.cya",checkElementTextIncludes(_, "456")),
+        ("businessactivities.keep.customer.records.title", checkElementTextIncludes(_, "lbl.yes")),
+        ("businessactivities.do.keep.records",
+          checkElementTextIncludes(_, "businessactivities.transactiontype.lbl.01", "businessactivities.transactiontype.lbl.02", "businessactivities.transactiontype.lbl.03", "SoftwareName")),
+        ("businessactivities.identify-suspicious-activity.title",checkElementTextIncludes(_, "lbl.yes")),
+        ("businessactivities.ncaRegistered.title",checkElementTextIncludes(_, "lbl.yes")),
+        ("businessactivities.riskassessment.policy.title", checkElementTextIncludes(_, "lbl.yes")),
+        ("businessactivities.document.riskassessment.policy.title",
+          checkElementTextIncludes(_, "businessactivities.RiskAssessmentType.lbl.01", "businessactivities.RiskAssessmentType.lbl.02")),
+        ("businessactivities.accountantForAMLSRegulations.title",checkElementTextIncludes(_, "lbl.yes")),
+        ("businessactivities.whoisyouraccountant.title",
+          checkElementTextIncludes(_, "AccountantName","tradingName","line1","line2","line3","line4","AB12CD")),
+        ("businessactivities.tax.matters.summary.title",checkElementTextIncludes(_, "AccountantName", "lbl.yes"))
+      )
 
       def view = views.html.businessactivities.summary(
         f = EmptyForm,

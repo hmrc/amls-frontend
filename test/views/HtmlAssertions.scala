@@ -18,23 +18,21 @@ package views
 
 import org.jsoup.nodes.Element
 import org.scalatest.MustMatchers
-import org.scalatest.mock.MockitoSugar
-import play.api.i18n.{Messages, MessagesProvider}
+import org.scalatest.mockito.MockitoSugar
+import play.api.i18n.Messages
 
 import scala.collection.JavaConversions._
 
 trait HtmlAssertions extends MockitoSugar {
   self:MustMatchers =>
 
-  implicit val provider = mock[MessagesProvider]
-
-  def checkListContainsItems(parent:Element, keysToFind:Set[String]) = {
+  def checkListContainsItems(parent:Element, keysToFind:Set[String])(implicit messages: Messages) = {
     val texts = parent.select("li").toSet.map((el:Element) => el.text())
     texts must be (keysToFind.map(k => Messages(k)))
     true
   }
 
-  def checkElementTextIncludes(el:Element, keys : String*) = {
+  def checkElementTextIncludes(el:Element, keys : String*)(implicit messages: Messages) = {
     val t = el.text()
     val l = el.getElementsByTag("a").attr("href")
     val p = l.substring(l.indexOf("?"))
@@ -45,7 +43,7 @@ trait HtmlAssertions extends MockitoSugar {
     true
   }
 
-  def checkElementTextOnlyIncludes(el:Element, keys : String*) = {
+  def checkElementTextOnlyIncludes(el:Element, keys : String*)(implicit messages: Messages) = {
     val t = el.text()
     keys.foreach { k =>
       t must include(Messages(k))

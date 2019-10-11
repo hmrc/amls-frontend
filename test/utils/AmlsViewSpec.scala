@@ -20,6 +20,7 @@ import akka.stream.Materializer
 import config.{ApplicationConfig, CachedStaticHtmlPartialProvider}
 import connectors.KeystoreConnector
 import controllers.CommonPlayDependencies
+import org.mockito.Mockito.when
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
@@ -54,7 +55,7 @@ trait AmlsViewSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with M
   val commonDependencies = app.injector.instanceOf(classOf[CommonPlayDependencies])
 
   implicit lazy val messagesApi = app.injector.instanceOf(classOf[MessagesApi])
-  implicit lazy val messages = messagesApi.preferred(FakeRequest())
+  implicit lazy  val messages = messagesApi.preferred(FakeRequest())
 
   implicit val headerCarrier = HeaderCarrier()
 
@@ -82,29 +83,5 @@ trait AmlsViewSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with M
     CSRFRequest(authRequest).withCSRFToken
   }
 
-//  def addTokenWithUrlEncodedBody[T](fakeRequest: FakeRequest[T])(data: (String,String)*) = {
-//    import play.api.test.CSRFTokenHelper._
-//
-//    val csrfConfig     = app.injector.instanceOf[CSRFConfigProvider].get
-//    val csrfFilter     = app.injector.instanceOf[CSRFFilter]
-//    val token          = csrfFilter.tokenProvider.generateToken
-//
-//    fakeRequest.withSession(SessionKeys.sessionId -> "fakesessionid")
-//      .withHeaders((csrfConfig.headerName, token)).withFormUrlEncodedBody(data:_*).withCSRFToken
-//  }
-
-//  def requestWithUrlEncodedBody(data: (String, String)*) = addTokenWithUrlEncodedBody(authRequest)(data:_*)
-//
-//  def addTokenWithHeaders[T](fakeRequest: FakeRequest[T])(data: (String,String)*) = {
-//    import play.api.test.CSRFTokenHelper._
-//
-//    val csrfConfig     = app.injector.instanceOf[CSRFConfigProvider].get
-//    val csrfFilter     = app.injector.instanceOf[CSRFFilter]
-//    val token          = csrfFilter.tokenProvider.generateToken
-//
-//    fakeRequest.withSession(SessionKeys.sessionId -> "fakesessionid")
-//      .withHeaders((csrfConfig.headerName, token)).withHeaders(data:_*).withCSRFToken
-//  }
-//
-//  def requestWithHeaders(data: (String, String)*) = addTokenWithHeaders(authRequest)(data:_*)
+  when(appConfig.logoutUrl).thenReturn("some url")
 }
