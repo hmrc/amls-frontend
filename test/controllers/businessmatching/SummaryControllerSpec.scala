@@ -22,10 +22,11 @@ import controllers.actions.SuccessfulAuthAction
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.businessmatching.updateservice._
+import models.flowmanagement.AddBusinessTypeFlowModel
 import models.status.NotCompleted
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.any
+import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
@@ -42,7 +43,6 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
     val controller = new SummaryController (
-      dataCache = mockCacheConnector,
       authAction = SuccessfulAuthAction,
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService
@@ -55,6 +55,8 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
     when {
       mockStatusService.isPending(any())
     } thenReturn false
+
+    mockCacheConnector.fetch[AddBusinessTypeFlowModel](any(), eqTo(AddBusinessTypeFlowModel.key))(any(), any())
 
     mockApplicationStatus(NotCompleted)
 

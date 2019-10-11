@@ -26,7 +26,7 @@
 }
 
 @supportingContent = {
-    <p>@Messages("businessmatching.updateservice.msb.services.list.heading")</p>
+    <p>@hint(Messages("businessmatching.updateservice.msb.services.list.heading"))</p>
 }
 
 @main(
@@ -57,18 +57,18 @@
           @if(isFxEnabled) {
               @checkbox(
                   f = f("msbServices[]"),
-                  labelText = "businessmatching.updateservice.msb.services.list.lbl.05",
+                  labelText = "businessmatching.updateservice.msb.services.list.lbl.03",
                   value = "05"
               )
           }
           @checkbox(
             f = f("msbServices[]"),
-            labelText = "businessmatching.updateservice.msb.services.list.lbl.03",
+            labelText = "businessmatching.updateservice.msb.services.list.lbl.04",
             value = "03"
           )
           @checkbox(
             f = f("msbServices[]"),
-            labelText = "businessmatching.updateservice.msb.services.list.lbl.04",
+            labelText = "businessmatching.updateservice.msb.services.list.lbl.05",
             value = "04"
           )
       }

@@ -24,10 +24,13 @@ import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement.{AddBusinessTypeFlowModel, AddBusinessTypeSummaryPageId}
+import models.responsiblepeople.ResponsiblePerson
+import models.tradingpremises.TradingPremises
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import services.{StatusService, TradingPremisesService}
-import utils.{AuthAction, RepeatingSection}
+import uk.gov.hmrc.http.HeaderCarrier
+import utils.{AuthAction, RepeatingSection, StatusConstants}
 import views.html.businessmatching.updateservice.add.update_services_summary
 
 import scala.concurrent.Future
@@ -44,10 +47,14 @@ class AddBusinessTypeSummaryController @Inject()(
                                                ) extends DefaultBaseController with RepeatingSection {
 
   def get() = authAction.async {
-      implicit request =>
-        OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key)) collect {
-          case model if model != AddBusinessTypeFlowModel() => Ok(update_services_summary(EmptyForm, model))
-        } getOrElse Redirect(controllers.businessmatching.routes.SummaryController.get())
+    implicit request =>
+      (for {
+        flowModel <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key))
+        filteredTPs: Seq[(TradingPremises, Int)] <- helper.filteredTps(request.credId, flowModel) orElse OptionT.pure[Future, Seq[(TradingPremises, Int)]](Seq())
+        filteredRPs: Seq[(ResponsiblePerson, Int)] <- helper.filteredRps(request.credId, flowModel) orElse OptionT.pure[Future, Seq[(ResponsiblePerson, Int)]](Seq())
+      } yield {
+        Ok(update_services_summary(EmptyForm, flowModel, filteredTPs, filteredRPs))
+      }) getOrElse Redirect(controllers.businessmatching.routes.SummaryController.get())
   }
 
   def post() = authAction.async {

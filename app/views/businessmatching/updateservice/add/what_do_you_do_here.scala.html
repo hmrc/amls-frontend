@@ -26,7 +26,7 @@
 }
 
 @supportingContent = {
-    <p>@Messages("businessmatching.updateservice.whatdoyoudohere.list.heading")</p>
+    <p>@hint(Messages("businessmatching.updateservice.whatdoyoudohere.list.hint"))</p>
 }
 
 @main(
@@ -60,21 +60,21 @@
             @if(msbServiceValues.contains("05")) {
                 @checkbox(
                     f = f("msbServices[]"),
-                    labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.05",
+                    labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.03",
                     value = "05"
                 )
             }
             @if(msbServiceValues.contains("03")) {
                 @checkbox(
                     f = f("msbServices[]"),
-                    labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.03",
+                    labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.04",
                     value = "03"
                 )
             }
             @if(msbServiceValues.contains("04")) {
                 @checkbox(
                     f = f("msbServices[]"),
-                    labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.04",
+                    labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.05",
                     value = "04"
                 )
             }

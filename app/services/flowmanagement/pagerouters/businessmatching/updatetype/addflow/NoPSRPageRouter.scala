@@ -16,7 +16,7 @@
 
 package services.flowmanagement.pagerouters.addflow
 
-import controllers.businessmatching.updateservice.add.{routes => addRoutes}
+import controllers.businessmatching.routes
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement.AddBusinessTypeFlowModel
 import play.api.mvc.Result
@@ -34,7 +34,7 @@ class NoPSRPageRouter @Inject()(val statusService: StatusService,
 
   override def getRoute(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)
                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
-    Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
+    Future.successful(Redirect(routes.SummaryController.get()))
   }
 }
 

@@ -18,7 +18,6 @@ package controllers.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._
-import connectors.DataCacheConnector
 import controllers.DefaultBaseController
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
@@ -32,7 +31,6 @@ import scala.concurrent.Future
 
 @Singleton
 class SummaryController @Inject()(
-                                   val dataCache: DataCacheConnector,
                                    authAction: AuthAction,
                                    val statusService: StatusService,
                                    val businessMatchingService: BusinessMatchingService
@@ -76,5 +74,4 @@ class SummaryController @Inject()(
         } yield Redirect(controllers.routes.RegistrationProgressController.get())
       } getOrElse InternalServerError("Unable to update business matching")
   }
-
 }
