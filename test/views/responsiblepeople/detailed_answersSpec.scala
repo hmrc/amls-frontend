@@ -50,7 +50,7 @@ class detailed_answersSpec extends AmlsSpec
       (Messages("lbl.nationality"), checkElementTextIncludes(_, "United Kingdom")),
       (Messages("responsiblepeople.detailed_answers.phone_number"), checkElementTextIncludes(_, "098765")),
       (Messages("responsiblepeople.detailed_answers.email"), checkElementTextIncludes(_, "e@mail.com")),
-      (Messages("responsiblepeople.detailed_answers.address"), checkElementTextOnlyIncludes(_, "addressLine1 addressLine2 addressLine3 addressLine4 postCode1")),
+      (Messages("responsiblepeople.detailed_answers.address", personName.fullName), checkElementTextOnlyIncludes(_, "addressLine1 addressLine2 addressLine3 addressLine4 postCode1")),
       (Messages("responsiblepeople.timeataddress.address_history.heading", "firstName middleName lastName"), checkElementTextIncludes(_, "0 to 5 months")),
       (Messages("responsiblepeople.detailed_answers.previous_address"), checkElementTextIncludes(_, "addressLine5 addressLine6 addressLine7 addressLine8 postCode2")),
       (Messages("responsiblepeople.detailed_answers.other_previous_address"), checkElementTextIncludes(_, "addressLine9 addressLine10 addressLine11 addressLine12 postCode3")),
@@ -142,7 +142,7 @@ class detailed_answersSpec extends AmlsSpec
 
         override val sectionChecks = Table[String, Element => Boolean](
           ("title key", "check"),
-          (Messages("responsiblepeople.detailed_answers.address"), checkElementTextIncludes(_, "addressLine1 addressLine2 addressLine3 addressLine4 spain")),
+          (Messages("responsiblepeople.detailed_answers.address", personName.fullName), checkElementTextIncludes(_, "addressLine1 addressLine2 addressLine3 addressLine4 spain")),
           (Messages("responsiblepeople.timeataddress.address_history.heading", "firstName middleName lastName"), checkElementTextIncludes(_, "0 to 5 months")),
           (Messages("responsiblepeople.detailed_answers.previous_address"), checkElementTextIncludes(_, "addressLine5 addressLine6 addressLine7 addressLine8 postCode2")),
           (Messages("responsiblepeople.detailed_answers.other_previous_address"), checkElementTextIncludes(_, "addressLine9 addressLine10 addressLine11 addressLine12 postCode3"))
@@ -157,7 +157,7 @@ class detailed_answersSpec extends AmlsSpec
           val header = headers.toList.find(e => e.text() == key)
 
           if (key.equals(
-            Messages("responsiblepeople.detailed_answers.address")) ||
+            Messages("responsiblepeople.detailed_answers.address", personName.fullName)) ||
             key.equals(Messages("responsiblepeople.timeataddress.address_history.heading", personName.fullName))
           ) {
             header must not be None
@@ -352,7 +352,7 @@ class detailed_answersSpec extends AmlsSpec
     }
 
     "display address on separate lines" in new ViewFixture {
-      def view = views.html.responsiblepeople.detailed_answers(Some(ResponsiblePerson(addressHistory = Some(addressHistory))), 1, true, businessMatching = businessMatching)
+      def view = views.html.responsiblepeople.detailed_answers(Some(ResponsiblePerson(addressHistory = Some(addressHistory))), 1, true, rpName = personName.fullName, businessMatching = businessMatching)
 
       def checkElementHasAttribute(el: Element, keys: String*) = {
         val t = el.text()
@@ -364,7 +364,7 @@ class detailed_answersSpec extends AmlsSpec
 
       override val sectionChecks = Table[String, Element => Boolean](
         ("title key", "check"),
-        (Messages("responsiblepeople.detailed_answers.address"), checkElementHasAttribute(_, "addressLine1 addressLine2 addressLine3 addressLine4 postCode1")),
+        (Messages("responsiblepeople.detailed_answers.address", personName.fullName), checkElementHasAttribute(_, "addressLine1 addressLine2 addressLine3 addressLine4 postCode1")),
         (Messages("responsiblepeople.detailed_answers.previous_address"), checkElementHasAttribute(_, "addressLine5 addressLine6 addressLine7 addressLine8 postCode2")),
         (Messages("responsiblepeople.detailed_answers.other_previous_address"), checkElementHasAttribute(_, "addressLine9 addressLine10 addressLine11 addressLine12 postCode3"))
       )
@@ -396,12 +396,12 @@ class detailed_answersSpec extends AmlsSpec
 
     "have the correct href" in new ViewFixture {
       def view = {
-        views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModel), 1, true, businessMatching = businessMatching)
+        views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModel), 1, true, rpName = personName.fullName, businessMatching = businessMatching)
       }
 
       override val sectionChecks = Table[String, Element => Boolean](
         ("title key", "check"),
-        (Messages("responsiblepeople.detailed_answers.address"), checkElementTextIncludes(_, "/anti-money-laundering/responsible-people/moved-address/1"))
+        (Messages("responsiblepeople.detailed_answers.address", personName.fullName), checkElementTextIncludes(_, "/anti-money-laundering/responsible-people/moved-address/1"))
       )
 
       def checkElementTextIncludes(el:Element, keys : String*) = {
