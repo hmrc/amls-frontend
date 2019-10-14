@@ -97,7 +97,7 @@ class what_do_you_do_hereSpec extends AmlsSpec {
     }
 
     "show selected checkboxes as checked" in new ViewFixture {
-      val msbSubservices: Set[String] = Set("01", "02")
+      val msbSubservices: Set[String] = Set("01")
       val form2: ValidForm[BusinessMatchingMsbServices] = Form2(BusinessMatchingMsbServices(Set(TransmittingMoney)))
       override def view = what_do_you_do_here(form2, edit = true, msbSubservices)
 

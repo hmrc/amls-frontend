@@ -43,11 +43,18 @@
             panel = false,
             supportingContent = supportingContent
         ) {
-            @if(msbServiceValues.contains("01")) {
+            @if(msbServiceValues.contains("03")) {
                 @checkbox(
                     f = f("msbServices[]"),
-                    labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.01",
-                    value = "01"
+                    labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.03",
+                    value = "03"
+                )
+            }
+            @if(msbServiceValues.contains("04")) {
+                @checkbox(
+                    f = f("msbServices[]"),
+                    labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.04",
+                    value = "04"
                 )
             }
             @if(msbServiceValues.contains("02")) {
@@ -60,22 +67,15 @@
             @if(msbServiceValues.contains("05")) {
                 @checkbox(
                     f = f("msbServices[]"),
-                    labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.03",
+                    labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.05",
                     value = "05"
                 )
             }
-            @if(msbServiceValues.contains("03")) {
+            @if(msbServiceValues.contains("01")) {
                 @checkbox(
                     f = f("msbServices[]"),
-                    labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.04",
-                    value = "03"
-                )
-            }
-            @if(msbServiceValues.contains("04")) {
-                @checkbox(
-                    f = f("msbServices[]"),
-                    labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.05",
-                    value = "04"
+                    labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.01",
+                    value = "01"
                 )
             }
         }
