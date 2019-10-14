@@ -30,6 +30,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, AuthorisedRequest}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class WaysToPayController @Inject()(

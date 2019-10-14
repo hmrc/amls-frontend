@@ -26,6 +26,7 @@ import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.legal_name_change_date
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class LegalNameChangeDateController @Inject()(val dataCacheConnector: DataCacheConnector,

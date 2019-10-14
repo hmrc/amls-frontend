@@ -29,6 +29,7 @@ import services.StatusService
 import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class MSBServicesController @Inject () (
                                        val dataCacheConnector: DataCacheConnector,

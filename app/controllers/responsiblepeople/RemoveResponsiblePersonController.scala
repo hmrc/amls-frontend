@@ -28,7 +28,7 @@ import utils.{AuthAction, RepeatingSection, StatusConstants}
 import views.html.responsiblepeople.remove_responsible_person
 
 import scala.concurrent.Future
-
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class RemoveResponsiblePersonController @Inject () (
                                                    val dataCacheConnector: DataCacheConnector,

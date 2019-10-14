@@ -23,7 +23,6 @@ import javax.inject.{Inject, Singleton}
 import play.api.mvc.MessagesControllerComponents
 import services.{PaymentsService, StatusService}
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

@@ -26,6 +26,7 @@ import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import utils.{AuthAction, RepeatingSection, StatusConstants}
 import views.html.tradingpremises.remove_trading_premises
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class RemoveTradingPremisesController @Inject () (
                                                    val dataCacheConnector: DataCacheConnector,

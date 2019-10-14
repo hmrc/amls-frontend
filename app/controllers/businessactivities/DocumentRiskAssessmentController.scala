@@ -23,12 +23,12 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, RiskAssessmentPolicy, RiskAssessmentTypes}
 import models.businessmatching.BusinessMatching
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.HeaderCarrierConverter
 import utils.{AuthAction, ControllerHelper}
 import views.html.businessactivities._
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+
 
 class DocumentRiskAssessmentController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                  val authAction: AuthAction,

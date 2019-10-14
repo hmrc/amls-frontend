@@ -23,10 +23,11 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities._
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService
-import utils.{AuthAction, ControllerHelper}
+import utils.AuthAction
 import views.html.businessactivities._
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class ExpectedBusinessTurnoverController @Inject() (val dataCacheConnector: DataCacheConnector,
                                                     implicit val statusService: StatusService,

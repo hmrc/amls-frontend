@@ -26,6 +26,7 @@ import utils.{AuthAction, RepeatingSection}
 import views.html.responsiblepeople.person_name
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class PersonNameController @Inject () ( val dataCacheConnector: DataCacheConnector,
                                         authAction: AuthAction,

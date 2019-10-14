@@ -34,6 +34,7 @@ import utils.{AuthAction, BooleanFormReadWrite}
 import views.html.businessmatching.updateservice.add.trading_premises
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class TradingPremisesController @Inject()(

@@ -26,6 +26,7 @@ import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.new_home_date_of_change
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class NewHomeAddressDateOfChangeController @Inject()(val dataCacheConnector: DataCacheConnector,

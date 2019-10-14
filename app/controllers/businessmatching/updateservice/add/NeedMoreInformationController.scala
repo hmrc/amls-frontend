@@ -27,7 +27,6 @@ import models.flowmanagement.{AddBusinessTypeFlowModel, NeedMoreInformationPageI
 import play.api.mvc.MessagesControllerComponents
 import services.flowmanagement.Router
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.businessmatching.updateservice.add.new_service_information
 
 import scala.concurrent.{ExecutionContext, Future}

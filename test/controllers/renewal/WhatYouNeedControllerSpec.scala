@@ -16,23 +16,15 @@
 
 package controllers.renewal
 
-import config.{ApplicationConfig, CachedStaticHtmlPartialProvider}
-import controllers.CommonPlayDependencies
 import controllers.actions.SuccessfulAuthAction
 import models.registrationprogress.{Completed, NotStarted, Section}
 import models.renewal.Renewal
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito.when
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n._
-import play.api.mvc.{MessagesControllerComponents, Request}
-import play.api.test.FakeRequest
+import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
 import services.RenewalService
-import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AmlsSpec
 

@@ -27,6 +27,7 @@ import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.known_by
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class KnownByController @Inject()(val dataCacheConnector: DataCacheConnector,

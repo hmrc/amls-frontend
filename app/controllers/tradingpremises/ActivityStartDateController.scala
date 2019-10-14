@@ -25,7 +25,7 @@ import play.api.i18n.MessagesApi
 import play.api.mvc.{MessagesControllerComponents, Request}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, RepeatingSection}
-
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class ActivityStartDateController @Inject()(override val messagesApi: MessagesApi,

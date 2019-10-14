@@ -34,6 +34,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, ControllerHelper, DeclarationHelper, RepeatingSection}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class DetailedAnswersController @Inject () (
                                              val dataCacheConnector: DataCacheConnector,

@@ -39,6 +39,7 @@ import views.html.businessmatching.updateservice.add.select_activities
 import services.ResponsiblePeopleService.ResponsiblePeopleListHelpers
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class SelectBusinessTypeController @Inject()(

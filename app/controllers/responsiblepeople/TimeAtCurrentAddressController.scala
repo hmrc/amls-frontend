@@ -29,6 +29,7 @@ import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.time_at_address
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class TimeAtCurrentAddressController @Inject () (
                                                 val dataCacheConnector: DataCacheConnector,

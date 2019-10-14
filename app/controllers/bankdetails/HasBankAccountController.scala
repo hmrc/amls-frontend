@@ -26,6 +26,7 @@ import utils.{AuthAction, BooleanFormReadWrite}
 import views.html.bankdetails._
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class HasBankAccountController @Inject()(val authAction: AuthAction,
                                          val ds: CommonPlayDependencies,

@@ -27,6 +27,7 @@ import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class RegisteringAgentPremisesController @Inject()(val dataCacheConnector: DataCacheConnector,

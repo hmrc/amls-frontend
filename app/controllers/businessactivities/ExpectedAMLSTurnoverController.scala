@@ -22,13 +22,12 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, ExpectedAMLSTurnover}
 import models.businessmatching._
-import play.api.i18n.Messages
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService
-import utils.{AuthAction, ControllerHelper}
+import utils.AuthAction
 import views.html.businessactivities._
 
-import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCacheConnector,
                                                 val authAction: AuthAction,

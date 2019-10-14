@@ -29,6 +29,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, StatusConstants}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class BankAccountIsUKController @Inject()(val dataCacheConnector: DataCacheConnector,

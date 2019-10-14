@@ -31,6 +31,7 @@ import services.StatusService
 import utils.{AuthAction, ControllerHelper}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class AddPersonController @Inject () (val dataCacheConnector: DataCacheConnector,
                                       val statusService: StatusService,

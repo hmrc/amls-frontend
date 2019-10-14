@@ -29,7 +29,6 @@ import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.declaration.select_business_nominated_officer
 
 import scala.concurrent.ExecutionContext.Implicits.global

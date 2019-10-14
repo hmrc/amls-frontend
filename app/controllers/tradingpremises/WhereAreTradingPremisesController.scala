@@ -36,6 +36,7 @@ import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 import views.html.tradingpremises._
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class WhereAreTradingPremisesController @Inject () (
                                                      val dataCacheConnector: DataCacheConnector,

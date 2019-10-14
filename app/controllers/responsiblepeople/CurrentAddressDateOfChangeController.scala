@@ -30,6 +30,7 @@ import services.StatusService
 import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class CurrentAddressDateOfChangeController @Inject () (
                                                       val dataCacheConnector: DataCacheConnector,

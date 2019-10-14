@@ -26,7 +26,6 @@ import play.api.mvc.MessagesControllerComponents
 import services.{RenewalService, StatusService, SubmissionService}
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

@@ -25,6 +25,8 @@ import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper}
 import views.html.businessactivities._
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 class TaxMattersController @Inject() (val dataCacheConnector: DataCacheConnector,
                                       val authAction: AuthAction,
                                       val ds: CommonPlayDependencies,

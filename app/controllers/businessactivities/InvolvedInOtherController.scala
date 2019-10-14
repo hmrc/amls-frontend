@@ -22,13 +22,12 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import models.businessactivities.{BusinessActivities, _}
 import models.businessmatching._
-import play.api.i18n.Messages
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService
-import utils.{AuthAction, ControllerHelper}
+import utils.AuthAction
 import views.html.businessactivities._
 
-import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class InvolvedInOtherController @Inject() ( val dataCacheConnector: DataCacheConnector,
                                             implicit val statusService: StatusService,

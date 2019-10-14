@@ -36,6 +36,7 @@ import utils.{AuthAction, RepeatingSection}
 import views.html.businessmatching._
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class RegisterServicesController @Inject()(authAction: AuthAction,

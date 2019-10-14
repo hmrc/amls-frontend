@@ -48,6 +48,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, ControllerHelper}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class LandingController @Inject()(val landingService: LandingService,

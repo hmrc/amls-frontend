@@ -29,6 +29,7 @@ import views.html.responsiblepeople.experience_training
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class ExperienceTrainingController @Inject () (val dataCacheConnector: DataCacheConnector,
                                                authAction: AuthAction,

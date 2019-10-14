@@ -27,6 +27,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, RepeatingSection}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class BusinessStructureController @Inject()(val dataCacheConnector: DataCacheConnector,

@@ -28,6 +28,7 @@ import utils.{AuthAction, BusinessName}
 import views.html.withdrawal.withdraw_application
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class WithdrawApplicationController @Inject()(
                                                authAction: AuthAction,

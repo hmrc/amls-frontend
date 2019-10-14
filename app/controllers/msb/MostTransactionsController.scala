@@ -30,6 +30,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, ControllerHelper}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class MostTransactionsController @Inject()(authAction: AuthAction,

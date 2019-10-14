@@ -26,6 +26,7 @@ import utils.{AuthAction, RepeatingSection}
 import views.html.tradingpremises.remove_agent_premises_reasons
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class RemoveAgentPremisesReasonsController @Inject () (
                                                       val dataCacheConnector: DataCacheConnector,

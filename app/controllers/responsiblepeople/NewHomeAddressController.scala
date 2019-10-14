@@ -30,6 +30,7 @@ import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class NewHomeAddressController @Inject()(authAction: AuthAction,

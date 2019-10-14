@@ -32,6 +32,7 @@ import utils.{AuthAction, BusinessName, ControllerHelper}
 import views.html.status._
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class StatusController @Inject()(val landingService: LandingService,

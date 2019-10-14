@@ -34,6 +34,7 @@ import views.html.responsiblepeople.additional_extra_address
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class AdditionalExtraAddressController @Inject() (
                                                    val dataCacheConnector: DataCacheConnector,

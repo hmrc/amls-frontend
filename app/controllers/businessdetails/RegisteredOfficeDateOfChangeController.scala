@@ -28,6 +28,7 @@ import services.StatusService
 import utils.{AuthAction, DateOfChangeHelper}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class RegisteredOfficeDateOfChangeController @Inject () (
                                                           val dataCacheConnector: DataCacheConnector,

@@ -31,6 +31,7 @@ import audit.AddressConversions._
 import com.google.inject.Inject
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class CurrentAddressController @Inject () (
                                             val dataCacheConnector: DataCacheConnector,

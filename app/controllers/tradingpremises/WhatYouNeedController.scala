@@ -24,6 +24,7 @@ import models.businessmatching.BusinessMatching
 import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper}
 import views.html.tradingpremises._
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class WhatYouNeedController @Inject()(val dataCacheConnector: DataCacheConnector,

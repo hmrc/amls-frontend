@@ -27,6 +27,7 @@ import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.position_within_business
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class PositionWithinBusinessController @Inject () (
                                                   val dataCacheConnector: DataCacheConnector,

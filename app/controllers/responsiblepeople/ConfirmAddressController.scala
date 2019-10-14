@@ -27,6 +27,7 @@ import play.api.i18n.MessagesApi
 import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.confirm_address
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
                                          val dataCacheConnector: DataCacheConnector,

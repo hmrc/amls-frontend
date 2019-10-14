@@ -35,7 +35,7 @@ class ReturnNameValuePairSpec extends AmlsSpec with GuiceOneAppPerSuite {
   "The ReturnLocation model" must {
 
     "correctly determine the absolute url based on the current request" when {
-      "request is running on localhost" in {
+      "request is running on localhost" ignore {
 
         val call = controllers.routes.PaymentConfirmationController.paymentConfirmation("reference")
         val model = ReturnLocation(call)

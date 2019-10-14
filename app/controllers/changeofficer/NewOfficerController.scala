@@ -31,6 +31,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, RepeatingSection, StatusConstants}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class NewOfficerController @Inject()(authAction: AuthAction,
                                      val ds: CommonPlayDependencies,

@@ -27,6 +27,7 @@ import models.changeofficer._
 import models.responsiblepeople.{ResponsiblePerson, ResponsiblePersonEndDate}
 import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, RepeatingSection, StatusConstants}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class RemoveResponsiblePersonController @Inject()(authAction: AuthAction,
                                                   val ds: CommonPlayDependencies,

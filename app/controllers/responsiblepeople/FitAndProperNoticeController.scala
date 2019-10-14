@@ -24,6 +24,7 @@ import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, RepeatingSection}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class FitAndProperNoticeController @Inject()(val dataCacheConnector: DataCacheConnector,

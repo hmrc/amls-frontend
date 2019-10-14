@@ -31,6 +31,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, StatusConstants}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class BankAccountNameController @Inject()(

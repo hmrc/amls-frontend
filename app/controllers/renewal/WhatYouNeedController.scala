@@ -22,7 +22,6 @@ import models.registrationprogress.{NotStarted, Section, Started}
 import play.api.mvc.MessagesControllerComponents
 import services.RenewalService
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.renewal._
 
 import scala.concurrent.ExecutionContext

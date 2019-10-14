@@ -32,7 +32,6 @@ import views.html.renewal.summary
 
 import scala.concurrent.Future
 
-
 @Singleton
 class SummaryController @Inject()(val dataCacheConnector: DataCacheConnector,
                                   val authAction: AuthAction,

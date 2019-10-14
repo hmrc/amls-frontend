@@ -16,7 +16,6 @@
 
 package controllers.responsiblepeople
 
-import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, _}
@@ -26,6 +25,7 @@ import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class ApprovalCheckController @Inject()(
                                          val dataCacheConnector: DataCacheConnector,

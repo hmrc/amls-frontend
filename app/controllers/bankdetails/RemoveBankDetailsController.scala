@@ -24,6 +24,8 @@ import models.bankdetails.BankDetails
 import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, StatusConstants}
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 @Singleton
 class RemoveBankDetailsController @Inject()(val authAction: AuthAction,
                                             val ds: CommonPlayDependencies,

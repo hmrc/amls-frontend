@@ -30,6 +30,7 @@ import utils.{AckRefGenerator, AuthAction}
 import views.html.withdrawal.withdrawal_reason
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class WithdrawalReasonController @Inject()(
                                             authAction: AuthAction,
