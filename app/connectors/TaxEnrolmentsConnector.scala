@@ -31,11 +31,15 @@ import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TaxEnrolmentsConnector @Inject()(http: HttpClient, appConfig: ApplicationConfig, audit: AuditConnector) {
+class TaxEnrolmentsConnector @Inject()(http: HttpClient, val appConfig: ApplicationConfig, audit: AuditConnector) {
 
   lazy val baseUrl = if (appConfig.enrolmentStubsEnabled) {
+    println(appConfig.enrolmentStubsEnabled)
+    println(s"${appConfig.enrolmentStubsUrl}/tax-enrolments")
     s"${appConfig.enrolmentStubsUrl}/tax-enrolments"
   } else {
+    println(appConfig.enrolmentStubsEnabled)
+    println(s"${appConfig.enrolmentStoreUrl}/tax-enrolments")
     s"${appConfig.enrolmentStoreUrl}/tax-enrolments"
   }
 

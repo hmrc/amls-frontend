@@ -36,6 +36,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.HttpResponse
@@ -325,7 +326,8 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
           controller.amlsConnector.refreshPaymentStatus(any(), any())(any(), any())
         } thenReturn Future.successful(paymentStatus)
 
-        val failedRequest = addToken(authRequest.copyFakeRequest(uri = baseUrl + "?paymentStatus=Failed"))
+        val failedRequest = addToken(FakeRequest("GET", s"$baseUrl?paymentStatus=Failed"))
+
         val result = controller.paymentConfirmation(payment.reference)(failedRequest)
 
         status(result) mustBe OK
@@ -350,7 +352,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
           controller.amlsConnector.refreshPaymentStatus(any(), any())(any(), any())
         } thenReturn Future.successful(paymentStatus)
 
-        val cancelledRequest = addToken(authRequest.copyFakeRequest(uri = baseUrl + "?paymentStatus=Cancelled"))
+        val cancelledRequest = addToken(FakeRequest("GET", s"$baseUrl?paymentStatus=Cancelled"))
         val result = controller.paymentConfirmation(payment.reference)(cancelledRequest)
 
         status(result) mustBe OK
@@ -378,7 +380,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
           controller.amlsConnector.getPaymentByAmlsReference(any(), any())(any(), any())
         } thenReturn Future.successful(Some(payment))
 
-        val cancelledRequest = addToken(authRequest.copyFakeRequest(uri = baseUrl + "?paymentStatus=Cancelled"))
+        val cancelledRequest = addToken(FakeRequest("GET", s"$baseUrl?paymentStatus=Cancelled"))
         val result = controller.paymentConfirmation(payment.reference)(cancelledRequest)
 
         status(result) mustBe OK

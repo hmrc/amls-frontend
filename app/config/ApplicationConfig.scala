@@ -16,22 +16,23 @@
 
 package config
 
-import javax.inject.Inject
-import play.api.Mode.Mode
-import play.api.{Application, Configuration, Environment, Play}
+import com.google.inject.{Inject, Singleton}
+import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 
-trait BaseApplicationConfig {
+import scala.concurrent.ExecutionContext.Implicits.global
 
-  def refreshProfileToggle: Boolean
+class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode, servicesConfig: ServicesConfig) {
 
-  def frontendBaseUrl: String
-}
+  def baseUrl(serviceName: String) = {
+    val protocol = servicesConfig.getConfString(s"microservice.services.protocol", "http")
+    val host = servicesConfig.getString(s"microservice.services.$serviceName.host")
+    val port = servicesConfig.getString(s"microservice.services.$serviceName.port")
+    s"$protocol://$host:$port"
+  }
 
-class ApplicationConfig @Inject()(val configuration: Configuration, val runMode: RunMode) extends ServicesConfig(configuration, runMode) with BaseApplicationConfig {
-
-  private def getConfigString(key: String) = getConfString(key, throw new Exception(s"Could not find config '$key'"))
-  private def getConfigInt(key: String) = getConfInt(key, throw new Exception(s"Could not find config '$key'"))
+  private def getConfigString(key: String) = servicesConfig.getConfString(key, throw new Exception(s"Could not find config '$key'"))
+  private def getConfigInt(key: String) = servicesConfig.getConfInt(key, throw new Exception(s"Could not find config '$key'"))
 
   val contactFormServiceIdentifier = "AMLS"
 
@@ -59,12 +60,12 @@ class ApplicationConfig @Inject()(val configuration: Configuration, val runMode:
   //lazy val allNotificationsUrl = s"$notificationsUrl/amls-notification"
   lazy val paymentsUrl:String = getConfigString("paymentsUrl")
 
-  lazy val timeout = getInt("timeout.seconds")
-  lazy val timeoutCountdown = getInt("timeout.countdown")
+  lazy val timeout = servicesConfig.getInt("timeout.seconds")
+  lazy val timeoutCountdown = servicesConfig.getInt("timeout.countdown")
 
   def businessCustomerUrl = getConfigString("business-customer.url")
 
-  private implicit lazy val app:Application = Play.current
+  //private implicit lazy val app:Application = Play.current
   //lazy val whitelist = Play.configuration.getStringSeq("whitelist") getOrElse Seq.empty
 
   //lazy val ggUrl = baseUrl("government-gateway")
@@ -99,15 +100,15 @@ class ApplicationConfig @Inject()(val configuration: Configuration, val runMode:
 
   def subscriptionUrl = s"$amlsUrl/amls/subscription"
 
-  def enrolmentStoreToggle = getConfBool("feature-toggle.enrolment-store", defBool = false)
+  def enrolmentStoreToggle = servicesConfig.getConfBool("feature-toggle.enrolment-store", false)
 
-  def fxEnabledToggle = getConfBool("feature-toggle.fx-enabled", defBool = false)
+  def fxEnabledToggle = servicesConfig.getConfBool("feature-toggle.fx-enabled", false)
 
-  def authUrl = baseUrl("auth")
+  lazy val authUrl = baseUrl("auth")
 
   def enrolmentStoreUrl = baseUrl("tax-enrolments")
 
-  def enrolmentStubsEnabled: Boolean = getConfBool("enrolment-stubs.enabled", defBool = false)
+  def enrolmentStubsEnabled: Boolean = servicesConfig.getConfBool("enrolment-stubs.enabled", false)
 
   def enrolmentStubsUrl = baseUrl("enrolment-stubs")
 
@@ -123,16 +124,16 @@ class ApplicationConfig @Inject()(val configuration: Configuration, val runMode:
 
   lazy val ggAuthUrl = baseUrl("government-gateway-authentication")
 
-  def mongoEncryptionEnabled = getConfBool("appCache.mongo.encryptionEnabled", true)
-  val mongoAppCacheEnabled = getConfBool("appCache.mongo.enabled", false)
-  val cacheExpiryInSeconds = getConfInt("appCache.expiryInSeconds", 60)
+  val mongoEncryptionEnabled = servicesConfig.getConfBool("appCache.mongo.encryptionEnabled", true)
+  val mongoAppCacheEnabled = servicesConfig.getConfBool("appCache.mongo.enabled", false)
+  val cacheExpiryInSeconds = servicesConfig.getConfInt("appCache.expiryInSeconds", 60)
 
-  override def refreshProfileToggle: Boolean = getConfBool("feature-toggle.refresh-profile", false)
+  def refreshProfileToggle: Boolean = servicesConfig.getConfBool("feature-toggle.refresh-profile",false)
 
-  override def frontendBaseUrl = {
-    val secure = getConfBool("amls-frontend.public.secure", defBool = false)
+  def frontendBaseUrl = {
+    val secure = servicesConfig.getConfBool("amls-frontend.public.secure", false)
     val scheme = if (secure) "https" else "http"
-    val host = getConfString("amls-frontend.public.host", "")
+    val host = servicesConfig.getConfString("amls-frontend.public.host", "")
 
     s"$scheme://$host"
   }
@@ -140,4 +141,7 @@ class ApplicationConfig @Inject()(val configuration: Configuration, val runMode:
   val testOnlyStubsUrl = baseUrl("test-only") + getConfigString("test-only.get-base-url")
 
   //def whitelist = getStringSeq("whitelist") getOrElse Seq.empty
+  lazy val payBaseUrl = s"${baseUrl("pay-api")}/pay-api"
+
+  lazy val businessMatchingUrl = s"${baseUrl("business-customer")}/business-customer"
 }

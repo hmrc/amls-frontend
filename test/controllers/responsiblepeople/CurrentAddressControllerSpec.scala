@@ -31,6 +31,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.{AutoCompleteService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -386,7 +387,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         "isUK field is not supplied" in new Fixture {
 
-          val line1MissingRequest = requestWithUrlEncodedBody("" -> "")
+          val line1MissingRequest = addToken(FakeRequest())
 
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))

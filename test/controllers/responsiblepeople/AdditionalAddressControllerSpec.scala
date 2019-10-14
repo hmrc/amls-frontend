@@ -272,7 +272,7 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         "isUK field is not supplied" in new Fixture {
 
-          val line1MissingRequest = requestWithUrlEncodedBody("" -> "")
+          val line1MissingRequest = requestWithUrlEncodedBody("invalid" -> "data")
 
           when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))

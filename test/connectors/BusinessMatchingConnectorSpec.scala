@@ -63,7 +63,7 @@ class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
 
     lazy val hc: AmlsHeaderCarrierForPartialsConverter = app.injector.instanceOf[AmlsHeaderCarrierForPartialsConverter]
 
-    val testBusinessMatchingConnector = new BusinessMatchingConnector(mock[HttpClient], hc, mock[Configuration], mock[RunMode])
+    val testBusinessMatchingConnector = new BusinessMatchingConnector(mock[HttpClient], hc, appConfig)
 
     val address = BusinessMatchingAddress("1 Test Street", "Test Town", None, None, None, "UK")
 

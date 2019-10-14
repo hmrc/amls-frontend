@@ -18,35 +18,35 @@ package connectors
 
 import audit.{CreatePaymentEvent, CreatePaymentFailureEvent}
 import cats.implicits._
-import javax.inject.Inject
+import com.google.inject.Inject
+import config.ApplicationConfig
 import models.payments.{CreatePaymentRequest, CreatePaymentResponse}
 import play.api.Mode.Mode
 import play.api.libs.json.{JsSuccess, Json}
 import play.api.{Configuration, Logger, Play}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.bootstrap.audit.DefaultAuditConnector
 import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import utils.HttpResponseHelper
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class PayApiConnector @Inject()(
-                                 http: HttpClient,
-                                 auditConnector: AuditConnector,
-                                 val configuration: Configuration,
-                                 val runMode: RunMode) extends ServicesConfig(configuration, runMode) with HttpResponseHelper  {
+                                 val http: HttpClient,
+                                 val auditConnector: DefaultAuditConnector,
+                                 val applicationConfig: ApplicationConfig) extends HttpResponseHelper  {
 
-  lazy val payBaseUrl = s"${baseUrl("pay-api")}/pay-api"
   private val logDebug = (msg: String) => Logger.debug(s"[PayApiConnector] $msg")
   private val logError = (msg: String) => Logger.error(s"[PayApiConnector] $msg")
 
   def createPayment(request: CreatePaymentRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CreatePaymentResponse]] = {
 
     val bodyParser = JsonParsed[CreatePaymentResponse]
-
     logDebug(s"Creating payment: ${Json.toJson(request)}")
-    http.POST[CreatePaymentRequest, HttpResponse](s"$payBaseUrl/amls/journey/start", request) map {
+    http.POST[CreatePaymentRequest, HttpResponse](s"${applicationConfig.payBaseUrl}/amls/journey/start", request) map {
       case response & bodyParser(JsSuccess(body: CreatePaymentResponse, _)) =>
         auditConnector.sendExtendedEvent(CreatePaymentEvent(request, body))
         body.some

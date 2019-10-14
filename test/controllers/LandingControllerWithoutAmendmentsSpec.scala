@@ -60,7 +60,8 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       cacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService],
       ds = commonDependencies,
-      cc = mockMcc)
+      cc = mockMcc,
+      messagesApi = messagesApi)
 
     val controllerNoUserRole = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],
@@ -70,7 +71,8 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       cacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService],
       ds = commonDependencies,
-      cc = mockMcc)
+      cc = mockMcc,
+      messagesApi = messagesApi)
 
     when {
       controllerNoAmlsNumber.landingService.setAltCorrespondenceAddress(any(), any[String])(any(), any())
@@ -201,7 +203,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       }
 
       "redirect to the sign-out page when the user role is not USER" in new Fixture {
-        val expectedLocation = s"${mockApplicationConfig.logoutUrl}?continue=${
+        val expectedLocation = s"${appConfig.logoutUrl}?continue=${
           URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role).absoluteUrl, "utf-8")}"
 
         val result = controllerNoUserRole.get()(request)

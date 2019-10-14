@@ -208,7 +208,7 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
     "respond with BAD_REQUEST" when {
       "given invalid data" in new Fixture {
 
-        val invalidPostRequest = requestWithUrlEncodedBody("" -> "")
+        val invalidPostRequest = requestWithUrlEncodedBody("invalid" -> "data")
 
         val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA11AA")
         val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(ThreeYearsPlus))

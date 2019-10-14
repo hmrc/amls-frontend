@@ -46,22 +46,21 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
   trait Fixture {
 
     val http = mock[HttpClient]
-    val appConfig = mock[ApplicationConfig]
     val auditConnector = mock[AuditConnector]
     val groupIdentfier = stringOfLengthGen(10).sample.get
 
-    lazy val connector = new TaxEnrolmentsConnector(http, appConfig, auditConnector)
+    lazy val connector = new TaxEnrolmentsConnector(http, mock[ApplicationConfig], auditConnector)
 
     val baseUrl = "http://localhost:3001"
     val serviceStub = "tax-enrolments"
     val enrolKey = AmlsEnrolmentKey(amlsRegistrationNumber)
 
     when {
-      appConfig.enrolmentStoreUrl
+      connector.appConfig.enrolmentStoreUrl
     } thenReturn baseUrl
 
     when {
-      appConfig.enrolmentStubsUrl
+      connector.appConfig.enrolmentStubsUrl
     } thenReturn serviceStub
 
     val enrolment = TaxEnrolment("123456789", postcodeGen.sample.get)
@@ -73,16 +72,16 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
     "stubbed" must {
       "return stubs base url" in new Fixture {
         when {
-          appConfig.enrolmentStubsEnabled
+          connector.appConfig.enrolmentStubsEnabled
         } thenReturn true
 
-        connector.baseUrl mustBe s"${appConfig.enrolmentStubsUrl}/tax-enrolments"
+        connector.baseUrl mustBe s"${connector.appConfig.enrolmentStubsUrl}/tax-enrolments"
       }
     }
 
     "not stubbed" must {
       "return tax enrolments base url" in new Fixture {
-        connector.baseUrl mustBe s"${appConfig.enrolmentStoreUrl}/tax-enrolments"
+        connector.baseUrl mustBe s"${connector.appConfig.enrolmentStoreUrl}/tax-enrolments"
       }
     }
   }

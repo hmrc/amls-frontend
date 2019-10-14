@@ -96,8 +96,8 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       cacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService],
       ds = commonDependencies,
-      cc = mockMcc
-    )
+      cc = mockMcc,
+      messagesApi = messagesApi)
 
     when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any()))
       .thenReturn(Future.successful(mock[CacheMap]))
@@ -256,7 +256,9 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       auditConnector = mock[AuditConnector],
       cacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService],
-      ds = commonDependencies, cc = mockMcc)
+      ds = commonDependencies,
+      cc = mockMcc,
+      messagesApi = messagesApi)
 
     when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any()))
       .thenReturn(Future.successful(mock[CacheMap]))
@@ -378,7 +380,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
   }
 
   "show landing page without authorisation" in new Fixture {
-    val result = controller.start()(FakeRequest().withSession())
+    val result = controller.start()(FakeRequest())
     status(result) mustBe OK
   }
 

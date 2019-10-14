@@ -16,7 +16,7 @@
 
 package connectors
 
-import config.AmlsHeaderCarrierForPartialsConverter
+import config.{AmlsHeaderCarrierForPartialsConverter, ApplicationConfig}
 import javax.inject.Inject
 import play.api.Mode.Mode
 import play.api.{Configuration, Logger, Play}
@@ -71,18 +71,15 @@ object BusinessMatchingReviewDetails {
 
 class BusinessMatchingConnector @Inject()(val http: HttpClient,
                                           hc: AmlsHeaderCarrierForPartialsConverter,
-                                          val configuration: Configuration,
-                                          val runMode: RunMode
-                                          ) extends ServicesConfig(configuration, runMode) {
+                                          val applicationConfig: ApplicationConfig) {
 
   import hc._
 
-  val businessMatchingUrl = s"${baseUrl("business-customer")}/business-customer"
   val serviceName = "amls"
 
   def getReviewDetails(implicit request: Request[_]): Future[Option[BusinessMatchingReviewDetails]] = {
 
-    val url = s"$businessMatchingUrl/fetch-review-details/$serviceName"
+    val url = s"${applicationConfig.businessMatchingUrl}/fetch-review-details/$serviceName"
     val logPrefix = "[BusinessMatchingConnector][getReviewDetails]"
 
     Logger.debug(s"$logPrefix Fetching $url..")

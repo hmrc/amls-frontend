@@ -16,19 +16,25 @@
 
 package connectors
 
+import config.ApplicationConfig
 import models.ReturnLocation
 import models.payments.{CreatePaymentRequest, CreatePaymentResponse, NextUrl}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import org.scalatest.MustMatchers
 import org.scalatest.concurrent._
+import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Configuration
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.HttpResponse
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.bootstrap.audit.DefaultAuditConnector
 import uk.gov.hmrc.play.bootstrap.config.RunMode
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import utils.AmlsSpec
@@ -36,11 +42,14 @@ import utils.AmlsSpec
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class PayApiConnectorSpec extends AmlsSpec with ScalaFutures with IntegrationPatience {
+class PayApiConnectorSpec extends AmlsSpec with IntegrationPatience {
 
   implicit val request = FakeRequest("GET", "/anti-money-laundering/confirmation")
 
   trait TestFixture {
+
+    //implicit val hc: HeaderCarrier = mock[HeaderCarrier]
+
     val paymentAmount = 100
 
     val paymentId = "1234567890"
@@ -59,7 +68,9 @@ class PayApiConnectorSpec extends AmlsSpec with ScalaFutures with IntegrationPat
 
     val auditConnector = mock[AuditConnector]
 
-    lazy val connector = new PayApiConnector(http, auditConnector, mock[Configuration], mock[RunMode])
+    val connector = new PayApiConnector(http, mock[DefaultAuditConnector], appConfig)
+
+    //when(connector.applicationConfig.payBaseUrl).thenReturn("url")
   }
 
   "The Pay-API connector" when {

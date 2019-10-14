@@ -521,7 +521,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       when(tp.yourTradingPremises) thenReturn Some(ytp)
       when(ytp.startDate) thenReturn Some(new LocalDate(2011,1,1))
 
-      val postRequest = requestWithUrlEncodedBody("" -> "")
+      val postRequest = requestWithUrlEncodedBody("invalid" -> "data")
 
       when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), meq(TradingPremises.key))(any(), any())) thenReturn Future.successful(Some(Seq(tp)))
 

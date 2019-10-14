@@ -123,7 +123,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with  MockitoS
       when(controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any(), any())).
         thenReturn(Future.successful(Some(BusinessDetails())))
 
-      val postRequest = requestWithUrlEncodedBody("" -> "")
+      val postRequest = requestWithUrlEncodedBody("invalid" -> "data")
 
       val result = controller.post(postRequest)
 

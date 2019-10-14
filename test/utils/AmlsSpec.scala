@@ -52,7 +52,7 @@ trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with 
   implicit val messages = messagesApi.preferred(requestWithToken)
   implicit val partialProvider = mock[CachedStaticHtmlPartialProvider]
   implicit val lang = Lang.defaultLang
-  implicit val appConfig = mock[ApplicationConfig]
+  implicit val appConfig = app.injector.instanceOf[ApplicationConfig]
 
   val commonDependencies = new CommonPlayDependencies(appConfig, messagesApi, partialProvider)
 
@@ -64,7 +64,7 @@ trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with 
   implicit val ec: ExecutionContext = mock[ExecutionContext]
   implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
 
-  when(appConfig.mongoEncryptionEnabled).thenReturn(false)
+  //when(appConfig.mongoEncryptionEnabled).thenReturn(false)
 
   def addToken[T](fakeRequest: FakeRequest[T]) = {
     import play.api.test.CSRFTokenHelper._

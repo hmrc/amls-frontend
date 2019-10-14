@@ -39,7 +39,8 @@ import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import play.api.Logger
-import play.api.mvc.{Call, MessagesControllerComponents, Request, Result}
+import play.api.i18n.MessagesApi
+import play.api.mvc.{AnyContent, Call, MessagesControllerComponents, MessagesRequest, Request, Result}
 import services.{AuthEnrolmentsService, LandingService, StatusService}
 import uk.gov.hmrc.auth.core.User
 import uk.gov.hmrc.http.HeaderCarrier
@@ -58,20 +59,24 @@ class LandingController @Inject()(val landingService: LandingService,
                                   authAction: AuthAction,
                                   val ds: CommonPlayDependencies,
                                   val statusService: StatusService,
-                                  val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                  val cc: MessagesControllerComponents,
+                                  override val messagesApi: MessagesApi) extends AmlsBaseController(ds, cc) {
 
   private lazy val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role()).absoluteUrl, "utf-8")
   def signoutUrl = s"${appConfig.logoutUrl}?continue=$unauthorisedUrl"
 
   private def isAuthorised(implicit headerCarrier: HeaderCarrier) =
-    headerCarrier.authorization.isDefined
+    {
+      println("ssssss" + headerCarrier)
+      headerCarrier.authorization.isDefined
+    }
 
   /**
     * allowRedirect allows us to configure whether or not the start page is *always* shown,
     * regardless of the user's auth status
     */
   def start(allowRedirect: Boolean = true) = Action.async {
-    implicit request =>
+    implicit request: MessagesRequest[AnyContent] =>
       if (isAuthorised && allowRedirect) {
         Future.successful(Redirect(controllers.routes.LandingController.get()))
       } else {

@@ -144,7 +144,7 @@ class SupervisionStartControllerSpec extends AmlsSpec with MockitoSugar with Sca
         Some(ProfessionalBodyYes("details"))
       )))
 
-      val newRequest = requestWithUrlEncodedBody("" -> "")
+      val newRequest = requestWithUrlEncodedBody("invalid" -> "data")
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
