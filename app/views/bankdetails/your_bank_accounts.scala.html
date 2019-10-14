@@ -82,23 +82,22 @@
 
                 @inCompleteModel.map { case(bankDetail, index) =>
                 <div class="hmrc-add-to-a-list__contents">
-                    <dt class="hmrc-add-to-a-list__identifier hmrc-add-to-a-list__identifier--light">
+                    <dt id="incomplete-detail-@index" class="hmrc-add-to-a-list__identifier hmrc-add-to-a-list__identifier--light">
                         @bankAccount(bankDetail)
                     </dt>
-                    <dd class="hmrc-add-to-a-list__change">
-                        <a href="@controllers.bankdetails.routes.BankAccountNameController.getIndex(index + 1).url">
+                    <dd id="incomplete-action-panel-@index" class="hmrc-add-to-a-list__change">
+                        <a id="incomplete-detail-edit-@index" href="@controllers.bankdetails.routes.BankAccountNameController.getIndex(index + 1).url">
                             <span aria-hidden="true">@Messages("bankdetails.yourbankaccount.edit")</span>
                             <span class="visually-hidden">@Messages("bankdetails.yourbankaccount.edit") @bankDetail.accountName</span>
                         </a>
                     </dd>
                     <dd class="hmrc-add-to-a-list__remove">
-                        <a href="@controllers.bankdetails.routes.RemoveBankDetailsController.get(index + 1).url">
+                        <a id="incomplete-detail-remove-@index" href="@controllers.bankdetails.routes.RemoveBankDetailsController.get(index + 1).url">
                             <span aria-hidden="true">@Messages("bankdetails.yourbankaccount.remove")</span>
                             <span class="visually-hidden">@Messages("bankdetails.yourbankaccount.remove") @bankDetail.accountName</span>
                         </a>
                     </dd>
                 </div>
-
                 }
             </dl>
         </div>
@@ -111,17 +110,16 @@
 
                     @completedModel.map { case(bankDetail, index) =>
                     <div class="hmrc-add-to-a-list__contents">
-                        <dt class="hmrc-add-to-a-list__identifier hmrc-add-to-a-list__identifier--light">
+                        <dt id="completed-detail-@index" class="hmrc-add-to-a-list__identifier hmrc-add-to-a-list__identifier--light">
                             @bankAccount(bankDetail)
                         </dt>
-                        <dd class="hmrc-add-to-a-list__remove">
-                            <a href="@controllers.bankdetails.routes.RemoveBankDetailsController.get(index + 1).url">
+                        <dd id="completed-action-panel-@index" class="hmrc-add-to-a-list__remove">
+                            <a id="completed-detail-remove-@index" href="@controllers.bankdetails.routes.RemoveBankDetailsController.get(index + 1).url">
                                 <span aria-hidden="true">@Messages("bankdetails.yourbankaccount.remove")</span>
                                 <span class="visually-hidden">@Messages("bankdetails.yourbankaccount.remove") @bankDetail.accountName</span>
                             </a>
                         </dd>
                     </div>
-
                     }
                 </dl>
             </div>
