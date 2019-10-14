@@ -79,25 +79,10 @@ class msb_subservicesSpec extends AmlsSpec {
       override def view = msb_subservices(EmptyForm, edit = false)
 
       val checkboxes = doc.body().getElementsByAttributeValue("type", "checkbox")
-      val labels = Seq("01", "02", "03", "04")
+      val labels = Seq("03", "04", "05", "01")
       (0 until checkboxes.size()) foreach { i =>
         checkboxes.get(i).attr("value") mustEqual labels(i)
       }
     }
-
-    "show the correct number of checkboxes when fxToggle is enabled" in new ViewFixture {
-      override def view = msb_subservices(EmptyForm, edit=false, isFxEnabled = true)
-      doc.body().getElementsByAttributeValue("type", "checkbox").size() mustEqual 5
-    }
-
-    "show the correct label for the checkboxes when fxToggle is enabled" in new ViewFixture {
-      override def view = msb_subservices(EmptyForm, edit=false, isFxEnabled = true)
-      val checkboxes = doc.body().getElementsByAttributeValue("type", "checkbox")
-      val labels = Seq("01", "02", "05", "03", "04")
-      (0 until checkboxes.size()) foreach { i =>
-        checkboxes.get(i).attr("value") mustEqual labels(i)
-      }
-    }
-
   }
 }
