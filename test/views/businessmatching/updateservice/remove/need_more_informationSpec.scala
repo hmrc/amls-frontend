@@ -16,7 +16,7 @@
 
 package views.businessmatching.updateservice.remove
 
-import models.businessmatching.AccountancyServices
+import models.businessmatching.{AccountancyServices, MoneyServiceBusiness}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -49,9 +49,17 @@ class need_more_informationSpec extends AmlsSpec with MustMatchers {
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
-    "show the correct content" in new ViewFixture {
-      doc.body().text() must include(Messages("businessmatching.updateservice.updateotherinformation.hint"))
-      doc.body().text() must include(Messages("businessmatching.updateservice.updateotherinformation.text"))
+    "show the correct content when asp is selected" in new ViewFixture {
+      doc.body().text() must include(Messages("businessmatching.updateservice.updateotherinformation.information.2"))
+      doc.body().text() must include(Messages("businessmatching.updateservice.updateotherinformation.information.3"))
+    }
+
+    "show the correct content when asp and msb is selected" in new ViewFixture {
+      override def view = need_more_information(Set(AccountancyServices.getMessage(), MoneyServiceBusiness.getMessage()))
+
+      doc.body().text() must include(Messages("businessmatching.updateservice.updateotherinformation.information.0"))
+      doc.body().text() must include(Messages("businessmatching.updateservice.updateotherinformation.information.2"))
+      doc.body().text() must include(Messages("businessmatching.updateservice.updateotherinformation.information.3"))
     }
 
     "have the correct button" in new ViewFixture {
