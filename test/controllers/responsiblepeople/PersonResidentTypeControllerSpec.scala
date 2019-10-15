@@ -26,7 +26,7 @@ import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.ArgumentCaptor
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._

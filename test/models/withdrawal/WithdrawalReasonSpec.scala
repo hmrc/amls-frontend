@@ -18,7 +18,7 @@ package models.withdrawal
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatest.MustMatchers
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsString, _}
 

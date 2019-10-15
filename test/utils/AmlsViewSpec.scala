@@ -22,7 +22,7 @@ import connectors.KeystoreConnector
 import controllers.CommonPlayDependencies
 import org.mockito.Mockito.when
 import org.scalatest.MustMatchers
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.inject.bind

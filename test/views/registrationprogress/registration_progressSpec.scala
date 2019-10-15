@@ -19,7 +19,7 @@ package views.registrationprogress
 import forms.EmptyForm
 import generators.businesscustomer.AddressGenerator
 import models.registrationprogress.{Completed, Section}
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.mvc.Call
 import utils.AmlsViewSpec

@@ -42,7 +42,7 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.libs.json.JsResultException
 import play.api.mvc.{BodyParsers, MessagesActionBuilder, Request, Result}
 import play.api.test.FakeRequest

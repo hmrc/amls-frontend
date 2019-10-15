@@ -28,8 +28,6 @@ private object AppDependencies {
   private val authVersion = "2.27.0-play-26"
   private val domain = "5.6.0-play-26"
 
-  private val playJars = ExclusionRule(organization = "com.typesafe.play")
-
   val compile = Seq(
     ws,
     "uk.gov.hmrc" %% "domain" % domain,
@@ -37,23 +35,22 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "http-caching-client" % httpCachingClientVersion,
     "uk.gov.hmrc" %% "play-whitelist-filter" % playWhitelistFilterVersion,
     "uk.gov.hmrc" %% "json-encryption" % jsonEncryptionVersion,
-    "uk.gov.hmrc" %% "simple-reactivemongo" % playReactivemongoVersion excludeAll(ExclusionRule("com.typesafe.play", "play-iteratees_2.11")), // excludeAll ExclusionRule("com.typesafe.play", "play-iteratees_2.11"),
+    "uk.gov.hmrc" %% "simple-reactivemongo" % playReactivemongoVersion,
     "uk.gov.hmrc" %% "auth-client" % authVersion,
     "uk.gov.hmrc" %% "play-ui" % "8.0.0-play-26",
     "uk.gov.hmrc" %% "bootstrap-play-26" % "0.45.0",
     "uk.gov.hmrc" %% "govuk-template" % "5.38.0-play-26",
     "uk.gov.hmrc" %% "http-verbs" % "9.8.0-play-26",
 
-    "io.github.jto" %% "validation-core"      % validationVersion, // excludeAll playJars,
-    "io.github.jto" %% "validation-playjson"  % validationVersion,// excludeAll playJars,
-    "io.github.jto" %% "validation-form"      % validationVersion,// excludeAll playJars,
+    "io.github.jto" %% "validation-core"      % validationVersion,
+    "io.github.jto" %% "validation-playjson"  % validationVersion,
+    "io.github.jto" %% "validation-form"      % validationVersion,
 
     "com.vladsch.flexmark" % "flexmark-all" % flexmarkVersion,
     "com.beachape" %% "enumeratum-play" % "1.5.10",
     "com.squareup.okhttp3" % "mockwebserver" % okHttpVersion,
-    "com.typesafe.play" %% "play-json" % "2.6.13",// excludeAll playJars,
-    "com.typesafe.play" %% "play-json-joda" % "2.6.13", // excludeAll playJars
-    "org.julienrf" %% "play-json-derived-codecs" % "3.3"
+    "com.typesafe.play" %% "play-json" % "2.6.13",
+    "com.typesafe.play" %% "play-json-joda" % "2.6.13"
   )
 
   trait ScopeDependencies {
@@ -61,7 +58,6 @@ private object AppDependencies {
     val dependencies: Seq[ModuleID]
   }
 
-  private val scalatestVersion = "3.0.8"
   private val pegdownVersion = "1.6.0"
   private val jsoupVersion = "1.9.2"
 
@@ -69,7 +65,6 @@ private object AppDependencies {
     def apply() = new ScopeDependencies {
       override val scope = "test"
       override lazy val dependencies = Seq(
-        //"org.scalatest" %% "scalatest" % scalatestVersion % scope,
         "org.scalacheck" %% "scalacheck" % "1.12.5" % scope,
         "org.pegdown" % "pegdown" % pegdownVersion % scope,
         "org.jsoup" % "jsoup" % jsoupVersion % scope,

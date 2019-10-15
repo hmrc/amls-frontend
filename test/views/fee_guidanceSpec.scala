@@ -19,7 +19,7 @@ package views
 import forms.EmptyForm
 import models.confirmation.{BreakdownRow, Currency}
 import models.registrationprogress.{Completed, Section}
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.mvc.Call
 import utils.AmlsViewSpec

@@ -16,7 +16,7 @@
 
 package models.businessmatching
 
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import models.DateOfChange

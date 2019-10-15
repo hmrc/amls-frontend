@@ -39,7 +39,6 @@ trait MicroService {
 
   lazy val microservice = Project(appName, file("."))
     .enablePlugins(Seq(play.sbt.PlayScala,SbtAutoBuildPlugin, SbtDistributablesPlugin, SbtGitVersioning, SbtArtifactory) ++ plugins : _*)
-    //.enablePlugins(PlayNettyServer)
     .settings(majorVersion := 4)
     .settings(playSettings ++ scoverageSettings : _*)
     .settings(scalaSettings: _*)
@@ -50,12 +49,10 @@ trait MicroService {
     .settings(routesImport += "utils.Binders._")
     .settings(
       libraryDependencies ++= appDependencies,
-      autoScalaLibrary := false,
       retrieveManaged := true,
       evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
       routesGenerator := InjectedRoutesGenerator,
-      pipelineStages in Assets := Seq(digest),
-      scalacOptions += "-target:jvm-1.8"
+      pipelineStages in Assets := Seq(digest)
     )
     .configs(IntegrationTest)
     .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
@@ -68,7 +65,6 @@ trait MicroService {
     .settings(
       resolvers += Resolver.bintrayRepo("hmrc", "releases"),
       resolvers += Resolver.jcenterRepo
-      //PlayKeys.devSettings += "play.server.provider" -> "play.core.server.NettyServerProvider"
     )
 }
 

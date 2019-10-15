@@ -20,8 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
+@Singleton
 class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode, servicesConfig: ServicesConfig) {
 
   def baseUrl(serviceName: String) = {
@@ -53,48 +52,20 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
   def logoutUrl = getConfigString("logout.url")
   lazy val loginContinue = getConfigString("login.continue")
 
-  //lazy val amlsUrl = baseUrl("amls")
-  //lazy val subscriptionUrl = s"$amlsUrl/amls/subscription"
-
-  //lazy val notificationsUrl = baseUrl("amls-notification")
-  //lazy val allNotificationsUrl = s"$notificationsUrl/amls-notification"
   lazy val paymentsUrl:String = getConfigString("paymentsUrl")
 
   lazy val timeout = servicesConfig.getInt("timeout.seconds")
   lazy val timeoutCountdown = servicesConfig.getInt("timeout.countdown")
 
   def businessCustomerUrl = getConfigString("business-customer.url")
-
-  //private implicit lazy val app:Application = Play.current
-  //lazy val whitelist = Play.configuration.getStringSeq("whitelist") getOrElse Seq.empty
-
-  //lazy val ggUrl = baseUrl("government-gateway")
-
-  //lazy val enrolUrl = s"$ggUrl/enrol"
   
   lazy val mongoCacheUpdateUrl = baseUrl("amls-stub") + getConfigString("amls-stub.get-file-url")
-  //lazy val testOnlyStubsUrl = baseUrl("test-only") + getConfigString("test-only.get-base-url")
 
   // The following values are used by the Fee Guidance Controller currently toggled off with feature-toggle.show-fees
   lazy val regFee = getConfigInt("amounts.registration")
   lazy val premisesFee = getConfigInt("amounts.premises")
   lazy val peopleFeeRate = getConfigInt("amounts.people")
   lazy val approvalCheckPeopleFeeRate = getConfigInt("amounts.approval-check-rate")
-
-//  override def refreshProfileToggle = getConfBool("feature-toggle.refresh-profile", false)
-//
-//  override def frontendBaseUrl = {
-//    val secure = getConfBool("amls-frontend.public.secure", defBool = false)
-//    val scheme = if (secure) "https" else "http"
-//    val host = getConfString("amls-frontend.public.host", "")
-//
-//    s"$scheme://$host"
-//  }
-//}
-//
-//class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode) extends ServicesConfig(configuration, runMode) with BaseApplicationConfig {
-
-  //private def getConfigString(key: String) = getConfString(key, throw new Exception(s"Could not find config '$key'"))
 
   def amlsUrl = baseUrl("amls")
 
@@ -140,7 +111,6 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
 
   val testOnlyStubsUrl = baseUrl("test-only") + getConfigString("test-only.get-base-url")
 
-  //def whitelist = getStringSeq("whitelist") getOrElse Seq.empty
   lazy val payBaseUrl = s"${baseUrl("pay-api")}/pay-api"
 
   lazy val businessMatchingUrl = s"${baseUrl("business-customer")}/business-customer"

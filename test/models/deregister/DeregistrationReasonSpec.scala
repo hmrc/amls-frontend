@@ -18,7 +18,7 @@ package models.deregister
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatest.MustMatchers
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 

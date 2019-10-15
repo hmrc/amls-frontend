@@ -22,7 +22,7 @@ import java.net.URI
 import models.hvd.{HowWillYouSellGoods, Retail}
 import org.jsoup.Jsoup
 import org.scalatest.MustMatchers
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec

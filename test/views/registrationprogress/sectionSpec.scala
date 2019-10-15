@@ -17,7 +17,7 @@
 package views
 
 import models.registrationprogress.{Completed, NotStarted, Started}
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.mvc.Call
 import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec

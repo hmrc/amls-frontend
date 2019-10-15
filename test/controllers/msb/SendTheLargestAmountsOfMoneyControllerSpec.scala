@@ -24,7 +24,7 @@ import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions, Send
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration}
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap

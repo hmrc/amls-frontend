@@ -19,7 +19,7 @@ package utils
 import models.responsiblepeople._
 import models.status._
 import org.scalatest.MustMatchers
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import services.StatusService
 import org.mockito.Mockito.when

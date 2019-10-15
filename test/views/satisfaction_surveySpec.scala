@@ -22,7 +22,7 @@ import forms.{EmptyForm, InvalidForm}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatest.MustMatchers
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
