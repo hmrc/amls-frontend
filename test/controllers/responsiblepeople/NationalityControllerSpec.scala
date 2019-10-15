@@ -84,7 +84,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
     }
 
     "load Not found page" when {
-      "get throws not found exception" ignore new Fixture {
+      "get throws not found exception" in new Fixture {
 
         val responsiblePeople = ResponsiblePerson()
 
@@ -100,7 +100,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
       }
     }
 
-    "load nationality page when nationality is none" ignore new Fixture {
+    "load nationality page when nationality is none" in new Fixture {
 
       val pResidenceType = PersonResidenceType(UKResidence(Nino(nextNino)), Some(Country("United Kingdom", "GB")), None)
       val responsiblePeople = ResponsiblePerson(personName, personResidenceType = Some(pResidenceType))
@@ -118,7 +118,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
       document.select("input[type=radio][name=nationality][value=02]").hasAttr("checked") must be(false)
     }
 
-    "pre-populate UI with data from sav4later" ignore new Fixture {
+    "pre-populate UI with data from sav4later" in new Fixture {
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(
@@ -136,7 +136,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
       document.select("input[type=radio][name=nationality][value=01]").hasAttr("checked") must be(false)
     }
 
-    "fail submission on error" ignore new Fixture {
+    "fail submission on error" in new Fixture {
 
       val newRequest = requestWithUrlEncodedBody("" -> "")
 
@@ -152,7 +152,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
       document.select("a[href=#nationality]").html() must include(Messages("error.required.nationality"))
     }
 
-    "submit with valid nationality data" ignore new Fixture {
+    "submit with valid nationality data" in new Fixture {
 
       val newRequest = requestWithUrlEncodedBody(
         "nationality" -> "01"
@@ -171,7 +171,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
       redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ContactDetailsController.get(1).url))
     }
 
-    "submit with valid nationality data (with other country)" ignore new Fixture {
+    "submit with valid nationality data (with other country)" in new Fixture {
 
       val newRequest = requestWithUrlEncodedBody(
         "nationality" -> "02",
@@ -191,7 +191,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
       redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ContactDetailsController.get(1).url))
     }
 
-    "submit with valid data in edit mode" ignore new Fixture {
+    "submit with valid data in edit mode" in new Fixture {
 
       val newRequest = requestWithUrlEncodedBody(
         "nationality" -> "02",
@@ -218,7 +218,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
       redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, Some(flowFromDeclaration)).url))
     }
 
-    "load NotFound page on exception" ignore new Fixture {
+    "load NotFound page on exception" in new Fixture {
 
       val newRequest = requestWithUrlEncodedBody(
         "nationality" -> "01"

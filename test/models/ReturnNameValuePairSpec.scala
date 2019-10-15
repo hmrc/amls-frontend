@@ -23,10 +23,6 @@ import org.mockito.Mockito.reset
 
 class ReturnNameValuePairSpec extends AmlsSpec with GuiceOneAppPerSuite {
 
-  reset {
-    appConfig
-  }
-
   implicit override lazy val app = new GuiceApplicationBuilder()
     .configure("microservice.services.amls-frontend.public.host" -> "somehost:9000")
     .configure("microservice.services.amls-frontend.public.secure" -> true)
@@ -35,7 +31,7 @@ class ReturnNameValuePairSpec extends AmlsSpec with GuiceOneAppPerSuite {
   "The ReturnLocation model" must {
 
     "correctly determine the absolute url based on the current request" when {
-      "request is running on localhost" ignore {
+      "request is running on localhost" in {
 
         val call = controllers.routes.PaymentConfirmationController.paymentConfirmation("reference")
         val model = ReturnLocation(call)
