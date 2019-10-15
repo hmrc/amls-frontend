@@ -16,31 +16,20 @@
 
 package models
 
+import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.inject.guice.GuiceApplicationBuilder
-import utils.AmlsSpec
-import org.mockito.Mockito.reset
 
-class ReturnNameValuePairSpec extends AmlsSpec with GuiceOneAppPerSuite {
-
-  implicit override lazy val app = new GuiceApplicationBuilder()
-    .configure("microservice.services.amls-frontend.public.host" -> "somehost:9000")
-    .configure("microservice.services.amls-frontend.public.secure" -> true)
-    .build()
+class ReturnNameValuePairSpec extends PlaySpec with GuiceOneAppPerSuite {
 
   "The ReturnLocation model" must {
-
     "correctly determine the absolute url based on the current request" when {
       "request is running on localhost" in {
 
         val call = controllers.routes.PaymentConfirmationController.paymentConfirmation("reference")
         val model = ReturnLocation(call)
 
-        model.absoluteUrl mustBe s"https://somehost:9000${call.url}"
-
+        model.absoluteUrl mustBe s"http://localhost:9222${call.url}"
       }
-
     }
   }
-
 }
