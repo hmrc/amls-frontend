@@ -21,7 +21,7 @@
 @(paymentReference: Option[String], total: Currency, breakdown: Seq[BreakdownRow], amountToPay: Currency, paymentsUrl: String)(implicit request: Request[_],m:Messages)
 
 @main(
-    title = Messages("confirmation.renewal.title")
+    title = Messages("confirmation.renewal.title") + " - " + Messages("confirmation.renewal.header.secondary")
 ) {
 
     <header class="page-header">
