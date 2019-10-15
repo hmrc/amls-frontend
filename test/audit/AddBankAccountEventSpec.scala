@@ -18,12 +18,14 @@ package audit
 
 import models.bankdetails._
 import play.api.test.FakeRequest
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import utils.AmlsSpec
 
 class AddBankAccountEventSpec extends AmlsSpec {
 
   implicit val request = FakeRequest("GET", "/test-path")
+  implicit override val headerCarrier: HeaderCarrier = HeaderCarrier()
 
   "The bank account audit event" must {
     "serialize to the correct json" when {
