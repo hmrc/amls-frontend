@@ -25,9 +25,10 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.HttpResponse
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.{Audit, DataEvent}
+import uk.gov.hmrc.play.bootstrap.audit.DefaultAuditConnector
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import utils.{AmlsSpec, DependencyMocks}
 
@@ -47,7 +48,7 @@ class GovernmentGatewayConnectorSpec extends AmlsSpec
   trait Fixture extends DependencyMocks {
     val audit = mock[Audit]
 
-    val connector = new GovernmentGatewayConnector(mock[HttpClient], mock[ApplicationConfig], mock[AuditConnector])
+    val connector = new GovernmentGatewayConnector(mock[HttpClient], appConfig, mock[DefaultAuditConnector])
 
     val fn: DataEvent => Unit = d => {}
 
@@ -61,6 +62,8 @@ class GovernmentGatewayConnectorSpec extends AmlsSpec
   "enrol" when {
     "called" must {
       "enrol the user via an HTTP call" in new Fixture {
+        implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
+
         mockHttpCall(Future.successful(HttpResponse(OK)))
 
         whenReady(connector.enrol(enrolmentRequestGen.sample.get)) { result =>

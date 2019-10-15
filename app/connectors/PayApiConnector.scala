@@ -21,18 +21,15 @@ import cats.implicits._
 import com.google.inject.Inject
 import config.ApplicationConfig
 import models.payments.{CreatePaymentRequest, CreatePaymentResponse}
-import play.api.Mode.Mode
+import play.api.Logger
 import play.api.libs.json.{JsSuccess, Json}
-import play.api.{Configuration, Logger, Play}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.bootstrap.audit.DefaultAuditConnector
-import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import utils.HttpResponseHelper
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, Future}
 
 class PayApiConnector @Inject()(
                                  val http: HttpClient,

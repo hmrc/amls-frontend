@@ -23,11 +23,11 @@ import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
 import models.enrolment.{AmlsEnrolmentKey, ErrorResponse, TaxEnrolment}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
-import org.scalatest.concurrent.{AbstractPatienceConfiguration, ScalaFutures}
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
 import play.api.libs.json.Json
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HttpResponse, Upstream4xxResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, Upstream4xxResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import utils.AmlsSpec
@@ -46,21 +46,22 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
   trait Fixture {
 
     val http = mock[HttpClient]
+    val appConfig = mock[ApplicationConfig]
     val auditConnector = mock[AuditConnector]
     val groupIdentfier = stringOfLengthGen(10).sample.get
+    implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
 
-    lazy val connector = new TaxEnrolmentsConnector(http, mock[ApplicationConfig], auditConnector)
-
+    val connector = new TaxEnrolmentsConnector(http, appConfig, auditConnector)
     val baseUrl = "http://localhost:3001"
     val serviceStub = "tax-enrolments"
     val enrolKey = AmlsEnrolmentKey(amlsRegistrationNumber)
 
     when {
-      connector.appConfig.enrolmentStoreUrl
+      appConfig.enrolmentStoreUrl
     } thenReturn baseUrl
 
     when {
-      connector.appConfig.enrolmentStubsUrl
+      appConfig.enrolmentStubsUrl
     } thenReturn serviceStub
 
     val enrolment = TaxEnrolment("123456789", postcodeGen.sample.get)
@@ -72,16 +73,16 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
     "stubbed" must {
       "return stubs base url" in new Fixture {
         when {
-          connector.appConfig.enrolmentStubsEnabled
+          appConfig.enrolmentStubsEnabled
         } thenReturn true
 
-        connector.baseUrl mustBe s"${connector.appConfig.enrolmentStubsUrl}/tax-enrolments"
+        connector.baseUrl mustBe s"${appConfig.enrolmentStubsUrl}/tax-enrolments"
       }
     }
 
     "not stubbed" must {
       "return tax enrolments base url" in new Fixture {
-        connector.baseUrl mustBe s"${connector.appConfig.enrolmentStoreUrl}/tax-enrolments"
+        connector.baseUrl mustBe s"${appConfig.enrolmentStoreUrl}/tax-enrolments"
       }
     }
   }
