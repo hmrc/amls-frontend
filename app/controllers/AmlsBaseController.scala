@@ -19,7 +19,7 @@ package controllers
 import com.google.inject.Inject
 import config.{ApplicationConfig, CachedStaticHtmlPartialProvider}
 import play.api.i18n.{Lang, MessagesApi, MessagesImpl, MessagesProvider}
-import play.api.mvc.{MessagesControllerComponents, Request}
+import play.api.mvc.{AnyContent, BodyParsers, MessagesActionBuilderImpl, MessagesControllerComponents, Request}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import utils.ControllerHelper
 
@@ -48,3 +48,7 @@ abstract class AmlsBaseController(val cpd: CommonPlayDependencies, override val 
 class CommonPlayDependencies @Inject()(val amlsConfig: ApplicationConfig,
                                        val messagesApi: MessagesApi,
                                        val partialProvider: CachedStaticHtmlPartialProvider)
+
+trait MessagesRequestHelper {
+  def messagesAction(parsers: BodyParsers.Default)(implicit executionContext: ExecutionContext, messagesApi: MessagesApi) = new MessagesActionBuilderImpl[AnyContent](parsers, messagesApi)
+}

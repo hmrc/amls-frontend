@@ -32,7 +32,7 @@ import models.{status => _, _}
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import play.api.mvc.Result
+import play.api.mvc.{BodyParsers, MessagesActionBuilder, Result}
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, LandingService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -60,8 +60,9 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       cacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService],
       ds = commonDependencies,
-      cc = mockMcc,
-      messagesApi = messagesApi)
+      mcc = mockMcc,
+      messagesApi = messagesApi,
+      parser = mock[BodyParsers.Default])
 
     val controllerNoUserRole = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],
@@ -71,8 +72,9 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       cacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService],
       ds = commonDependencies,
-      cc = mockMcc,
-      messagesApi = messagesApi)
+      mcc = mockMcc,
+      messagesApi = messagesApi,
+      parser = mock[BodyParsers.Default])
 
     when {
       controllerNoAmlsNumber.landingService.setAltCorrespondenceAddress(any(), any[String])(any(), any())

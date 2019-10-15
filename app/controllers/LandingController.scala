@@ -39,8 +39,8 @@ import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import play.api.Logger
-import play.api.i18n.MessagesApi
-import play.api.mvc.{AnyContent, Call, MessagesControllerComponents, MessagesRequest, Request, Result}
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc._
 import services.{AuthEnrolmentsService, LandingService, StatusService}
 import uk.gov.hmrc.auth.core.User
 import uk.gov.hmrc.http.HeaderCarrier
@@ -48,8 +48,8 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, ControllerHelper}
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class LandingController @Inject()(val landingService: LandingService,
@@ -59,23 +59,23 @@ class LandingController @Inject()(val landingService: LandingService,
                                   authAction: AuthAction,
                                   val ds: CommonPlayDependencies,
                                   val statusService: StatusService,
-                                  val cc: MessagesControllerComponents,
-                                  override val messagesApi: MessagesApi) extends AmlsBaseController(ds, cc) {
+                                  val mcc: MessagesControllerComponents,
+                                  implicit override val messagesApi: MessagesApi,
+                                  parser: BodyParsers.Default) extends AmlsBaseController(ds, mcc) with I18nSupport with MessagesRequestHelper {
+
+  //private def messagesAction = new MessagesActionBuilderImpl[AnyContent](parser, messagesApi)
 
   private lazy val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role()).absoluteUrl, "utf-8")
   def signoutUrl = s"${appConfig.logoutUrl}?continue=$unauthorisedUrl"
 
   private def isAuthorised(implicit headerCarrier: HeaderCarrier) =
-    {
-      println("ssssss" + headerCarrier)
       headerCarrier.authorization.isDefined
-    }
 
   /**
     * allowRedirect allows us to configure whether or not the start page is *always* shown,
     * regardless of the user's auth status
     */
-  def start(allowRedirect: Boolean = true) = Action.async {
+  def start(allowRedirect: Boolean = true): Action[AnyContent] = messagesAction(parser).async {
     implicit request: MessagesRequest[AnyContent] =>
       if (isAuthorised && allowRedirect) {
         Future.successful(Redirect(controllers.routes.LandingController.get()))

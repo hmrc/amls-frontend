@@ -44,7 +44,7 @@ import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import play.api.libs.json.JsResultException
-import play.api.mvc.{Request, Result}
+import play.api.mvc.{BodyParsers, MessagesActionBuilder, Request, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, LandingService, StatusService}
@@ -58,6 +58,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar with MustMatchers with StatusGenerator {
 
   val businessCustomerUrl = "TestUrl"
+  implicit override val headerCarrier: HeaderCarrier = HeaderCarrier()
 
   trait Fixture { self =>
 
@@ -96,8 +97,9 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       cacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService],
       ds = commonDependencies,
-      cc = mockMcc,
-      messagesApi = messagesApi)
+      mcc = mockMcc,
+      messagesApi = messagesApi,
+      parser = mock[BodyParsers.Default])
 
     when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any()))
       .thenReturn(Future.successful(mock[CacheMap]))
@@ -257,8 +259,9 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       cacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService],
       ds = commonDependencies,
-      cc = mockMcc,
-      messagesApi = messagesApi)
+      mcc = mockMcc,
+      messagesApi = messagesApi,
+      parser = mock[BodyParsers.Default])
 
     when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any()))
       .thenReturn(Future.successful(mock[CacheMap]))
@@ -380,7 +383,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
   }
 
   "show landing page without authorisation" in new Fixture {
-    val result = controller.start()(FakeRequest())
+    val result = controller.start()(FakeRequest().withSession())
     status(result) mustBe OK
   }
 

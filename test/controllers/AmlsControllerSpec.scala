@@ -19,6 +19,7 @@ package controllers
 import controllers.actions.SuccessfulAuthAction
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
+import play.api.mvc.BodyParsers
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import utils.AmlsSpec
@@ -31,7 +32,7 @@ class AmlsControllerSpec extends AmlsSpec {
       implicit val unauthenticatedRequest = FakeRequest()
       val request = addToken(unauthenticatedRequest)
 
-      val controller = new AmlsController(SuccessfulAuthAction, commonDependencies, mockMcc)
+      val controller = new AmlsController(SuccessfulAuthAction, commonDependencies, mockMcc, messagesApi, mock[BodyParsers.Default])
     }
 
     "AmlsController" must {
