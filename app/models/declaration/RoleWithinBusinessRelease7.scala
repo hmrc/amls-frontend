@@ -25,8 +25,6 @@ import play.api.libs.json.Reads.StringReads
 import play.api.libs.json.{JsError, _}
 import utils.TraversableValidators.minLengthR
 
-//import models.declaration.Other
-
 case class RoleWithinBusinessRelease7(items: Set[RoleType])
 
 sealed trait RoleType {

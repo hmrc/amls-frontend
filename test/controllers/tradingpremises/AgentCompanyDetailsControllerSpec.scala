@@ -25,18 +25,15 @@ import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.AmlsSpec
 
 import scala.concurrent.Future
 
-class AgentCompanyDetailsControllerSpec extends AmlsSpec with OneAppPerSuite with MockitoSugar with ScalaFutures with TradingPremisesGenerator{
+class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGenerator {
 
   trait Fixture {
     self => val request = addToken(authRequest)

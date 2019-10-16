@@ -26,8 +26,6 @@ import models.registrationdetails.RegistrationDetails
 import org.joda.time.LocalDateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito.when
-import org.scalatest.MustMatchers
-import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
@@ -35,7 +33,7 @@ import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
-class DeRegisterApplicationControllerSpec extends AmlsSpec with MustMatchers with OneAppPerSuite {
+class DeRegisterApplicationControllerSpec extends AmlsSpec {
 
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(authRequest)

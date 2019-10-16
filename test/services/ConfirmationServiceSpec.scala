@@ -47,9 +47,9 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.test.Helpers._
-import uk.gov.hmrc.domain.Org
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
@@ -61,7 +61,7 @@ class ConfirmationServiceSpec extends PlaySpec
   with MockitoSugar
   with ScalaFutures
   with IntegrationPatience
-  with OneAppPerSuite
+  with GuiceOneAppPerSuite
   with ResponsiblePersonGenerator
   with generators.tradingpremises.TradingPremisesGenerator
   with AmlsReferenceNumberGenerator {

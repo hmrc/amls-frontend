@@ -23,9 +23,10 @@ import generators.AmlsReferenceNumberGenerator
 import models.ReturnLocation
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.mvc.{Action, AnyContent, AnyContentAsEmpty, BodyParser, BodyParsers, Controller}
-import play.api.test.{FakeRequest, Helpers}
+import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.mvc._
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
@@ -38,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class AuthActionSpec extends PlaySpec with MockitoSugar
   with ScalaFutures
-  with OneAppPerSuite
+  with GuiceOneAppPerSuite
   with AmlsReferenceNumberGenerator{
 
   import AuthActionSpec._

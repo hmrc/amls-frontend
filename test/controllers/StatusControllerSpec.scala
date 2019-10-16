@@ -33,20 +33,18 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.OneAppPerSuite
 import play.api.http.Status.OK
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
-class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuite with PaymentGenerator {
+class StatusControllerSpec extends AmlsSpec with PaymentGenerator {
 
   val cacheMap = mock[CacheMap]
 

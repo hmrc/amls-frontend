@@ -25,7 +25,6 @@ import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
@@ -33,7 +32,7 @@ import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
-class DeregistrationReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
+class DeregistrationReasonControllerSpec extends AmlsSpec {
 
   trait TestFixture extends AuthorisedFixture {
     self =>

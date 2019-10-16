@@ -21,17 +21,18 @@ import models.status.ConfirmationStatus
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.bind
-import play.api.inject.guice.{GuiceApplicationBuilder, GuiceInjectorBuilder}
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{Action, Results}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-
-import scala.concurrent.Future
 import uk.gov.hmrc.http.HttpResponse
 
-class ConfirmationFilterSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with Results {
+import scala.concurrent.Future
+
+class ConfirmationFilterSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with Results {
 
   val keystore = mock[KeystoreConnector]
   val authenticator = mock[AuthenticatorConnector]

@@ -19,12 +19,13 @@ package models.responsiblepeople
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.http.cache.client.CacheMap
 
-class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsiblePeopleValues with OneAppPerSuite {
+class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsiblePeopleValues with GuiceOneAppPerSuite {
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .build()

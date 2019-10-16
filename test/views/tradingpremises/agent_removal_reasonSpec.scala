@@ -19,11 +19,7 @@ package views.tradingpremises
 import forms.{Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.tradingpremises._
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
-import play.api.test.FakeRequest
-import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
 import views.Fixture
 

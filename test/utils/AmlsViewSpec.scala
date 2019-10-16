@@ -23,7 +23,8 @@ import controllers.CommonPlayDependencies
 import org.mockito.Mockito.when
 import org.scalatest.MustMatchers
 import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.inject.bind
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
@@ -31,19 +32,9 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
 import play.api.{Application, Mode}
 import play.filters.csrf.{CSRFConfigProvider, CSRFFilter}
-import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
+import uk.gov.hmrc.http.HeaderCarrier
 
-trait AmlsViewSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with MustMatchers {
-
-  var authConnector = mock[AuthConnector]
-
-  val authRequest = FakeRequest().withSession(
-    SessionKeys.sessionId -> "SessionId",
-    SessionKeys.token -> "Token",
-    SessionKeys.userId -> "Test User",
-    SessionKeys.authToken -> ""
-  )
+trait AmlsViewSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with MustMatchers with AuthorisedFixture {
 
   protected val bindModules: Seq[GuiceableModule] = Seq(bind[KeystoreConnector].to(mock[KeystoreConnector]))
 

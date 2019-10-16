@@ -108,7 +108,6 @@ class CryptoCache(cache: Cache, crypto: CompositeSymmetricCrypto) extends Cache(
   * An injectible factory for creating new MongoCacheClients
   */
 class MongoCacheClientFactory @Inject()(config: ApplicationConfig, applicationCrypto: ApplicationCrypto, component: ReactiveMongoComponent) {
-  //class DbConnection extends MongoDbConnection
   def createClient: MongoCacheClient = new MongoCacheClient(config, component.mongoConnector.db, applicationCrypto)
 }
 

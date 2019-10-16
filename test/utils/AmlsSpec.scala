@@ -19,7 +19,6 @@ package utils
 import akka.stream.Materializer
 import config.{ApplicationConfig, CachedStaticHtmlPartialProvider}
 import controllers.CommonPlayDependencies
-import org.mockito.Mockito.when
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
@@ -29,21 +28,11 @@ import play.api.i18n.{Lang, MessagesApi, MessagesImpl, MessagesProvider}
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
 import play.filters.csrf.{CSRFConfigProvider, CSRFFilter}
-import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 
 import scala.concurrent.ExecutionContext
 
-trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with ScalaFutures with MustMatchers {
-
-  var authConnector = mock[AuthConnector]
-
-  val authRequest = FakeRequest().withSession(
-    SessionKeys.sessionId -> "SessionId",
-    SessionKeys.token -> "Token",
-    SessionKeys.userId -> "Test User",
-    SessionKeys.authToken -> ""
-  )
+trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with ScalaFutures with MustMatchers with AuthorisedFixture {
 
   import play.api.test.CSRFTokenHelper._
 
@@ -64,8 +53,6 @@ trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with 
   implicit val ec: ExecutionContext = mock[ExecutionContext]
   implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
 
-  //when(appConfig.mongoEncryptionEnabled).thenReturn(false)
-
   def addToken[T](fakeRequest: FakeRequest[T]) = {
     import play.api.test.CSRFTokenHelper._
 
@@ -73,7 +60,6 @@ trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with 
     val csrfFilter     = app.injector.instanceOf[CSRFFilter]
     val token          = csrfFilter.tokenProvider.generateToken
 
-    //fakeRequest.withHeaders((csrfConfig.headerName, token)).withCSRFToken
     CSRFRequest(fakeRequest.withHeaders((csrfConfig.headerName, token))).withCSRFToken
   }
 

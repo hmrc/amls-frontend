@@ -71,9 +71,9 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
 
   def subscriptionUrl = s"$amlsUrl/amls/subscription"
 
-  def enrolmentStoreToggle = servicesConfig.getConfBool("feature-toggle.enrolment-store", false)
+  def enrolmentStoreToggle = configuration.getOptional[Boolean]("feature-toggle.enrolment-store").getOrElse(false)
 
-  def fxEnabledToggle = servicesConfig.getConfBool("feature-toggle.fx-enabled", false)
+  def fxEnabledToggle = configuration.getOptional[Boolean]("feature-toggle.fx-enabled").getOrElse(false)
 
   lazy val authUrl = baseUrl("auth")
 
@@ -95,11 +95,11 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
 
   lazy val ggAuthUrl = baseUrl("government-gateway-authentication")
 
-  val mongoEncryptionEnabled = servicesConfig.getConfBool("appCache.mongo.encryptionEnabled", true)
-  val mongoAppCacheEnabled = servicesConfig.getConfBool("appCache.mongo.enabled", false)
-  val cacheExpiryInSeconds = servicesConfig.getConfInt("appCache.expiryInSeconds", 60)
+  val mongoEncryptionEnabled = configuration.getOptional[Boolean]("appCache.mongo.encryptionEnabled").getOrElse(true)
+  val mongoAppCacheEnabled = configuration.getOptional[Boolean]("appCache.mongo.enabled").getOrElse(false)
+  val cacheExpiryInSeconds = configuration.getOptional[Int]("appCache.expiryInSeconds").getOrElse(60)
 
-  def refreshProfileToggle: Boolean = servicesConfig.getConfBool("feature-toggle.refresh-profile",false)
+  def refreshProfileToggle: Boolean = configuration.getOptional[Boolean]("feature-toggle.refresh-profile").getOrElse(false)
 
   def frontendBaseUrl = {
     val secure = servicesConfig.getConfBool("amls-frontend.public.secure", false)
