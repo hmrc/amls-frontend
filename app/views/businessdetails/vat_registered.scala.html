@@ -29,7 +29,7 @@
 }
 
 @main(
-    title = Messages("businessdetails.registeredforvat.title") + " - " + Messages("summary.businessdetails"),
+    title = s"${views.ViewUtils.errorPrefix(f)}" +  Messages("businessdetails.registeredforvat.title") + " - " + Messages("summary.businessdetails"),
     heading = header
 ) {
 
