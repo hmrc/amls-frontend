@@ -18,6 +18,7 @@ package services
 
 import connectors.DataCacheConnector
 import javax.inject.Inject
+import models.amp.Amp
 import models.businessdetails.BusinessDetails
 import models.asp.Asp
 import models.bankdetails.BankDetails
@@ -33,6 +34,7 @@ import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnector) {
@@ -60,6 +62,8 @@ class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnecto
       (m, n) => n match {
         case AccountancyServices =>
           m + Asp.section + Supervision.section
+        case ArtMarketParticipant =>
+          m + Amp.section
         case EstateAgentBusinessService =>
           m + EstateAgentBusiness.section
         case HighValueDealing =>

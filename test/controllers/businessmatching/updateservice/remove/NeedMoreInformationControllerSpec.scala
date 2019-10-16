@@ -17,7 +17,7 @@
 package controllers.businessmatching.updateservice.remove
 
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching.HighValueDealing
+import models.businessmatching.{AccountancyServices}
 import models.flowmanagement.{NeedToUpdatePageId, RemoveBusinessTypeFlowModel}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -46,7 +46,7 @@ class NeedMoreInformationControllerSpec extends AmlsSpec {
     "get is called" must {
 
       "return OK with need_to_update view" in new Fixture {
-        mockCacheFetch(Some(RemoveBusinessTypeFlowModel(Some(Set(HighValueDealing)))), Some(RemoveBusinessTypeFlowModel.key))
+        mockCacheFetch(Some(RemoveBusinessTypeFlowModel(Some(Set(AccountancyServices)))), Some(RemoveBusinessTypeFlowModel.key))
 
         val result = controller.get()(request)
         status(result) must be(OK)

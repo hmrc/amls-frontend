@@ -22,6 +22,7 @@ import connectors.{AmlsConnector, DataCacheConnector}
 import exceptions.{DuplicateSubscriptionException, NoEnrolmentException}
 import javax.inject.Inject
 import models._
+import models.amp.Amp
 import models.asp.Asp
 import models.bankdetails.{BankDetails, NoBankAccountUsed}
 import models.businessactivities.BusinessActivities
@@ -110,6 +111,7 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
       aspSection = cache.getEntry[Asp](Asp.key),
       msbSection = cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key),
       hvdSection = cache.getEntry[Hvd](Hvd.key),
+      ampSection = cache.getEntry[Amp](Amp.key),
       supervisionSection = cache.getEntry[Supervision](Supervision.key)
     )
   }

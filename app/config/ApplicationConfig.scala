@@ -57,6 +57,9 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
   lazy val timeout = servicesConfig.getInt("timeout.seconds")
   lazy val timeoutCountdown = servicesConfig.getInt("timeout.countdown")
 
+  lazy val ampWhatYouNeedUrl = s"${getConfString("amls-art-market-participant-frontend.url", "")}/what-you-need"
+  lazy val ampSummeryUrl     = s"${getConfString("amls-art-market-participant-frontend.url", "")}/check-your-answers"
+
   def businessCustomerUrl = getConfigString("business-customer.url")
   
   lazy val mongoCacheUpdateUrl = baseUrl("amls-stub") + getConfigString("amls-stub.get-file-url")

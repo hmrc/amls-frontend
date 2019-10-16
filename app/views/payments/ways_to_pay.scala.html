@@ -25,12 +25,6 @@
     @errorSummary(f)
 }
 
-@supportingContent = {
-    <p>@Messages("payments.waystopay.info")</p>
-    <p>@Messages("payments.waystopay.info2")</p>
-    <p>@Messages("payments.waystopay.lead.time")</p>
-}
-
 @main(
     title = Messages("payments.waystopay.title") + " - " + Messages("submit.registration"),
     heading = header
@@ -43,7 +37,6 @@
             f = f("waysToPay"),
             heading = "payments.waystopay.title",
             section = "submit.registration",
-            supportingContent = supportingContent,
             panel = false
         ) {
             @radio(
@@ -58,7 +51,7 @@
             )
         }
 
-        @submit(returnLink = false)
+        @submit(returnLink = false, buttonMessageKey=Some("button.continue"))
 
     }
 }

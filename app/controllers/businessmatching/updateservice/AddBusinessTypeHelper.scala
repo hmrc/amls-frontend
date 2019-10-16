@@ -153,4 +153,48 @@ class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
     case _ => Set.empty[String]
   }
 
+  def getTp(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier) = {
+    for {
+      tradingPremises <- OptionT.liftF(tradingPremises(credId))
+      indexes: Set[Int] <- OptionT.fromOption[Future](model.tradingPremisesActivities.map(tpa => tpa.index))
+    } yield (indexes, tradingPremises)
+  }
+
+  def getRp(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier) = {
+    for {
+      responsiblePeople <- OptionT.liftF(responsiblePeople(credId))
+      indexes: Set[Int] <- OptionT.fromOption[Future](model.responsiblePeople.map(rpf => rpf.index))
+    } yield (indexes, responsiblePeople)
+  }
+
+  def tradingPremises(credId: String)(implicit hc: HeaderCarrier): Future[Seq[(TradingPremises, Int)]] = {
+    getData[TradingPremises](credId).map {
+      _.zipWithIndex.filterNot { case (tp, _) =>
+        tp.status.contains(StatusConstants.Deleted) | !tp.isComplete
+      }
+    }
+  }
+
+  def responsiblePeople(credId: String)(implicit hc: HeaderCarrier): Future[Seq[(ResponsiblePerson, Int)]] = {
+    getData[ResponsiblePerson](credId).map {
+      _.zipWithIndex.filterNot { case (rp, _) =>
+        rp.status.contains(StatusConstants.Deleted) | !rp.isComplete
+      }
+    }
+  }
+
+  def filteredTps(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier) = {
+    for {
+      (index: Set[Int], tps: Seq[(TradingPremises, Int)]) <- getTp(credId, model)
+      filteredTps <- OptionT.pure[Future, Seq[(TradingPremises, Int)]](tps.filter { key => index.contains(key._2)})
+    } yield filteredTps
+  }
+
+  def filteredRps(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier) = {
+    for {
+      (index: Set[Int], rps: Seq[(ResponsiblePerson, Int)]) <- getRp(credId, model)
+      filteredRps <- OptionT.pure[Future, Seq[(ResponsiblePerson, Int)]](rps.filter { key => index.contains(key._2)})
+    } yield filteredRps
+  }
+
 }

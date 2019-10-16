@@ -107,6 +107,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
         tradingPremisesSection = None,
         msbSection = None,
         hvdSection = None,
+        ampSection = None,
         supervisionSection = None,
         aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
       )
@@ -143,6 +144,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
         tradingPremisesSection = None,
         msbSection = None,
         hvdSection = None,
+        ampSection = None,
         supervisionSection = None,
         aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
       )
@@ -238,6 +240,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
         tradingPremisesSection = None,
         msbSection = None,
         hvdSection = None,
+        ampSection = None,
         supervisionSection = None,
         aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
       )

@@ -60,6 +60,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
     aspSection = None,
     msbSection = None,
     hvdSection = None,
+    ampSection = None,
     supervisionSection = None
   )
 
@@ -77,6 +78,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
     aspSection = None,
     msbSection = None,
     hvdSection = None,
+    ampSection = None,
     supervisionSection = None
   )
 

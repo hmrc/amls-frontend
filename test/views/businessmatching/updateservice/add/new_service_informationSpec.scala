@@ -16,7 +16,7 @@
 
 package views.businessmatching.updateservice.add
 
-import models.businessmatching.AccountancyServices
+import models.businessmatching.{AccountancyServices, TrustAndCompanyServices}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
@@ -50,8 +50,22 @@ class new_service_informationSpec extends AmlsViewSpec with MustMatchers {
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
-    "show the correct content" in new ViewFixture {
-      doc.body().text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.1"))
+    "show the correct content when only ASP is selected" in new ViewFixture {
+      doc.body().text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.asp"))
+    }
+
+    "show the correct content when only TCSP is selected" in new ViewFixture {
+      override def view = new_service_information(Set(TrustAndCompanyServices.getMessage()))
+
+      doc.body().text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.tcsp"))
+    }
+
+    "show the correct content when only both ASP and TCSP are selected" in new ViewFixture {
+      override def view = new_service_information(Set(TrustAndCompanyServices.getMessage(), AccountancyServices.getMessage()))
+
+      doc.body().text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.supervision"))
+      doc.body().text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.3"))
+      doc.body().text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.4"))
       doc.body().text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.2"))
     }
 

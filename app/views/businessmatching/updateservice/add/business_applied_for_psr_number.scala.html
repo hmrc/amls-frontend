@@ -31,7 +31,7 @@
 }
 
 @supportingContent = {
-    <p>@m("businessmatching.updateservice.psr.number.hint")</p>
+    <p>@hint(Messages("businessmatching.updateservice.psr.number.hint"))</p>
 }
 
 @main(
@@ -45,7 +45,8 @@
             f = f("appliedFor"),
             heading = "businessmatching.updateservice.psr.number.title",
             section = "summary.updateservice",
-            panel = false
+            panel = false,
+            supportingContent = supportingContent
         ) {
             @radio(
                 f = f("appliedFor"),

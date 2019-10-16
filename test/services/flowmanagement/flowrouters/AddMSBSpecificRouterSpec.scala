@@ -16,6 +16,7 @@
 
 package services.flowmanagement.flowrouters
 
+import controllers.businessmatching.routes
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import models.businessmatching._
 import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, TradingPremisesActivities}
@@ -130,7 +131,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
         "MSB is the Business Activity" in new Fixture {
           val result = await(router.getRoute("internalId", NoPSRPageId, model))
 
-          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
+          result mustBe Redirect(routes.SummaryController.get())
         }
       }
     }

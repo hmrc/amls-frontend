@@ -31,17 +31,17 @@ import utils.UpdateServicesSummaryFixtures
 class update_services_summarySpec extends UpdateServicesSummaryFixtures {
   "The update_services_summary view" must {
     "have the correct title" in new ViewFixture {
-      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(), Seq(), Seq())
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.updateservice"))
     }
 
     "have correct heading" in new ViewFixture {
-      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(), Seq(), Seq())
       heading.html must be(Messages("title.cya"))
     }
 
     "have correct subHeading" in new ViewFixture {
-      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(), Seq(), Seq())
       subHeading.html must include(Messages("summary.updateservice"))
     }
   }
@@ -49,7 +49,7 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
   "for which business type you wish to register" must {
     "have a question title" in new ViewFixture {
       val addBusinessTypeFlowModel:AddBusinessTypeFlowModel  = AddBusinessTypeFlowModel(activity = Some(AccountancyServices))
-      def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
+      def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
 
       doc.body().text must include(Messages("businessmatching.updateservice.selectactivities.title"))
     }
@@ -62,7 +62,7 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
       "show AccountancyServices if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(AccountancyServices))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.01"))
       }
@@ -71,7 +71,7 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
       "show BillPaymentServices if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(BillPaymentServices))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.03"))
       }
@@ -79,7 +79,7 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
       "show EstateAgentBusinessService if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(EstateAgentBusinessService))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.04"))
       }
@@ -87,7 +87,7 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
       "show HighValueDealing if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(HighValueDealing))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.05"))
       }
@@ -95,7 +95,7 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
       "show MoneyServiceBusiness if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.06"))
       }
@@ -103,7 +103,7 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
       "show TrustAndCompanyServices if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.07"))
       }
@@ -111,7 +111,7 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
       "show TelephonePaymentService if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(TelephonePaymentService))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.08"))
       }
@@ -121,7 +121,7 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
   "if adding msb" must {
     "which services does your business provide" must {
       "have a question title" in new MSBAllViewFixture {
-        doc.body().text must include(Messages("businessmatching.services.title"))
+        doc.body().text must include(Messages("businessmatching.updateservice.msb.services.title"))
       }
 
       "show edit link" in new MSBAllViewFixture {
@@ -264,9 +264,9 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
       }
 
       "which responsible people have passed the HMRC fit and proper test" must {
-        "have a question title" in new MSBViewFixture {
+        "have a question title" in new MSBAllViewFixture {
           doc.body().text must include(Messages("businessmatching.updateservice.whichfitandproper.heading"))
-          doc.getElementById("fit-and-proper-count").text mustBe Messages("businessmatching.updateservice.summary.whichfitandproper.count", 1)
+          doc.getElementById("responsible-person").text mustBe Messages("Katie Test")
         }
 
         "show edit link" in new MSBViewFixture {
@@ -293,7 +293,7 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
     "which responsible people have passed the HMRC fit and proper test" must {
       "have a question title" in new SimpleTCSPViewFixture {
         doc.body().text must include(Messages("businessmatching.updateservice.whichfitandproper.heading"))
-        doc.getElementById("fit-and-proper-count").text mustBe Messages("businessmatching.updateservice.summary.whichfitandproper.count.plural", 2)
+        doc.getElementById("responsible-person").text mustBe Messages("Katie Test David Test")
       }
 
       "show edit link" in new SimpleTCSPViewFixture {
@@ -333,7 +333,7 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
 
   "if doing business type at trading premises, for which premises will you do this business type from" must {
     "have a question title" in new MSBAllViewFixture {
-      doc.body().text must include(Messages("businessmatching.updateservice.whichtradingpremises.summary", Messages("businessmatching.registerservices.servicename.lbl.06.phrased")))
+      doc.body().text must include(Messages("businessmatching.updateservice.whichtradingpremises.heading", Messages("businessmatching.registerservices.servicename.lbl.06.phrased")))
     }
 
     "show edit link" in new MSBAllViewFixture {
@@ -341,8 +341,8 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
     }
 
     "show the message and count" in new MSBAllViewFixture {
-      doc.getElementById("tp-premises-activities").text mustBe Messages("lbl.yes")
-      doc.getElementById("tp-premises-activities-count").text mustBe Messages("businessmatching.updateservice.summary.whichtradingpremises.count", 2)
+      doc.getElementsByClass("trading-premises-list").first().child(0).html() must include(Messages("foo, 1, 2, AA1 1BB"))
+      doc.getElementsByClass("trading-premises-list").first().child(1).html() must include(Messages("Bar, 1, 2, AA1 1BB"))
     }
   }
 

@@ -92,8 +92,6 @@ object Tcsp {
   import play.api.libs.json._
   import utils.MappingUtils._
 
-  implicit val formatOption = Reads.optionWithNull[Tcsp]
-
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "tcsp"
     val notStarted = Section(messageKey, NotStarted, false, controllers.tcsp.routes.WhatYouNeedController.get())
@@ -166,4 +164,7 @@ object Tcsp {
   }.apply(Tcsp.apply _)
   implicit def default(tcsp: Option[Tcsp]): Tcsp =
     tcsp.getOrElse(Tcsp())
+
+  implicit val formatOption = Reads.optionWithNull[Tcsp]
+
 }

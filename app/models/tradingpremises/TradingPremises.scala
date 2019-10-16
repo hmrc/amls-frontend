@@ -112,8 +112,6 @@ object TradingPremises {
 
   val key = "trading-premises"
 
-  implicit val formatOption = Reads.optionWithNull[Seq[TradingPremises]]
-
   def anyChanged(newModel: Seq[TradingPremises]): Boolean = newModel exists {
     _.hasChanged
   }
@@ -205,6 +203,8 @@ object TradingPremises {
   }
 
   implicit val writes: Writes[TradingPremises] = Json.writes[TradingPremises]
+
+  implicit val formatOption = Reads.optionWithNull[Seq[TradingPremises]]
 
   implicit def default(tradingPremises: Option[TradingPremises]): TradingPremises =
     tradingPremises.getOrElse(TradingPremises())

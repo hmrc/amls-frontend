@@ -192,11 +192,53 @@ object FormTypes {
         ) (d => (d.year.getAsString, d.monthOfYear.getAsString, d.dayOfMonth.getAsString))
     }
 
-  val futureDateRule: Rule[LocalDate, LocalDate] = maxDateWithMsg(LocalDate.now, "error.future.date")
+  // Date rule logic that makes use of LocalDate.now should be retrieved via a def.
+  // A `val` keyword represents a value. It’s an immutable reference, meaning that its value never changes.
+  // Once assigned it will always keep the same value.
+  // While the def is a function declaration. It is evaluated on call and not stored as an immutable object.
+  def futureDateRule: Rule[LocalDate, LocalDate] = maxDateWithMsg(LocalDate.now, "error.future.date")
+  def localDateFutureRule: Rule[UrlFormEncoded, LocalDate] = localDateRuleWithPattern andThen pastStartDateRule andThen futureDateRule
+
+  def dateOfChangeActivityStartDateRule = From[UrlFormEncoded] { __ =>
+    import jto.validation.forms.Rules._
+    ((__ \ "activityStartDate").read(optionR(jodaLocalDateR("yyyy-MM-dd"))) ~
+      (__ \ "dateOfChange").read(localDateFutureRule)).tupled.andThen(dateOfChangeActivityStartDateRuleMapping).repath(_ => Path \ "dateOfChange")
+  }
+
+  def premisesEndDateRule = From[UrlFormEncoded] { __ =>
+    import jto.validation.forms.Rules._
+    ((__ \ "premisesStartDate").read(jodaLocalDateR("yyyy-MM-dd")) ~
+      (__ \ "endDate").read(localDateFutureRule)).tupled.andThen(premisesEndDateRuleMapping).repath(_ => Path \ "endDate")
+  }
+
+  def peopleEndDateRule = From[UrlFormEncoded] { __ =>
+    import jto.validation.forms.Rules._
+    ((__ \ "positionStartDate").read(jodaLocalDateR("yyyy-MM-dd")) ~
+      (__ \ "endDate").read(localDateFutureRule) ~
+      (__ \ "userName").read[String]).tupled.andThen(peopleEndDateRuleMapping).repath(_ => Path \ "endDate")
+  }
+
+  def businessActivityRule(msg: String) = From[UrlFormEncoded] { __ =>
+    (__ \ "businessActivities").read(minLengthR[Set[BusinessActivity]](1).withMessage(msg)) map (BusinessActivities(_))
+  }
+
+  def supervisionEndDateRule = From[UrlFormEncoded] { __ =>
+    import jto.validation.forms.Rules._
+    ((__ \ "extraStartDate").read(jodaLocalDateR("yyyy-MM-dd")) ~
+      (__ \ "endDate").read(localDateFutureRule)).tupled.andThen(supervisionEndDateRuleMapping).repath(_ => Path \ "endDate")
+  }
+
+  def supervisionStartDateRule = From[UrlFormEncoded] { __ =>
+    import jto.validation.forms.Rules._
+    ((__ \ "extraEndDate").read(extraEndDateRule) ~
+      (__ \ "startDate").read(localDateFutureRule)).tupled.andThen(supervisionStartDateRuleMapping).repath(_ => Path \ "startDate")
+  }
+
   val endOfCenturyDateRule: Rule[LocalDate, LocalDate] = maxDateWithMsg(new LocalDate(2099, 12, 31), "error.future.date")
   val pastStartDateRule: Rule[LocalDate, LocalDate] = minDateWithMsg(new LocalDate(1900, 1, 1), "error.allowed.start.date")
-  val localDateFutureRule: Rule[UrlFormEncoded, LocalDate] = localDateRuleWithPattern andThen pastStartDateRule andThen futureDateRule
+  val pastStartDateRuleExtended: Rule[LocalDate, LocalDate] = minDateWithMsg(new LocalDate(1700, 1, 1), "error.allowed.start.date.extended")
   val allowedPastAndFutureDateRule: Rule[UrlFormEncoded, LocalDate] = localDateRuleWithPattern andThen pastStartDateRule andThen endOfCenturyDateRule
+  val allowedPastAndFutureDateRuleExtended: Rule[UrlFormEncoded, LocalDate] = localDateRuleWithPattern andThen pastStartDateRuleExtended andThen endOfCenturyDateRule
 
   val dateOfChangeActivityStartDateRuleMapping = Rule.fromMapping[(Option[LocalDate], LocalDate), LocalDate] {
     case (Some(d1), d2) if d2.isAfter(d1) => Valid(d2)
@@ -210,12 +252,6 @@ object FormTypes {
     case _ => Invalid(Seq(ValidationError(List("error.mismatch.atb.email"))))
   }
 
-  val dateOfChangeActivityStartDateRule = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    ((__ \ "activityStartDate").read(optionR(jodaLocalDateR("yyyy-MM-dd"))) ~
-      (__ \ "dateOfChange").read(localDateFutureRule)).tupled.andThen(dateOfChangeActivityStartDateRuleMapping).repath(_ => Path \ "dateOfChange")
-  }
-
   val confirmEmailMatchRule = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
     ((__ \ "email").read(emailType) ~
@@ -227,26 +263,9 @@ object FormTypes {
     case (startDate, _) => Invalid(Seq(ValidationError("error.expected.tp.date.after.start", startDate.toString("dd-MM-yyyy"))))
   }
 
-  val premisesEndDateRule = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    ((__ \ "premisesStartDate").read(jodaLocalDateR("yyyy-MM-dd")) ~
-      (__ \ "endDate").read(localDateFutureRule)).tupled.andThen(premisesEndDateRuleMapping).repath(_ => Path \ "endDate")
-  }
-
   val peopleEndDateRuleMapping = Rule.fromMapping[(LocalDate, LocalDate, String), LocalDate] {
     case (d1, d2, un) if d2.isAfter(d1) => Valid(d2)
     case (startDate, _, userName) => Invalid(Seq(ValidationError("error.expected.rp.date.after.start", userName, startDate.toString("dd-MM-yyyy"))))
-  }
-
-  val peopleEndDateRule = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    ((__ \ "positionStartDate").read(jodaLocalDateR("yyyy-MM-dd")) ~
-      (__ \ "endDate").read(localDateFutureRule) ~
-      (__ \ "userName").read[String]).tupled.andThen(peopleEndDateRuleMapping).repath(_ => Path \ "endDate")
-  }
-
-  def businessActivityRule(msg: String) = From[UrlFormEncoded] { __ =>
-    (__ \ "businessActivities").read(minLengthR[Set[BusinessActivity]](1).withMessage(msg)) map (BusinessActivities(_))
   }
 
   /** Supervision section date rules **/
@@ -260,21 +279,9 @@ object FormTypes {
     case (_, _) => Invalid(Seq(ValidationError("error.expected.supervision.startdate.before.enddate")))
   }
 
-  val supervisionEndDateRule = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    ((__ \ "extraStartDate").read(jodaLocalDateR("yyyy-MM-dd")) ~
-      (__ \ "endDate").read(localDateFutureRule)).tupled.andThen(supervisionEndDateRuleMapping).repath(_ => Path \ "endDate")
-  }
-
   val extraEndDateRule = Rule.fromMapping[String, LocalDate] {
     case str if str.nonEmpty => Valid(LocalDate.parse(str, DateTimeFormat.forPattern("yyyy-MM-dd")))
     case _ => Valid(new LocalDate(2099, 12, 31))
-  }
-
-  val supervisionStartDateRule = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    ((__ \ "extraEndDate").read(extraEndDateRule) ~
-      (__ \ "startDate").read(localDateFutureRule)).tupled.andThen(supervisionStartDateRuleMapping).repath(_ => Path \ "startDate")
   }
 
   /** Business Identifier Rules */

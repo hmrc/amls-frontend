@@ -34,7 +34,6 @@ import scala.concurrent.Future
 
 @Singleton
 class SummaryController @Inject()(
-                                   val dataCache: DataCacheConnector,
                                    authAction: AuthAction,
                                    val ds: CommonPlayDependencies,
                                    val statusService: StatusService,
@@ -79,5 +78,4 @@ class SummaryController @Inject()(
         } yield Redirect(controllers.routes.RegistrationProgressController.get())
       } getOrElse InternalServerError("Unable to update business matching")
   }
-
 }

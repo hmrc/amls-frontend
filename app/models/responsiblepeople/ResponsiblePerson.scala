@@ -19,7 +19,6 @@ package models.responsiblepeople
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 import org.joda.time.LocalDate
-import play.api.libs.json.Reads
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
@@ -234,8 +233,6 @@ object ResponsiblePerson {
       _.hasChanged
     }
 
-  implicit val formatOption = Reads.optionWithNull[Seq[ResponsiblePerson]]
-
   def filter(rp: Seq[ResponsiblePerson]): Seq[ResponsiblePerson] =
     rp.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_ == ResponsiblePerson())
 
@@ -379,6 +376,8 @@ object ResponsiblePerson {
       }
     }
   }
+
+  implicit val formatOption = Reads.optionWithNull[Seq[ResponsiblePerson]]
 
   private def hasUkPassportNumber(rp: ResponsiblePerson): Boolean = rp.ukPassport match {
     case Some(UKPassportYes(_)) => true

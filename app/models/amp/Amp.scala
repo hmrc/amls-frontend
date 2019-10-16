@@ -27,9 +27,7 @@ import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 
-final case class Amp(id: String,
-                     data: JsObject = Json.obj(),
-                     lastUpdated: LocalDateTime = LocalDateTime.now,
+final case class Amp(data: JsObject = Json.obj(),
                      hasChanged: Boolean = false,
                      hasAccepted: Boolean = false) {
 
@@ -48,42 +46,38 @@ final case class Amp(id: String,
   val dateTransactionOverThreshold = JsPath \ "dateTransactionOverThreshold"
   val percentageExpectedTurnover   = JsPath \ "percentageExpectedTurnover"
   val otherTypeOfParticipant       = "somethingelse"
+  val notPresent                   = "null"
 
   private def get[A](path: JsPath)(implicit rds: Reads[A]): Option[A] =
     Reads.optionNoError(Reads.at(path)).reads(data).getOrElse(None)
 
-  private def isDefinedAt(path: JsPath): Boolean = {
-    get[JsValue](path).isDefined
-  }
-
   private def valueAt(path: JsPath): String = {
-    get[JsValue](path).getOrElse("").toString().toLowerCase()
+    get[JsValue](path).getOrElse(notPresent).toString().toLowerCase()
   }
 
   private def isTypeOfParticipantComplete: Boolean = {
-    isDefinedAt(typeOfParticipant) &&
+    valueAt(typeOfParticipant) != notPresent &&
       ((valueAt(typeOfParticipant).contains(otherTypeOfParticipant) &&
-        isDefinedAt(typeOfParticipantDetail)) ||
+        valueAt(typeOfParticipantDetail) != notPresent) ||
         (!valueAt(typeOfParticipant).contains(otherTypeOfParticipant)))
   }
 
   private def isBoughtOrSoldOverThresholdComplete: Boolean = {
-    isDefinedAt(boughtOrSoldOverThreshold) &&
+    valueAt(boughtOrSoldOverThreshold) != notPresent &&
       ((valueAt(boughtOrSoldOverThreshold) == "true" &&
-        isDefinedAt(dateTransactionOverThreshold)) ||
+        valueAt(dateTransactionOverThreshold) != notPresent) ||
         (valueAt(boughtOrSoldOverThreshold) == "false"))
   }
 
   def isComplete: Boolean = {
     isTypeOfParticipantComplete &&
     isBoughtOrSoldOverThresholdComplete &&
-    isDefinedAt(identifyLinkedTransactions) &&
-    isDefinedAt(percentageExpectedTurnover)
+    valueAt(identifyLinkedTransactions) != notPresent &&
+    valueAt(percentageExpectedTurnover) != notPresent
   }
 }
 
-object Amp {
-
+object Amp  {
   val redirectCallType       = "GET"
   val key                    = "amp"
   lazy val ampWhatYouNeedUrl = "https://localhost:9223/amls-art-market-participant-frontend/what-you-need"
@@ -94,13 +88,13 @@ object Amp {
   }
 
   def section(implicit cache: CacheMap): Section = {
-    val notStarted = Section(key, NotStarted, false, generateRedirect(ampWhatYouNeedUrl))
+    val notStarted = Section(key, NotStarted, false, generateRedirect(ApplicationConfig.ampWhatYouNeedUrl))
     cache.getEntry[Amp](key).fold(notStarted) {
       model =>
-        if (model.isComplete) {
-          Section(key, Completed, model.hasChanged, generateRedirect(ampSummeryUrl))
+        if (model.isComplete && model.hasAccepted) {
+          Section(key, Completed, model.hasChanged, generateRedirect(ApplicationConfig.ampSummeryUrl))
         } else {
-          Section(key, Started, model.hasChanged, generateRedirect(ampWhatYouNeedUrl))
+          Section(key, Started, model.hasChanged, generateRedirect(ApplicationConfig.ampWhatYouNeedUrl))
         }
     }
   }
@@ -114,9 +108,7 @@ object Amp {
     import play.api.libs.functional.syntax._
 
     (
-      (__ \ "_id").read[String] and
         (__ \ "data").read[JsObject] and
-        (__ \ "lastUpdated").read(MongoDateTimeFormats.localDateTimeRead) and
         (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
         (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false))
       ) (Amp.apply _)
@@ -127,11 +119,11 @@ object Amp {
     import play.api.libs.functional.syntax._
 
     (
-      (__ \ "_id").write[String] and
         (__ \ "data").write[JsObject] and
-        (__ \ "lastUpdated").write(MongoDateTimeFormats.localDateTimeWrite) and
         (__ \ "hasChanged").write[Boolean] and
         (__ \ "hasAccepted").write[Boolean]
       ) (unlift(Amp.unapply))
   }
+
+  implicit val formatOption = Reads.optionWithNull[Amp]
 }

@@ -19,6 +19,7 @@ package services
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
+import models.amp.Amp
 import models.businessdetails._
 import models.asp.{Accountancy, Asp, OtherBusinessTaxMattersNo, ServicesOfBusiness}
 import models.bankdetails.{BankDetails, PersonalAccount, UKAccount}
@@ -37,8 +38,7 @@ import models.{DataImport, _}
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.verify
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.http.ws.WSHttp
@@ -47,8 +47,7 @@ import utils.{AmlsSpec, DependencyMocks}
 import scala.collection.Seq
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
-  with ScalaFutures
+class UpdateMongoCacheServiceSpec extends AmlsSpec
   with BusinessMatchingGenerator
   with TradingPremisesGenerator
   with ResponsiblePersonGenerator {
@@ -74,6 +73,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
       aspSection = None,
       msbSection = None,
       hvdSection = None,
+      ampSection = None,
       supervisionSection = None
     )
 
@@ -181,6 +181,16 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
       Some(LinkedCashPayments(false)),
       Some(DateOfChange(new LocalDate("2016-02-24"))))
 
+    val ampData = Json.obj(
+      "typeOfParticipant"     -> Seq("artGalleryOwner"),
+      "boughtOrSoldOverThreshold"     -> true,
+      "dateTransactionOverThreshold"  -> LocalDate.now,
+      "identifyLinkedTransactions"    -> true,
+      "percentageExpectedTurnover"    -> "fortyOneToSixty"
+    )
+
+    val amp = Amp(data = ampData)
+
     val supervision = Supervision(
       Some(AnotherBodyNo),
       Some(ProfessionalBodyMemberYes),
@@ -228,6 +238,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
       Some(asp),
       Some(msb),
       Some(hvd),
+      Some(amp),
       Some(supervision),
       Some(subscription),
       Some(amendVariationRenewalResponse))
