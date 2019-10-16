@@ -74,9 +74,9 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
 
   def subscriptionUrl = s"$amlsUrl/amls/subscription"
 
-  def enrolmentStoreToggle = configuration.getOptional[Boolean]("feature-toggle.enrolment-store").getOrElse(false)
+  def enrolmentStoreToggle = servicesConfig.getConfBool("feature-toggle.enrolment-store", false)
 
-  def fxEnabledToggle = configuration.getOptional[Boolean]("feature-toggle.fx-enabled").getOrElse(false)
+  def fxEnabledToggle = servicesConfig.getConfBool("feature-toggle.fx-enabled", false)
 
   lazy val authUrl = baseUrl("auth")
 
