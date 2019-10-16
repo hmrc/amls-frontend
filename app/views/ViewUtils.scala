@@ -16,12 +16,12 @@
 
 package views
 
-import forms.Form2
 import play.api.i18n.Messages
+import play.twirl.api.Html
 
 object ViewUtils {
 
-  def errorPrefix(form: Form2[_])(implicit messages: Messages): String = {
-    if (form.errors.nonEmpty) messages("error.browser.title.prefix").concat(" ") else ""
+  def errorPrefix(content: Html)(implicit messages: Messages): String = {
+    if (content.toString().contains("error-notification")) messages("error.browser.title.prefix").concat(" ") else ""
   }
 }
