@@ -63,8 +63,6 @@ class LandingController @Inject()(val landingService: LandingService,
                                   implicit override val messagesApi: MessagesApi,
                                   parser: BodyParsers.Default) extends AmlsBaseController(ds, mcc) with I18nSupport with MessagesRequestHelper {
 
-  //private def messagesAction = new MessagesActionBuilderImpl[AnyContent](parser, messagesApi)
-
   private lazy val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role()).absoluteUrl, "utf-8")
   def signoutUrl = s"${appConfig.logoutUrl}?continue=$unauthorisedUrl"
 
