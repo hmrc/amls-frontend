@@ -357,7 +357,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       val bacsRequest = UpdateBacsRequest(true)
 
       when {
-        amlsConnector.http.PUT[UpdateBacsRequest, HttpResponse](any(), any())(any(), any(), any(), any())
+        amlsConnector.http.PUT[UpdateBacsRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any())
       } thenReturn Future.successful(HttpResponse(OK))
     }
   }
@@ -367,7 +367,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       val result = paymentStatusResultGen.sample.get
 
       when {
-        amlsConnector.http.PUT[RefreshPaymentStatusRequest, PaymentStatusResult](any(), any())(any(), any(), any(), any())
+        amlsConnector.http.PUT[RefreshPaymentStatusRequest, PaymentStatusResult](any(), any(), any())(any(), any(), any(), any())
       } thenReturn Future.successful(result)
 
       whenReady(amlsConnector.refreshPaymentStatus(result.amlsRef, accountTypeId)) { r => r mustBe result }
