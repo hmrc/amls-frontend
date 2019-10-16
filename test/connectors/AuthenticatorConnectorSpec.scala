@@ -48,13 +48,13 @@ class AuthenticatorConnectorSpec extends AmlsSpec with ScalaFutures {
 
       when(appConfig.refreshProfileToggle).thenReturn(true)
 
-      when(http.POSTEmpty[HttpResponse](any(), any())(any(), any(), any())) thenReturn Future.successful(HttpResponse(200))
+      when(http.POSTEmpty[HttpResponse](any())(any(), any(), any())) thenReturn Future.successful(HttpResponse(200))
 
       val result = Await.result(connector.refreshProfile, 5 seconds)
 
       result.status must be(200)
 
-      verify(http).POSTEmpty(endsWith(s"/government-gateway-authentication/refresh-profile"), any())(any(), any(), any())
+      verify(http).POSTEmpty(endsWith(s"/government-gateway-authentication/refresh-profile"))(any(), any(), any())
 
     }
 
@@ -66,7 +66,7 @@ class AuthenticatorConnectorSpec extends AmlsSpec with ScalaFutures {
 
       result.status must be(200)
 
-      verify(http, never).POSTEmpty(any(), any())(any(), any(), any())
+      verify(http, never).POSTEmpty(any())(any(), any(), any())
     }
 
   }

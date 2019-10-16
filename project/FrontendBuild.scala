@@ -38,7 +38,7 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "simple-reactivemongo" % playReactivemongoVersion,
     "uk.gov.hmrc" %% "auth-client" % authVersion,
     "uk.gov.hmrc" %% "play-ui" % "8.0.0-play-26",
-    "uk.gov.hmrc" %% "bootstrap-play-26" % "1.1.0",
+    "uk.gov.hmrc" %% "bootstrap-play-26" % "0.45.0",
     "uk.gov.hmrc" %% "govuk-template" % "5.38.0-play-26",
     "uk.gov.hmrc" %% "http-verbs" % "9.8.0-play-26",
 
