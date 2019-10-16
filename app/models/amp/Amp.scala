@@ -81,20 +81,20 @@ object Amp  {
   val redirectCallType       = "GET"
   val key                    = "amp"
   lazy val ampWhatYouNeedUrl = "https://localhost:9223/amls-art-market-participant-frontend/what-you-need"
-  lazy val ampSummeryUrl     = "https://localhost:9223/amls-art-market-participant-frontend/check-your-answers"
+  lazy val ampSummaryUrl     = "https://localhost:9223/amls-art-market-participant-frontend/check-your-answers"
 
   private def generateRedirect(destinationUrl: String) = {
     Call(redirectCallType, destinationUrl)
   }
 
   def section(implicit cache: CacheMap): Section = {
-    val notStarted = Section(key, NotStarted, false, generateRedirect(ApplicationConfig.ampWhatYouNeedUrl))
+    val notStarted = Section(key, NotStarted, false, generateRedirect(ampWhatYouNeedUrl))
     cache.getEntry[Amp](key).fold(notStarted) {
       model =>
         if (model.isComplete && model.hasAccepted) {
-          Section(key, Completed, model.hasChanged, generateRedirect(ApplicationConfig.ampSummeryUrl))
+          Section(key, Completed, model.hasChanged, generateRedirect(ampSummaryUrl))
         } else {
-          Section(key, Started, model.hasChanged, generateRedirect(ApplicationConfig.ampWhatYouNeedUrl))
+          Section(key, Started, model.hasChanged, generateRedirect(ampWhatYouNeedUrl))
         }
     }
   }

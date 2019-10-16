@@ -20,10 +20,10 @@ import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.amp.Amp
-import models.businessdetails._
 import models.asp.{Accountancy, Asp, OtherBusinessTaxMattersNo, ServicesOfBusiness}
 import models.bankdetails.{BankDetails, PersonalAccount, UKAccount}
 import models.businessactivities._
+import models.businessdetails._
 import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
 import models.declaration.release7.{BeneficialShareholder, RoleWithinBusinessRelease7}
@@ -41,7 +41,6 @@ import org.mockito.Mockito.verify
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import uk.gov.hmrc.play.http.ws.WSHttp
 import utils.{AmlsSpec, DependencyMocks}
 
 import scala.collection.Seq
@@ -184,7 +183,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
     val ampData = Json.obj(
       "typeOfParticipant"     -> Seq("artGalleryOwner"),
       "boughtOrSoldOverThreshold"     -> true,
-      "dateTransactionOverThreshold"  -> LocalDate.now,
+      "dateTransactionOverThreshold"  -> LocalDate.now.toString,
       "identifyLinkedTransactions"    -> true,
       "percentageExpectedTurnover"    -> "fortyOneToSixty"
     )
