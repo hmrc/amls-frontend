@@ -103,7 +103,7 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
           Messages("summary.businessmatching") + " - " +
           Messages("title.amls") + " - " + Messages("title.gov")
 
-        document.title() mustBe pageTitle
+        document.title() mustBe s"Error: $pageTitle"
     }
 
     "on post() redirect correctly if valid data sent and edit is true" in new Fixture {
