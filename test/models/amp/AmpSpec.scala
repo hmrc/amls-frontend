@@ -22,9 +22,12 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 import org.mockito.Mockito._
+import org.scalatest.MustMatchers
+import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.play.PlaySpec
 import play.api.mvc.Call
 
-trait AmpValues extends AmlsSpec {
+trait AmpValues {
 
   val dateVal = LocalDateTime.now
 
@@ -103,7 +106,7 @@ trait AmpValues extends AmlsSpec {
   val MissingPercentageExpectedTurnoverModel    = Amp(MissingPercentageExpectedTurnoverData)
 }
 
-class AmpSpec extends AmpValues {
+class AmpSpec extends AmlsSpec with AmpValues {
   "Amp" must {
     "have a mongo key that" must {
       "be correctly set" in {
@@ -127,8 +130,8 @@ class AmpSpec extends AmpValues {
 
     "have a section function that" must {
       implicit val cache         = mock[CacheMap]
-      lazy val ampWhatYouNeedUrl = "https://localhost:9223/amls-art-market-participant-frontend/what-you-need"
-      lazy val ampSummaryUrl     = "https://localhost:9223/amls-art-market-participant-frontend/check-your-answers"
+      val ampWhatYouNeedUrl = "http://localhost:9223/anti-money-laundering/art-market-participant/what-you-need"
+      val ampSummaryUrl     = "http://localhost:9223/anti-money-laundering/art-market-participant/check-your-answers"
 
       "return a NotStarted Section when model is empty" in {
         val notStartedSection = Section("amp", NotStarted, false, Call("GET", ampWhatYouNeedUrl))
