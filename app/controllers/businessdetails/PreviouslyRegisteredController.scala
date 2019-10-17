@@ -72,7 +72,7 @@ class PreviouslyRegisteredController @Inject () (
     data match {
       case PreviouslyRegisteredYes(_) => businessDetails.copy(previouslyRegistered = Some(data), activityStartDate = None,
                                                                 hasChanged = true)
-      case PreviouslyRegisteredYesWithoutMlr(_) => businessDetails.copy(previouslyRegistered = Some(data), activityStartDate = None,
+      case PreviouslyRegisteredYesOptionalMlr(_) => businessDetails.copy(previouslyRegistered = Some(data), activityStartDate = None,
         hasChanged = true)
       case PreviouslyRegisteredNo => businessDetails.copy(previouslyRegistered = Some(data),
                                                                 hasChanged = true)

@@ -24,7 +24,7 @@ import cats.data.Validated.{Valid}
 sealed trait PreviouslyRegistered
 
 case class PreviouslyRegisteredYes(value: String) extends PreviouslyRegistered
-case class PreviouslyRegisteredYesWithoutMlr(value: Option[String]) extends PreviouslyRegistered
+case class PreviouslyRegisteredYesOptionalMlr(value: Option[String]) extends PreviouslyRegistered
 case object PreviouslyRegisteredNo extends PreviouslyRegistered
 
 object PreviouslyRegistered {
@@ -35,7 +35,7 @@ object PreviouslyRegistered {
     import jto.validation.forms.Rules._
 
     (__ \ "previouslyRegistered").read[Boolean].withMessage("error.required.atb.previously.registered") flatMap {
-      case true => Rule.fromMapping { _ => Valid(PreviouslyRegisteredYesWithoutMlr(None)) }
+      case true => Rule.fromMapping { _ => Valid(PreviouslyRegisteredYesOptionalMlr(None)) }
       case false => Rule.fromMapping { _ => Valid(PreviouslyRegisteredNo) }
     }
   }
@@ -45,8 +45,8 @@ object PreviouslyRegistered {
       Map("previouslyRegistered" -> Seq("true"),
         "prevMLRRegNo" -> Seq(value)
       )
-    case PreviouslyRegisteredYesWithoutMlr(None) => Map("previouslyRegistered" -> Seq("true"))
-    case PreviouslyRegisteredYesWithoutMlr(Some(mlr)) =>
+    case PreviouslyRegisteredYesOptionalMlr(None) => Map("previouslyRegistered" -> Seq("true"))
+    case PreviouslyRegisteredYesOptionalMlr(Some(mlr)) =>
       Map("previouslyRegistered" -> Seq("true"),
         "prevMLRRegNo" -> Seq(mlr)
       )
@@ -55,8 +55,8 @@ object PreviouslyRegistered {
 
   implicit val jsonReads: Reads[PreviouslyRegistered] =
     (__ \ "previouslyRegistered").read[Boolean] flatMap {
+      case true => (__ \ "prevMLRRegNo").readNullable[String] map PreviouslyRegisteredYesOptionalMlr.apply
       case false => Reads(_ => JsSuccess(PreviouslyRegisteredNo))
-      case true => (__ \ "prevMLRRegNo").readNullable[String] map PreviouslyRegisteredYesWithoutMlr.apply
     }
 
   implicit val jsonWrites = Writes[PreviouslyRegistered] {
@@ -65,7 +65,7 @@ object PreviouslyRegistered {
         "previouslyRegistered" -> true,
         "prevMLRRegNo" -> value
       )
-    case PreviouslyRegisteredYesWithoutMlr(x) =>
+    case PreviouslyRegisteredYesOptionalMlr(x) =>
       if(x.isDefined) {
         Json.obj(
           "previouslyRegistered" -> true,
