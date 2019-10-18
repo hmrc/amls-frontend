@@ -76,7 +76,7 @@ class summarySpec extends AmlsSpec
       def view = views.html.businessdetails.summary(
         EmptyForm,
         BusinessDetails(
-          Some(PreviouslyRegisteredYes("1234")),
+          Some(PreviouslyRegisteredYes(Some("1234"))),
           Some(ActivityStartDate(new LocalDate(2016, 1, 2))),
           Some(VATRegisteredYes("2345")),
           Some(CorporationTaxRegisteredYes("3456")),

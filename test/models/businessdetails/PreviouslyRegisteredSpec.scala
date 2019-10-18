@@ -41,7 +41,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
         )
 
         PreviouslyRegistered.formRule.validate(data) must
-          be(Valid(PreviouslyRegisteredYes("1" * 8)))
+          be(Valid(PreviouslyRegisteredYes(Some("1" * 8))))
       }
     }
 
@@ -144,7 +144,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
 
     "write correct data from `Yes` value" in {
 
-      PreviouslyRegistered.formWrites.writes(PreviouslyRegisteredYes("12345678")) must
+      PreviouslyRegistered.formWrites.writes(PreviouslyRegisteredYes(Some("12345678"))) must
         be(Map("previouslyRegistered" -> Seq("true"), "prevMLRRegNo" -> Seq("12345678")))
     }
   }
@@ -162,7 +162,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("previouslyRegistered" -> true, "prevMLRRegNo" -> "12345678")
 
       Json.fromJson[PreviouslyRegistered](json) must
-        be(JsSuccess(PreviouslyRegisteredYes("12345678"), JsPath \ "prevMLRRegNo"))
+        be(JsSuccess(PreviouslyRegisteredYes(Some("12345678")), JsPath \ "prevMLRRegNo"))
     }
 
     "fail to validate when given an empty `Yes` value" in {
@@ -178,7 +178,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
       Json.toJson(PreviouslyRegisteredNo) must
         be(Json.obj("previouslyRegistered" -> false))
 
-      Json.toJson(PreviouslyRegisteredYes("12345678")) must
+      Json.toJson(PreviouslyRegisteredYes(Some("12345678"))) must
         be(Json.obj(
           "previouslyRegistered" -> true,
           "prevMLRRegNo" -> "12345678"

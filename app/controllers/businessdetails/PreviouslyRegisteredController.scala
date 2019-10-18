@@ -68,7 +68,7 @@ class PreviouslyRegisteredController @Inject () (
   }
 
   private def getUpdatedModel(businessType: BusinessType, businessDetails: BusinessDetails, data: PreviouslyRegistered): BusinessDetails = {
-    businessDetails.copy(previouslyRegistered = Some(data), activityStartDate = None, hasChanged = true)
+    businessDetails.copy(previouslyRegistered = Some(data), hasChanged = true)
   }
 
   private def getRouting(businessType: BusinessType, edit: Boolean, data: PreviouslyRegistered): Result = {

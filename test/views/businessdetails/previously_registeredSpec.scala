@@ -34,7 +34,7 @@ class previously_registeredSpec extends AmlsSpec with MustMatchers  {
   "previously_registered view" must {
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[PreviouslyRegistered] = Form2(PreviouslyRegisteredYes("prevMLRRegNo"))
+      val form2: ValidForm[PreviouslyRegistered] = Form2(PreviouslyRegisteredYes(Some("prevMLRRegNo")))
 
       def view = views.html.businessdetails.previously_registered(form2, true)
 
@@ -43,7 +43,7 @@ class previously_registeredSpec extends AmlsSpec with MustMatchers  {
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[PreviouslyRegistered] = Form2(PreviouslyRegisteredYes("prevMLRRegNo"))
+      val form2: ValidForm[PreviouslyRegistered] = Form2(PreviouslyRegisteredYes(Some("prevMLRRegNo")))
 
       def view = views.html.businessdetails.previously_registered(form2, true)
 

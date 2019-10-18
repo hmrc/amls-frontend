@@ -26,7 +26,7 @@ import utils.AmlsSpec
 
 class businessDetailsSpec extends AmlsSpec {
 
-  val previouslyRegistered = PreviouslyRegisteredYes("12345678")
+  val previouslyRegistered = PreviouslyRegisteredYes(Some("12345678"))
 
   val cache = mock[CacheMap]
 
@@ -348,9 +348,6 @@ class businessDetailsSpec extends AmlsSpec {
         }
       }
     }
-
-
-
 
     "correspondenceAddress value is set" which {
       "is the same as before" must {

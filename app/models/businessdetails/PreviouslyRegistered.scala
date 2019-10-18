@@ -44,8 +44,10 @@ object PreviouslyRegistered {
       Map("previouslyRegistered" -> Seq("true"),
         "prevMLRRegNo" -> Seq(value)
       )
-    case PreviouslyRegisteredYes(None) => Map("previouslyRegistered" -> Seq("true"))
-    case PreviouslyRegisteredNo => Map("previouslyRegistered" -> Seq("false"))
+    case PreviouslyRegisteredYes(None) =>
+      Map("previouslyRegistered" -> Seq("true"))
+    case PreviouslyRegisteredNo =>
+      Map("previouslyRegistered" -> Seq("false"))
   }
 
   implicit val jsonReads: Reads[PreviouslyRegistered] =
@@ -56,10 +58,16 @@ object PreviouslyRegistered {
 
   implicit val jsonWrites = Writes[PreviouslyRegistered] {
     case PreviouslyRegisteredYes(value) =>
-      Json.obj(
-        "previouslyRegistered" -> true,
-        "prevMLRRegNo" -> value
-      )
+      if(value.isDefined) {
+        Json.obj(
+          "previouslyRegistered" -> true,
+          "prevMLRRegNo" -> value
+        )
+      } else {
+        Json.obj(
+          "previouslyRegistered" -> true
+        )
+      }
     case PreviouslyRegisteredYes(None) =>
       Json.obj(
         "previouslyRegistered" -> true

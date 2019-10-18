@@ -60,7 +60,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
     "on get display the previously registered with HMRC with pre populated data" in new Fixture {
 
       when(controller.dataCacheConnector.fetch[BusinessDetails](any(), any())
-        (any(), any())).thenReturn(Future.successful(Some(BusinessDetails(Some(PreviouslyRegisteredYes("12345678"))))))
+        (any(), any())).thenReturn(Future.successful(Some(BusinessDetails(Some(PreviouslyRegisteredYes(Some("12345678")))))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
