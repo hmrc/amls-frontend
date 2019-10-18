@@ -53,7 +53,7 @@ class WhatDateRemovedController @Inject()(
     implicit request =>
       getFormData(request.credId) map { case model =>
         val form = model.dateOfChange map { v => Form2(v) } getOrElse EmptyForm
-        Ok(date_of_change(form, "summary.updateservice", routes.WhatDateRemovedController.post(edit), false))
+        Ok(date_of_change(form, "summary.updateservice", routes.WhatDateRemovedController.post(edit), false, "button.continue"))
       } getOrElse  InternalServerError("Get: Unable to show date_of_change Activities page. Failed to retrieve data")
     }
 
@@ -61,7 +61,7 @@ class WhatDateRemovedController @Inject()(
       implicit request =>
         Form2[DateOfChange](request.body) match {
           case form: InvalidForm =>
-            Future.successful(BadRequest(date_of_change(form, "summary.updateservice", routes.WhatDateRemovedController.post(edit))))
+            Future.successful(BadRequest(date_of_change(form, "summary.updateservice", routes.WhatDateRemovedController.post(edit), false, "button.continue")))
 
            case ValidForm(_, data) => dataCacheConnector.update[RemoveBusinessTypeFlowModel](request.credId, RemoveBusinessTypeFlowModel.key) {
               case Some(model) => model.copy(dateOfChange = Some(data))
