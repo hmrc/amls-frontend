@@ -40,7 +40,7 @@
             <p>@model.previouslyRegistered.map {
                 case PreviouslyRegisteredNo => { @Messages("lbl.no") }
                 case PreviouslyRegisteredYes(v) => { @Messages("businessdetails.registeredformlr.mlrregno.lbl"): @v }
-                case PreviouslyRegisteredYesOptionalMlr(v) => { @Messages("lbl.yes") }
+                case PreviouslyRegisteredYes(None) => { @Messages("lbl.yes") }
             }</p>
         }
     }

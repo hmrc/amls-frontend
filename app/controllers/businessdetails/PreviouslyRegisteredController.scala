@@ -60,8 +60,7 @@ class PreviouslyRegisteredController @Inject () (
               } yield {
                 dataCacheConnector.save[BusinessDetails](request.credId, BusinessDetails.key,
                   getUpdatedModel(businessType,  cache.getEntry[BusinessDetails](BusinessDetails.key), data))
-                //getRouting(businessType, edit, data)
-                Redirect (routes.ActivityStartDateController.get(edit))
+                getRouting(businessType, edit, data)
               }).getOrElse(Redirect(routes.ConfirmRegisteredOfficeController.get(edit)))
           }
       }
@@ -69,25 +68,13 @@ class PreviouslyRegisteredController @Inject () (
   }
 
   private def getUpdatedModel(businessType: BusinessType, businessDetails: BusinessDetails, data: PreviouslyRegistered): BusinessDetails = {
-    data match {
-      case PreviouslyRegisteredYes(_) => businessDetails.copy(previouslyRegistered = Some(data), activityStartDate = None,
-                                                                hasChanged = true)
-      case PreviouslyRegisteredYesOptionalMlr(_) => businessDetails.copy(previouslyRegistered = Some(data), activityStartDate = None,
-        hasChanged = true)
-      case PreviouslyRegisteredNo => businessDetails.copy(previouslyRegistered = Some(data),
-                                                                hasChanged = true)
-    }
+    businessDetails.copy(previouslyRegistered = Some(data), activityStartDate = None, hasChanged = true)
   }
 
-//  private def getRouting(businessType: BusinessType, edit: Boolean, data: PreviouslyRegistered): Result = {
-//    (businessType, edit, data) match {
-//      case (UnincorporatedBody | LPrLLP | LimitedCompany | Partnership, _, PreviouslyRegisteredYes(_)) =>
-//          Redirect (routes.VATRegisteredController.get (edit))
-//      case (_, _, PreviouslyRegisteredNo) =>
-//        Redirect (routes.ActivityStartDateController.get (edit))
-//      case (_, true, PreviouslyRegisteredYes(_)) => Redirect(routes.SummaryController.get())
-//      case (_, false, PreviouslyRegisteredYes(_)) =>
-//        Redirect(routes.ConfirmRegisteredOfficeController.get(edit))
-//    }
-//  }
+  private def getRouting(businessType: BusinessType, edit: Boolean, data: PreviouslyRegistered): Result = {
+    (edit) match {
+      case true => Redirect(routes.SummaryController.get())
+      case _    => Redirect (routes.ActivityStartDateController.get(edit))
+    }
+  }
 }
