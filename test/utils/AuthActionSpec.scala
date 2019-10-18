@@ -44,7 +44,8 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
   private lazy val unauthorisedUrl = URLEncoder.encode(
     ReturnLocation(controllers.routes.AmlsController.unauthorised_role()).absoluteUrl, "utf-8"
   )
-  def signoutUrl = s"${ApplicationConfig.logoutUrl}?continue=$unauthorisedUrl"
+  def unauthorised = s"${ApplicationConfig.logoutUrl}?continue=$unauthorisedUrl"
+  def signout      = s"${ApplicationConfig.logoutUrl}"
 
   def fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("", "")
 
@@ -84,83 +85,83 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
     }
 
     "erroneous retrievals are obtained" must {
-      "redirect the user to signoutUrl" in {
+      "redirect the user to unauthorised" in {
         val authAction = new DefaultAuthAction(fakeAuthConnector(erroneousRetrievals))
         val controller = new Harness(authAction)
 
         val result = controller.onPageLoad()(fakeRequest)
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(signoutUrl)
+        redirectLocation(result) mustBe Some(unauthorised)
       }
     }
 
     "the user hasn't logged in" must {
-      "redirect the user to signoutUrl " in {
+      "redirect the user to signout " in {
         val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new MissingBearerToken)))
         val controller = new Harness(authAction)
         val result = controller.onPageLoad()(fakeRequest)
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).get must startWith(signoutUrl)
+        redirectLocation(result).get must startWith(signout)
       }
     }
 
     "the user's session has expired" must {
-      "redirect the user to signoutUrl " in {
+      "redirect the user to signout " in {
         val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new BearerTokenExpired)))
         val controller = new Harness(authAction)
         val result = controller.onPageLoad()(fakeRequest)
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).get must startWith(signoutUrl)
+        redirectLocation(result).get must startWith(signout)
       }
     }
 
     "the user doesn't have sufficient enrolments" must {
-      "redirect the user to the signoutUrl" in {
+      "redirect the user to the unauthorised" in {
         val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new InsufficientEnrolments)))
         val controller = new Harness(authAction)
         val result = controller.onPageLoad()(fakeRequest)
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(signoutUrl)
+        redirectLocation(result) mustBe Some(unauthorised)
       }
     }
 
     "the user doesn't have sufficient confidence level" must {
-      "redirect the user to the signoutUrl" in {
+      "redirect the user to the unauthorised" in {
         val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new InsufficientConfidenceLevel)))
         val controller = new Harness(authAction)
         val result = controller.onPageLoad()(fakeRequest)
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(signoutUrl)
+        redirectLocation(result) mustBe Some(unauthorised)
       }
     }
 
     "the user used an unaccepted auth provider" must {
-      "redirect the user to the signoutUrl" in {
+      "redirect the user to the unauthorised" in {
         val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new UnsupportedAuthProvider)))
         val controller = new Harness(authAction)
         val result = controller.onPageLoad()(fakeRequest)
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(signoutUrl)
+        redirectLocation(result) mustBe Some(unauthorised)
       }
     }
 
     "the user has an unsupported affinity group" must {
-      "redirect the user to the signoutUrl" in {
+      "redirect the user to the unauthorised" in {
         val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new UnsupportedAffinityGroup)))
         val controller = new Harness(authAction)
         val result = controller.onPageLoad()(fakeRequest)
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(signoutUrl)
+        redirectLocation(result) mustBe Some(unauthorised)
       }
     }
 
     "the user has an unsupported credential role" must {
-      "redirect the user to the signoutUrl" in {
+      "redirect the user to the unauthorised" in {
         val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new UnsupportedCredentialRole)))
         val controller = new Harness(authAction)
         val result = controller.onPageLoad()(fakeRequest)
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(signoutUrl)
+        redirectLocation(result) mustBe Some(unauthorised)
       }
     }
   }
