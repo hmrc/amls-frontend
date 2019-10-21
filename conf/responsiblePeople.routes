@@ -18,9 +18,6 @@ POST        /other-names/:index/                                   @controllers.
 GET         /self-assessment/:index/                               @controllers.responsiblepeople.RegisteredForSelfAssessmentController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /self-assessment/:index/                               @controllers.responsiblepeople.RegisteredForSelfAssessmentController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
-GET         /address/:index/                                       @controllers.responsiblepeople.ConfirmAddressController.get(index: Int)
-POST        /address/:index/                                       @controllers.responsiblepeople.ConfirmAddressController.post(index: Int)
-
 GET         /moved-address/:index/                                 @controllers.responsiblepeople.MovedAddressController.get(index: Int)
 POST        /moved-address/:index/                                 @controllers.responsiblepeople.MovedAddressController.post(index: Int)
 
