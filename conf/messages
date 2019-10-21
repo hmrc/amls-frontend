@@ -16,6 +16,8 @@ err.summary = There is a problem
 err.text.validation = Only use letters A to Z, numbers 0 to 9, and basic punctuation
 err.text.role.in.business.text.validation = Role in the business must only include letters a to z, numbers 0 to 9, and basic punctuation
 
+error.browser.title.prefix = Error:
+
 error.required.address.line1 = Enter the first line of the address
 error.required.address.line2 = Enter the second line of the address
 error.max.length.address.line = You can’t enter more than 35 characters
