@@ -90,7 +90,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.businessdetails.routes.VATRegisteredController.get().url))
+      redirectLocation(result) must be(Some(controllers.businessdetails.routes.ActivityStartDateController.get(false).url))
     }
 
     "on post with valid data and load confirm address page when businessType is SoleProprietor" in new Fixture {
@@ -162,7 +162,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.businessdetails.routes.VATRegisteredController.get(true).url))
+      redirectLocation(result) must be(Some(controllers.businessdetails.routes.SummaryController.get().url))
     }
 
     "on post with invalid data" in new Fixture {
