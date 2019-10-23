@@ -883,6 +883,25 @@ h2#complete-header {
     margin-right:0px;
 }
 
+.cya-summary-table {
+  display:table
+}
+
+.cya-row {
+  display:table-row
+}
+
+.cya-cell {
+  display:table-cell;
+  padding:10px 20px 10px 0;
+  border-bottom:1px solid #b1b4b6
+}
+
+.cya-footer {
+  white-space:nowrap;
+  padding-right:0
+}
+
 /* class for older browsers; pseudo-class for modern browsers */
 
 .check-your-answers__last,
@@ -1655,3 +1674,4 @@ legend .page-header {
 .radio-description {
   margin-left: 0.6em;
 }
+
