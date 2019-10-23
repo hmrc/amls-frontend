@@ -25,33 +25,36 @@
     @errorSummary(f)
 }
 
-@supportingContent = {
-    <p>@Messages("responsiblepeople.legalnamechangedate.paragraph")</p>
-}
-
 @main(
-    title = Messages("responsiblepeople.legalName.title") + " - " + Messages("summary.responsiblepeople"),
+    title = Messages("responsiblepeople.legalNameInput.title") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
     @form(f, controllers.responsiblepeople.routes.LegalNameController.post(index, edit, flow)) {
 
         @fieldsetWithErrorGroup(
             f = f("hasPreviousName"),
-            heading = Messages("responsiblepeople.legalName.heading", personName),
+            heading = Messages("responsiblepeople.legalNameInput.heading", personName),
             section = "summary.responsiblepeople",
-            supportingContent = supportingContent,
+            hint = "responsiblepeople.legalnamechangedate.hint",
             panel = false
         ) {
-            @radio(
-                f = f("hasPreviousName"),
-                labelText = "lbl.yes",
-                value = "true"
-            )
-            @radio(
-                f = f("hasPreviousName"),
-                labelText = "lbl.no",
-                value = "false"
-            )
+            @panel(
+                field = Some(f("previous-panel")),
+                panel = false,
+                jsHidden = true
+            ) {
+                @fieldsetWithErrorGroup(
+                    f = f("previous"),
+                    legend = "responsiblepeople.personName.isknownbyothernames",
+                    legendHidden = true,
+                    panel = true
+                ) {
+                    @input(f("firstName"), "responsiblepeople.personName.otherfirstnames")
+                    @input(f("middleName"), "responsiblepeople.personName.othermiddlenames")
+                    @input(f("lastName"), "responsiblepeople.personName.otherlastnames")
+                }
+
+            }
         }
 
         @submit(edit)
