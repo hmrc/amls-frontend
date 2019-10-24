@@ -170,7 +170,7 @@ class ChangeSubSectorHelper @Inject()(authAction: AuthAction,
       val msbActivitiesFromBm = bm.msbServices.getOrElse(BusinessMatchingMsbServices(Set.empty)).msbServices
       val msbActivitiesFromChangeSubsectors = model.subSectors.getOrElse(Set.empty)
 
-      val diffMsbServices = (msbActivitiesFromBm diff msbActivitiesFromChangeSubsectors) ++ (msbActivitiesFromChangeSubsectors diff msbActivitiesFromBm)
+      val diffMsbServices = (msbActivitiesFromBm diff msbActivitiesFromChangeSubsectors) union (msbActivitiesFromChangeSubsectors diff msbActivitiesFromBm)
 
       if (diffMsbServices.nonEmpty) {
         Future.successful(true)
