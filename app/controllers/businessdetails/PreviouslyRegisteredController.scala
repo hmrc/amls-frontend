@@ -21,7 +21,6 @@ import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
 import models.businessdetails._
-import models.businessmatching.BusinessType._
 import models.businessmatching.{BusinessMatching, BusinessType}
 import play.api.mvc.Result
 import utils.{AuthAction, ControllerHelper}
@@ -52,16 +51,17 @@ class PreviouslyRegisteredController @Inject () (
         case f: InvalidForm =>
           Future.successful(BadRequest(previously_registered(f, edit)))
         case ValidForm(_, data) =>
-          dataCacheConnector.fetchAll(request.credId) map {
+          dataCacheConnector.fetchAll(request.credId) flatMap {
             optionalCache =>
               (for {
                 cache <- optionalCache
                 businessType <- ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
+                saved <- Option(dataCacheConnector.save[BusinessDetails](request.credId, BusinessDetails.key,
+                  getUpdatedModel(businessType,  cache.getEntry[BusinessDetails](BusinessDetails.key), data)).map(_ => getRouting(businessType, edit, data)
+                ))
               } yield {
-                dataCacheConnector.save[BusinessDetails](request.credId, BusinessDetails.key,
-                  getUpdatedModel(businessType,  cache.getEntry[BusinessDetails](BusinessDetails.key), data))
-                getRouting(businessType, edit, data)
-              }).getOrElse(Redirect(routes.ConfirmRegisteredOfficeController.get(edit)))
+                saved
+              }).getOrElse(Future.successful(Redirect(routes.ConfirmRegisteredOfficeController.get(edit))))
           }
       }
     }

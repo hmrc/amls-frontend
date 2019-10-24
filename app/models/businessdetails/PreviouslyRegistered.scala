@@ -57,17 +57,11 @@ object PreviouslyRegistered {
     }
 
   implicit val jsonWrites = Writes[PreviouslyRegistered] {
-    case PreviouslyRegisteredYes(value) =>
-      if(value.isDefined) {
-        Json.obj(
-          "previouslyRegistered" -> true,
-          "prevMLRRegNo" -> value
-        )
-      } else {
-        Json.obj(
-          "previouslyRegistered" -> true
-        )
-      }
+    case PreviouslyRegisteredYes(Some(value)) =>
+      Json.obj(
+        "previouslyRegistered" -> true,
+        "prevMLRRegNo" -> value
+      )
     case PreviouslyRegisteredYes(None) =>
       Json.obj(
         "previouslyRegistered" -> true
