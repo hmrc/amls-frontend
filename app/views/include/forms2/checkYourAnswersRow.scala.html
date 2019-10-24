@@ -22,27 +22,23 @@
     editLinkTag: String = ""
 )(content: Html)(implicit lang: Lang, m: Messages)
 
-<section class="cya-row @classes.mkString(" ")">
-    <div class="cya-cell">
+<div class="cya-summary-list__row @classes.mkString(" ")">
+    <dt class="cya-summary-list__key">
         @if(question.nonEmpty) {
-        <h2 class="heading-small">@question</h2>
+            <span class="bold">@question</span>
         }
-        <span class="visuallyhidden">@Messages("summary.visuallyhidden.answer"): </span>
-    </div>
-    <div class="cya-cell">
+    </dt>
+    <dd class="cya-summary-list__value">
         @content
-    </div>
-    <div class="cya-cell">
+    </dd>
+    <dd class="cya-summary-list__actions">
         @if(editUrl.nonEmpty && allowEdit) {
-          <div class="cya-footer">
-              <footer class="group">
-                  <p>
-                      <a @if(editLinkTag.nonEmpty) {id="@editLinkTag"} href="@editUrl" class="change-answer"><span aria-hidden="true">@Messages("button.edit")</span> <span class="visuallyhidden">@Messages("button.edit") @Messages("summary.visuallyhidden.your.answer.for") &#8220;@question&#8221;</span></a>
-                  </p>
-              </footer>
-          </div>
+            <a @if(editLinkTag.nonEmpty) {id="@editLinkTag"} href="@editUrl" class="change-answer">
+                <span aria-hidden="true">@Messages("button.edit")</span>
+                <span class="visuallyhidden">@Messages("button.edit") @Messages("summary.visuallyhidden.your.answer.for") &#8220;@question&#8221;</span>
+            </a>
         } else {
-        &nbsp;
+            <span class="table-placeholder">&nbsp;</span>
         }
-    </div>
-</section>
+    </dd>
+</div>
