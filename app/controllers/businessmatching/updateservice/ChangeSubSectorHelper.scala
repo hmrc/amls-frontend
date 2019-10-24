@@ -121,8 +121,10 @@ class ChangeSubSectorHelper @Inject()(authAction: AuthAction,
         if (msb == MoneyServiceBusiness()) {
           Future.successful(None)
         } else {
-          dataCacheConnector.save[MoneyServiceBusiness](credId, MoneyServiceBusiness.key, updatedMsb) map { _ =>
-            updatedMsb.copy(hasAccepted = hasAccepted)
+          updateChangeFlag(credId, model) flatMap { isSectionChanged =>
+            dataCacheConnector.save[MoneyServiceBusiness](credId, MoneyServiceBusiness.key, updatedMsb.copy(hasChanged = isSectionChanged)) map { _ =>
+              updatedMsb.copy(hasAccepted = hasAccepted)
+            }
           }
         }
       }
@@ -156,6 +158,24 @@ class ChangeSubSectorHelper @Inject()(authAction: AuthAction,
         dataCacheConnector.save[BusinessMatching](credId, BusinessMatching.key, updatedBm) map { _ =>
           updatedBm.copy(hasAccepted = hasAccepted)
         }
+      }
+    }
+  }
+
+  def updateChangeFlag(credId: String, model: ChangeSubSectorFlowModel)
+                      (implicit hc: HeaderCarrier, executionContext: ExecutionContext) = {
+
+    dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key) flatMap { maybeBm =>
+      val bm = maybeBm.getOrElse(BusinessMatching())
+      val msbActivitiesFromBm = bm.msbServices.getOrElse(BusinessMatchingMsbServices(Set.empty)).msbServices
+      val msbActivitiesFromChangeSubsectors = model.subSectors.getOrElse(Set.empty)
+
+      val diffMsbServices = (msbActivitiesFromBm diff msbActivitiesFromChangeSubsectors) ++ (msbActivitiesFromChangeSubsectors diff msbActivitiesFromBm)
+
+      if (diffMsbServices.nonEmpty) {
+        Future.successful(true)
+      } else {
+        Future.successful(false)
       }
     }
   }
