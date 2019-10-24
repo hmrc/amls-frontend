@@ -57,10 +57,10 @@ class PreviouslyRegisteredController @Inject () (
                 cache <- optionalCache
                 businessType <- ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
                 saved <- Option(dataCacheConnector.save[BusinessDetails](request.credId, BusinessDetails.key,
-                  getUpdatedModel(businessType,  cache.getEntry[BusinessDetails](BusinessDetails.key), data)).map(_ => getRouting(businessType, edit, data)
-                ))
+                  getUpdatedModel(businessType,  cache.getEntry[BusinessDetails](BusinessDetails.key), data))
+                )
               } yield {
-                saved
+                saved.map(_ => getRouting(businessType, edit, data))
               }).getOrElse(Future.successful(Redirect(routes.ConfirmRegisteredOfficeController.get(edit))))
           }
       }

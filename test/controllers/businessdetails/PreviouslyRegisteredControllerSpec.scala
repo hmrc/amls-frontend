@@ -75,6 +75,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
         "previouslyRegistered" -> "true",
         "prevMLRRegNo" -> "12345678"
       )
+
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
         Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
 
@@ -84,9 +85,10 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
         .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
       when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
         .thenReturn(Some(BusinessDetails(Some(PreviouslyRegisteredNo))))
-
       when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
+      when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
+        .thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -159,6 +161,8 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
 
       when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
+      when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
+        .thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)

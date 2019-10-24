@@ -60,7 +60,7 @@ class summarySpec extends AmlsSpec
 
     val sectionChecks = Table[String, Element => Boolean](
       ("title key", "check"),
-      ("businessdetails.registeredformlr.title",checkElementTextIncludes(_, "businessdetails.registeredformlr.mlrregno.lbl", "1234")),
+      ("businessdetails.registeredformlr.title",checkElementTextIncludes(_, "lbl.yes")),
       ("businessdetails.activity.start.date.title",checkElementTextIncludes(_, "lbl.start.date", "2 January 2016")),
       ("businessdetails.registeredforvat.title",checkElementTextIncludes(_, "lbl.vat.reg.number", "2345")),
       ("businessdetails.registeredoffice.title",checkElementTextIncludes(_, "lbl.yes")),
