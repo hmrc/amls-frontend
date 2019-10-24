@@ -50,41 +50,59 @@
     }
 
     @if(incompleteTp.nonEmpty) {
-        <p><h2 id="incomplete-header">@Messages("tradingpremises.yourpremises.incomplete")</h2></p>
-        <ul class="list" id="incomplete-tp-list">
-        @incompleteTp.map { case (tp, index) =>
-            <li class="summary__listing">
-                <div>
-                    <div id="incomplete-detail-@index">@tpDetail(tp)</div>
-                    <div id="incompleted-action-panel-@index">
-                        <a id="detail-edit-@index" href="@controllers.tradingpremises.routes.YourTradingPremisesController.getIndividual(index + 1, true).url">@Messages("button.edit")</a>
-                        @Messages("lbl.or")
-                        <a id="detail-remove-@index" href="@tp.removeUrl(index + 1, add, status)">@Messages("button.remove")</a>
-                    </div>
-                    </div>
-            </li>
-        }
-        </ul>
+        <h2 id="incomplete-header">@Messages("tradingpremises.yourpremises.incomplete")</h2>
+        <div class="form-group">
+            <dl class="hmrc-add-to-a-list hmrc-add-to-a-list--short">
+
+                @incompleteTp.map { case(tp, index) =>
+                <div class="hmrc-add-to-a-list__contents">
+                    <dt id="incomplete-detail-@index" class="hmrc-add-to-a-list__identifier hmrc-add-to-a-list__identifier--light">
+                        @tpDetail(tp)
+                    </dt>
+                    <dd id="incomplete-action-panel-@index" class="hmrc-add-to-a-list__change">
+                        <a id="detail-edit-@index" href="@controllers.tradingpremises.routes.YourTradingPremisesController.getIndividual(index + 1, true).url">
+                            <span aria-hidden="true">@Messages("button.edit")</span>
+                            <span class="visually-hidden">@Messages("button.edit") @tpDetail(tp)</span>
+                        </a>
+                    </dd>
+                    <dd class="hmrc-add-to-a-list__remove">
+                        <a id="detail-remove-@index" href="@tp.removeUrl(index + 1, add, status)">
+                            <span aria-hidden="true">@Messages("button.remove")</span>
+                            <span class="visually-hidden">@Messages("button.remove") @tpDetail(tp)</span>
+                        </a>
+                    </dd>
+                </div>
+                }
+            </dl>
+        </div>
     }
 
     @if(completeTp.nonEmpty) {
-        @if(incompleteTp.nonEmpty) {
-            <p><h2 id="complete-header">@Messages("tradingpremises.yourpremises.complete")</h2></p>
-        }
-        <ul class="list" id="complete-tp-list">
-        @completeTp.map { case (tp, index) =>
-            <li class="summary__listing">
-                <div>
-                    <div id="complete-detail-@index">@tpDetail(tp)</div>
-                    <div id="completed-action-panel-@index">
-                        <a id="detail-edit-@index" href="@controllers.tradingpremises.routes.DetailedAnswersController.get(index + 1).url">@Messages("button.edit")</a>
-                        @Messages("lbl.or")
-                        <a id="detail-remove-@index" href="@tp.removeUrl(index + 1, add, status)">@Messages("button.remove")</a>
-                    </div>
+        @if(incompleteTp.nonEmpty) {<p><h2 id="complete-header">@Messages("tradingpremises.yourpremises.complete")</h2></p> }
+        <div class="form-group">
+            <dl class="hmrc-add-to-a-list hmrc-add-to-a-list--short">
+
+                @completeTp.map { case(tp, index) =>
+                <div class="hmrc-add-to-a-list__contents">
+                    <dt id="completed-detail-@index" class="hmrc-add-to-a-list__identifier hmrc-add-to-a-list__identifier--light">
+                        @tpDetail(tp)
+                    </dt>
+                    <dd id="incomplete-action-panel-@index" class="hmrc-add-to-a-list__change">
+                        <a id="detail-edit-@index" href="@controllers.tradingpremises.routes.DetailedAnswersController.get(index + 1).url">
+                            <span aria-hidden="true">@Messages("button.edit")</span>
+                            <span class="visually-hidden">@Messages("button.edit") @tpDetail(tp)</span>
+                        </a>
+                    </dd>
+                    <dd class="hmrc-add-to-a-list__remove">
+                        <a id="detail-remove-@index" href="@tp.removeUrl(index + 1, add, status)">
+                            <span aria-hidden="true">@Messages("button.remove")</span>
+                            <span class="visually-hidden">@Messages("button.remove") @tpDetail(tp)</span>
+                        </a>
+                    </dd>
                 </div>
-            </li>
-        }
-        </ul>
+                }
+            </dl>
+        </div>
     }
 
     @if(incompleteTp.nonEmpty || (completeTp.isEmpty & incompleteTp.isEmpty)) {

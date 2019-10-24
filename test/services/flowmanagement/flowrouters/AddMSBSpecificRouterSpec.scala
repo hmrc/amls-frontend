@@ -16,8 +16,8 @@
 
 package services.flowmanagement.flowrouters
 
-import controllers.businessmatching.routes
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
+import controllers.{routes => rootRoutes}
 import models.businessmatching._
 import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, TradingPremisesActivities}
 import models.flowmanagement._
@@ -25,9 +25,7 @@ import play.api.mvc.Results.Redirect
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.flowrouters.businessmatching.AddBusinessTypeRouter
-import services.flowmanagement.pagerouters._
 import services.flowmanagement.pagerouters.addflow._
-import services.flowmanagement.pagerouters.removeflow._
 import utils.{AmlsSpec, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -131,7 +129,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
         "MSB is the Business Activity" in new Fixture {
           val result = await(router.getRoute("internalId", NoPSRPageId, model))
 
-          result mustBe Redirect(routes.SummaryController.get())
+          result mustBe Redirect(rootRoutes.RegistrationProgressController.get())
         }
       }
     }

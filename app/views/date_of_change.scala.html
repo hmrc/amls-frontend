@@ -17,7 +17,7 @@
 @import include._
 @import forms2._
 
-@(f: forms.Form2[_], subheadingMessage: String, controllerAction: Call, returnLink: Boolean = true)(implicit request: Request[_],m:Messages)
+@(f: forms.Form2[_], subheadingMessage: String, controllerAction: Call, returnLink: Boolean = true, buttonMsgKey: String = "button.saveandcontinue")(implicit request: Request[_],m:Messages)
 
 @header = {
   @components.back_link()
@@ -39,7 +39,7 @@
       section = subheadingMessage
     )
 
-    @submit(false, Some(Messages("button.saveandcontinue")), returnLink)
+    @submit(false, buttonMessageKey = Some(buttonMsgKey), returnLink)
 
   }
 }
