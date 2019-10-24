@@ -20,7 +20,7 @@ import cats.data.Validated.{Invalid, Valid}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{ValidationError, _}
 import models.tcsp.ServicesOfAnotherTCSP
-import play.api.libs.json.{Writes => _, _}
+import play.api.libs.json.{Json, Reads, Writes}
 import utils.MappingUtils.Implicits._
 
 case class PreviousName(
@@ -90,5 +90,29 @@ object PreviousName {
       (__ \ "lastName").readNullable[String]
   }.apply(PreviousName.apply _)
 
-  implicit val jsonWrites = Json.writes[PreviousName]
+  implicit val jsonWrites = Writes[PreviousName] { pn =>
+    Json.obj("hasPreviousName" -> pn.hasPreviousName,
+                    "firstName" -> pn.firstName,
+                    "middleName" -> pn.middleName,
+                    "lastName" -> pn.lastName
+    )
+  }
+
+  implicit val jsonWrites2 = Writes[PreviousName] {
+    case PreviousName(a@Some(true), None,  ,d) => {
+      Json.obj("hasPreviousName" -> a,
+        "firstName" -> b,
+        "middleName" -> c,
+        "lastName" -> d
+      )
+    }
+    case PreviousName(a, b, c ,d) => {
+      Json.obj("hasPreviousName" -> a,
+        "firstName" -> b,
+        "middleName" -> c,
+        "lastName" -> d
+      )
+    }
+
+  }
 }

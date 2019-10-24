@@ -52,13 +52,8 @@ class LegalNameInputController @Inject()(val dataCacheConnector: DataCacheConnec
           case ValidForm(_, data) => {
             for {
               _ <- {
-                data.hasPreviousName match {
-                  case Some(true) => updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
+                 updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
                     rp.legalName(data)
-                  }
-                  case Some(false) => updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
-                    rp.legalName(PreviousName(Some(false), None, None, None)).copy(legalNameChangeDate = None)
-                  }
                 }
               }
             } yield {

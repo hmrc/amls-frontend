@@ -32,12 +32,14 @@
     @form(f, controllers.responsiblepeople.routes.LegalNameInputController.post(index, edit, flow)) {
 
         @fieldsetWithErrorGroup(
-            f = f("hasPreviousName"),
+            f = f("previous"),
             heading = Messages("responsiblepeople.legalNameInput.heading", personName),
             section = "summary.responsiblepeople",
             hint = "responsiblepeople.legalnamechangedate.hint",
             panel = false
         ) {
+            <input type ="hidden" name="hasPreviousName" value=true />
+
             @input(f("firstName"), "responsiblepeople.personName.otherfirstnames")
             @input(f("middleName"), "responsiblepeople.personName.othermiddlenames")
             @input(f("lastName"), "responsiblepeople.personName.otherlastnames")
