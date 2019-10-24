@@ -55,14 +55,13 @@ object PreviousName {
         Invalid(Seq(Path -> Seq(ValidationError("error.rp.previous.invalid"))))
     }
 
-    (__ \ "hasPreviousName").read[Boolean].withMessage("error.required.rp.hasPreviousName") flatMap {
-      case true => (
-        (
-          (__ \ "firstName").read(optionR(genericNameRule("error.required.rp.first_name"))) ~
-            (__ \ "middleName").read(optionR(genericNameRule())) ~
-            (__ \ "lastName").read(optionR(genericNameRule("error.required.rp.last_name")))
-          ).tupled andThen iR).map(t => PreviousName(Some(true), t._1, t._2, t._3))
-      case false => Rule.fromMapping { _ => Valid(PreviousName(Some(false), None, None, None)) }
+    (__ \ "hasPreviousName").read[Option[Boolean]] flatMap {
+      case Some(true) => (
+          (__ \ "firstName").read[Option[String]] ~
+          (__ \ "middleName").read[Option[String]] ~
+          (__ \ "lastName").read[Option[String]]
+        ).tupled.map(t => PreviousName(Some(true), t._1, t._2, t._3))
+      case _ => Rule.fromMapping { _ => Valid(PreviousName(Some(false), None, None, None)) }
     }
   }
 

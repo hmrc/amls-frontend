@@ -27,7 +27,7 @@ import play.api.test.Helpers._
 import utils._
 
 
-class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
+class LegalNameInputControllerSpec extends AmlsSpec with ScalaFutures {
 
   trait TestFixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(self.authRequest)
@@ -38,11 +38,11 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
       .build()
 
-    lazy val controller = injector.instanceOf[LegalNameController]
+    lazy val controller = injector.instanceOf[LegalNameInputController]
 
   }
 
-  "The LegalNameController" when {
+  "The LegalNameInputController" when {
     "get is called" must {
       "load the page" in new TestFixture {
         val addPerson = PersonName(
@@ -51,7 +51,14 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
           lastName = "last"
         )
 
-        val responsiblePeople = ResponsiblePerson(personName = Some(addPerson))
+        val previousPerson = PreviousName(
+          hasPreviousName = Some(true),
+          firstName = Some("first"),
+          middleName = Some("middle"),
+          lastName = Some("last")
+        )
+
+        val responsiblePeople = ResponsiblePerson(personName = Some(addPerson), legalName = Some(previousPerson))
 
 
         mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(responsiblePeople)), Some(ResponsiblePerson.key))
@@ -62,9 +69,9 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("input[name=firstName]").`val` must be("")
-        document.select("input[name=middleName]").`val` must be("")
-        document.select("input[name=lastName]").`val` must be("")
+        document.select("input[name=firstName]").`val` must be("first")
+        document.select("input[name=middleName]").`val` must be("middle")
+        document.select("input[name=lastName]").`val` must be("last")
       }
 
       "prepopulate the view with data" in new TestFixture {
@@ -77,9 +84,9 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
 
         val previousPerson = PreviousName(
           hasPreviousName = Some(true),
-          None,
-          None,
-          None
+          firstName = Some("Matty"),
+          middleName = Some("James"),
+          lastName = Some("Harris")
         )
 
         val responsiblePeople = ResponsiblePerson(personName = Some(addPerson), legalName = Some(previousPerson))
@@ -93,7 +100,10 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
 
         val document = Jsoup.parse(contentAsString(result))
 
-        document.select("input[name=hasPreviousName]").`val` must be("true")
+        document.select("input[name=hasPreviousName]").`val` must be("")
+        document.select("input[name=firstName]").`val` must be("Matty")
+        document.select("input[name=middleName]").`val` must be("James")
+        document.select("input[name=lastName]").`val` must be("Harris")
       }
 
     }
@@ -115,7 +125,7 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
 
             val result = controller.post(RecordId)(requestWithParams)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.LegalNameInputController.get(RecordId).url))
+            redirectLocation(result) must be(Some(routes.LegalNameChangeDateController.get(RecordId).url))
           }
         }
 

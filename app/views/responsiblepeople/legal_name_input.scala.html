@@ -29,7 +29,7 @@
     title = Messages("responsiblepeople.legalNameInput.title") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
-    @form(f, controllers.responsiblepeople.routes.LegalNameController.post(index, edit, flow)) {
+    @form(f, controllers.responsiblepeople.routes.LegalNameInputController.post(index, edit, flow)) {
 
         @fieldsetWithErrorGroup(
             f = f("hasPreviousName"),
@@ -38,23 +38,9 @@
             hint = "responsiblepeople.legalnamechangedate.hint",
             panel = false
         ) {
-            @panel(
-                field = Some(f("previous-panel")),
-                panel = false,
-                jsHidden = true
-            ) {
-                @fieldsetWithErrorGroup(
-                    f = f("previous"),
-                    legend = "responsiblepeople.personName.isknownbyothernames",
-                    legendHidden = true,
-                    panel = true
-                ) {
-                    @input(f("firstName"), "responsiblepeople.personName.otherfirstnames")
-                    @input(f("middleName"), "responsiblepeople.personName.othermiddlenames")
-                    @input(f("lastName"), "responsiblepeople.personName.otherlastnames")
-                }
-
-            }
+            @input(f("firstName"), "responsiblepeople.personName.otherfirstnames")
+            @input(f("middleName"), "responsiblepeople.personName.othermiddlenames")
+            @input(f("lastName"), "responsiblepeople.personName.otherlastnames")
         }
 
         @submit(edit)
