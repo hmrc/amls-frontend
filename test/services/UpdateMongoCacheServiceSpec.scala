@@ -92,7 +92,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
     val tradingPremises = Seq(tradingPremisesGen.sample.get, tradingPremisesGen.sample.get)
 
     val businessDetails = BusinessDetails(
-      previouslyRegistered = Some(PreviouslyRegisteredYes("12345678")),
+      previouslyRegistered = Some(PreviouslyRegisteredYes(Some("12345678"))),
       activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))),
       vatRegistered = Some(VATRegisteredYes("123456789")),
       corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1234567890")),

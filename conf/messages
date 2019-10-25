@@ -1005,7 +1005,6 @@ aboutyou.rolewithinbusiness.lbl.08 = Other
 
 businessdetails.whatyouneed.subheading = In this section you’ll be asked for things like:
 businessdetails.whatyouneed.subheading_2 = You’ll also need:
-businessdetails.whatyouneed.line_1 = your Money Laundering Regulations registration number, if you’re already registered for supervision
 businessdetails.whatyouneed.line_2 = your VAT registration number, if you’re registered for VAT
 businessdetails.whatyouneed.line_3 = your registered office or main place of business address
 businessdetails.whatyouneed.line_4 = a contact email, telephone number, and postal address
@@ -1042,7 +1041,7 @@ businessdetails.correspondenceaddress.nonUkAddress = No
 businessdetails.correspondenceaddress.address = Address
 businessdetails.correspondenceaddress.postCode = Postcode
 businessdetails.correspondenceaddress.country = Country
-businessdetails.registeredformlr.title = Is your business currently registered with HM Revenue and Customs (HMRC) for anti-money laundering supervision?
+businessdetails.registeredformlr.title = Is your business currently registered with HMRC under the Money Laundering regulations?
 businessdetails.registeredformlr.lbl = This only refers to registration with HMRC
 businessdetails.registeredformlr.mlrregno.lbl = Money Laundering Regulations registration number
 businessdetails.registeredformlr.taxReferenceHint = This is 8 numbers, like 12345678. Find it on the certificate you received from HMRC when you registered for anti-money laundering supervision.
