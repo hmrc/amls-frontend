@@ -39,27 +39,13 @@
             heading = "businessdetails.registeredformlr.title",
             section =  "summary.businessdetails",
             panel = false,
-            f = f("previouslyRegistered")
+            f = f("previouslyRegistered"),
+            classes = Seq("inline")
         ) {
             @radio(
                 f = f("previouslyRegistered"),
                 labelText = "lbl.yes",
-                value = "true",
-                target = s"#$target")
-            @panel(
-                field = Some(f(s"$target")),
-                jsHidden = false,
-                id = target
-            ) {
-                @input(
-                    field = f("prevMLRRegNo"),
-                    labelText = "businessdetails.registeredformlr.mlrregno.lbl",
-                    hintText = "businessdetails.registeredformlr.taxReferenceHint",
-                    attrType = "number",
-                    attrMaxlength = "8",
-                    attrPattern = "[0-9]{1,8}"
-                )
-            }
+                value = "true")
             @radio(
                 f = f("previouslyRegistered"),
                 labelText = "lbl.no",

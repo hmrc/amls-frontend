@@ -18,14 +18,12 @@ package models.businessdetails
 
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.ValidationError
 import play.api.libs.json._
-import cats.data.Validated.{Invalid, Valid}
+import cats.data.Validated.{Valid}
 
 sealed trait PreviouslyRegistered
 
-case class PreviouslyRegisteredYes(value: String) extends PreviouslyRegistered
-
+case class PreviouslyRegisteredYes(value: Option[String]) extends PreviouslyRegistered
 case object PreviouslyRegisteredNo extends PreviouslyRegistered
 
 object PreviouslyRegistered {
@@ -35,34 +33,39 @@ object PreviouslyRegistered {
   implicit val formRule: Rule[UrlFormEncoded, PreviouslyRegistered] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
 
-    val mlrRegNoRegex = "^([0-9]{8})$".r
-
     (__ \ "previouslyRegistered").read[Boolean].withMessage("error.required.atb.previously.registered") flatMap {
-      case true =>
-        (__ \ "prevMLRRegNo").read(pattern(mlrRegNoRegex).withMessage("error.invalid.mlr.number")) map PreviouslyRegisteredYes.apply
+      case true => Rule.fromMapping { _ => Valid(PreviouslyRegisteredYes(None)) }
       case false => Rule.fromMapping { _ => Valid(PreviouslyRegisteredNo) }
     }
   }
 
   implicit val formWrites: Write[PreviouslyRegistered, UrlFormEncoded] = Write {
-    case PreviouslyRegisteredYes(value) =>
+    case PreviouslyRegisteredYes(Some(value)) =>
       Map("previouslyRegistered" -> Seq("true"),
         "prevMLRRegNo" -> Seq(value)
       )
-    case PreviouslyRegisteredNo => Map("previouslyRegistered" -> Seq("false"))
+    case PreviouslyRegisteredYes(None) =>
+      Map("previouslyRegistered" -> Seq("true"))
+    case PreviouslyRegisteredNo =>
+      Map("previouslyRegistered" -> Seq("false"))
   }
 
   implicit val jsonReads: Reads[PreviouslyRegistered] =
     (__ \ "previouslyRegistered").read[Boolean] flatMap {
-      case true => (__ \ "prevMLRRegNo").read[String] map PreviouslyRegisteredYes.apply
+      case true => (__ \ "prevMLRRegNo").readNullable[String] map PreviouslyRegisteredYes.apply
       case false => Reads(_ => JsSuccess(PreviouslyRegisteredNo))
     }
 
   implicit val jsonWrites = Writes[PreviouslyRegistered] {
-    case PreviouslyRegisteredYes(value) => Json.obj(
-      "previouslyRegistered" -> true,
-      "prevMLRRegNo" -> value
-    )
+    case PreviouslyRegisteredYes(Some(value)) =>
+      Json.obj(
+        "previouslyRegistered" -> true,
+        "prevMLRRegNo" -> value
+      )
+    case PreviouslyRegisteredYes(None) =>
+      Json.obj(
+        "previouslyRegistered" -> true
+      )
     case PreviouslyRegisteredNo => Json.obj("previouslyRegistered" -> false)
   }
 }
