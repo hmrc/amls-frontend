@@ -130,6 +130,40 @@ class businessDetailsSpec extends AmlsSpec {
     }
   }
 
+
+  "isComplete" must {
+
+    "return false" when {
+      "previously registered but no previous AMLS number and no activity start date" in {
+        completeModel.copy(previouslyRegistered = Some(PreviouslyRegisteredYes(None)),
+                            activityStartDate = None).isComplete must be(false)
+      }
+
+      "not previously registered and no activity start date" in {
+        completeModel.copy(previouslyRegistered = Some(PreviouslyRegisteredNo),
+                           activityStartDate = None).isComplete must be(false)
+      }
+    }
+
+    "return true" when {
+      "previously registered with a previous AMLS number but no activity start date" in {
+        completeModel.copy(previouslyRegistered = Some(PreviouslyRegisteredYes(Some("12345678"))),
+                           activityStartDate = None).isComplete must be(true)
+      }
+
+      "previously registered with no previous AMLS number but with activity start date" in {
+        completeModel.copy(previouslyRegistered = Some(PreviouslyRegisteredYes(None)),
+                           activityStartDate = Some(ActivityStartDate(LocalDate.now()))).isComplete must be(true)
+      }
+
+      "not previously registered and with activity start date" in {
+        completeModel.copy(previouslyRegistered = Some(PreviouslyRegisteredNo),
+                           activityStartDate = Some(ActivityStartDate(LocalDate.now()))).isComplete must be(true)
+      }
+    }
+
+  }
+
   "Partially complete BusinessDetails" must {
 
     val partialJson = Json.obj(
