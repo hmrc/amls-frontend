@@ -61,12 +61,12 @@ class summarySpec extends AmlsSpec
     val sectionChecks = Table[String, Element => Boolean](
       ("title key", "check"),
       ("businessdetails.registeredformlr.title",checkElementTextIncludes(_, "businessdetails.registeredformlr.mlrregno.lbl", "1234")),
-      ("businessdetails.activity.start.date.title",checkElementTextIncludes(_, "lbl.start.date", "2 January 2016")),
+      ("businessdetails.activity.start.date.title",checkElementTextIncludes(_, "2 January 2016")),
       ("businessdetails.registeredforvat.title",checkElementTextIncludes(_, "lbl.vat.reg.number", "2345")),
       ("businessdetails.registeredoffice.title",checkElementTextIncludes(_, "lbl.yes")),
       ("businessdetails.registeredoffice.where.title",checkElementTextIncludes(_, "line1","line2","line3","line4","AB12CD")),
-      ("businessdetails.contactingyou.email.title",checkElementTextIncludes(_, "businessdetails.contactingyou.email.lbl", "test@test.com")),
-      ("businessdetails.contactingyou.phone.title",checkElementTextIncludes(_, "businessdetails.contactingyou.phone.lbl", "01234567890")),
+      ("businessdetails.contactingyou.email.title",checkElementTextIncludes(_, "test@test.com")),
+      ("businessdetails.contactingyou.phone.title",checkElementTextIncludes(_, "01234567890")),
       ("businessdetails.correspondenceaddress.title",
         checkElementTextIncludes(_, "your name", "business name","line1","line2","line3","line4","AB12CD"))
     )
@@ -91,12 +91,12 @@ class summarySpec extends AmlsSpec
       )
 
       forAll(sectionChecks) { (key, check) => {
-        val hTwos = doc.select("section.check-your-answers h2")
+        val questions = doc.select("span.bold")
 
-        val hTwo = hTwos.toList.find(e => e.text() == Messages(key))
+        val question = questions.toList.find(e => e.text() == Messages(key))
 
-        hTwo must not be None
-        val section = hTwo.get.parents().select("section").first()
+        question must not be None
+        val section = question.get.parents().select("div").first()
         check(section) must be(true)
       }
       }
