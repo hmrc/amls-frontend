@@ -31,14 +31,14 @@
     heading = header
 )  {
 
-
     @form(f, controllers.businessmatching.updateservice.add.routes.AddMoreBusinessTypesController.post()) {
 
         @fieldsetWithErrorGroup(
             f = f("addmoreactivities"),
             heading = "businessmatching.updateservice.addmoreactivities.heading",
             section = "summary.updateservice",
-            panel = false
+            panel = false,
+            classes = Seq("inline")
         ) {
             @radio(
                 f = f("addmoreactivities"),

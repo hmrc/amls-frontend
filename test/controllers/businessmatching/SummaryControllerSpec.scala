@@ -107,7 +107,7 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
       status(result) must be(OK)
 
       val doc = Jsoup.parse(contentAsString(result))
-      val editUrl = doc.select("section.register-services a.change-answer").first().attr("href")
+      val editUrl = doc.select("a#businessactivities-edit.change-answer").first().attr("href")
 
       editUrl mustBe controllers.businessmatching.routes.RegisterServicesController.get().url
     }

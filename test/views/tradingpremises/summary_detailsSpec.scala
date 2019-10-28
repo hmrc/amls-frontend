@@ -124,7 +124,7 @@ class summary_detailsSpec extends TestHelper with HtmlAssertions with TableDrive
       val hTwo = doc.select("section.check-your-answers h2").toList.find(e => e.text() == Messages("tradingpremises.whatdoesyourbusinessdo.title"))
       val servicesSection = hTwo.get.parent.toString
 
-      servicesSection must include("Edit")
+      servicesSection must include(Messages("button.edit"))
 
     }
 

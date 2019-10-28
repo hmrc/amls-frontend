@@ -18,7 +18,7 @@
 @import forms2._
 @import forms.EmptyForm
 
-@(activities: Set[String])(implicit request: Request[_], messages: Messages)
+@(activities: Set[String], hideSupervisionDetails:Boolean)(implicit request: Request[_], messages: Messages)
 
 @header = {
     @components.back_link()
@@ -30,37 +30,41 @@
     heading = header
 ) {
 
-    @activities match {
-        case list if list.contains("Accountancy service provider") && (list.size == 1) => {
-            <p>@Messages("businessmatching.updateservice.newserviceinformation.info.asp")</p>
+    @if(activities.size == 1) {
+        @activities match {
+            case list if list.contains("Accountancy service provider") => {
+                @if(hideSupervisionDetails) {
+                    <p>@Messages("businessmatching.updateservice.newserviceinformation.info.onlyasp")</p>
+                } else {
+                    <p>@Messages("businessmatching.updateservice.newserviceinformation.info.asp")</p>
+                }
+            }
+            case list if list.contains("Trust or company service provider") => {
+                @if(hideSupervisionDetails) {
+                    <p>@Messages("businessmatching.updateservice.newserviceinformation.info.onlytcsp")</p>
+                } else {
+                    <p>@Messages("businessmatching.updateservice.newserviceinformation.info.tcsp")</p>
+                }
+            }
+            case _ => {
+                <p>@Messages("businessmatching.updateservice.newserviceinformation.info.1", (activities.mkString(" ")).toLowerCase)</p>
+            }
         }
-        case list if list.contains("Trust or company service provider") && (list.size == 1) => {
-            <p>@Messages("businessmatching.updateservice.newserviceinformation.info.tcsp")</p>
-        }
-        case list if list.contains("Trust or company service provider") || list.contains("Accountancy service provider") && (list.size > 1) => {
-            <p>@Messages("businessmatching.updateservice.newserviceinformation.info.2")</p>
-                <ul class="list list-bullet">
-                    @activities.toList.sorted.map { ba =>
+    }
+
+    @if(activities.size > 1) {
+        <p>@Messages("businessmatching.updateservice.newserviceinformation.info.2")</p>
+        <ul class="list list-bullet">
+            @activities.toList.sorted.map { ba =>
                 <li>@Character.toLowerCase(ba.charAt(0))@ba.substring(1)</li>
             }
+            @if((activities.contains("Trust or company service provider") || activities.contains("Accountancy service provider")) && !hideSupervisionDetails) {
                 <li>@Messages("businessmatching.updateservice.newserviceinformation.info.supervision")</li>
-                </ul>
-            <p>@Messages("businessmatching.updateservice.newserviceinformation.info.3")</p>
-            <p>@Messages("businessmatching.updateservice.newserviceinformation.info.4")</p>
-        }
-        case list if list.size > 1 => {
-            <p>@Messages("businessmatching.updateservice.newserviceinformation.info.2")</p>
-                <ul class="list list-bullet">
-                    @activities.toList.sorted.map { ba =>
-                <li>@Character.toLowerCase(ba.charAt(0))@ba.substring(1)</li>
             }
-                </ul>
-            <p>@Messages("businessmatching.updateservice.newserviceinformation.info.3")</p>
-            <p>@Messages("businessmatching.updateservice.newserviceinformation.info.4")</p>
-        }
-        case list if list.size == 1 => {
-            <p>@Messages("businessmatching.updateservice.newserviceinformation.info.1", (activities.mkString(" ")).toLowerCase)</p>
-        }
+        </ul>
+
+        <p>@Messages("businessmatching.updateservice.newserviceinformation.info.3")</p>
+        <p>@Messages("businessmatching.updateservice.newserviceinformation.info.4")</p>
     }
 
     @form(EmptyForm, controllers.businessmatching.updateservice.add.routes.NeedMoreInformationController.post()) {

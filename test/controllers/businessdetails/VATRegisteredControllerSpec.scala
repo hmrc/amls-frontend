@@ -65,7 +65,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
         when {
           controller.dataCacheConnector.fetch[BusinessDetails](any(), any())(any(), any())
-        } thenReturn Future.successful(Some(BusinessDetails(Some(PreviouslyRegisteredYes("")), None, Some(VATRegisteredYes("123456789")))))
+        } thenReturn Future.successful(Some(BusinessDetails(Some(PreviouslyRegisteredYes(Some(""))), None, Some(VATRegisteredYes("123456789")))))
 
         val result = controller.get()(request)
         status(result) must be(OK)
