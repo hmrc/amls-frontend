@@ -86,367 +86,350 @@
 ) {
 
     @model.map { person =>
-
         @if(showHide){
-            <div class="panel-indent panel-indent--gutter panel-border-wide info">
-                <p>
-                    <a href="@controllers.responsiblepeople.routes.NewHomeAddressDateOfChangeController.get(idx)">
-                        @Messages("responsiblepeople.detailed_answer.tell.us.moved", personName)
-                    </a>
-                </p>
-            </div>
+        <div class="panel-indent panel-indent--gutter panel-border-wide info">
+            <p>
+                <a href="@controllers.responsiblepeople.routes.NewHomeAddressDateOfChangeController.get(idx)">
+                    @Messages("responsiblepeople.detailed_answer.tell.us.moved", personName)
+                </a>
+            </p>
+        </div>
         }
+    }
 
-        <h2 class="heading-large">
-            @Messages("responsiblepeople.detailed_answers.visuallyhidden.header"):
-            @person.personName.map { name =>
-                @name.fullName
-            }.getOrElse{
-                @Messages("missing.personName")
+    <dl class="cya-summary-list">
+
+        @model.map { person =>
+
+            @person.personName.map { pn =>
+                @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.personName.title"),
+                    editUrl = controllers.responsiblepeople.routes.PersonNameController.get(idx, true, flow).toString()
+                ) {
+                        @pn.fullName
+                }
             }
-        </h2>
 
-        @detailedAnswers(
-            question = Messages("responsiblepeople.personName.title"),
-            editUrl = controllers.responsiblepeople.routes.PersonNameController.get(idx, true, flow).toString(),
-            dataItem = person.personName
-        ) { pn =>
-                <p>@pn.fullName</p>
-        }
+            @person.legalName.map { ln =>
+                @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.legalName.heading", personName),
+                    editUrl = controllers.responsiblepeople.routes.LegalNameController.get(idx, true, flow).toString()
+                    ) {
+                         @ln.hasPreviousName match {
+                            case Some(true) => {
+                                <ul class="list">
+                                    <li>@ln.fullName</li>
+                                </ul>
+                            }
+                        }
+                }
+            }
 
-        @detailedAnswers(
-            question = Messages("responsiblepeople.legalName.heading", personName),
-            editUrl = controllers.responsiblepeople.routes.LegalNameController.get(idx, true, flow).toString(),
-            dataItem = person.legalName
-            ) { ln =>
-                @ln.hasPreviousName match {
-                    case Some(false) => {<p>@Messages("lbl.no")</p>}
-                    case Some(true) => {
-                        <ul class="list">
-                            <li>@ln.fullName</li>
-                        </ul>
+            @person.legalNameChangeDate.map { legalNameChangeDate =>
+                @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.legalnamechangedate.heading", personName),
+                    editUrl = controllers.responsiblepeople.routes.LegalNameChangeDateController.get(idx, true, flow).toString()
+                ) {
+                    @DateHelper.formatDate(legalNameChangeDate)
+                }
+            }
+
+
+            @person.knownBy.map { other =>
+                @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.knownby.heading", personName),
+                    editUrl = controllers.responsiblepeople.routes.KnownByController.get(idx, true, flow).toString()
+                ) {
+                        @other.hasOtherNames match {
+                            case Some(true) => {
+                            <ul class="list">
+                                <li>@other.otherName</li>
+                            </ul>
+                            }
+                            case Some(false) => {@Messages("lbl.no")}
+                        }
+                }
+            }
+
+
+            @person.dateOfBirth.map { dateOfBirth =>
+
+                @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.detailed_answers.dob", personName),
+                    editUrl = controllers.responsiblepeople.routes.DateOfBirthController.get(idx, true, flow).toString(),
+                    editLinkTag = "date-of-birth"
+                ) {
+                    @DateHelper.formatDate(dateOfBirth.dateOfBirth)
+                }
+
+            }
+
+            @person.personResidenceType.map { prt =>
+                 @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.detailed_answers.uk_resident", personName),
+                    editUrl = controllers.responsiblepeople.routes.PersonResidentTypeController.get(idx, true, flow).toString()
+                ) {
+                    @prt.isUKResidence match {
+                        case UKResidence(nino) => {
+                            <p>@Messages("lbl.yes")</p>
+                            <p>@Messages("responsiblepeople.detailed_answers.uk_resident.nino", personName): @nino</p>
+                        }
+                        case NonUKResidence => {
+                            @Messages("lbl.no")
+                        }
                     }
                 }
-        }
-
-        @person.legalNameChangeDate.map { legalNameChangeDate =>
-            @detailedAnswers(
-                question = Messages("responsiblepeople.legalnamechangedate.heading", personName),
-                editUrl = controllers.responsiblepeople.routes.LegalNameChangeDateController.get(idx, true, flow).toString(),
-                dataItem = person.legalNameChangeDate
-                ) { lncd =>
-                    <p>@DateHelper.formatDate(lncd)</p>
             }
-        }
 
+            @person.ukPassport.map { ukPassport =>
+                 @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.detailed_answers.uk.passport", personName),
+                    editUrl = controllers.responsiblepeople.routes.PersonUKPassportController.get(idx, true, flow).toString(),
+                    editLinkTag = "uk-passport"
+                ) {
+                    @ukPassport match {
+                        case UKPassportYes(ukPassportNumber) => {
+                            <p>@Messages("lbl.yes")</p>
+                            <p>@Messages("responsiblepeople.detailed_answers.uk_resident.passport_number", personName): @ukPassportNumber</p>
+                        }
+                        case UKPassportNo => {
+                            @Messages("lbl.no")
+                        }
+                    }
+                }
 
-        @detailedAnswers(
-            question = Messages("responsiblepeople.knownby.heading", personName),
-            editUrl = controllers.responsiblepeople.routes.KnownByController.get(idx, true, flow).toString(),
-            dataItem = person.knownBy
-        ) { other =>
-                @other.hasOtherNames match {
-                    case Some(true) => {
+            }
+
+            @person.nonUKPassport.map { nonUKPassport =>
+                 @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.detailed_answers.non.uk.passport", personName),
+                    editUrl = controllers.responsiblepeople.routes.PersonNonUKPassportController.get(idx, true, flow).toString()
+                ) {
+                    @nonUKPassport  match {
+                        case NonUKPassportYes(nonUKPassportNumber) => {
+                            <p>@Messages("lbl.yes")</p>
+                            <p>@Messages("responsiblepeople.detailed_answers.uk_resident.passport_number", personName): @nonUKPassportNumber</p>
+                        }
+                        case NoPassport => {
+                            @Messages("lbl.no")
+                        }
+                    }
+                }
+            }
+
+            @person.personResidenceType.map { prt =>
+                 @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.detailed_answers.country_of_birth"),
+                    editUrl = controllers.responsiblepeople.routes.CountryOfBirthController.get(idx, true, flow).toString()
+                ) {
+                    @prt.countryOfBirth
+                }
+
+                 @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.detailed_answers.nationality"),
+                    editUrl = controllers.responsiblepeople.routes.NationalityController.get(idx, true, flow).toString()
+                ) {
+                    @prt.nationality
+                }
+            }
+
+            @person.contactDetails.map { cd =>
+                 @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.detailed_answers.phone_number"),
+                    editUrl = controllers.responsiblepeople.routes.ContactDetailsController.get(idx, true, flow).toString()
+                ) {
+                    @cd.phoneNumber
+                }
+
+                @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.detailed_answers.email"),
+                    editUrl = controllers.responsiblepeople.routes.ContactDetailsController.get(idx, true, flow).toString()
+                ) {
+                    @cd.emailAddress
+                }
+            }
+
+            @person.addressHistory.flatMap(_.currentAddress).map { a=>
+                @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.detailed_answers.address", personName),
+                    editUrl =  showHide match {
+                            case true => {
+                                controllers.responsiblepeople.routes.MovedAddressController.get(idx).toString()
+                            }
+                            case _ => {
+                                controllers.responsiblepeople.routes.CurrentAddressController.get(idx, true, flow).toString()
+                            }
+                        }
+
+                ) {
                     <ul class="list">
-                        <li>@other.otherName</li>
-                    </ul>
-                    }
-                    case Some(false) => {<p>@Messages("lbl.no")</p>}
-                }
-        }
-
-
-        @person.dateOfBirth.map { dateOfBirth =>
-
-            @detailedAnswers(
-                question = Messages("responsiblepeople.detailed_answers.dob", personName),
-                editUrl = controllers.responsiblepeople.routes.DateOfBirthController.get(idx, true, flow).toString(),
-                dataItem = Some(dateOfBirth),
-                editLinkTag = "date-of-birth"
-            ) { dob =>
-                <p>@DateHelper.formatDate(dob.dateOfBirth)</p>
-            }
-
-        }
-
-        @detailedAnswers(
-            question = Messages("responsiblepeople.detailed_answers.uk_resident", personName),
-            editUrl = controllers.responsiblepeople.routes.PersonResidentTypeController.get(idx, true, flow).toString(),
-            dataItem = person.personResidenceType
-        ) { prt =>
-            @prt.isUKResidence match {
-                case UKResidence(nino) => {
-                    <p>@Messages("lbl.yes")</p>
-                    <p>@Messages("responsiblepeople.detailed_answers.uk_resident.nino", personName): @nino</p>
-                }
-                case NonUKResidence => {
-                    <p>@Messages("lbl.no")</p>
-                }
-            }
-        }
-
-        @person.ukPassport.map { ukPassport =>
-
-            @detailedAnswers(
-                question = Messages("responsiblepeople.detailed_answers.uk.passport", personName),
-                editUrl = controllers.responsiblepeople.routes.PersonUKPassportController.get(idx, true, flow).toString(),
-                dataItem = Some(ukPassport),
-                editLinkTag = "uk-passport"
-            ) { pp =>
-                @pp match {
-                    case UKPassportYes(ukPassportNumber) => {
-                        <p>@Messages("lbl.yes")</p>
-                        <p>@Messages("responsiblepeople.detailed_answers.uk_resident.passport_number", personName): @ukPassportNumber</p>
-                    }
-                    case UKPassportNo => {
-                        <p>@Messages("lbl.no")</p>
-                    }
-                }
-            }
-
-        }
-
-        @person.nonUKPassport.map { nonUKPassport =>
-
-            @detailedAnswers(
-                question = Messages("responsiblepeople.detailed_answers.non.uk.passport", personName),
-                editUrl = controllers.responsiblepeople.routes.PersonNonUKPassportController.get(idx, true, flow).toString(),
-                dataItem = Some(nonUKPassport)
-            ) { pp =>
-                @pp match {
-                    case NonUKPassportYes(nonUKPassportNumber) => {
-                        <p>@Messages("lbl.yes")</p>
-                        <p>@Messages("responsiblepeople.detailed_answers.uk_resident.passport_number", personName): @nonUKPassportNumber</p>
-                    }
-                    case NoPassport => {
-                        <p>@Messages("lbl.no")</p>
-                    }
-                }
-            }
-
-        }
-
-        @detailedAnswers(
-            question = Messages("responsiblepeople.detailed_answers.country_of_birth"),
-            editUrl = controllers.responsiblepeople.routes.CountryOfBirthController.get(idx, true, flow).toString(),
-            dataItem = person.personResidenceType
-        ) { prt =>
-            <p>@prt.countryOfBirth</p>
-        }
-
-        @detailedAnswers(
-            question = Messages("responsiblepeople.detailed_answers.nationality"),
-            editUrl = controllers.responsiblepeople.routes.NationalityController.get(idx, true, flow).toString(),
-            dataItem = person.personResidenceType
-        ) { prt =>
-            <p>@prt.nationality</p>
-        }
-
-        @detailedAnswers(
-            question = Messages("responsiblepeople.detailed_answers.phone_number"),
-            editUrl = controllers.responsiblepeople.routes.ContactDetailsController.get(idx, true, flow).toString(),
-            dataItem = person.contactDetails
-        ) { cd =>
-            <p>@cd.phoneNumber</p>
-        }
-
-        @detailedAnswers(
-            question = Messages("responsiblepeople.detailed_answers.email"),
-            editUrl = controllers.responsiblepeople.routes.ContactDetailsController.get(idx, true, flow).toString(),
-            dataItem = person.contactDetails
-        ) { cd =>
-            <p>@cd.emailAddress</p>
-        }
-
-        @detailedAnswers(
-            question = Messages("responsiblepeople.detailed_answers.address", personName),
-            editUrl =
-                {
-                    showHide match {
-                        case true => {
-                            controllers.responsiblepeople.routes.MovedAddressController.get(idx).toString()
-                        }
-                        case _ => {
-                            controllers.responsiblepeople.routes.CurrentAddressController.get(idx, true, flow).toString()
-                        }
-                    }
-                },
-            dataItem = person.addressHistory.flatMap(_.currentAddress)
-        ) { a =>
-            <ul class="list">
-                @a.personAddress.toLines.map { l => <li>@l</li> }
-            </ul>
-        }
-
-        @detailedAnswers(
-            question = Messages("responsiblepeople.timeataddress.address_history.heading", personName),
-            editUrl = controllers.responsiblepeople.routes.TimeAtCurrentAddressController.get(idx, true, flow).toString,
-            dataItem = person.addressHistory.flatMap(_.currentAddress)
-        ){ a =>
-            @timeAtAddress(a.timeAtAddress)
-        }
-
-        @person.addressHistory.flatMap(_.additionalAddress).map { pa =>
-            @detailedAnswers(
-                question = Messages("responsiblepeople.detailed_answers.previous_address"),
-                editUrl = controllers.responsiblepeople.routes.AdditionalAddressController.get(idx, true, flow).toString(),
-                dataItem = Some(pa)
-            ) { a =>
-                <ul class="list">
-                    @a.personAddress.toLines.map { l => <li>@l</li> }
-                </ul>
-            }
-
-            @detailedAnswers(
-                question = Messages("responsiblepeople.timeataddress.address_history.heading", personName),
-                editUrl = controllers.responsiblepeople.routes.TimeAtAdditionalAddressController.get(idx, true, flow).toString,
-                dataItem = Some(pa)
-            ){ a =>
-                @timeAtAddress(a.timeAtAddress)
-            }
-
-        }
-
-        @person.addressHistory.flatMap(_.additionalExtraAddress).map { pa =>
-            @detailedAnswers(
-                question = Messages("responsiblepeople.detailed_answers.other_previous_address"),
-                editUrl = controllers.responsiblepeople.routes.AdditionalExtraAddressController.get(idx, true, flow).toString(),
-                dataItem = Some(pa)
-            ) { a =>
-                <ul class="list">
-                    @a.personAddress.toLines.map { l => <li>@l</li> }
-                </ul>
-            }
-
-            @detailedAnswers(
-                question = Messages("responsiblepeople.timeataddress.address_history.heading", personName),
-                editUrl = controllers.responsiblepeople.routes.TimeAtAdditionalExtraAddressController.get(idx, true, flow).toString,
-                dataItem = Some(pa)
-            ){ a =>
-                @timeAtAddress(a.timeAtAddress)
-            }
-        }
-
-        @detailedAnswers(
-            question = Messages("responsiblepeople.position_within_business.heading", personName),
-            editUrl = controllers.responsiblepeople.routes.PositionWithinBusinessController.get(idx, true, flow).toString(),
-            dataItem = person.positions
-        ) { pos =>
-            <ul class="list">
-            @pos.positions.map(p => PositionWithinBusiness.getPrettyName(p)).toList.sorted.map(p => <li>{p}</li>)
-            </ul>
-        }
-
-        @detailedAnswers(
-            question = Messages("responsiblepeople.position_within_business.startDate.heading", personName),
-            editUrl = controllers.responsiblepeople.routes.PositionWithinBusinessStartDateController.get(idx, true, flow).toString(),
-            dataItem = person.positions
-        ) { pos =>
-            <p>@pos.startDate.map(sd => sd.startDate).map(DateHelper.formatDate(_)).getOrElse("")</p>
-        }
-
-        @person.soleProprietorOfAnotherBusiness.map { anotherBusiness =>
-            @detailedAnswers(
-            question = Messages("responsiblepeople.detailed_answers.soleproprietor_for_other_business"),
-            editUrl = controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.get(idx, true, flow).toString(),
-            dataItem = Some(anotherBusiness)
-            ) { vr2 =>
-            <p>@vr2.soleProprietorOfAnotherBusiness match {
-                case true => {@Messages("lbl.yes")}
-                case false => {@Messages("lbl.no")}
-                }</p>
-            }
-        }
-
-        @person.vatRegistered.map { vr =>
-            @detailedAnswers(
-                question = Messages("responsiblepeople.detailed_answers.registered_for_vat"),
-                editUrl = controllers.responsiblepeople.routes.VATRegisteredController.get(idx, true, flow).toString(),
-                dataItem = Some(vr)
-            ) { vr2 =>
-                <p>@vr2 match {
-                    case VATRegisteredYes(regNo) => {@regNo}
-                    case VATRegisteredNo => {@Messages("lbl.no")}
-                }</p>
-            }
-        }
-
-        @person.saRegistered.map { sar =>
-            @detailedAnswers(
-                question = Messages("responsiblepeople.detailed_answers.registered_for_sa"),
-                editUrl = controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(idx, true, flow).toString(),
-                dataItem = Some(sar)
-            ) { sa =>
-                <p>@sa match {
-                    case SaRegisteredYes(regNo) => {@regNo}
-                    case SaRegisteredNo => {@Messages("lbl.no")}
-                }</p>
-            }
-        }
-
-        @detailedAnswers(
-            question = getServicesHeading.toString(),
-            editUrl = controllers.responsiblepeople.routes.ExperienceTrainingController.get(idx, true, flow).toString(),
-            dataItem = person.experienceTraining
-        ) { ex =>
-            @businessMatching.alphabeticalBusinessActivitiesLowerCase(false).map { types =>
-                @if(types.size > 1) {
-                    <p>@Messages("responsiblepeople.experiencetraining.cya")</p>
-
-                    <ul class="list list-bullet">
-                    @types.map { businessType =>
-                        <li>@businessType</li>
-                    }
+                        @a.personAddress.toLines.map { l => <li>@l</li> }
                     </ul>
                 }
+
+                 @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.timeataddress.address_history.heading", personName),
+                    editUrl = controllers.responsiblepeople.routes.TimeAtCurrentAddressController.get(idx, true, flow).toString
+                ){
+                    @timeAtAddress(a.timeAtAddress)
+                }
             }
-            <p>@ex match {
-            case ExperienceTrainingYes(info) => {<p>@Messages("lbl.yes")</p> @info}
-                case ExperienceTrainingNo => {@Messages("lbl.no")}
-            }</p>
-        }
 
-        @detailedAnswers(
-            question = Messages("responsiblepeople.detailed_answers.training_in_anti_money_laundering"),
-            editUrl = controllers.responsiblepeople.routes.TrainingController.get(idx, true, flow).toString(),
-            dataItem = person.training
-        ) { tra =>
-            <p>@tra match {
-                case TrainingYes(info) => {@info}
-                case TrainingNo => {@Messages("lbl.no")}
-            }</p>
-        }
+            @person.addressHistory.flatMap(_.additionalAddress).map { a =>
+                 @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.detailed_answers.previous_address"),
+                    editUrl = controllers.responsiblepeople.routes.AdditionalAddressController.get(idx, true, flow).toString
+                ) {
+                    <ul class="list">
+                        @a.personAddress.toLines.map { l => <li>@l</li> }
+                    </ul>
+                }
 
-        @person.approvalFlags.hasAlreadyPassedFitAndProper.map { fp =>
-            @detailedAnswers(
-                question = Messages("responsiblepeople.detailed_answers.already_passed_fit_and_proper"),
-                editUrl = controllers.responsiblepeople.routes.FitAndProperController.get(idx, true, flow).toString(),
-                dataItem = person.approvalFlags.hasAlreadyPassedFitAndProper,
-                editLinkTag = "fit-and-proper"
-            ) { fp2 =>
-                <p>@fp match {
-                    case true => {@Messages("lbl.yes")}
-                    case false => {@Messages("lbl.no")}
-                }</p>
+                 @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.timeataddress.address_history.heading", personName),
+                    editUrl = controllers.responsiblepeople.routes.TimeAtAdditionalAddressController.get(idx, true, flow).toString
+                ){
+                    @timeAtAddress(a.timeAtAddress)
+                }
             }
-        }
 
-        @if(showApprovalSection) {
-            @person.approvalFlags.hasAlreadyPaidApprovalCheck.map { fp =>
-                @detailedAnswers(
-                    question = Messages("responsiblepeople.detailed_answers.already_paid_approval_check", personName),
-                    editUrl = controllers.responsiblepeople.routes.ApprovalCheckController.get(idx, true, flow).toString(),
-                    dataItem = person.approvalFlags.hasAlreadyPaidApprovalCheck,
-                    editLinkTag = "approval-check"
-                ) { fp2 =>
-                    <p>@fp match {
+            @person.addressHistory.flatMap(_.additionalExtraAddress).map { a =>
+                 @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.detailed_answers.other_previous_address"),
+                    editUrl = controllers.responsiblepeople.routes.AdditionalExtraAddressController.get(idx, true, flow).toString
+                ) {
+                    <ul class="list">
+                        @a.personAddress.toLines.map { l => <li>@l</li> }
+                    </ul>
+                }
+
+                 @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.timeataddress.address_history.heading", personName),
+                    editUrl = controllers.responsiblepeople.routes.TimeAtAdditionalExtraAddressController.get(idx, true, flow).toString
+                ){
+                    @timeAtAddress(a.timeAtAddress)
+                }
+            }
+
+            @person.positions.map { pos =>
+                 @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.position_within_business.heading", personName),
+                    editUrl = controllers.responsiblepeople.routes.PositionWithinBusinessController.get(idx, true, flow).toString
+                ) {
+
+                    <ul class="@{if (pos.positions.size > 1) { "list list-bullet" } else { "list"}}">
+                        @pos.positions.map(p => PositionWithinBusiness.getPrettyName(p)).toList.sorted.map(p => <li>{p}</li>)
+                    </ul>
+                }
+
+                 @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.position_within_business.startDate.heading", personName),
+                    editUrl = controllers.responsiblepeople.routes.PositionWithinBusinessStartDateController.get(idx, true, flow).toString()
+                ) {
+                    @pos.startDate.map(sd => sd.startDate).map(DateHelper.formatDate(_)).getOrElse("")
+                }
+            }
+
+            @person.soleProprietorOfAnotherBusiness.map { anotherBusiness =>
+                 @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.detailed_answers.soleproprietor_for_other_business"),
+                    editUrl = controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.get(idx, true, flow).toString()
+                ) {
+                    @anotherBusiness.soleProprietorOfAnotherBusiness match {
                         case true => {@Messages("lbl.yes")}
                         case false => {@Messages("lbl.no")}
+                    }
+                }
+            }
+
+            @person.vatRegistered.map { vr =>
+                 @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.detailed_answers.registered_for_vat"),
+                    editUrl = controllers.responsiblepeople.routes.VATRegisteredController.get(idx, true, flow).toString
+                ) {
+                    @vr match {
+                        case VATRegisteredYes(regNo) => {@regNo}
+                        case VATRegisteredNo => {@Messages("lbl.no")}
+                    }
+                }
+            }
+
+            @person.saRegistered.map { sar =>
+                 @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.detailed_answers.registered_for_sa"),
+                    editUrl = controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(idx, true, flow).toString()
+                ) {
+                    @sar match {
+                        case SaRegisteredYes(regNo) => {@regNo}
+                        case SaRegisteredNo => {@Messages("lbl.no")}
+                    }
+                }
+            }
+
+            @person.experienceTraining.map { ex =>
+                 @checkYourAnswersRow(
+                    question = getServicesHeading.toString(),
+                    editUrl = controllers.responsiblepeople.routes.ExperienceTrainingController.get(idx, true, flow).toString()
+                ) {
+                    @businessMatching.alphabeticalBusinessActivitiesLowerCase(false).map { types =>
+                        @if(types.size > 1) {
+                            <p>@Messages("responsiblepeople.experiencetraining.cya")</p>
+
+                            <ul class="list list-bullet">
+                            @types.map { businessType =>
+                                <li>@businessType</li>
+                            }
+                            </ul>
+                        }
+                    }
+                    <p>@ex match {
+                    case ExperienceTrainingYes(info) => {<p>@Messages("lbl.yes")</p> @info}
+                        case ExperienceTrainingNo => {@Messages("lbl.no")}
                     }</p>
                 }
             }
+
+            @person.training.map { tra =>
+                 @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.detailed_answers.training_in_anti_money_laundering"),
+                    editUrl = controllers.responsiblepeople.routes.TrainingController.get(idx, true, flow).toString
+                ) {
+                    @tra match {
+                        case TrainingYes(info) => {@info}
+                        case TrainingNo => {@Messages("lbl.no")}
+                    }
+                }
+            }
+
+            @person.approvalFlags.hasAlreadyPassedFitAndProper.map { fp =>
+                 @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.detailed_answers.already_passed_fit_and_proper"),
+                    editUrl = controllers.responsiblepeople.routes.FitAndProperController.get(idx, true, flow).toString,
+                    editLinkTag = "fit-and-proper"
+                ) {
+                    @fp match {
+                        case true => {@Messages("lbl.yes")}
+                        case false => {@Messages("lbl.no")}
+                    }
+                }
+            }
+
+            @if(showApprovalSection) {
+                @person.approvalFlags.hasAlreadyPaidApprovalCheck.map { fp =>
+                     @checkYourAnswersRow(
+                        question = Messages("responsiblepeople.detailed_answers.already_paid_approval_check", personName),
+                        editUrl = controllers.responsiblepeople.routes.ApprovalCheckController.get(idx, true, flow).toString(),
+                        editLinkTag = "approval-check"
+                    ) {
+                        @fp match {
+                            case true => {@Messages("lbl.yes")}
+                            case false => {@Messages("lbl.no")}
+                        }
+                    }
+                }
+            }
         }
-    }
+    </dl>
 
     @form(EmptyForm, controllers.responsiblepeople.routes.DetailedAnswersController.post(idx, flow)) {
         @submit(false, Some(Messages("responsiblepeople.check_your_answers.button")), false)
