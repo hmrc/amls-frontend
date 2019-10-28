@@ -60,7 +60,7 @@ class summarySpec extends AmlsSpec
 
     val sectionChecks = Table[String, Element => Boolean](
       ("title key", "check"),
-      ("businessdetails.registeredformlr.title",checkElementTextIncludes(_, "businessdetails.registeredformlr.mlrregno.lbl", "1234")),
+      ("businessdetails.registeredformlr.title",checkElementTextIncludes(_, "lbl.yes")),
       ("businessdetails.activity.start.date.title",checkElementTextIncludes(_, "lbl.start.date", "2 January 2016")),
       ("businessdetails.registeredforvat.title",checkElementTextIncludes(_, "lbl.vat.reg.number", "2345")),
       ("businessdetails.registeredoffice.title",checkElementTextIncludes(_, "lbl.yes")),
@@ -76,7 +76,7 @@ class summarySpec extends AmlsSpec
       def view = views.html.businessdetails.summary(
         EmptyForm,
         BusinessDetails(
-          Some(PreviouslyRegisteredYes("1234")),
+          Some(PreviouslyRegisteredYes(Some("1234"))),
           Some(ActivityStartDate(new LocalDate(2016, 1, 2))),
           Some(VATRegisteredYes("2345")),
           Some(CorporationTaxRegisteredYes("3456")),
