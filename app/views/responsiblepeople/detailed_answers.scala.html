@@ -121,12 +121,24 @@
             ) { ln =>
                 @ln.hasPreviousName match {
                     case Some(false) => {<p>@Messages("lbl.no")</p>}
+                    case Some(true) => {<p>@Messages("lbl.yes")</p>}
+                }
+        }
+
+        @if(person.legalName.flatMap(f => f.hasPreviousName) == Some(true)) {
+            @detailedAnswers(
+                question = Messages("responsiblepeople.legalNameInput.heading", personName),
+                editUrl = controllers.responsiblepeople.routes.LegalNameInputController.get(idx, true, flow).toString(),
+                dataItem = person.legalName
+            ) { ln =>
+                @ln.hasPreviousName match {
                     case Some(true) => {
                         <ul class="list">
                             <li>@ln.fullName</li>
                         </ul>
                     }
                 }
+            }
         }
 
         @person.legalNameChangeDate.map { legalNameChangeDate =>

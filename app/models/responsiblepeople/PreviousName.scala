@@ -98,21 +98,21 @@ object PreviousName {
     )
   }
 
-  implicit val jsonWrites2 = Writes[PreviousName] {
-    case PreviousName(a@Some(true), None,  ,d) => {
-      Json.obj("hasPreviousName" -> a,
-        "firstName" -> b,
-        "middleName" -> c,
-        "lastName" -> d
-      )
-    }
-    case PreviousName(a, b, c ,d) => {
-      Json.obj("hasPreviousName" -> a,
-        "firstName" -> b,
-        "middleName" -> c,
-        "lastName" -> d
-      )
-    }
-
-  }
+//  implicit val jsonWrites2 = Writes[PreviousName] {
+//    case PreviousName(a@Some(true), None,  ,d) => {
+//      Json.obj("hasPreviousName" -> a,
+//        "firstName" -> b,
+//        "middleName" -> c,
+//        "lastName" -> d
+//      )
+//    }
+//    case PreviousName(a, b, c ,d) => {
+//      Json.obj("hasPreviousName" -> a,
+//        "firstName" -> b,
+//        "middleName" -> c,
+//        "lastName" -> d
+//      )
+//    }
+//
+//  }
 }
