@@ -100,7 +100,7 @@ class LegalNameInputControllerSpec extends AmlsSpec with ScalaFutures {
 
         val document = Jsoup.parse(contentAsString(result))
 
-        document.select("input[name=hasPreviousName]").`val` must be("")
+        document.select("input[name=hasPreviousName]").`val` must be("true")
         document.select("input[name=firstName]").`val` must be("Matty")
         document.select("input[name=middleName]").`val` must be("James")
         document.select("input[name=lastName]").`val` must be("Harris")

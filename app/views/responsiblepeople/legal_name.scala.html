@@ -42,6 +42,10 @@
             supportingContent = supportingContent,
             panel = false
         ) {
+            <input type ="hidden" name="firstName" value="@f("firstName").value" />
+            <input type ="hidden" name="middleName" value="@f("middleName").value" />
+            <input type ="hidden" name="lastName" value="@f("lastName").value" />
+
             @radio(
                 f = f("hasPreviousName"),
                 labelText = "lbl.yes",
