@@ -57,10 +57,11 @@ object PreviousName {
 
     (__ \ "hasPreviousName").read[Option[Boolean]] flatMap {
       case Some(true) => (
-          (__ \ "firstName").read[Option[String]] ~
-          (__ \ "middleName").read[Option[String]] ~
-          (__ \ "lastName").read[Option[String]]
-        ).tupled.map(t => PreviousName(Some(true), t._1, t._2, t._3))
+        (
+          (__ \ "firstName").read(optionR(genericNameRule())) ~
+            (__ \ "middleName").read(optionR(genericNameRule())) ~
+            (__ \ "lastName").read(optionR(genericNameRule()))
+          ).tupled andThen iR).map(t => PreviousName(Some(true), t._1, t._2, t._3))
       case _ => Rule.fromMapping { _ => Valid(PreviousName(Some(false), None, None, None)) }
     }
   }
@@ -92,9 +93,9 @@ object PreviousName {
 
   implicit val jsonWrites = Writes[PreviousName] { pn =>
     Json.obj("hasPreviousName" -> pn.hasPreviousName,
-                    "firstName" -> pn.firstName,
-                    "middleName" -> pn.middleName,
-                    "lastName" -> pn.lastName
+      "firstName" -> pn.firstName,
+      "middleName" -> pn.middleName,
+      "lastName" -> pn.lastName
     )
   }
 }

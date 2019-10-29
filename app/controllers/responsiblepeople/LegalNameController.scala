@@ -21,6 +21,7 @@ import connectors.DataCacheConnector
 import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{PreviousName, ResponsiblePerson}
+import org.joda.time.LocalDate
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.legal_name
 
@@ -44,34 +45,49 @@ class LegalNameController @Inject()(val dataCacheConnector: DataCacheConnector,
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request => {
+
+        def processForm(data: PreviousName) = {
+          for {
+            _ <- {
+              data.hasPreviousName match {
+                case Some(true) => updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
+                  rp.legalName(data)
+                }
+                case Some(false) => updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
+                  rp.legalName(PreviousName(Some(false), None, None, None)).copy(legalNameChangeDate = None)
+                }
+              }
+            }
+          } yield edit match {
+            case true if data.hasPreviousName.contains(true) => Redirect(routes.LegalNameInputController.get(index, edit, flow))
+            case true => Redirect(routes.DetailedAnswersController.get(index, flow))
+            case false if data.hasPreviousName.contains(true) => Redirect(routes.LegalNameInputController.get(index, edit, flow))
+            case _ => Redirect(routes.KnownByController.get(index, edit, flow))
+          }
+        }
+
         Form2[PreviousName](request.body) match {
+          case f: InvalidForm if isRequiredDataPresent(f) => processForm(PreviousName(Some(true), None, None, None))
           case f: InvalidForm =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
               BadRequest(views.html.responsiblepeople.legal_name(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
-            for {
-              _ <- {
-                data.hasPreviousName match {
-                  case Some(true) => updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
-                    rp.legalName(data)
-                  }
-                  case Some(false) => updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
-                    rp.legalName(PreviousName(Some(false), None, None, None)).copy(legalNameChangeDate = None)
-                  }
-                }
-              }
-            } yield edit match {
-              case true if data.hasPreviousName.contains(true) => Redirect(routes.LegalNameInputController.get(index, edit, flow))
-              case true => Redirect(routes.DetailedAnswersController.get(index, flow))
-              case false if data.hasPreviousName.contains(true) => Redirect(routes.LegalNameInputController.get(index, edit, flow))
-              case _ => Redirect(routes.KnownByController.get(index, edit, flow))
-            }
+            processForm(data)
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
         }
       }
+  }
+
+  private def isRequiredDataPresent(form: InvalidForm): Boolean = {
+    val isFirstNameEmpty = form.data.get("firstName").contains(Seq(""))
+    val isMiddleNameEmpty = form.data.get("middleName").contains(Seq(""))
+    val isLastNameEmpty = form.data.get("lastName").contains(Seq(""))
+    val isHasPreviousNameTrue = form.data.get("hasPreviousName").contains(Seq("true"))
+
+    isFirstNameEmpty && isMiddleNameEmpty && isLastNameEmpty && isHasPreviousNameTrue
   }
 
 }
