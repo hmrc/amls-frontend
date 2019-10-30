@@ -34,7 +34,8 @@
 
         @checkYourAnswersRow(
             question = Messages("businessactivities.confirm-activities.title"),
-            editUrl = controllers.businessactivities.routes.InvolvedInOtherController.get(true).toString
+            editUrl = controllers.businessactivities.routes.InvolvedInOtherController.get(true).toString,
+            editLinkTag = "involvedinother-edit"
         ) {
             @model.involvedInOther.map {
                 case InvolvedInOtherNo => { @Messages("lbl.no") }
@@ -45,7 +46,8 @@
         @model.expectedBusinessTurnover.map { turnover =>
             @checkYourAnswersRow(
                 question = Messages("businessactivities.business-turnover.title"),
-                editUrl = controllers.businessactivities.routes.ExpectedBusinessTurnoverController.get(true).toString
+                editUrl = controllers.businessactivities.routes.ExpectedBusinessTurnoverController.get(true).toString,
+                editLinkTag = "expectedbusinessturnover-edit"
             ) {
                 @turnover match {
                     case ExpectedBusinessTurnover.First => { @Messages("businessactivities.turnover.lbl.01") }
@@ -62,9 +64,10 @@
         @model.expectedAMLSTurnover.map { turnover =>
             @checkYourAnswersRow(
                 question = Messages("businessactivities.turnover.title"),
-                editUrl = controllers.businessactivities.routes.ExpectedAMLSTurnoverController.get(true).toString
+                editUrl = controllers.businessactivities.routes.ExpectedAMLSTurnoverController.get(true).toString,
+                editLinkTag = "expectedamlsturnover-edit"
             ) {
-                <ul class="list list-bullet">
+                <ul id="businessactivities-list" class="list list-bullet">
                     @bmBusinessActivities.map { businessActivities =>
                         @businessActivities.map { ba =>
                             <li>@ba</li>
