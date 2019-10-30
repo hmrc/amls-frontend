@@ -95,12 +95,12 @@ class detailed_answersSpec extends AmlsSpec
 
 
         forAll(sectionChecks) { (key, check) => {
-          val headers = doc.select("section.check-your-answers h2")
-          val header = headers.toList.find(e => e.text() == key)
-          header must not be None
-          val section = header.get.parents().select("section").first()
-          check(section) must be(true)
-        }
+            val questions = doc.select("span.bold")
+            val question = questions.toList.find(e => e.text() == Messages(key))
+            question must not be None
+            val section = question.get.parents().select("div").first()
+            check(section) must be(true)
+          }
         }
       }
 
@@ -115,10 +115,10 @@ class detailed_answersSpec extends AmlsSpec
         )
 
         forAll(sectionChecks) { (key, check) => {
-          val headers = doc.select("section.check-your-answers h2")
-          val header = headers.toList.find(e => e.text() == key)
-          header must not be None
-          val section = header.get.parents().select("section").first()
+          val questions = doc.select("span.bold")
+          val question = questions.toList.find(e => e.text() == Messages(key))
+          question must not be None
+          val section = question.get.parents().select("div").first()
           check(section) must be(true)
         }
         }
@@ -153,20 +153,17 @@ class detailed_answersSpec extends AmlsSpec
         }
 
         forAll(sectionChecks) { (key, check) => {
-          val headers = doc.select("section.check-your-answers h2")
-          val header = headers.toList.find(e => e.text() == key)
-
-          if (key.equals(
-            Messages("responsiblepeople.detailed_answers.address", personName.fullName)) ||
+          val questions = doc.select("span.bold")
+          val question = questions.toList.find(e => e.text() == Messages(key))
+          if (key.equals(Messages("responsiblepeople.detailed_answers.address", personName.fullName)) ||
             key.equals(Messages("responsiblepeople.timeataddress.address_history.heading", personName.fullName))
           ) {
-            header must not be None
-            val section = header.get.parents().select("section").first()
+            question must not be None
+            val section = question.get.parents().select("div").first()
             check(section) must be(true)
           } else {
-            header mustBe None
+            question mustBe None
           }
-
         }
         }
       }
@@ -194,12 +191,11 @@ class detailed_answersSpec extends AmlsSpec
         }
 
         forAll(sectionChecks) { (key, check) => {
-          val headers = doc.select("section.check-your-answers h2")
-          val header = headers.toList.find(e => e.text() == key)
-          header must not be None
-          val section = header.get.parents().select("section").first()
+          val questions = doc.select("span.bold")
+          val question = questions.toList.find(e => e.text() == Messages(key))
+          question must not be None
+          val section = question.get.parents().select("div").first()
           check(section) must be(true)
-
         }
         }
       }
@@ -221,12 +217,11 @@ class detailed_answersSpec extends AmlsSpec
         }
 
         forAll(sectionChecks) { (key, check) => {
-          val headers = doc.select("section.check-your-answers h2")
-          val header = headers.toList.find(e => e.text() == key)
-          header must not be None
-          val section = header.get.parents().select("section").first()
+          val questions = doc.select("span.bold")
+          val question = questions.toList.find(e => e.text() == Messages(key))
+          question must not be None
+          val section = question.get.parents().select("div").first()
           check(section) must be(true)
-
         }
         }
 
@@ -255,13 +250,11 @@ class detailed_answersSpec extends AmlsSpec
         }
 
         forAll(sectionChecks) { (key, check) => {
-          val headers = doc.select("section.check-your-answers h2")
-          val header = headers.toList.find(e => e.text() == key)
-
-          header must not be None
-          val section = header.get.parents().select("section").first()
+          val questions = doc.select("span.bold")
+          val question = questions.toList.find(e => e.text() == Messages(key))
+          question must not be None
+          val section = question.get.parents().select("div").first()
           check(section) must be(true)
-
         }
         }
 
@@ -290,13 +283,11 @@ class detailed_answersSpec extends AmlsSpec
         }
 
         forAll(sectionChecks) { (key, check) => {
-          val headers = doc.select("section.check-your-answers h2")
-          val header = headers.toList.find(e => e.text() == key)
-
-          header must not be None
-          val section = header.get.parents().select("section").first()
+          val questions = doc.select("span.bold")
+          val question = questions.toList.find(e => e.text() == Messages(key))
+          question must not be None
+          val section = question.get.parents().select("div").first()
           check(section) must be(true)
-
         }
         }
 
@@ -317,13 +308,12 @@ class detailed_answersSpec extends AmlsSpec
         }
 
         forAll(sectionChecks) { (key, check) => {
-          val headers = doc.select("section.check-your-answers h2")
-          val header = headers.toList.find(e => e.text() == key)
-
-          header must not be None
-          val section = header.get.parents().select("section").first()
+          val questions = doc.select("span.bold")
+          val question = questions.toList.find(e => e.text() == Messages(key))
+          question must not be None
+          val section = question.get.parents().select("div").first()
           check(section) must be(true)
-          }
+        }
         }
       }
 
@@ -342,11 +332,10 @@ class detailed_answersSpec extends AmlsSpec
         }
 
         forAll(sectionChecks) { (key, check) => {
-          val headers = doc.select("section.check-your-answers h2")
-          val header = headers.toList.find(e => e.text() == key)
-
-          header must be(None)
-          }
+          val questions = doc.select("span.bold")
+          val question = questions.toList.find(e => e.text() == Messages(key))
+          question mustBe None
+        }
         }
       }
     }
@@ -370,11 +359,10 @@ class detailed_answersSpec extends AmlsSpec
       )
 
       forAll(sectionChecks) { (key, check) => {
-        val headers = doc.select("section.check-your-answers h2")
-        val header = headers.toList.find(e => e.text() == key)
-
-        header must not be None
-        val section = header.get.parents().select("section").first()
+        val questions = doc.select("span.bold")
+        val question = questions.toList.find(e => e.text() == Messages(key))
+        question must not be None
+        val section = question.get.parents().select("div").first()
         check(section) must be(false)
       }
       }
@@ -388,9 +376,9 @@ class detailed_answersSpec extends AmlsSpec
 
       val timeAtAddresses = doc.getElementsMatchingOwnText(Messages("responsiblepeople.timeataddress.address_history.heading", "firstName middleName lastName"))
 
-      timeAtAddresses(0).nextElementSibling().nextElementSibling().text() must be(Messages("responsiblepeople.timeataddress.5_months_history"))
-      timeAtAddresses(2).nextElementSibling().nextElementSibling().text() must be(Messages("responsiblepeople.timeataddress.11_months_history"))
-      timeAtAddresses(4).nextElementSibling().nextElementSibling().text() must be(Messages("responsiblepeople.timeataddress.3_years_history"))
+      timeAtAddresses(0).parent().nextElementSibling().text() must be(Messages("responsiblepeople.timeataddress.5_months_history"))
+      timeAtAddresses(2).parent().nextElementSibling().text() must be(Messages("responsiblepeople.timeataddress.11_months_history"))
+      timeAtAddresses(4).parent().nextElementSibling().text() must be(Messages("responsiblepeople.timeataddress.3_years_history"))
 
     }
 
@@ -413,11 +401,10 @@ class detailed_answersSpec extends AmlsSpec
       }
 
       forAll(sectionChecks) { (key, check) => {
-        val headers = doc.select("section.check-your-answers h2")
-        val header = headers.toList.find(e => e.text() == key)
-
-        header must not be None
-        val section = header.get.parents().select("section").first()
+        val questions = doc.select("span.bold")
+        val question = questions.toList.find(e => e.text() == Messages(key))
+        question must not be None
+        val section = question.get.parents().select("div").first()
         check(section) must be(true)
       }
       }
