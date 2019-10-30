@@ -21,7 +21,6 @@ import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
 import models.businessdetails._
-import models.businessmatching.BusinessType._
 import models.businessmatching.{BusinessMatching, BusinessType}
 import play.api.mvc.Result
 import utils.{AuthAction, ControllerHelper}
@@ -52,39 +51,30 @@ class PreviouslyRegisteredController @Inject () (
         case f: InvalidForm =>
           Future.successful(BadRequest(previously_registered(f, edit)))
         case ValidForm(_, data) =>
-          dataCacheConnector.fetchAll(request.credId) map {
+          dataCacheConnector.fetchAll(request.credId) flatMap {
             optionalCache =>
               (for {
                 cache <- optionalCache
                 businessType <- ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
-              } yield {
-                dataCacheConnector.save[BusinessDetails](request.credId, BusinessDetails.key,
+                saved <- Option(dataCacheConnector.save[BusinessDetails](request.credId, BusinessDetails.key,
                   getUpdatedModel(businessType,  cache.getEntry[BusinessDetails](BusinessDetails.key), data))
-                getRouting(businessType, edit, data)
-              }).getOrElse(Redirect(routes.ConfirmRegisteredOfficeController.get(edit)))
+                )
+              } yield {
+                saved.map(_ => getRouting(businessType, edit, data))
+              }).getOrElse(Future.successful(Redirect(routes.ConfirmRegisteredOfficeController.get(edit))))
           }
       }
     }
   }
 
   private def getUpdatedModel(businessType: BusinessType, businessDetails: BusinessDetails, data: PreviouslyRegistered): BusinessDetails = {
-    data match {
-      case PreviouslyRegisteredYes(_) => businessDetails.copy(previouslyRegistered = Some(data), activityStartDate = None,
-                                                                hasChanged = true)
-      case PreviouslyRegisteredNo => businessDetails.copy(previouslyRegistered = Some(data),
-                                                                hasChanged = true)
-    }
+    businessDetails.copy(previouslyRegistered = Some(data), hasChanged = true)
   }
 
   private def getRouting(businessType: BusinessType, edit: Boolean, data: PreviouslyRegistered): Result = {
-    (businessType, edit, data) match {
-      case (UnincorporatedBody | LPrLLP | LimitedCompany | Partnership, _, PreviouslyRegisteredYes(_)) =>
-          Redirect (routes.VATRegisteredController.get (edit))
-      case (_, _, PreviouslyRegisteredNo) =>
-        Redirect (routes.ActivityStartDateController.get (edit))
-      case (_, true, PreviouslyRegisteredYes(_)) => Redirect(routes.SummaryController.get())
-      case (_, false, PreviouslyRegisteredYes(_)) =>
-        Redirect(routes.ConfirmRegisteredOfficeController.get(edit))
+    (edit) match {
+      case true => Redirect(routes.SummaryController.get())
+      case _    => Redirect (routes.ActivityStartDateController.get(edit))
     }
   }
 }

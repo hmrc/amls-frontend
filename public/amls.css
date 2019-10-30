@@ -883,6 +883,68 @@ h2#complete-header {
     margin-right:0px;
 }
 
+.cya-summary-list {
+  display: table;
+}
+@media (max-width: 640px) {
+  .cya-summary-list {
+    display: block;
+  }
+}
+
+.cya-summary-list__row {
+  display: table-row;
+}
+
+@media (max-width: 640px) {
+  .cya-summary-list__row {
+    display: block;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #b1b4b6;
+  }
+}
+
+.cya-summary-list__key,
+.cya-summary-list__value,
+.cya-summary-list__actions {
+  display: table-cell;
+  padding: 10px 20px 10px 0;
+  border-bottom: 1px solid #b1b4b6;
+}
+
+@media (max-width: 640px) {
+  .cya-summary-list__key,
+  .cya-summary-list__value,
+  .cya-summary-list__actions {
+    display: block;
+    border-bottom: 0;
+    padding: 0;
+  }
+}
+
+.cya-summary-list__value {
+  margin-bottom: 15px;
+}
+
+.cya-summary-list__value > :last-child {
+  margin-bottom: 0;
+}
+
+
+.cya-summary-list__actions {
+  white-space: nowrap;
+  padding-right: 0;
+}
+
+@media (max-width: 640px) {
+    .table-placeholder {
+        height: 0;
+        margin-bottom: -15px;
+        display: block;
+    }
+}
+
 /* class for older browsers; pseudo-class for modern browsers */
 
 .check-your-answers__last,

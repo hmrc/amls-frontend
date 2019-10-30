@@ -25,6 +25,6 @@ object ActivitiesHelper {
 
   def acSectors(activities: Set[BusinessActivity]): Boolean = {
     (activities.contains(HighValueDealing) || activities.contains(AccountancyServices) ||
-      activities.contains(EstateAgentBusinessService))
+      activities.contains(EstateAgentBusinessService) || activities.contains(ArtMarketParticipant))
   }
 }

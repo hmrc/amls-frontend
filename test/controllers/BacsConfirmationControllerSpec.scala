@@ -167,7 +167,7 @@ class BacsConfirmationControllerSpec extends AmlsSpec
 
       "bacs confirmation is requested and is a transitional renewal" in new Fixture {
 
-        val businessDetailsYes = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredYes("123456")))
+        val businessDetailsYes = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredYes(Some("123456"))))
 
         when {
           controller.statusService.getReadStatus(any[String](), any[(String, String)]())(any(), any())

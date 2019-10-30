@@ -52,6 +52,14 @@ class SubmitRegistrationConfirmationViewSpec extends AmlsSpec with PaymentGenera
       doc.select(".info").text mustBe Messages("confirmation.submission.info")
     }
 
+    "show the correct time limit" in new ViewFixture {
+      doc.select("#timelimit").text mustBe Messages("confirmation.timelimit")
+    }
+
+    "show the link to print the page" in new ViewFixture {
+      doc.select(".print-link").text mustBe Messages("link.print")
+    }
+
     "show the correct fee" in new ViewFixture {
       doc.select(".reg-online--pay-fee .heading-large").first.text mustBe s"£$fee.00"
     }

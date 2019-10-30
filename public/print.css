@@ -23,11 +23,12 @@
      .messaging,
      .no-print,
      .declaration,
-     .button {
+     .button,
+      details.details:not([open]) {
          display: none !important;
      }
 
-     .print-left {
+     .print-left, .heading-secondary {
         text-align:left;
         margin:auto;
      }

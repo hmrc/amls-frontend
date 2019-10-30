@@ -16,11 +16,10 @@
 
 package models.businessdetails
 
+import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
-import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
+import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
 
@@ -33,7 +32,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
           be(Valid(PreviouslyRegisteredNo))
       }
 
-      "successfully validate given an `Yes` value with 8 characters" in {
+      "successfully validate given an `Yes` value with pre-existing MLR reg number" in {
 
         val data = Map(
           "previouslyRegistered" -> Seq("true"),
@@ -41,7 +40,28 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
         )
 
         PreviouslyRegistered.formRule.validate(data) must
-          be(Valid(PreviouslyRegisteredYes("1" * 8)))
+          be(Valid(PreviouslyRegisteredYes(None)))
+      }
+
+      "successfully validate given an `Yes` value with no MLR reg number" in {
+
+        val data = Map(
+          "previouslyRegistered" -> Seq("true")
+        )
+
+        PreviouslyRegistered.formRule.validate(data) must
+          be(Valid(PreviouslyRegisteredYes(None)))
+      }
+
+      "successfully validate given an `Yes` value with an empty MLR reg number" in {
+
+        val data = Map(
+          "previouslyRegistered" -> Seq("true"),
+          "prevMLRRegNo" -> Seq("")
+        )
+
+        PreviouslyRegistered.formRule.validate(data) must
+          be(Valid(PreviouslyRegisteredYes(None)))
       }
     }
 
@@ -95,44 +115,6 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
             (Path \ "previouslyRegistered") -> Seq(ValidationError("error.required.atb.previously.registered"))
           )))
       }
-
-      "'Yes' is selected but no value is provided" when {
-        "represented by an empty string" in {
-          val data = Map(
-            "previouslyRegistered" -> Seq("true"),
-            "prevMLRRegNo" -> Seq("")
-          )
-
-          PreviouslyRegistered.formRule.validate(data) must
-            be(Invalid(Seq(
-              (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.mlr.number"))
-            )))
-        }
-
-        "represented by a sequence of whitespace" in {
-          val data = Map(
-            "previouslyRegistered" -> Seq("true"),
-            "prevMLRRegNo" -> Seq("       \t")
-          )
-
-          PreviouslyRegistered.formRule.validate(data) must
-            be(Invalid(Seq(
-              (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.mlr.number"))
-            )))
-        }
-
-        "represented by a missing field" in {
-          val data = Map(
-            "previouslyRegistered" -> Seq("true")
-          )
-
-          PreviouslyRegistered.formRule.validate(data) must
-            be(Invalid(Seq(
-              (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.required"))
-            )))
-        }
-      }
-
     }
 
     "write correct data from enum value" in {
@@ -144,7 +126,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
 
     "write correct data from `Yes` value" in {
 
-      PreviouslyRegistered.formWrites.writes(PreviouslyRegisteredYes("12345678")) must
+      PreviouslyRegistered.formWrites.writes(PreviouslyRegisteredYes(Some("12345678"))) must
         be(Map("previouslyRegistered" -> Seq("true"), "prevMLRRegNo" -> Seq("12345678")))
     }
   }
@@ -162,15 +144,15 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("previouslyRegistered" -> true, "prevMLRRegNo" -> "12345678")
 
       Json.fromJson[PreviouslyRegistered](json) must
-        be(JsSuccess(PreviouslyRegisteredYes("12345678"), JsPath \ "prevMLRRegNo"))
+        be(JsSuccess(PreviouslyRegisteredYes(Some("12345678")), JsPath \ "prevMLRRegNo"))
     }
 
-    "fail to validate when given an empty `Yes` value" in {
+    "successfully validate validate when given an empty `Yes` value" in {
 
       val json = Json.obj("previouslyRegistered" -> true)
 
       Json.fromJson[PreviouslyRegistered](json) must
-        be(JsError((JsPath \ "prevMLRRegNo") -> play.api.data.validation.ValidationError("error.path.missing")))
+        be(JsSuccess(PreviouslyRegisteredYes(None)))
     }
 
     "write the correct value" in {
@@ -178,7 +160,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
       Json.toJson(PreviouslyRegisteredNo) must
         be(Json.obj("previouslyRegistered" -> false))
 
-      Json.toJson(PreviouslyRegisteredYes("12345678")) must
+      Json.toJson(PreviouslyRegisteredYes(Some("12345678"))) must
         be(Json.obj(
           "previouslyRegistered" -> true,
           "prevMLRRegNo" -> "12345678"
