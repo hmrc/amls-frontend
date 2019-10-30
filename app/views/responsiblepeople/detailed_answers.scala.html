@@ -104,7 +104,8 @@
             @person.personName.map { pn =>
                 @checkYourAnswersRow(
                     question = Messages("responsiblepeople.personName.title"),
-                    editUrl = controllers.responsiblepeople.routes.PersonNameController.get(idx, true, flow).toString()
+                    editUrl = controllers.responsiblepeople.routes.PersonNameController.get(idx, true, flow).toString(),
+                    editLinkTag = "rp-personname-edit"
                 ) {
                         @pn.fullName
                 }
@@ -113,7 +114,8 @@
             @person.legalName.map { ln =>
                 @checkYourAnswersRow(
                     question = Messages("responsiblepeople.legalName.heading", personName),
-                    editUrl = controllers.responsiblepeople.routes.LegalNameController.get(idx, true, flow).toString()
+                    editUrl = controllers.responsiblepeople.routes.LegalNameController.get(idx, true, flow).toString(),
+                    editLinkTag = "rp-legalname-edit"
                     ) {
                         @ln.hasPreviousName match {
                             case Some(false) => {<p>@Messages("lbl.no")</p>}
@@ -129,7 +131,8 @@
             @person.legalNameChangeDate.map { legalNameChangeDate =>
                 @checkYourAnswersRow(
                     question = Messages("responsiblepeople.legalnamechangedate.heading", personName),
-                    editUrl = controllers.responsiblepeople.routes.LegalNameChangeDateController.get(idx, true, flow).toString()
+                    editUrl = controllers.responsiblepeople.routes.LegalNameChangeDateController.get(idx, true, flow).toString(),
+                    editLinkTag = "rp-legalnamechangedate-edit"
                 ) {
                     @DateHelper.formatDate(legalNameChangeDate)
                 }
@@ -139,7 +142,8 @@
             @person.knownBy.map { other =>
                 @checkYourAnswersRow(
                     question = Messages("responsiblepeople.knownby.heading", personName),
-                    editUrl = controllers.responsiblepeople.routes.KnownByController.get(idx, true, flow).toString()
+                    editUrl = controllers.responsiblepeople.routes.KnownByController.get(idx, true, flow).toString(),
+                    editLinkTag = "rp-knownby-edit"
                 ) {
                         @other.hasOtherNames match {
                             case Some(true) => {
@@ -168,7 +172,8 @@
             @person.personResidenceType.map { prt =>
                  @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.uk_resident", personName),
-                    editUrl = controllers.responsiblepeople.routes.PersonResidentTypeController.get(idx, true, flow).toString()
+                    editUrl = controllers.responsiblepeople.routes.PersonResidentTypeController.get(idx, true, flow).toString(),
+                    editLinkTag = "rp-ukresident-edit"
                 ) {
                     @prt.isUKResidence match {
                         case UKResidence(nino) => {
@@ -204,7 +209,8 @@
             @person.nonUKPassport.map { nonUKPassport =>
                  @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.non.uk.passport", personName),
-                    editUrl = controllers.responsiblepeople.routes.PersonNonUKPassportController.get(idx, true, flow).toString()
+                    editUrl = controllers.responsiblepeople.routes.PersonNonUKPassportController.get(idx, true, flow).toString(),
+                    editLinkTag = "rp-nonukpassport-edit"
                 ) {
                     @nonUKPassport  match {
                         case NonUKPassportYes(nonUKPassportNumber) => {
@@ -221,14 +227,16 @@
             @person.personResidenceType.map { prt =>
                  @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.country_of_birth"),
-                    editUrl = controllers.responsiblepeople.routes.CountryOfBirthController.get(idx, true, flow).toString()
+                    editUrl = controllers.responsiblepeople.routes.CountryOfBirthController.get(idx, true, flow).toString(),
+                    editLinkTag = "rp-countryofbirth-edit"
                 ) {
                     @prt.countryOfBirth
                 }
 
                  @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.nationality"),
-                    editUrl = controllers.responsiblepeople.routes.NationalityController.get(idx, true, flow).toString()
+                    editUrl = controllers.responsiblepeople.routes.NationalityController.get(idx, true, flow).toString(),
+                    editLinkTag = "rp-nationality-edit"
                 ) {
                     @prt.nationality
                 }
@@ -237,14 +245,16 @@
             @person.contactDetails.map { cd =>
                  @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.phone_number"),
-                    editUrl = controllers.responsiblepeople.routes.ContactDetailsController.get(idx, true, flow).toString()
+                    editUrl = controllers.responsiblepeople.routes.ContactDetailsController.get(idx, true, flow).toString(),
+                    editLinkTag = "rp-phonenumber-edit"
                 ) {
                     @cd.phoneNumber
                 }
 
                 @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.email"),
-                    editUrl = controllers.responsiblepeople.routes.ContactDetailsController.get(idx, true, flow).toString()
+                    editUrl = controllers.responsiblepeople.routes.ContactDetailsController.get(idx, true, flow).toString(),
+                    editLinkTag = "rp-email-edit"
                 ) {
                     @cd.emailAddress
                 }
@@ -260,7 +270,8 @@
                             case _ => {
                                 controllers.responsiblepeople.routes.CurrentAddressController.get(idx, true, flow).toString()
                             }
-                        }
+                        },
+                    editLinkTag = "rpaddress-edit"
 
                 ) {
                     <ul class="list">
@@ -270,7 +281,8 @@
 
                  @checkYourAnswersRow(
                     question = Messages("responsiblepeople.timeataddress.address_history.heading", personName),
-                    editUrl = controllers.responsiblepeople.routes.TimeAtCurrentAddressController.get(idx, true, flow).toString
+                    editUrl = controllers.responsiblepeople.routes.TimeAtCurrentAddressController.get(idx, true, flow).toString,
+                    editLinkTag = "rp-timeatataddress-edit"
                 ){
                     @timeAtAddress(a.timeAtAddress)
                 }
@@ -279,7 +291,8 @@
             @person.addressHistory.flatMap(_.additionalAddress).map { a =>
                  @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.previous_address"),
-                    editUrl = controllers.responsiblepeople.routes.AdditionalAddressController.get(idx, true, flow).toString
+                    editUrl = controllers.responsiblepeople.routes.AdditionalAddressController.get(idx, true, flow).toString,
+                    editLinkTag = "rp-previousaddress-edit"
                 ) {
                     <ul class="list">
                         @a.personAddress.toLines.map { l => <li>@l</li> }
@@ -288,7 +301,8 @@
 
                  @checkYourAnswersRow(
                     question = Messages("responsiblepeople.timeataddress.address_history.heading", personName),
-                    editUrl = controllers.responsiblepeople.routes.TimeAtAdditionalAddressController.get(idx, true, flow).toString
+                    editUrl = controllers.responsiblepeople.routes.TimeAtAdditionalAddressController.get(idx, true, flow).toString,
+                    editLinkTag = "rp-timeatpreviousaddress-edit"
                 ){
                     @timeAtAddress(a.timeAtAddress)
                 }
@@ -297,7 +311,8 @@
             @person.addressHistory.flatMap(_.additionalExtraAddress).map { a =>
                  @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.other_previous_address"),
-                    editUrl = controllers.responsiblepeople.routes.AdditionalExtraAddressController.get(idx, true, flow).toString
+                    editUrl = controllers.responsiblepeople.routes.AdditionalExtraAddressController.get(idx, true, flow).toString,
+                    editLinkTag = "rp-otherpreviousaddress-edit"
                 ) {
                     <ul class="list">
                         @a.personAddress.toLines.map { l => <li>@l</li> }
@@ -306,7 +321,8 @@
 
                  @checkYourAnswersRow(
                     question = Messages("responsiblepeople.timeataddress.address_history.heading", personName),
-                    editUrl = controllers.responsiblepeople.routes.TimeAtAdditionalExtraAddressController.get(idx, true, flow).toString
+                    editUrl = controllers.responsiblepeople.routes.TimeAtAdditionalExtraAddressController.get(idx, true, flow).toString,
+                    editLinkTag = "rp-timeatotherpreviousaddress-edit"
                 ){
                     @timeAtAddress(a.timeAtAddress)
                 }
@@ -315,7 +331,8 @@
             @person.positions.map { pos =>
                  @checkYourAnswersRow(
                     question = Messages("responsiblepeople.position_within_business.heading", personName),
-                    editUrl = controllers.responsiblepeople.routes.PositionWithinBusinessController.get(idx, true, flow).toString
+                    editUrl = controllers.responsiblepeople.routes.PositionWithinBusinessController.get(idx, true, flow).toString,
+                    editLinkTag = "rp-positionwithinbusiness-edit"
                 ) {
 
                     <ul class="@{if (pos.positions.size > 1) { "list list-bullet" } else { "list"}}">
@@ -325,7 +342,8 @@
 
                  @checkYourAnswersRow(
                     question = Messages("responsiblepeople.position_within_business.startDate.heading", personName),
-                    editUrl = controllers.responsiblepeople.routes.PositionWithinBusinessStartDateController.get(idx, true, flow).toString()
+                    editUrl = controllers.responsiblepeople.routes.PositionWithinBusinessStartDateController.get(idx, true, flow).toString(),
+                    editLinkTag = "rp-positionstartdate-edit"
                 ) {
                     @pos.startDate.map(sd => sd.startDate).map(DateHelper.formatDate(_)).getOrElse("")
                 }
@@ -334,7 +352,8 @@
             @person.soleProprietorOfAnotherBusiness.map { anotherBusiness =>
                  @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.soleproprietor_for_other_business"),
-                    editUrl = controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.get(idx, true, flow).toString()
+                    editUrl = controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.get(idx, true, flow).toString(),
+                    editLinkTag = "rp-soleproprietor-edit"
                 ) {
                     @anotherBusiness.soleProprietorOfAnotherBusiness match {
                         case true => {@Messages("lbl.yes")}
@@ -346,7 +365,8 @@
             @person.vatRegistered.map { vr =>
                  @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.registered_for_vat"),
-                    editUrl = controllers.responsiblepeople.routes.VATRegisteredController.get(idx, true, flow).toString
+                    editUrl = controllers.responsiblepeople.routes.VATRegisteredController.get(idx, true, flow).toString,
+                    editLinkTag = "rp-registeredforvat-edit"
                 ) {
                     @vr match {
                         case VATRegisteredYes(regNo) => {@regNo}
@@ -358,7 +378,8 @@
             @person.saRegistered.map { sar =>
                  @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.registered_for_sa"),
-                    editUrl = controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(idx, true, flow).toString()
+                    editUrl = controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(idx, true, flow).toString(),
+                    editLinkTag = "rp-registeredforsa-edit"
                 ) {
                     @sar match {
                         case SaRegisteredYes(regNo) => {@regNo}
@@ -370,7 +391,8 @@
             @person.experienceTraining.map { ex =>
                  @checkYourAnswersRow(
                     question = getServicesHeading.toString(),
-                    editUrl = controllers.responsiblepeople.routes.ExperienceTrainingController.get(idx, true, flow).toString()
+                    editUrl = controllers.responsiblepeople.routes.ExperienceTrainingController.get(idx, true, flow).toString(),
+                    editLinkTag = "rp-training-edit"
                 ) {
                     @businessMatching.alphabeticalBusinessActivitiesLowerCase(false).map { types =>
                         @if(types.size > 1) {
@@ -393,7 +415,8 @@
             @person.training.map { tra =>
                  @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.training_in_anti_money_laundering"),
-                    editUrl = controllers.responsiblepeople.routes.TrainingController.get(idx, true, flow).toString
+                    editUrl = controllers.responsiblepeople.routes.TrainingController.get(idx, true, flow).toString,
+                    editLinkTag = "rp-traininginmlre-edit"
                 ) {
                     @tra match {
                         case TrainingYes(info) => {@info}
