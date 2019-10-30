@@ -21,7 +21,7 @@
 @import models.businessmatching.MoneyServiceBusiness
 @import utils._
 
-@(model: TradingPremises, isMsb: Boolean, index: Int, hasOneService: Boolean, hasOneMsbService: Boolean = None)(implicit request: Request[_], m: Messages, lang: Lang)
+@(model: TradingPremises, isMsb: Boolean, index: Int, hasOneService: Boolean, hasOneMsbService: Boolean)(implicit request: Request[_], m: Messages, lang: Lang)
 
 @header = {
     @heading("summary.checkyouranswers.title", "summary.tradingpremises")
@@ -30,11 +30,13 @@
     title = Messages("summary.checkyouranswers.title") + " - " + Messages("summary.tradingpremises"),
     heading = header
 ) {
+    <dl class="cya-summary-list">
+
     @model.yourTradingPremises.map { yta =>
 
         @if(isMsb) {
             @model.registeringAgentPremises.map { agentPremises =>
-                @checkYourAnswers(
+                @checkYourAnswersRow(
                     question = Messages("tradingpremises.agent.premises.title"),
                     editLinkTag = "tradingpremisessummarywho-edit",
                     editUrl = controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(index, true).toString
@@ -49,7 +51,7 @@
         }
 
         @model.businessStructure.map { x =>
-            @checkYourAnswers(
+            @checkYourAnswersRow(
                 question = Messages("tradingpremises.businessStructure.title"),
                 editLinkTag = "tradingpremisesbusinessstructure-edit",
                 editUrl = controllers.tradingpremises.routes.BusinessStructureController.get(index, true).toString
@@ -59,7 +61,7 @@
         }
 
         @model.agentCompanyDetails.map { x =>
-            @checkYourAnswers(
+            @checkYourAnswersRow(
                 question = Messages("tradingpremises.youragent.company.name"),
                 editLinkTag = "tradingpremisesagentcompanyname-edit",
                 editUrl = controllers.tradingpremises.routes.AgentCompanyDetailsController.get(index, true).toString
@@ -69,7 +71,7 @@
         }
 
         @model.agentName.map { x =>
-            @checkYourAnswers(
+            @checkYourAnswersRow(
                 question = Messages("tradingpremises.agentname.title"),
                 editLinkTag = "tradingpremisesagentnametitle-edit",
                 editUrl = controllers.tradingpremises.routes.AgentNameController.get(index, true).toString
@@ -87,7 +89,7 @@
         }
 
         @model.agentPartnership.map { x =>
-            @checkYourAnswers(
+            @checkYourAnswersRow(
                 question = Messages("tradingpremises.agentpartnership.title"),
                 editLinkTag = "tradingpremisesagentpartnershiptitle-edit",
                 editUrl = controllers.tradingpremises.routes.AgentPartnershipController.get(index, true).toString
@@ -98,7 +100,7 @@
 
         @model.agentCompanyDetails.map { x =>
             @x.companyRegistrationNumber.map { crn =>
-                @checkYourAnswers(
+                @checkYourAnswersRow(
                     question = Messages("tradingpremises.youragent.crn"),
                     editLinkTag = "tradingpremisesyouragentcrn-edit",
                     editUrl = controllers.tradingpremises.routes.AgentCompanyDetailsController.get(index, true).toString
@@ -108,15 +110,15 @@
             }
         }
 
-        @checkYourAnswers(
+        @checkYourAnswersRow(
             question = Messages("tradingpremises.summary.tradingname"),
-            editLinkTag = "tradingpremisedsummaryaddress-edit",
+            editLinkTag = "tradingpremisessummarytradingname-edit",
             editUrl = controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, true).toString
         ) {
             <p>@yta.tradingName</p>
         }
 
-        @checkYourAnswers(
+        @checkYourAnswersRow(
             question = Messages("tradingpremises.summary.address"),
             editLinkTag = "tradingpremisedsummaryaddress-edit",
             editUrl = controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, true).toString
@@ -127,7 +129,7 @@
         }
 
         @yta.startDate.map { startDate =>
-            @checkYourAnswers(
+            @checkYourAnswersRow(
                 question = Messages("tradingpremises.startDate.title"),
                 editLinkTag = "tradingprmisedsummarystartdate-edit",
                 editUrl = controllers.tradingpremises.routes.ActivityStartDateController.get(index, true).toString
@@ -136,7 +138,7 @@
             }
         }
         @yta.isResidential.map { residential =>
-            @checkYourAnswers(
+            @checkYourAnswersRow(
                 question = Messages("tradingpremises.isResidential.title"),
                 editLinkTag = "tradingpremisessummaryresidential-edit",
                 editUrl = controllers.tradingpremises.routes.IsResidentialController.get(index, true).toString
@@ -153,7 +155,7 @@
         }
 
         @model.whatDoesYourBusinessDoAtThisAddress.map { ba =>
-            @checkYourAnswers(
+            @checkYourAnswersRow(
                 question = Messages("tradingpremises.whatdoesyourbusinessdo.title"),
                 editLinkTag = "tradingpremisedsummaryservices-edit",
                 editUrl = if(!hasOneService) {
@@ -169,7 +171,7 @@
         }
 
         @model.msbServices.map { msb =>
-            @checkYourAnswers(
+            @checkYourAnswersRow(
                 question = Messages("tradingpremises.msb.services.title"),
                 editLinkTag = "tradingpremisesmsbservices-edit",
                 editUrl = if(!hasOneMsbService) {
@@ -200,6 +202,8 @@
             }
         }
     }
+
+    </dl>
 
     @form(EmptyForm, controllers.tradingpremises.routes.DetailedAnswersController.post(index)) {
         @submit(false, Some(Messages("button.checkyouranswers.tradingpremises")), false)
