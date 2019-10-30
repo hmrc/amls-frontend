@@ -96,12 +96,12 @@ class summary_detailsSpec extends TestHelper with HtmlAssertions with TableDrive
       def view = views.html.tradingpremises.summary_details(tradingPremises, isMsb, 1, false, false)
 
       forAll(sectionChecks) { (key, check) => {
-        val hTwos = doc.select("span.bold")
+        val elements = doc.select("span.bold")
 
-        val hTwo = hTwos.toList.find(e => e.text() == Messages(key))
+        val maybeElement = elements.toList.find(e => e.text() == Messages(key))
 
-        hTwo must not be (None)
-        val section = hTwo.get.parents().select("div").first()
+        maybeElement must not be (None)
+        val section = maybeElement.get.parents().select("div").first()
         check(section) must be(true)
       }}
     }
@@ -121,11 +121,24 @@ class summary_detailsSpec extends TestHelper with HtmlAssertions with TableDrive
 
       def view = views.html.tradingpremises.summary_details(tradingPremises, isMsb, 1, false, false)
 
-      val hTwo = doc.select("div.cya-summary-list__row").toList.find(e => e.text().contains(Messages("tradingpremises.whatdoesyourbusinessdo.title")))
-      val servicesSection = hTwo.get.parent.toString
+      val maybeElement = doc.select("div.cya-summary-list__row").toList.find(e => e.text().contains(Messages("tradingpremises.whatdoesyourbusinessdo.title")))
+      val servicesSection = maybeElement.get.parent.toString
 
       servicesSection must include(Messages("button.edit"))
 
+    }
+
+    "not show the edit link for business services if the business sector has only one business service" in new ViewFixture {
+
+      val isMsb = true
+      val testData = WhatDoesYourBusinessDo(Set(MoneyServiceBusiness))
+
+      def view = views.html.tradingpremises.summary_details(tradingPremises.copy(whatDoesYourBusinessDoAtThisAddress = Some(testData)), isMsb, 1, true, false)
+
+      val maybeElement = doc.select("div.cya-summary-list__row").toList.find(e => e.text().contains(Messages("tradingpremises.whatdoesyourbusinessdo.title")))
+      val servicesSection = maybeElement.get.toString
+
+      servicesSection mustNot include(Messages("button.edit"))
     }
   }
 }
