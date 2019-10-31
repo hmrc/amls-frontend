@@ -79,7 +79,7 @@ class summary_detailsSpec extends TestHelper with HtmlAssertions with TableDrive
   "The summary details page" must {
     val sectionChecks = Table[String, Element => Boolean](
       ("title key", "check"),
-      ("tradingpremises.summary.address", checkElementTextIncludes(_, "Trading address 1 2 asdfasdf")),
+      ("tradingpremises.summary.address", checkElementTextIncludes(_, "Trading address Answer: 1 2 asdfasdf")),
       ("tradingpremises.startDate.title", checkElementTextIncludes(_, DateHelper.formatDate(new LocalDate(1990, 2, 24)))),
       ("tradingpremises.isResidential.title", checkElementTextIncludes(_, "lbl.yes")),
       ("tradingpremises.whatdoesyourbusinessdo.title", checkElementTextOnlyIncludes(_, "Bill payment service provider", "Estate agency business", "Money service business")),
@@ -93,15 +93,15 @@ class summary_detailsSpec extends TestHelper with HtmlAssertions with TableDrive
     "load summary details page when it is an msb" in new ViewFixture {
 
       val isMsb = true
-      def view = views.html.tradingpremises.summary_details(tradingPremises, isMsb, 1, false, false)
+      def view = views.html.tradingpremises.summary_details(tradingPremises, isMsb, 1, false)
 
       forAll(sectionChecks) { (key, check) => {
-        val elements = doc.select("span.bold")
+        val hTwos = doc.select("section.check-your-answers h2")
 
-        val maybeElement = elements.toList.find(e => e.text() == Messages(key))
+        val hTwo = hTwos.toList.find(e => e.text() == Messages(key))
 
-        maybeElement must not be (None)
-        val section = maybeElement.get.parents().select("div").first()
+        hTwo must not be (None)
+        val section = hTwo.get.parents().select("section").first()
         check(section) must be(true)
       }}
     }
@@ -109,7 +109,7 @@ class summary_detailsSpec extends TestHelper with HtmlAssertions with TableDrive
     "load summary details page when it is not an msb" in new ViewFixture {
 
       val isNotMsb = false
-      def view = views.html.tradingpremises.summary_details(tradingPremises, isNotMsb, 1, false, false)
+      def view = views.html.tradingpremises.summary_details(tradingPremises, isNotMsb, 1, false)
 
       html mustNot include(Messages("tradingpremises.summary.who-uses"))
     }
@@ -119,10 +119,10 @@ class summary_detailsSpec extends TestHelper with HtmlAssertions with TableDrive
       val isMsb = true
       val testData = WhatDoesYourBusinessDo(Set(MoneyServiceBusiness))
 
-      def view = views.html.tradingpremises.summary_details(tradingPremises, isMsb, 1, false, false)
+      def view = views.html.tradingpremises.summary_details(tradingPremises, isMsb, 1, false)
 
-      val maybeElement = doc.select("div.cya-summary-list__row").toList.find(e => e.text().contains(Messages("tradingpremises.whatdoesyourbusinessdo.title")))
-      val servicesSection = maybeElement.get.parent.toString
+      val hTwo = doc.select("section.check-your-answers h2").toList.find(e => e.text() == Messages("tradingpremises.whatdoesyourbusinessdo.title"))
+      val servicesSection = hTwo.get.parent.toString
 
       servicesSection must include(Messages("button.edit"))
 
@@ -133,12 +133,12 @@ class summary_detailsSpec extends TestHelper with HtmlAssertions with TableDrive
       val isMsb = true
       val testData = WhatDoesYourBusinessDo(Set(MoneyServiceBusiness))
 
-      def view = views.html.tradingpremises.summary_details(tradingPremises.copy(whatDoesYourBusinessDoAtThisAddress = Some(testData)), isMsb, 1, true, false)
+      def view = views.html.tradingpremises.summary_details(tradingPremises.copy(whatDoesYourBusinessDoAtThisAddress = Some(testData)), isMsb, 1, true)
 
-      val maybeElement = doc.select("div.cya-summary-list__row").toList.find(e => e.text().contains(Messages("tradingpremises.whatdoesyourbusinessdo.title")))
-      val servicesSection = maybeElement.get.toString
+      val hTwo = doc.select("section.check-your-answers h2").toList.find(e => e.text() == Messages("tradingpremises.whatdoesyourbusinessdo.title"))
+      val servicesSection = hTwo.get.parent.toString
 
-      servicesSection mustNot include(Messages("button.edit"))
+      servicesSection mustNot include("Edit")
     }
   }
 }
