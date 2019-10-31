@@ -65,5 +65,4 @@ class LegalNameInputController @Inject()(val dataCacheConnector: DataCacheConnec
         }
       }
   }
-
 }

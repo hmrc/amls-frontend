@@ -16,12 +16,11 @@
 
 package controllers.responsiblepeople
 
-import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.{Inject, Singleton}
 import models.responsiblepeople.{PreviousName, ResponsiblePerson}
-import org.joda.time.LocalDate
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.legal_name
 
@@ -89,5 +88,4 @@ class LegalNameController @Inject()(val dataCacheConnector: DataCacheConnector,
 
     isFirstNameEmpty && isMiddleNameEmpty && isLastNameEmpty && isHasPreviousNameTrue
   }
-
 }

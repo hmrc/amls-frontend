@@ -22,7 +22,7 @@
 
 @header = {
     @components.back_link()
-    @errorSummary(f)
+    @errorSummaryWithPlaceholder(f, personName)
 }
 
 @main(
@@ -36,13 +36,14 @@
             heading = Messages("responsiblepeople.legalNameInput.heading", personName),
             section = "summary.responsiblepeople",
             hint = "responsiblepeople.legalnamechangedate.hint",
-            panel = false
+            panel = false,
+            errorGroupPlaceholder = personName
         ) {
             <input type ="hidden" name="hasPreviousName" value=true />
 
-            @input(f("firstName"), "responsiblepeople.personName.otherfirstnames")
+            @inputWithErrorPlaceholder(f("firstName"), "responsiblepeople.personName.otherfirstnames", personName)
             @input(f("middleName"), "responsiblepeople.personName.othermiddlenames")
-            @input(f("lastName"), "responsiblepeople.personName.otherlastnames")
+            @inputWithErrorPlaceholder(f("lastName"), "responsiblepeople.personName.otherlastnames", personName)
         }
 
         @submit(edit)

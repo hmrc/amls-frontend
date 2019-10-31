@@ -22,7 +22,7 @@
 
 @header = {
     @components.back_link()
-    @errorSummary(f)
+    @errorSummaryWithPlaceholder(f, personName)
 }
 
 @supportingContent = {
@@ -40,7 +40,8 @@
             heading = Messages("responsiblepeople.legalName.heading", personName),
             section = "summary.responsiblepeople",
             supportingContent = supportingContent,
-            panel = false
+            panel = false,
+            errorGroupPlaceholder = personName
         ) {
             <input type ="hidden" name="firstName" value="@f("firstName").value" />
             <input type ="hidden" name="middleName" value="@f("middleName").value" />
@@ -57,7 +58,6 @@
                 value = "false"
             )
         }
-
         @submit(edit)
     }
 }

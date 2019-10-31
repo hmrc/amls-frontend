@@ -16,22 +16,17 @@
 
 package models.responsiblepeople
 
-import cats.data.Validated.{Invalid, Valid}
+import cats.data.Validated.Valid
+import jto.validation._
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.{ValidationError, _}
-import models.tcsp.ServicesOfAnotherTCSP
-import play.api.libs.json.{Json, Reads, Writes}
-import utils.MappingUtils.Implicits._
+import play.api.libs.json.{Json, Reads}
 
-case class PreviousName(
-                         hasPreviousName: Option[Boolean] = None,
-                         firstName: Option[String],
-                         middleName: Option[String],
-                         lastName: Option[String]
-                       ) {
+case class PreviousName(hasPreviousName: Option[Boolean] = None,
+                        firstName: Option[String],
+                        middleName: Option[String],
+                        lastName: Option[String]) {
 
   val fullName = Seq(firstName, middleName, lastName).flatten[String].mkString(" ")
-
 }
 
 object PreviousName {
@@ -39,29 +34,28 @@ object PreviousName {
   import models.FormTypes._
   import utils.MappingUtils.Implicits._
 
-
   implicit val formR: Rule[UrlFormEncoded, PreviousName] = From[UrlFormEncoded] { __ =>
 
     import jto.validation.forms.Rules._
 
-    type I = (Option[String], Option[String], Option[String])
+    val firstNameRule = genericNameRule("error.rp.previous.first.invalid",
+      "error.rp.previous.first.length.invalid",
+      "error.rp.previous.first.char.invalid")
 
-    val iR = Rule[I, I] {
-      case names@(first, middle, last) if names.productIterator.collectFirst {
-        case Some(_) => true
-      }.isDefined =>
-        Valid(names)
-      case _ =>
-        Invalid(Seq(Path -> Seq(ValidationError("error.rp.previous.invalid"))))
-    }
+    val middleNameRule = genericNameRule("",
+      "error.rp.previous.middle.length.invalid",
+      "error.rp.previous.middle.char.invalid")
 
-    (__ \ "hasPreviousName").read[Option[Boolean]] flatMap {
-      case Some(true) => (
-        (
-          (__ \ "firstName").read(optionR(genericNameRule())) ~
-            (__ \ "middleName").read(optionR(genericNameRule())) ~
-            (__ \ "lastName").read(optionR(genericNameRule()))
-          ).tupled andThen iR).map(t => PreviousName(Some(true), t._1, t._2, t._3))
+    val lastNameRule = genericNameRule("error.rp.previous.last.invalid",
+      "error.rp.previous.last.length.invalid",
+      "error.rp.previous.last.char.invalid")
+
+    (__ \ "hasPreviousName").read[Boolean].withMessage("error.required.rp.hasPreviousName") flatMap {
+      case true => (
+        (__ \ "firstName").read(firstNameRule) ~
+          (__ \ "middleName").read(optionR(middleNameRule)) ~
+          (__ \ "lastName").read(lastNameRule)
+        ).tupled.map(t => PreviousName(Some(true), Some(t._1), t._2, Some(t._3)))
       case _ => Rule.fromMapping { _ => Valid(PreviousName(Some(false), None, None, None)) }
     }
   }
@@ -91,11 +85,5 @@ object PreviousName {
       (__ \ "lastName").readNullable[String]
   }.apply(PreviousName.apply _)
 
-  implicit val jsonWrites = Writes[PreviousName] { pn =>
-    Json.obj("hasPreviousName" -> pn.hasPreviousName,
-      "firstName" -> pn.firstName,
-      "middleName" -> pn.middleName,
-      "lastName" -> pn.lastName
-    )
-  }
+  implicit val jsonWrites = Json.writes[PreviousName]
 }
