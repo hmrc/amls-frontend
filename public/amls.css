@@ -2089,3 +2089,8 @@ input.form-control-error[type="password"],
   -webkit-box-shadow: none;
   box-shadow: none
 }
+
+.login-event  .button,
+.login-event  .button:visited {
+  background-color: white;
+}
