@@ -143,7 +143,7 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with OneAppPerSuite wit
 
           val result = controller.post(1, true)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.YourTradingPremisesController.getIndividual(1).url))
+          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
 
         }
       }

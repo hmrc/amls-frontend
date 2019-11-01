@@ -28,7 +28,7 @@ import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -252,7 +252,7 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
       val result = controller.post(1,edit = true)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.YourTradingPremisesController.getIndividual(1).url)
+      redirectLocation(result) mustBe Some(routes.DetailedAnswersController.get(1).url)
     }
 
     "set the hasChanged flag to true" in new Fixture {
