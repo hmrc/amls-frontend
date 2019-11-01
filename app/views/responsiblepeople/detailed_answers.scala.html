@@ -115,54 +115,44 @@
                 @checkYourAnswersRow(
                     question = Messages("responsiblepeople.legalName.heading", personName),
                     editUrl = controllers.responsiblepeople.routes.LegalNameController.get(idx, true, flow).toString(),
-                    editLinkTag = "rp-legalname-edit"
+                    editLinkTag = "rp-legalname-yes-no-edit"
+                ) {
+                    @ln.hasPreviousName match {
+                        case Some(false) => {
+                            <p>@Messages("lbl.no")</p>
+                        }
+                        case Some(true) => {
+                            <p>@Messages("lbl.yes")</p>
+                        }
+                    }
+                }
+
+                @if(person.legalName.flatMap(f => f.hasPreviousName) == Some(true)) {
+                    @checkYourAnswersRow(
+                        question = Messages("responsiblepeople.legalNameInput.heading", personName),
+                        editUrl = controllers.responsiblepeople.routes.LegalNameInputController.get(idx, true, flow).toString(),
+                        editLinkTag = "rp-legalname-edit"
                     ) {
                         @ln.hasPreviousName match {
-                            case Some(false) => {<p>@Messages("lbl.no")</p>}
                             case Some(true) => {
                                 <ul class="list">
                                     <li>@ln.fullName</li>
                                 </ul>
                             }
                         }
-        @detailedAnswers(
-            question = Messages("responsiblepeople.legalName.heading", personName),
-            editUrl = controllers.responsiblepeople.routes.LegalNameController.get(idx, true, flow).toString(),
-            dataItem = person.legalName
-            ) { ln =>
-                @ln.hasPreviousName match {
-                    case Some(false) => {<p>@Messages("lbl.no")</p>}
-                    case Some(true) => {<p>@Messages("lbl.yes")</p>}
+                    }
                 }
-        }
 
-        @if(person.legalName.flatMap(f => f.hasPreviousName) == Some(true)) {
-            @detailedAnswers(
-                question = Messages("responsiblepeople.legalNameInput.heading", personName),
-                editUrl = controllers.responsiblepeople.routes.LegalNameInputController.get(idx, true, flow).toString(),
-                dataItem = person.legalName
-            ) { ln =>
-                @ln.hasPreviousName match {
-                    case Some(true) => {
-                        <ul class="list">
-                            <li>@ln.fullName</li>
-                        </ul>
+                @person.legalNameChangeDate.map { legalNameChangeDate =>
+                    @checkYourAnswersRow(
+                        question = Messages("responsiblepeople.legalnamechangedate.heading", personName),
+                        editUrl = controllers.responsiblepeople.routes.LegalNameChangeDateController.get(idx, true, flow).toString(),
+                        editLinkTag = "rp-legalnamechangedate-edit"
+                    ) {
+                        @DateHelper.formatDate(legalNameChangeDate)
                     }
                 }
             }
-            }
-        }
-
-            @person.legalNameChangeDate.map { legalNameChangeDate =>
-                @checkYourAnswersRow(
-                    question = Messages("responsiblepeople.legalnamechangedate.heading", personName),
-                    editUrl = controllers.responsiblepeople.routes.LegalNameChangeDateController.get(idx, true, flow).toString(),
-                    editLinkTag = "rp-legalnamechangedate-edit"
-                ) {
-                    @DateHelper.formatDate(legalNameChangeDate)
-                }
-            }
-
 
             @person.knownBy.map { other =>
                 @checkYourAnswersRow(
