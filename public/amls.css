@@ -188,7 +188,7 @@ ul.list.activities-list, ul.list.activities-list li {
    all text colour takes on regular anchor colour  */
 
 a.progress-step {
-  background-color: #dee0e2;
+  background-color: #f3f2f1;
   color: #0b0c0c;
   display: block;
   /* for IE8 */
@@ -208,14 +208,14 @@ a.progress-step {
 /* give the whole step component a focus outline */
 
 .progress-step:focus {
-  outline: 3px solid #ffbf47;
+  outline: 3px solid #ffdd00;
 }
 
 
 /* mimic the anchor colours inside this block-level component */
 
 .progress-step__edit {
-  color: #005ea5;
+  color: #1d70b8;
 }
 
 .progress-step__edit:focus,
@@ -242,7 +242,7 @@ a.progress-step,
 
 .progress-step--details {
   background-color: #f8f8f8;
-  border-bottom: 3px solid #dee0e2;
+  border-bottom: 3px solid #f3f2f1;
   padding: 5px 10px 15px;
 }
 
@@ -560,7 +560,7 @@ div.grid-layout {
 .application-submit,
 .user-attention {
   background-color: #f8f8f8;
-  border-bottom: #dee0e2 solid 3px;
+  border-bottom: #f3f2f1 solid 3px;
   margin-left: 30px;
   padding: 20px;
   padding-bottom: 30px;
@@ -568,7 +568,7 @@ div.grid-layout {
 
 
 .user-attention{
-  background-color: #005ea5;
+  background-color: #1d70b8;
   color: #ffffff;
   border-bottom: none;
 }
@@ -640,11 +640,11 @@ select {
 
 .amls-error-summary {
   background-color: #fff;
-  border: 4px solid #b10e1e;
+  border: 4px solid #d4351c;
 }
 
 .amls-error-summary:focus {
-    outline: 3px solid #ffbf47;
+    outline: 3px solid #ffdd00;
 }
 
 .amls-error-summary li,
@@ -655,11 +655,11 @@ select {
 
 .error-notification,
 .amls-error-summary li > a {
-  color: #b10e1e;
+  color: #d4351c;
 }
 
 .form-field--error {
-  border-color: #b10e1e;
+  border-color: #d4351c;
   border-left-width: 4px;
 }
 
@@ -913,6 +913,16 @@ h2#complete-header {
   border-bottom: 1px solid #b1b4b6;
 }
 
+.cya-summary-list__key {
+  width: 50%;
+}
+
+@media (max-width: 640px) {
+  .cya-summary-list__key {
+    width: auto;
+  }
+}
+
 @media (max-width: 640px) {
   .cya-summary-list__key,
   .cya-summary-list__value,
@@ -935,6 +945,13 @@ h2#complete-header {
 .cya-summary-list__actions {
   white-space: nowrap;
   padding-right: 0;
+  text-align: right;
+}
+
+@media (max-width: 640px) {
+  .cya-summary-list__actions {
+    text-align: left;
+  }
 }
 
 @media (max-width: 640px) {
@@ -982,7 +999,7 @@ h2#complete-header {
 }
 
 .check-your-answers .change-answer {
-  color: #005ea5;
+  color: #1d70b8;
   font-weight: bold;
   line-height: 1.25;
   margin: 0 0 .21053em;
@@ -1067,7 +1084,7 @@ h2#complete-header {
 .summary-table a:link,
 .summary-table a:visited,
 .summary-table a:hover {
-  color: #005ea5;
+  color: #1d70b8;
 }
 
 .summary-table a:link,
@@ -1191,7 +1208,7 @@ fieldset.panel-indent legend {
 
 .declaration {
   background: #f8f8f8;
-  border-bottom: #dee0e2 solid 3px;
+  border-bottom: #f3f2f1 solid 3px;
   margin: 0 0 40px 0;
   padding: 20px;
 }
@@ -1287,7 +1304,7 @@ fieldset.panel-indent legend {
 
 table.notifications thead th,
 table.notifications thead td {
-  background-color: #005ea5;
+  background-color: #1d70b8;
   color: #fff;
 }
 
@@ -1310,7 +1327,7 @@ table.notifications thead td {
 }
 
 .unread .circle {
-  background: #00823b;
+  background: #00703c;
   border-radius: 50%;
   display: block;
   font-size: 12px;
@@ -1334,7 +1351,7 @@ table.notifications thead td {
 }
 
 .messaging {
-  background-color: #005ea5;
+  background-color: #1d70b8;
   margin: 0;
   padding-left: 20px;
   padding: 10px 20px;
@@ -1497,7 +1514,7 @@ details {
 
 .full-width-banner {
     display: none;
-    background-color: #005ea5;
+    background-color: #1d70b8;
     color: #fff;
 }
 .full-width-banner--show {
@@ -1549,7 +1566,7 @@ li.autocomplete__option {
 
 /* login event */
 .login-event {
-  background-color: #005ea5;
+  background-color: #1d70b8;
   color: white;
   padding: 25px 15px 15px;
   margin-bottom: 30px;
@@ -1577,7 +1594,7 @@ li.autocomplete__option {
 .login-event .button {
   background-color: white;
   margin-bottom: .5em;
-  color: #005ea5;
+  color: #1d70b8;
   box-shadow: 0 2px 0 #004172;
 }
 
@@ -1586,7 +1603,7 @@ li.autocomplete__option {
 }
 
 .login-event .button:focus {
-  background-color: #ffbf47;
+  background-color: #ffdd00;
 }
 
 .link-back {
@@ -1703,7 +1720,7 @@ h2.override-heading-medium {
 
 .form-field--error > input,
 .form-field--error > textarea {
-    border-color: #b10e1e;
+    border-color: #d4351c;
 }
 
 legend .page-header {
@@ -1718,3 +1735,357 @@ legend .page-header {
   margin-left: 0.6em;
 }
 
+/*=========================
+updated 15 Oct 2019 14:14 BST
+Palette change
+https://designnotes.blog.gov.uk/2019/07/29/weve-updated-the-gov-uk-colours-and-font/
+=========================*/
+
+.button--secondary,
+.button--secondary:visited,
+.button--secondary.disabled:hover,
+.button--secondary[disabled="disabled"]:hover,
+.button--secondary[disabled]:hover,
+.block-label,
+.block-label--stacked,
+.footer,
+.box--shaded,
+.side-nav__link:hover,
+.dataTable tbody .status--unconfirmed,
+.tag,
+.tabs-nav .tabs-nav__tab:focus,
+.tabs-nav .tabs-nav__tab:hover,
+.tabs-nav .tabs-nav__tab:active,
+.tabs-nav a.tabs-nav__tab:focus,
+.tabs-nav .tabs-nav__tab.link-style:focus,
+.tabs-nav .tabs-nav__tab.button--link-style:focus,
+.tabs-nav a.tabs-nav__tab:hover,
+.tabs-nav .tabs-nav__tab.link-style:hover,
+.tabs-nav .tabs-nav__tab.button--link-style:hover,
+.tabs-nav a.tabs-nav__tab:active,
+.tabs-nav .tabs-nav__tab.link-style:active,
+.tabs-nav .tabs-nav__tab.button--link-style:active,
+.annual-summaries--group .statement__summary--parent[aria-expanded=true],
+.payments .table-label.selected,
+.payments .table-label:hover,
+html {
+  background-color: #f3f2f1;
+}
+.button--secondary:active {
+  -webkit-box-shadow: 0 0 0 #f3f2f1;
+  box-shadow: 0 0 0 #f3f2f1
+}
+.block-label,
+.block-label--stacked {
+  border-color: #f3f2f1;
+}
+.dynamically-displayed {
+  border-left: 5px solid #f3f2f1;
+}
+.explore a,
+.explore--inside-government a,
+.explore--inline a,
+.explore .link-style,
+.explore--inside-government .link-style,
+.explore--inline .link-style,
+.explore .button--link-style,
+.explore--inside-government .button--link-style,
+.explore--inline .button--link-style,
+.explore--inline__links {
+  color: #f3f2f1;
+}
+.indent {
+  border-left-color: #f3f2f1;
+}
+.services-dashboard .service-option--links:first-child .service-option--item,
+.account-menu__link:hover,
+.is-smaller .account-menu__link--back {
+  border-bottom-color: #f3f2f1;
+}
+
+.heading--underlined,
+.section--branded h2,
+.table--light-header thead,
+.table__header--highlight,
+.business-tax .section--branded h2,
+.is-smaller .account-menu__link--home.account-menu__link--active:hover,
+.account-menu__link--active,
+.account-menu__link--active:visited {
+  border-bottom-color: #1d70b8;
+}
+.heading-large--blue,
+.button.button--link,
+a.back-to-top-link:visited,
+.back-to-top-link.link-style:visited,
+.back-to-top-link.button--link-style:visited,
+.page-nav__link,
+.banner-links,
+.side-nav--child .side-nav__list--selected .side-nav__link,
+.dataTables_paginate a,
+.dataTables_paginate .link-style,
+.dataTables_paginate .button--link-style,
+.accordion__button:visited,
+.toggle__button,
+.tabs-nav .tabs-nav__tab:visited,
+.tabs-nav__tab,
+.payments .tab,
+.services-dashboard .service-option--links .service-option--link:link,
+.link,
+.link:active,
+details summary,
+a,
+.link-style,
+.button--link-style,
+.button--link-style,
+.subnav a:visited,
+.subnav .link-style:visited,
+.subnav .button--link-style:visited,
+.is-smaller .subnav__section a:hover,
+.is-smaller .subnav__section .link-style:hover,
+.is-smaller .subnav__section .button--link-style:hover {
+  color: #1d70b8
+}
+.brand-border--top,
+.section--blue-top,
+.footer,
+.service-info {
+  border-top-color: #1d70b8;
+}
+.button--notification,
+.button--notification:visited,
+.button--notification.disabled:hover,
+.button--notification[disabled="disabled"]:hover,
+.button--notification[disabled]:hover,
+.alpha-banner .phase-tag,
+.beta-banner .phase-tag,
+.phase-tag,
+.side-nav__list--selected .side-nav__link,
+.side-nav__list--selected:hover .side-nav__link,
+.highlight-message--dark,
+.hero,
+.paye-statements .sidebar-links__item.selected,
+option:active,
+option:checked,
+.phase-banner .phase-tag,
+.phase-banner-alpha .phase-tag,
+.phase-banner-beta .phase-tag,
+.phase-tag,
+.full-width-banner,
+.hmrc-banner .phase-tag {
+  background-color: #1d70b8;
+}
+select:focus::-ms-value {
+  background-color: #1d70b8;
+}
+.button--notification:active {
+  -webkit-box-shadow: 0 0 0 #1d70b8;
+  box-shadow: 0 0 0 #1d70b8;
+}
+.attorneyBanner,
+.panel-indent--info,
+.delegation-banner {
+  border-left-color: #1d70b8;
+}
+
+.page-nav__link:focus,
+.js-enabled .add-focus,
+.modal-dialog__content:focus,
+.button:focus,
+details summary:focus,
+.error-summary:focus {
+  outline-color: #ffdd00;
+}
+.multiple-choice [type=radio]:focus+label::before {
+  -webkit-box-shadow: 0 0 0 4px #ffdd00;
+  box-shadow: 0 0 0 4px #ffdd00;
+}
+.multiple-choice [type=checkbox]:focus+label::before {
+  -webkit-box-shadow: 0 0 0 3px #ffdd00;
+  box-shadow: 0 0 0 3px #ffdd00
+}
+.account-menu__link:focus,
+.is-smaller .account-menu__link--home:focus,
+.is-smaller .account-menu__link--menu:focus,
+.is-smaller .account-menu__link--home.account-menu__link--active:focus,
+.is-smaller .account-menu__link--menu.account-menu__link--active:focus {
+  border-bottom-color: #ffdd00;
+}
+
+
+button,
+.button,
+button:visited,
+.button:visited,
+button.disabled:hover,
+button[disabled="disabled"]:hover,
+button[disabled]:hover,
+.button.disabled:hover,
+.button[disabled="disabled"]:hover,
+.button[disabled]:hover,
+.button--small,
+.button--small:visited,
+.button--small.disabled:hover,
+.button--small[disabled="disabled"]:hover,
+.button--small[disabled]:hover,
+.toggle__button--active,
+.toggle__button--active:hover,
+.toggle__button--active:focus,
+.button[disabled="disabled"] {
+  background-color: #00703c;
+}
+button:active,
+.button:active,
+.button--small:active {
+  -webkit-box-shadow: 0 0 0 #00703c;
+  box-shadow: 0 0 0 #00703c;
+}
+.list--ticks li::before,
+.tick,
+.form-hint-list-item--valid {
+  color: #00703c;
+}
+
+.button--alert,
+.button--alert:visited,
+.button--alert.disabled:hover,
+.button--alert[disabled="disabled"]:hover,
+.button--alert[disabled]:hover,
+.marker-column__marker,
+.reminder.urgent a,
+.reminder.urgent .link-style,
+.reminder.urgent .button--link-style,
+.alert-block,
+.alert--important,
+.tabs-nav .tabs-nav__tab .count,
+.flag.flag--urgent,
+.highlight-block--red,
+.main-nav .count,
+.badge {
+  background-color: #d4351c;
+}
+.button--alert:active {
+  -webkit-box-shadow: 0 0 0 #d4351c;
+  box-shadow: 0 0 0 #d4351c;
+}
+.email-form-errors .error-notification,
+.annual-summaries--group .alert--text,
+.sent-in-error,
+.business-tax .content__body .flag.flag--urgent,
+.error-message,
+.error-summary .error-summary-list a,
+.error-summary .error-summary-list .link-style,
+.error-summary .error-summary-list .button--link-style {
+  color: #d4351c;
+}
+.email-form-errors .error-notification,
+.attorneyBanner--client-request-rejected,
+.business-tax .content__body .flag.flag--urgent,
+.form-group-error {
+  border-left-color: #d4351c;
+}
+.business-tax .alert--failure,
+.form-control-error,
+textarea.form-control-error,
+input.form-control-error[type="text"],
+input.form-control-error[type="password"],
+.error-summary {
+  border-color: #d4351c;
+}
+
+.form-control-error.form-control-error.form-control-error {
+  border-color: #d4351c;
+}
+
+/* =========================
+ updated 8 Oct 2019 16:07 BST
+ focus states
+ changes made to bring in line with
+ https://designnotes.blog.gov.uk/2019/07/29/weve-made-the-gov-uk-design-system-more-accessible/
+ ========================= */
+
+  a:focus,
+  .error-summary .error-summary-list a:focus,
+  details summary:focus {
+    outline: 3px solid transparent;
+    color: #0b0c0c;
+    background-color: #fd0;
+    -webkit-box-shadow: 0 -2px #fd0, 0 4px #0b0c0c;
+    box-shadow: 0 -2px #fd0, 0 4px #0b0c0c;
+    text-decoration: none;
+  }
+  details summary:focus .summary {
+    text-decoration: none;
+  }
+  input:focus,
+  textarea:focus,
+  select:focus,
+  #global-header input:focus {
+    outline-color: #fd0;
+  }
+  .button {
+    border: 2px solid transparent;
+  }
+  .button:focus:not(:active):not(:hover) {
+    border-color: #fd0;
+    color: #0b0c0c;
+    background-color: #fd0;
+    -webkit-box-shadow: 0 2px 0 #0b0c0c;
+    box-shadow: 0 2px 0 #0b0c0c;
+  }
+  .button:focus {
+    border-color: #fd0;
+    outline: 3px solid transparent;
+    -webkit-box-shadow: inset 0 0 0 1px #fd0;
+    box-shadow: inset 0 0 0 1px #fd0;
+  }
+  .autocomplete__input:focus,
+  .form-control:focus {
+    outline: 3px solid #fd0;
+    outline-offset: 0;
+    -webkit-box-shadow: inset 0 0 0 2px;
+    box-shadow: inset 0 0 0 2px;
+  }
+  .multiple-choice [type=checkbox]:focus+label::before {
+    border-width: 3px;
+  }
+
+  .report-error .report-error__toggle:focus,
+  #footer a:focus,
+  #global-header .header-proposition #proposition-links li a:focus,
+  #global-header .header-proposition a.menu:focus,
+  #global-header #logo:focus {
+    color: #0b0c0c;
+  }
+  #global-header #logo:focus img {
+    filter: invert(1);
+  }
+  .account-menu__link:focus,
+  .is-smaller .account-menu__link--home:focus,
+  .is-smaller .account-menu__link--menu:focus,
+  .is-smaller .account-menu__link--home.account-menu__link--active:focus,
+  .is-smaller .account-menu__link--menu.account-menu__link--active:focus {
+    color: #0b0c0c;
+    background-color: #fd0;
+  }
+  @media (min-width: 641px){
+    #footer .footer-meta .copyright a {
+      background-position: 50% 0;
+      float: right;
+    }
+  }
+  #footer .footer-meta .copyright a:focus {
+    background-color: #fd0;
+  }
+
+  textarea:focus {
+    outline: 3px solid #fd0;
+    outline-offset: 0;
+    -webkit-box-shadow: inset 0 0 0 2px;
+    box-shadow: inset 0 0 0 2px;
+  }
+
+.form-control-error.form-control-error:focus {
+  border-color: #0b0c0c;
+  -webkit-box-shadow: none;
+  box-shadow: none
+}

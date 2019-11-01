@@ -189,7 +189,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
 
       }
 
-      "redirect to the Trading Premises details page on submitting false and edit true" in new Fixture {
+      "redirect to the details page on submitting false and edit true" in new Fixture {
 
         val model = TradingPremises(
           registeringAgentPremises = Some(
@@ -212,7 +212,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
         val result = controller.post(1,edit = true)(newRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.YourTradingPremisesController.getIndividual(1).url)
+        redirectLocation(result) mustBe Some(routes.DetailedAnswersController.get(1).url)
       }
 
       "redirect to the Trading Premises details page on submitting false and edit false" in new Fixture {
