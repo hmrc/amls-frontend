@@ -99,8 +99,6 @@ case class TradingPremises(
       case TradingPremises(Some(RegisteringAgentPremises(true)), _, Some(SoleProprietor), None, _, _, _, _, _, _, _, _, _, _, _) =>
         false
 
-      //case TradingPremises(Some(RegisteringAgentPremises(true)), _, _, None, _, _, _, _, _, _, _, _, _, _, _) => false
-
       case TradingPremises(_, _, Some(_), Some(_), Some(_), Some(_), maybeActivities, maybeSubSectors, _, _, _, _, _, _, true)
         if activitiesAreValid(maybeActivities, maybeSubSectors) => true
 
