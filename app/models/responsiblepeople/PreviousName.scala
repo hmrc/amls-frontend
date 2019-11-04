@@ -55,7 +55,7 @@ object PreviousName {
         (__ \ "firstName").read(firstNameRule) ~
           (__ \ "middleName").read(optionR(middleNameRule)) ~
           (__ \ "lastName").read(lastNameRule)
-        ).tupled.map(t => PreviousName(Some(true), Some(t._1), t._2, Some(t._3)))
+        ).tupled.map(name => PreviousName(Some(true), Some(name._1), name._2, Some(name._3)))
       case _ => Rule.fromMapping { _ => Valid(PreviousName(Some(false), None, None, None)) }
     }
   }

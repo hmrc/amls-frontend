@@ -118,12 +118,8 @@
                     editLinkTag = "rp-legalname-yes-no-edit"
                 ) {
                     @ln.hasPreviousName match {
-                        case Some(false) => {
-                            <p>@Messages("lbl.no")</p>
-                        }
-                        case Some(true) => {
-                            <p>@Messages("lbl.yes")</p>
-                        }
+                        case Some(false) => {@Messages("lbl.no")}
+                        case Some(true) => {@Messages("lbl.yes")}
                     }
                 }
 
