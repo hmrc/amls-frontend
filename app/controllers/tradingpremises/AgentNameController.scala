@@ -85,7 +85,7 @@ class AgentNameController @Inject()(
                 case SubmissionDecisionApproved if redirectToAgentNameDateOfChange(getTradingPremises(result, index), data) =>
                   Redirect(routes.AgentNameController.dateOfChange(index))
                 case _ => if (edit) {
-                  Redirect(routes.YourTradingPremisesController.getIndividual(index))
+                  Redirect(routes.DetailedAnswersController.get(index))
                 } else {
                   TPControllerHelper.redirectToNextPage(result, index, edit)
                 }

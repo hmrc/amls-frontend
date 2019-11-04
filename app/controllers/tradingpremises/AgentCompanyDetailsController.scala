@@ -65,7 +65,7 @@ class AgentCompanyDetailsController @Inject()(val dataCacheConnector: DataCacheC
                   tp.msbServices, true, tp.lineId, tp.status, tp.endDate)
               }
             } yield edit match {
-              case true => Redirect(routes.YourTradingPremisesController.getIndividual(index))
+              case true => Redirect(routes.DetailedAnswersController.get(index))
               case false => TPControllerHelper.redirectToNextPage(result, index, edit)
             }
           }.recoverWith {

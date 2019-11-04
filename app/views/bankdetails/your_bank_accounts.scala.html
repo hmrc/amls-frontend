@@ -75,41 +75,52 @@
 
     @if(inCompleteModel.nonEmpty) {
         <h2 id="incomplete-header">@Messages("bankdetails.yourbankaccounts.incomplete")</h2>
-        <ul class="list">
-        @inCompleteModel.map { case(bankDetail, index) =>
-            <li class="summary__listing">
-                <div>
-                    <div id="incomplete-detail-@index">
+        <div class="form-group">
+            <dl class="hmrc-add-to-a-list hmrc-add-to-a-list--short">
+
+                @inCompleteModel.map { case(bankDetail, index) =>
+                <div class="hmrc-add-to-a-list__contents">
+                    <dt id="incomplete-detail-@index" class="hmrc-add-to-a-list__identifier hmrc-add-to-a-list__identifier--light">
                         @bankAccount(bankDetail)
-                    </div>
-                    <div id="incomplete-action-panel-@index">
-                        <a id="incomplete-detail-edit-@index" href="@controllers.bankdetails.routes.BankAccountNameController.getIndex(index + 1).url">@Messages("bankdetails.yourbankaccount.edit")</a>
-                        @Messages("bankdetails.yourbankaccount.or")
-                        <a id="incomplete-detail-remove-@index" href="@controllers.bankdetails.routes.RemoveBankDetailsController.get(index + 1).url">@Messages("bankdetails.yourbankaccount.remove")</a>
-                    </div>
+                    </dt>
+                    <dd id="incomplete-action-panel-@index" class="hmrc-add-to-a-list__change">
+                        <a id="incomplete-detail-edit-@index" href="@controllers.bankdetails.routes.BankAccountNameController.getIndex(index + 1).url">
+                            <span aria-hidden="true">@Messages("bankdetails.yourbankaccount.edit")</span>
+                            <span class="visually-hidden">@Messages("bankdetails.yourbankaccount.edit") @bankDetail.accountName</span>
+                        </a>
+                    </dd>
+                    <dd class="hmrc-add-to-a-list__remove">
+                        <a id="incomplete-detail-remove-@index" href="@controllers.bankdetails.routes.RemoveBankDetailsController.get(index + 1).url">
+                            <span aria-hidden="true">@Messages("bankdetails.yourbankaccount.remove")</span>
+                            <span class="visually-hidden">@Messages("bankdetails.yourbankaccount.remove") @bankDetail.accountName</span>
+                        </a>
+                    </dd>
                 </div>
-            </li>
-            }
-        </ul>
+                }
+            </dl>
+        </div>
     }
 
     @if(completedModel.nonEmpty) {
         @if(inCompleteModel.nonEmpty) { <h2 id="completed-header">@Messages("bankdetails.yourbankaccounts.complete")</h2> }
-        <ul class="list">
-        @completedModel.map { case(bankDetail, index) =>
-            <li class="group summary__listing">
-                <div>
-                    <div id="completed-detail-@index">
-                        @bankAccount(bankDetail)
+            <div class="form-group">
+                <dl class="hmrc-add-to-a-list hmrc-add-to-a-list--short">
+
+                    @completedModel.map { case(bankDetail, index) =>
+                    <div class="hmrc-add-to-a-list__contents">
+                        <dt id="completed-detail-@index" class="hmrc-add-to-a-list__identifier hmrc-add-to-a-list__identifier--light">
+                            @bankAccount(bankDetail)
+                        </dt>
+                        <dd id="completed-action-panel-@index" class="hmrc-add-to-a-list__remove">
+                            <a id="completed-detail-remove-@index" href="@controllers.bankdetails.routes.RemoveBankDetailsController.get(index + 1).url">
+                                <span aria-hidden="true">@Messages("bankdetails.yourbankaccount.remove")</span>
+                                <span class="visually-hidden">@Messages("bankdetails.yourbankaccount.remove") @bankDetail.accountName</span>
+                            </a>
+                        </dd>
                     </div>
-                    <div id="completed-action-panel-@index">
-                        <a id="completed-detail-remove-@index" href="@controllers.bankdetails.routes.RemoveBankDetailsController.get(index + 1).url">
-                        @Messages("bankdetails.yourbankaccount.remove")</a>
-                    </div>
-                </div>
-            </li>
-        }
-        </ul>
+                    }
+                </dl>
+            </div>
     }
 
     @if(inCompleteModel.isEmpty) {

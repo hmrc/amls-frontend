@@ -31,221 +31,238 @@
     heading = header
 ) {
 
-    @checkYourAnswers(
-        question = Messages("businessactivities.confirm-activities.title"),
-        editUrl = controllers.businessactivities.routes.InvolvedInOtherController.get(true).toString
-    ) {
-        <p>@model.involvedInOther.map {
-            case InvolvedInOtherNo => { @Messages("lbl.no") }
-            case InvolvedInOtherYes(v) => { @v }
-        }</p>
-    }
+    <dl class="cya-summary-list">
 
-    @model.expectedBusinessTurnover.map { turnover =>
-        @checkYourAnswers(
-            question = Messages("businessactivities.business-turnover.title"),
-            editUrl = controllers.businessactivities.routes.ExpectedBusinessTurnoverController.get(true).toString
+        @checkYourAnswersRow(
+            question = Messages("businessactivities.confirm-activities.title"),
+            editUrl = controllers.businessactivities.routes.InvolvedInOtherController.get(true).toString,
+            editLinkTag = "involvedinother-edit"
         ) {
-            <p>@turnover match {
-                case ExpectedBusinessTurnover.First => { @Messages("businessactivities.turnover.lbl.01") }
-                case ExpectedBusinessTurnover.Second => { @Messages("businessactivities.turnover.lbl.02") }
-                case ExpectedBusinessTurnover.Third => { @Messages("businessactivities.turnover.lbl.03") }
-                case ExpectedBusinessTurnover.Fourth => { @Messages("businessactivities.turnover.lbl.04") }
-                case ExpectedBusinessTurnover.Fifth => { @Messages("businessactivities.turnover.lbl.05") }
-                case ExpectedBusinessTurnover.Sixth => { @Messages("businessactivities.turnover.lbl.06") }
-                case ExpectedBusinessTurnover.Seventh => { @Messages("businessactivities.turnover.lbl.07") }
-            }</p>
+            @model.involvedInOther.map {
+                case InvolvedInOtherNo => { @Messages("lbl.no") }
+                case InvolvedInOtherYes(v) => { @v }
+            }
         }
-    }
 
-    @model.expectedAMLSTurnover.map { turnover =>
-        @checkYourAnswers(
-            question = Messages("businessactivities.turnover.title"),
-            editUrl = controllers.businessactivities.routes.ExpectedAMLSTurnoverController.get(true).toString
-        ) {
-            <ul class="list list-bullet">
-                @bmBusinessActivities.map { businessActivities =>
-                    @businessActivities.map { ba =>
-                        <li>@ba</li>
-                    }
+        @model.expectedBusinessTurnover.map { turnover =>
+            @checkYourAnswersRow(
+                question = Messages("businessactivities.business-turnover.title"),
+                editUrl = controllers.businessactivities.routes.ExpectedBusinessTurnoverController.get(true).toString,
+                editLinkTag = "expectedbusinessturnover-edit"
+            ) {
+                @turnover match {
+                    case ExpectedBusinessTurnover.First => { @Messages("businessactivities.turnover.lbl.01") }
+                    case ExpectedBusinessTurnover.Second => { @Messages("businessactivities.turnover.lbl.02") }
+                    case ExpectedBusinessTurnover.Third => { @Messages("businessactivities.turnover.lbl.03") }
+                    case ExpectedBusinessTurnover.Fourth => { @Messages("businessactivities.turnover.lbl.04") }
+                    case ExpectedBusinessTurnover.Fifth => { @Messages("businessactivities.turnover.lbl.05") }
+                    case ExpectedBusinessTurnover.Sixth => { @Messages("businessactivities.turnover.lbl.06") }
+                    case ExpectedBusinessTurnover.Seventh => { @Messages("businessactivities.turnover.lbl.07") }
                 }
-            </ul>
-
-            <p>@turnover match {
-                case ExpectedAMLSTurnover.First => { @Messages("businessactivities.business-turnover.lbl.01") }
-                case ExpectedAMLSTurnover.Second => { @Messages("businessactivities.business-turnover.lbl.02") }
-                case ExpectedAMLSTurnover.Third => { @Messages("businessactivities.business-turnover.lbl.03") }
-                case ExpectedAMLSTurnover.Fourth => { @Messages("businessactivities.business-turnover.lbl.04") }
-                case ExpectedAMLSTurnover.Fifth => { @Messages("businessactivities.business-turnover.lbl.05") }
-                case ExpectedAMLSTurnover.Sixth => { @Messages("businessactivities.business-turnover.lbl.06") }
-                case ExpectedAMLSTurnover.Seventh => { @Messages("businessactivities.business-turnover.lbl.07") }
-            }</p>
-        }
-    }
-
-    @checkYourAnswers(
-        question = Messages("businessactivities.businessfranchise.title"),
-        editUrl = controllers.businessactivities.routes.BusinessFranchiseController.get(true).toString
-    ) {
-        <p>@model.businessFranchise.map {
-            case BusinessFranchiseNo => { @Messages("lbl.no") }
-            case BusinessFranchiseYes(name) => { @name }
-        }</p>
-    }
-
-    @model.howManyEmployees.map { employees =>
-        @checkYourAnswers(
-            question = Messages("businessactivities.employees.line2.cya"),
-            editUrl = controllers.businessactivities.routes.EmployeeCountAMLSSupervisionController.get(true).toString
-        ) {
-            <p>@employees.employeeCountAMLSSupervision</p>
-        }
-
-        @checkYourAnswers(
-            question = Messages("businessactivities.employees.line1.cya"),
-            editUrl = controllers.businessactivities.routes.HowManyEmployeesController.get(true).toString
-        ) {
-            <p>@employees.employeeCount</p>
-        }
-    }
-
-    @checkYourAnswers(
-        question = Messages("businessactivities.keep.customer.records.title"),
-        editUrl = controllers.businessactivities.routes.TransactionRecordController.get(true).toString
-    ) {
-        @model.transactionRecord.map {
-            case false => { <p>@Messages("lbl.no")</p> }
-            case _ => { <p>@Messages("lbl.yes")</p>
-            }
-        }
-    }
-
-
-    @model.transactionRecordTypes.map { t =>
-        @checkYourAnswers(
-            question = Messages("businessactivities.do.keep.records"),
-            editUrl = controllers.businessactivities.routes.TransactionTypesController.get(true).toString
-        ) {
-                <ul class="list list-bullet">
-                    @t.types.map { x =>
-                    <li>@x match {
-                        case Paper => {@Messages("businessactivities.transactiontype.lbl.01")}
-                        case DigitalSpreadsheet => {@Messages("businessactivities.transactiontype.lbl.02")}
-                        case DigitalSoftware(software) => {@Messages("businessactivities.transactiontype.lbl.03"): @software}
-                    }</li>
-                }
-                </ul>
             }
         }
 
-    @checkYourAnswers(
-        question = Messages("businessactivities.identify-suspicious-activity.title"),
-        editUrl = controllers.businessactivities.routes.IdentifySuspiciousActivityController.get(true).toString
-    ) {
-        <p>@model.identifySuspiciousActivity.map { x =>
-            @x.hasWrittenGuidance match {
-                case true => { @Messages("lbl.yes") }
-                case false => { @Messages("lbl.no") }
-            }
-        }</p>
-    }
-
-    @checkYourAnswers(
-        question = Messages("businessactivities.ncaRegistered.title"),
-        editUrl = controllers.businessactivities.routes.NCARegisteredController.get(true).toString
-    ) {
-        <p>@model.ncaRegistered.map { x =>
-            @x.ncaRegistered match {
-                case true =>  { @Messages("lbl.yes") }
-                case false =>  { @Messages("lbl.no") }
-            }
-        }</p>
-    }
-
-    @model.riskAssessmentPolicy.map {
-        case RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), _) => {
-            @checkYourAnswers(
-                question = Messages("businessactivities.riskassessment.policy.title"),
-                editUrl = controllers.businessactivities.routes.RiskAssessmentController.get(true).toString
+        @model.expectedAMLSTurnover.map { turnover =>
+            @checkYourAnswersRow(
+                question = Messages("businessactivities.turnover.title"),
+                editUrl = controllers.businessactivities.routes.ExpectedAMLSTurnoverController.get(true).toString,
+                editLinkTag = "expectedamlsturnover-edit"
             ) {
-                <p>@Messages("lbl.no")</p>
-            }
-        }
-        case RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(v)) => {
-            @checkYourAnswers(
-                question = Messages("businessactivities.riskassessment.policy.title"),
-                editUrl = controllers.businessactivities.routes.RiskAssessmentController.get(true).toString
-            ) {
-                <p>@Messages("lbl.yes")</p>
-            }
-            @checkYourAnswers(
-                question = Messages("businessactivities.document.riskassessment.policy.title"),
-                editUrl = controllers.businessactivities.routes.DocumentRiskAssessmentController.get(true).toString
-            ) {
-                <ul class="list list-bullet">
-                    @v.map {
-                        case Digital => { <li>@Messages("businessactivities.RiskAssessmentType.lbl.02")</li> }
-                        case PaperBased => { <li>@Messages("businessactivities.RiskAssessmentType.lbl.01")</li> }
+                <ul id="businessactivities-list" class="list list-bullet">
+                    @bmBusinessActivities.map { businessActivities =>
+                        @businessActivities.map { ba =>
+                            <li>@ba</li>
+                        }
                     }
                 </ul>
-            }
-        }
-    }
 
-
-    @if(!hideReceiveAdvice) {
-        @model.accountantForAMLSRegulations.map { x =>
-            @checkYourAnswers(
-                question = Messages("businessactivities.accountantForAMLSRegulations.title"),
-                editUrl = controllers.businessactivities.routes.AccountantForAMLSRegulationsController.get(true).toString
-            ) {
-                <p>@x.accountantForAMLSRegulations match {
-                    case true =>  { @Messages("lbl.yes") }
-                    case false =>  { @Messages("lbl.no") }
+                <p>@turnover match {
+                    case ExpectedAMLSTurnover.First => { @Messages("businessactivities.business-turnover.lbl.01") }
+                    case ExpectedAMLSTurnover.Second => { @Messages("businessactivities.business-turnover.lbl.02") }
+                    case ExpectedAMLSTurnover.Third => { @Messages("businessactivities.business-turnover.lbl.03") }
+                    case ExpectedAMLSTurnover.Fourth => { @Messages("businessactivities.business-turnover.lbl.04") }
+                    case ExpectedAMLSTurnover.Fifth => { @Messages("businessactivities.business-turnover.lbl.05") }
+                    case ExpectedAMLSTurnover.Sixth => { @Messages("businessactivities.business-turnover.lbl.06") }
+                    case ExpectedAMLSTurnover.Seventh => { @Messages("businessactivities.business-turnover.lbl.07") }
                 }</p>
             }
         }
 
-        @model.accountantForAMLSRegulations.map { x =>
-            @x.accountantForAMLSRegulations match {
-                case true => {
-                    @checkYourAnswers(
-                        question = Messages("businessactivities.whoisyouraccountant.title"),
-                        editUrl = controllers.businessactivities.routes.WhoIsYourAccountantController.get(true).toString
-                    ) {
-                        @model.whoIsYourAccountant.map { accountant =>
-                            <ul class="list">
-                                @if(!accountant.accountantsName.isEmpty) {
-                                    <li>@accountant.accountantsName</li>
-                                }
-                                @if(!accountant.accountantsTradingName.isEmpty) {
-                                    <li>@accountant.accountantsTradingName</li>
-                                }
-                                <li>@accountant.address.toLines.map { line =>
-                                    @line<br />
-                                }</li>
-                            </ul>
-                        }
-                    }
-
-                    @model.taxMatters.map { x =>
-                      @model.whoIsYourAccountant.map { accountant =>
-                        @checkYourAnswers(
-                            question =  Messages("businessactivities.tax.matters.summary.title", accountant.accountantsName),
-                            editUrl = controllers.businessactivities.routes.TaxMattersController.get(true).toString
-                        ) {
-                            <p>@x.manageYourTaxAffairs match {
-                                case true =>  { @Messages("lbl.yes") }
-                                case false =>  { @Messages("lbl.no") }
-                            }</p>
-                        }
-                      }
-                    }
-                }
-                case false =>{}
+        @checkYourAnswersRow(
+            question = Messages("businessactivities.businessfranchise.title"),
+            editUrl = controllers.businessactivities.routes.BusinessFranchiseController.get(true).toString,
+            editLinkTag = "businessfranchise-edit"
+        ) {
+            @model.businessFranchise.map {
+                case BusinessFranchiseNo => { @Messages("lbl.no") }
+                case BusinessFranchiseYes(name) => { @name }
             }
         }
-    }
+
+        @model.howManyEmployees.map { employees =>
+            @checkYourAnswersRow(
+                question = Messages("businessactivities.employees.line2.cya"),
+                editUrl = controllers.businessactivities.routes.EmployeeCountAMLSSupervisionController.get(true).toString,
+                editLinkTag = "employeescountline2-edit"
+            ) {
+                @employees.employeeCountAMLSSupervision
+            }
+
+            @checkYourAnswersRow(
+                question = Messages("businessactivities.employees.line1.cya"),
+                editUrl = controllers.businessactivities.routes.HowManyEmployeesController.get(true).toString,
+                editLinkTag = "employeescountline1-edit"
+            ) {
+                @employees.employeeCount
+            }
+        }
+
+        @checkYourAnswersRow(
+            question = Messages("businessactivities.keep.customer.records.title"),
+            editUrl = controllers.businessactivities.routes.TransactionRecordController.get(true).toString,
+            editLinkTag = "keeprecords-edit"
+        ) {
+            @model.transactionRecord.map {
+                case false => { @Messages("lbl.no") }
+                case _ => { @Messages("lbl.yes")
+                }
+            }
+        }
+
+
+        @model.transactionRecordTypes.map { t =>
+            @checkYourAnswersRow(
+                question = Messages("businessactivities.do.keep.records"),
+                editUrl = controllers.businessactivities.routes.TransactionTypesController.get(true).toString,
+                editLinkTag = "howrecordskept-edit"
+            ) {
+                    <ul class="list list-bullet">
+                        @t.types.map { x =>
+                        <li>@x match {
+                            case Paper => {@Messages("businessactivities.transactiontype.lbl.01")}
+                            case DigitalSpreadsheet => {@Messages("businessactivities.transactiontype.lbl.02")}
+                            case DigitalSoftware(software) => {@Messages("businessactivities.transactiontype.lbl.03"): @software}
+                        }</li>
+                    }
+                    </ul>
+                }
+            }
+
+        @checkYourAnswersRow(
+            question = Messages("businessactivities.identify-suspicious-activity.title"),
+            editUrl = controllers.businessactivities.routes.IdentifySuspiciousActivityController.get(true).toString,
+            editLinkTag = "suspiciousactivity-edit"
+        ) {
+            @model.identifySuspiciousActivity.map { x =>
+                @x.hasWrittenGuidance match {
+                    case true => { @Messages("lbl.yes") }
+                    case false => { @Messages("lbl.no") }
+                }
+            }
+        }
+
+        @checkYourAnswersRow(
+            question = Messages("businessactivities.ncaRegistered.title"),
+            editUrl = controllers.businessactivities.routes.NCARegisteredController.get(true).toString,
+            editLinkTag = "ncaregistered-edit"
+        ) {
+            @model.ncaRegistered.map { x =>
+                @x.ncaRegistered match {
+                    case true =>  { @Messages("lbl.yes") }
+                    case false =>  { @Messages("lbl.no") }
+                }
+            }
+        }
+
+        @model.riskAssessmentPolicy.map {
+            case RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), _) => {
+                @checkYourAnswersRow(
+                    question = Messages("businessactivities.riskassessment.policy.title"),
+                    editUrl = controllers.businessactivities.routes.RiskAssessmentController.get(true).toString,
+                    editLinkTag = "riskassessment-edit"
+                ) {
+                    @Messages("lbl.no")
+                }
+            }
+            case RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(v)) => {
+                @checkYourAnswersRow(
+                    question = Messages("businessactivities.riskassessment.policy.title"),
+                    editUrl = controllers.businessactivities.routes.RiskAssessmentController.get(true).toString,
+                    editLinkTag = "riskassessmentpolicy-edit"
+                ) {
+                    @Messages("lbl.yes")
+                }
+                @checkYourAnswersRow(
+                    question = Messages("businessactivities.document.riskassessment.policy.title"),
+                    editUrl = controllers.businessactivities.routes.DocumentRiskAssessmentController.get(true).toString,
+                    editLinkTag = "documentriskassessment-edit"
+                ) {
+                    <ul class="list list-bullet">
+                        @v.map {
+                            case Digital => { <li>@Messages("businessactivities.RiskAssessmentType.lbl.02")</li> }
+                            case PaperBased => { <li>@Messages("businessactivities.RiskAssessmentType.lbl.01")</li> }
+                        }
+                    </ul>
+                }
+            }
+        }
+
+
+        @if(!hideReceiveAdvice) {
+            @model.accountantForAMLSRegulations.map { x =>
+                @checkYourAnswersRow(
+                    question = Messages("businessactivities.accountantForAMLSRegulations.title"),
+                    editUrl = controllers.businessactivities.routes.AccountantForAMLSRegulationsController.get(true).toString
+                ) {
+                    @x.accountantForAMLSRegulations match {
+                        case true =>  { @Messages("lbl.yes") }
+                        case false =>  { @Messages("lbl.no") }
+                    }
+                }
+            }
+
+            @model.accountantForAMLSRegulations.map { x =>
+                @x.accountantForAMLSRegulations match {
+                    case true => {
+                        @checkYourAnswersRow(
+                            question = Messages("businessactivities.whoisyouraccountant.title"),
+                            editUrl = controllers.businessactivities.routes.WhoIsYourAccountantController.get(true).toString
+                        ) {
+                            @model.whoIsYourAccountant.map { accountant =>
+                                <ul class="list">
+                                    @if(!accountant.accountantsName.isEmpty) {
+                                        <li>@accountant.accountantsName</li>
+                                    }
+                                    @if(!accountant.accountantsTradingName.isEmpty) {
+                                        <li>@accountant.accountantsTradingName</li>
+                                    }
+                                    <li>@accountant.address.toLines.map { line =>
+                                        @line<br />
+                                    }</li>
+                                </ul>
+                            }
+                        }
+
+                        @model.taxMatters.map { x =>
+                          @model.whoIsYourAccountant.map { accountant =>
+                            @checkYourAnswersRow(
+                                question =  Messages("businessactivities.tax.matters.summary.title", accountant.accountantsName),
+                                editUrl = controllers.businessactivities.routes.TaxMattersController.get(true).toString
+                            ) {
+                                @x.manageYourTaxAffairs match {
+                                    case true =>  { @Messages("lbl.yes") }
+                                    case false =>  { @Messages("lbl.no") }
+                                }
+                            }
+                          }
+                        }
+                    }
+                    case false =>{}
+                }
+            }
+        }
+
+    </dl>
 
     @form(f, controllers.businessactivities.routes.SummaryController.post()) {
             @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)

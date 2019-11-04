@@ -26,6 +26,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
+import play.api.i18n.Messages
 import utils.AmlsSpec
 import play.api.test.Helpers._
 import services.StatusService
@@ -42,7 +43,8 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
     val controller = new SummaryController (
       dataCache = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       statusService = mock[StatusService],
       cc = mockMcc
     )
@@ -128,9 +130,9 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
 
-        document.getElementsByTag("section").get(0).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByTag("section").get(1).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByTag("section").get(2).getElementsByTag("a").hasClass("change-answer") must be(true)
+        document.getElementById("involvedinother-edit").html() must include(Messages("button.edit"))
+        document.getElementById("expectedbusinessturnover-edit").html() must include(Messages("button.edit"))
+        document.getElementById("expectedamlsturnover-edit").html() must include(Messages("button.edit"))
       }
     }
 
@@ -152,9 +154,9 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
 
-        document.getElementsByTag("section").get(0).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByTag("section").get(1).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByTag("section").get(2).getElementsByTag("a").hasClass("change-answer") must be(true)
+        document.getElementById("involvedinother-edit").html() must include(Messages("button.edit"))
+        document.getElementById("expectedbusinessturnover-edit").html() must include(Messages("button.edit"))
+        document.getElementById("expectedamlsturnover-edit").html() must include(Messages("button.edit"))
       }
     }
 
@@ -176,7 +178,8 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       val result = controller.get()(request)
       status(result) must be(OK)
       val document = Jsoup.parse(contentAsString(result))
-      val listElement = document.getElementsByTag("section").get(2).getElementsByClass("list-bullet").get(0)
+
+      val listElement = document.getElementById("businessactivities-list")
       listElement.children().size() must be(bmBusinessActivities.fold(0)(x => x.businessActivities.size))
 
     }

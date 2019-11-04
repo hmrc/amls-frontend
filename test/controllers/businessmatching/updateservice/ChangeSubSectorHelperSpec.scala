@@ -17,19 +17,21 @@
 package controllers.businessmatching.updateservice
 
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching._
+import models.businessmatching.{ForeignExchange, _}
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.ChangeSubSectorFlowModel
 import models.moneyservicebusiness.{MoneyServiceBusiness => MSB, _}
-import org.mockito.Mockito.{never, verify}
+import org.mockito.Mockito.{never, verify, when}
 import org.mockito.Matchers.{any, eq => eqTo}
 import models.tradingpremises.{ChequeCashingScrapMetal => TPChequeCashingScrapMetal, CurrencyExchange => TPCurrencyExchange, TransmittingMoney => TPTransmittingMoney, ChequeCashingNotScrapMetal => _, _}
+import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
-class ChangeSubSectorHelperSpec extends AmlsSpec {
+class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
 
   trait Fixture extends DependencyMocks {
     self =>
@@ -124,6 +126,12 @@ class ChangeSubSectorHelperSpec extends AmlsSpec {
           hasAccepted = true)),
         Some(MSB.key))
 
+      mockCacheFetch[BusinessMatching](
+        Some(BusinessMatching(
+          msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))),
+          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX")))),
+        Some(BusinessMatching.key))
+
       mockCacheSave[MSB]
 
       val updatedMsb = await(helper.updateMsb("internalId", model))
@@ -148,6 +156,12 @@ class ChangeSubSectorHelperSpec extends AmlsSpec {
           hasAccepted = true)),
         Some(MSB.key))
 
+      mockCacheFetch[BusinessMatching](
+        Some(BusinessMatching(
+          msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal))),
+          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX")))),
+        Some(BusinessMatching.key))
+
       mockCacheSave[MSB]
 
       val updatedMsb = await(helper.updateMsb("internalId", model))
@@ -158,6 +172,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec {
       updatedMsb.sendMoneyToOtherCountry mustBe None
       updatedMsb.sendTheLargestAmountsOfMoney mustBe None
       updatedMsb.mostTransactions mustBe None
+      updatedMsb.hasChanged mustBe false
       updatedMsb.hasAccepted mustBe true
     }
 
@@ -371,6 +386,72 @@ class ChangeSubSectorHelperSpec extends AmlsSpec {
         val result = await(helper.updateServiceRegister("internalId", ChangeSubSectorFlowModel(Some(Set(TransmittingMoney, CurrencyExchange)))))
 
         result mustBe model.copy(addedSubSectors = Some(Set(CurrencyExchange)))
+      }
+    }
+  }
+
+  "needs updateChangeFlag method which" when {
+    "called with the same msb subsectors in BM and ChangeSubsectorFlowModel" must {
+      "return false" in new Fixture {
+        val model = ChangeSubSectorFlowModel(Some(Set(ChequeCashingScrapMetal, TransmittingMoney)), None)
+
+        mockCacheFetch[BusinessMatching](
+          Some(BusinessMatching(
+            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
+            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX")))),
+          Some(BusinessMatching.key))
+
+        val result = await(helper.updateChangeFlag("internalId", model))
+
+      result mustBe false
+      }
+    }
+
+    "called when added CurrencyExchange to msb subsectors in ChangeSubsectorFlowModel" must {
+      "return true" in new Fixture {
+        val model = ChangeSubSectorFlowModel(Some(Set(ChequeCashingScrapMetal, TransmittingMoney, CurrencyExchange)), None)
+
+        mockCacheFetch[BusinessMatching](
+          Some(BusinessMatching(
+            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
+            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX")))),
+          Some(BusinessMatching.key))
+
+        val result = await(helper.updateChangeFlag("internalId", model))
+
+        result mustBe true
+      }
+    }
+
+    "called when removed TransmittingMoney from msb subsectors in ChangeSubsectorFlowModel" must {
+      "return true" in new Fixture {
+        val model = ChangeSubSectorFlowModel(Some(Set(ChequeCashingScrapMetal)), None)
+
+        mockCacheFetch[BusinessMatching](
+          Some(BusinessMatching(
+            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
+            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX")))),
+          Some(BusinessMatching.key))
+
+        val result = await(helper.updateChangeFlag("internalId", model))
+
+        result mustBe true
+      }
+    }
+
+    "called when added ForeignExchange and TransmittingMoney from msb subsectors in ChangeSubsectorFlowModel" must {
+      "return true" in new Fixture {
+        val model = ChangeSubSectorFlowModel(Some(Set(ChequeCashingScrapMetal, ForeignExchange, TransmittingMoney)), None)
+
+        mockCacheFetch[BusinessMatching](
+          Some(BusinessMatching(
+            msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))),
+            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX")))),
+          Some(BusinessMatching.key))
+
+        val result = await(helper.updateChangeFlag("internalId", model))
+
+        result mustBe true
       }
     }
   }

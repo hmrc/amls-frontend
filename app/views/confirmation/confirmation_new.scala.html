@@ -80,6 +80,13 @@
         }
     }
 
+
+    <div id="timelimit"><p>@Messages("confirmation.timelimit")</p></div>
+
+    @printLink(linkId = "confirmation-print",
+        gaTag = Some("fee-reference:click:print")
+    )
+
     <p><a id="payfee" class="button" href="@paymentsUrl">@Messages("button.continuetopayment")</a></p>
 
 }

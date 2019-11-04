@@ -100,7 +100,6 @@ class your_responsible_peopleSpec extends AmlsViewSpec with MustMatchers {
       def view = views.html.responsiblepeople.your_responsible_people(completeRpSeq, incompleteRpSeq)
 
       doc.getElementById("complete-header").text must include(Messages("responsiblepeople.check_your_answers.complete"))
-      doc.getElementById("complete-detail-0").text must include("Katie Test")
       doc.getElementById("detail-edit-0").attr("href") must be(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url)
       doc.getElementById("detail-remove-0").attr("href") must be(controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(1).url)
 

@@ -61,8 +61,7 @@ class ContactDetailsController @Inject () (
               }
             } yield edit match {
               case true => Redirect(routes.DetailedAnswersController.get(index, flow))
-              case false if index > 1 => Redirect(routes.CurrentAddressController.get(index, edit, flow))
-              case false if index == 1 => Redirect(routes.ConfirmAddressController.get(index))
+              case false => Redirect(routes.CurrentAddressController.get(index, edit, flow))
             }
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

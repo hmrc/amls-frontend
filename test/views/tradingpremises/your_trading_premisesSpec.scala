@@ -97,11 +97,9 @@ class your_trading_premisesSpec extends AmlsViewSpec with MustMatchers with Trad
 
       doc.getElementById("complete-header").text must include(Messages("tradingpremises.yourpremises.complete"))
 
-      doc.getElementById("complete-detail-0").text must include("CPLT 1")
       doc.getElementById("detail-edit-0").attr("href") must be(controllers.tradingpremises.routes.DetailedAnswersController.get(1).url)
       doc.getElementById("detail-remove-0").attr("href") must be(controllers.tradingpremises.routes.RemoveTradingPremisesController.get(1).url)
 
-      doc.getElementById("complete-detail-1").text must include("CPLT 2")
       doc.getElementById("detail-edit-1").attr("href") must be(controllers.tradingpremises.routes.DetailedAnswersController.get(2).url)
       doc.getElementById("detail-remove-1").attr("href") must be(controllers.tradingpremises.routes.RemoveTradingPremisesController.get(2).url)
 

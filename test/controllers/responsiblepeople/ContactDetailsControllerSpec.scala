@@ -131,7 +131,6 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CurrentAddressController.get(2).url))
           }
-        }
         "there is no responsible person for the index" must {
           "respond with NOT_FOUND" in new Fixture {
 

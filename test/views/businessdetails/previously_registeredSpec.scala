@@ -34,7 +34,7 @@ class previously_registeredSpec extends AmlsViewSpec with MustMatchers  {
   "previously_registered view" must {
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[PreviouslyRegistered] = Form2(PreviouslyRegisteredYes("prevMLRRegNo"))
+      val form2: ValidForm[PreviouslyRegistered] = Form2(PreviouslyRegisteredYes(Some("prevMLRRegNo")))
 
       def view = views.html.businessdetails.previously_registered(form2, true)
 
@@ -43,7 +43,7 @@ class previously_registeredSpec extends AmlsViewSpec with MustMatchers  {
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[PreviouslyRegistered] = Form2(PreviouslyRegisteredYes("prevMLRRegNo"))
+      val form2: ValidForm[PreviouslyRegistered] = Form2(PreviouslyRegisteredYes(Some("prevMLRRegNo")))
 
       def view = views.html.businessdetails.previously_registered(form2, true)
 
@@ -56,20 +56,15 @@ class previously_registeredSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "previouslyRegistered") -> Seq(ValidationError("not a message Key")),
-          (Path \ "prevMLRRegNo-panel") -> Seq(ValidationError("second not a message Key"))
+          (Path \ "previouslyRegistered") -> Seq(ValidationError("not a message Key"))
         ))
 
       def view = views.html.businessdetails.previously_registered(form2, true)
 
       errorSummary.html() must include("not a message Key")
-      errorSummary.html() must include("second not a message Key")
 
       doc.getElementById("previouslyRegistered")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
-
-      doc.getElementById("prevMLRRegNo-panel")
-        .getElementsByClass("error-notification").first().html() must include("second not a message Key")
 
     }
 

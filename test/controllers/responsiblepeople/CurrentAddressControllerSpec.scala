@@ -376,7 +376,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
           val result = currentAddressController.post(RecordId)(requestWithParams)
           status(result) must be(BAD_REQUEST)
           val document: Document  = Jsoup.parse(contentAsString(result))
-          document.title must be(pageTitle)
+          document.title mustBe s"Error: $pageTitle"
           val errorCount = 2
           val elementsWithError : Elements = document.getElementsByClass("error-notification")
           elementsWithError.size() must be(errorCount)

@@ -48,12 +48,15 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
                                    val parser: BodyParsers.Default)
                                   (implicit val executionContext: ExecutionContext) extends AuthAction with AuthorisedFunctions {
 
-  private val amlsKey = "HMRC-MLR-ORG"
-  private val amlsNumberKey = "MLRRefNumber"
+  private val amlsKey              = "HMRC-MLR-ORG"
+  private val amlsNumberKey        = "MLRRefNumber"
+
   private lazy val unauthorisedUrl = URLEncoder.encode(
     ReturnLocation(controllers.routes.AmlsController.unauthorised_role()).absoluteUrl, "utf-8"
   )
-  def signoutUrl = s"${applicationConfig.logoutUrl}?continue=$unauthorisedUrl"
+
+  def unauthorised = s"${applicationConfig.logoutUrl}?continue=$unauthorisedUrl"
+  def signout      = s"${applicationConfig.logoutUrl}"
 
   override final protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] = {
 
@@ -85,32 +88,32 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
         )
       case _ =>
         Logger.debug("DefaultAuthAction:Refine - Non match (enrolments ~ Some(credentials) ~ Some(affinityGroup))")
-        Future.successful(Left(Redirect(Call("GET", signoutUrl))))
+        Future.successful(Left(Redirect(Call("GET", unauthorised))))
     }.recover[Either[Result, AuthorisedRequest[A]]] {
       case nas: NoActiveSession =>
         Logger.debug("DefaultAuthAction:Refine - NoActiveSession:" + nas)
-        Left(Redirect(Call("GET", signoutUrl)))
+        Left(Redirect(Call("GET", signout)))
       case ie: InsufficientEnrolments =>
         Logger.debug("DefaultAuthAction:Refine - InsufficientEnrolments:" + ie)
-        Left(Redirect(Call("GET", signoutUrl)))
+        Left(Redirect(Call("GET", unauthorised)))
       case icl: InsufficientConfidenceLevel =>
         Logger.debug("DefaultAuthAction:Refine - InsufficientConfidenceLevel:" + icl)
-        Left(Redirect(Call("GET", signoutUrl)))
+        Left(Redirect(Call("GET", unauthorised)))
       case uap: UnsupportedAuthProvider =>
         Logger.debug("DefaultAuthAction:Refine - UnsupportedAuthProvider:" + uap)
-        Left(Redirect(Call("GET", signoutUrl)))
+        Left(Redirect(Call("GET", unauthorised)))
       case uag: UnsupportedAffinityGroup =>
         Logger.debug("DefaultAuthAction:Refine - UnsupportedAffinityGroup:" + uag)
-        Left(Redirect(Call("GET", signoutUrl)))
+        Left(Redirect(Call("GET", unauthorised)))
       case ucr: UnsupportedCredentialRole =>
         Logger.debug("DefaultAuthAction:Refine - UnsupportedCredentialRole:" + ucr)
-        Left(Redirect(Call("GET", signoutUrl)))
+        Left(Redirect(Call("GET", unauthorised)))
       case enf: enrolmentNotFound =>
         Logger.debug("DefaultAuthAction:Refine - enrolmentNotFound:" + enf)
-        Left(Redirect(Call("GET", signoutUrl)))
+        Left(Redirect(Call("GET", unauthorised)))
       case e : AuthorisationException =>
         Logger.debug("DefaultAuthAction:Refine - AuthorisationException:" + e)
-        Left(Redirect(Call("GET", signoutUrl)))
+        Left(Redirect(Call("GET", unauthorised)))
     }
   }
 

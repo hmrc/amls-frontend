@@ -198,7 +198,7 @@ class ConfirmationControllerSpec extends AmlsSpec
 
       val result = controller.get()(request)
       status(result) mustBe OK
-      Jsoup.parse(contentAsString(result)).title must include("Application fee and reference")
+      Jsoup.parse(contentAsString(result)).title must include("Your fee and payment reference")
       contentAsString(result) must include(paymentReferenceNumber)
     }
 

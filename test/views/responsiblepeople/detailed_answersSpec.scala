@@ -46,7 +46,7 @@ class detailed_answersSpec extends AmlsSummaryViewSpec with TableDrivenPropertyC
       (Messages("lbl.nationality"), checkElementTextIncludes(_, "United Kingdom")),
       (Messages("responsiblepeople.detailed_answers.phone_number"), checkElementTextIncludes(_, "098765")),
       (Messages("responsiblepeople.detailed_answers.email"), checkElementTextIncludes(_, "e@mail.com")),
-      (Messages("responsiblepeople.detailed_answers.address"), checkElementTextOnlyIncludes(_, "addressLine1 addressLine2 addressLine3 addressLine4 postCode1")),
+      (Messages("responsiblepeople.detailed_answers.address", personName.fullName), checkElementTextOnlyIncludes(_, "addressLine1 addressLine2 addressLine3 addressLine4 postCode1")),
       (Messages("responsiblepeople.timeataddress.address_history.heading", "firstName middleName lastName"), checkElementTextIncludes(_, "0 to 5 months")),
       (Messages("responsiblepeople.detailed_answers.previous_address"), checkElementTextIncludes(_, "addressLine5 addressLine6 addressLine7 addressLine8 postCode2")),
       (Messages("responsiblepeople.detailed_answers.other_previous_address"), checkElementTextIncludes(_, "addressLine9 addressLine10 addressLine11 addressLine12 postCode3")),
@@ -91,12 +91,12 @@ class detailed_answersSpec extends AmlsSummaryViewSpec with TableDrivenPropertyC
 
 
         forAll(sectionChecks) { (key, check) => {
-          val headers = doc.select("section.check-your-answers h2")
-          val header = headers.toList.find(e => e.text() == key)
-          header must not be None
-          val section = header.get.parents().select("section").first()
-          check(section) must be(true)
-        }
+            val questions = doc.select("span.bold")
+            val question = questions.toList.find(e => e.text() == Messages(key))
+            question must not be None
+            val section = question.get.parents().select("div").first()
+            check(section) must be(true)
+          }
         }
       }
 
@@ -111,10 +111,10 @@ class detailed_answersSpec extends AmlsSummaryViewSpec with TableDrivenPropertyC
         )
 
         forAll(sectionChecks) { (key, check) => {
-          val headers = doc.select("section.check-your-answers h2")
-          val header = headers.toList.find(e => e.text() == key)
-          header must not be None
-          val section = header.get.parents().select("section").first()
+          val questions = doc.select("span.bold")
+          val question = questions.toList.find(e => e.text() == Messages(key))
+          question must not be None
+          val section = question.get.parents().select("div").first()
           check(section) must be(true)
         }
         }
@@ -138,7 +138,7 @@ class detailed_answersSpec extends AmlsSummaryViewSpec with TableDrivenPropertyC
 
         override val sectionChecks = Table[String, Element => Boolean](
           ("title key", "check"),
-          (Messages("responsiblepeople.detailed_answers.address"), checkElementTextIncludes(_, "addressLine1 addressLine2 addressLine3 addressLine4 spain")),
+          (Messages("responsiblepeople.detailed_answers.address", personName.fullName), checkElementTextIncludes(_, "addressLine1 addressLine2 addressLine3 addressLine4 spain")),
           (Messages("responsiblepeople.timeataddress.address_history.heading", "firstName middleName lastName"), checkElementTextIncludes(_, "0 to 5 months")),
           (Messages("responsiblepeople.detailed_answers.previous_address"), checkElementTextIncludes(_, "addressLine5 addressLine6 addressLine7 addressLine8 postCode2")),
           (Messages("responsiblepeople.detailed_answers.other_previous_address"), checkElementTextIncludes(_, "addressLine9 addressLine10 addressLine11 addressLine12 postCode3"))
@@ -149,20 +149,17 @@ class detailed_answersSpec extends AmlsSummaryViewSpec with TableDrivenPropertyC
         }
 
         forAll(sectionChecks) { (key, check) => {
-          val headers = doc.select("section.check-your-answers h2")
-          val header = headers.toList.find(e => e.text() == key)
-
-          if (key.equals(
-            Messages("responsiblepeople.detailed_answers.address")) ||
+          val questions = doc.select("span.bold")
+          val question = questions.toList.find(e => e.text() == Messages(key))
+          if (key.equals(Messages("responsiblepeople.detailed_answers.address", personName.fullName)) ||
             key.equals(Messages("responsiblepeople.timeataddress.address_history.heading", personName.fullName))
           ) {
-            header must not be None
-            val section = header.get.parents().select("section").first()
+            question must not be None
+            val section = question.get.parents().select("div").first()
             check(section) must be(true)
           } else {
-            header mustBe None
+            question mustBe None
           }
-
         }
         }
       }
@@ -190,12 +187,11 @@ class detailed_answersSpec extends AmlsSummaryViewSpec with TableDrivenPropertyC
         }
 
         forAll(sectionChecks) { (key, check) => {
-          val headers = doc.select("section.check-your-answers h2")
-          val header = headers.toList.find(e => e.text() == key)
-          header must not be None
-          val section = header.get.parents().select("section").first()
+          val questions = doc.select("span.bold")
+          val question = questions.toList.find(e => e.text() == Messages(key))
+          question must not be None
+          val section = question.get.parents().select("div").first()
           check(section) must be(true)
-
         }
         }
       }
@@ -217,12 +213,11 @@ class detailed_answersSpec extends AmlsSummaryViewSpec with TableDrivenPropertyC
         }
 
         forAll(sectionChecks) { (key, check) => {
-          val headers = doc.select("section.check-your-answers h2")
-          val header = headers.toList.find(e => e.text() == key)
-          header must not be None
-          val section = header.get.parents().select("section").first()
+          val questions = doc.select("span.bold")
+          val question = questions.toList.find(e => e.text() == Messages(key))
+          question must not be None
+          val section = question.get.parents().select("div").first()
           check(section) must be(true)
-
         }
         }
 
@@ -251,13 +246,11 @@ class detailed_answersSpec extends AmlsSummaryViewSpec with TableDrivenPropertyC
         }
 
         forAll(sectionChecks) { (key, check) => {
-          val headers = doc.select("section.check-your-answers h2")
-          val header = headers.toList.find(e => e.text() == key)
-
-          header must not be None
-          val section = header.get.parents().select("section").first()
+          val questions = doc.select("span.bold")
+          val question = questions.toList.find(e => e.text() == Messages(key))
+          question must not be None
+          val section = question.get.parents().select("div").first()
           check(section) must be(true)
-
         }
         }
 
@@ -286,13 +279,11 @@ class detailed_answersSpec extends AmlsSummaryViewSpec with TableDrivenPropertyC
         }
 
         forAll(sectionChecks) { (key, check) => {
-          val headers = doc.select("section.check-your-answers h2")
-          val header = headers.toList.find(e => e.text() == key)
-
-          header must not be None
-          val section = header.get.parents().select("section").first()
+          val questions = doc.select("span.bold")
+          val question = questions.toList.find(e => e.text() == Messages(key))
+          question must not be None
+          val section = question.get.parents().select("div").first()
           check(section) must be(true)
-
         }
         }
 
@@ -313,13 +304,12 @@ class detailed_answersSpec extends AmlsSummaryViewSpec with TableDrivenPropertyC
         }
 
         forAll(sectionChecks) { (key, check) => {
-          val headers = doc.select("section.check-your-answers h2")
-          val header = headers.toList.find(e => e.text() == key)
-
-          header must not be None
-          val section = header.get.parents().select("section").first()
+          val questions = doc.select("span.bold")
+          val question = questions.toList.find(e => e.text() == Messages(key))
+          question must not be None
+          val section = question.get.parents().select("div").first()
           check(section) must be(true)
-          }
+        }
         }
       }
 
@@ -338,17 +328,16 @@ class detailed_answersSpec extends AmlsSummaryViewSpec with TableDrivenPropertyC
         }
 
         forAll(sectionChecks) { (key, check) => {
-          val headers = doc.select("section.check-your-answers h2")
-          val header = headers.toList.find(e => e.text() == key)
-
-          header must be(None)
-          }
+          val questions = doc.select("span.bold")
+          val question = questions.toList.find(e => e.text() == Messages(key))
+          question mustBe None
+        }
         }
       }
     }
 
     "display address on separate lines" in new ViewFixture {
-      def view = views.html.responsiblepeople.detailed_answers(Some(ResponsiblePerson(addressHistory = Some(addressHistory))), 1, true, businessMatching = businessMatching)
+      def view = views.html.responsiblepeople.detailed_answers(Some(ResponsiblePerson(addressHistory = Some(addressHistory))), 1, true, rpName = personName.fullName, businessMatching = businessMatching)
 
       def checkElementHasAttribute(el: Element, keys: String*) = {
         val t = el.text()
@@ -360,17 +349,16 @@ class detailed_answersSpec extends AmlsSummaryViewSpec with TableDrivenPropertyC
 
       override val sectionChecks = Table[String, Element => Boolean](
         ("title key", "check"),
-        (Messages("responsiblepeople.detailed_answers.address"), checkElementHasAttribute(_, "addressLine1 addressLine2 addressLine3 addressLine4 postCode1")),
+        (Messages("responsiblepeople.detailed_answers.address", personName.fullName), checkElementHasAttribute(_, "addressLine1 addressLine2 addressLine3 addressLine4 postCode1")),
         (Messages("responsiblepeople.detailed_answers.previous_address"), checkElementHasAttribute(_, "addressLine5 addressLine6 addressLine7 addressLine8 postCode2")),
         (Messages("responsiblepeople.detailed_answers.other_previous_address"), checkElementHasAttribute(_, "addressLine9 addressLine10 addressLine11 addressLine12 postCode3"))
       )
 
       forAll(sectionChecks) { (key, check) => {
-        val headers = doc.select("section.check-your-answers h2")
-        val header = headers.toList.find(e => e.text() == key)
-
-        header must not be None
-        val section = header.get.parents().select("section").first()
+        val questions = doc.select("span.bold")
+        val question = questions.toList.find(e => e.text() == Messages(key))
+        question must not be None
+        val section = question.get.parents().select("div").first()
         check(section) must be(false)
       }
       }
@@ -384,20 +372,20 @@ class detailed_answersSpec extends AmlsSummaryViewSpec with TableDrivenPropertyC
 
       val timeAtAddresses = doc.getElementsMatchingOwnText(Messages("responsiblepeople.timeataddress.address_history.heading", "firstName middleName lastName"))
 
-      timeAtAddresses(0).nextElementSibling().nextElementSibling().text() must be(Messages("responsiblepeople.timeataddress.5_months_history"))
-      timeAtAddresses(2).nextElementSibling().nextElementSibling().text() must be(Messages("responsiblepeople.timeataddress.11_months_history"))
-      timeAtAddresses(4).nextElementSibling().nextElementSibling().text() must be(Messages("responsiblepeople.timeataddress.3_years_history"))
+      timeAtAddresses(0).parent().nextElementSibling().text() must be(Messages("responsiblepeople.timeataddress.5_months_history"))
+      timeAtAddresses(2).parent().nextElementSibling().text() must be(Messages("responsiblepeople.timeataddress.11_months_history"))
+      timeAtAddresses(4).parent().nextElementSibling().text() must be(Messages("responsiblepeople.timeataddress.3_years_history"))
 
     }
 
     "have the correct href" in new ViewFixture {
       def view = {
-        views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModel), 1, true, businessMatching = businessMatching)
+        views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModel), 1, true, rpName = personName.fullName, businessMatching = businessMatching)
       }
 
       override val sectionChecks = Table[String, Element => Boolean](
         ("title key", "check"),
-        (Messages("responsiblepeople.detailed_answers.address"), checkElementTextIncludes(_, "/anti-money-laundering/responsible-people/moved-address/1"))
+        (Messages("responsiblepeople.detailed_answers.address", personName.fullName), checkElementTextIncludes(_, "/anti-money-laundering/responsible-people/moved-address/1"))
       )
 
       def checkElementTextIncludes(el:Element, keys : String*) = {
@@ -409,11 +397,10 @@ class detailed_answersSpec extends AmlsSummaryViewSpec with TableDrivenPropertyC
       }
 
       forAll(sectionChecks) { (key, check) => {
-        val headers = doc.select("section.check-your-answers h2")
-        val header = headers.toList.find(e => e.text() == key)
-
-        header must not be None
-        val section = header.get.parents().select("section").first()
+        val questions = doc.select("span.bold")
+        val question = questions.toList.find(e => e.text() == Messages(key))
+        question must not be None
+        val section = question.get.parents().select("div").first()
         check(section) must be(true)
       }
       }

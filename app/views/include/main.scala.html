@@ -146,7 +146,7 @@
 }
 
 @hmrcGovUkTemplate(
-    Some(title + " - " + Messages("title.amls") + " - " + Messages("title.gov")),
+    Some(views.ViewUtils.errorPrefix(mainContent) + title + " - " + Messages("title.amls") + " - " + Messages("title.gov")),
     bodyClasses
 )(
     head,

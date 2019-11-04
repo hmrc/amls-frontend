@@ -16,7 +16,6 @@
 
 package models.businessdetails
 
-import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.api.libs.json.{Json, Reads}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -74,6 +73,10 @@ case class BusinessDetails(
 
   def isComplete: Boolean =
     this match {
+      case BusinessDetails(Some(PreviouslyRegisteredYes(None)), None, _, _, _, _, _, _, _, _, _, _) =>
+        false
+      case BusinessDetails(Some(PreviouslyRegisteredNo), None, _, _, _, _, _, _, _, _, _, _) =>
+        false
       case BusinessDetails(Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), _, Some(_), Some(true), _, None, _, true) =>
         false
       case BusinessDetails(Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), _, Some(_), Some(true), Some(_), None, _, true) =>

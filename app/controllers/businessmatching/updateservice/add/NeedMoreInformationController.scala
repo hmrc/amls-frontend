@@ -26,7 +26,7 @@ import models.businessmatching.{BillPaymentServices, TelephonePaymentService}
 import models.flowmanagement.{AddBusinessTypeFlowModel, NeedMoreInformationPageId}
 import play.api.mvc.MessagesControllerComponents
 import services.flowmanagement.Router
-import utils.AuthAction
+import utils.{AuthAction, ControllerHelper}
 import views.html.businessmatching.updateservice.add.new_service_information
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -44,6 +44,7 @@ class NeedMoreInformationController @Inject()(authAction: AuthAction,
         (for {
           model <- OptionT(dataCacheConnector.fetch[ServiceChangeRegister](request.credId, ServiceChangeRegister.key))
           activity <- OptionT.fromOption[Future](model.addedActivities)
+          cacheMap <- OptionT(dataCacheConnector.fetchAll(request.credId))
         } yield {
           val activityNames = activity filterNot {
             case BillPaymentServices | TelephonePaymentService => true
@@ -52,7 +53,7 @@ class NeedMoreInformationController @Inject()(authAction: AuthAction,
             _.getMessage()
           }
 
-          Ok(new_service_information(activityNames))
+          Ok(new_service_information(activityNames, ControllerHelper.supervisionComplete(cacheMap)))
         }) getOrElse InternalServerError("Get: Unable to show New Service Information page")
   }
 

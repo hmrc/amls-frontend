@@ -205,7 +205,7 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
 
       status(result) must be(BAD_REQUEST)
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.title must be(pageTitle)
+      document.title must be(s"Error: $pageTitle")
     }
 
 

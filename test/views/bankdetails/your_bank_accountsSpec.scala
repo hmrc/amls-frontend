@@ -148,10 +148,9 @@ class your_bank_accountsSpec extends AmlsSummaryViewSpec with PropertyChecks {
       doc.getElementById("incomplete-detail-4").text must include(Messages("bankdetails.yourbankaccounts.noaccountname"))
 
       doc.getElementById("incomplete-detail-edit-1").attr("href") must be(controllers.bankdetails.routes.BankAccountNameController.getIndex(2).url)
-      doc.getElementById("incomplete-detail-edit-1").text must be(Messages("bankdetails.yourbankaccount.edit"))
+      doc.getElementById("incomplete-detail-edit-1").text must include(Messages("bankdetails.yourbankaccount.edit"))
       doc.getElementById("incomplete-detail-remove-1").attr("href") must be(controllers.bankdetails.routes.RemoveBankDetailsController.get(2).url)
-      doc.getElementById("incomplete-detail-remove-1").text must be(Messages("bankdetails.yourbankaccount.remove"))
-      doc.getElementById("incomplete-action-panel-1").text must include(Messages("bankdetails.yourbankaccount.or"))
+      doc.getElementById("incomplete-detail-remove-1").text must include(Messages("bankdetails.yourbankaccount.remove"))
     }
 
     "have an complete section with correct data and remove links - if there are complete elements" in new ViewFixture {
@@ -183,7 +182,6 @@ class your_bank_accountsSpec extends AmlsSummaryViewSpec with PropertyChecks {
 
       Option(doc.getElementById("completed-detail-edit-1")).isDefined must be(false)
       doc.getElementById("completed-detail-remove-1").attr("href") must be(controllers.bankdetails.routes.RemoveBankDetailsController.get(2).url)
-      doc.getElementById("completed-detail-remove-1").text must be(Messages("bankdetails.yourbankaccount.remove"))
     }
 
 

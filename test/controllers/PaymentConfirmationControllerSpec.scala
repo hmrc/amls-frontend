@@ -190,7 +190,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
         } thenReturn Future.successful(None)
 
 
-        val businessDetailsYes = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredYes("123456")))
+        val businessDetailsYes = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredYes(Some("123456"))))
 
         when {
           controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any(), any())

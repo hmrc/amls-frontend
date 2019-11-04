@@ -97,12 +97,12 @@ class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
       )
 
       forAll(sectionChecks) { (key, check) => {
-        val hTwos = doc.select("section.check-your-answers h2")
+        val questions = doc.select("span.bold")
 
-        val hTwo = hTwos.toList.find(e => e.text() == Messages(key, "AccountantName"))
+        val question = questions.toList.find(e => e.text() == Messages(key, "AccountantName"))
 
-        hTwo must not be None
-        val section = hTwo.get.parents().select("section").first()
+        question must not be None
+        val section = question.get.parents().select("div").first()
         check(section) must be(true)
       }
       }
