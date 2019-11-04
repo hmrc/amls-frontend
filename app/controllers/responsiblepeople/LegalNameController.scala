@@ -66,7 +66,7 @@ class LegalNameController @Inject()(val dataCacheConnector: DataCacheConnector,
         }
 
         Form2[PreviousName](request.body) match {
-          case f: InvalidForm if isRequiredDataPresent(f) => processForm(PreviousName(Some(true), None, None, None))
+          case f: InvalidForm if isHasPreviousNameTrue(f) => processForm(getModelFromForm(f))
           case f: InvalidForm =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
               BadRequest(views.html.responsiblepeople.legal_name(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
@@ -80,12 +80,14 @@ class LegalNameController @Inject()(val dataCacheConnector: DataCacheConnector,
       }
   }
 
-  private def isRequiredDataPresent(form: InvalidForm): Boolean = {
-    val isFirstNameEmpty = form.data.get("firstName").contains(Seq(""))
-    val isMiddleNameEmpty = form.data.get("middleName").contains(Seq(""))
-    val isLastNameEmpty = form.data.get("lastName").contains(Seq(""))
-    val isHasPreviousNameTrue = form.data.get("hasPreviousName").contains(Seq("true"))
+  private def isHasPreviousNameTrue(form: InvalidForm) =
+    form.data.get("hasPreviousName").contains(Seq("true"))
 
-    isFirstNameEmpty && isMiddleNameEmpty && isLastNameEmpty && isHasPreviousNameTrue
+  private def getModelFromForm(form: InvalidForm) = {
+    val firstName = form.data.get("firstName").map(_.head)
+    val middleName = form.data.get("middleName").map(_.head)
+    val lastName = form.data.get("lastName").map(_.head)
+
+    PreviousName(Some(true), firstName, middleName, lastName)
   }
 }
