@@ -51,11 +51,9 @@ class LegalNameInputController @Inject()(val dataCacheConnector: DataCacheConnec
             }
           case ValidForm(_, data) => {
             for {
-              _ <- {
-                 updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
+              _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
                     rp.legalName(data)
                 }
-              }
             } yield {
               Redirect(routes.LegalNameChangeDateController.get(index, edit, flow))
             }
