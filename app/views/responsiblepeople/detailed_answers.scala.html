@@ -420,10 +420,10 @@
                             </ul>
                         }
                     }
-                    <p>@ex match {
-                    case ExperienceTrainingYes(info) => {<p>@Messages("lbl.yes")</p> @info}
+                    @ex match {
+                        case ExperienceTrainingYes(info) => {<p>@Messages("lbl.yes")</p> <p>@info</p>}
                         case ExperienceTrainingNo => {@Messages("lbl.no")}
-                    }</p>
+                    }
                 }
             }
 
