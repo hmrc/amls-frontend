@@ -165,7 +165,24 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
           status(result) must be(BAD_REQUEST)
 
         }
+      }
 
+      "form is invalid" when {
+        "hasPreviousName is true" must {
+          "redirect to LegalNameInputController" in new TestFixture {
+
+            val requestWithHasPreviousNameTrue = request.withFormUrlEncodedBody(
+              "hasPreviousName" -> "true"
+            )
+
+            mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
+            mockCacheSave[PreviousName]
+
+            val result = controller.post(RecordId)(requestWithHasPreviousNameTrue)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.LegalNameInputController.get(RecordId).url))
+          }
+        }
       }
 
       "model cannot be found with given index" must {
