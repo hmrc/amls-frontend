@@ -57,48 +57,11 @@ class PreviousNameSpec extends PlaySpec {
         ))
     }
 
-
-
     "successfully validate with firstName and lastname" in {
 
       val data: UrlFormEncoded = Map(
         "hasPreviousName" -> Seq("true"),
-        "firstName" -> Seq("oldFirst")
-      )
-
-      implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
-        equal(
-          Valid(PreviousName(
-            hasPreviousName = Some(true),
-            firstName = Some("oldFirst"),
-            middleName = None,
-            lastName = None
-          )
-        ))
-    }
-
-    "successfully validate with just middleName" in {
-
-      val data: UrlFormEncoded = Map(
-        "hasPreviousName" -> Seq("true"),
-        "middleName" -> Seq("oldMiddle")
-      )
-
-      implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
-        equal(
-          Valid(PreviousName(
-            hasPreviousName = Some(true),
-            firstName = None,
-            middleName = Some("oldMiddle"),
-            lastName = None
-          )
-        ))
-    }
-
-    "successfully validate with just lastName" in {
-
-      val data: UrlFormEncoded = Map(
-        "hasPreviousName" -> Seq("true"),
+        "firstName" -> Seq("oldFirst"),
         "lastName" -> Seq("oldLast")
       )
 
@@ -106,7 +69,7 @@ class PreviousNameSpec extends PlaySpec {
         equal(
           Valid(PreviousName(
             hasPreviousName = Some(true),
-            firstName = None,
+            firstName = Some("oldFirst"),
             middleName = None,
             lastName = Some("oldLast")
           )
@@ -125,8 +88,9 @@ class PreviousNameSpec extends PlaySpec {
       implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
         equal(
           Invalid(Seq(
-            Path -> Seq(ValidationError("error.rp.previous.invalid"))
-          ))
+            Path \ "firstName" -> Seq(ValidationError("error.rp.previous.first.invalid")),
+            Path \ "lastName" -> Seq(ValidationError("error.rp.previous.last.invalid")))
+          )
         )
     }
 

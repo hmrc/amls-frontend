@@ -6,6 +6,9 @@ GET         /what-you-need/:index/                                 @controllers.
 GET         /name/:index/                                          @controllers.responsiblepeople.PersonNameController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /name/:index/                                          @controllers.responsiblepeople.PersonNameController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
+GET         /previous-name/:index/                                 @controllers.responsiblepeople.LegalNameInputController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /previous-name/:index/                                 @controllers.responsiblepeople.LegalNameInputController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+
 GET         /legal-name-change/:index/                             @controllers.responsiblepeople.LegalNameController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /legal-name-change/:index/                             @controllers.responsiblepeople.LegalNameController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 

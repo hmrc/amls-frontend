@@ -16,28 +16,27 @@
 
 package controllers.responsiblepeople
 
-import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.{LegalNameChangeDate, ResponsiblePerson}
+import javax.inject.{Inject, Singleton}
+import models.responsiblepeople.{PreviousName, ResponsiblePerson}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.legal_name_change_date
+import views.html.responsiblepeople.legal_name_input
 
 import scala.concurrent.Future
 
 @Singleton
-class LegalNameChangeDateController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                              authAction: AuthAction
-                                             )extends RepeatingSection with DefaultBaseController {
+class LegalNameInputController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                         authAction: AuthAction) extends RepeatingSection with DefaultBaseController {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>
         getData[ResponsiblePerson](request.credId, index) map {
-          case Some(ResponsiblePerson(Some(personName),_,Some(changeDate),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-          => Ok(legal_name_change_date(Form2[LegalNameChangeDate](LegalNameChangeDate(changeDate)), edit, index, flow, personName.titleName))
-          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-          => Ok(legal_name_change_date(EmptyForm, edit, index, flow, personName.titleName))
+          case Some(ResponsiblePerson(Some(personName), Some(previous), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
+          => Ok(legal_name_input(Form2[PreviousName](previous), edit, index, flow, personName.titleName))
+          case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
+          => Ok(legal_name_input(EmptyForm, edit, index, flow, personName.titleName))
           case _
           => NotFound(notFoundView)
         }
@@ -45,19 +44,18 @@ class LegalNameChangeDateController @Inject()(val dataCacheConnector: DataCacheC
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request => {
-        Form2[LegalNameChangeDate](request.body) match {
+        Form2[PreviousName](request.body) match {
           case f: InvalidForm =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
-              BadRequest(views.html.responsiblepeople.legal_name_change_date(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+              BadRequest(views.html.responsiblepeople.legal_name_input(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
             for {
               _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
-                rp.legalNameChangeDate(data.date)
-              }
-            } yield edit match {
-              case true => Redirect(routes.DetailedAnswersController.get(index, flow))
-              case false => Redirect(routes.KnownByController.get(index, edit, flow))
+                    rp.legalName(data)
+                }
+            } yield {
+              Redirect(routes.LegalNameChangeDateController.get(index, edit, flow))
             }
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
