@@ -21,6 +21,8 @@ import jto.validation.forms.Rules.{maxLength, notEmpty, minLength => _, _}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Path, Rule, ValidationError, Write}
 import models.FormTypes.{basicPunctuationPattern, notEmptyStrip}
+
+import play.api.i18n.{Lang, Messages}
 import play.api.libs.json.Reads.StringReads
 import play.api.libs.json._
 import utils.TraversableValidators.minLengthR
@@ -43,6 +45,27 @@ sealed trait BusinessType {
       case LawSociety => "13"
       case Other(_) => "14"
     }
+
+  def getMessage()(implicit lang: Lang, messages: Messages): String = {
+    val message = s"supervision.memberofprofessionalbody.lbl."
+    this match {
+      case AccountingTechnicians => Messages(s"${message}01")
+      case CharteredCertifiedAccountants => Messages(s"${message}02")
+      case InternationalAccountants => Messages(s"${message}03")
+      case TaxationTechnicians => Messages(s"${message}04")
+      case ManagementAccountants => Messages(s"${message}05")
+      case InstituteOfTaxation => Messages(s"${message}06")
+      case Bookkeepers => Messages(s"${message}07")
+      case AccountantsIreland => Messages(s"${message}08")
+      case AccountantsScotland => Messages(s"${message}09")
+      case AccountantsEnglandandWales => Messages(s"${message}10")
+        .replace("Accountants of England", "Accountants in England")
+      case FinancialAccountants => Messages(s"${message}11")
+      case AssociationOfBookkeepers => Messages(s"${message}12")
+      case LawSociety => Messages(s"${message}13")
+      case Other(_) => Messages(s"${message}14")
+    }
+  }
 }
 
 case object AccountingTechnicians extends BusinessType

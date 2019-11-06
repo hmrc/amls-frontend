@@ -83,11 +83,11 @@ class summarySpec extends AmlsSpec with MustMatchers with TableDrivenPropertyChe
       )
 
       forAll(sectionChecks) { (key, check) => {
-        val hTwos = doc.select("section.check-your-answers h2")
-        val hTwo = hTwos.toList.find(e => e.text() == Messages(key))
+        val Elements = doc.select("span.bold")
+        val maybeElement = Elements.toList.find(e => e.text() == Messages(key))
 
-        hTwo must not be None
-        val section = hTwo.get.parents().select("section").first()
+        maybeElement must not be None
+        val section = maybeElement.get.parents().select("div").first()
         check(section) must be(true)
       }}
     }
@@ -120,11 +120,11 @@ class summarySpec extends AmlsSpec with MustMatchers with TableDrivenPropertyChe
       )
 
       forAll(sectionChecks) { (key, check) => {
-        val hTwos = doc.select("section.check-your-answers h2")
-        val hTwo = hTwos.toList.find(e => e.text() == Messages(key))
+        val Elements = doc.select("span.bold")
+        val maybeElement = Elements.toList.find(e => e.text() == Messages(key))
 
-        hTwo must not be None
-        val section = hTwo.get.parents().select("section").first()
+        maybeElement must not be None
+        val section = maybeElement.get.parents().select("div").first()
         check(section) must be(true)
       }}
     }
