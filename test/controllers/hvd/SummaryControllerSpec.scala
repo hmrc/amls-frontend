@@ -113,7 +113,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
 
-        val answerRows = document.getElementsByClass("cya-summary-list__row").toArray(new Array[Element](9))
+        val answerRows = document.getElementsByClass("cya-summary-list__row").toArray(Array[Element]())
         answerRows.size mustBe 9
 
         for ( el <- answerRows ) {
