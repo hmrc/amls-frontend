@@ -1685,11 +1685,12 @@ responsiblepeople.contact_details.phone.hint = You can only use numbers, spaces,
 responsiblepeople.contact_details.email.lbl = Email address
 responsiblepeople.contact_details.email.hint = For example, myname@example.com.
 
-responsiblepeople.wherepersonlives.heading = Where does {0} live?
-responsiblepeople.wherepersonlives.title = Where does this person live?
+responsiblepeople.wherepersonlives.heading = Is {0}’s home address in the UK?
+responsiblepeople.wherepersonlives.title = Is this persons home address in the UK?
+responsiblepeople.wherepersonlivescountry.heading = What is {0}’s home address?
+responsiblepeople.wherepersonlivescountry.title = What is this persons home address?
+responsiblepeople.wherepersonlive.whatisaddressleg = What is this persons home address?
 responsiblepeople.wherepersonlives.need.to.know = We need to know all the home addresses for the last 3 years.
-responsiblepeople.wherepersonlives.is.uk = Is this a UK address?
-responsiblepeople.wherepersonlives.is.overseas = Is this address overseas?
 responsiblepeople.wherepersonlives.ukAddress = Yes
 responsiblepeople.wherepersonlives.nonUkAddress = No
 responsiblepeople.wherepersonlives.address = Address
