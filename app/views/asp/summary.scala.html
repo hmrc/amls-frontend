@@ -31,12 +31,12 @@
 ) {
 
     @model.services.map { a =>
-        @checkYourAnswers(
+        @checkYourAnswersRow(
             question = Messages("asp.services.title"),
             editUrl = controllers.asp.routes.ServicesOfBusinessController.get(true).toString,
             editLinkTag = "aspservices-edit"
         ) {
-            <ul class="list list--comma">
+            <ul class="list list-bullet">
             @a.services.toList.sortBy(_.getMessage).map { line =>
                 <li>@line match {
                     case Accountancy => {@Messages("asp.service.lbl.01")}
@@ -50,15 +50,15 @@
         }
     }
 
-    @checkYourAnswers(
+    @checkYourAnswersRow(
         question = Messages("asp.other.business.tax.matters.title"),
         editUrl = controllers.asp.routes.OtherBusinessTaxMattersController.get(true).toString,
         editLinkTag = "aspotherbusinesstaxmatters-edit"
     ) {
-        <p>@model.otherBusinessTaxMatters.map {
+        @model.otherBusinessTaxMatters.map {
             case OtherBusinessTaxMattersNo => { @Messages("lbl.no") }
             case OtherBusinessTaxMattersYes => { @Messages("lbl.yes") }
-        }</p>
+        }
     }
     @form(f, controllers.asp.routes.SummaryController.post()) {
         @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
