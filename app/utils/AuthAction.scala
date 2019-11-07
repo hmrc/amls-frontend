@@ -118,7 +118,7 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector)
   }
 
   private def authPredicate = {
-    User and (AffinityGroup.Organisation or (Enrolment(saKey) or Enrolment(ctKey) or Enrolment(amlsKey)))
+    User and (AffinityGroup.Organisation or (Enrolment(saKey) or Enrolment(ctKey)))
   }
 
   private def amlsRefNo(enrolments: Enrolments): Option[String] = {
