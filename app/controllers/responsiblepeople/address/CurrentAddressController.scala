@@ -29,7 +29,7 @@ import play.api.mvc.{AnyContent, Request}
 import services.{AutoCompleteService, StatusService}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, ControllerHelper, DateOfChangeHelper, RepeatingSection}
-import views.html.responsiblepeople.current_address
+import views.html.responsiblepeople.address.current_address
 
 import scala.concurrent.Future
 
@@ -46,9 +46,9 @@ class CurrentAddressController @Inject ()(
         getData[ResponsiblePerson](request.credId, index) map {
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,
           Some(ResponsiblePersonAddressHistory(Some(currentAddress),_,_)),_,_,_,_,_,_,_,_,_,_,_, _))
-          => Ok(current_address(Form2[ResponsiblePersonCurrentAddress](currentAddress), edit, index, flow, personName.titleName, autoCompleteService.getCountries))
+          => Ok(current_address(Form2[ResponsiblePersonCurrentAddress](currentAddress), edit, index, flow, personName.titleName))
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-          => Ok(current_address(Form2(ResponsiblePersonAddressHistory.default()), edit, index, flow, personName.titleName, autoCompleteService.getCountries))
+          => Ok(current_address(Form2(ResponsiblePersonAddressHistory.default()), edit, index, flow, personName.titleName))
           case _
           => NotFound(notFoundView)
         }

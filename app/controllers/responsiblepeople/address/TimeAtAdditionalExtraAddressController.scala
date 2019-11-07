@@ -24,7 +24,7 @@ import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople._
 import play.api.mvc.{AnyContent, Request}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.time_at_additional_extra_address
+import views.html.responsiblepeople.address.time_at_additional_extra_address
 
 import scala.concurrent.Future
 
@@ -47,29 +47,38 @@ class TimeAtAdditionalExtraAddressController @Inject () (
   }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
-    implicit request => {
+    implicit request =>
       (Form2[TimeAtAddress](request.body) match {
         case f: InvalidForm =>
-          getData[ResponsiblePerson](request.credId, index) map { rp =>
-            BadRequest(time_at_additional_extra_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
-          }
+          //         getData[ResponsiblePerson](request.credId, index) map { rp =>
+          //            BadRequest(time_at_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+          //          }
+          Future.successful(Redirect(controllers.responsiblepeople.routes.PositionWithinBusinessController.get(index, edit, flow)))
         case ValidForm(_, data) =>
-          getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>
-            (for {
-              rp <- responsiblePerson
-              addressHistory <- rp.addressHistory
-              additionalExtraAddress <- addressHistory.additionalExtraAddress
-            } yield {
-              val additionalExtraAddressWithTime = additionalExtraAddress.copy(
-                timeAtAddress = Some(data)
-              )
-              updateAndRedirect(request.credId, additionalExtraAddressWithTime, index, edit, flow)
-            }) getOrElse Future.successful(NotFound(notFoundView))
-          }
+          //          {
+          //            getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>
+          //              (for {
+          //                rp <- responsiblePerson
+          //                addressHistory <- rp.addressHistory
+          //                currentAddress <- addressHistory.currentAddress
+          //              } yield {
+          //                val currentAddressWithTime = currentAddress.copy(
+          //                  timeAtAddress = Some(data)
+          //                )
+          //                doUpdate(request.credId, index, currentAddressWithTime).flatMap { _ =>
+          //                  for {
+          //                    status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+          //                  } yield {
+          //                    redirectTo(index, data, rp, status, edit, flow)
+          //                  }
+          //                }
+          //              }) getOrElse Future.successful(NotFound(notFoundView))
+          //            }
+          //          }
+          Future.successful(Redirect(controllers.responsiblepeople.routes.PositionWithinBusinessController.get(index, edit, flow)))
       }).recoverWith {
         case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
       }
-    }
   }
 
   private def updateAndRedirect(credId: String, data: ResponsiblePersonAddress, index: Int, edit: Boolean, flow: Option[String])

@@ -34,6 +34,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.additional_address
+import views.html.responsiblepeople.address.additional_address_UK
 
 import scala.concurrent.Future
 
@@ -49,9 +50,9 @@ class AdditionalAddressUKController @Inject()(
     implicit request =>
       getData[ResponsiblePerson](request.credId, index) map {
         case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_, Some(ResponsiblePersonAddressHistory(_, Some(additionalAddress), _)),_,_,_,_,_,_,_,_,_,_,_, _)) =>
-          Ok(additional_address(Form2[ResponsiblePersonAddress](additionalAddress), edit, index, flow, personName.titleName, autoCompleteService.getCountries))
+          Ok(additional_address_UK(Form2[ResponsiblePersonAddress](additionalAddress), edit, index, flow, personName.titleName))
         case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
-          Ok(additional_address(Form2(ResponsiblePersonAddressHistory.default()), edit, index, flow, personName.titleName, autoCompleteService.getCountries))
+          Ok(additional_address_UK(Form2(ResponsiblePersonAddressHistory.default()), edit, index, flow, personName.titleName))
         case _ => NotFound(notFoundView)
       }
   }
