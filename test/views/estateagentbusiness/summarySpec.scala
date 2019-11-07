@@ -57,7 +57,9 @@ class summarySpec extends AmlsSpec with MustMatchers  {
 
       def view = views.html.estateagentbusiness.summary(EmptyForm, validBusiness)
 
-      val checkYourAnswersSection = doc.select("section.check-your-answers")
+      val checkYourAnswersSection = doc.select("div.cya-summary-list__row")
+
+      println(checkYourAnswersSection.toString)
 
       checkYourAnswersSection.size() must not be 0
 
@@ -81,7 +83,7 @@ class summarySpec extends AmlsSpec with MustMatchers  {
 
       def view = views.html.estateagentbusiness.summary(EmptyForm, business)
 
-      val checkYourAnswersSection = doc.select("section.check-your-answers")
+      val checkYourAnswersSection = doc.select("div.cya-summary-list__row")
 
       checkYourAnswersSection.size() must be(4)
       checkYourAnswersSection.get(1).html must include(Messages("estateagentbusiness.registered.redress.title"))
@@ -94,7 +96,7 @@ class summarySpec extends AmlsSpec with MustMatchers  {
 
       def view = views.html.estateagentbusiness.summary(EmptyForm, business)
 
-      val section = doc.select("section.check-your-answers")
+      val section = doc.select("span.bold")
 
       section.size must be(3)
       section.html() must not include Messages("estateagentbusiness.registered.redress.title")
