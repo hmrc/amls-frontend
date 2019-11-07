@@ -106,3 +106,30 @@ GET         /country-of-birth/:index/                              @controllers.
 POST        /country-of-birth/:index/                              @controllers.responsiblepeople.CountryOfBirthController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
 GET         /your-responsible-people                               @controllers.responsiblepeople.YourResponsiblePeopleController.get()
+
+GET         /address-country/:index/                               @controllers.responsiblepeople.address.CurrentAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /address-country/:index/                               @controllers.responsiblepeople.address.CurrentAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+
+GET         /address-uk/:index/                                    @controllers.responsiblepeople.address.CurrentAddressUKController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /address-uk/:index/                                    @controllers.responsiblepeople.address.CurrentAddressUKController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+
+GET         /address-non-uk/:index/                                @controllers.responsiblepeople.address.CurrentAddressNonUKController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /address-non-uk/:index/                                @controllers.responsiblepeople.address.CurrentAddressNonUKController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+
+GET         /previous-address-country/:index/                      @controllers.responsiblepeople.address.AdditionalAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /previous-address-country/:index/                      @controllers.responsiblepeople.address.AdditionalAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+
+GET         /previous-address-uk/:index/                           @controllers.responsiblepeople.address.AdditionalAddressUKController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /previous-address-uk/:index/                           @controllers.responsiblepeople.address.AdditionalAddressUKController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+
+GET         /previous-address-non-uk/:index/                       @controllers.responsiblepeople.address.AdditionalAddressNonUKController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /previous-address-non-uk/:index/                       @controllers.responsiblepeople.address.AdditionalAddressNonUKController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+
+GET         /other-previous-address-country/:index/                @controllers.responsiblepeople.address.AdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /other-previous-address-country/:index/                @controllers.responsiblepeople.address.AdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+
+GET         /other-previous-address-uk/:index/                     @controllers.responsiblepeople.address.AdditionalExtraAddressUKController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /other-previous-address-uk/:index/                     @controllers.responsiblepeople.address.AdditionalExtraAddressUKController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+
+GET         /other-previous-address-non-uk/:index/                 @controllers.responsiblepeople.address.AdditionalExtraAddressNonUKController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /other-previous-address-non-uk/:index/                 @controllers.responsiblepeople.address.AdditionalExtraAddressNonUKController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)

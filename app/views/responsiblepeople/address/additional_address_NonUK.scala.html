@@ -34,71 +34,25 @@
 
     @form(f, controllers.responsiblepeople.routes.AdditionalAddressController.post(index, edit, flow)) {
 
-        <div class="form-group">
+        <div id="@{s"""${f("country").id}-fieldset"""}">
             @fieldset(
-                legend = "responsiblepeople.wherepersonlives.is.uk",
-                f = f("isUK"),
+                legend = "responsiblepeople.additional_address.address",
+                jsHidden = false,
+                legendHidden = true,
                 panel = false,
-                classes = Seq("inline")
+                f = f(s"""${f("address-overseas").id}-fieldset""")
             ) {
-                @radio(
-                    f = f("isUK"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    target = s"#${f("postCode").id}-fieldset",
-                    inline = true
-                )
-                @radio(
-                    f = f("isUK"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    target = s"#${f("country").id}-fieldset",
-                    inline = true
+                @input(f("addressLineNonUK1"), labelText = "lbl.address.line1")
+                @input(f("addressLineNonUK2"), labelText = "lbl.address.line2")
+                @input(f("addressLineNonUK3"), labelText = "lbl.address.line3")
+                @input(f("addressLineNonUK4"), labelText = "lbl.address.line4")
+                @country_autocomplete(
+                    field = f("country"),
+                    placeholder = s"$personName ${Messages("error.required.select.non.uk.previous.address")}",
+                    labelText = "responsiblepeople.additional_address.country",
+                    data = countryData.getOrElse(Seq.empty)
                 )
             }
-        </div>
-
-        <div class="form-group">
-            <div id="@{s"""${f("postCode").id}-fieldset"""}">
-
-                @fieldset(
-                    legend = "responsiblepeople.additional_address.address",
-                    legendHidden = true,
-                    panel = false,
-                    f = f(s"""${f("address").id}-fieldset""")
-                ) {
-                    @input(f("addressLine1"), labelText = "lbl.address.line1")
-                    @input(f("addressLine2"), labelText = "lbl.address.line2")
-                    @input(f("addressLine3"), labelText = "lbl.address.line3")
-                    @input(f("addressLine4"), labelText = "lbl.address.line4")
-                    @input(
-                        field = f("postCode"),
-                        labelText = "responsiblepeople.additional_address.postCode",
-                        classes = Seq("postcode")
-                    )
-                }
-            </div>
-
-            <div id="@{s"""${f("country").id}-fieldset"""}">
-                @fieldset(
-                    legend = "responsiblepeople.additional_address.address",
-                    jsHidden = false,
-                    legendHidden = true,
-                    panel = false,
-                    f = f(s"""${f("address-overseas").id}-fieldset""")
-                ) {
-                    @input(f("addressLineNonUK1"), labelText = "lbl.address.line1")
-                    @input(f("addressLineNonUK2"), labelText = "lbl.address.line2")
-                    @input(f("addressLineNonUK3"), labelText = "lbl.address.line3")
-                    @input(f("addressLineNonUK4"), labelText = "lbl.address.line4")
-                    @country_autocomplete(
-                        field = f("country"),
-                        placeholder = s"$personName ${Messages("error.required.select.non.uk.previous.address")}",
-                        labelText = "responsiblepeople.additional_address.country",
-                        data = countryData.getOrElse(Seq.empty)
-                    )
-                }
-            </div>
         </div>
 
         @submit(edit, Some("button.saveandcontinue"))
