@@ -132,7 +132,7 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector)
   private def getActiveEnrolment(enrolments: Enrolments, key: String) = {
     /*
     *  Look for activated enrolments only for SA and CT.
-    *  Enrolments can be activated or not yet activated.
+    *  Enrolments can be 'Activated' or 'NotYetActivated'.
     */
     enrolments.getEnrolment(key).filter(e => e.isActivated)
   }
