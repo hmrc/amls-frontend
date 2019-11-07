@@ -133,3 +133,12 @@ POST        /other-previous-address-uk/:index/                     @controllers.
 
 GET         /other-previous-address-non-uk/:index/                 @controllers.responsiblepeople.address.AdditionalExtraAddressNonUKController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /other-previous-address-non-uk/:index/                 @controllers.responsiblepeople.address.AdditionalExtraAddressNonUKController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+
+GET         /time-at-address-2/:index/                             @controllers.responsiblepeople.address.TimeAtCurrentAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /time-at-address-2/:index/                             @controllers.responsiblepeople.address.TimeAtCurrentAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+
+GET         /time-at-previous-address-2/:index/                    @controllers.responsiblepeople.address.TimeAtAdditionalAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /time-at-previous-address-2/:index/                    @controllers.responsiblepeople.address.TimeAtAdditionalAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+
+GET         /time-at-other-previous-address-2/:index/              @controllers.responsiblepeople.address.TimeAtAdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /time-at-other-previous-address-2/:index/              @controllers.responsiblepeople.address.TimeAtAdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
