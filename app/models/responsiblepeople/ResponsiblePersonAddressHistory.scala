@@ -41,4 +41,6 @@ object ResponsiblePersonAddressHistory {
 
   implicit val format = Json.format[ResponsiblePersonAddressHistory]
 
+  def default() = ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), None)
+
 }
