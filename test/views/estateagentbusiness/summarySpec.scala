@@ -59,8 +59,6 @@ class summarySpec extends AmlsSpec with MustMatchers  {
 
       val checkYourAnswersSection = doc.select("div.cya-summary-list__row")
 
-      println(checkYourAnswersSection.toString)
-
       checkYourAnswersSection.size() must not be 0
 
       checkYourAnswersSection.get(0).html must include(Messages("estateagentbusiness.service.lbl.02")) // Commercial
