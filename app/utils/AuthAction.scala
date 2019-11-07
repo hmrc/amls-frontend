@@ -123,7 +123,7 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector)
 
   private def amlsRefNo(enrolments: Enrolments): Option[String] = {
     val amlsRefNumber = for {
-      enrolment      <- getActiveEnrolment(enrolments, amlsKey)
+      enrolment      <- enrolments.getEnrolment(amlsKey)
       amlsIdentifier <- enrolment.getIdentifier(amlsNumberKey)
     } yield amlsIdentifier.value
     amlsRefNumber
