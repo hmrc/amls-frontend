@@ -275,7 +275,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
           val result = currentAddressController.post(RecordId, true)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.CurrentAddressDateOfChangeController.get(RecordId,true).url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CurrentAddressDateOfChangeController.get(RecordId,true).url))
 
           val captor = ArgumentCaptor.forClass(classOf[DataEvent])
           verify(auditConnector).sendEvent(captor.capture())(any(), any())
@@ -315,7 +315,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
           val result = currentAddressController.post(RecordId, true)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.CurrentAddressDateOfChangeController.get(RecordId,true).url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CurrentAddressDateOfChangeController.get(RecordId,true).url))
 
         }
       }
@@ -344,7 +344,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
           val result = currentAddressController.post(RecordId, true)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(RecordId).url))
 
         }
       }
