@@ -62,20 +62,20 @@ class summarySpec extends AmlsSpec
     val fullProductSet = Set("hvd.products.option.01","hvd.products.option.03","hvd.products.option.06",
       "hvd.products.option.04","hvd.products.option.11","hvd.products.option.08","hvd.products.option.07",
       "hvd.products.option.10","hvd.products.option.05","hvd.products.option.09","hvd.products.option.02",
-      "Other: Other Product"
+      "Other Product"
     )
 
     val sectionChecks = Table[String, Element=>Boolean](
       ("title key", "check"),
-      ("hvd.cash.payment.title",checkElementTextIncludes(_, "lbl.yes")),
-      ("hvd.cash.payment.date.title",checkElementTextIncludes(_, "20 June 2012")),
+      ("hvd.cash.payment.title",checkElementTextOnlyIncludes(_, "lbl.yes")),
+      ("hvd.cash.payment.date.title",checkElementTextOnlyIncludes(_, "20 June 2012")),
       ("hvd.products.title", checkListContainsItems(_, fullProductSet)),
-      ("hvd.excise.goods.title", checkElementTextIncludes(_, "lbl.yes")),
+      ("hvd.excise.goods.title", checkElementTextOnlyIncludes(_, "lbl.yes")),
       ("hvd.how-will-you-sell-goods.title", checkListContainsItems(_, Set("Retail", "Auction", "Wholesale"))),
-      ("hvd.percentage.title", checkElementTextIncludes(_, "hvd.percentage.lbl.03")),
-      ("hvd.receiving.title", checkElementTextIncludes(_, "lbl.yes")),
-      ("hvd.receiving.expect.to.receive", checkElementTextIncludes(_, "hvd.receiving.option.01", "hvd.receiving.option.02", "Other payment method")),
-      ("hvd.identify.linked.cash.payment.title", checkElementTextIncludes(_, "lbl.yes"))
+      ("hvd.percentage.title", checkElementTextOnlyIncludes(_, "hvd.percentage.lbl.03")),
+      ("hvd.receiving.title", checkElementTextOnlyIncludes(_, "lbl.yes")),
+      ("hvd.receiving.expect.to.receive", checkElementTextOnlyIncludes(_, "hvd.receiving.option.01", "hvd.receiving.option.02", "Other payment method")),
+      ("hvd.identify.linked.cash.payment.title", checkElementTextOnlyIncludes(_, "lbl.yes"))
     )
 
     "include the provided data" in new ViewFixture {
@@ -100,11 +100,11 @@ class summarySpec extends AmlsSpec
       }
 
       forAll(sectionChecks) { (key, check) => {
-        val hTwos = doc.select("section.check-your-answers h2")
+        val hTwos = doc.select(".cya-summary-list__key")
         val hTwo = hTwos.toList.find(e => e.text() == Messages(key))
 
         hTwo must not be None
-        val section = hTwo.get.parents().select("section").first()
+        val section = hTwo.get.parent().select(".cya-summary-list__value").first()
         check(section) must be(true)
       }}
     }
