@@ -30,17 +30,13 @@ class additional_extra_address_UKSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
-
-    val countries = Some(Seq(
-      NameValuePair("Country 1", "country:1")
-    ))
   }
 
   "additional_extra_address view" must {
 
     "have a back link" in new ViewFixture {
       val form2: ValidForm[ResponsiblePersonAddress] = Form2(ResponsiblePersonAddress(PersonAddressUK("","",None,None,""), None))
-      def view = views.html.responsiblepeople.additional_extra_address(form2, true, 1, None, "firstName lastName", countries)
+      def view = views.html.responsiblepeople.address.additional_extra_address_UK(form2, true, 1, None, "firstName lastName")
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
@@ -48,18 +44,18 @@ class additional_extra_address_UKSpec extends AmlsSpec with MustMatchers {
 
       val form2: ValidForm[ResponsiblePersonAddress] = Form2(ResponsiblePersonAddress(PersonAddressUK("","",None,None,""), None))
 
-      def view = views.html.responsiblepeople.additional_extra_address(form2, true, 1, None, "firstName lastName", countries)
+      def view = views.html.responsiblepeople.address.additional_extra_address_UK(form2, true, 1, None, "firstName lastName")
 
-      doc.title must startWith (Messages("responsiblepeople.additional_extra_address.title", "firstName lastName"))
+      doc.title must startWith (Messages("responsiblepeople.additional_extra_address_country.title", "firstName lastName"))
     }
 
     "have correct headings" in new ViewFixture {
 
       val form2: ValidForm[ResponsiblePersonAddress] = Form2(ResponsiblePersonAddress(PersonAddressUK("","",None,None,""), None))
 
-      def view = views.html.responsiblepeople.additional_extra_address(form2, true, 1, None, "firstName lastName", countries)
+      def view = views.html.responsiblepeople.address.additional_extra_address_UK(form2, true, 1, None, "firstName lastName")
 
-      heading.html must be(Messages("responsiblepeople.additional_extra_address.heading", "firstName lastName"))
+      heading.html must be(Messages("responsiblepeople.additional_extra_address_country.heading", "firstName lastName"))
       subHeading.html must include(Messages("summary.responsiblepeople"))
 
     }
@@ -69,7 +65,6 @@ class additional_extra_address_UKSpec extends AmlsSpec with MustMatchers {
 
         val form2: InvalidForm = InvalidForm(Map.empty,
           Seq(
-            (Path \ "isUK") -> Seq(ValidationError("not a message Key")),
             (Path \ "addressLine1") -> Seq(ValidationError("second not a message Key")),
             (Path \ "addressLine2") -> Seq(ValidationError("third not a message Key")),
             (Path \ "addressLine3") -> Seq(ValidationError("fourth not a message Key")),
@@ -77,17 +72,14 @@ class additional_extra_address_UKSpec extends AmlsSpec with MustMatchers {
             (Path \ "postCode") -> Seq(ValidationError("sixth not a message Key"))
           ))
 
-        def view = views.html.responsiblepeople.additional_extra_address(form2, true, 1, None, "firstName lastName", countries)
+        def view = views.html.responsiblepeople.address.additional_extra_address_UK(form2, true, 1, None, "firstName lastName")
 
-        errorSummary.html() must include("not a message Key")
         errorSummary.html() must include("second not a message Key")
         errorSummary.html() must include("third not a message Key")
         errorSummary.html() must include("fourth not a message Key")
         errorSummary.html() must include("fifth not a message Key")
         errorSummary.html() must include("sixth not a message Key")
 
-        doc.getElementById("isUK")
-          .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
         doc.getElementById("addressLine1").parent()
           .getElementsByClass("error-notification").first().html() must include("second not a message Key")
@@ -106,46 +98,6 @@ class additional_extra_address_UKSpec extends AmlsSpec with MustMatchers {
 
       }
 
-      "non UK" in new ViewFixture {
-
-        val form2: InvalidForm = InvalidForm(Map.empty,
-          Seq(
-            (Path \ "isUK") -> Seq(ValidationError("not a message Key")),
-            (Path \ "addressLineNonUK1") -> Seq(ValidationError("second not a message Key")),
-            (Path \ "addressLineNonUK2") -> Seq(ValidationError("third not a message Key")),
-            (Path \ "addressLineNonUK3") -> Seq(ValidationError("fourth not a message Key")),
-            (Path \ "addressLineNonUK4") -> Seq(ValidationError("fifth not a message Key")),
-            (Path \ "country") -> Seq(ValidationError("sixth not a message Key"))
-          ))
-
-        def view = views.html.responsiblepeople.additional_extra_address(form2, true, 1, None, "firstName lastName", countries)
-
-        errorSummary.html() must include("not a message Key")
-        errorSummary.html() must include("second not a message Key")
-        errorSummary.html() must include("third not a message Key")
-        errorSummary.html() must include("fourth not a message Key")
-        errorSummary.html() must include("fifth not a message Key")
-        errorSummary.html() must include("sixth not a message Key")
-
-        doc.getElementById("isUK")
-          .getElementsByClass("error-notification").first().html() must include("not a message Key")
-
-        doc.getElementById("addressLineNonUK1").parent()
-          .getElementsByClass("error-notification").first().html() must include("second not a message Key")
-
-        doc.getElementById("addressLineNonUK2").parent()
-          .getElementsByClass("error-notification").first().html() must include("third not a message Key")
-
-        doc.getElementById("addressLineNonUK3").parent()
-          .getElementsByClass("error-notification").first().html() must include("fourth not a message Key")
-
-        doc.getElementById("addressLineNonUK4").parent()
-          .getElementsByClass("error-notification").first().html() must include("fifth not a message Key")
-
-        doc.getElementById("country").parent()
-          .getElementsByClass("error-notification").first().html() must include("sixth not a message Key")
-
-      }
     }
   }
 }

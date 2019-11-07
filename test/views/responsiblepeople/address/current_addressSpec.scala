@@ -40,14 +40,14 @@ class current_addressSpec extends AmlsSpec with MustMatchers {
 
     "have a back link" in new ViewFixture {
       val form2 = EmptyForm
-      def view = views.html.responsiblepeople.current_address(form2, true, 1, None, name, countries)
+      def view = views.html.responsiblepeople.address.current_address(form2, true, 1, None, name)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.current_address(form2, true, 1, None, name, countries)
+      def view = views.html.responsiblepeople.address.current_address(form2, true, 1, None, name)
 
       doc.title must be(Messages("responsiblepeople.wherepersonlives.title") +
         " - " + Messages("summary.responsiblepeople") +
@@ -62,10 +62,10 @@ class current_addressSpec extends AmlsSpec with MustMatchers {
     "show errors in the correct locations" in new ViewFixture {
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "isUK") -> Seq(ValidationError("not a message Key 1")),
+          (Path \ "isUK") -> Seq(ValidationError("not a message Key 1"))
         ))
 
-      def view = views.html.responsiblepeople.current_address(form2, true, 1, None, name, countries)
+      def view = views.html.responsiblepeople.address.current_address(form2, true, 1, None, name)
 
       errorSummary.html() must include("not a message Key 1")
     }
