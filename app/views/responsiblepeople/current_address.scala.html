@@ -17,9 +17,10 @@
 @import forms.Form2
 @import include._
 @import include.forms2._
+@import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 @import models.autocomplete.NameValuePair
 
-@(f: Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String, countries: Option[Seq[NameValuePair]])(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String, countries: Option[Seq[NameValuePair]])(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()
@@ -37,7 +38,7 @@
         <div class="form-group">
             @fieldset(
                 f = f("isUK"),
-                legend = "responsiblepeople.wherepersonlives.title",
+                legend = "responsiblepeople.wherepersonlives.is.uk",
                 panel=false,
                 classes = Seq("inline")
             ) {
@@ -45,15 +46,81 @@
                     f = f("isUK"),
                     labelText = "responsiblepeople.wherepersonlives.ukAddress",
                     value = "true",
+                    target = ".ukAddress-fieldset",
                     inline = true
                 )
                 @radio(
                     f = f("isUK"),
                     labelText = "responsiblepeople.wherepersonlives.nonUkAddress",
                     value = "false",
+                    target = ".nonUkAddress-fieldset",
                     inline = true
                 )
             }
+        </div>
+
+        <div class="form-group">
+            @fieldset(
+                legend = "responsiblepeople.wherepersonlives.title",
+                legendHidden = true,
+                panel = false,
+                classes = Seq("ukAddress-fieldset"),
+                f = f("ukAddress-fieldset")
+            ) {
+                @input(
+                    field = f("addressLine1"),
+                    labelText = "lbl.address.line1"
+                )
+                @input(
+                    field = f("addressLine2"),
+                    labelText = "lbl.address.line2"
+                )
+                @input(
+                    field = f("addressLine3"),
+                    labelText = "lbl.address.line3"
+                )
+                @input(
+                    field = f("addressLine4"),
+                    labelText = "lbl.address.line4"
+                )
+                @input(
+                    field = f("postCode"),
+                    labelText = "responsiblepeople.wherepersonlives.postcode",
+                    classes = Seq("form-control-1-4 form-control-1-4")
+                )
+            }
+
+        @fieldset(
+            legend = "responsiblepeople.wherepersonlives.title",
+            legendHidden = true,
+            panel = false,
+            classes = Seq("nonUkAddress-fieldset"),
+            f = f("nonUkAddress-fieldset")
+        ) {
+            @input(
+                field = f("addressLineNonUK1"),
+                labelText = "lbl.address.line1"
+            )
+            @input(
+                field = f("addressLineNonUK2"),
+                labelText = "lbl.address.line2"
+            )
+            @input(
+                field = f("addressLineNonUK3"),
+                labelText = "lbl.address.line3"
+            )
+            @input(
+                field = f("addressLineNonUK4"),
+                labelText = "lbl.address.line4"
+            )
+            @country_autocomplete(
+                field = f("country"),
+                placeholder = s"$personName ${Messages("error.required.select.non.uk.address")}",
+                labelText = "responsiblepeople.wherepersonlives.country",
+                data = countries.getOrElse(Seq.empty)
+            )
+        }
+
         </div>
 
         @submit(edit, Some("button.saveandcontinue"))
