@@ -96,8 +96,8 @@ POST        /fit-and-proper/:index/                                @controllers.
 GET         /approval-check/:index/                                @controllers.responsiblepeople.ApprovalCheckController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /approval-check/:index/                                @controllers.responsiblepeople.ApprovalCheckController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
-GET         /contact-details/:index/                                @controllers.responsiblepeople.ContactDetailsController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-POST        /contact-details/:index/                                @controllers.responsiblepeople.ContactDetailsController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+GET         /contact-details/:index/                               @controllers.responsiblepeople.ContactDetailsController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /contact-details/:index/                               @controllers.responsiblepeople.ContactDetailsController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
 GET         /remove/:index/                                        @controllers.responsiblepeople.RemoveResponsiblePersonController.get(index: Int, flow: Option[String] ?= None)
 POST        /remove/:index/                                        @controllers.responsiblepeople.RemoveResponsiblePersonController.remove(index: Int, flow: Option[String] ?= None)

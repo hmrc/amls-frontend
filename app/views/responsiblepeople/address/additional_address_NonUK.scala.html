@@ -32,11 +32,11 @@
     heading = header
 ) {
 
-    @form(f, controllers.responsiblepeople.routes.AdditionalAddressController.post(index, edit, flow)) {
+    @form(f, controllers.responsiblepeople.address.routes.AdditionalAddressNonUKController.post(index, edit, flow)) {
 
         <div id="@{s"""${f("country").id}-fieldset"""}">
             @fieldset(
-                legend = "responsiblepeople.additional_address.address",
+                legend = "responsiblepeople.additional_extra_address.address",
                 jsHidden = false,
                 legendHidden = true,
                 panel = false,
