@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.responsiblepeople
+package views.responsiblepeople.address
 
 import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
@@ -24,7 +24,7 @@ import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
 
-class current_addressSpec extends AmlsSpec with MustMatchers {
+class additional_addressSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
@@ -38,22 +38,18 @@ class current_addressSpec extends AmlsSpec with MustMatchers {
 
   "current_address view" must {
 
-    "have a back link" in new ViewFixture {
-      val form2 = EmptyForm
-      def view = views.html.responsiblepeople.current_address(form2, true, 1, None, name, countries)
-      doc.getElementsByAttributeValue("class", "link-back") must not be empty
-    }
-
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.current_address(form2, true, 1, None, name, countries)
+      def view = views.html.responsiblepeople.additional_address(form2, true, 1, None, name, countries)
 
-      doc.title must be(Messages("responsiblepeople.wherepersonlives.title") +
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+
+      doc.title must be(Messages("responsiblepeople.additional_address.title") +
         " - " + Messages("summary.responsiblepeople") +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
-      heading.html must be(Messages("responsiblepeople.wherepersonlives.heading", name))
+      heading.html must be(Messages("responsiblepeople.additional_address.heading", name))
       subHeading.html must include(Messages("summary.responsiblepeople"))
 
       doc.getElementsByAttributeValue("name", "isUK") must not be empty
@@ -86,7 +82,7 @@ class current_addressSpec extends AmlsSpec with MustMatchers {
           (Path \ "country") -> Seq(ValidationError("not a message Key 11"))
         ))
 
-      def view = views.html.responsiblepeople.current_address(form2, true, 1, None, name, countries)
+      def view = views.html.responsiblepeople.additional_address(form2, true, 1, None, name, countries)
 
       errorSummary.html() must include("not a message Key 1")
       errorSummary.html() must include("not a message Key 2")

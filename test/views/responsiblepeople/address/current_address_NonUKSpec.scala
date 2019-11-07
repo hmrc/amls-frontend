@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.responsiblepeople
+package views.responsiblepeople.address
 
 import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
@@ -24,26 +24,30 @@ import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
 
-class current_address_UKSpec extends AmlsSpec with MustMatchers {
+class current_address_NonUKSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
     val name = "firstName lastName"
+
+    val countries = Some(Seq(
+      NameValuePair("Country 1", "country:1")
+    ))
   }
 
   "current_address view" must {
 
     "have a back link" in new ViewFixture {
       val form2 = EmptyForm
-      def view = views.html.responsiblepeople.current_address_UK(form2, true, 1, None, name)
+      def view = views.html.responsiblepeople.current_address_NonUK(form2, true, 1, None, name, countries)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.current_address_UK(form2, true, 1, None, name)
+      def view = views.html.responsiblepeople.current_address_NonUK(form2, true, 1, None, name, countries)
 
       doc.title must be(Messages("responsiblepeople.wherepersonlivescountry.title") +
         " - " + Messages("summary.responsiblepeople") +
@@ -52,30 +56,31 @@ class current_address_UKSpec extends AmlsSpec with MustMatchers {
       heading.html must be(Messages("responsiblepeople.wherepersonlivescountry.heading", name))
       subHeading.html must include(Messages("summary.responsiblepeople"))
 
-      doc.getElementsByAttributeValue("name", "addressLine1") must not be empty
-      doc.getElementsByAttributeValue("name", "addressLine2") must not be empty
-      doc.getElementsByAttributeValue("name", "addressLine3") must not be empty
-      doc.getElementsByAttributeValue("name", "addressLine4") must not be empty
-      doc.getElementsByAttributeValue("name", "postCode") must not be empty
+      doc.getElementsByAttributeValue("name", "addressLineNonUK1") must not be empty
+      doc.getElementsByAttributeValue("name", "addressLineNonUK2") must not be empty
+      doc.getElementsByAttributeValue("name", "addressLineNonUK3") must not be empty
+      doc.getElementsByAttributeValue("name", "addressLineNonUK4") must not be empty
+      doc.getElementsByAttributeValue("name", "country") must not be empty
+
     }
 
     "show errors in the correct locations" in new ViewFixture {
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "addressLine1") -> Seq(ValidationError("not a message Key 2")),
-          (Path \ "addressLine2") -> Seq(ValidationError("not a message Key 3")),
-          (Path \ "addressLine3") -> Seq(ValidationError("not a message Key 4")),
-          (Path \ "addressLine4") -> Seq(ValidationError("not a message Key 5")),
-          (Path \ "postCode") -> Seq(ValidationError("not a message Key 6"))
+          (Path \ "addressLineNonUK1") -> Seq(ValidationError("not a message Key 7")),
+          (Path \ "addressLineNonUK2") -> Seq(ValidationError("not a message Key 8")),
+          (Path \ "addressLineNonUK3") -> Seq(ValidationError("not a message Key 9")),
+          (Path \ "addressLineNonUK4") -> Seq(ValidationError("not a message Key 10")),
+          (Path \ "country") -> Seq(ValidationError("not a message Key 11"))
         ))
 
-      def view = views.html.responsiblepeople.current_address_UK(form2, true, 1, None, name)
+      def view = views.html.responsiblepeople.current_address_NonUK(form2, true, 1, None, name, countries)
 
-      errorSummary.html() must include("not a message Key 2")
-      errorSummary.html() must include("not a message Key 3")
-      errorSummary.html() must include("not a message Key 4")
-      errorSummary.html() must include("not a message Key 5")
-      errorSummary.html() must include("not a message Key 6")
+      errorSummary.html() must include("not a message Key 7")
+      errorSummary.html() must include("not a message Key 8")
+      errorSummary.html() must include("not a message Key 9")
+      errorSummary.html() must include("not a message Key 10")
+      errorSummary.html() must include("not a message Key 11")
     }
   }
 }
