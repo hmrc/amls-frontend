@@ -143,12 +143,12 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector)
       case _ =>
 
         val sa = for {
-          enrolment <- enrolments.getEnrolment("IR-SA")
+          enrolment <- enrolments.getEnrolment("IR-SA").filter(e => e.isActivated)
           utr       <- enrolment.getIdentifier("UTR")
         } yield "sa" -> utr.value
 
         val ct = for {
-          enrolment <- enrolments.getEnrolment("IR-CT")
+          enrolment <- enrolments.getEnrolment("IR-CT").filter(e => e.isActivated)
           utr       <- enrolment.getIdentifier("UTR")
         } yield "ct" -> utr.value
 
