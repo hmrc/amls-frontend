@@ -51,17 +51,17 @@
 @label = {
     @if(heading.nonEmpty) {
         <div class="page-header">
-            <h1>
-                <label class="heading-xlarge" for="@field.id">
-                    @Messages(heading)
-                </label>
-            </h1>
             @if(section.nonEmpty) {
                 <p class="heading-secondary">
                     <span class="visuallyhidden">This section is: </span>@Messages(section)
                 </p>
             }
         </div>
+        <h1>
+            <label class="heading-xlarge" for="@field.id">
+                @Messages(heading)
+            </label>
+        </h1>
         <p>@labelSpan</p>
     } else {
         <label class="form-label" for="@field.id">
