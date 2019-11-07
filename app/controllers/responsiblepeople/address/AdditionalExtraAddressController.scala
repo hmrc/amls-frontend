@@ -24,7 +24,7 @@ import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
 import controllers.responsiblepeople.routes
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople._
 import play.api.mvc.{AnyContent, Request}
 import services.AutoCompleteService
@@ -49,7 +49,7 @@ class AdditionalExtraAddressController @Inject()(
         case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,Some(ResponsiblePersonAddressHistory(_,_,Some(additionalExtraAddress))),_,_,_,_,_,_,_,_,_,_,_, _)) =>
           Ok(additional_extra_address(Form2[ResponsiblePersonAddress](additionalExtraAddress), edit, index, flow, personName.titleName))
         case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
-          Ok(additional_extra_address(Form2(ResponsiblePersonAddressHistory.default()), edit, index, flow, personName.titleName))
+          Ok(additional_extra_address(EmptyForm, edit, index, flow, personName.titleName))
         case _ => NotFound(notFoundView)
       }
   }

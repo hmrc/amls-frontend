@@ -34,7 +34,9 @@
 
     @form(f, controllers.responsiblepeople.address.routes.CurrentAddressUKController.post(index,edit,flow)) {
 
-    <div class="form-group">
+        <input type ="hidden" name="isUK" value=true />
+
+        <div class="form-group">
         @fieldset(
             legend = "responsiblepeople.wherepersonlivescountry.title",
             legendHidden = true,

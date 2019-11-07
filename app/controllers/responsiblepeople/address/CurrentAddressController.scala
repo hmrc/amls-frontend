@@ -22,7 +22,7 @@ import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
 import controllers.responsiblepeople.routes
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople._
 import models.status.SubmissionStatus
 import play.api.mvc.{AnyContent, Request}
@@ -48,7 +48,7 @@ class CurrentAddressController @Inject ()(
           Some(ResponsiblePersonAddressHistory(Some(currentAddress),_,_)),_,_,_,_,_,_,_,_,_,_,_, _))
           => Ok(current_address(Form2[ResponsiblePersonCurrentAddress](currentAddress), edit, index, flow, personName.titleName))
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-          => Ok(current_address(Form2(ResponsiblePersonAddressHistory.default()), edit, index, flow, personName.titleName))
+          => Ok(current_address(EmptyForm, edit, index, flow, personName.titleName))
           case _
           => NotFound(notFoundView)
         }

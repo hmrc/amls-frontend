@@ -34,6 +34,8 @@
 
     @form(f, controllers.responsiblepeople.address.routes.AdditionalExtraAddressUKController.post(index, edit, flow)) {
 
+        <input type ="hidden" name="isUK" value=true />
+
         <div id="@{s"""${f("postCode").id}-fieldset"""}">
 
             @fieldset(

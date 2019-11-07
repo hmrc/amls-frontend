@@ -34,6 +34,8 @@
 
     @form(f, controllers.responsiblepeople.address.routes.AdditionalAddressNonUKController.post(index, edit, flow)) {
 
+        <input type ="hidden" name="isUK" value=false />
+
         <div id="@{s"""${f("country").id}-fieldset"""}">
             @fieldset(
                 legend = "responsiblepeople.additional_extra_address.address",
