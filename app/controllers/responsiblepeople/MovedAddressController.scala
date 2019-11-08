@@ -45,7 +45,7 @@ class MovedAddressController @Inject()(override val messagesApi: MessagesApi,
             } yield {
               addr.currentAddress match {
                 case Some(addr) => Ok(moved_address(EmptyForm, addr.personAddress, index, ControllerHelper.rpTitleName(Some(rp))))
-                case _ => Redirect(routes.CurrentAddressController.get(index,true))
+                case _ => Redirect(address.routes.CurrentAddressController.get(index,true))
               }
             }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
         }
@@ -65,14 +65,14 @@ class MovedAddressController @Inject()(override val messagesApi: MessagesApi,
                 addr.currentAddress match {
                   case Some(addr) => BadRequest(views.html.responsiblepeople.moved_address(f, addr.personAddress,
                     index, ControllerHelper.rpTitleName(Some(rp))))
-                  case _ => Redirect(routes.CurrentAddressController.get(index, true))
+                  case _ => Redirect(address.routes.CurrentAddressController.get(index, true))
                 }
               }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
           }
         case ValidForm(_, data) =>
           data.movedAddress match {
             case true => Future.successful(Redirect(routes.NewHomeAddressDateOfChangeController.get(index)))
-            case false => Future.successful(Redirect(routes.CurrentAddressController.get(index,true)))
+            case false => Future.successful(Redirect(address.routes.CurrentAddressController.get(index,true)))
           }
       }
   }

@@ -279,7 +279,7 @@
                                 controllers.responsiblepeople.routes.MovedAddressController.get(idx).toString()
                             }
                             case _ => {
-                                controllers.responsiblepeople.routes.CurrentAddressController.get(idx, true, flow).toString()
+                                controllers.responsiblepeople.address.routes.CurrentAddressController.get(idx, true, flow).toString()
                             }
                         },
                     editLinkTag = "rpaddress-edit"
@@ -292,7 +292,7 @@
 
                  @checkYourAnswersRow(
                     question = Messages("responsiblepeople.timeataddress.address_history.heading", personName),
-                    editUrl = controllers.responsiblepeople.routes.TimeAtCurrentAddressController.get(idx, true, flow).toString,
+                    editUrl = controllers.responsiblepeople.address.routes.TimeAtCurrentAddressController.get(idx, true, flow).toString,
                     editLinkTag = "rp-timeatataddress-edit"
                 ){
                     @timeAtAddress(a.timeAtAddress)
@@ -302,7 +302,7 @@
             @person.addressHistory.flatMap(_.additionalAddress).map { a =>
                  @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.previous_address"),
-                    editUrl = controllers.responsiblepeople.routes.AdditionalAddressController.get(idx, true, flow).toString,
+                    editUrl = controllers.responsiblepeople.address.routes.AdditionalAddressController.get(idx, true, flow).toString,
                     editLinkTag = "rp-previousaddress-edit"
                 ) {
                     <ul class="list">
@@ -312,7 +312,7 @@
 
                  @checkYourAnswersRow(
                     question = Messages("responsiblepeople.timeataddress.address_history.heading", personName),
-                    editUrl = controllers.responsiblepeople.routes.TimeAtAdditionalAddressController.get(idx, true, flow).toString,
+                    editUrl = controllers.responsiblepeople.address.routes.TimeAtAdditionalAddressController.get(idx, true, flow).toString,
                     editLinkTag = "rp-timeatpreviousaddress-edit"
                 ){
                     @timeAtAddress(a.timeAtAddress)
@@ -322,7 +322,7 @@
             @person.addressHistory.flatMap(_.additionalExtraAddress).map { a =>
                  @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.other_previous_address"),
-                    editUrl = controllers.responsiblepeople.routes.AdditionalExtraAddressController.get(idx, true, flow).toString,
+                    editUrl = controllers.responsiblepeople.address.routes.AdditionalExtraAddressController.get(idx, true, flow).toString,
                     editLinkTag = "rp-otherpreviousaddress-edit"
                 ) {
                     <ul class="list">
@@ -332,7 +332,7 @@
 
                  @checkYourAnswersRow(
                     question = Messages("responsiblepeople.timeataddress.address_history.heading", personName),
-                    editUrl = controllers.responsiblepeople.routes.TimeAtAdditionalExtraAddressController.get(idx, true, flow).toString,
+                    editUrl = controllers.responsiblepeople.address.routes.TimeAtAdditionalExtraAddressController.get(idx, true, flow).toString,
                     editLinkTag = "rp-timeatotherpreviousaddress-edit"
                 ){
                     @timeAtAddress(a.timeAtAddress)
