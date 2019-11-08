@@ -61,13 +61,67 @@ class AdditionalExtraAddressUKController @Inject()(
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
     authAction.async {
       implicit request =>
-        (Form2[ResponsiblePersonCurrentAddress](request.body) match {
+        (Form2[ResponsiblePersonAddress](request.body) match {
           case f: InvalidForm =>
-            Future.successful(Redirect(routes.TimeAtAdditionalExtraAddressController.get(index, edit, flow)))
+            getData[ResponsiblePerson](request.credId, index) map { rp =>
+              BadRequest(additional_extra_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
+            }
           case ValidForm(_, data) => {
-            Future.successful(Redirect(routes.TimeAtAdditionalExtraAddressController.get(index, edit, flow)))
+            getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>
+              (for {
+                rp <- responsiblePerson
+                addressHistory <- rp.addressHistory
+                additionalExtraAddress <- addressHistory.additionalExtraAddress
+              } yield {
+                val additionalExtraAddressWithTime = data.copy(timeAtAddress = additionalExtraAddress.timeAtAddress)
+                updateAndRedirect(request.credId, additionalExtraAddressWithTime, index, edit, flow)
+              }) getOrElse updateAndRedirect(request.credId, data, index, edit, flow)
+            }
           }}).recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
     }
+
+  private def updateAndRedirect(credId: String, data: ResponsiblePersonAddress, index: Int, edit: Boolean, flow: Option[String])
+                               (implicit request: Request[AnyContent]) = {
+    val doUpdate = () => updateDataStrict[ResponsiblePerson](credId, index) { res =>
+      res.addressHistory(
+        res.addressHistory match {
+          case Some(a) => a.additionalExtraAddress(data)
+          case _ => ResponsiblePersonAddressHistory(additionalExtraAddress = Some(data))
+        }
+      )
+    } map { _ =>
+      data.timeAtAddress match {
+        case Some(_) if edit => Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index, flow))
+        case _ => Redirect(routes.TimeAtAdditionalExtraAddressController.get(index, edit, flow))
+
+      }
+    }
+
+    val block = for {
+      rp <- OptionT(getData[ResponsiblePerson](credId, index))
+      result <- OptionT.liftF(doUpdate())
+      _ <- OptionT.liftF(auditAddressChange(data.personAddress, rp, edit))
+    } yield result
+
+    block getOrElse NotFound(notFoundView)
+  }
+
+  private def auditAddressChange(newAddress: PersonAddress, model: ResponsiblePerson, edit: Boolean)
+                                (implicit hc: HeaderCarrier, request: Request[_]): Future[AuditResult] = {
+    if (edit) {
+      val oldAddress = for {
+        history <- model.addressHistory
+        addr <- history.additionalExtraAddress
+      } yield addr
+
+      oldAddress.fold[Future[AuditResult]](Future.successful(Success)) { addr =>
+        auditConnector.sendEvent(AddressModifiedEvent(newAddress, Some(addr.personAddress)))
+      }
+    }
+    else {
+      auditConnector.sendEvent(AddressCreatedEvent(newAddress))
+    }
+  }
 }

@@ -21,7 +21,7 @@ import audit.{AddressCreatedEvent, AddressModifiedEvent}
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople._
 import models.status.SubmissionStatus
 import play.api.mvc.{AnyContent, Request}
@@ -48,7 +48,7 @@ class CurrentAddressUKController @Inject ()(
         Some(ResponsiblePersonAddressHistory(Some(currentAddress),_,_)),_,_,_,_,_,_,_,_,_,_,_, _))
         => Ok(current_address_UK(Form2[ResponsiblePersonCurrentAddress](currentAddress), edit, index, flow, personName.titleName))
         case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-        => Ok(current_address_UK(Form2(ResponsiblePersonAddressHistory.default()), edit, index, flow, personName.titleName))
+        => Ok(current_address_UK(EmptyForm, edit, index, flow, personName.titleName))
         case _
         => NotFound(notFoundView)
       }
@@ -59,12 +59,64 @@ class CurrentAddressUKController @Inject ()(
       implicit request =>
         (Form2[ResponsiblePersonCurrentAddress](request.body) match {
           case f: InvalidForm =>
-            Future.successful(Redirect(routes.TimeAtCurrentAddressController.get(index, edit, flow)))
+            println("============ " + f)
+            getData[ResponsiblePerson](request.credId, index) map { rp =>
+              BadRequest(current_address_UK(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+            }
+            //Future.successful(Redirect(routes.TimeAtCurrentAddressController.get(index, edit, flow)))
           case ValidForm(_, data) => {
+            getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>
+              val currentAddressWithTime = (for {
+                rp <- responsiblePerson
+                addressHistory <- rp.addressHistory
+                currentAddress <- addressHistory.currentAddress
+              } yield data.copy(timeAtAddress = currentAddress.timeAtAddress)).getOrElse(data)
 
-            Future.successful(Redirect(routes.TimeAtCurrentAddressController.get(index, edit, flow)))
+              statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) flatMap {
+                status => updateAndRedirect(request.credId, currentAddressWithTime, index, edit, flow, responsiblePerson, status)
+              }
+            }
           }}).recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
     }
+
+  private def updateAndRedirect(credId: String,
+                                data: ResponsiblePersonCurrentAddress,
+                                index: Int,
+                                edit: Boolean,
+                                flow: Option[String],
+                                originalResponsiblePerson: Option[ResponsiblePerson],
+                                status: SubmissionStatus)(implicit request: Request[AnyContent]) = {
+
+    updateDataStrict[ResponsiblePerson](credId, index) { res =>
+      res.addressHistory(
+        res.addressHistory match {
+          case Some(a) => a.currentAddress(data)
+          case _ => ResponsiblePersonAddressHistory(currentAddress = Some(data))
+        })
+    } flatMap { _ =>
+      if (edit) {
+        val originalAddress = for {
+          rp <- originalResponsiblePerson
+          rpHistory <- rp.addressHistory
+          rpCurrAddr <- rpHistory.currentAddress
+        } yield rpCurrAddr.personAddress
+        auditConnector.sendEvent(AddressModifiedEvent(data.personAddress, originalAddress)) map { _ =>
+          if (redirectToDateOfChange[PersonAddress](status, originalAddress, data.personAddress)
+            && originalResponsiblePerson.flatMap {
+            orp => orp.lineId
+          }.isDefined && originalAddress.isDefined) {
+            Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))
+          } else {
+            Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index, flow))
+          }
+        }
+      } else {
+        auditConnector.sendEvent(AddressCreatedEvent(data.personAddress)) map { _ =>
+          Redirect(routes.TimeAtCurrentAddressController.get(index, edit, flow))
+        }
+      }
+    }
+  }
 }

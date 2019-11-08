@@ -50,31 +50,22 @@ class TimeAtAdditionalExtraAddressController @Inject () (
     implicit request =>
       (Form2[TimeAtAddress](request.body) match {
         case f: InvalidForm =>
-          //         getData[ResponsiblePerson](request.credId, index) map { rp =>
-          //            BadRequest(time_at_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
-          //          }
-          Future.successful(Redirect(controllers.responsiblepeople.routes.PositionWithinBusinessController.get(index, edit, flow)))
+          getData[ResponsiblePerson](request.credId, index) map { rp =>
+            BadRequest(time_at_additional_extra_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+          }
         case ValidForm(_, data) =>
-          //          {
-          //            getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>
-          //              (for {
-          //                rp <- responsiblePerson
-          //                addressHistory <- rp.addressHistory
-          //                currentAddress <- addressHistory.currentAddress
-          //              } yield {
-          //                val currentAddressWithTime = currentAddress.copy(
-          //                  timeAtAddress = Some(data)
-          //                )
-          //                doUpdate(request.credId, index, currentAddressWithTime).flatMap { _ =>
-          //                  for {
-          //                    status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
-          //                  } yield {
-          //                    redirectTo(index, data, rp, status, edit, flow)
-          //                  }
-          //                }
-          //              }) getOrElse Future.successful(NotFound(notFoundView))
-          //            }
-          //          }
+          getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>
+            (for {
+              rp <- responsiblePerson
+              addressHistory <- rp.addressHistory
+              additionalExtraAddress <- addressHistory.additionalExtraAddress
+            } yield {
+              val additionalExtraAddressWithTime = additionalExtraAddress.copy(
+                timeAtAddress = Some(data)
+              )
+              updateAndRedirect(request.credId, additionalExtraAddressWithTime, index, edit, flow)
+            }) getOrElse Future.successful(NotFound(notFoundView))
+          }
           Future.successful(Redirect(controllers.responsiblepeople.routes.PositionWithinBusinessController.get(index, edit, flow)))
       }).recoverWith {
         case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

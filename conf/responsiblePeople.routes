@@ -116,6 +116,9 @@ POST        /address-uk/:index/                                    @controllers.
 GET         /address-non-uk/:index/                                @controllers.responsiblepeople.address.CurrentAddressNonUKController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /address-non-uk/:index/                                @controllers.responsiblepeople.address.CurrentAddressNonUKController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
+GET         /address-2/:index/date-change                          @controllers.responsiblepeople.address.CurrentAddressDateOfChangeController.get(index:Int, edit: Boolean ?= false)
+POST        /address-2/:index/date-change                          @controllers.responsiblepeople.address.CurrentAddressDateOfChangeController.post(index:Int, edit: Boolean ?= false)
+
 GET         /previous-address-country/:index/                      @controllers.responsiblepeople.address.AdditionalAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /previous-address-country/:index/                      @controllers.responsiblepeople.address.AdditionalAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 

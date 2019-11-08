@@ -23,13 +23,14 @@ import connectors.DataCacheConnector
 import controllers.DefaultBaseController
 import controllers.responsiblepeople.routes
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.Country
 import models.responsiblepeople._
 import models.status.SubmissionStatus
 import play.api.mvc.{AnyContent, Request}
 import services.{AutoCompleteService, StatusService}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, ControllerHelper, DateOfChangeHelper, RepeatingSection}
-import views.html.responsiblepeople.address.current_address
+import views.html.responsiblepeople.address.{current_address, current_address_UK}
 
 import scala.concurrent.Future
 
@@ -57,48 +58,72 @@ class CurrentAddressController @Inject ()(
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
     authAction.async {
         implicit request =>
+          def processForm(data: ResponsiblePersonCurrentAddress) = {
+            //todo: save data
+            data.personAddress match {
+              case _: PersonAddressUK => Future.successful(Redirect(routes.CurrentAddressUKController.get(index, edit, flow)))
+              case _: PersonAddressNonUK => Future.successful(Redirect(routes.CurrentAddressNonUKController.get(index, edit, flow)))
+            }
+          }
+
           (Form2[ResponsiblePersonCurrentAddress](request.body) match {
+            case f: InvalidForm if f.data.get("isUK").isDefined => processForm(ResponsiblePersonCurrentAddress(processAsValid(f), None, None))
             case f: InvalidForm =>
-              Future.successful(Redirect(routes.CurrentAddressUKController.get(index, edit, flow)))
+              getData[ResponsiblePerson](request.credId, index) map { rp =>
+                BadRequest(current_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+              }
             case ValidForm(_, data) => {
-              Future.successful(Redirect(routes.CurrentAddressUKController.get(index, edit, flow)))
+              processForm(data)
           }}).recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
     }
-//
-//  private def updateAndRedirect
-//  (credId: String, data: ResponsiblePersonCurrentAddress, index: Int, edit: Boolean, flow: Option[String], originalResponsiblePerson: Option[ResponsiblePerson],
-//   status: SubmissionStatus)
-//  (implicit request: Request[AnyContent]) = {
-//    updateDataStrict[ResponsiblePerson](credId, index) { res =>
-//      res.addressHistory(
-//        res.addressHistory match {
-//          case Some(a) => a.currentAddress(data)
-//          case _ => ResponsiblePersonAddressHistory(currentAddress = Some(data))
-//        })
-//    } flatMap { _ =>
-//      if (edit) {
-//        val originalAddress = for {
-//          rp <- originalResponsiblePerson
-//          rpHistory <- rp.addressHistory
-//          rpCurrAddr <- rpHistory.currentAddress
-//        } yield rpCurrAddr.personAddress
-//        auditConnector.sendEvent(AddressModifiedEvent(data.personAddress, originalAddress)) map { _ =>
-//          if (redirectToDateOfChange[PersonAddress](status, originalAddress, data.personAddress)
-//            && originalResponsiblePerson.flatMap {
-//            orp => orp.lineId
-//          }.isDefined && originalAddress.isDefined) {
-//            Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))
-//          } else {
-//            Redirect(routes.DetailedAnswersController.get(index, flow))
-//          }
-//        }
-//      } else {
-//        auditConnector.sendEvent(AddressCreatedEvent(data.personAddress)) map { _ =>
-//          Redirect(routes.TimeAtCurrentAddressController.get(index, edit, flow))
-//        }
-//      }
-//    }
-//  }
+
+  //todo: populate the models correctly
+  def processAsValid(f: InvalidForm): PersonAddress = {
+    if(f.data.get("isUK").contains(Seq("true"))){
+      PersonAddressUK("", "", None, None, "")
+    } else {
+      PersonAddressNonUK("", "", None, None, Country("", ""))
+    }
+  }
+
+  private def updateAndRedirect(credId: String,
+                                data: ResponsiblePersonCurrentAddress,
+                                index: Int,
+                                edit: Boolean,
+                                flow: Option[String],
+                                originalResponsiblePerson: Option[ResponsiblePerson],
+                                status: SubmissionStatus)(implicit request: Request[AnyContent]) = {
+
+    updateDataStrict[ResponsiblePerson](credId, index) { res =>
+      res.addressHistory(
+        res.addressHistory match {
+          case Some(a) => a.currentAddress(data)
+          case _ => ResponsiblePersonAddressHistory(currentAddress = Some(data))
+        })
+    } flatMap { _ =>
+      if (edit) {
+        val originalAddress = for {
+          rp <- originalResponsiblePerson
+          rpHistory <- rp.addressHistory
+          rpCurrAddr <- rpHistory.currentAddress
+        } yield rpCurrAddr.personAddress
+        auditConnector.sendEvent(AddressModifiedEvent(data.personAddress, originalAddress)) map { _ =>
+          if (redirectToDateOfChange[PersonAddress](status, originalAddress, data.personAddress)
+            && originalResponsiblePerson.flatMap {
+            orp => orp.lineId
+          }.isDefined && originalAddress.isDefined) {
+            Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))
+          } else {
+            Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index, flow))
+          }
+        }
+      } else {
+        auditConnector.sendEvent(AddressCreatedEvent(data.personAddress)) map { _ =>
+          Redirect(routes.TimeAtCurrentAddressController.get(index, edit, flow))
+        }
+      }
+    }
+  }
 }
