@@ -16,21 +16,15 @@
 
 package controllers.responsiblepeople.address
 
-import audit.AddressConversions._
-import audit.{AddressCreatedEvent, AddressModifiedEvent}
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
-import controllers.responsiblepeople.routes
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.Country
 import models.responsiblepeople._
-import models.status.SubmissionStatus
-import play.api.mvc.{AnyContent, Request}
 import services.{AutoCompleteService, StatusService}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, ControllerHelper, DateOfChangeHelper, RepeatingSection}
-import views.html.responsiblepeople.address.{current_address, current_address_UK}
+import views.html.responsiblepeople.address.current_address
 
 import scala.concurrent.Future
 
@@ -66,7 +60,7 @@ class CurrentAddressController @Inject ()(
           }
 
           (Form2[ResponsiblePersonCurrentAddress](request.body) match {
-            case f: InvalidForm if f.data.get("isUK").isDefined => processForm(ResponsiblePersonCurrentAddress(processAsValid(f), None, None))
+            case f: InvalidForm if f.data.get("isUK").isDefined => processForm(ResponsiblePersonCurrentAddress(AddressHelper.modelFromForm(f), None, None))
             case f: InvalidForm =>
               getData[ResponsiblePerson](request.credId, index) map { rp =>
                 BadRequest(current_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
@@ -77,13 +71,4 @@ class CurrentAddressController @Inject ()(
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
     }
-
-  //todo: populate the models correctly
-  def processAsValid(f: InvalidForm): PersonAddress = {
-    if(f.data.get("isUK").contains(Seq("true"))){
-      PersonAddressUK("", "", None, None, "")
-    } else {
-      PersonAddressNonUK("", "", None, None, Country("", ""))
-    }
-  }
 }

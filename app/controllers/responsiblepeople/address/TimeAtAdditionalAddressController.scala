@@ -19,7 +19,6 @@ package controllers.responsiblepeople.address
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
-import controllers.responsiblepeople.routes
 import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ThreeYearsPlus}
 import models.responsiblepeople._

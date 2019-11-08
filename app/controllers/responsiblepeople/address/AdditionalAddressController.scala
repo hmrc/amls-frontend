@@ -16,23 +16,13 @@
 
 package controllers.responsiblepeople.address
 
-import audit.AddressConversions._
-import audit.{AddressCreatedEvent, AddressModifiedEvent}
-import cats.data.OptionT
-import cats.implicits._
 import com.google.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
-import controllers.responsiblepeople.routes
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.Country
-import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ThreeYearsPlus}
 import models.responsiblepeople._
-import play.api.mvc.{AnyContent, Request}
 import services.AutoCompleteService
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
-import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.address.additional_address
 
@@ -68,7 +58,7 @@ class AdditionalAddressController @Inject()(
         }
 
         (Form2[ResponsiblePersonAddress](request.body) match {
-          case f: InvalidForm if f.data.get("isUK").isDefined => processForm(ResponsiblePersonAddress(processAsValid(f), None))
+          case f: InvalidForm if f.data.get("isUK").isDefined => processForm(ResponsiblePersonAddress(AddressHelper.modelFromForm(f), None))
           case f: InvalidForm =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
               BadRequest(additional_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
@@ -79,13 +69,4 @@ class AdditionalAddressController @Inject()(
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
     }
-
-  //todo: populate the models correctly
-  def processAsValid(f: InvalidForm): PersonAddress = {
-    if(f.data.get("isUK").contains(Seq("true"))){
-      PersonAddressUK("", "", None, None, "")
-    } else {
-      PersonAddressNonUK("", "", None, None, Country("", ""))
-    }
-  }
 }

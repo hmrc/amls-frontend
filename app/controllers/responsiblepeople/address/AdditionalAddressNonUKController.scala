@@ -23,7 +23,6 @@ import cats.implicits._
 import com.google.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
-import controllers.responsiblepeople.routes
 import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ThreeYearsPlus}
 import models.responsiblepeople._
@@ -32,8 +31,7 @@ import services.AutoCompleteService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
-import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.additional_address
+import utils.{AuthAction, RepeatingSection}
 import views.html.responsiblepeople.address.additional_address_NonUK
 
 import scala.concurrent.Future
