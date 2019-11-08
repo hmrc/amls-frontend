@@ -25,6 +25,7 @@ import connectors.DataCacheConnector
 import controllers.DefaultBaseController
 import controllers.responsiblepeople.routes
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.Country
 import models.responsiblepeople._
 import play.api.mvc.{AnyContent, Request}
 import services.AutoCompleteService
@@ -57,56 +58,32 @@ class AdditionalExtraAddressController @Inject()(
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
     authAction.async {
       implicit request =>
-        (Form2[ResponsiblePersonCurrentAddress](request.body) match {
+        def processForm(data: ResponsiblePersonAddress) = {
+          data.personAddress match {
+            case _: PersonAddressUK => Future.successful(Redirect(routes.AdditionalExtraAddressUKController.get(index, edit, flow)))
+            case _: PersonAddressNonUK => Future.successful(Redirect(routes.AdditionalExtraAddressNonUKController.get(index, edit, flow)))
+          }
+        }
+
+        (Form2[ResponsiblePersonAddress](request.body) match {
+          case f: InvalidForm if f.data.get("isUK").isDefined => processForm(ResponsiblePersonAddress(processAsValid(f), None))
           case f: InvalidForm =>
-            Future.successful(Redirect(routes.AdditionalExtraAddressUKController.get(index, edit, flow)))
+            getData[ResponsiblePerson](request.credId, index) map { rp =>
+              BadRequest(additional_extra_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+            }
           case ValidForm(_, data) => {
-            Future.successful(Redirect(routes.AdditionalExtraAddressUKController.get(index, edit, flow)))
+            processForm(data)
           }}).recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
     }
 
-//  private def updateAndRedirect(credId: String, data: ResponsiblePersonAddress, index: Int, edit: Boolean, flow: Option[String])
-//                               (implicit request: Request[AnyContent]) = {
-//    val doUpdate = () => updateDataStrict[ResponsiblePerson](credId, index) { res =>
-//      res.addressHistory(
-//        res.addressHistory match {
-//          case Some(a) => a.additionalExtraAddress(data)
-//          case _ => ResponsiblePersonAddressHistory(additionalExtraAddress = Some(data))
-//        }
-//      )
-//    } map { _ =>
-//      data.timeAtAddress match {
-//        case Some(_) if edit => Redirect(routes.DetailedAnswersController.get(index, flow))
-//        case _ => Redirect(routes.TimeAtAdditionalExtraAddressController.get(index, edit, flow))
-//
-//      }
-//    }
-//
-//    val block = for {
-//      rp <- OptionT(getData[ResponsiblePerson](credId, index))
-//      result <- OptionT.liftF(doUpdate())
-//      _ <- OptionT.liftF(auditAddressChange(data.personAddress, rp, edit))
-//    } yield result
-//
-//    block getOrElse NotFound(notFoundView)
-//  }
-//
-//  private def auditAddressChange(newAddress: PersonAddress, model: ResponsiblePerson, edit: Boolean)
-//                                (implicit hc: HeaderCarrier, request: Request[_]): Future[AuditResult] = {
-//    if (edit) {
-//      val oldAddress = for {
-//        history <- model.addressHistory
-//        addr <- history.additionalExtraAddress
-//      } yield addr
-//
-//      oldAddress.fold[Future[AuditResult]](Future.successful(Success)) { addr =>
-//        auditConnector.sendEvent(AddressModifiedEvent(newAddress, Some(addr.personAddress)))
-//      }
-//    }
-//    else {
-//      auditConnector.sendEvent(AddressCreatedEvent(newAddress))
-//    }
-//  }
+  //todo: populate the models correctly
+  def processAsValid(f: InvalidForm): PersonAddress = {
+    if(f.data.get("isUK").contains(Seq("true"))){
+      PersonAddressUK("", "", None, None, "")
+    } else {
+      PersonAddressNonUK("", "", None, None, Country("", ""))
+    }
+  }
 }
