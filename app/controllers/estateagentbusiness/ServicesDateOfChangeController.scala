@@ -51,9 +51,7 @@ class ServicesDateOfChangeController  @Inject()( val dataCacheConnector: DataCac
                       case Some(service) => {
                         eab.copy(services = Some(service.copy(dateOfChange = Some(data))))
                       }
-                      case None => {
-                        eab
-                      }
+                      case None => eab
                     })
                 } yield {
                   eab.services.map(candidate => candidate.services.contains(Residential)) match {
