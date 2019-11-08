@@ -37,12 +37,10 @@ import views.html.responsiblepeople.address.additional_address_UK
 import scala.concurrent.Future
 
 @Singleton
-class AdditionalAddressUKController @Inject()(
-                                              override val dataCacheConnector: DataCacheConnector,
+class AdditionalAddressUKController @Inject()(override val dataCacheConnector: DataCacheConnector,
                                               authAction: AuthAction,
-                                              auditConnector: AuditConnector,
-                                              val autoCompleteService: AutoCompleteService
-                                            ) extends RepeatingSection with DefaultBaseController {
+                                              implicit val auditConnector: AuditConnector,
+                                              val autoCompleteService: AutoCompleteService) extends RepeatingSection with DefaultBaseController {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request =>
@@ -96,25 +94,10 @@ class AdditionalAddressUKController @Inject()(
 
     (for {
       rp <- OptionT(getData[ResponsiblePerson](credId, index))
-      _ <- OptionT.liftF(auditAddressChange(data.personAddress, rp, edit)) orElse OptionT.some[Future, AuditResult](Success)
+      addressHistory <- OptionT.fromOption[Future](rp.addressHistory)
+      oldAddress <- OptionT.fromOption[Future](addressHistory.additionalAddress)
+      _ <- OptionT.liftF(AddressHelper.auditChange(data.personAddress, Some(oldAddress), edit)) orElse OptionT.some[Future, AuditResult](Success)
       result <- OptionT.liftF(doUpdate())
     } yield result) getOrElse NotFound(notFoundView)
-  }
-
-  private def auditAddressChange(newAddress: PersonAddress, model: ResponsiblePerson, edit: Boolean)
-                                (implicit hc: HeaderCarrier, request: Request[_]): Future[AuditResult] = {
-    if (edit) {
-      val oldAddress = for {
-        history <- model.addressHistory
-        addr <- history.additionalAddress
-      } yield addr
-
-      oldAddress.fold[Future[AuditResult]](Future.successful(Success)) { addr =>
-        auditConnector.sendEvent(AddressModifiedEvent(newAddress, Some(addr.personAddress)))
-      }
-    }
-    else {
-      auditConnector.sendEvent(AddressCreatedEvent(newAddress))
-    }
   }
 }

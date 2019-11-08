@@ -16,9 +16,17 @@
 
 package controllers.responsiblepeople.address
 
+import audit.AddressConversions._
+import audit.{AddressCreatedEvent, AddressModifiedEvent}
 import forms.InvalidForm
 import models.Country
-import models.responsiblepeople.{PersonAddress, PersonAddressNonUK, PersonAddressUK}
+import models.responsiblepeople.{PersonAddress, PersonAddressNonUK, PersonAddressUK, ResponsiblePerson, ResponsiblePersonAddress}
+import play.api.mvc.Request
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
+import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
+
+import scala.concurrent.{ExecutionContext, Future}
 
 object AddressHelper {
 
@@ -27,6 +35,35 @@ object AddressHelper {
       PersonAddressUK("", "", None, None, "")
     } else {
       PersonAddressNonUK("", "", None, None, Country("", ""))
+    }
+  }
+
+  protected[address] def auditAddressChange(newAddress: PersonAddress, model: ResponsiblePerson, edit: Boolean)
+                                (implicit hc: HeaderCarrier, request: Request[_], auditConnector: AuditConnector, ec: ExecutionContext): Future[AuditResult] = {
+    if (edit) {
+      val oldAddress = for {
+        history <- model.addressHistory
+        addr <- history.additionalAddress
+      } yield addr
+
+      oldAddress.fold[Future[AuditResult]](Future.successful(Success)) { addr =>
+        auditConnector.sendEvent(AddressModifiedEvent(newAddress, Some(addr.personAddress)))
+      }
+    }
+    else {
+      auditConnector.sendEvent(AddressCreatedEvent(newAddress))
+    }
+  }
+
+  protected[address] def auditChange(newAddress: PersonAddress, oldAddress: Option[ResponsiblePersonAddress], edit: Boolean)
+                                    (implicit hc: HeaderCarrier, request: Request[_], auditConnector: AuditConnector, ec: ExecutionContext): Future[AuditResult] = {
+    if (edit) {
+      oldAddress.fold[Future[AuditResult]](Future.successful(Success)) { addr =>
+        auditConnector.sendEvent(AddressModifiedEvent(newAddress, Some(addr.personAddress)))
+      }
+    }
+    else {
+      auditConnector.sendEvent(AddressCreatedEvent(newAddress))
     }
   }
 }

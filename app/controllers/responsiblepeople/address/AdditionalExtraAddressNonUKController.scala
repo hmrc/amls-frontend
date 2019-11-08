@@ -23,7 +23,7 @@ import cats.implicits._
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople._
 import play.api.mvc.{AnyContent, Request}
 import services.AutoCompleteService
@@ -36,15 +36,10 @@ import views.html.responsiblepeople.address.additional_extra_address_NonUK
 
 import scala.concurrent.Future
 
-class AdditionalExtraAddressNonUKController @Inject()(
-                                                   val dataCacheConnector: DataCacheConnector,
-                                                   authAction: AuthAction,
-                                                   auditConnector: AuditConnector,
-                                                   autoCompleteService: AutoCompleteService
-                                                 ) extends RepeatingSection with DefaultBaseController {
-
-
-  final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None)
+class AdditionalExtraAddressNonUKController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                                      authAction: AuthAction,
+                                                      implicit val auditConnector: AuditConnector,
+                                                      autoCompleteService: AutoCompleteService) extends RepeatingSection with DefaultBaseController {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request =>
@@ -52,7 +47,7 @@ class AdditionalExtraAddressNonUKController @Inject()(
         case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,Some(ResponsiblePersonAddressHistory(_,_,Some(additionalExtraAddress))),_,_,_,_,_,_,_,_,_,_,_, _)) =>
           Ok(additional_extra_address_NonUK(Form2[ResponsiblePersonAddress](additionalExtraAddress), edit, index, flow, personName.titleName, autoCompleteService.getCountries))
         case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
-          Ok(additional_extra_address_NonUK(Form2(DefaultAddressHistory), edit, index, flow, personName.titleName, autoCompleteService.getCountries))
+          Ok(additional_extra_address_NonUK(EmptyForm, edit, index, flow, personName.titleName, autoCompleteService.getCountries))
         case _ => NotFound(notFoundView)
       }
   }
@@ -100,27 +95,12 @@ class AdditionalExtraAddressNonUKController @Inject()(
 
     val block = for {
       rp <- OptionT(getData[ResponsiblePerson](credId, index))
+      addressHistory <- OptionT.fromOption[Future](rp.addressHistory)
+      oldAddress <- OptionT.fromOption[Future](addressHistory.additionalExtraAddress)
       result <- OptionT.liftF(doUpdate())
-      _ <- OptionT.liftF(auditAddressChange(data.personAddress, rp, edit))
+      _ <- OptionT.liftF(AddressHelper.auditChange(data.personAddress, Some(oldAddress), edit))
     } yield result
 
     block getOrElse NotFound(notFoundView)
-  }
-
-  private def auditAddressChange(newAddress: PersonAddress, model: ResponsiblePerson, edit: Boolean)
-                                (implicit hc: HeaderCarrier, request: Request[_]): Future[AuditResult] = {
-    if (edit) {
-      val oldAddress = for {
-        history <- model.addressHistory
-        addr <- history.additionalExtraAddress
-      } yield addr
-
-      oldAddress.fold[Future[AuditResult]](Future.successful(Success)) { addr =>
-        auditConnector.sendEvent(AddressModifiedEvent(newAddress, Some(addr.personAddress)))
-      }
-    }
-    else {
-      auditConnector.sendEvent(AddressCreatedEvent(newAddress))
-    }
   }
 }
