@@ -31,11 +31,12 @@
 ) {
 
     @model.services.map { a =>
-        @checkYourAnswers(
+        @checkYourAnswersRow(
             question = Messages("estateagentbusiness.services.title"),
-            editUrl = controllers.estateagentbusiness.routes.BusinessServicesController.get(true).toString
+            editUrl = controllers.estateagentbusiness.routes.BusinessServicesController.get(true).toString,
+            editLinkTag = "eabwhichservices-edit"
         ) {
-            <ul>
+            <ul class = "list list-bullet">
             @a.services.toList.sortBy(_.getMessage).map { line =>
                 <li>@line match {
                     case Residential => {@Messages("estateagentbusiness.service.lbl.01")}
@@ -55,41 +56,44 @@
 
     @model.services.map { a =>
         @if(a.services.contains(Residential)) {
-            @checkYourAnswers(
+            @checkYourAnswersRow(
                 question = Messages("estateagentbusiness.registered.redress.title"),
-                editUrl = controllers.estateagentbusiness.routes.ResidentialRedressSchemeController.get(true).toString
+                editUrl = controllers.estateagentbusiness.routes.ResidentialRedressSchemeController.get(true).toString,
+                editLinkTag = "eabredressscheme-edit"
             ) {
                 @model.redressScheme.map { a =>
-                    <p>@a match {
+                    @a match {
                         case ThePropertyOmbudsman => {@Messages("estateagentbusiness.redress.lbl.01") }
                         case OmbudsmanServices => {@Messages("estateagentbusiness.redress.lbl.02") }
                         case PropertyRedressScheme => {@Messages("estateagentbusiness.redress.lbl.03") }
                         case Other(value) => {@value }
                         case RedressSchemedNo => {@Messages("estateagentbusiness.redress.lbl.05")}
-                    }</p>
+                    }
                 }
             }
         }
     }
 
-    @checkYourAnswers(
+    @checkYourAnswersRow(
         question = Messages("estateagentbusiness.penalisedbyprofessional.title"),
-        editUrl = controllers.estateagentbusiness.routes.PenalisedByProfessionalController.get(true).toString
+        editUrl = controllers.estateagentbusiness.routes.PenalisedByProfessionalController.get(true).toString,
+        editLinkTag = "eabprofessionalbody-edit"
     ) {
-        <p>@model.professionalBody.map {
+        @model.professionalBody.map {
             case ProfessionalBodyNo => { @Messages("lbl.no") }
             case ProfessionalBodyYes(v) => { @v }
-        }</p>
+        }
     }
 
-    @checkYourAnswers(
+    @checkYourAnswersRow(
         question = Messages("estateagentbusiness.penalisedunderestateagentsact.title"),
-        editUrl = controllers.estateagentbusiness.routes.PenalisedUnderEstateAgentsActController.get(true).toString
+        editUrl = controllers.estateagentbusiness.routes.PenalisedUnderEstateAgentsActController.get(true).toString,
+        editLinkTag = "eabpenalisedact-edit"
     ) {
-        <p>@model.penalisedUnderEstateAgentsAct.map {
+        @model.penalisedUnderEstateAgentsAct.map {
             case PenalisedUnderEstateAgentsActNo => { @Messages("lbl.no") }
             case PenalisedUnderEstateAgentsActYes(v) => { @v }
-        }</p>
+        }
     }
 
 
