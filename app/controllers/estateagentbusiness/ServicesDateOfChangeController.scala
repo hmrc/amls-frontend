@@ -23,7 +23,6 @@ import javax.inject.Inject
 import models.DateOfChange
 import models.businessdetails.BusinessDetails
 import models.estateagentbusiness.{EstateAgentBusiness, Residential}
-import play.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
 import views.html.date_of_change
@@ -42,7 +41,6 @@ class ServicesDateOfChangeController  @Inject()( val dataCacheConnector: DataCac
       implicit request =>
         getModelWithDateMap(request.credId) flatMap {
           case (eab, startDate) =>
-            println("ACHI (eab, startDate): " + (eab, startDate))
             Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDate) match {
               case f: InvalidForm =>
                 Future.successful(BadRequest(date_of_change(f, "summary.estateagentbusiness", routes.ServicesDateOfChangeController.post())))
@@ -58,7 +56,6 @@ class ServicesDateOfChangeController  @Inject()( val dataCacheConnector: DataCac
                       }
                     })
                 } yield {
-                  Logger.debug("ACHI: " + eab)
                   eab.services.map(candidate => candidate.services.contains(Residential)) match {
                     case Some(true) => Redirect(routes.ResidentialRedressSchemeController.get(true))
                     case _          => Redirect(routes.SummaryController.get())
