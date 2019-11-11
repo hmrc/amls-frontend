@@ -16,8 +16,6 @@
 
 package controllers.responsiblepeople.address
 
-import audit.AddressConversions._
-import audit.{AddressCreatedEvent, AddressModifiedEvent}
 import cats.data._
 import cats.implicits._
 import com.google.inject.Inject
@@ -27,11 +25,8 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople._
 import play.api.mvc.{AnyContent, Request}
 import services.AutoCompleteService
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
-import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.additional_extra_address
 import views.html.responsiblepeople.address.additional_extra_address_NonUK
 
 import scala.concurrent.Future
@@ -58,7 +53,7 @@ class AdditionalExtraAddressNonUKController @Inject()(val dataCacheConnector: Da
         (Form2[ResponsiblePersonAddress](request.body) match {
           case f: InvalidForm =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
-              BadRequest(additional_extra_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
+              BadRequest(additional_extra_address_NonUK(f, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
             }
           case ValidForm(_, data) => {
             getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>

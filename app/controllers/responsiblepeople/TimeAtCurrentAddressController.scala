@@ -26,7 +26,7 @@ import models.status.SubmissionStatus
 import play.api.mvc.{AnyContent, Request}
 import services.StatusService
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.time_at_address
+import views.html.responsiblepeople.address.time_at_address
 
 import scala.concurrent.Future
 
@@ -101,7 +101,7 @@ class TimeAtCurrentAddressController @Inject () (
     timeAtAddress match {
       case ThreeYearsPlus | OneToThreeYears if !edit => Redirect(routes.PositionWithinBusinessController.get(index, edit, flow))
       case ThreeYearsPlus | OneToThreeYears if edit => Redirect(routes.DetailedAnswersController.get(index, flow))
-      case _ => Redirect(routes.AdditionalAddressController.get(index, edit, flow))
+      case _ => Redirect(address.routes.AdditionalAddressController.get(index, edit, flow))
     }
   }
 }

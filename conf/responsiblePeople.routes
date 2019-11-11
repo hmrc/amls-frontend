@@ -24,14 +24,8 @@ POST        /self-assessment/:index/                               @controllers.
 GET         /moved-address/:index/                                 @controllers.responsiblepeople.MovedAddressController.get(index: Int)
 POST        /moved-address/:index/                                 @controllers.responsiblepeople.MovedAddressController.post(index: Int)
 
-GET         /new-address/:index/                                   @controllers.responsiblepeople.CurrentAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-POST        /new-address/:index/                                   @controllers.responsiblepeople.CurrentAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-
 GET         /time-at-address/:index/                               @controllers.responsiblepeople.TimeAtCurrentAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /time-at-address/:index/                               @controllers.responsiblepeople.TimeAtCurrentAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-
-GET         /address/:index/date-change                            @controllers.responsiblepeople.CurrentAddressDateOfChangeController.get(index:Int, edit: Boolean ?= false)
-POST        /address/:index/date-change                            @controllers.responsiblepeople.CurrentAddressDateOfChangeController.post(index:Int, edit: Boolean ?= false)
 
 GET         /residency/:index/                                     @controllers.responsiblepeople.PersonResidentTypeController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /residency/:index/                                     @controllers.responsiblepeople.PersonResidentTypeController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
@@ -57,14 +51,8 @@ POST        /address-new/:index/                                   @controllers.
 GET         /date-change-moved/:index/                             @controllers.responsiblepeople.NewHomeAddressDateOfChangeController.get(index:Int)
 POST        /date-change-moved/:index/                             @controllers.responsiblepeople.NewHomeAddressDateOfChangeController.post(index:Int)
 
-GET         /previous-address/:index/                              @controllers.responsiblepeople.AdditionalAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-POST        /previous-address/:index/                              @controllers.responsiblepeople.AdditionalAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-
 GET         /time-at-previous-address/:index/                      @controllers.responsiblepeople.TimeAtAdditionalAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /time-at-previous-address/:index/                      @controllers.responsiblepeople.TimeAtAdditionalAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-
-GET         /other-previous-address/:index/                        @controllers.responsiblepeople.AdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-POST        /other-previous-address/:index/                        @controllers.responsiblepeople.AdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
 GET         /time-at-other-previous-address/:index/                @controllers.responsiblepeople.TimeAtAdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /time-at-other-previous-address/:index/                @controllers.responsiblepeople.TimeAtAdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
@@ -77,7 +65,6 @@ POST        /when-role-started/:index/                             @controllers.
 
 GET         /sole-proprietor-of-another-business/:index/           @controllers.responsiblepeople.SoleProprietorOfAnotherBusinessController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /sole-proprietor-of-another-business/:index/           @controllers.responsiblepeople.SoleProprietorOfAnotherBusinessController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-
 
 GET         /vat-registered-for-another-business/:index/           @controllers.responsiblepeople.VATRegisteredController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /vat-registered-for-another-business/:index/           @controllers.responsiblepeople.VATRegisteredController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
