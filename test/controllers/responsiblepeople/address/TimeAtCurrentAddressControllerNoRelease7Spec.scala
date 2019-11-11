@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.responsiblepeople
+package controllers.responsiblepeople.address
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction

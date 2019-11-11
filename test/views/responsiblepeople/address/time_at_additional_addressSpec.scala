@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.responsiblepeople
+package views.responsiblepeople.address
 
 import forms.{Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
@@ -25,20 +25,18 @@ import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
 
-class time_at_additional_extra_addressSpec extends AmlsSpec with MustMatchers  {
+class time_at_additional_addressSpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
-
-    val name = "FirstName LastName"
   }
 
-  "time_at_additional_extra_address view" must {
+  "time_at_additional_address view" must {
 
     "have a back link" in new ViewFixture {
       val form2: ValidForm[TimeAtAddress] = Form2(ZeroToFiveMonths)
 
-      def view = views.html.responsiblepeople.time_at_additional_extra_address(form2, false, 0, None, name)
+      def view = views.html.responsiblepeople.time_at_additional_address(form2, false, 0, None, "FirstName LastName")
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
@@ -46,7 +44,7 @@ class time_at_additional_extra_addressSpec extends AmlsSpec with MustMatchers  {
 
       val form2: ValidForm[TimeAtAddress] = Form2(ZeroToFiveMonths)
 
-      def view = views.html.responsiblepeople.time_at_additional_extra_address(form2, false, 0, None, name)
+      def view = views.html.responsiblepeople.time_at_additional_address(form2, false, 0, None, "FirstName LastName")
 
       doc.title must be(Messages("responsiblepeople.timeataddress.address_history.title") +
         " - " + Messages("summary.responsiblepeople") +
@@ -58,9 +56,9 @@ class time_at_additional_extra_addressSpec extends AmlsSpec with MustMatchers  {
 
       val form2: ValidForm[TimeAtAddress] = Form2(ZeroToFiveMonths)
 
-      def view = views.html.responsiblepeople.time_at_additional_extra_address(form2, false, 0, None, name)
+      def view = views.html.responsiblepeople.time_at_additional_address(form2, false, 0, None, "FirstName LastName")
 
-      heading.html() must be(Messages("responsiblepeople.timeataddress.address_history.heading", name))
+      heading.html() must be(Messages("responsiblepeople.timeataddress.address_history.heading", "FirstName LastName"))
     }
 
     "show errors in correct places when validation fails" in new ViewFixture {
@@ -74,11 +72,10 @@ class time_at_additional_extra_addressSpec extends AmlsSpec with MustMatchers  {
         Seq((Path \ timeAtAddress, Seq(ValidationError(messageKey1))))
       )
 
-      def view = views.html.responsiblepeople.time_at_additional_extra_address(form2, false, 0, None, name)
+      def view = views.html.responsiblepeople.time_at_additional_address(form2, false, 0, None, "FirstName LastName")
 
       errorSummary.html() must include(messageKey1)
     }
   }
-
 
 }
