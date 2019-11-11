@@ -30,9 +30,7 @@ import scala.concurrent.Future
 
 class CurrentAddressController @Inject ()(
                                             val dataCacheConnector: DataCacheConnector,
-                                            auditConnector: AuditConnector,
                                             autoCompleteService: AutoCompleteService,
-                                            statusService: StatusService,
                                             authAction: AuthAction
                                           ) extends RepeatingSection with DefaultBaseController with DateOfChangeHelper {
 
