@@ -32,13 +32,11 @@ import views.html.responsiblepeople.address.current_address_UK
 
 import scala.concurrent.Future
 
-class CurrentAddressUKController @Inject ()(
-                                            val dataCacheConnector: DataCacheConnector,
+class CurrentAddressUKController @Inject ()(val dataCacheConnector: DataCacheConnector,
                                             auditConnector: AuditConnector,
                                             autoCompleteService: AutoCompleteService,
                                             statusService: StatusService,
-                                            authAction: AuthAction
-                                          ) extends RepeatingSection with DefaultBaseController with DateOfChangeHelper {
+                                            authAction: AuthAction) extends RepeatingSection with DefaultBaseController with DateOfChangeHelper {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request =>

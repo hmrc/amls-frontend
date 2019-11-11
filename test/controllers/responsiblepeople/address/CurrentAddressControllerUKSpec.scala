@@ -56,7 +56,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with MockitoSugar {
     val autoCompleteService = mock[AutoCompleteService]
     val statusService = mock[StatusService]
 
-    val currentAddressController = new CurrentAddressController (
+    val currentAddressController = new CurrentAddressUKController (
       dataCacheConnector = mockDataCacheConnector,
       auditConnector = auditConnector,
       authAction = SuccessfulAuthAction,
@@ -79,9 +79,9 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with MockitoSugar {
   val emptyCache = CacheMap("", Map.empty)
   val outOfBounds = 99
 
-  "CurrentAddressController" when {
+  "CurrentAddressUKController" when {
 
-    val pageTitle = Messages("responsiblepeople.wherepersonlives.title", "firstname lastname") + " - " +
+    val pageTitle = Messages("responsiblepeople.wherepersonlivescountry.title", "firstname lastname") + " - " +
       Messages("summary.responsiblepeople") + " - " +
       Messages("title.amls") + " - " + Messages("title.gov")
 
@@ -99,7 +99,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with MockitoSugar {
         status(result) must be(NOT_FOUND)
       }
 
-      "display the persons page when no existing data in mongoCache" in new Fixture {
+      "display the address uk page when no existing data in mongoCache" in new Fixture {
 
         val responsiblePeople = ResponsiblePerson(personName)
 
@@ -111,8 +111,6 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with MockitoSugar {
 
         val document = Jsoup.parse(contentAsString(result))
         document.title must be(pageTitle)
-        document.select("input[name=isUK][value=true]").hasAttr("checked") must be(true)
-        document.select("input[name=isUK][value=false]").hasAttr("checked") must be(false)
         document.select("input[name=addressLine1]").`val` must be("")
         document.select("input[name=addressLine2]").`val` must be("")
         document.select("input[name=addressLine3]").`val` must be("")
@@ -123,13 +121,9 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with MockitoSugar {
         document.select("input[name=addressLineNonUK4]").`val` must be("")
         document.select("input[name=postcode]").`val` must be("")
         document.select("input[name=country]").`val` must be("")
-        document.select("input[name=timeAtAddress][value=01]").hasAttr("checked") must be(false)
-        document.select("input[name=timeAtAddress][value=02]").hasAttr("checked") must be(false)
-        document.select("input[name=timeAtAddress][value=03]").hasAttr("checked") must be(false)
-        document.select("input[name=timeAtAddress][value=04]").hasAttr("checked") must be(false)
       }
 
-      "display the previous home address with UK fields populated" in new Fixture {
+      "display the home address with UK fields populated" in new Fixture {
 
         val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
         val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
@@ -144,34 +138,11 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with MockitoSugar {
 
         val document = Jsoup.parse(contentAsString(result))
         document.title must be(pageTitle)
-        document.select("input[name=isUK][value=true]").hasAttr("checked") must be(true)
         document.select("input[name=addressLine1]").`val` must be("Line 1")
         document.select("input[name=addressLine2]").`val` must be("Line 2")
         document.select("input[name=addressLine3]").`val` must be("Line 3")
         document.select("input[name=addressLine4]").`val` must be("")
         document.select("input[name=postcode]").`val` must be("AA1 1AA")
-      }
-
-      "display the previous home address with non-UK fields populated" in new Fixture {
-
-        val nonukAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))
-        val additionalAddress = ResponsiblePersonCurrentAddress(nonukAddress, Some(SixToElevenMonths))
-        val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
-        val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
-
-        when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-
-        val result = currentAddressController.get(RecordId)(request)
-        status(result) must be(OK)
-
-        val document = Jsoup.parse(contentAsString(result))
-        document.select("input[name=isUK][value=false]").hasAttr("checked") must be(true)
-        document.select("input[name=addressLineNonUK1]").`val` must be("Line 1")
-        document.select("input[name=addressLineNonUK2]").`val` must be("Line 2")
-        document.select("input[name=addressLineNonUK3]").`val` must be("")
-        document.select("input[name=addressLineNonUK4]").`val` must be("")
-        document.select("select[name=country] > option[value=ES]").hasAttr("selected") must be(true)
       }
     }
 
@@ -213,43 +184,6 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with MockitoSugar {
               d.detail("postCode") mustBe "AA1 1AA"
           }
         }
-
-        "all the mandatory non-UK parameters are supplied" in new Fixture {
-
-          val requestWithParams = request.withFormUrlEncodedBody(
-            "isUK" -> "false",
-            "addressLineNonUK1" -> "Line 1",
-            "addressLineNonUK2" -> "Line 2",
-            "country" -> "ES"
-          )
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
-          val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
-
-          when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
-            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
-            .thenReturn(Future.successful(SubmissionReadyForReview))
-
-          val result = currentAddressController.post(RecordId)(requestWithParams)
-
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.TimeAtCurrentAddressController.get(RecordId).url))
-
-          val captor = ArgumentCaptor.forClass(classOf[DataEvent])
-          verify(auditConnector).sendEvent(captor.capture())(any(), any())
-
-          captor.getValue match {
-            case d: DataEvent =>
-              d.detail("addressLine1") mustBe "Line 1"
-              d.detail("addressLine2") mustBe "Line 2"
-              d.detail("country") mustBe "Spain"
-          }
-        }
-
       }
 
       "redirect to CurrentAddressDateOfChangeController" when {
@@ -422,57 +356,6 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with MockitoSugar {
           document.select("a[href=#addressLine2]").html() must include(Messages("error.required.address.line2"))
           document.select("a[href=#postcode]").html() must include(Messages("error.invalid.postcode"))
         }
-
-        "there is no country supplied" in new Fixture {
-
-          val requestWithMissingParams = request.withFormUrlEncodedBody(
-            "isUK" -> "false",
-            "addressLineNonUK1" -> "",
-            "addressLineNonUK2" -> "",
-            "country" -> ""
-          )
-
-          when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
-            .thenReturn(Future.successful(SubmissionReadyForReview))
-
-          val result = currentAddressController.post(RecordId)(requestWithMissingParams)
-          status(result) must be(BAD_REQUEST)
-
-          val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#addressLineNonUK1]").html() must include(Messages("error.required.address.line1"))
-          document.select("a[href=#addressLineNonUK2]").html() must include(Messages("error.required.address.line2"))
-          document.select("a[href=#country]").html() must include(Messages("error.required.country"))
-        }
-
-        "the country selected is United Kingdom" in new Fixture {
-
-          val requestWithMissingParams = request.withFormUrlEncodedBody(
-            "isUK" -> "false",
-            "addressLineNonUK1" -> "",
-            "addressLineNonUK2" -> "",
-            "country" -> "GB"
-          )
-
-          when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
-            .thenReturn(Future.successful(SubmissionReadyForReview))
-
-          val result = currentAddressController.post(RecordId)(requestWithMissingParams)
-          status(result) must be(BAD_REQUEST)
-
-          val rpName: String = personName.map(pName =>
-            pName.titleName
-          ).getOrElse("")
-
-          val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#addressLineNonUK1]").html() must include(Messages("error.required.address.line1"))
-          document.select("a[href=#addressLineNonUK2]").html() must include(Messages("error.required.address.line2"))
-          document.select("a[href=#country]").html() must include(Messages("error.required.select.non.uk", s"$rpName ${Messages("error.required.select.non.uk.address")}"))
-        }
-
     }
 
       "respond with NOT_FOUND" when {
