@@ -24,11 +24,11 @@
 @header = {
     @components.back_link()
     @errorSummaryWithPlaceholder(f, s"$personName's ${Messages("error.required.select.non.uk.previous.address")}")
-    @headingWithPlaceholder(("responsiblepeople.additional_address.heading", personName), "summary.responsiblepeople")
+    @headingWithPlaceholder(("responsiblepeople.additional_address_country.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("responsiblepeople.additional_address.title", personName) + " - " + Messages("summary.responsiblepeople"),
+    title = Messages("responsiblepeople.additional_address_country.title", personName) + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 
