@@ -38,7 +38,7 @@ class time_at_additional_extra_addressSpec extends AmlsSpec with MustMatchers  {
     "have a back link" in new ViewFixture {
       val form2: ValidForm[TimeAtAddress] = Form2(ZeroToFiveMonths)
 
-      def view = views.html.responsiblepeople.time_at_additional_extra_address(form2, false, 0, None, name)
+      def view = views.html.responsiblepeople.address.time_at_additional_extra_address(form2, false, 0, None, name)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
@@ -46,7 +46,7 @@ class time_at_additional_extra_addressSpec extends AmlsSpec with MustMatchers  {
 
       val form2: ValidForm[TimeAtAddress] = Form2(ZeroToFiveMonths)
 
-      def view = views.html.responsiblepeople.time_at_additional_extra_address(form2, false, 0, None, name)
+      def view = views.html.responsiblepeople.address.time_at_additional_extra_address(form2, false, 0, None, name)
 
       doc.title must be(Messages("responsiblepeople.timeataddress.address_history.title") +
         " - " + Messages("summary.responsiblepeople") +
@@ -58,7 +58,7 @@ class time_at_additional_extra_addressSpec extends AmlsSpec with MustMatchers  {
 
       val form2: ValidForm[TimeAtAddress] = Form2(ZeroToFiveMonths)
 
-      def view = views.html.responsiblepeople.time_at_additional_extra_address(form2, false, 0, None, name)
+      def view = views.html.responsiblepeople.address.time_at_additional_extra_address(form2, false, 0, None, name)
 
       heading.html() must be(Messages("responsiblepeople.timeataddress.address_history.heading", name))
     }
@@ -74,7 +74,7 @@ class time_at_additional_extra_addressSpec extends AmlsSpec with MustMatchers  {
         Seq((Path \ timeAtAddress, Seq(ValidationError(messageKey1))))
       )
 
-      def view = views.html.responsiblepeople.time_at_additional_extra_address(form2, false, 0, None, name)
+      def view = views.html.responsiblepeople.address.time_at_additional_extra_address(form2, false, 0, None, name)
 
       errorSummary.html() must include(messageKey1)
     }

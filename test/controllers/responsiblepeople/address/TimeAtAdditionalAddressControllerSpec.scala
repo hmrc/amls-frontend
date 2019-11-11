@@ -213,7 +213,7 @@ class TimeAtAdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar {
             val result = timeAtAdditionalAddressController.post(RecordId, true, Some(flowFromDeclaration))(requestWithParams)
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, Some(flowFromDeclaration)).url))
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(RecordId, Some(flowFromDeclaration)).url))
           }
         }
         "time at address is ThreeYearsPlus" must {
@@ -235,7 +235,7 @@ class TimeAtAdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar {
             val result = timeAtAdditionalAddressController.post(RecordId, true, Some(flowFromDeclaration))(requestWithParams)
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, Some(flowFromDeclaration)).url))
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(RecordId, Some(flowFromDeclaration)).url))
           }
         }
       }
@@ -282,7 +282,7 @@ class TimeAtAdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar {
             val result = timeAtAdditionalAddressController.post(RecordId)(requestWithParams)
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.PositionWithinBusinessController.get(RecordId).url))
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PositionWithinBusinessController.get(RecordId).url))
           }
         }
 
@@ -305,7 +305,7 @@ class TimeAtAdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar {
             val result = timeAtAdditionalAddressController.post(RecordId)(requestWithParams)
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.PositionWithinBusinessController.get(RecordId).url))
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PositionWithinBusinessController.get(RecordId).url))
           }
         }
       }

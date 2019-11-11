@@ -98,7 +98,7 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with Mockito
           val result = timeAtAddressController.post(recordId, true)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId).url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(recordId).url))
         }
       }
     }

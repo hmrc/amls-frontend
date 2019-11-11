@@ -191,7 +191,7 @@ class TimeAtAdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar {
             val result = timeAtAdditionalAddressController.post(RecordId, true)(requestWithParams)
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.AdditionalExtraAddressController.get(RecordId, true).url))
+            redirectLocation(result) must be(Some(address.routes.AdditionalExtraAddressController.get(RecordId, true).url))
           }
         }
 
@@ -261,7 +261,7 @@ class TimeAtAdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar {
             val result = timeAtAdditionalAddressController.post(RecordId)(requestWithParams)
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.AdditionalExtraAddressController.get(RecordId).url))
+            redirectLocation(result) must be(Some(address.routes.AdditionalExtraAddressController.get(RecordId).url))
           }
         }
 
