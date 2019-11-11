@@ -50,7 +50,7 @@ class AdditionalExtraAddressControllerUKSpec extends AmlsSpec with MockitoSugar 
     val auditConnector = mock[AuditConnector]
     val autoCompleteService = mock[AutoCompleteService]
 
-    val additionalExtraAddressController = new AdditionalExtraAddressController (
+    val additionalExtraAddressController = new AdditionalExtraAddressUKController (
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction,
       auditConnector = auditConnector,
@@ -77,10 +77,9 @@ class AdditionalExtraAddressControllerUKSpec extends AmlsSpec with MockitoSugar 
 
   "AdditionalExtraAddressController" when {
 
-
     "get is called" must {
 
-      "display the persons page" in new Fixture {
+      "display the extra address UK page" in new Fixture {
 
         val responsiblePeople = ResponsiblePerson(personName)
 
@@ -91,18 +90,11 @@ class AdditionalExtraAddressControllerUKSpec extends AmlsSpec with MockitoSugar 
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("input[name=isUK][value=true]").hasAttr("checked") must be(true)
-        document.select("input[name=isUK][value=false]").hasAttr("checked") must be(false)
         document.select("input[name=addressLine1]").`val` must be("")
         document.select("input[name=addressLine2]").`val` must be("")
         document.select("input[name=addressLine3]").`val` must be("")
         document.select("input[name=addressLine4]").`val` must be("")
-        document.select("input[name=addressLineNonUK1]").`val` must be("")
-        document.select("input[name=addressLineNonUK2]").`val` must be("")
-        document.select("input[name=addressLineNonUK3]").`val` must be("")
-        document.select("input[name=addressLineNonUK4]").`val` must be("")
         document.select("input[name=postcode]").`val` must be("")
-        document.select("input[name=country]").`val` must be("")
 
       }
       "display the persons page with pre-populated data" in new Fixture {
@@ -149,7 +141,6 @@ class AdditionalExtraAddressControllerUKSpec extends AmlsSpec with MockitoSugar 
         status(result) must be(NOT_FOUND)
       }
     }
-
   }
 
   "post is called" when {
@@ -165,7 +156,11 @@ class AdditionalExtraAddressControllerUKSpec extends AmlsSpec with MockitoSugar 
             "postCode" -> "AA1 1AA"
           )
 
-          val responsiblePeople = ResponsiblePerson(personName)
+          val ukAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA1 1AA")
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
+          val additionalExtraAddress = ResponsiblePersonAddress(ukAddress, Some(ZeroToFiveMonths))
+          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress), additionalExtraAddress = Some(additionalExtraAddress))
+          val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
 
           when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -175,7 +170,7 @@ class AdditionalExtraAddressControllerUKSpec extends AmlsSpec with MockitoSugar 
 
           val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.TimeAtAdditionalExtraAddressController.get(RecordId).url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.address.routes.TimeAtAdditionalExtraAddressController.get(RecordId).url))
 
           val captor = ArgumentCaptor.forClass(classOf[DataEvent])
           verify(auditConnector).sendEvent(captor.capture())(any(), any())
@@ -196,7 +191,11 @@ class AdditionalExtraAddressControllerUKSpec extends AmlsSpec with MockitoSugar 
             "postCode" -> "AA1 1AA"
           )
 
-          val responsiblePeople = ResponsiblePerson()
+          val ukAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA1 1AA")
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
+          val additionalExtraAddress = ResponsiblePersonAddress(ukAddress, None)
+          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress), additionalExtraAddress = Some(additionalExtraAddress))
+          val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
 
           when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
             (any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -206,7 +205,7 @@ class AdditionalExtraAddressControllerUKSpec extends AmlsSpec with MockitoSugar 
 
           val result = additionalExtraAddressController.post(RecordId, true)(requestWithParams)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.TimeAtAdditionalExtraAddressController.get(RecordId, true).url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.address.routes.TimeAtAdditionalExtraAddressController.get(RecordId, true).url))
         }
       }
 

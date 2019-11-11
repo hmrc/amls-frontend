@@ -18,6 +18,7 @@ package controllers.responsiblepeople.address
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import models.Country
 import models.autocomplete.NameValuePair
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
@@ -27,6 +28,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.AutoCompleteService
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -46,20 +48,13 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar {
     self =>
     val request = addToken(authRequest)
 
-
-    val auditConnector = mock[AuditConnector]
     val autoCompleteService = mock[AutoCompleteService]
 
     val additionalExtraAddressController = new AdditionalExtraAddressController (
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction,
-      auditConnector = auditConnector,
       autoCompleteService = autoCompleteService
     )
-
-    when {
-      auditConnector.sendEvent(any())(any(), any())
-    } thenReturn Future.successful(Success)
 
     when {
       autoCompleteService.getCountries
@@ -80,7 +75,7 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
     "get is called" must {
 
-      "display the persons page" in new Fixture {
+      "display the address country page" in new Fixture {
 
         val responsiblePeople = ResponsiblePerson(personName)
 
@@ -91,23 +86,13 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar {
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("input[name=isUK][value=true]").hasAttr("checked") must be(true)
+        document.select("input[name=isUK][value=true]").hasAttr("checked") must be(false)
         document.select("input[name=isUK][value=false]").hasAttr("checked") must be(false)
-        document.select("input[name=addressLine1]").`val` must be("")
-        document.select("input[name=addressLine2]").`val` must be("")
-        document.select("input[name=addressLine3]").`val` must be("")
-        document.select("input[name=addressLine4]").`val` must be("")
-        document.select("input[name=addressLineNonUK1]").`val` must be("")
-        document.select("input[name=addressLineNonUK2]").`val` must be("")
-        document.select("input[name=addressLineNonUK3]").`val` must be("")
-        document.select("input[name=addressLineNonUK4]").`val` must be("")
-        document.select("input[name=postcode]").`val` must be("")
-        document.select("input[name=country]").`val` must be("")
-
       }
-      "display the persons page with pre-populated data" in new Fixture {
 
-        val address = PersonAddressUK(
+      "display the address page with pre-populated data for UK address" in new Fixture {
+
+        val ukAddress = PersonAddressUK(
           "existingAddressLine1",
           "existingAddressLine1",
           Some("existingAddressLine3"),
@@ -118,9 +103,9 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar {
         val responsiblePeople = ResponsiblePerson(
           personName = personName,
           addressHistory = Some(ResponsiblePersonAddressHistory(
-            None,
-            None,
-            Some(ResponsiblePersonAddress(address, None))
+            currentAddress = None,
+            additionalAddress = None,
+            additionalExtraAddress = Some(ResponsiblePersonAddress(ukAddress, None))
           ))
         )
 
@@ -130,18 +115,46 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar {
         val result = additionalExtraAddressController.get(RecordId)(request)
         status(result) must be(OK)
 
-        val doc = Jsoup.parse(contentAsString(result))
-        doc.getElementById("addressLine1").`val`() mustBe address.addressLine1
-        doc.getElementById("addressLine2").`val`() mustBe address.addressLine2
-        doc.getElementById("addressLine3").`val`() mustBe address.addressLine3.get
-        doc.getElementById("addressLine4").`val`() mustBe address.addressLine4.get
-        doc.getElementById("postCode").`val`() mustBe address.postCode
+        val document = Jsoup.parse(contentAsString(result))
 
+        document.select("input[name=isUK][value=true]").hasAttr("checked") must be(true)
+        document.select("input[name=isUK][value=false]").hasAttr("checked") must be(false)
+      }
+
+      "display the address page with pre-populated data for non-UK address" in new Fixture {
+
+        val ukAddress = PersonAddressNonUK(
+          "existingAddressLine1",
+          "existingAddressLine1",
+          Some("existingAddressLine3"),
+          Some("existingAddressLine4"),
+          Country("Spain", "ES")
+        )
+
+        val responsiblePeople = ResponsiblePerson(
+          personName = personName,
+          addressHistory = Some(ResponsiblePersonAddressHistory(
+            currentAddress = None,
+            additionalAddress = None,
+            additionalExtraAddress = Some(ResponsiblePersonAddress(ukAddress, None))
+          ))
+        )
+
+        when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+        val result = additionalExtraAddressController.get(RecordId)(request)
+        status(result) must be(OK)
+
+        val document = Jsoup.parse(contentAsString(result))
+
+        document.select("input[name=isUK][value=true]").hasAttr("checked") must be(false)
+        document.select("input[name=isUK][value=false]").hasAttr("checked") must be(true)
       }
     }
 
     "respond with NOT_FOUND" when {
-      "name cannot be found" in new Fixture {
+      "address cannot be found" in new Fixture {
         when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
@@ -149,20 +162,16 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar {
         status(result) must be(NOT_FOUND)
       }
     }
-
   }
 
   "post is called" when {
 
     "form is valid" must {
-      "go to TimeAtAdditionalExtraAddressController" when {
-        "edit is false" in new Fixture {
+      "go to AdditionalExtraAddressUKController" when {
+        "user selected Yes" in new Fixture {
 
           val requestWithParams = request.withFormUrlEncodedBody(
-            "isUK" -> "true",
-            "addressLine1" -> "Line 1",
-            "addressLine2" -> "Line 2",
-            "postCode" -> "AA1 1AA"
+            "isUK" -> "true"
           )
 
           val responsiblePeople = ResponsiblePerson(personName)
@@ -175,55 +184,18 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
           val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.TimeAtAdditionalExtraAddressController.get(RecordId).url))
-
-          val captor = ArgumentCaptor.forClass(classOf[DataEvent])
-          verify(auditConnector).sendEvent(captor.capture())(any(), any())
-
-          captor.getValue match {
-            case d: DataEvent =>
-              d.detail("addressLine1") mustBe "Line 1"
-              d.detail("addressLine2") mustBe "Line 2"
-              d.detail("postCode") mustBe "AA1 1AA"
-          }
-        }
-
-        "edit is true and timeAtAddress does not exist" in new Fixture {
-          val requestWithParams = request.withFormUrlEncodedBody(
-            "isUK" -> "true",
-            "addressLine1" -> "Line 1",
-            "addressLine2" -> "Line 2",
-            "postCode" -> "AA1 1AA"
-          )
-
-          val responsiblePeople = ResponsiblePerson()
-
-          when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-            (any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-
-          when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any()))
-            .thenReturn(Future.successful(mockCacheMap))
-
-          val result = additionalExtraAddressController.post(RecordId, true)(requestWithParams)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.TimeAtAdditionalExtraAddressController.get(RecordId, true).url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.address.routes.AdditionalExtraAddressUKController.get(RecordId).url))
         }
       }
 
-      "go to DetailedAnswersController" when {
-        "edit is true" in new Fixture {
+      "go to AdditionalExtraAddressNonUKController" when {
+        "user selected No" in new Fixture {
 
           val requestWithParams = request.withFormUrlEncodedBody(
-            "isUK" -> "true",
-            "addressLine1" -> "New line 1",
-            "addressLine2" -> "New line 2",
-            "postCode" -> "TE1 1ET"
+            "isUK" -> "false"
           )
 
-          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-          val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
-          val history = ResponsiblePersonAddressHistory(additionalExtraAddress = Some(additionalAddress))
-          val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
+          val responsiblePeople = ResponsiblePerson(personName)
 
           when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -231,35 +203,16 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar {
           when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
-          val result = additionalExtraAddressController.post(RecordId, true, Some(flowFromDeclaration))(requestWithParams)
+          val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(RecordId, Some(flowFromDeclaration)).url))
-
-          val captor = ArgumentCaptor.forClass(classOf[DataEvent])
-          verify(auditConnector).sendEvent(captor.capture())(any(), any())
-
-          captor.getValue match {
-            case d: DataEvent =>
-              d.detail("addressLine1") mustBe "New line 1"
-              d.detail("addressLine2") mustBe "New line 2"
-              d.detail("postCode") mustBe "TE1 1ET"
-              d.detail("originalLine1") mustBe "Line 1"
-              d.detail("originalLine2") mustBe "Line 2"
-              d.detail("originalPostCode") mustBe "AA1 1AA"
-          }
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.address.routes.AdditionalExtraAddressNonUKController.get(RecordId).url))
         }
       }
-
     }
 
     "respond with BAD_REQUEST" when {
       "form is invalid" in new Fixture {
-        val requestWithParams = request.withFormUrlEncodedBody(
-          "isUK" -> "",
-          "addressLineNonUK1" -> "",
-          "addressLineNonUK2" -> "",
-          "country" -> ""
-        )
+        val requestWithParams = request.withFormUrlEncodedBody()
 
         val responsiblePeople = ResponsiblePerson(personName)
 
@@ -276,12 +229,7 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
     "respond with NOT_FOUND" when {
       "responsible person is not found for that index" in new Fixture {
-        val requestWithParams = request.withFormUrlEncodedBody(
-          "isUK" -> "true",
-          "addressLine1" -> "Line 1",
-          "addressLine2" -> "Line 2",
-          "postCode" -> "AA1 1AA"
-        )
+        val requestWithParams = request
 
         val responsiblePeople = ResponsiblePerson(personName)
 
