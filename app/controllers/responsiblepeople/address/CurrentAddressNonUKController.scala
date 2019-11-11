@@ -61,7 +61,6 @@ class CurrentAddressNonUKController @Inject ()(
             getData[ResponsiblePerson](request.credId, index) map { rp =>
               BadRequest(current_address_NonUK(f, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
             }
-            //Future.successful(Redirect(routes.TimeAtCurrentAddressController.get(index, edit, flow)))
           case ValidForm(_, data) => {
             getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>
             val currentAddressWithTime = (for {
@@ -88,7 +87,7 @@ class CurrentAddressNonUKController @Inject ()(
                                 status: SubmissionStatus)(implicit request: Request[AnyContent]) = {
 
     updateDataStrict[ResponsiblePerson](credId, index) { res =>
-      res.addressHistory(
+      res.addressHistory (
         res.addressHistory match {
           case Some(a) => a.currentAddress(data)
           case _ => ResponsiblePersonAddressHistory(currentAddress = Some(data))
