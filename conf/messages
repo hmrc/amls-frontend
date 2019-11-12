@@ -18,10 +18,10 @@ err.text.role.in.business.text.validation = Role in the business must only inclu
 
 error.browser.title.prefix = Error:
 
-error.required.address.line1 = Enter the first line of the address
-error.required.address.line2 = Enter the second line of the address
+error.required.address.line1 = Enter address line 1
+error.required.address.line2 = Enter address line 2
 error.max.length.address.line = You can’t enter more than 35 characters
-error.invalid.postcode = Enter a valid postcode
+error.invalid.postcode = Enter a postcode, like AA1 1AA
 error.required.country = Enter a country name, like France
 error.invalid.country = Enter a country name, like France
 error.required.country.name = Enter a country name, like France

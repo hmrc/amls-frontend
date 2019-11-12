@@ -20,6 +20,7 @@ import cats.data.Validated.{Invalid, Valid}
 import models.Country
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, ValidationError, Write}
+import models.FormTypes.genericAddressRule
 import play.api.libs.json.{Reads, Writes}
 
 sealed trait PersonAddress {
@@ -66,7 +67,23 @@ object AddressType extends Enumeration {
 }
 
 object PersonAddress {
-  implicit def formRule(addressType: AddressType.Value = AddressType.Deafult): Rule[UrlFormEncoded, PersonAddress] = From[UrlFormEncoded] { __ =>
+  val addressLine1Rule = genericAddressRule("error.required.address.line1",
+    "error.required.enter.addresslineone.charcount",
+    "error.required.enter.addresslineone.regex")
+
+  val addressLine2Rule = genericAddressRule("error.required.address.line2",
+    "error.required.enter.addresslineone.charcount",
+    "error.required.enter.addresslineone.regex")
+
+  val addressLine3Rule = genericAddressRule("",
+    "error.required.enter.addresslineone.charcount",
+    "error.required.enter.addresslineone.regex")
+
+  val addressLine4Rule = genericAddressRule("",
+    "error.required.enter.addresslineone.charcount",
+    "error.required.enter.addresslineone.regex")
+
+  def formRule(addressType: AddressType.Value = AddressType.Deafult): Rule[UrlFormEncoded, PersonAddress] = From[UrlFormEncoded] { __ =>
     val validateCountry: Rule[Country, Country] = Rule.fromMapping[Country, Country] { country =>
       country.code match {
         case "GB" => Invalid(Seq(ValidationError(List("error.required.select.non.uk"))))
@@ -78,17 +95,17 @@ object PersonAddress {
     import utils.MappingUtils.Implicits._
 
     def readUKaddress =
-      (__ \ "addressLine1").read(trimNotEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
-        (__ \ "addressLine2").read(trimNotEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
-        (__ \ "addressLine3").read(optionR(validateAddress)) ~
-        (__ \ "addressLine4").read(optionR(validateAddress)) ~
+      (__ \ "addressLine1").read(addressLine1Rule) ~
+        (__ \ "addressLine2").read(addressLine2Rule) ~
+        (__ \ "addressLine3").read(optionR(addressLine3Rule)) ~
+        (__ \ "addressLine4").read(optionR(addressLine4Rule)) ~
         (__ \ "postCode").read(notEmptyStrip andThen postcodeType)
 
     def readNonUKaddress =
-      (__ \ "addressLineNonUK1").read(trimNotEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
-        (__ \ "addressLineNonUK2").read(trimNotEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
-        (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
-        (__ \ "addressLineNonUK4").read(optionR(validateAddress)) ~
+      (__ \ "addressLineNonUK1").read(addressLine1Rule) ~
+        (__ \ "addressLineNonUK2").read(addressLine2Rule) ~
+        (__ \ "addressLineNonUK3").read(optionR(addressLine3Rule)) ~
+        (__ \ "addressLineNonUK4").read(optionR(addressLine4Rule)) ~
         (__ \ "country").read(validateCountry)
 
     (__ \ "isUK").read[Boolean].withMessage(s"error.required.uk.or.overseas.address.$addressType") flatMap {
@@ -109,19 +126,18 @@ object PersonAddress {
     import utils.MappingUtils.Implicits._
 
     def readUKaddress =
-      (__ \ "addressLine1").read(trimNotEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
-        (__ \ "addressLine2").read(trimNotEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
-        (__ \ "addressLine3").read(optionR(validateAddress)) ~
-        (__ \ "addressLine4").read(optionR(validateAddress)) ~
+      (__ \ "addressLine1").read(addressLine1Rule) ~
+        (__ \ "addressLine2").read(addressLine2Rule) ~
+        (__ \ "addressLine3").read(optionR(addressLine3Rule)) ~
+        (__ \ "addressLine4").read(optionR(addressLine4Rule)) ~
         (__ \ "postCode").read(notEmptyStrip andThen postcodeType)
 
     def readNonUKaddress =
-      (__ \ "addressLineNonUK1").read(trimNotEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
-        (__ \ "addressLineNonUK2").read(trimNotEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
-        (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
-        (__ \ "addressLineNonUK4").read(optionR(validateAddress)) ~
+      (__ \ "addressLineNonUK1").read(addressLine1Rule) ~
+        (__ \ "addressLineNonUK2").read(addressLine2Rule) ~
+        (__ \ "addressLineNonUK3").read(optionR(addressLine3Rule)) ~
+        (__ \ "addressLineNonUK4").read(optionR(addressLine4Rule)) ~
         (__ \ "country").read(validateCountry)
-
     (__ \ "isUK").read[Boolean].withMessage("error.required.uk.or.overseas") flatMap {
       case true => readUKaddress(PersonAddressUK.apply _)
       case false => readNonUKaddress(PersonAddressNonUK.apply _)
