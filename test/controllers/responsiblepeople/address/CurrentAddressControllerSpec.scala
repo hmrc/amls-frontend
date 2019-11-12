@@ -181,7 +181,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
           status(result) must be(BAD_REQUEST)
 
           val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#isUK]").html() must include(Messages("error.required.uk.or.overseas"))
+          document.select("a[href=#isUK]").html() must include(Messages(s"error.required.uk.or.overseas.address.current", personName.get.titleName))
         }
       }
     }
