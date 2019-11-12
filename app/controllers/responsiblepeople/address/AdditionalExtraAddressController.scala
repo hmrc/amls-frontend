@@ -55,7 +55,7 @@ class AdditionalExtraAddressController @Inject()(
           }
         }
 
-        (Form2[ResponsiblePersonAddress](request.body) match {
+        (Form2[ResponsiblePersonAddress](request.body)(ResponsiblePersonAddress.addressFormRule(PersonAddress.formRule(AddressType.OtherPrevious))) match {
           case f: InvalidForm if f.data.get("isUK").isDefined => processForm(ResponsiblePersonAddress(AddressHelper.modelFromForm(f), None))
           case f: InvalidForm =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>

@@ -57,7 +57,7 @@ class CurrentAddressController @Inject ()(
             }
           }
 
-          (Form2[ResponsiblePersonCurrentAddress](request.body) match {
+          (Form2[ResponsiblePersonCurrentAddress](request.body)(ResponsiblePersonCurrentAddress.addressFormRule(PersonAddress.formRule(AddressType.Current)))  match {
             case f: InvalidForm if f.data.get("isUK").isDefined => processForm(ResponsiblePersonCurrentAddress(AddressHelper.modelFromForm(f), None, None))
             case f: InvalidForm =>
               getData[ResponsiblePerson](request.credId, index) map { rp =>

@@ -26,6 +26,10 @@ error.required.country = Enter a country name, like France
 error.invalid.country = Enter a country name, like France
 error.required.country.name = Enter a country name, like France
 error.required.nationality = Select one or more options to show this person’s nationality
+error.required.uk.or.overseas.address.previous.other = Select yes if {0}’s other previous home address was in the UK
+error.required.uk.or.overseas.address.previous = Select yes if {0}’s previous home address was in the UK
+error.required.uk.or.overseas.address.current = Select yes if {0}’s home address is in the UK
+error.required.uk.or.overseas.address.default = Select yes if this is a UK address
 error.required.uk.or.overseas = Select yes if this is a UK address
 
 error.required.firstname = Enter a first name.

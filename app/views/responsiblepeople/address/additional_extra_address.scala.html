@@ -23,7 +23,7 @@
 
 @header = {
     @components.back_link()
-    @errorSummaryWithPlaceholder(f, s"$personName's ${Messages("error.required.select.non.uk.other.previous.address")}")
+    @errorSummaryWithPlaceholder(f, personName)
     @headingWithPlaceholder(("responsiblepeople.additional_extra_address.heading", personName), "summary.responsiblepeople")
 }
 
@@ -34,12 +34,13 @@
 
     @form(f, controllers.responsiblepeople.address.routes.AdditionalExtraAddressController.post(index, edit, flow)) {
 
-            @fieldset(
+            @fieldsetWithErrorGroup(
                 legend = "responsiblepeople.additional_extra_address.title",
                 legendHidden = true,
                 f = f("isUK"),
                 panel = false,
-                classes = Seq("inline")
+                classes = Seq("inline"),
+                errorGroupPlaceholder = personName
             ) {
                 @radio(
                     f = f("isUK"),

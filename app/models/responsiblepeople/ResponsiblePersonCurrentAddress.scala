@@ -42,6 +42,13 @@ object ResponsiblePersonCurrentAddress {
       ) ((personAddress:PersonAddress, _:Option[TimeAtAddress]) => ResponsiblePersonCurrentAddress(personAddress, None, None))
   }
 
+  def addressFormRule(paFormRule: Rule[UrlFormEncoded, PersonAddress]): Rule[UrlFormEncoded, ResponsiblePersonCurrentAddress] = From[UrlFormEncoded] { __ =>
+    import jto.validation.forms.Rules._
+    (
+      __.read(paFormRule andThen validateCountry) ~ (__ \ "timeAtAddress").read[Option[TimeAtAddress]]
+      ) ((personAddress:PersonAddress, _:Option[TimeAtAddress]) => ResponsiblePersonCurrentAddress(personAddress, None, None))
+  }
+
   def unapplyNoDateOfChange(currentAddress:ResponsiblePersonCurrentAddress):Option[(PersonAddress,Option[TimeAtAddress])] =
     Some((currentAddress.personAddress,currentAddress.timeAtAddress))
 

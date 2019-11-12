@@ -58,7 +58,45 @@ case class PersonAddressNonUK(
                          addressLineNonUK4: Option[String],
                          country: Country) extends PersonAddress
 
+object AddressType extends Enumeration {
+  val Current = Value("current")
+  val Previous = Value("previous")
+  val OtherPrevious = Value("previous.other")
+  val Deafult = Value("default")
+}
+
 object PersonAddress {
+  implicit def formRule(addressType: AddressType.Value = AddressType.Deafult): Rule[UrlFormEncoded, PersonAddress] = From[UrlFormEncoded] { __ =>
+    val validateCountry: Rule[Country, Country] = Rule.fromMapping[Country, Country] { country =>
+      country.code match {
+        case "GB" => Invalid(Seq(ValidationError(List("error.required.select.non.uk"))))
+        case _ => Valid(country)
+      }
+    }
+    import jto.validation.forms.Rules._
+    import models.FormTypes._
+    import utils.MappingUtils.Implicits._
+
+    def readUKaddress =
+      (__ \ "addressLine1").read(trimNotEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
+        (__ \ "addressLine2").read(trimNotEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
+        (__ \ "addressLine3").read(optionR(validateAddress)) ~
+        (__ \ "addressLine4").read(optionR(validateAddress)) ~
+        (__ \ "postCode").read(notEmptyStrip andThen postcodeType)
+
+    def readNonUKaddress =
+      (__ \ "addressLineNonUK1").read(trimNotEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
+        (__ \ "addressLineNonUK2").read(trimNotEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
+        (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
+        (__ \ "addressLineNonUK4").read(optionR(validateAddress)) ~
+        (__ \ "country").read(validateCountry)
+
+    (__ \ "isUK").read[Boolean].withMessage(s"error.required.uk.or.overseas.address.$addressType") flatMap {
+      case true => readUKaddress(PersonAddressUK.apply _)
+      case false => readNonUKaddress(PersonAddressNonUK.apply _)
+    }
+  }
+
   implicit val formRule: Rule[UrlFormEncoded, PersonAddress] = From[UrlFormEncoded] { __ =>
     val validateCountry: Rule[Country, Country] = Rule.fromMapping[Country, Country] { country =>
       country.code match {
@@ -66,27 +104,29 @@ object PersonAddress {
         case _ => Valid(country)
       }
     }
-      import jto.validation.forms.Rules._
-      import models.FormTypes._
-      import utils.MappingUtils.Implicits._
+    import jto.validation.forms.Rules._
+    import models.FormTypes._
+    import utils.MappingUtils.Implicits._
+
+    def readUKaddress =
+      (__ \ "addressLine1").read(trimNotEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
+        (__ \ "addressLine2").read(trimNotEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
+        (__ \ "addressLine3").read(optionR(validateAddress)) ~
+        (__ \ "addressLine4").read(optionR(validateAddress)) ~
+        (__ \ "postCode").read(notEmptyStrip andThen postcodeType)
+
+    def readNonUKaddress =
+      (__ \ "addressLineNonUK1").read(trimNotEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
+        (__ \ "addressLineNonUK2").read(trimNotEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
+        (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
+        (__ \ "addressLineNonUK4").read(optionR(validateAddress)) ~
+        (__ \ "country").read(validateCountry)
 
     (__ \ "isUK").read[Boolean].withMessage("error.required.uk.or.overseas") flatMap {
-        case true => (
-            (__ \ "addressLine1").read(trimNotEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
-            (__ \ "addressLine2").read(trimNotEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
-            (__ \ "addressLine3").read(optionR(validateAddress)) ~
-            (__ \ "addressLine4").read(optionR(validateAddress)) ~
-            (__ \ "postCode").read(notEmptyStrip andThen postcodeType)
-          )(PersonAddressUK.apply _)
-        case false => (
-            (__ \ "addressLineNonUK1").read(trimNotEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
-            (__ \ "addressLineNonUK2").read(trimNotEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
-            (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
-            (__ \ "addressLineNonUK4").read(optionR(validateAddress)) ~
-            (__ \ "country").read(validateCountry)
-          )(PersonAddressNonUK.apply _)
-      }
+      case true => readUKaddress(PersonAddressUK.apply _)
+      case false => readNonUKaddress(PersonAddressNonUK.apply _)
     }
+  }
 
   implicit val formWrites = Write[PersonAddress, UrlFormEncoded] {
     case a: PersonAddressUK =>

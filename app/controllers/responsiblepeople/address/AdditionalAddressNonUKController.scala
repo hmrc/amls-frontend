@@ -56,7 +56,7 @@ class AdditionalAddressNonUKController @Inject()(override val dataCacheConnector
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
     authAction.async {
       implicit request =>
-        (Form2[ResponsiblePersonAddress](request.body) match {
+        (Form2[ResponsiblePersonAddress](request.body)(ResponsiblePersonAddress.addressFormRule(PersonAddress.formRule(AddressType.Previous))) match {
           case f: InvalidForm =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
               BadRequest(additional_address_NonUK(f, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
