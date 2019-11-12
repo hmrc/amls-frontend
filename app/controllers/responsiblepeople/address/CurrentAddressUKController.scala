@@ -56,11 +56,9 @@ class CurrentAddressUKController @Inject ()(val dataCacheConnector: DataCacheCon
       implicit request =>
         (Form2[ResponsiblePersonCurrentAddress](request.body) match {
           case f: InvalidForm =>
-            println("============ " + f)
             getData[ResponsiblePerson](request.credId, index) map { rp =>
               BadRequest(current_address_UK(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
-            //Future.successful(Redirect(routes.TimeAtCurrentAddressController.get(index, edit, flow)))
           case ValidForm(_, data) => {
             getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>
               val currentAddressWithTime = (for {

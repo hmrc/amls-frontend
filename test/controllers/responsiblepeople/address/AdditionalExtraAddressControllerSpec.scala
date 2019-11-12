@@ -20,21 +20,14 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.autocomplete.NameValuePair
-import models.responsiblepeople.ResponsiblePerson._
-import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
 import org.jsoup.Jsoup
-import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.AutoCompleteService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
-import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
@@ -227,20 +220,25 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar {
       }
     }
 
-    "respond with NOT_FOUND" when {
-      "responsible person is not found for that index" in new Fixture {
-        val requestWithParams = request
+    "process form as valid" when {
+      "isUK is defined and false" in new Fixture {
+        val requestWithParams = request.withFormUrlEncodedBody(
+          "isUK" -> "false"
+        )
 
-        val responsiblePeople = ResponsiblePerson(personName)
+        val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.responsiblepeople.address.routes.AdditionalExtraAddressNonUKController.get(RecordId).url))
+      }
 
-        when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
-          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+      "isUK is defined and true" in new Fixture {
+        val requestWithParams = request.withFormUrlEncodedBody(
+          "isUK" -> "true"
+        )
 
-        when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any()))
-          .thenReturn(Future.successful(mockCacheMap))
-
-        val result = additionalExtraAddressController.post(0)(requestWithParams)
-        status(result) must be(NOT_FOUND)
+        val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.responsiblepeople.address.routes.AdditionalExtraAddressUKController.get(RecordId).url))
       }
     }
   }
