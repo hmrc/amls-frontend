@@ -31,8 +31,8 @@ import services.AutoCompleteService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
-import utils.{AuthAction, RepeatingSection}
-import views.html.responsiblepeople.address.additional_address_UK
+import utils.{AuthAction, ControllerHelper, RepeatingSection}
+import views.html.responsiblepeople.address.{additional_address_UK, current_address_NonUK}
 
 import scala.concurrent.Future
 
@@ -58,7 +58,9 @@ class AdditionalAddressUKController @Inject()(override val dataCacheConnector: D
       implicit request =>
         (Form2[ResponsiblePersonAddress](request.body) match {
           case f: InvalidForm =>
-            Future.successful(Redirect(routes.TimeAtAdditionalAddressController.get(index, edit, flow)))
+            getData[ResponsiblePerson](request.credId, index) map { rp =>
+              BadRequest(additional_address_UK(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+            }
           case ValidForm(_, data) => {
             getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>
               (for {

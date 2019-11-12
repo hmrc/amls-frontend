@@ -32,7 +32,6 @@ import scala.concurrent.Future
 class AdditionalAddressController @Inject()(
                                               override val dataCacheConnector: DataCacheConnector,
                                               authAction: AuthAction,
-                                              auditConnector: AuditConnector,
                                               val autoCompleteService: AutoCompleteService
                                             ) extends RepeatingSection with DefaultBaseController {
 
