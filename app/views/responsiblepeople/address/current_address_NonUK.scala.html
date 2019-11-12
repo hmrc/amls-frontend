@@ -36,7 +36,6 @@
 
         <input type ="hidden" name="isUK" value=false />
 
-        <div class="form-group">
         @fieldset(
             legend = "responsiblepeople.wherepersonlivescountry.title",
             legendHidden = true,
@@ -67,8 +66,6 @@
                 data = countries.getOrElse(Seq.empty)
             )
         }
-
-        </div>
 
         @submit(edit, Some("button.saveandcontinue"))
     }

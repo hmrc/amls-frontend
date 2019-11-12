@@ -36,8 +36,6 @@
 
         <input type ="hidden" name="isUK" value=true />
 
-        <div id="@{s"""${f("postCode").id}-fieldset"""}">
-
             @fieldset(
                 legend = "responsiblepeople.additional_extra_address.address",
                 legendHidden = true,
@@ -54,8 +52,6 @@
                     classes = Seq("postcode")
                 )
             }
-        </div>
-
 
         @submit(edit)
     }

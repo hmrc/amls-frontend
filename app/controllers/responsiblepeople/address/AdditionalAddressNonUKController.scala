@@ -59,7 +59,7 @@ class AdditionalAddressNonUKController @Inject()(override val dataCacheConnector
         (Form2[ResponsiblePersonAddress](request.body) match {
           case f: InvalidForm =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
-              BadRequest(current_address_NonUK(f, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
+              BadRequest(additional_address_NonUK(f, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
             }
           case ValidForm(_, data) => {
             getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>

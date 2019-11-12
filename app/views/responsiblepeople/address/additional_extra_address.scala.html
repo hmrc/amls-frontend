@@ -34,9 +34,9 @@
 
     @form(f, controllers.responsiblepeople.address.routes.AdditionalExtraAddressController.post(index, edit, flow)) {
 
-        <div class="form-group">
             @fieldset(
                 legend = "responsiblepeople.additional_extra_address.title",
+                legendHidden = true,
                 f = f("isUK"),
                 panel = false,
                 classes = Seq("inline")
@@ -54,7 +54,6 @@
                     inline = true
                 )
             }
-        </div>
 
         @submit(edit)
     }
