@@ -312,7 +312,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with MockitoSugar {
           val elementsWithError : Elements = document.getElementsByClass("error-notification")
           elementsWithError.size() must be(errorCount)
           for (ele: Element <- elementsWithError) {
-            ele.html() must include(Messages("err.text.validation"))
+            ele.html() must include(Messages("error.required.enter.addresslineone.regex"))
           }
         }
 

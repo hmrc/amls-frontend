@@ -184,10 +184,10 @@ class PersonAddressSpec extends PlaySpec {
           )
           PersonAddress.formRule.validate(data) must be(
             Invalid(Seq(
-              (Path \ "addressLine1") -> Seq(ValidationError("error.max.length.address.line")),
-              (Path \ "addressLine2") -> Seq(ValidationError("error.max.length.address.line")),
-              (Path \ "addressLine3") -> Seq(ValidationError("error.max.length.address.line")),
-              (Path \ "addressLine4") -> Seq(ValidationError("error.max.length.address.line")),
+              (Path \ "addressLine1") -> Seq(ValidationError("error.required.enter.addresslineone.charcount")),
+              (Path \ "addressLine2") -> Seq(ValidationError("error.required.enter.addresslinetwo.charcount")),
+              (Path \ "addressLine3") -> Seq(ValidationError("error.required.enter.addresslinethree.charcount")),
+              (Path \ "addressLine4") -> Seq(ValidationError("error.required.enter.addresslinefour.charcount")),
               (Path \ "postCode") -> Seq(ValidationError("error.invalid.postcode"))
             )))
         }
@@ -202,10 +202,10 @@ class PersonAddressSpec extends PlaySpec {
           )
           PersonAddress.formRule.validate(data) must be(
             Invalid(Seq(
-              (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.max.length.address.line")),
-              (Path \ "addressLineNonUK2") -> Seq(ValidationError("error.max.length.address.line")),
-              (Path \ "addressLineNonUK3") -> Seq(ValidationError("error.max.length.address.line")),
-              (Path \ "addressLineNonUK4") -> Seq(ValidationError("error.max.length.address.line")),
+              (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.required.enter.addresslineone.charcount")),
+              (Path \ "addressLineNonUK2") -> Seq(ValidationError("error.required.enter.addresslinetwo.charcount")),
+              (Path \ "addressLineNonUK3") -> Seq(ValidationError("error.required.enter.addresslinethree.charcount")),
+              (Path \ "addressLineNonUK4") -> Seq(ValidationError("error.required.enter.addresslinefour.charcount")),
               (Path \ "country") -> Seq(ValidationError("error.invalid.country"))
             )))
         }

@@ -72,16 +72,16 @@ object PersonAddress {
     "error.required.enter.addresslineone.regex")
 
   val addressLine2Rule = genericAddressRule("error.required.address.line2",
-    "error.required.enter.addresslineone.charcount",
-    "error.required.enter.addresslineone.regex")
+    "error.required.enter.addresslinetwo.charcount",
+    "error.required.enter.addresslinetwo.regex")
 
   val addressLine3Rule = genericAddressRule("",
-    "error.required.enter.addresslineone.charcount",
-    "error.required.enter.addresslineone.regex")
+    "error.required.enter.addresslinethree.charcount",
+    "error.required.enter.addresslinethree.regex")
 
   val addressLine4Rule = genericAddressRule("",
-    "error.required.enter.addresslineone.charcount",
-    "error.required.enter.addresslineone.regex")
+    "error.required.enter.addresslinefour.charcount",
+    "error.required.enter.addresslinefour.regex")
 
   def formRule(addressType: AddressType.Value = AddressType.Deafult): Rule[UrlFormEncoded, PersonAddress] = From[UrlFormEncoded] { __ =>
     val validateCountry: Rule[Country, Country] = Rule.fromMapping[Country, Country] { country =>
@@ -90,6 +90,7 @@ object PersonAddress {
         case _ => Valid(country)
       }
     }
+
     import jto.validation.forms.Rules._
     import models.FormTypes._
     import utils.MappingUtils.Implicits._
@@ -138,6 +139,7 @@ object PersonAddress {
         (__ \ "addressLineNonUK3").read(optionR(addressLine3Rule)) ~
         (__ \ "addressLineNonUK4").read(optionR(addressLine4Rule)) ~
         (__ \ "country").read(validateCountry)
+
     (__ \ "isUK").read[Boolean].withMessage("error.required.uk.or.overseas") flatMap {
       case true => readUKaddress(PersonAddressUK.apply _)
       case false => readNonUKaddress(PersonAddressNonUK.apply _)

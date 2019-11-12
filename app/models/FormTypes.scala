@@ -308,8 +308,8 @@ object FormTypes {
                          regExMessage: String="error.invalid.common_name.validation") =
     notEmptyStrip
       .andThen(notEmpty.withMessage(requiredMsg))
-      .andThen(regexWithMsg(commonNameRegex, regExMessage))
-      .andThen(maxWithMsg(maxNameTypeLength, maxLengthMsg))
+      .andThen(maxWithMsg(maxAddressLength, maxLengthMsg))
+      .andThen(regexWithMsg(addressTypeRegex, regExMessage))
 
   val accountNameType = notEmptyStrip
     .andThen(notEmpty.withMessage("error.bankdetails.accountname"))
