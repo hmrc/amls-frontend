@@ -34,10 +34,10 @@
 
     @form(f, controllers.responsiblepeople.address.routes.CurrentAddressController.post(index,edit,flow)) {
 
-        <div class="form-group">
             @fieldset(
                 f = f("isUK"),
                 legend = "responsiblepeople.wherepersonlives.title",
+                legendHidden = true,
                 panel = false,
                 classes = Seq("inline")
             ) {
@@ -54,7 +54,6 @@
                     inline = true
                 )
             }
-        </div>
 
         @submit(edit, Some("button.saveandcontinue"))
     }

@@ -52,27 +52,22 @@
 
         <input type ="hidden" name="isUK" value=true />
 
-        <div class="form-group">
-            <div id="@{s"""${f("postCode").id}-fieldset"""}">
-
-                @fieldset(
-                    legend = "responsiblepeople.additional_extra_address.address",
-                    legendHidden = true,
-                    panel = false,
-                    f = f(s"""${f("address").id}-fieldset""")
-                ) {
-                    @input(f("addressLine1"), labelText = "lbl.address.line1")
-                    @input(f("addressLine2"), labelText = "lbl.address.line2")
-                    @input(f("addressLine3"), labelText = "lbl.address.line3")
-                    @input(f("addressLine4"), labelText = "lbl.address.line4")
-                    @input(
-                        field = f("postCode"),
-                        labelText = "responsiblepeople.additional_address.postCode",
-                        classes = Seq("postcode")
-                    )
-                }
-            </div>
-        </div>
+            @fieldset(
+                legend = "responsiblepeople.additional_extra_address.address",
+                legendHidden = true,
+                panel = false,
+                f = f(s"""${f("address").id}-fieldset""")
+            ) {
+                @input(f("addressLine1"), labelText = "lbl.address.line1")
+                @input(f("addressLine2"), labelText = "lbl.address.line2")
+                @input(f("addressLine3"), labelText = "lbl.address.line3")
+                @input(f("addressLine4"), labelText = "lbl.address.line4")
+                @input(
+                    field = f("postCode"),
+                    labelText = "responsiblepeople.additional_address.postCode",
+                    classes = Seq("postcode")
+                )
+            }
 
         @submit(edit, Some("button.saveandcontinue"))
     }
