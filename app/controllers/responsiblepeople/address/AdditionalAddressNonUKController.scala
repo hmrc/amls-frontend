@@ -96,9 +96,7 @@ class AdditionalAddressNonUKController @Inject()(override val dataCacheConnector
 
     (for {
       rp <- OptionT(getData[ResponsiblePerson](credId, index))
-      addressHistory <- OptionT.fromOption[Future](rp.addressHistory)
-      oldAddress <- OptionT.fromOption[Future](addressHistory.additionalAddress)
-      _ <- OptionT.liftF(AddressHelper.auditChange(data.personAddress, Some(oldAddress), edit)) orElse OptionT.some[Future, AuditResult](Success)
+      _ <- OptionT.liftF(AddressHelper.auditPreviousAddressChange(data.personAddress, rp, edit)) orElse OptionT.some[Future, AuditResult](Success)
       result <- OptionT.liftF(doUpdate())
     } yield result) getOrElse NotFound(notFoundView)
   }

@@ -38,12 +38,29 @@ object AddressHelper {
     }
   }
 
-  protected[address] def auditAddressChange(newAddress: PersonAddress, model: ResponsiblePerson, edit: Boolean)
+  protected[address] def auditPreviousAddressChange(newAddress: PersonAddress, model: ResponsiblePerson, edit: Boolean)
                                 (implicit hc: HeaderCarrier, request: Request[_], auditConnector: AuditConnector, ec: ExecutionContext): Future[AuditResult] = {
     if (edit) {
       val oldAddress = for {
         history <- model.addressHistory
         addr <- history.additionalAddress
+      } yield addr
+
+      oldAddress.fold[Future[AuditResult]](Future.successful(Success)) { addr =>
+        auditConnector.sendEvent(AddressModifiedEvent(newAddress, Some(addr.personAddress)))
+      }
+    }
+    else {
+      auditConnector.sendEvent(AddressCreatedEvent(newAddress))
+    }
+  }
+
+  protected[address] def auditPreviousExtraAddressChange(newAddress: PersonAddress, model: ResponsiblePerson, edit: Boolean)
+                                (implicit hc: HeaderCarrier, request: Request[_], auditConnector: AuditConnector, ec: ExecutionContext): Future[AuditResult] = {
+    if (edit) {
+      val oldAddress = for {
+        history <- model.addressHistory
+        addr <- history.additionalExtraAddress
       } yield addr
 
       oldAddress.fold[Future[AuditResult]](Future.successful(Success)) { addr =>

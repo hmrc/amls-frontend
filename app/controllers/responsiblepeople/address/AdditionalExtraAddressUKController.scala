@@ -92,10 +92,8 @@ class AdditionalExtraAddressUKController @Inject()(
 
     val block = for {
       rp <- OptionT(getData[ResponsiblePerson](credId, index))
-      addressHistory <- OptionT.fromOption[Future](rp.addressHistory)
-      oldAddress <- OptionT.fromOption[Future](addressHistory.additionalExtraAddress)
       result <- OptionT.liftF(doUpdate())
-      _ <- OptionT.liftF(AddressHelper.auditChange(data.personAddress, Some(oldAddress), edit))
+      _ <- OptionT.liftF(AddressHelper.auditPreviousExtraAddressChange(data.personAddress, rp, edit))
     } yield result
 
     block getOrElse NotFound(notFoundView)

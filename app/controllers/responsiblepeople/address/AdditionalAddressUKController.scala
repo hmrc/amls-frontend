@@ -23,7 +23,7 @@ import cats.implicits._
 import com.google.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ThreeYearsPlus}
 import models.responsiblepeople._
 import play.api.mvc.{AnyContent, Request}
@@ -48,7 +48,7 @@ class AdditionalAddressUKController @Inject()(override val dataCacheConnector: D
         case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_, Some(ResponsiblePersonAddressHistory(_, Some(additionalAddress), _)),_,_,_,_,_,_,_,_,_,_,_, _)) =>
           Ok(additional_address_UK(Form2[ResponsiblePersonAddress](additionalAddress), edit, index, flow, personName.titleName))
         case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
-          Ok(additional_address_UK(Form2(ResponsiblePersonAddressHistory.default()), edit, index, flow, personName.titleName))
+          Ok(additional_address_UK(EmptyForm, edit, index, flow, personName.titleName))
         case _ => NotFound(notFoundView)
       }
   }
@@ -96,9 +96,7 @@ class AdditionalAddressUKController @Inject()(override val dataCacheConnector: D
 
     (for {
       rp <- OptionT(getData[ResponsiblePerson](credId, index))
-      addressHistory <- OptionT.fromOption[Future](rp.addressHistory)
-      oldAddress <- OptionT.fromOption[Future](addressHistory.additionalAddress)
-      _ <- OptionT.liftF(AddressHelper.auditChange(data.personAddress, Some(oldAddress), edit)) orElse OptionT.some[Future, AuditResult](Success)
+      _ <- OptionT.liftF(AddressHelper.auditPreviousAddressChange(data.personAddress, rp, edit)) orElse OptionT.some[Future, AuditResult](Success)
       result <- OptionT.liftF(doUpdate())
     } yield result) getOrElse NotFound(notFoundView)
   }

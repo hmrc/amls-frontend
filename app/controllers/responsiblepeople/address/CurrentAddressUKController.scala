@@ -46,8 +46,7 @@ class CurrentAddressUKController @Inject ()(val dataCacheConnector: DataCacheCon
         => Ok(current_address_UK(Form2[ResponsiblePersonCurrentAddress](currentAddress), edit, index, flow, personName.titleName))
         case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
         => Ok(current_address_UK(EmptyForm, edit, index, flow, personName.titleName))
-        case _
-        => NotFound(notFoundView)
+        case _ => NotFound(notFoundView)
       }
   }
 
