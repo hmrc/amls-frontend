@@ -84,7 +84,7 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
           val result = controller.post(1, false)(postRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.TimeAtCurrentAddressController.get(1, false).url))
+          redirectLocation(result) must be(Some(address.routes.TimeAtCurrentAddressController.get(1, false).url))
 
         }
       }
@@ -113,7 +113,7 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
           val result = controller.post(1, false)(postRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.TimeAtCurrentAddressController.get(1, false).url))
+          redirectLocation(result) must be(Some(address.routes.TimeAtCurrentAddressController.get(1, false).url))
 
         }
       }

@@ -65,7 +65,6 @@ class TimeAtAdditionalExtraAddressController @Inject () (
               updateAndRedirect(request.credId, additionalExtraAddressWithTime, index, edit, flow)
             }) getOrElse Future.successful(NotFound(notFoundView))
           }
-          Future.successful(Redirect(controllers.responsiblepeople.routes.PositionWithinBusinessController.get(index, edit, flow)))
       }).recoverWith {
         case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
       }
