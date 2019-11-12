@@ -227,20 +227,25 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar {
       }
     }
 
-    "respond with NOT_FOUND" when {
-      "responsible person is not found for that index" in new Fixture {
-        val requestWithParams = request
+    "process form as valid" when {
+      "isUK is defined and false" in new Fixture {
+        val requestWithParams = request.withFormUrlEncodedBody(
+          "isUK" -> "false"
+        )
 
-        val responsiblePeople = ResponsiblePerson(personName)
+        val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.responsiblepeople.address.routes.AdditionalExtraAddressNonUKController.get(RecordId).url))
+      }
 
-        when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
-          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+      "isUK is defined and true" in new Fixture {
+        val requestWithParams = request.withFormUrlEncodedBody(
+          "isUK" -> "true"
+        )
 
-        when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any()))
-          .thenReturn(Future.successful(mockCacheMap))
-
-        val result = additionalExtraAddressController.post(0)(requestWithParams)
-        status(result) must be(NOT_FOUND)
+        val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.responsiblepeople.address.routes.AdditionalExtraAddressUKController.get(RecordId).url))
       }
     }
   }
