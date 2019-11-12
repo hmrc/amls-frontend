@@ -53,7 +53,6 @@ class TimeAtAdditionalAddressController @Inject () (
              getData[ResponsiblePerson](request.credId, index) map { rp =>
                 BadRequest(time_at_additional_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
               }
-          Future.successful(Redirect(routes.AdditionalExtraAddressController.get(index, edit, flow)))
         case ValidForm(_, data) => {
           getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>
             (for {

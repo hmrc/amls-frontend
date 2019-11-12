@@ -193,7 +193,7 @@ class AdditionalAddressUKControllerSpec extends AmlsSpec with MockitoSugar {
           when(additionalAddressUKController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          val result = additionalAddressUKController.post(RecordId)(request.withFormUrlEncodedBody())
+          val result = additionalAddressUKController.post(RecordId)(requestWithMissingParams)
           status(result) must be(BAD_REQUEST)
 
           val document: Document = Jsoup.parse(contentAsString(result))
@@ -205,6 +205,7 @@ class AdditionalAddressUKControllerSpec extends AmlsSpec with MockitoSugar {
         "given an invalid uk address" in new Fixture {
 
           val requestWithParams = request.withFormUrlEncodedBody(
+            "isUK" -> "true",
             "addressLine1" -> "Line *1",
             "addressLine2" -> "Line &2",
             "postCode" -> "AA1 1AA"
@@ -223,6 +224,7 @@ class AdditionalAddressUKControllerSpec extends AmlsSpec with MockitoSugar {
           status(result) must be(BAD_REQUEST)
 
           val document: Document  = Jsoup.parse(contentAsString(result))
+          println(document.toString)
           document.title mustBe s"Error: $pageTitle"
           val errorCount = 2
           val elementsWithError : Elements = document.getElementsByClass("error-notification")

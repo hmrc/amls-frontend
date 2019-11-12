@@ -144,10 +144,16 @@ class TimeAtAdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar {
             "timeAtAddress" -> ""
           )
 
-          when(timeAtAdditionalAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
-            .thenReturn(Future.successful(emptyCache))
+          val mockCacheMap = mock[CacheMap]
 
-          val result = timeAtAdditionalAddressController.post(RecordId)(requestWithMissingParams)
+          val responsiblePeople = ResponsiblePerson()
+
+          when(timeAtAdditionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(timeAtAdditionalAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any()))
+            .thenReturn(Future.successful(mockCacheMap))
+
+          val result = timeAtAdditionalAddressController.post(RecordId, edit = true)(requestWithMissingParams)
           status(result) must be(BAD_REQUEST)
         }
       }
