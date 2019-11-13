@@ -307,7 +307,7 @@ error.required.enter.addresslinetwo.regex = Address line 2 can include letters a
 error.required.enter.addresslinethree.regex = Address line 3 can include letters a to z, numbers, spaces, and most punctuation and special characters
 error.required.enter.addresslinefour.regex = Address line 4 can include letters a to z, numbers, spaces, and most punctuation and special characters
 error.required.enter.addresslineone.charcount = Address line 1 must be 35 characters or less
-error.required.enter.addresslineotwo.charcount = Address line 2 must be 35 characters or less
+error.required.enter.addresslinetwo.charcount = Address line 2 must be 35 characters or less
 error.required.enter.addresslinethree.charcount = Address line 3 must be 35 characters or less
 error.required.enter.addresslinefour.charcount = Address line 4 must be 35 characters or less
 
