@@ -93,16 +93,20 @@ class summarySpec extends AmlsSpec with MustMatchers with HtmlAssertions with Ta
       }
 
       forAll(sectionChecks) { (key, check) => {
-        val hTwos = doc.select("section.check-your-answers h2")
-        val hTwo = hTwos.toList.find(e => e.text() == Messages(key))
+        val questions = doc.select("span.bold")
 
-        hTwo must not be None
-        val section = hTwo.get.parents().select("section").first()
+        val question = questions.toList.find(e => e.text() == Messages(key))
+
+        question must not be None
+        val section = question.get.parents().select("div").first()
         check(section) must be(true)
       }}
 
-      doc.getElementsMatchingOwnText(Messages("tcsp.off-the-shelf.companies.lbl")).first().nextElementSibling().nextElementSibling().text() must be("Yes")
-      doc.getElementsMatchingOwnText(Messages("tcsp.create.complex.corporate.structures.lbl")).first().nextElementSibling().nextElementSibling().text() must be("No")
+      doc.select("span.bold").toList.find(e => e.text() ==  Messages("tcsp.off-the-shelf.companies.lbl"))
+        .get.parents().select("div").first().getElementsByClass("cya-summary-list__value").html() must be("Yes")
+
+      doc.select("span.bold").toList.find(e => e.text() ==  Messages("tcsp.create.complex.corporate.structures.lbl"))
+        .get.parents().select("div").first().getElementsByClass("cya-summary-list__value").html() must be("No")
     }
 
   }

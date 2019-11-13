@@ -34,70 +34,70 @@
 
     @model.anotherBody.map {
         case AnotherBodyNo => {
-            @checkYourAnswers(
+            @checkYourAnswersRow(
                 question = Messages("supervision.another_body.title"),
                 editLinkTag = "supervisionanotherbody-edit",
                 editUrl = controllers.supervision.routes.AnotherBodyController.get(true).toString
             ) {
-                <p>@Messages("lbl.no")</p>
+                @Messages("lbl.no")
             }
         }
 
         case AnotherBodyYes(supervisorName, Some(sDate), Some(eDate), Some(reasons)) => {
-            @checkYourAnswers(
+            @checkYourAnswersRow(
                 question = Messages("supervision.another_body.title"),
                 editLinkTag = "supervisionanotherbody-edit-name",
                 editUrl = controllers.supervision.routes.AnotherBodyController.get(true).toString
             ) {
-                <p>@supervisorName</p>
+                @supervisorName
             }
 
-            @checkYourAnswers(
+            @checkYourAnswersRow(
                 question = Messages("supervision.supervision_start.title"),
                 editLinkTag = "supervisionanotherbody-edit-start-date",
                 editUrl = controllers.supervision.routes.SupervisionStartController.get(true).toString
             ) {
-                <p>@DateHelper.formatDate(sDate.startDate)</p>
+                @DateHelper.formatDate(sDate.startDate)
             }
 
-            @checkYourAnswers(
+            @checkYourAnswersRow(
                 question = Messages("supervision.supervision_end.title"),
                 editLinkTag = "supervisionanotherbody-edit-end-date",
                 editUrl = controllers.supervision.routes.SupervisionEndController.get(true).toString
             ) {
-                <p>@DateHelper.formatDate(eDate.endDate)</p>
+                @DateHelper.formatDate(eDate.endDate)
             }
 
-            @checkYourAnswers(
+            @checkYourAnswersRow(
                 question = Messages("supervision.supervision_end_reasons.title"),
                 editLinkTag = "supervisionanotherbody-edit-ending-reason",
                 editUrl = controllers.supervision.routes.SupervisionEndReasonsController.get(true).toString
             ) {
-                <p>@reasons.endingReason</p>
+                @reasons.endingReason
             }
         }
     }
 
-    @checkYourAnswers(
+    @checkYourAnswersRow(
         question = Messages("supervision.memberofprofessionalbody.title"),
         editLinkTag = "supervisionmemberofbody-edit",
         editUrl = controllers.supervision.routes.ProfessionalBodyMemberController.get(true).toString
     ) {
         @model.professionalBodyMember.map {
-            case ProfessionalBodyMemberNo => { <p>@Messages("lbl.no")</p> }
-            case ProfessionalBodyMemberYes => { <p>@Messages("lbl.yes")</p> }
+            case ProfessionalBodyMemberNo => { @Messages("lbl.no") }
+            case ProfessionalBodyMemberYes => { @Messages("lbl.yes") }
         }
     }
 
     @model.professionalBodies.map { businessType =>
 
-        @checkYourAnswers(
+        @checkYourAnswersRow(
             question = Messages("supervision.whichprofessionalbody.title"),
             editLinkTag = "supervisionwhichbody-edit",
             editUrl = controllers.supervision.routes.WhichProfessionalBodyController.get(true).toString
         ) {
-            <ul class="list">
-                @businessType.businessTypes.toList.sortBy(_.value).map { x =>
+            <ul class="list list-bullet">
+                @businessType.businessTypes.toList.sortBy(_.getMessage).map { x =>
                     <li>@x match {
                         case AccountingTechnicians => {@Messages("supervision.memberofprofessionalbody.lbl.01")}
                         case CharteredCertifiedAccountants => {@Messages("supervision.memberofprofessionalbody.lbl.02")}
@@ -106,30 +106,21 @@
                         case ManagementAccountants => {@Messages("supervision.memberofprofessionalbody.lbl.05")}
                         case InstituteOfTaxation => {@Messages("supervision.memberofprofessionalbody.lbl.06")}
                         case Bookkeepers => {@Messages("supervision.memberofprofessionalbody.lbl.07")}
-                        case _ => {@Messages("")}
-                        }
-                    </li>
-                    }
-
-                @businessType.businessTypes.collectFirst { case AccountantsEnglandandWales => <li>@Messages("supervision.memberofprofessionalbody.lbl.10")</li> }
-
-                @businessType.businessTypes.toList.sortBy(_.value).map { x =>
-                    <li>@x match {
                         case AccountantsIreland => {@Messages("supervision.memberofprofessionalbody.lbl.08")}
                         case AccountantsScotland => {@Messages("supervision.memberofprofessionalbody.lbl.09")}
+                        case AccountantsEnglandandWales => {@Messages("supervision.memberofprofessionalbody.lbl.10")}
                         case FinancialAccountants => {@Messages("supervision.memberofprofessionalbody.lbl.11")}
                         case AssociationOfBookkeepers => {@Messages("supervision.memberofprofessionalbody.lbl.12")}
                         case LawSociety => {@Messages("supervision.memberofprofessionalbody.lbl.13")}
                         case Other(details) => {@Messages("supervision.memberofprofessionalbody.lbl.14"): @details}
-                        case _ => {@Messages("")}
-                    }
+                        }
                     </li>
-                }
+                    }
             </ul>
         }
     }
 
-    @checkYourAnswers(
+    @checkYourAnswersRow(
         question = Messages("supervision.penalisedbyprofessional.title"),
         editLinkTag = "supervisionpenalised-edit",
         editUrl = controllers.supervision.routes.PenalisedByProfessionalController.get(true).toString

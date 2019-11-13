@@ -34,7 +34,9 @@
     heading = header
 ) {
 
-    @checkYourAnswers(
+    <dl class="cya-summary-list">
+
+    @checkYourAnswersRow(
         question = Messages("businessmatching.updateservice.selectactivities.title"),
         editUrl = routes.SelectBusinessTypeController.get(edit = true).url,
         editLinkTag = "selectactivities-edit"
@@ -44,14 +46,14 @@
 
     @if(flowModel.activity.equals(Some(MoneyServiceBusiness))) {
         @flowModel.subSectors.map { services =>
-            @checkYourAnswers(
+            @checkYourAnswersRow(
                 question = Messages("businessmatching.updateservice.msb.services.title"),
                 editUrl = routes.SubSectorsController.get(true).toString,
                 allowEdit = true,
                 editLinkTag="msbservices-edit"
             ) {
-                <ul id="msb-service" class="list list--comma">
-                    @services.msbServices.map { svc =>
+                <ul id="msb-service" class="list list-bullet">
+                    @services.msbServices.toList.sortBy(_.getMessage).map { svc =>
                     <li>@svc match {
                         case TransmittingMoney => {@Messages("businessmatching.services.list.lbl.01")}
                         case CurrencyExchange => {@Messages("businessmatching.services.list.lbl.02")}
@@ -65,7 +67,7 @@
 
                 @if(services.msbServices.contains(TransmittingMoney)) {
                 @flowModel.businessAppliedForPSRNumber.map { psr =>
-                @checkYourAnswers(
+                @checkYourAnswersRow(
                     question = Messages("businessmatching.psr.number.title"),
                     editUrl = routes.BusinessAppliedForPSRNumberController.get(true).toString,
                     editLinkTag="psr-edit",
@@ -83,7 +85,7 @@
 
 
     @if(flowModel.fitAndProper.isDefined) {
-        @checkYourAnswers(
+        @checkYourAnswersRow(
                 question = Messages("businessmatching.updateservice.fitandproper.heading", flowModel.activityName.getOrElse("").toLowerCase),
                 editUrl = routes.FitAndProperController.get(edit = true).url,
                 editLinkTag = "fitandproper-edit"
@@ -95,7 +97,7 @@
         }
 
         @if(flowModel.fitAndProper.contains(true)) {
-            @checkYourAnswers(
+            @checkYourAnswersRow(
                 question = Messages("businessmatching.updateservice.whichfitandproper.heading", flowModel.activityName.getOrElse("").toLowerCase),
                 editUrl = routes.WhichFitAndProperController.get(edit = true).url,
                 editLinkTag = "whichfitandproper-edit"
@@ -117,7 +119,7 @@
         }
     }
 
-    @checkYourAnswers(
+    @checkYourAnswersRow(
         question = Messages("businessmatching.updateservice.tradingpremises.summary", flowModel.activity.map(a => a.getMessage(true)).getOrElse("")),
         editUrl = routes.TradingPremisesController.get(edit = true).url,
         editLinkTag = "tradingpremises-edit"
@@ -129,7 +131,7 @@
     }
 
     @if(flowModel.areNewActivitiesAtTradingPremises.contains(true)) {
-        @checkYourAnswers(
+        @checkYourAnswersRow(
             question = Messages("businessmatching.updateservice.whichtradingpremises.heading", flowModel.activity.map(a => a.getMessage(true)).getOrElse("")),
             editUrl = routes.WhichTradingPremisesController.get().url,
             editLinkTag = "whichtradingpremises-edit"
@@ -150,14 +152,14 @@
         }
 
             @flowModel.tradingPremisesMsbServices.map { tpMsbServices =>
-                @checkYourAnswers(
+                @checkYourAnswersRow(
                     question = Messages("businessmatching.updateservice.whatdoyoudohere.heading", flowModel.activityName.getOrElse("").toLowerCase),
                     editUrl = routes.WhatDoYouDoHereController.get(true).url,
                     allowEdit = flowModel.subSectors.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.size > 1,
                     editLinkTag = "whatdoyoudohere-edit"
                 ) {
-                    <ul id="tp-msb-services" class="list list--comma">
-                        @tpMsbServices.msbServices.map { service =>
+                    <ul id="tp-msb-services" class="list list-bullet">
+                        @tpMsbServices.msbServices.toList.sortBy(_.getMessage).map { service =>
                             <li>@service match {
                                 case TransmittingMoney => {@Messages("businessmatching.updateservice.msb.services.list.lbl.01")}
                                 case CurrencyExchange => {@Messages("businessmatching.updateservice.msb.services.list.lbl.02")}
@@ -171,6 +173,8 @@
 
         }
     }
+
+    </dl>
 
     @form(f, controllers.businessmatching.updateservice.add.routes.AddBusinessTypeSummaryController.post()) {
         @submit(edit = false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false, buttonId = Some("updatesummary-submit"))

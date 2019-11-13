@@ -19,7 +19,9 @@
 @import models.flowmanagement.RemoveBusinessTypeFlowModel
 @import controllers.businessmatching.updateservice.remove.routes
 @import utils.DateHelper
+@import models.businessmatching._
 
+@import views.html.include.forms2.checkYourAnswersRow
 @(f: forms.Form2[_], model: RemoveBusinessTypeFlowModel)(implicit m: Messages, r: Request[_])
 
 @header = {
@@ -34,18 +36,50 @@
     heading = header
 ) {
 
+    <dl class="cya-summary-list">
+
     @model.activitiesToRemove.map { activities =>
-        @checkYourAnswers(
+        @checkYourAnswersRow(
             question = Messages("businessmatching.updateservice.removeactivities.heading"),
             editUrl = routes.RemoveBusinessTypesController.get(edit = true).url,
             editLinkTag="removeactivities-edit"
         ) {
-            <p>@activities.map(_.getMessage()).mkString(", ")</p>
+            <ul id="service-to-remove" class="list list-bullet">
+                @activities.toList.sortBy(_.getMessage()).map { line =>
+                <li>@line match {
+                    case AccountancyServices => {
+                        @Messages("businessmatching.registerservices.servicename.lbl.01")
+                    }
+                    case ArtMarketParticipant => {
+                        @Messages("businessmatching.registerservices.servicename.lbl.02")
+                    }
+                    case BillPaymentServices => {
+                        @Messages("businessmatching.registerservices.servicename.lbl.03")
+                    }
+                    case EstateAgentBusinessService => {
+                        @Messages("businessmatching.registerservices.servicename.lbl.04")
+                    }
+                    case HighValueDealing => {
+                        @Messages("businessmatching.registerservices.servicename.lbl.05")
+                    }
+                    case MoneyServiceBusiness => {
+                        @Messages("businessmatching.registerservices.servicename.lbl.06")
+                    }
+                    case TelephonePaymentService => {
+                        @Messages("businessmatching.registerservices.servicename.lbl.08")
+                    }
+                    case TrustAndCompanyServices => {
+                        @Messages("businessmatching.registerservices.servicename.lbl.07")
+                    }
+                }
+                </li>
+            }
+            </ul>
         }
     }
 
     @model.dateOfChange.map { doc =>
-        @checkYourAnswers(
+        @checkYourAnswersRow(
             question = Messages("dateofchange.title"),
             editUrl = routes.WhatDateRemovedController.get(edit = true).url,
             editLinkTag="dateofchange-edit"
@@ -53,6 +87,8 @@
             <p>@DateHelper.formatDate(doc.dateOfChange)</p>
         }
     }
+
+    </dl>
 
     @form(f, controllers.businessmatching.updateservice.remove.routes.RemoveBusinessTypesSummaryController.post()) {
         @submit(edit = false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false, buttonId = Some("updatesummary-submit"))
