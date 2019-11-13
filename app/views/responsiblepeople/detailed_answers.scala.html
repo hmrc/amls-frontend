@@ -274,7 +274,7 @@
             @person.addressHistory.flatMap(_.currentAddress).map { a=>
                 @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.address.UK", personName),
-                    editUrl =  showHide match {
+                    editUrl = showHide match {
                         case true => {
                             controllers.responsiblepeople.routes.MovedAddressController.get(idx).toString()
                         }
@@ -282,22 +282,23 @@
                             controllers.responsiblepeople.address.routes.CurrentAddressController.get(idx, true, flow).toString()
                         }
                     },
-                    editLinkTag = "rpaddress-edit"
+                    editLinkTag = "rpaddress-isUK-edit"
 
                 ) {
-                    <ul class="list">
-                    @a.personAddress.toLines.map { l => <li>@l</li> }
-                    </ul>
+                    @a.personAddress.isUK
                 }
 
                 @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.address", personName),
-                    editUrl =  showHide match {
-                            case true => {
-                                controllers.responsiblepeople.routes.MovedAddressController.get(idx).toString()
+                    editUrl =  (a.personAddress, showHide)match {
+                            case (_, true) => {
+                                controllers.responsiblepeople.routes.MovedAddressController.get(idx).toString
                             }
-                            case _ => {
-                                controllers.responsiblepeople.address.routes.CurrentAddressController.get(idx, true, flow).toString()
+                            case (_:PersonAddressNonUK, false) => {
+                                controllers.responsiblepeople.address.routes.CurrentAddressNonUKController.get(idx, true, flow).toString()
+                            }
+                            case (_:PersonAddressUK, false) => {
+                                controllers.responsiblepeople.address.routes.CurrentAddressUKController.get(idx, true, flow).toString()
                             }
                         },
                     editLinkTag = "rpaddress-edit"
@@ -318,9 +319,24 @@
             }
 
             @person.addressHistory.flatMap(_.additionalAddress).map { a =>
-                 @checkYourAnswersRow(
-                    question = Messages("responsiblepeople.detailed_answers.previous_address"),
+                @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.detailed_answers.address.previous.UK", personName),
                     editUrl = controllers.responsiblepeople.address.routes.AdditionalAddressController.get(idx, true, flow).toString,
+                    editLinkTag = "rp-previousaddress-isUK-edit"
+                ) {
+                    @a.personAddress.isUK
+                }
+
+                 @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.detailed_answers.address.previous", personName),
+                    editUrl = a.personAddress match {
+                        case _:PersonAddressNonUK => {
+                            controllers.responsiblepeople.address.routes.AdditionalAddressNonUKController.get(idx, true, flow).toString()
+                        }
+                        case _:PersonAddressUK => {
+                            controllers.responsiblepeople.address.routes.AdditionalAddressUKController.get(idx, true, flow).toString()
+                        }
+                    },
                     editLinkTag = "rp-previousaddress-edit"
                 ) {
                     <ul class="list">
@@ -338,8 +354,16 @@
             }
 
             @person.addressHistory.flatMap(_.additionalExtraAddress).map { a =>
+                @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.detailed_answers.address.other.previous.UK", personName),
+                    editUrl = controllers.responsiblepeople.address.routes.AdditionalExtraAddressController.get(idx, true, flow).toString,
+                    editLinkTag = "rp-otherpreviousaddress-isUK-edit"
+                ) {
+                    @a.personAddress.isUK
+                }
+
                  @checkYourAnswersRow(
-                    question = Messages("responsiblepeople.detailed_answers.other_previous_address"),
+                    question = Messages("responsiblepeople.detailed_answers.address.other.previous", personName),
                     editUrl = controllers.responsiblepeople.address.routes.AdditionalExtraAddressController.get(idx, true, flow).toString,
                     editLinkTag = "rp-otherpreviousaddress-edit"
                 ) {
