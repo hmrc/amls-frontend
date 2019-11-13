@@ -235,7 +235,7 @@ class AdditionalAddressControllerNonUKSpec extends AmlsSpec with MockitoSugar {
           val requestWithParams = request.withFormUrlEncodedBody(
             "isUK" -> "false",
             "addressLineNonUK1" -> "Line *1",
-            "addressLineNonUK2" -> "Line *2",
+            "addressLineNonUK2" -> "Line 2",
             "country" -> "ES"
           )
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
@@ -252,11 +252,11 @@ class AdditionalAddressControllerNonUKSpec extends AmlsSpec with MockitoSugar {
           status(result) must be(BAD_REQUEST)
 
           val document: Document  = Jsoup.parse(contentAsString(result))
-          val errorCount = 2
+          val errorCount = 1
           val elementsWithError : Elements = document.getElementsByClass("error-notification")
           elementsWithError.size() must be(errorCount)
           for (ele: Element <- elementsWithError) {
-            ele.html() must include(Messages("err.text.validation"))
+            ele.html() must include(Messages("error.required.enter.addresslineone.regex"))
           }
         }
 

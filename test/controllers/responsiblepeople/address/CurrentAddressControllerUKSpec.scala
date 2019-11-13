@@ -289,7 +289,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with MockitoSugar {
           val requestWithParams = request.withFormUrlEncodedBody(
             "isUK" -> "true",
             "addressLine1" -> "Line &1",
-            "addressLine2" -> "Line *2",
+            "addressLine2" -> "Line 2",
             "postCode" -> "AA1 1AA"
           )
           val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
@@ -308,7 +308,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with MockitoSugar {
           status(result) must be(BAD_REQUEST)
           val document: Document  = Jsoup.parse(contentAsString(result))
           document.title mustBe s"Error: $pageTitle"
-          val errorCount = 2
+          val errorCount = 1
           val elementsWithError : Elements = document.getElementsByClass("error-notification")
           elementsWithError.size() must be(errorCount)
           for (ele: Element <- elementsWithError) {
