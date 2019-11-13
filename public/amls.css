@@ -48,6 +48,14 @@ form .page-header h1 {
   margin-top: 0;
 }
 
+h1 label.heading-xlarge {
+  margin-top: 0;
+}
+
+form .page-header + h1 {
+  margin-top: 0.15em;
+}
+
 .page-header .heading-secondary {
   color: #6f777b;
   display: table-header-group;
