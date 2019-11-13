@@ -273,6 +273,24 @@
 
             @person.addressHistory.flatMap(_.currentAddress).map { a=>
                 @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.detailed_answers.address.UK", personName),
+                    editUrl =  showHide match {
+                        case true => {
+                            controllers.responsiblepeople.routes.MovedAddressController.get(idx).toString()
+                        }
+                        case _ => {
+                            controllers.responsiblepeople.address.routes.CurrentAddressController.get(idx, true, flow).toString()
+                        }
+                    },
+                    editLinkTag = "rpaddress-edit"
+
+                ) {
+                    <ul class="list">
+                    @a.personAddress.toLines.map { l => <li>@l</li> }
+                    </ul>
+                }
+
+                @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.address", personName),
                     editUrl =  showHide match {
                             case true => {

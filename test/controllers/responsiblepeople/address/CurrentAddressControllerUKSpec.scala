@@ -289,7 +289,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with MockitoSugar {
           val requestWithParams = request.withFormUrlEncodedBody(
             "isUK" -> "true",
             "addressLine1" -> "Line &1",
-            "addressLine2" -> "Line 2",
+            "addressLine2" -> "Line *2",
             "postCode" -> "AA1 1AA"
           )
           val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
@@ -308,12 +308,12 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with MockitoSugar {
           status(result) must be(BAD_REQUEST)
           val document: Document  = Jsoup.parse(contentAsString(result))
           document.title mustBe s"Error: $pageTitle"
-          val errorCount = 1
+          val errorCount = 2
           val elementsWithError : Elements = document.getElementsByClass("error-notification")
           elementsWithError.size() must be(errorCount)
-          for (ele: Element <- elementsWithError) {
-            ele.html() must include(Messages("error.required.enter.addresslineone.regex"))
-          }
+          val elements = elementsWithError.map(_.text())
+          elements.get(0) must include(Messages("error.required.enter.addresslineone.regex"))
+          elements.get(1) must include(Messages("error.required.enter.addresslinetwo.regex"))
         }
 
         "isUK field is not supplied" in new Fixture {
