@@ -24,7 +24,6 @@
 @header = {
     @components.back_link()
     @errorSummaryWithPlaceholder(f, personName)
-    @headingWithPlaceholder(("responsiblepeople.wherepersonlives.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
@@ -36,23 +35,21 @@
 
             @fieldsetWithErrorGroup(
                 f = f("isUK"),
-                legend = "responsiblepeople.wherepersonlives.title",
-                legendHidden = true,
                 panel = false,
-                classes = Seq("inline"),
-                errorGroupPlaceholder = personName
+                heading = Messages("responsiblepeople.wherepersonlives.heading", personName),
+                section = "summary.responsiblepeople",
+                errorGroupPlaceholder = personName,
+                classes = Seq("inline")
             ) {
                 @radio(
                     f = f("isUK"),
                     labelText = "responsiblepeople.wherepersonlives.ukAddress",
-                    value = "true",
-                    inline = true
+                    value = "true"
                 )
                 @radio(
                     f = f("isUK"),
                     labelText = "responsiblepeople.wherepersonlives.nonUkAddress",
-                    value = "false",
-                    inline = true
+                    value = "false"
                 )
             }
 

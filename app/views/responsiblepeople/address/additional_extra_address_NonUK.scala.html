@@ -24,7 +24,6 @@
 @header = {
     @components.back_link()
     @errorSummaryWithPlaceholder(f, s"$personName's ${Messages("error.required.select.non.uk.other.previous.address")}")
-    @headingWithPlaceholder(("responsiblepeople.additional_extra_address_country.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
@@ -36,10 +35,9 @@
 
         <input type ="hidden" name="isUK" value=false />
 
-            @fieldset(
-                legend = "responsiblepeople.additional_extra_address.address",
-                legendHidden = true,
-                jsHidden = false,
+            @fieldsetWithErrorGroup(
+                heading = Messages("responsiblepeople.additional_extra_address_country.heading", personName),
+                section = "summary.responsiblepeople",
                 panel = false,
                 f = f(s"""${f("address-overseas").id}-fieldset""")
             ) {
