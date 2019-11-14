@@ -167,15 +167,15 @@ class AdditionalAddressUKControllerSpec extends AmlsSpec with MockitoSugar {
 
           status(result) must be(SEE_OTHER)
 
-//          val captor = ArgumentCaptor.forClass(classOf[DataEvent])
-//          verify(auditConnector).sendEvent(captor.capture())(any(), any())
-//
-//          captor.getValue match {
-//            case d: DataEvent =>
-//              d.detail("addressLine1") mustBe "Line 1"
-//              d.detail("addressLine2") mustBe "Line 2"
-//              d.detail("postCode") mustBe "AA1 1AA"
-//          }
+          val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+          verify(auditConnector).sendEvent(captor.capture())(any(), any())
+
+          captor.getValue match {
+            case d: DataEvent =>
+              d.detail("addressLine1") mustBe "Line 1"
+              d.detail("addressLine2") mustBe "Line 2"
+              d.detail("postCode") mustBe "AA1 1AA"
+          }
         }
       }
       "respond with BAD_REQUEST" when {

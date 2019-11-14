@@ -88,12 +88,10 @@ class AdditionalExtraAddressNonUKController @Inject()(val dataCacheConnector: Da
       }
     }
 
-    val block = for {
+    (for {
       rp <- OptionT(getData[ResponsiblePerson](credId, index))
       result <- OptionT.liftF(doUpdate())
       _ <- OptionT.liftF(AddressHelper.auditPreviousExtraAddressChange(data.personAddress, rp, edit))
-    } yield result
-
-    block getOrElse NotFound(notFoundView)
+    } yield result).getOrElse(NotFound(notFoundView))
   }
 }
