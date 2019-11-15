@@ -143,10 +143,10 @@ class summarySpec extends AmlsSpec
       }
 
       forAll(sectionChecks) { (key, check, editLink) => {
-        val headers = doc.select("section.check-your-answers h2")
+        val headers = doc.select("span.bold")
         val header = headers.toList.find(e => e.text() == Messages(key))
         header must not be None
-        val section = header.get.parents().select("section").first()
+        val section = header.get.parents().select("div").first()
         check(section) must be(true)
         section.select("a[href]").attr("href") must include(editLink)
       }}
