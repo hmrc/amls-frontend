@@ -20,11 +20,11 @@ import audit.AddressConversions._
 import audit.{AddressCreatedEvent, AddressModifiedEvent}
 import forms.InvalidForm
 import models.Country
-import models.responsiblepeople.{PersonAddress, PersonAddressNonUK, PersonAddressUK, ResponsiblePerson, ResponsiblePersonAddress}
+import models.responsiblepeople._
 import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 
 import scala.concurrent.{ExecutionContext, Future}
 

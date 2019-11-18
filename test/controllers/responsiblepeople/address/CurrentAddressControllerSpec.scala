@@ -20,11 +20,14 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.autocomplete.NameValuePair
+import models.hvd.Hvd
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
+import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
@@ -141,11 +144,17 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
     "post is called" must {
       "redirect to CurrentAddressUkController" when {
-
         "true selected" in new Fixture {
 
           val requestWithParams = request.withFormUrlEncodedBody(
             "isUK" -> "true")
+
+          val responsiblePeople = ResponsiblePerson()
+
+          when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
           val result = currentAddressController.post(RecordId)(requestWithParams)
 
@@ -174,8 +183,13 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
           val line1MissingRequest = request.withFormUrlEncodedBody()
 
-          when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
-            .thenReturn(Future.successful(emptyCache))
+          val responsiblePeople = ResponsiblePerson(personName)
+
+          when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+          when(currentAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any()))
+            .thenReturn(Future.successful(mock[CacheMap]))
 
           val result = currentAddressController.post(RecordId)(line1MissingRequest)
           status(result) must be(BAD_REQUEST)

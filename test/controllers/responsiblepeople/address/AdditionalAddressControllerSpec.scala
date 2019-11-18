@@ -193,8 +193,8 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar {
         "isUk is false" in new Fixture {
 
           val requestWithParams = request.withFormUrlEncodedBody(
-          "isUK" -> "false"
-          )
+          "isUK" -> "false")
+
           val responsiblePeople = ResponsiblePerson()
 
           when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))

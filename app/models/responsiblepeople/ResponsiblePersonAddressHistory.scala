@@ -34,7 +34,6 @@ case class ResponsiblePersonAddressHistory(currentAddress: Option[ResponsiblePer
   def removeAdditionalExtraAddress = this.copy(additionalExtraAddress = None)
 
   def isComplete: Boolean = currentAddress.isDefined
-
 }
 
 object ResponsiblePersonAddressHistory {
@@ -43,4 +42,19 @@ object ResponsiblePersonAddressHistory {
 
   def default() = ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), None)
 
+  def isRPAddressInUK(address: Option[ResponsiblePersonAddress]): Boolean = {
+    address match {
+      case Some(ResponsiblePersonAddress(PersonAddressUK(_,_,_,_,_), _)) => true
+      case Some(ResponsiblePersonAddress(PersonAddressNonUK(_,_,_,_,_), _)) => false
+      case None => false
+    }
+  }
+
+  def isRPCurrentAddressInUK(address: Option[ResponsiblePersonCurrentAddress]): Boolean = {
+    address match {
+      case Some(ResponsiblePersonCurrentAddress(PersonAddressUK(_,_,_,_,_), _, _)) => true
+      case Some(ResponsiblePersonCurrentAddress(PersonAddressNonUK(_,_,_,_,_), _, _)) => false
+      case None => false
+    }
+  }
 }

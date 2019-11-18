@@ -22,7 +22,7 @@ import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople._
 import services.AutoCompleteService
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.address.additional_extra_address
 
@@ -48,23 +48,37 @@ class AdditionalExtraAddressController @Inject()(
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
     authAction.async {
       implicit request =>
-        def processForm(data: ResponsiblePersonAddress) = {
-          data.personAddress match {
-            case _: PersonAddressUK => Future.successful(Redirect(routes.AdditionalExtraAddressUKController.get(index, edit, flow)))
-            case _: PersonAddressNonUK => Future.successful(Redirect(routes.AdditionalExtraAddressNonUKController.get(index, edit, flow)))
-          }
-        }
-
         (Form2[ResponsiblePersonAddress](request.body)(ResponsiblePersonAddress.addressFormRule(PersonAddress.formRule(AddressType.OtherPrevious))) match {
-          case f: InvalidForm if f.data.get("isUK").isDefined => processForm(ResponsiblePersonAddress(AddressHelper.modelFromForm(f), None))
-          case f: InvalidForm =>
-            getData[ResponsiblePerson](request.credId, index) map { rp =>
+          case f: InvalidForm if f.data.get("isUK").isDefined
+          => processForm(ResponsiblePersonAddress(AddressHelper.modelFromForm(f), None), request.credId, index, edit, flow)
+          case f: InvalidForm
+          => getData[ResponsiblePerson](request.credId, index) map { rp =>
               BadRequest(additional_extra_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
-          case ValidForm(_, data) => {
-            processForm(data)
-          }}).recoverWith {
+          case ValidForm(_, data)
+          => processForm(data, request.credId, index, edit, flow)
+          }).recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
     }
+
+  private def processForm(data: ResponsiblePersonAddress, credId: String, index: Int, edit: Boolean, flow: Option[String])
+                         (implicit hc: HeaderCarrier) = {
+
+    updateDataStrict[ResponsiblePerson](credId, index) { res =>
+      (res.addressHistory, data.personAddress) match {
+        case (Some(rph), _:PersonAddressUK) if !ResponsiblePersonAddressHistory.isRPAddressInUK(rph.additionalExtraAddress)
+        => res.addressHistory(rph.copy(additionalExtraAddress = None))
+        case (Some(rph), _:PersonAddressNonUK) if ResponsiblePersonAddressHistory.isRPAddressInUK(rph.additionalExtraAddress)
+        => res.addressHistory(rph.copy(additionalExtraAddress = None))
+        case (_, _) => res
+      }
+    } map { _ =>
+      if (data.personAddress.isInstanceOf[PersonAddressUK]) {
+        Redirect(routes.AdditionalExtraAddressUKController.get(index, edit, flow))
+      } else {
+        Redirect(routes.AdditionalExtraAddressNonUKController.get(index, edit, flow))
+      }
+    }
+  }
 }

@@ -16,8 +16,6 @@
 
 package controllers.responsiblepeople.address
 
-import audit.AddressConversions._
-import audit.{AddressCreatedEvent, AddressModifiedEvent}
 import cats.data.OptionT
 import cats.implicits._
 import com.google.inject.{Inject, Singleton}
@@ -28,11 +26,10 @@ import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ThreeYearsPlus}
 import models.responsiblepeople._
 import play.api.mvc.{AnyContent, Request}
 import services.AutoCompleteService
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.address.{additional_address_UK, current_address_NonUK}
+import views.html.responsiblepeople.address.additional_address_UK
 
 import scala.concurrent.Future
 
