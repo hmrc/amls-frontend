@@ -24,6 +24,7 @@ import models.responsiblepeople._
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.scalatest.{BeforeAndAfter, OptionValues}
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import services.AutoCompleteService
@@ -32,10 +33,14 @@ import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
-class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar {
+class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar with BeforeAndAfter with OptionValues {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
   val RecordId = 1
+
+  before {
+    reset(mockDataCacheConnector)
+  }
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -226,6 +231,14 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar {
           "isUK" -> "false"
         )
 
+        val responsiblePeople = ResponsiblePerson(personName)
+
+        when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+        when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(mockCacheMap))
+
         val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.responsiblepeople.address.routes.AdditionalExtraAddressNonUKController.get(RecordId).url))
@@ -235,6 +248,14 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar {
         val requestWithParams = request.withFormUrlEncodedBody(
           "isUK" -> "true"
         )
+
+        val responsiblePeople = ResponsiblePerson(personName)
+
+        when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+        when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(mockCacheMap))
 
         val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
         status(result) must be(SEE_OTHER)

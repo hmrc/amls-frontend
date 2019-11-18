@@ -26,6 +26,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.scalatest.{BeforeAndAfter, OptionValues}
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
@@ -36,10 +37,14 @@ import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
-class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar {
+class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with BeforeAndAfter with OptionValues {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
   val RecordId = 1
+
+  before {
+    reset(mockDataCacheConnector)
+  }
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
@@ -149,11 +154,13 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar {
     "post is called" must {
 
       "respond with BAD_REQUEST" when {
-
         "isUK field is not supplied" in new Fixture {
-
           val line1MissingRequest = request.withFormUrlEncodedBody()
 
+          val responsiblePeople = ResponsiblePerson()
+
+          when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
@@ -167,10 +174,9 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
       "go to AdditionalAddressUK" when {
         "isUK is true"  in new Fixture {
-
           val requestWithParams = request.withFormUrlEncodedBody(
-            "isUK" -> "true"
-          )
+            "isUK" -> "true")
+
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
@@ -187,7 +193,6 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar {
           redirectLocation(result) must be(Some(controllers.responsiblepeople.address.routes.AdditionalAddressUKController.get(RecordId, true).url))
         }
       }
-
 
       "go to AdditionalAddressNonUK page" when {
         "isUk is false" in new Fixture {
