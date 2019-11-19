@@ -70,10 +70,12 @@ class CurrentAddressController @Inject ()(
 
     updateDataStrict[ResponsiblePerson](credId, index) { res =>
       (res.addressHistory, data.personAddress) match {
-        case (Some(rph), _:PersonAddressUK) if !ResponsiblePersonAddressHistory.isRPCurrentAddressInUK(rph.currentAddress)
-        => res.addressHistory(rph.copy(currentAddress = None))
-        case (Some(rph), _:PersonAddressNonUK) if ResponsiblePersonAddressHistory.isRPCurrentAddressInUK(rph.currentAddress)
-        => res.addressHistory(rph.copy(currentAddress = None))
+        case (None, _)
+        => res.addressHistory(ResponsiblePersonAddressHistory(Some(data)))
+        case (Some(rph), addrUk:PersonAddressUK) if !ResponsiblePersonAddressHistory.isRPCurrentAddressInUK(rph.currentAddress)
+        => res.addressHistory(rph.copy(currentAddress = Some(ResponsiblePersonCurrentAddress(addrUk, rph.currentAddress.flatMap(_.timeAtAddress)))))
+        case (Some(rph), addrNonUK:PersonAddressNonUK) if ResponsiblePersonAddressHistory.isRPCurrentAddressInUK(rph.currentAddress)
+        => res.addressHistory(rph.copy(currentAddress = Some(ResponsiblePersonCurrentAddress(addrNonUK, rph.currentAddress.flatMap(_.timeAtAddress)))))
         case (_, _) => res
       }
     } map { _ =>
