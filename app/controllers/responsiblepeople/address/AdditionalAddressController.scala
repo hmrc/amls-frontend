@@ -68,10 +68,12 @@ class AdditionalAddressController @Inject()(
 
     updateDataStrict[ResponsiblePerson](credId, index) { res =>
       (res.addressHistory, data.personAddress) match {
+        case (Some(rph), _) if rph.additionalAddress.isEmpty
+        => res.addressHistory(rph.copy(additionalAddress = Some(data)))
         case (Some(rph), _:PersonAddressUK) if !ResponsiblePersonAddressHistory.isRPAddressInUK(rph.additionalAddress)
-        => res.addressHistory(rph.copy(additionalAddress = None))
+        => res.addressHistory(rph.copy(additionalAddress = Some(data)))
         case (Some(rph), _:PersonAddressNonUK) if ResponsiblePersonAddressHistory.isRPAddressInUK(rph.additionalAddress)
-        => res.addressHistory(rph.copy(additionalAddress = None))
+        => res.addressHistory(rph.copy(additionalAddress = Some(data)))
         case (_, _) => res
       }
     } map { _ =>

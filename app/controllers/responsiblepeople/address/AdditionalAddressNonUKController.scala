@@ -21,7 +21,7 @@ import cats.implicits._
 import com.google.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ThreeYearsPlus}
 import models.responsiblepeople._
 import play.api.mvc.{AnyContent, Request}
@@ -45,8 +45,9 @@ class AdditionalAddressNonUKController @Inject()(override val dataCacheConnector
         case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_, Some(ResponsiblePersonAddressHistory(_, Some(additionalAddress), _)),_,_,_,_,_,_,_,_,_,_,_, _)) =>
           Ok(additional_address_NonUK(Form2[ResponsiblePersonAddress](additionalAddress), edit, index, flow, personName.titleName, autoCompleteService.getCountries))
         case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
-          Ok(additional_address_NonUK(Form2(ResponsiblePersonAddressHistory.default()), edit, index, flow, personName.titleName, autoCompleteService.getCountries))
-        case _ => NotFound(notFoundView)
+          Ok(additional_address_NonUK(EmptyForm, edit, index, flow, personName.titleName, autoCompleteService.getCountries))
+        case _ =>
+          NotFound(notFoundView)
       }
   }
 

@@ -193,7 +193,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
           val captor = ArgumentCaptor.forClass(classOf[Seq[ResponsiblePerson]])
           verify(currentAddressController.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key), captor.capture())(any(), any())
           captor.getValue.head.isComplete mustBe false
-          captor.getValue.head.addressHistory.value.currentAddress mustBe None
+          captor.getValue.head.addressHistory.value.currentAddress mustBe Some(ResponsiblePersonCurrentAddress(PersonAddressNonUK("", "", None, None, Country("", "")), Some(ZeroToFiveMonths), None))
         }
       }
 
@@ -222,7 +222,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
           val captor = ArgumentCaptor.forClass(classOf[Seq[ResponsiblePerson]])
           verify(currentAddressController.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key), captor.capture())(any(), any())
           captor.getValue.head.isComplete mustBe false
-          captor.getValue.head.addressHistory.value.currentAddress mustBe None
+          captor.getValue.head.addressHistory.value.currentAddress mustBe Some(ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), Some(ZeroToFiveMonths), None))
         }
       }
 
