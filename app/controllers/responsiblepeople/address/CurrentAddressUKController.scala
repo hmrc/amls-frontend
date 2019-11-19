@@ -90,25 +90,34 @@ class CurrentAddressUKController @Inject ()(val dataCacheConnector: DataCacheCon
           case _ => ResponsiblePersonAddressHistory(currentAddress = Some(data))
         })
     } flatMap { _ =>
-      if (edit) {
-        val originalAddress = for {
-          rp <- originalResponsiblePerson
-          rpHistory <- rp.addressHistory
-          rpCurrAddr <- rpHistory.currentAddress
-        } yield rpCurrAddr.personAddress
-        auditConnector.sendEvent(AddressModifiedEvent(data.personAddress, originalAddress)) map { _ =>
-          if (redirectToDateOfChange[PersonAddress](status, originalAddress, data.personAddress)
-            && originalResponsiblePerson.flatMap {
-            orp => orp.lineId
-          }.isDefined && originalAddress.isDefined) {
-            Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))
-          } else {
-            Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index, flow))
+      val originalAddress = for {
+        rp <- originalResponsiblePerson
+        rpHistory <- rp.addressHistory
+        rpCurrAddr <- rpHistory.currentAddress
+      } yield rpCurrAddr.personAddress
+
+      (edit, originalAddress) match {
+        case (true, _)  => {
+          auditConnector.sendEvent(AddressModifiedEvent(data.personAddress, originalAddress)) map { _ =>
+            if (redirectToDateOfChange[PersonAddress](status, originalAddress, data.personAddress)
+              && originalResponsiblePerson.flatMap {
+              orp => orp.lineId
+            }.isDefined) {
+              Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))
+            } else {
+              Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index, flow))
+            }
           }
         }
-      } else {
-        auditConnector.sendEvent(AddressCreatedEvent(data.personAddress)) map { _ =>
-          Redirect(routes.TimeAtCurrentAddressController.get(index, edit, flow))
+        case (false, Some(address)) if address.addressLine1.isEmpty => {
+          auditConnector.sendEvent(AddressModifiedEvent(data.personAddress, originalAddress)) map { _ =>
+            Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))
+          }
+        }
+        case (_, _) => {
+          auditConnector.sendEvent(AddressCreatedEvent(data.personAddress)) map { _ =>
+            Redirect(routes.TimeAtCurrentAddressController.get(index, edit, flow))
+          }
         }
       }
     }
