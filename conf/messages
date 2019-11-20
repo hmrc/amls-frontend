@@ -911,7 +911,7 @@ confirmation.payment.button.retry = Try to pay again
 payments.waystopay.title = How do you want to pay your fees?
 payments.waystopay.header = How do you want to pay your fees?
 
-payments.waystopay.info = If paying by Bacs Payment Schemes Limited (Bacs), check transaction limits and processing times for your bank.
+payments.waystopay.info = If paying by Bacs, check transaction limits and processing times for your bank.
 payments.waystopay.info2 = There is a fee if you pay by corporate credit card. You cannot pay by personal credit card.
 payments.waystopay.lead.time = Payments normally take 3 working days.
 
