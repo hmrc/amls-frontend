@@ -71,16 +71,4 @@ object AddressHelper {
       auditConnector.sendEvent(AddressCreatedEvent(newAddress))
     }
   }
-
-  protected[address] def auditChange(newAddress: PersonAddress, oldAddress: Option[ResponsiblePersonAddress], edit: Boolean)
-                                    (implicit hc: HeaderCarrier, request: Request[_], auditConnector: AuditConnector, ec: ExecutionContext): Future[AuditResult] = {
-    if (edit) {
-      oldAddress.fold[Future[AuditResult]](Future.successful(Success)) { addr =>
-        auditConnector.sendEvent(AddressModifiedEvent(newAddress, Some(addr.personAddress)))
-      }
-    }
-    else {
-      auditConnector.sendEvent(AddressCreatedEvent(newAddress))
-    }
-  }
 }

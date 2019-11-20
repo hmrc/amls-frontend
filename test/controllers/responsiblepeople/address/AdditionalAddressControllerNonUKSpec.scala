@@ -24,7 +24,7 @@ import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 import models.responsiblepeople._
 import org.jsoup.Jsoup
-import org.jsoup.nodes.{Document, Element}
+import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._

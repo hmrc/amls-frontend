@@ -18,17 +18,23 @@ package controllers.responsiblepeople.address
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
-import models.Country
 import models.autocomplete.NameValuePair
+import models.businessactivities.BusinessActivities
+import models.businessdetails.BusinessDetails
+import models.businessmatching.{BillPaymentServices, BusinessMatching, BusinessActivities => BMActivities}
+import models.declaration.AddPerson
+import models.declaration.release7.RoleWithinBusinessRelease7
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReadyForReview}
+import models.{Country, ViewResponse}
 import org.jsoup.Jsoup
-import org.jsoup.nodes.{Document, Element}
+import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers._
+import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
@@ -43,11 +49,33 @@ import utils.{AmlsSpec, AuthorisedFixture}
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
 
-class CurrentAddressControllerUKSpec extends AmlsSpec with MockitoSugar {
+class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with MockitoSugar {
 
   implicit val hc = HeaderCarrier()
   val mockDataCacheConnector = mock[DataCacheConnector]
   val RecordId = 1
+
+  val viewResponse = ViewResponse(
+    "",
+    businessMatchingSection = BusinessMatching(
+      activities = Some(BMActivities(
+        Set(BillPaymentServices)
+      ))
+    ),
+    businessDetailsSection = BusinessDetails(),
+    bankDetailsSection = Seq.empty,
+    businessActivitiesSection = BusinessActivities(),
+    eabSection = None,
+    aspSection = None,
+    tcspSection = None,
+    responsiblePeopleSection = None,
+    tradingPremisesSection = None,
+    msbSection = None,
+    hvdSection = None,
+    ampSection = None,
+    supervisionSection = None,
+    aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
+  )
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
@@ -148,7 +176,6 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with MockitoSugar {
 
     "post is called" must {
       "redirect to TimeAtAddressController" when {
-
         "all the mandatory UK parameters are supplied" in new Fixture {
 
           val requestWithParams = request.withFormUrlEncodedBody(
@@ -166,6 +193,11 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with MockitoSugar {
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
+
+          when {
+            currentAddressController.dataCacheConnector.fetch[ViewResponse](any(), eqTo(ViewResponse.key))(any(), any())
+          } thenReturn Future.successful(Some(viewResponse))
+
           when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
@@ -205,6 +237,10 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with MockitoSugar {
             .thenReturn(Future.successful(emptyCache))
           when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          when {
+            currentAddressController.dataCacheConnector.fetch[ViewResponse](any(), eqTo(ViewResponse.key))(any(), any())
+          } thenReturn Future.successful(Some(viewResponse.copy(responsiblePeopleSection = Some(Seq(responsiblePeople)))))
 
           val result = currentAddressController.post(RecordId, true)(requestWithParams)
 
@@ -246,6 +282,10 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with MockitoSugar {
           when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
             .thenReturn(Future.successful(ReadyForRenewal(None)))
 
+          when {
+            currentAddressController.dataCacheConnector.fetch[ViewResponse](any(), eqTo(ViewResponse.key))(any(), any())
+          } thenReturn Future.successful(Some(viewResponse))
+
           val result = currentAddressController.post(RecordId, true)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
@@ -274,6 +314,10 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with MockitoSugar {
           when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
+          when {
+            currentAddressController.dataCacheConnector.fetch[ViewResponse](any(), eqTo(ViewResponse.key))(any(), any())
+          } thenReturn Future.successful(Some(viewResponse.copy(responsiblePeopleSection = Some(Seq(responsiblePeople)))))
+
           val result = currentAddressController.post(RecordId)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
@@ -300,6 +344,10 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with MockitoSugar {
             .thenReturn(Future.successful(emptyCache))
           when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          when {
+            currentAddressController.dataCacheConnector.fetch[ViewResponse](any(), eqTo(ViewResponse.key))(any(), any())
+          } thenReturn Future.successful(Some(viewResponse.copy(responsiblePeopleSection = Some(Seq(responsiblePeople)))))
 
           val result = currentAddressController.post(RecordId)(requestWithParams)
 
@@ -328,6 +376,10 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with MockitoSugar {
           when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
+          when {
+            currentAddressController.dataCacheConnector.fetch[ViewResponse](any(), eqTo(ViewResponse.key))(any(), any())
+          } thenReturn Future.successful(Some(viewResponse))
+
           val result = currentAddressController.post(RecordId)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
@@ -355,6 +407,10 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with MockitoSugar {
             .thenReturn(Future.successful(emptyCache))
           when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
+
+          when {
+            currentAddressController.dataCacheConnector.fetch[ViewResponse](any(), eqTo(ViewResponse.key))(any(), any())
+          } thenReturn Future.successful(Some(viewResponse))
 
           val result = currentAddressController.post(RecordId, true)(requestWithParams)
 

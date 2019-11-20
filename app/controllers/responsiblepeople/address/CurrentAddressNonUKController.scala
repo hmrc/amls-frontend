@@ -18,10 +18,13 @@ package controllers.responsiblepeople.address
 
 import audit.AddressConversions._
 import audit.{AddressCreatedEvent, AddressModifiedEvent}
+import cats.data.OptionT
+import cats.implicits._
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.ViewResponse
 import models.responsiblepeople._
 import models.status.SubmissionStatus
 import play.api.mvc.{AnyContent, Request}
@@ -78,12 +81,8 @@ class CurrentAddressNonUKController @Inject ()(
         }
     }
 
-  private def updateAndRedirect(credId: String,
-                                data: ResponsiblePersonCurrentAddress,
-                                index: Int,
-                                edit: Boolean,
-                                flow: Option[String],
-                                originalResponsiblePerson: Option[ResponsiblePerson],
+  private def updateAndRedirect(credId: String, data: ResponsiblePersonCurrentAddress, index: Int, edit: Boolean,
+                                flow: Option[String], originalResponsiblePerson: Option[ResponsiblePerson],
                                 status: SubmissionStatus)(implicit request: Request[AnyContent]) = {
 
     updateDataStrict[ResponsiblePerson](credId, index) { res =>
@@ -93,35 +92,39 @@ class CurrentAddressNonUKController @Inject ()(
           case _ => ResponsiblePersonAddressHistory(currentAddress = Some(data))
         })
     } flatMap { _ =>
-      val originalAddress = for {
-        rp <- originalResponsiblePerson
-        rpHistory <- rp.addressHistory
-        rpCurrAddr <- rpHistory.currentAddress
-      } yield rpCurrAddr.personAddress
+      val oldAddress = for {
+        viewResponse <- OptionT(dataCacheConnector.fetch[ViewResponse](credId, ViewResponse.key))
+        rp <- OptionT.fromOption[Future](ResponsiblePerson.getResponsiblePersonFromData(viewResponse.responsiblePeopleSection, index))
+        address <- OptionT.fromOption[Future](rp.addressHistory)
+        personAddress <- OptionT.fromOption[Future](address.currentAddress)
+      } yield personAddress.personAddress
 
-      (edit, originalAddress) match {
-        case (true, _)  => {
-          auditConnector.sendEvent(AddressModifiedEvent(data.personAddress, originalAddress)) map { _ =>
-            if (redirectToDateOfChange[PersonAddress](status, originalAddress, data.personAddress)
-              && originalResponsiblePerson.flatMap {
-              orp => orp.lineId
-            }.isDefined) {
-              Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))
-            } else {
-              Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index, flow))
+      oldAddress.value flatMap { originalAddress =>
+        (edit, originalAddress) match {
+          case (true, _)  => {
+            auditConnector.sendEvent(AddressModifiedEvent(data.personAddress, originalAddress)) map { _ =>
+              if (redirectToDateOfChange[PersonAddress](status, originalAddress, data.personAddress)
+                && originalResponsiblePerson.flatMap {
+                orp => orp.lineId
+              }.isDefined) {
+                Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))
+              } else {
+                Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index, flow))
+              }
             }
           }
-        }
-        case (false, Some(address)) if (address.isEmpty | address.isComplete) & isEligibleForDateOfChange(status) & originalResponsiblePerson.flatMap {
-          orp => orp.lineId
-        }.isDefined => {
-          auditConnector.sendEvent(AddressModifiedEvent(data.personAddress, originalAddress)) map { _ =>
-            Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))
+          case (false, Some(a)) if !data.personAddress.equals(a) & (a.isEmpty | a.isComplete)
+            & isEligibleForDateOfChange(status) & originalResponsiblePerson.flatMap {
+            orp => orp.lineId
+          }.isDefined => {
+            auditConnector.sendEvent(AddressModifiedEvent(data.personAddress, originalAddress)) map { _ =>
+              Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))
+            }
           }
-        }
-        case (_, _) => {
-          auditConnector.sendEvent(AddressCreatedEvent(data.personAddress)) map { _ =>
-            Redirect(routes.TimeAtCurrentAddressController.get(index, edit, flow))
+          case (_, _) => {
+            auditConnector.sendEvent(AddressCreatedEvent(data.personAddress)) map { _ =>
+              Redirect(routes.TimeAtCurrentAddressController.get(index, edit, flow))
+            }
           }
         }
       }

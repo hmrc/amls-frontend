@@ -20,17 +20,15 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.autocomplete.NameValuePair
-import models.hvd.Hvd
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers._
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
-import org.scalatest.{BeforeAndAfter, OptionValues}
 import org.scalatest.mock.MockitoSugar
+import org.scalatest.{BeforeAndAfter, OptionValues}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.AutoCompleteService

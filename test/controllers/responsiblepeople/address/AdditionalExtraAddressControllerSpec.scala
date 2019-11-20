@@ -24,11 +24,10 @@ import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers._
-import org.mockito.Mockito._
 import org.mockito.Matchers.{any, eq => eqTo}
-import org.scalatest.{BeforeAndAfter, OptionValues}
+import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
+import org.scalatest.{BeforeAndAfter, OptionValues}
 import play.api.test.Helpers._
 import services.AutoCompleteService
 import uk.gov.hmrc.http.cache.client.CacheMap
