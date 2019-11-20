@@ -61,6 +61,12 @@
                 <a id="view-message" href="@controllers.routes.NotificationController.getMessages()">@Messages("notifications.youHaveMessages")</a>
             </div>
             <div class="grid-row statusblock declaration">
+
+                <h2 class="heading-small">@Messages("status.fees")</h2>
+                <ul>
+                    <li><a id="how-to-pay" href="pending-how-to-pay">@Messages("status.howtopay")</a></li>
+                </ul>
+
                 <h2 class="heading-small">@Messages("status.hassomethingchanged")</h2>
                 <ul>
                     <li><a id="update-information" href="@controllers.routes.RegistrationProgressController.get()">@Messages("status.amendment.edit")</a></li>

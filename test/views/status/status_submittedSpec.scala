@@ -91,13 +91,11 @@ class status_submittedSpec extends AmlsSpec with MustMatchers with AmlsReference
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.4"))
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.5"))
 
-      Option(doc.getElementById("submission-ready-pay-the-fee")) mustBe defined
+      Option(doc.getElementById("submission-ready-pay-the-fee")) mustNot be(defined)
 
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") mustBe controllers.routes.NotificationController.getMessages().url
 
-      doc.getElementsMatchingOwnText(Messages("status.submissionreadyforreview.description.link"))
-        .attr("href")must be(controllers.routes.ConfirmationController.get().toString)
       doc.getElementsMatchingOwnText(Messages("status.submissionreadyforreview.description.5.link"))
         .attr("href") must be("https://www.gov.uk/government/collections/anti-money-laundering-businesses-supervised-by-hm-revenue-and-customs")
     }
@@ -130,7 +128,7 @@ class status_submittedSpec extends AmlsSpec with MustMatchers with AmlsReference
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.2.listline3"))
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.3"))
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.4"))
-      Option(doc.getElementsByClass("partial-deskpro-form").first()) mustBe defined
+      Option(doc.getElementsByClass("partial-deskpro-form").first()) mustNot be(defined)
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.5"))
 
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)

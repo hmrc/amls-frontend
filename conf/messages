@@ -626,7 +626,7 @@ status.hassomethingchanged = About your business
 status.submissionready.changelink1 = Check or update your business information
 status.submissionready.buttontext = Continue
 status.submissionreadyforreview.heading = Application pending
-status.submissionreadyforreview.description = You have 28 days to pay your fees from the date you submitted your application. Your application will be refused if you do not pay the fees. If you’ve not paid already,
+status.submissionreadyforreview.description = You have 28 days to pay your fees from the date you submitted your application. Your application will be refused if you do not pay the fees.
 status.submissionreadyforreview.description.no.fee = You have 28 days to pay your fees from the date you submitted your application. Your application will be refused if you do not pay the fees.
 status.submissionreadyforreview.description.2 = HMRC will review your application after we’ve received payment. Our review usually takes 45 days. It will take longer if:
 status.submissionreadyforreview.description.2.listline1 = we need to contact you for extra information
@@ -717,7 +717,8 @@ status.amendment.edit.uppercase.start = Check or update your business informatio
 status.fee.link = If you haven’t paid the fee
 status.readyforrenewal.warning = Your supervision will expire on {0} unless you renew.
 status.submittedForReview.submitteddate.text = Application submitted {0}
-
+status.fees = Your fees
+status.howtopay = How to pay
 
 fee.details.heading = Your application won’t be reviewed by HMRC until you have paid the fee.
 fee.details.dup.heading = If you haven’t paid, you’ll need to make a payment. You’ll see a breakdown of your fees before you make the payment.
