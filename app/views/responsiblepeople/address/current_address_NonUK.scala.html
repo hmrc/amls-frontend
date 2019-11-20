@@ -1,0 +1,72 @@
+@*
+ * Copyright 2019 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.Form2
+@import include._
+@import include.forms2._
+@import models.autocomplete.NameValuePair
+
+@(f: Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String, countries: Option[Seq[NameValuePair]])(implicit request: Request[_],m:Messages, lang: Lang)
+
+@header = {
+    @components.back_link()
+    @errorSummaryWithPlaceholder(f, s"$personName ${Messages("error.required.select.non.uk.address")}")
+}
+
+@main(
+    title = Messages("responsiblepeople.wherepersonlivescountry.title", personName) + " - " + Messages("summary.responsiblepeople"),
+    heading = header
+) {
+
+    @form(f, controllers.responsiblepeople.address.routes.CurrentAddressNonUKController.post(index,edit,flow)) {
+
+        <input type ="hidden" name="isUK" value=false />
+
+        @fieldsetWithErrorGroup(
+            heading = Messages("responsiblepeople.wherepersonlivescountry.heading", personName),
+            section = "summary.responsiblepeople",
+            panel = false,
+            classes = Seq("nonUkAddress-fieldset"),
+            f = f("nonUkAddress-fieldset")
+        ) {
+            @input(
+                field = f("addressLineNonUK1"),
+                labelText = "lbl.address.line1"
+            )
+            @input(
+                field = f("addressLineNonUK2"),
+                labelText = "lbl.address.line2"
+            )
+            @input(
+                field = f("addressLineNonUK3"),
+                labelText = "lbl.address.line3"
+            )
+            @input(
+                field = f("addressLineNonUK4"),
+                labelText = "lbl.address.line4"
+            )
+            @country_autocomplete(
+                field = f("country"),
+                placeholder = s"$personName ${Messages("error.required.select.non.uk.address")}",
+                labelText = "responsiblepeople.wherepersonlives.country",
+                data = countries.getOrElse(Seq.empty)
+            )
+        }
+
+        @submit(edit, Some("button.saveandcontinue"))
+    }
+}
+

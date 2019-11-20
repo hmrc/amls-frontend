@@ -52,8 +52,10 @@ class detailed_answersSpec extends AmlsSpec
       (Messages("responsiblepeople.detailed_answers.email"), checkElementTextIncludes(_, "e@mail.com")),
       (Messages("responsiblepeople.detailed_answers.address", personName.fullName), checkElementTextOnlyIncludes(_, "addressLine1 addressLine2 addressLine3 addressLine4 postCode1")),
       (Messages("responsiblepeople.timeataddress.address_history.heading", "firstName middleName lastName"), checkElementTextIncludes(_, "0 to 5 months")),
-      (Messages("responsiblepeople.detailed_answers.previous_address"), checkElementTextIncludes(_, "addressLine5 addressLine6 addressLine7 addressLine8 postCode2")),
-      (Messages("responsiblepeople.detailed_answers.other_previous_address"), checkElementTextIncludes(_, "addressLine9 addressLine10 addressLine11 addressLine12 postCode3")),
+      (Messages("responsiblepeople.detailed_answers.address.previous.UK", "firstName middleName lastName"), checkElementTextIncludes(_, "Yes")),
+      (Messages("responsiblepeople.detailed_answers.address.previous", "firstName middleName lastName"), checkElementTextIncludes(_, "addressLine5 addressLine6 addressLine7 addressLine8 postCode2")),
+      (Messages("responsiblepeople.detailed_answers.address.other.previous.UK", "firstName middleName lastName"), checkElementTextIncludes(_, "Yes")),
+      (Messages("responsiblepeople.detailed_answers.address.other.previous", "firstName middleName lastName"), checkElementTextIncludes(_, "addressLine9 addressLine10 addressLine11 addressLine12 postCode3")),
       (Messages("responsiblepeople.position_within_business.heading", "firstName middleName lastName"), checkElementTextIncludes(_, "Beneficial owner (holding more than 25% of shares in the business)")),
       (Messages("responsiblepeople.position_within_business.heading", "firstName middleName lastName"), checkElementTextIncludes(_, "Nominated officer")),
       (Messages("responsiblepeople.position_within_business.startDate.heading", "firstName middleName lastName"), checkElementTextIncludes(_, "24 February 1990")),
@@ -64,7 +66,6 @@ class detailed_answersSpec extends AmlsSpec
       (Messages("responsiblepeople.detailed_answers.training_in_anti_money_laundering"), checkElementTextIncludes(_, "training")),
       (Messages("responsiblepeople.detailed_answers.already_passed_fit_and_proper"), checkElementTextIncludes(_, "Yes"))
     )
-
   }
 
   "summary view" must {
@@ -354,8 +355,8 @@ class detailed_answersSpec extends AmlsSpec
       override val sectionChecks = Table[String, Element => Boolean](
         ("title key", "check"),
         (Messages("responsiblepeople.detailed_answers.address", personName.fullName), checkElementHasAttribute(_, "addressLine1 addressLine2 addressLine3 addressLine4 postCode1")),
-        (Messages("responsiblepeople.detailed_answers.previous_address"), checkElementHasAttribute(_, "addressLine5 addressLine6 addressLine7 addressLine8 postCode2")),
-        (Messages("responsiblepeople.detailed_answers.other_previous_address"), checkElementHasAttribute(_, "addressLine9 addressLine10 addressLine11 addressLine12 postCode3"))
+        (Messages("responsiblepeople.detailed_answers.address.previous", personName.fullName), checkElementHasAttribute(_, "addressLine5 addressLine6 addressLine7 addressLine8 postCode2")),
+        (Messages("responsiblepeople.detailed_answers.address.other.previous", personName.fullName), checkElementHasAttribute(_, "addressLine9 addressLine10 addressLine11 addressLine12 postCode3"))
       )
 
       forAll(sectionChecks) { (key, check) => {

@@ -106,7 +106,7 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get(1)(request)
-        redirectLocation(result) must be(Some(routes.CurrentAddressController.get(1,true).url))
+        redirectLocation(result) must be(Some(address.routes.CurrentAddressController.get(1,true).url))
         status(result) must be(SEE_OTHER)
 
       }
@@ -149,7 +149,7 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
           val result = controller.post(1)(newRequest)
           status(result) must be (SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.CurrentAddressController.get(1, true).url))
+          redirectLocation(result) must be(Some(address.routes.CurrentAddressController.get(1, true).url))
         }
       }
 
@@ -176,7 +176,7 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.post(1)(newRequest)
-        redirectLocation(result) must be(Some(routes.CurrentAddressController.get(1,true).url))
+        redirectLocation(result) must be(Some(address.routes.CurrentAddressController.get(1,true).url))
         status(result) must be(SEE_OTHER)
       }
 

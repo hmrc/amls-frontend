@@ -303,6 +303,14 @@ object FormTypes {
       .andThen(regexWithMsg(commonNameRegex, regExMessage))
       .andThen(maxWithMsg(maxNameTypeLength, maxLengthMsg))
 
+  def genericAddressRule(requiredMsg: String = "",
+                         maxLengthMsg: String = "error.invalid.common_name.length",
+                         regExMessage: String="error.invalid.common_name.validation") =
+    notEmptyStrip
+      .andThen(notEmpty.withMessage(requiredMsg))
+      .andThen(maxWithMsg(maxAddressLength, maxLengthMsg))
+      .andThen(regexWithMsg(addressTypeRegex, regExMessage))
+
   val accountNameType = notEmptyStrip
     .andThen(notEmpty.withMessage("error.bankdetails.accountname"))
     .andThen(maxLength(maxAccountName).withMessage("error.invalid.bankdetails.accountname"))
