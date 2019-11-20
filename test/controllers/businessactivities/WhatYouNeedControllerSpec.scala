@@ -16,12 +16,14 @@
 
 package controllers.businessactivities
 
+import controllers.actions.SuccessfulAuthAction
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved, SubmissionReadyForReview}
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
@@ -29,7 +31,10 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
     self =>
 
     val request = addToken(authRequest)
-    val controller = new WhatYouNeedController(self.authConnector, mockStatusService)
+    val controller = new WhatYouNeedController(
+      authAction = SuccessfulAuthAction,
+      statusService = mockStatusService,
+      authConnector = mock[AuthConnector])
   }
 
   "WhatYouNeedController" must {

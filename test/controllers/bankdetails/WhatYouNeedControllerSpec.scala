@@ -16,6 +16,7 @@
 
 package controllers.bankdetails
 
+import controllers.actions.SuccessfulAuthAction
 import generators.bankdetails.BankDetailsGenerator
 import models.bankdetails.BankDetails
 import org.jsoup.Jsoup
@@ -36,7 +37,7 @@ class WhatYouNeedControllerSpec
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val request = addToken(authRequest)
-    val controller = new WhatYouNeedController(self.authConnector, mockCacheConnector)
+    val controller = new WhatYouNeedController(SuccessfulAuthAction, mockCacheConnector)
 
     def assertHref(url: String)(implicit doc: Document) = {
       doc.getElementById("bankwhatyouneed-button").attr("href") mustBe url

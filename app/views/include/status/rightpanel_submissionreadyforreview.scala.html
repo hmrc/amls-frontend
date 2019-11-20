@@ -19,11 +19,12 @@
 @import forms2._
 @import models.FeeResponse
 @import config.{ApplicationConfig => appConfig, CachedStaticHtmlPartialProvider}
+@import uk.gov.hmrc.play.views.html.{helpers => uiHelpers}
 
 @(feeResponse: Option[FeeResponse])(implicit request: Request[_],m:Messages, lang: Lang)
 
 @getHelpForm = {
-@config.CachedStaticHtmlPartialProvider.getPartialContent(appConfig.reportAProblemUrl)
+    @{uiHelpers.reportAProblemLink(config.ApplicationConfig.reportAProblemPartialUrl, config.ApplicationConfig.reportAProblemNonJSUrl)}
 }
 
 @feeResponse match {

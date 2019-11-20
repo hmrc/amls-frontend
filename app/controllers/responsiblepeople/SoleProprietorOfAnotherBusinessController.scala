@@ -16,25 +16,24 @@
 
 package controllers.responsiblepeople
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.responsiblepeople.{ResponsiblePerson, SoleProprietorOfAnotherBusiness, VATRegistered}
 import services.StatusService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.sole_proprietor
 
 import scala.concurrent.Future
 
 @Singleton
 class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                          val authConnector: AuthConnector,
-                                                          val statusService: StatusService) extends RepeatingSection with BaseController {
+                                                          authAction: AuthAction,
+                                                          val statusService: StatusService) extends RepeatingSection with DefaultBaseController {
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext => implicit request => {
-      getData[ResponsiblePerson](index) map {
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
+    implicit request => {
+      getData[ResponsiblePerson](request.credId, index) map {
         case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, Some(soleProprietorOfAnotherBusiness)))
         => Ok(sole_proprietor(Form2[SoleProprietorOfAnotherBusiness](soleProprietorOfAnotherBusiness), edit, index, flow, personName.titleName))
         case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, None, _, _, _))
@@ -48,22 +47,15 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
     }
   }
 
-  def getVatRegData(rp: ResponsiblePerson, data: SoleProprietorOfAnotherBusiness): Option[VATRegistered] = {
-    data.soleProprietorOfAnotherBusiness match {
-      case true => rp.vatRegistered
-      case false => None
-    }
-  }
-
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext => implicit request =>
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
+    implicit request =>
       Form2[SoleProprietorOfAnotherBusiness](request.body) match {
-        case f: InvalidForm => getData[ResponsiblePerson](index) flatMap { rp =>
+        case f: InvalidForm => getData[ResponsiblePerson](request.credId, index) flatMap { rp =>
           Future.successful(BadRequest(sole_proprietor(f, edit, index, flow, ControllerHelper.rpTitleName(rp))))
         }
         case ValidForm(_, data) => {
           for {
-            _ <- updateDataStrict[ResponsiblePerson](index) { rp =>
+            _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
               rp.copy(soleProprietorOfAnotherBusiness = Some(data), vatRegistered = getVatRegData(rp, data))
             }
           } yield if(data.soleProprietorOfAnotherBusiness equals true) {
@@ -78,5 +70,12 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
       }
+  }
+
+  def getVatRegData(rp: ResponsiblePerson, data: SoleProprietorOfAnotherBusiness): Option[VATRegistered] = {
+    data.soleProprietorOfAnotherBusiness match {
+      case true => rp.vatRegistered
+      case false => None
+    }
   }
 }

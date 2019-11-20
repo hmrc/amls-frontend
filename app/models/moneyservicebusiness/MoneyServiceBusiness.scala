@@ -127,8 +127,6 @@ object MoneyServiceBusiness {
 
   val key = "msb"
 
-  implicit val formatOption = Reads.optionWithNull[MoneyServiceBusiness]
-
   def section(implicit cache: CacheMap): Section = {
     val messageKey = key
     val notStarted = Section(messageKey, NotStarted, false, controllers.msb.routes.WhatYouNeedController.get())
@@ -170,6 +168,8 @@ object MoneyServiceBusiness {
   }
 
   implicit val writes: Writes[MoneyServiceBusiness] = Json.writes[MoneyServiceBusiness]
+
+  implicit val formatOption = Reads.optionWithNull[MoneyServiceBusiness]
 
   implicit def default(value: Option[MoneyServiceBusiness]): MoneyServiceBusiness = {
     value.getOrElse(MoneyServiceBusiness())

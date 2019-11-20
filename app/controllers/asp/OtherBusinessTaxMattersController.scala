@@ -17,23 +17,22 @@
 package controllers.asp
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.asp.{Asp, OtherBusinessTaxMatters}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.asp.other_business_tax_matters
 
 import scala.concurrent.Future
 
 class OtherBusinessTaxMattersController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                  val authConnector: AuthConnector
-                                                 ) extends BaseController {
+                                                  authAction: AuthAction
+                                                 ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        dataCacheConnector.fetch[Asp](Asp.key) map {
+        dataCacheConnector.fetch[Asp](request.credId, Asp.key) map {
           response =>
             val form: Form2[OtherBusinessTaxMatters] = (for {
               asp <- response
@@ -43,16 +42,15 @@ class OtherBusinessTaxMattersController @Inject()(val dataCacheConnector: DataCa
         }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request => {
         Form2[OtherBusinessTaxMatters](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(other_business_tax_matters(f, edit)))
           case ValidForm(_, data) =>
             for {
-              asp <- dataCacheConnector.fetch[Asp](Asp.key)
-              _ <- dataCacheConnector.save[Asp](Asp.key,
+              asp <- dataCacheConnector.fetch[Asp](request.credId, Asp.key)
+              _ <- dataCacheConnector.save[Asp](request.credId, Asp.key,
                 asp.otherBusinessTaxMatters(data)
               )
             } yield Redirect(routes.SummaryController.get())

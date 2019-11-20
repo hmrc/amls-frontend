@@ -16,13 +16,14 @@
 
 package controllers.supervision
 
+import controllers.actions.SuccessfulAuthAction
 import models.supervision.{ProfessionalBodyYes, Supervision}
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 
 class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
@@ -32,7 +33,7 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
 
     val controller = new PenalisedByProfessionalController (
       dataCacheConnector = mockCacheConnector,
-      authConnector = self.authConnector
+      authAction = SuccessfulAuthAction
     )
 
     mockCacheSave[Supervision]

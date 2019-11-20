@@ -28,8 +28,6 @@ import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.PageRouter
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -37,15 +35,14 @@ class RemoveBusinessTypesSummaryPageRouter @Inject()(val statusService: StatusSe
                                                      val businessMatchingService: BusinessMatchingService,
                                                      val dataCacheConnector: DataCacheConnector) extends PageRouter[RemoveBusinessTypeFlowModel] {
 
-  override def getPageRoute(model: RemoveBusinessTypeFlowModel, edit: Boolean = false)
-                           (implicit ac: AuthContext,
-                            hc: HeaderCarrier,
+  override def getRoute(credId: String, model: RemoveBusinessTypeFlowModel, edit: Boolean = false)
+                       (implicit hc: HeaderCarrier,
                             ec: ExecutionContext
                            ): Future[Result] = {
 
     val allTpComplete = (tp: Seq[TradingPremises]) => tp.forall(_.isComplete)
 
-    dataCacheConnector.fetch[Seq[TradingPremises]](TradingPremises.key) map {
+    dataCacheConnector.fetch[Seq[TradingPremises]](credId, TradingPremises.key) map {
 
       case Some(tp) =>
         model.activitiesToRemove map { m =>

@@ -30,7 +30,7 @@
 }
 
 @supportingContent = {
-    <p>@m("businessmatching.updateservice.psr.number.hint")</p>
+    <p>@hint(Messages("businessmatching.updateservice.psr.number.hint"))</p>
 }
 
 @main(
@@ -44,7 +44,8 @@
             f = f("appliedFor"),
             heading = "businessmatching.updateservice.psr.number.title",
             section = "summary.updateservice",
-            panel = false
+            panel = false,
+            supportingContent = supportingContent
         ) {
             @radio(
                 f = f("appliedFor"),
@@ -72,7 +73,7 @@
                 value = "false"
             )
         }
-        @submit(edit, returnLink = false, buttonId = Some("appliedspsr-submit"))
+        @submit(edit, returnLink = false, buttonMessageKey = Some("button.continue"), buttonId = Some("appliedspsr-submit"))
     }
 
 }

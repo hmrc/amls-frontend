@@ -17,11 +17,10 @@
 package controllers.declaration
 
 import javax.inject.{Inject, Singleton}
-
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.declaration.BusinessPartners
 import models.responsiblepeople.ResponsiblePerson._
@@ -29,24 +28,72 @@ import models.responsiblepeople.{Partner, Positions, ResponsiblePerson}
 import models.status.{RenewalSubmitted, _}
 import play.api.mvc.{AnyContent, Request, Result}
 import services.{ProgressService, StatusService}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.DeclarationHelper._
-import utils.StatusConstants
+import utils.AuthAction
 import views.html.declaration.register_partners
 
 import scala.concurrent.Future
 
 @Singleton
-class RegisterPartnersController @Inject()(val authConnector: AuthConnector,
+class RegisterPartnersController @Inject()(authAction: AuthAction,
                                            val dataCacheConnector: DataCacheConnector,
                                            implicit val statusService: StatusService,
                                            implicit val progressService: ProgressService
-                                          ) extends BaseController {
+                                          ) extends DefaultBaseController {
+  def get() = authAction.async {
+    implicit request => {
 
-  def businessPartnersView(status: Status, form: Form2[BusinessPartners], rp: Seq[ResponsiblePerson])
-                          (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] = {
-    statusService.getStatus map {
+      val result = for {
+        subtitle <- OptionT.liftF(statusSubtitle(request.amlsRefNumber, request.accountTypeId, request.credId))
+        responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key))
+      } yield {
+        Ok(views.html.declaration.register_partners(
+          subtitle,
+          EmptyForm,
+          nonPartners(responsiblePeople),
+          currentPartnersNames(responsiblePeople)
+        ))
+      }
+      result getOrElse InternalServerError("failure getting status")
+    }
+  }
+
+  def post() = authAction.async {
+    implicit request => {
+      Form2[BusinessPartners](request.body) match {
+        case f: InvalidForm => {
+          dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key) flatMap {
+            case Some(data) => {
+              businessPartnersView(request.amlsRefNumber, request.accountTypeId, request.credId, BadRequest, f, data)
+            }
+            case None =>
+              businessPartnersView(request.amlsRefNumber, request.accountTypeId, request.credId, BadRequest, f, Seq.empty)
+          }
+        }
+        case ValidForm(_, data) => {
+          data.value match {
+            case "-1" =>
+              Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, Some(flowFromDeclaration))))
+            case _ =>
+              saveAndRedirect(request.amlsRefNumber, request.accountTypeId, request.credId, data)
+          }
+        }
+      }
+    }
+  }
+
+  def getNonPartners(people: Seq[ResponsiblePerson]) = {
+    people.filter(_.positions.fold(false)(p => !p.positions.contains(Partner)))
+  }
+
+  def businessPartnersView(amlsRegistrationNo: Option[String],
+                           accountTypeId: (String, String),
+                           cacheId: String,
+                           status: Status,
+                           form: Form2[BusinessPartners],
+                           rp: Seq[ResponsiblePerson])
+                          (implicit request: Request[AnyContent]): Future[Result] = {
+    statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) map {
       case SubmissionReady =>
         status(register_partners("submit.registration", form, getNonPartners(rp), currentPartnersNames(rp)))
       case SubmissionReadyForReview | SubmissionDecisionApproved =>
@@ -58,12 +105,12 @@ class RegisterPartnersController @Inject()(val authConnector: AuthConnector,
     }
   }
 
-  private def saveAndRedirect(data : BusinessPartners) (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] = {
+  private def saveAndRedirect(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String, data : BusinessPartners) (implicit request: Request[AnyContent]): Future[Result] = {
     (for {
-      responsiblePeople <- dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key)
+      responsiblePeople <- dataCacheConnector.fetch[Seq[ResponsiblePerson]](cacheId, ResponsiblePerson.key)
       rp <- updatePartners(responsiblePeople, data)
-      _ <- dataCacheConnector.save(ResponsiblePerson.key, rp)
-      url <- progressService.getSubmitRedirect
+      _ <- dataCacheConnector.save(cacheId, ResponsiblePerson.key, rp)
+      url <- progressService.getSubmitRedirect(amlsRegistrationNo, accountTypeId, cacheId)
     } yield url match {
       case Some(x) => Redirect(x)
       case _ => InternalServerError("Unable to get redirect url")
@@ -86,52 +133,6 @@ class RegisterPartnersController @Inject()(val authConnector: AuthConnector,
         }
         Future.successful(Some(updatedList))
       case _ => Future.successful(eventualMaybePeoples)
-    }
-  }
-
-  def getNonPartners(people: Seq[ResponsiblePerson]) = {
-    people.filter(_.positions.fold(false)(p => !p.positions.contains(Partner)))
-  }
-
-  def get() = Authorised.async {
-    implicit authContext => implicit request => {
-
-      val result = for {
-        subtitle <- OptionT.liftF(statusSubtitle())
-        responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key))
-      } yield {
-        Ok(views.html.declaration.register_partners(
-          subtitle,
-          EmptyForm,
-          nonPartners(responsiblePeople),
-          currentPartnersNames(responsiblePeople)
-        ))
-      }
-      result getOrElse InternalServerError("failure getting status")
-    }
-  }
-
-  def post() = Authorised.async {
-    implicit authContext => implicit request => {
-      Form2[BusinessPartners](request.body) match {
-        case f: InvalidForm => {
-          dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key) flatMap {
-            case Some(data) => {
-              businessPartnersView(BadRequest, f, data)
-            }
-            case None =>
-              businessPartnersView(BadRequest, f, Seq.empty)
-          }
-        }
-        case ValidForm(_, data) => {
-          data.value match {
-            case "-1" =>
-              Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, Some(flowFromDeclaration))))
-            case _ =>
-              saveAndRedirect(data)
-          }
-        }
-      }
     }
   }
 }

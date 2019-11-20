@@ -15,11 +15,16 @@
  *@
 
 @import include.main
+@import include._
 
-@(title: String, heading: String, message: String)(implicit request: Request[_],m:Messages)
+@(title: String, text: String, message: String)(implicit request: Request[_],m:Messages)
+@header = {
+ <h1 class="heading-xlarge error-page-margin">@Messages(text)</h1>
+}
 
 @main(
-    title = title
+ title = title,
+ heading = header
 ) {
-    <p>@message</p>
+ <p>@message</p>
 }

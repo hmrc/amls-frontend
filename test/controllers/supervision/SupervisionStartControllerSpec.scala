@@ -16,6 +16,7 @@
 
 package controllers.supervision
 
+import controllers.actions.SuccessfulAuthAction
 import models.supervision._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -30,7 +31,7 @@ class SupervisionStartControllerSpec extends AmlsSpec with MockitoSugar with Sca
   trait Fixture extends AuthorisedFixture  with DependencyMocks{
     self => val request = addToken(authRequest)
 
-    val controller = new SupervisionStartController(mockCacheConnector, authConnector = self.authConnector)
+    val controller = new SupervisionStartController(mockCacheConnector, authAction = SuccessfulAuthAction)
   }
 
   "SupervisionStartController" must {

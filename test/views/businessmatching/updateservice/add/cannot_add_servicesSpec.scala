@@ -49,7 +49,6 @@ class cannot_add_servicesSpec extends AmlsSpec {
     }
 
     "show the correct content" in new ViewFixture {
-      doc.body().text() must include(Messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.1"))
       doc.body().text() must include(Messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.2"))
     }
   }

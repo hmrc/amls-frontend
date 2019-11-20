@@ -16,25 +16,23 @@
 
 package controllers.businessdetails
 
-import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.Country
-import models.businessdetails._
 import models.businesscustomer.{Address, ReviewDetails}
+import models.businessdetails._
 import models.businessmatching.BusinessMatching
-import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, Partnership, UnincorporatedBody}
+import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, Partnership}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.http.HeaderCarrier
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
@@ -43,7 +41,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
     val controller = new VATRegisteredController (
       dataCacheConnector = mockCacheConnector,
-      authConnector = self.authConnector
+      authAction = SuccessfulAuthAction
     )
   }
 
@@ -54,7 +52,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
       "display the registered for VAT page" in new Fixture {
 
         when{
-          controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any())
+          controller.dataCacheConnector.fetch[BusinessDetails](any(), any())(any(), any())
         } thenReturn Future.successful(None)
 
         val result = controller.get()(request)
@@ -66,8 +64,8 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
       "display the registered for VAT page with pre populated data" in new Fixture {
 
         when {
-          controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any())
-        } thenReturn Future.successful(Some(BusinessDetails(Some(PreviouslyRegisteredYes("")), None, Some(VATRegisteredYes("123456789")))))
+          controller.dataCacheConnector.fetch[BusinessDetails](any(), any())(any(), any())
+        } thenReturn Future.successful(Some(BusinessDetails(Some(PreviouslyRegisteredYes(Some(""))), None, Some(VATRegisteredYes("123456789")))))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -169,7 +167,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
             "registeredForVATYes" -> "1234567890"
           )
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post()(newRequest)

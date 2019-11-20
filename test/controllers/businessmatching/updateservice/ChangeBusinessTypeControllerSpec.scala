@@ -18,12 +18,13 @@ package controllers.businessmatching.updateservice
 
 import cats.data.OptionT
 import cats.implicits._
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching._
-import models.businessmatching.updateservice.{Add, ChangeBusinessType, Remove}
+import models.businessmatching.updateservice.Remove
 import models.businessmatching.updateservice.{Add, ChangeBusinessType}
 import models.flowmanagement.{ChangeBusinessTypesPageId, RemoveBusinessTypeFlowModel}
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
@@ -43,11 +44,12 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
     val bmService = mock[BusinessMatchingService]
 
     val controller = new ChangeBusinessTypesController(
-      self.authConnector,
+      SuccessfulAuthAction,
       mockCacheConnector,
       bmService,
       createRouter[ChangeBusinessType],
-      mock[RemoveBusinessTypeHelper]
+      mock[RemoveBusinessTypeHelper],
+      mock[AddBusinessTypeHelper]
     )
 
     val businessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
@@ -57,19 +59,22 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
     mockCacheGetEntry[BusinessMatching](Some(businessMatching), BusinessMatching.key)
 
     when {
-      bmService.getRemainingBusinessActivities(any(), any(), any())
+      bmService.getRemainingBusinessActivities(any())(any(), any())
     } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
 
     when {
-      controller.helper.removeFlowData(any(), any(), any())
+      controller.helper.removeFlowData(any())(any(), any())
     } thenReturn OptionT.some[Future, RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel())
-
   }
 
   "ChangeServicesController" when {
 
     "get is called" must {
       "return OK with change_services view" in new Fixture {
+
+        when {
+          controller.addHelper.prefixedActivities(any())(any())
+        } thenReturn Set.empty[String]
 
         val result = controller.get()(request)
 
@@ -79,8 +84,13 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
       }
 
       "return OK with change_services view - no activities" in new Fixture {
+
         when {
-          bmService.getRemainingBusinessActivities(any(), any(), any())
+          controller.addHelper.prefixedActivities(any())(any())
+        } thenReturn Set.empty[String]
+
+        when {
+          bmService.getRemainingBusinessActivities(any())(any(), any())
         } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set.empty)
 
         val result = controller.get()(request)
@@ -101,7 +111,7 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
           val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "add"))
 
           status(result) must be(SEE_OTHER)
-          controller.router.verify(ChangeBusinessTypesPageId, Add)
+          controller.router.verify("internalId", ChangeBusinessTypesPageId, Add)
         }
       }
 
@@ -111,12 +121,16 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
           val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "remove"))
 
           status(result) must be(SEE_OTHER)
-          controller.router.verify(ChangeBusinessTypesPageId, Remove)
+          controller.router.verify("internalId", ChangeBusinessTypesPageId, Remove)
         }
       }
 
       "return BAD_REQUEST" when {
         "request is invalid" in new Fixture {
+          when {
+            controller.addHelper.prefixedActivities(any())(any())
+          } thenReturn Set.empty[String]
+
           val result = controller.post()(request)
           status(result) must be(BAD_REQUEST)
         }

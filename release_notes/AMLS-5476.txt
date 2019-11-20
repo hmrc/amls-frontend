@@ -1,0 +1,1 @@
+ + [AMLS-5476] - 'Bug fix: Approval fee is not rendering in fees table for AMP'

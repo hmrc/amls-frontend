@@ -26,7 +26,7 @@
 }
 
 @supportingContent = {
-    <p>@Messages("businessmatching.updateservice.msb.services.list.heading")</p>
+    <p>@hint(Messages("businessmatching.updateservice.msb.services.list.heading"))</p>
 }
 
 @main(
@@ -45,24 +45,6 @@
       ) {
           @checkbox(
             f = f("msbServices[]"),
-            labelText = "businessmatching.updateservice.msb.services.list.lbl.01",
-            value = "01"
-          )
-          @checkbox(
-            f = f("msbServices[]"),
-            labelText = "businessmatching.updateservice.msb.services.list.lbl.02",
-            value = "02"
-          )
-
-          @if(isFxEnabled) {
-              @checkbox(
-                  f = f("msbServices[]"),
-                  labelText = "businessmatching.updateservice.msb.services.list.lbl.05",
-                  value = "05"
-              )
-          }
-          @checkbox(
-            f = f("msbServices[]"),
             labelText = "businessmatching.updateservice.msb.services.list.lbl.03",
             value = "03"
           )
@@ -71,8 +53,26 @@
             labelText = "businessmatching.updateservice.msb.services.list.lbl.04",
             value = "04"
           )
+
+          @if(isFxEnabled) {
+              @checkbox(
+                  f = f("msbServices[]"),
+                  labelText = "businessmatching.updateservice.msb.services.list.lbl.02",
+                  value = "02"
+              )
+          }
+          @checkbox(
+            f = f("msbServices[]"),
+            labelText = "businessmatching.updateservice.msb.services.list.lbl.05",
+            value = "05"
+          )
+          @checkbox(
+            f = f("msbServices[]"),
+            labelText = "businessmatching.updateservice.msb.services.list.lbl.01",
+            value = "01"
+          )
       }
-      @submit(edit, returnLink = false, buttonId = Some("msbsubservice-submit"))
+      @submit(edit, returnLink = false, buttonMessageKey = Some("button.continue"), buttonId = Some("msbsubservice-submit"))
     }
 
 }

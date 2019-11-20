@@ -73,7 +73,7 @@ class SubscriptionRequestSpec extends PlaySpec with MockitoSugar {
       val emptyTp = TradingPremises()
       val sequenceOfTps = Seq(completeModel, emptyTp)
 
-      val testRequest = SubscriptionRequest(None, None, Some(sequenceOfTps), None, None, None, None, None, None, None, None, None, None)
+      val testRequest = SubscriptionRequest(None, None, Some(sequenceOfTps), None, None, None, None, None, None, None, None, None, None, None)
 
       (Json.toJson(testRequest)).as[SubscriptionRequest].tradingPremisesSection.get.size must be(1)
 
@@ -85,7 +85,7 @@ class SubscriptionRequestSpec extends PlaySpec with MockitoSugar {
       val emptyRp = ResponsiblePerson()
       val sequenceOfRps = Seq(nonEmptyRp, emptyRp)
 
-      val testRequest = SubscriptionRequest(None, None, None, None, None, None, None, Some(sequenceOfRps), None, None, None, None, None)
+      val testRequest = SubscriptionRequest(None, None, None, None, None, None, None, Some(sequenceOfRps), None, None, None, None, None, None)
 
       (Json.toJson(testRequest)).as[SubscriptionRequest].responsiblePeopleSection.get.size must be(1)
 

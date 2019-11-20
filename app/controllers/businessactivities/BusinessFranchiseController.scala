@@ -19,20 +19,20 @@ package controllers.businessactivities
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.{DefaultBaseController}
 import models.businessactivities.{BusinessActivities, _}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.businessactivities._
 
 import scala.concurrent.Future
 
-class BusinessFranchiseController @Inject() ( val dataCacheConnector: DataCacheConnector,
-                                              override val authConnector: AuthConnector
-                                            ) extends BaseController {
+class BusinessFranchiseController @Inject() (val dataCacheConnector: DataCacheConnector,
+                                            val authAction: AuthAction
+                                            ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+   implicit request =>
+      dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
         response =>
           val form: Form2[BusinessFranchise] = (for {
             businessActivities <- response
@@ -42,15 +42,15 @@ class BusinessFranchiseController @Inject() ( val dataCacheConnector: DataCacheC
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request => {
       Form2[BusinessFranchise](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(business_franchise_name(f, edit)))
         case ValidForm(_, data) =>
           for {
-            businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key,
+            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
               businessActivities.businessFranchise(data)
             )
           } yield edit match {

@@ -1,0 +1,1 @@
+ + [AMLS-5485] - 'Fixed colour of login event button'

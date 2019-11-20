@@ -16,6 +16,7 @@
 
 package controllers.supervision
 
+import controllers.actions.SuccessfulAuthAction
 import models.supervision._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -31,7 +32,7 @@ class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with Scala
     self =>
     val request = addToken(authRequest)
 
-    val controller = new SupervisionEndController(mockCacheConnector, authConnector = self.authConnector)
+    val controller = new SupervisionEndController(mockCacheConnector, authAction = SuccessfulAuthAction)
   }
 
   "SupervisionEndController" must {

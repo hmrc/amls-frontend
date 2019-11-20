@@ -17,15 +17,15 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople._
-import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
@@ -36,7 +36,7 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
     self =>
     val request = addToken(authRequest)
     val dataCache: DataCacheConnector = mock[DataCacheConnector]
-    val controller = new MovedAddressController(messagesApi, self.dataCache, self.authConnector)
+    val controller = new MovedAddressController(messagesApi, self.dataCache, SuccessfulAuthAction)
 
   }
 
@@ -64,7 +64,7 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
         when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
           .thenReturn(Some(responsiblePerson))
 
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get(1)(request)
@@ -78,7 +78,7 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
         when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
           .thenReturn(None)
 
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get(1)(request)
@@ -102,11 +102,11 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
         when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
           .thenReturn(Some(responsiblePerson))
 
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get(1)(request)
-        redirectLocation(result) must be(Some(routes.CurrentAddressController.get(1,true).url))
+        redirectLocation(result) must be(Some(address.routes.CurrentAddressController.get(1,true).url))
         status(result) must be(SEE_OTHER)
 
       }
@@ -134,7 +134,7 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
             .thenReturn(Some(Seq(ResponsiblePerson())))
 
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(1)(newRequest)
@@ -149,7 +149,7 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
           val result = controller.post(1)(newRequest)
           status(result) must be (SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.CurrentAddressController.get(1, true).url))
+          redirectLocation(result) must be(Some(address.routes.CurrentAddressController.get(1, true).url))
         }
       }
 
@@ -172,11 +172,11 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
         when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
           .thenReturn(Some(responsiblePerson))
 
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.post(1)(newRequest)
-        redirectLocation(result) must be(Some(routes.CurrentAddressController.get(1,true).url))
+        redirectLocation(result) must be(Some(address.routes.CurrentAddressController.get(1,true).url))
         status(result) must be(SEE_OTHER)
       }
 
@@ -190,7 +190,7 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
         when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
           .thenReturn(None)
 
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.post(1)(newRequest)
@@ -208,7 +208,7 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
         when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
           .thenReturn(Some(responsiblePerson))
 
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.post(1)(newRequest)

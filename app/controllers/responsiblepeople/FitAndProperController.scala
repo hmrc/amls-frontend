@@ -19,33 +19,30 @@ package controllers.responsiblepeople
 import javax.inject.{Inject, Singleton}
 import config.AppConfig
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{Form2, _}
 import models.businessmatching.BusinessMatching
 import models.responsiblepeople.ResponsiblePerson
 import play.api.mvc.{AnyContent, Request, Result}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
 @Singleton
 class FitAndProperController @Inject()(
                                         val dataCacheConnector: DataCacheConnector,
-                                        val authConnector: AuthConnector,
+                                        authAction: AuthAction,
                                         appConfig: AppConfig
-                                      ) extends RepeatingSection with BaseController {
+                                      ) extends RepeatingSection with DefaultBaseController {
 
   val FIELDNAME = "hasAlreadyPassedFitAndProper"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(FIELDNAME)
   implicit val boolRead = utils.BooleanFormReadWrite.formRule(FIELDNAME, "error.required.rp.fit_and_proper")
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext => implicit request =>
-
-      getData[ResponsiblePerson](index) map {
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
+    implicit request =>
+      getData[ResponsiblePerson](request.credId, index) map {
         case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,alreadyPassed,_,_,_,_,_,_))
           if alreadyPassed.hasAlreadyPassedFitAndProper.isDefined =>
           Ok(views.html.responsiblepeople.fit_and_proper(Form2[Boolean](alreadyPassed.hasAlreadyPassedFitAndProper.get),
@@ -58,17 +55,16 @@ class FitAndProperController @Inject()(
   }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = {
-    Authorised.async {
-      implicit authContext =>
+    authAction.async {
         implicit request =>
           Form2[Boolean](request.body) match {
             case f: InvalidForm =>
-              getData[ResponsiblePerson](index) map { rp =>
+              getData[ResponsiblePerson](request.credId, index) map { rp =>
                 BadRequest(views.html.responsiblepeople.fit_and_proper(f, edit, index, flow,
                   ControllerHelper.rpTitleName(rp)))
               }
             case ValidForm(_, data) => {
-              dataCacheConnector.fetchAll flatMap { maybeCache =>
+              dataCacheConnector.fetchAll(request.credId) flatMap { maybeCache =>
 
                 val businessMatching = for {
                   cacheMap <- maybeCache
@@ -79,7 +75,7 @@ class FitAndProperController @Inject()(
                   ControllerHelper.isTCSPSelected(Some(businessMatching))
 
                 for {
-                  cacheMap <- fetchAllAndUpdateStrict[ResponsiblePerson](index) { (_, rp) =>
+                  cacheMap <- fetchAllAndUpdateStrict[ResponsiblePerson](request.credId, index) { (_, rp) =>
                       rp.updateFitAndProperAndApproval(data, msbOrTcsp)
                   }
                 } yield identifyRoutingTarget(index, edit, cacheMap, data, msbOrTcsp, flow)
@@ -97,7 +93,7 @@ class FitAndProperController @Inject()(
                                     fitAndProperAnswer: Boolean,
                                     msbOrTscp: Boolean,
                                     flow: Option[String])
-                                   (implicit authContext: AuthContext, request: Request[AnyContent]): Result = {
+                                   (implicit request: Request[AnyContent]): Result = {
     (edit, fitAndProperAnswer) match {
       case (true, false) => routeMsbOrTcsb(index, cacheMapOpt, fitAndProperAnswer, msbOrTscp, flow)
       case (false, false) => routeMsbOrTcsb(index, cacheMapOpt, fitAndProperAnswer, msbOrTscp, flow)
@@ -110,7 +106,7 @@ class FitAndProperController @Inject()(
                              fitAndProperAnswer: Boolean,
                              msbOrTscp: Boolean,
                              flow: Option[String])
-                            (implicit authContext: AuthContext, request: Request[AnyContent]):Result = {
+                            (implicit request: Request[AnyContent]):Result = {
     if (msbOrTscp) {
       Redirect(routes.DetailedAnswersController.get(index, flow))
     } else {

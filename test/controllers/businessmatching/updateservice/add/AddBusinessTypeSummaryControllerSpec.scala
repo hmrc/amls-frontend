@@ -19,11 +19,13 @@ package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
+import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
+import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.businessmatching._
-import models.businessmatching.updateservice.{ServiceChangeRegister, TradingPremisesActivities}
+import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, ServiceChangeRegister, TradingPremisesActivities}
 import models.flowmanagement.{AddBusinessTypeFlowModel, AddBusinessTypeSummaryPageId}
 import models.responsiblepeople.ResponsiblePerson
 import models.status.SubmissionDecisionApproved
@@ -37,7 +39,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.TradingPremisesService
 import services.businessmatching.BusinessMatchingService
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -45,7 +47,7 @@ import scala.concurrent.Future
 class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
   with MockitoSugar
   with TradingPremisesGenerator
-  with BusinessMatchingGenerator {
+  with BusinessMatchingGenerator with ResponsiblePersonGenerator {
 
   sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
@@ -57,7 +59,7 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
     val controller = new AddBusinessTypeSummaryController(
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       dataCacheConnector = mockCacheConnector,
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,
@@ -66,13 +68,21 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
       tradingPremisesService = mockTradingPremisesService
     )
 
-    val flowModel = AddBusinessTypeFlowModel(
-      Some(HighValueDealing),
-      Some(true),
-      Some(TradingPremisesActivities(Set(0)))
+    val flowModel = AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices),
+        areNewActivitiesAtTradingPremises = Some(true),
+        tradingPremisesActivities = Some(TradingPremisesActivities(Set(1))),
+        addMoreActivities = None,
+        fitAndProper = Some(true),
+        responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1))),
+        hasChanged = true,
+        hasAccepted = false,
+        businessAppliedForPSRNumber = None,
+        subSectors = None,
+        tradingPremisesMsbServices = None
     )
 
-    mockCacheFetch(Some(flowModel))
+    mockCacheFetch[AddBusinessTypeFlowModel](Some(flowModel))
+
     mockApplicationStatus(SubmissionDecisionApproved)
   }
 
@@ -81,6 +91,18 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
 
     "get is called" must {
       "return OK with update_service_summary view" in new Fixture {
+
+        val responsiblePeople: Seq[ResponsiblePerson] = Gen.listOfN(5, responsiblePersonGen).sample.get
+
+        val tradingPremises: Seq[TradingPremises] = Gen.listOfN(5, tradingPremisesGen).sample.get
+
+        when {
+          controller.helper.filteredTps(any(), eqTo(flowModel))(any())
+        } thenReturn OptionT.fromOption[Future](Some(tradingPremises.zipWithIndex))
+
+        when {
+          controller.helper.filteredRps(any(), eqTo(flowModel))(any())
+        } thenReturn OptionT.fromOption[Future](Some(responsiblePeople.zipWithIndex))
 
         val result = controller.get()(request)
 
@@ -112,15 +134,15 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
         )
 
         when {
-          controller.helper.updateTradingPremises(eqTo(flowModel))(any(), any())
+          controller.helper.updateTradingPremises(any(), eqTo(flowModel))(any())
         } thenReturn OptionT.fromOption[Future](Some(modifiedTradingPremises))
 
         when {
-          controller.helper.updateBusinessMatching(any())(any(), any())
+          controller.helper.updateBusinessMatching(any(), any())(any())
         } thenReturn OptionT.fromOption[Future](Some(businessMatchingModel))
 
         when {
-          controller.helper.updateServicesRegister(any())(any(), any())
+          controller.helper.updateServicesRegister(any(), any())(any())
         } thenReturn OptionT.some[Future, ServiceChangeRegister](serviceChangeRegister)
 
         when {
@@ -128,30 +150,30 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
         } thenReturn modifiedTradingPremises
 
         when {
-          controller.helper.updateHasAcceptedFlag(eqTo(flowModel))(any(), any())
+          controller.helper.updateHasAcceptedFlag(any(), eqTo(flowModel))(any())
         } thenReturn OptionT.fromOption[Future](Some(mockCacheMap))
 
         when {
-          controller.helper.updateBusinessActivities(any())(any(), any())
+          controller.helper.updateBusinessActivities(any(), any())(any())
         } thenReturn OptionT.some[Future, models.businessactivities.BusinessActivities](mock[models.businessactivities.BusinessActivities])
 
         when {
-          controller.helper.updateSupervision(any(), any())
+          controller.helper.updateSupervision(any())(any())
         } thenReturn OptionT.some[Future, Supervision](Supervision())
 
         when {
-          controller.helper.updateResponsiblePeople(any())(any(), any())
+          controller.helper.updateResponsiblePeople(any(), any())(any())
         } thenReturn OptionT.some[Future, Seq[ResponsiblePerson]](Seq.empty)
 
         when {
-          controller.helper.clearFlowModel()(any(), any())
+          controller.helper.clearFlowModel(any())(any())
         } thenReturn OptionT.some[Future, AddBusinessTypeFlowModel](AddBusinessTypeFlowModel())
 
         val result = controller.post()(request)
 
         status(result) must be(SEE_OTHER)
 
-        controller.router.verify(AddBusinessTypeSummaryPageId, flowModel)
+        controller.router.verify("internalId", AddBusinessTypeSummaryPageId, flowModel)
       }
     }
   }

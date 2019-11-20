@@ -16,6 +16,7 @@
 
 package controllers.asp
 
+import controllers.actions.SuccessfulAuthAction
 import models.asp.{Asp, OtherBusinessTaxMattersYes}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -39,13 +40,11 @@ class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar w
     self =>
     val request = addToken(authRequest)
 
-    val controller = new OtherBusinessTaxMattersController(mockCacheConnector, authConnector = self.authConnector)
+    mockCacheFetch[Asp](None)
 
-    when(controller.dataCacheConnector.fetch[Asp](any())
-      (any(), any(), any())).thenReturn(Future.successful(None))
+    mockCacheSave[Asp]
 
-    when(controller.dataCacheConnector.save[Asp](any(), any())
-      (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+    val controller = new OtherBusinessTaxMattersController(mockCacheConnector, authAction = SuccessfulAuthAction)
 
     val newRequest = request.withFormUrlEncodedBody(
       "otherBusinessTaxMatters" -> "true"
@@ -62,8 +61,8 @@ class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar w
       }
 
       "display the the Does your business use the services of another Trust or Company Service Provider page with pre populated data" in new Fixture {
-        when(controller.dataCacheConnector.fetch[Asp](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Asp(otherBusinessTaxMatters = Some(OtherBusinessTaxMattersYes)))))
+        when(controller.dataCacheConnector.fetch[Asp](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(Asp(otherBusinessTaxMatters = Some(OtherBusinessTaxMattersYes)))))
 
         val result = controller.get()(request)
         status(result) must be(OK)

@@ -16,6 +16,7 @@
 
 package controllers.msb
 
+import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
@@ -35,7 +36,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
     self => val request = addToken(authRequest)
 
     val controller = new SendTheLargestAmountsOfMoneyController(
-      self.authConnector,
+      SuccessfulAuthAction,
       mockCacheConnector,
       mockStatusService,
       mockServiceFlow,
@@ -49,7 +50,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
 
   "SendTheLargestAmountsOfMoneyController" must {
     "load the 'Where to Send The Largest Amounts Of Money' page" in new Fixture  {
-      mockIsNewActivity(false)
+      mockIsNewActivityNewAuth(false)
       mockApplicationStatus(NotCompleted)
       mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
 
@@ -66,7 +67,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
       val msb = Some(MoneyServiceBusiness(
         sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB"))))))
 
-      mockIsNewActivity(false)
+      mockIsNewActivityNewAuth(false)
       mockApplicationStatus(NotCompleted)
       mockCacheFetch[MoneyServiceBusiness](msb, Some(MoneyServiceBusiness.key))
 
@@ -82,7 +83,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
       "application is in variation mode and a service has just been added" in new Fixture {
         mockApplicationStatus(SubmissionDecisionApproved)
         mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
-        mockIsNewActivity(true, Some(MoneyServiceBusinessActivity))
+        mockIsNewActivityNewAuth(true, Some(MoneyServiceBusinessActivity))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -92,7 +93,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
       "application is in variation mode and no service has been added" in new Fixture {
         mockApplicationStatus(SubmissionDecisionApproved)
         mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
-        mockIsNewActivity(false)
+        mockIsNewActivityNewAuth(false)
 
         val result = controller.get()(request)
         status(result) must be(OK)

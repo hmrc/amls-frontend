@@ -21,7 +21,6 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.AmlsSpec
 
 class EstateAgentBusinessSpec extends AmlsSpec {
@@ -172,7 +171,6 @@ class EstateAgentBusinessSpec extends AmlsSpec {
 
     "return `Started` section when there is a section which isn't completed" in {
       implicit val cache = mock[CacheMap]
-      implicit val ac = mock[AuthContext]
       when {
         cache.getEntry[EstateAgentBusiness](eqTo(EstateAgentBusiness.key))(any())
       } thenReturn Some(incompleteModel)
@@ -181,7 +179,6 @@ class EstateAgentBusinessSpec extends AmlsSpec {
 
     "return `Completed` section when there is a section which is completed" in {
       implicit val cache = mock[CacheMap]
-      implicit val ac = mock[AuthContext]
       when {
         cache.getEntry[EstateAgentBusiness](eqTo(EstateAgentBusiness.key))(any())
       } thenReturn Some(completeModel)

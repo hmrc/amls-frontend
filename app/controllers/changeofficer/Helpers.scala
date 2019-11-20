@@ -20,7 +20,6 @@ import cats.data.OptionT
 import connectors.DataCacheConnector
 import models.changeofficer.NewOfficer
 import models.responsiblepeople.{NominatedOfficer, ResponsiblePerson}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.StatusConstants
 
 import scala.concurrent.Future
@@ -28,12 +27,11 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 object Helpers {
 
-  def getNominatedOfficerName()(implicit authContext: AuthContext,
-                                headerCarrier: HeaderCarrier,
+  def getNominatedOfficerName(credId: String)(implicit headerCarrier: HeaderCarrier,
                                 dataCacheConnector: DataCacheConnector,
                                 f: cats.Monad[Future]): OptionT[Future, String] = {
     for {
-      people <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key))
+      people <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePerson]](credId, ResponsiblePerson.key))
       (nominatedOfficer, _) <- OptionT.fromOption[Future](getOfficer(ResponsiblePerson.filterWithIndex(people)))
       name <- OptionT.fromOption[Future](nominatedOfficer.personName)
     } yield {
@@ -49,12 +47,11 @@ object Helpers {
     }
   }
 
-  def getNominatedOfficerWithIndex()(implicit authContext: AuthContext,
-                                headerCarrier: HeaderCarrier,
+  def getNominatedOfficerWithIndex(credId: String)(implicit headerCarrier: HeaderCarrier,
                                 dataCacheConnector: DataCacheConnector,
                                 f: cats.Monad[Future]): OptionT[Future, (ResponsiblePerson, Int)] = {
     for {
-      people <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key))
+      people <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePerson]](credId: String, ResponsiblePerson.key))
       nominatedOfficer <- OptionT.fromOption[Future](getOfficer(people.zipWithIndex))
     } yield nominatedOfficer
   }

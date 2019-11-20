@@ -17,40 +17,36 @@
 package controllers.estateagentbusiness
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.DateOfChange
 import models.businessdetails.BusinessDetails
-import models.estateagentbusiness.EstateAgentBusiness
+import models.estateagentbusiness.{EstateAgentBusiness, Residential}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.date_of_change
 
 import scala.concurrent.Future
 
-class ServicesDateOfChangeController  @Inject()(
-                                                 val dataCacheConnector: DataCacheConnector,
-                                                 val authConnector: AuthConnector) extends BaseController {
+class ServicesDateOfChangeController  @Inject()( val dataCacheConnector: DataCacheConnector,
+                                                 val authAction: AuthAction) extends DefaultBaseController {
 
-  def get = Authorised.async {
-    implicit authContext =>
+  def get = authAction.async {
       implicit request =>
         Future.successful(Ok(date_of_change(EmptyForm, "summary.estateagentbusiness", routes.ServicesDateOfChangeController.post())))
   }
 
-  def post = Authorised.async {
-    implicit authContext =>
+  def post = authAction.async {
       implicit request =>
-        getModelWithDateMap() flatMap {
+        getModelWithDateMap(request.credId) flatMap {
           case (eab, startDate) =>
             Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDate) match {
               case f: InvalidForm =>
                 Future.successful(BadRequest(date_of_change(f, "summary.estateagentbusiness", routes.ServicesDateOfChangeController.post())))
               case ValidForm(_, data) => {
                 for {
-                  _ <- dataCacheConnector.save[EstateAgentBusiness](EstateAgentBusiness.key,
+                  _ <- dataCacheConnector.save[EstateAgentBusiness](request.credId, EstateAgentBusiness.key,
                     eab.services match {
                       case Some(service) => {
                         eab.copy(services = Some(service.copy(dateOfChange = Some(data))))
@@ -58,15 +54,18 @@ class ServicesDateOfChangeController  @Inject()(
                       case None => eab
                     })
                 } yield {
-                  Redirect(routes.SummaryController.get())
+                  eab.services.map(candidate => candidate.services.contains(Residential)) match {
+                    case Some(true) => Redirect(routes.ResidentialRedressSchemeController.get(true))
+                    case _          => Redirect(routes.SummaryController.get())
+                  }
                 }
               }
             }
         }
   }
 
-  private def getModelWithDateMap()(implicit authContext: AuthContext, hc: HeaderCarrier): Future[(EstateAgentBusiness, Map[_ <: String, Seq[String]])] = {
-    dataCacheConnector.fetchAll map {
+  private def getModelWithDateMap(credId:String)(implicit hc: HeaderCarrier): Future[(EstateAgentBusiness, Map[_ <: String, Seq[String]])] = {
+    dataCacheConnector.fetchAll(credId) map {
       optionalCache =>
         (for {
           cache <- optionalCache

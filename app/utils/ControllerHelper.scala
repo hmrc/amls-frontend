@@ -18,6 +18,7 @@ package utils
 
 import cats.implicits._
 import connectors.DataCacheConnector
+import forms.InvalidForm
 import models.businessactivities.{BusinessActivities => BA}
 import models.businessmatching._
 import models.businessmatching.updateservice.ServiceChangeRegister
@@ -34,8 +35,6 @@ import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -104,18 +103,20 @@ object ControllerHelper {
   //For repeating section
 
 
-  def allowedToEdit(implicit statusService: StatusService, hc: HeaderCarrier, auth: AuthContext): Future[Boolean] = {
-    statusService.getStatus map {
+  def allowedToEdit(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)
+                   (implicit statusService: StatusService, hc: HeaderCarrier): Future[Boolean] = {
+    statusService.getStatus(amlsRegistrationNo, accountTypeId, credId) map {
       case SubmissionReady | NotCompleted | SubmissionReadyForReview  => true
       case _ => false
     }
   }
 
-  def allowedToEdit(activity: BusinessActivity, msbSubSector: Option[BusinessMatchingMsbService] = None)
-                   (implicit statusService: StatusService, cacheConnector: DataCacheConnector, hc: HeaderCarrier, auth: AuthContext, serviceFlow: ServiceFlow): Future[Boolean] = for {
-    status <- statusService.getStatus
-    isNewActivity <- serviceFlow.isNewActivity(activity)
-    changeRegister <- cacheConnector.fetch[ServiceChangeRegister](ServiceChangeRegister.key)
+  def allowedToEdit(activity: BusinessActivity, msbSubSector: Option[BusinessMatchingMsbService] = None,
+                    amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)
+                   (implicit statusService: StatusService, cacheConnector: DataCacheConnector, hc: HeaderCarrier, serviceFlow: ServiceFlow): Future[Boolean] = for {
+    status <- statusService.getStatus(amlsRegistrationNo, accountTypeId, credId)
+    isNewActivity <- serviceFlow.isNewActivity(credId, activity)
+    changeRegister <- cacheConnector.fetch[ServiceChangeRegister](credId, ServiceChangeRegister.key)
   } yield (status, isNewActivity, changeRegister, msbSubSector) match {
     case (SubmissionDecisionApproved | ReadyForRenewal(_), _, Some(c), Some(m)) if c.addedSubSectors.fold(false)(_.contains(m)) => true
     case (_, true, _, _) => true
@@ -196,5 +197,26 @@ object ControllerHelper {
     case AnotherBodyYes(_, Some(_), Some(_), Some(_)) => true
     case AnotherBodyNo => true
     case _ => false
+  }
+
+  def stripEmptyValuesFromFormWithArray(form: InvalidForm, arrayName: String, indexUpdater: Int => Int = a => a): InvalidForm = {
+
+    def removeEmptyFieldsFromFormData(f: Map[String, Seq[String]]): Map[String, Seq[String]] = f
+      .filter(field => field._1.contains(arrayName))
+      .filter(field => field._2.exists(s => s.nonEmpty))
+
+    def updateIndexesInFormData(formData: Map[String, Seq[String]]): Map[String, Seq[String]] = {
+      def updateIndexesInFormKeys(formKey: String, index: Int)= formKey.replaceFirst("[\\d]", s"${indexUpdater(index)}")
+      formData.zipWithIndex
+        .map((fieldAndIndex: ((String, Seq[String]), Int)) =>
+          ( updateIndexesInFormKeys(formKey = fieldAndIndex._1._1, index = fieldAndIndex._2), fieldAndIndex._1._2 )
+        )
+    }
+
+    val csrfToken = form.data.head
+    val nonEmptyFormData:Map[String, Seq[String]] = removeEmptyFieldsFromFormData(form.data.tail)
+    val reindexedNonEmptyFormData = updateIndexesInFormData(nonEmptyFormData)
+
+    form.copy(data = reindexedNonEmptyFormData + csrfToken)
   }
 }

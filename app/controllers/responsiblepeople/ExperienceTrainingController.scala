@@ -18,46 +18,31 @@ package controllers.responsiblepeople
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms._
-import models.businessmatching.{BusinessActivities, BusinessMatching}
+import models.businessmatching.BusinessMatching
 import models.responsiblepeople.{ExperienceTraining, ResponsiblePerson}
 import play.api.Logger
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{ControllerHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.experience_training
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 class ExperienceTrainingController @Inject () (
                                               val dataCacheConnector: DataCacheConnector,
-                                              val authConnector: AuthConnector
-                                              ) extends RepeatingSection with BaseController {
+                                              authAction: AuthAction
+                                              ) extends RepeatingSection with DefaultBaseController {
 
-
-
-  private def businessMatchingData(implicit ac: AuthContext, hc: HeaderCarrier): Future[BusinessMatching] = {
-    dataCacheConnector.fetchAll map {
-      cache =>
-        Logger.debug(cache.toString)
-        (for {
-          c <- cache
-          businessMatching <- c.getEntry[BusinessMatching](BusinessMatching.key)
-        } yield businessMatching).getOrElse(BusinessMatching())
-    }
-  }
-
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-      implicit authContext => implicit request =>
-        businessMatchingData flatMap {
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
+      implicit request =>
+        businessMatchingData(request.credId) flatMap {
           bm =>
-            getData[ResponsiblePerson](index) map {
+            getData[ResponsiblePerson](request.credId, index) map {
               case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_, Some(experienceTraining),_,_,_,_,_,_,_,_))
-              => Ok(experience_training(Form2[ExperienceTraining](experienceTraining), bm.prefixedAlphabeticalBusinessTypes, edit, index, flow, personName.titleName))
+              => Ok(experience_training(Form2[ExperienceTraining](experienceTraining), bm, edit, index, flow, personName.titleName))
               case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-              => Ok(experience_training(EmptyForm, bm.prefixedAlphabeticalBusinessTypes, edit, index, flow, personName.titleName))
+              => Ok(experience_training(EmptyForm, bm, edit, index, flow, personName.titleName))
               case _
               => NotFound(notFoundView)
             }
@@ -65,18 +50,18 @@ class ExperienceTrainingController @Inject () (
     }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
-    Authorised.async {
-      implicit authContext => implicit request => {
-        businessMatchingData flatMap {
+    authAction.async {
+      implicit request => {
+        businessMatchingData(request.credId) flatMap {
           bm =>
             Form2[ExperienceTraining](request.body) match {
               case f: InvalidForm =>
-                getData[ResponsiblePerson](index) map { rp =>
-                  BadRequest(views.html.responsiblepeople.experience_training(f, bm.prefixedAlphabeticalBusinessTypes, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+                getData[ResponsiblePerson](request.credId, index) map { rp =>
+                  BadRequest(views.html.responsiblepeople.experience_training(f, bm, edit, index, flow, ControllerHelper.rpTitleName(rp)))
                 }
               case ValidForm(_, data) => {
                 for {
-                  result <- updateDataStrict[ResponsiblePerson](index) { rp => rp.experienceTraining(data) }
+                  result <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp => rp.experienceTraining(data) }
                 } yield if (edit) {
                   Redirect(routes.DetailedAnswersController.get(index, flow))
                 } else {
@@ -89,4 +74,15 @@ class ExperienceTrainingController @Inject () (
         }
       }
     }
+
+  private def businessMatchingData(credId: String)(implicit hc: HeaderCarrier): Future[BusinessMatching] = {
+    dataCacheConnector.fetchAll(credId) map {
+      cache =>
+        Logger.debug(cache.toString)
+        (for {
+          c <- cache
+          businessMatching <- c.getEntry[BusinessMatching](BusinessMatching.key)
+        } yield businessMatching).getOrElse(BusinessMatching())
+    }
+  }
 }

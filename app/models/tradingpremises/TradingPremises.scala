@@ -86,6 +86,19 @@ case class TradingPremises(
 
   def isComplete: Boolean = {
     this match {
+
+      case TradingPremises(Some(RegisteringAgentPremises(true)), _, None, _, _, _, _, _, _, _, _, _, _, _, _) =>
+        false
+
+      case TradingPremises(Some(RegisteringAgentPremises(true)), _, Some(Partnership), _, _, None, _, _, _, _, _, _, _, _, _) =>
+        false
+
+      case TradingPremises(Some(RegisteringAgentPremises(true)), _, Some(LimitedLiabilityPartnership | IncorporatedBody),
+        _, None, _, _, _, _, _, _, _, _, _, _) => false
+
+      case TradingPremises(Some(RegisteringAgentPremises(true)), _, Some(SoleProprietor), None, _, _, _, _, _, _, _, _, _, _, _) =>
+        false
+
       case TradingPremises(_, _, Some(_), Some(_), Some(_), Some(_), maybeActivities, maybeSubSectors, _, _, _, _, _, _, true)
         if activitiesAreValid(maybeActivities, maybeSubSectors) => true
 
@@ -111,8 +124,6 @@ object TradingPremises {
   import play.api.libs.json._
 
   val key = "trading-premises"
-
-  implicit val formatOption = Reads.optionWithNull[Seq[TradingPremises]]
 
   def anyChanged(newModel: Seq[TradingPremises]): Boolean = newModel exists {
     _.hasChanged
@@ -205,6 +216,8 @@ object TradingPremises {
   }
 
   implicit val writes: Writes[TradingPremises] = Json.writes[TradingPremises]
+
+  implicit val formatOption = Reads.optionWithNull[Seq[TradingPremises]]
 
   implicit def default(tradingPremises: Option[TradingPremises]): TradingPremises =
     tradingPremises.getOrElse(TradingPremises())

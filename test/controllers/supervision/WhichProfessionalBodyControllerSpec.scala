@@ -16,6 +16,7 @@
 
 package controllers.supervision
 
+import controllers.actions.SuccessfulAuthAction
 import models.supervision._
 import org.jsoup.Jsoup
 import org.scalatest.mock.MockitoSugar
@@ -24,7 +25,7 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with MockitoSugar {
 
@@ -32,14 +33,11 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
 
     val request = addToken(authRequest)
 
-    val controller = new WhichProfessionalBodyController(
-      mockCacheConnector,
-      self.authConnector
+    val controller = new WhichProfessionalBodyController(mockCacheConnector,
+                                                         authAction = SuccessfulAuthAction
     )
-
     mockCacheFetch[Supervision](Some(Supervision()))
     mockCacheSave[Supervision]
-
   }
 
   "WhichProfessionalBodyControllerSpec" when {
@@ -115,7 +113,6 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
             redirectLocation(result) must be(Some(routes.SummaryController.get().url))
           }
         }
-
       }
 
       "invalid data" must {
@@ -127,9 +124,7 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
           status(result) must be(BAD_REQUEST)
         }
       }
-
     }
-
   }
 
   it must {
@@ -143,12 +138,10 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
 
-      verify(controller.dataCacheConnector).save[Supervision](any(),eqTo(Supervision(
+      verify(controller.dataCacheConnector).save[Supervision](any(), any(), eqTo(Supervision(
         professionalBodies = Some(ProfessionalBodies(Set(AccountingTechnicians, CharteredCertifiedAccountants))),
         hasChanged = true
-      )))(any(),any(),any())
-
+      )))(any(),any())
     }
   }
-
 }

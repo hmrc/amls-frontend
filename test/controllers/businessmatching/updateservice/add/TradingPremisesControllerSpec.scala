@@ -16,6 +16,7 @@
 
 package controllers.businessmatching.updateservice.add
 
+import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
@@ -24,7 +25,7 @@ import models.status.SubmissionDecisionApproved
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class TradingPremisesControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
 
@@ -36,7 +37,7 @@ class TradingPremisesControllerSpec extends AmlsSpec with BusinessMatchingGenera
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
     val controller = new TradingPremisesController(
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       dataCacheConnector = mockCacheConnector,
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,
@@ -77,7 +78,7 @@ class TradingPremisesControllerSpec extends AmlsSpec with BusinessMatchingGenera
 
             status(result) mustBe SEE_OTHER
 
-            controller.router.verify(TradingPremisesPageId,
+            controller.router.verify("internalId", TradingPremisesPageId,
               AddBusinessTypeFlowModel(areNewActivitiesAtTradingPremises = Some(true), hasChanged = true))
           }
         }
@@ -93,7 +94,7 @@ class TradingPremisesControllerSpec extends AmlsSpec with BusinessMatchingGenera
 
               status(result) mustBe SEE_OTHER
 
-              controller.router.verify(TradingPremisesPageId,
+              controller.router.verify("internalId", TradingPremisesPageId,
                 AddBusinessTypeFlowModel(Some(HighValueDealing), areNewActivitiesAtTradingPremises = Some(false), hasChanged = true))
             }
           }

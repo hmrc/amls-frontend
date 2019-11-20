@@ -1,20 +1,20 @@
-GET         /add-more-activities                                       @controllers.businessmatching.updateservice.add.AddMoreBusinessTypesController.get()
-POST        /add-more-activities                                       @controllers.businessmatching.updateservice.add.AddMoreBusinessTypesController.post()
+GET         /add-another-service                                       @controllers.businessmatching.updateservice.add.AddMoreBusinessTypesController.get()
+POST        /add-another-service                                       @controllers.businessmatching.updateservice.add.AddMoreBusinessTypesController.post()
 
-GET         /activities-select                                         @controllers.businessmatching.updateservice.add.SelectBusinessTypeController.get(edit: Boolean ?= false)
-POST        /activities-select                                         @controllers.businessmatching.updateservice.add.SelectBusinessTypeController.post(edit: Boolean ?= false)
+GET         /register-services                                         @controllers.businessmatching.updateservice.add.SelectBusinessTypeController.get(edit: Boolean ?= false)
+POST        /register-services                                         @controllers.businessmatching.updateservice.add.SelectBusinessTypeController.post(edit: Boolean ?= false)
 
 GET         /trading-premises                                          @controllers.businessmatching.updateservice.add.TradingPremisesController.get(edit: Boolean ?= false)
 POST        /trading-premises                                          @controllers.businessmatching.updateservice.add.TradingPremisesController.post(edit: Boolean ?= false)
 
-GET         /which-trading-premises                                    @controllers.businessmatching.updateservice.add.WhichTradingPremisesController.get(edit: Boolean ?= false)
-POST        /which-trading-premises                                    @controllers.businessmatching.updateservice.add.WhichTradingPremisesController.post(edit: Boolean ?= false)
+GET         /activities-at-trading-premises                            @controllers.businessmatching.updateservice.add.WhichTradingPremisesController.get(edit: Boolean ?= false)
+POST        /activities-at-trading-premises                            @controllers.businessmatching.updateservice.add.WhichTradingPremisesController.post(edit: Boolean ?= false)
 
 GET         /fit-and-proper                                            @controllers.businessmatching.updateservice.add.FitAndProperController.get(edit: Boolean ?= false)
 POST        /fit-and-proper                                            @controllers.businessmatching.updateservice.add.FitAndProperController.post(edit: Boolean ?= false)
 
-GET         /which-fit-and-proper                                      @controllers.businessmatching.updateservice.add.WhichFitAndProperController.get(edit: Boolean ?= false)
-POST        /which-fit-and-proper                                      @controllers.businessmatching.updateservice.add.WhichFitAndProperController.post(edit: Boolean ?= false)
+GET         /which-responsible-people-fit-and-proper                   @controllers.businessmatching.updateservice.add.WhichFitAndProperController.get(edit: Boolean ?= false)
+POST        /which-responsible-people-fit-and-proper                   @controllers.businessmatching.updateservice.add.WhichFitAndProperController.post(edit: Boolean ?= false)
 
 GET         /new-service-information                                   @controllers.businessmatching.updateservice.add.NeedMoreInformationController.get()
 POST        /new-service-information                                   @controllers.businessmatching.updateservice.add.NeedMoreInformationController.post()
@@ -22,23 +22,23 @@ POST        /new-service-information                                   @controll
 GET         /check-your-answers                                        @controllers.businessmatching.updateservice.add.AddBusinessTypeSummaryController.get()
 POST        /check-your-answers                                        @controllers.businessmatching.updateservice.add.AddBusinessTypeSummaryController.post()
 
-GET         /sub-services                                              @controllers.businessmatching.updateservice.add.SubSectorsController.get(edit: Boolean ?= false)
-POST        /sub-services                                              @controllers.businessmatching.updateservice.add.SubSectorsController.post(edit: Boolean ?= false)
+GET         /money-service-business-activities                         @controllers.businessmatching.updateservice.add.SubSectorsController.get(edit: Boolean ?= false)
+POST        /money-service-business-activities                         @controllers.businessmatching.updateservice.add.SubSectorsController.post(edit: Boolean ?= false)
 
 GET         /psr-registration                                          @controllers.businessmatching.updateservice.add.BusinessAppliedForPSRNumberController.get(edit: Boolean ?= false)
 POST        /psr-registration                                          @controllers.businessmatching.updateservice.add.BusinessAppliedForPSRNumberController.post(edit: Boolean ?= false)
 
-GET         /what-do-you-do-here                                       @controllers.businessmatching.updateservice.add.WhatDoYouDoHereController.get(edit: Boolean ?= false)
-POST        /what-do-you-do-here                                       @controllers.businessmatching.updateservice.add.WhatDoYouDoHereController.post(edit: Boolean ?= false)
+GET         /money-service-business-activities-at-trading-premises     @controllers.businessmatching.updateservice.add.WhatDoYouDoHereController.get(edit: Boolean ?= false)
+POST        /money-service-business-activities-at-trading-premises     @controllers.businessmatching.updateservice.add.WhatDoYouDoHereController.post(edit: Boolean ?= false)
 
-GET         /no-psr                                                    @controllers.businessmatching.updateservice.add.NoPsrController.get()
-POST        /no-psr                                                    @controllers.businessmatching.updateservice.add.NoPsrController.post()
+GET         /no-psr-number                                             @controllers.businessmatching.updateservice.add.NoPsrController.get()
+POST        /no-psr-number                                             @controllers.businessmatching.updateservice.add.NoPsrController.post()
 
-GET         /activities-remove                                         @controllers.businessmatching.updateservice.remove.RemoveBusinessTypesController.get(edit: Boolean ?= false)
-POST        /activities-remove                                         @controllers.businessmatching.updateservice.remove.RemoveBusinessTypesController.post(edit: Boolean ?= false)
+GET         /remove-services                                           @controllers.businessmatching.updateservice.remove.RemoveBusinessTypesController.get(edit: Boolean ?= false)
+POST        /remove-services                                           @controllers.businessmatching.updateservice.remove.RemoveBusinessTypesController.post(edit: Boolean ?= false)
 
-GET         /ask-removed-business                                      @controllers.businessmatching.updateservice.remove.NeedMoreInformationController.get()
-POST        /ask-removed-business                                      @controllers.businessmatching.updateservice.remove.NeedMoreInformationController.post()
+GET         /update-information                                        @controllers.businessmatching.updateservice.remove.NeedMoreInformationController.get()
+POST        /update-information                                        @controllers.businessmatching.updateservice.remove.NeedMoreInformationController.post()
 
 GET         /unable-to-remove                                          @controllers.businessmatching.updateservice.remove.UnableToRemoveBusinessTypesController.get()
 

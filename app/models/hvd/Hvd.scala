@@ -105,8 +105,6 @@ object Hvd {
 
   val key = "hvd"
 
-  implicit val formatOption = Reads.optionWithNull[Hvd]
-
   def section(implicit cache: CacheMap): Section = {
     val notStarted = Section(key, NotStarted, false, controllers.hvd.routes.WhatYouNeedController.get())
     cache.getEntry[Hvd](key).fold(notStarted)  {
@@ -152,6 +150,8 @@ object Hvd {
   }
 
   implicit val writes: Writes[Hvd] = Json.writes[Hvd]
+
+  implicit val formatOption = Reads.optionWithNull[Hvd]
 
   implicit def default(hvd: Option[Hvd]): Hvd =
     hvd.getOrElse(Hvd())

@@ -17,6 +17,7 @@
 package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
+import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import models.flowmanagement.{AddBusinessTypeFlowModel, NoPSRPageId}
 import org.mockito.Matchers.any
@@ -38,7 +39,7 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
     val controller = new NoPsrController(
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       dataCacheConnector = mockCacheConnector,
       helper = mockUpdateServiceHelper,
       router = createRouter[AddBusinessTypeFlowModel]
@@ -63,13 +64,13 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
 
     "clear the flow model" in new Fixture {
       when {
-        mockUpdateServiceHelper.clearFlowModel()(any(), any())
+        mockUpdateServiceHelper.clearFlowModel(any())(any())
       } thenReturn OptionT[Future, AddBusinessTypeFlowModel](Future.successful(Some(AddBusinessTypeFlowModel())))
 
       val result = controller.post()(request.withFormUrlEncodedBody())
 
       status(result) mustBe SEE_OTHER
-      controller.router.verify(NoPSRPageId, AddBusinessTypeFlowModel())
+      controller.router.verify("internalId", NoPSRPageId, AddBusinessTypeFlowModel())
     }
   }
 }

@@ -16,6 +16,7 @@
 
 package controllers.businessmatching.updateservice.add
 
+import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.tradingpremises.TradingPremisesGenerator
 import models.businessmatching._
@@ -27,7 +28,7 @@ import org.scalatest.PrivateMethodTester
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class WhichTradingPremisesControllerSpec extends AmlsSpec
   with PrivateMethodTester
@@ -48,7 +49,7 @@ class WhichTradingPremisesControllerSpec extends AmlsSpec
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
     val controller = new WhichTradingPremisesController(
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       dataCacheConnector = mockCacheConnector,
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,
@@ -98,7 +99,7 @@ class WhichTradingPremisesControllerSpec extends AmlsSpec
 
             status(result) must be(SEE_OTHER)
 
-            controller.router.verify(WhichTradingPremisesPageId,
+            controller.router.verify("internalId", WhichTradingPremisesPageId,
               AddBusinessTypeFlowModel(tradingPremisesActivities = Some(TradingPremisesActivities(Set(1))), hasChanged = true))
           }
         }

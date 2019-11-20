@@ -16,13 +16,13 @@
 
 package controllers.renewal
 
-import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.{Inject, Singleton}
 import models.renewal.{Renewal, SendTheLargestAmountsOfMoney}
 import services.{AutoCompleteService, RenewalService}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{AuthAction, ControllerHelper}
 import views.html.renewal.send_largest_amounts_of_money
 
 import scala.concurrent.Future
@@ -30,14 +30,14 @@ import scala.concurrent.Future
 @Singleton
 class SendTheLargestAmountsOfMoneyController @Inject()(
                                                         val dataCacheConnector: DataCacheConnector,
-                                                        val authConnector: AuthConnector,
+                                                        val authAction: AuthAction,
                                                         val renewalService: RenewalService,
                                                         val autoCompleteService: AutoCompleteService
-                                                      ) extends BaseController {
+                                                      ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[Renewal](Renewal.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[Renewal](request.credId, Renewal.key) map {
         response =>
           val form: Form2[SendTheLargestAmountsOfMoney] = (for {
             renewal <- response
@@ -47,18 +47,22 @@ class SendTheLargestAmountsOfMoneyController @Inject()(
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request =>
       Form2[SendTheLargestAmountsOfMoney](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(send_largest_amounts_of_money(f, edit, autoCompleteService.getCountries)))
+          Future.successful(BadRequest(send_largest_amounts_of_money(alignFormDataWithValidationErrors(f), edit, autoCompleteService.getCountries)))
         case ValidForm(_, data) =>
           for {
-            renewal <- renewalService.getRenewal
-            _ <- renewalService.updateRenewal(renewal.sendTheLargestAmountsOfMoney(data))
+            renewal <- renewalService.getRenewal(request.credId)
+            _ <- renewalService.updateRenewal(request.credId, renewal.sendTheLargestAmountsOfMoney(data))
           } yield redirectTo(edit, renewal)
       }
   }
+
+  def alignFormDataWithValidationErrors(form: InvalidForm): InvalidForm =
+    ControllerHelper.stripEmptyValuesFromFormWithArray(form, "largestAmountsOfMoney", index => index / 2)
+
 
   def redirectTo(edit:Boolean, renewal: Renewal) = edit match {
     case true if !mostTransactionsDataRequired(renewal)  => Redirect(routes.SummaryController.get())

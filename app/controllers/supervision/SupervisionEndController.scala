@@ -17,23 +17,22 @@
 package controllers.supervision
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.supervision._
 import org.joda.time.LocalDate
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.supervision.supervision_end
 
 import scala.concurrent.Future
 
 class SupervisionEndController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                         val authConnector: AuthConnector
-                                      ) extends BaseController {
+                                         val authAction: AuthAction) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[Supervision](Supervision.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map {
         case Some(Supervision(anotherBody, _, _, _, _, _)) if getEndDate(anotherBody).isDefined
         => Ok(supervision_end(Form2[SupervisionEnd](SupervisionEnd(getEndDate(anotherBody).get)), edit))
         case _ => Ok(supervision_end(EmptyForm, edit))
@@ -50,10 +49,10 @@ class SupervisionEndController @Inject()(val dataCacheConnector: DataCacheConnec
     }
   }
 
-  def post(edit : Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+  def post(edit : Boolean = false) = authAction.async {
+    implicit request =>
 
-      dataCacheConnector.fetch[Supervision](Supervision.key) flatMap { supervision =>
+      dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) flatMap { supervision =>
         def extraFields: Map[String, Seq[String]] = supervision match {
           case Some(s) => getExtraFields(s)
           case _ => Map()
@@ -71,14 +70,14 @@ class SupervisionEndController @Inject()(val dataCacheConnector: DataCacheConnec
           case f: InvalidForm =>
             Future.successful(BadRequest(supervision_end(f, edit)))
           case ValidForm(_, data) =>
-            dataCacheConnector.fetchAll flatMap {
+            dataCacheConnector.fetchAll(request.credId) flatMap {
               optMap =>
                 val result = for {
                   cache <- optMap
                   supervision <- cache.getEntry[Supervision](Supervision.key)
                   anotherBody <- supervision.anotherBody
                 } yield {
-                  dataCacheConnector.save[Supervision](Supervision.key,
+                  dataCacheConnector.save[Supervision](request.credId, Supervision.key,
                     supervision.copy(anotherBody = Some(updateData(anotherBody, data)))) map {
                     _ => redirect(edit)
                   }

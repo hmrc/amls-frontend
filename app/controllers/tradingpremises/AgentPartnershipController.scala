@@ -17,24 +17,23 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms._
 import javax.inject.{Inject, Singleton}
 import models.tradingpremises._
 import play.api.i18n.MessagesApi
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
+import utils.{AuthAction, RepeatingSection}
 
 import scala.concurrent.Future
 
 @Singleton
 class AgentPartnershipController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                            val authConnector: AuthConnector,
-                                            override val messagesApi: MessagesApi) extends RepeatingSection with BaseController {
+                                            val authAction: AuthAction,
+                                            override val messagesApi: MessagesApi) extends RepeatingSection with DefaultBaseController {
 
-    def get(index: Int, edit: Boolean = false) = Authorised.async {
-      implicit authContext => implicit request =>
-        getData[TradingPremises](index) map {
+    def get(index: Int, edit: Boolean = false) = authAction.async {
+      implicit request =>
+        getData[TradingPremises](request.credId, index) map {
           case Some(tp) => {
             val form = tp.agentPartnership match {
               case Some(data) => Form2[AgentPartnership](data)
@@ -46,21 +45,21 @@ class AgentPartnershipController @Inject()(val dataCacheConnector: DataCacheConn
         }
     }
 
-   def post(index: Int ,edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+   def post(index: Int ,edit: Boolean = false) = authAction.async {
+    implicit request => {
       Form2[AgentPartnership](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.tradingpremises.agent_partnership(f, index,edit)))
         case ValidForm(_, data) => {
           for {
-            result <- fetchAllAndUpdateStrict[TradingPremises](index) { (_,tp) =>
+            result <- fetchAllAndUpdateStrict[TradingPremises](request.credId, index) { (_,tp) =>
                 TradingPremises(tp.registeringAgentPremises,
                   tp.yourTradingPremises, tp.businessStructure,
                   None, None, Some(data),tp.whatDoesYourBusinessDoAtThisAddress,
                   tp.msbServices, true, tp.lineId, tp.status, tp.endDate)
             }
           } yield edit match {
-            case true => Redirect(routes.YourTradingPremisesController.getIndividual(index))
+            case true => Redirect(routes.DetailedAnswersController.get(index))
             case false => TPControllerHelper.redirectToNextPage(result, index, edit)
           }
         }.recoverWith {

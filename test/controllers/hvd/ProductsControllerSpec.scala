@@ -16,6 +16,7 @@
 
 package controllers.hvd
 
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.HighValueDealing
 import models.hvd._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
@@ -201,7 +202,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
               "products[1]" -> "02"
             )
 
-            mockIsNewActivity(true, Some(HighValueDealing))
+            mockIsNewActivityNewAuth(true, Some(HighValueDealing))
             mockCacheFetch[Hvd](None)
             mockApplicationStatus(SubmissionDecisionApproved)
 
@@ -216,7 +217,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
               "products[1]" -> "04"
             )
 
-            mockIsNewActivity(true, Some(HighValueDealing))
+            mockIsNewActivityNewAuth(true, Some(HighValueDealing))
             mockCacheFetch[Hvd](None)
             mockApplicationStatus(SubmissionDecisionApproved)
 
@@ -234,11 +235,11 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
 
     val controller = new ProductsController(mockCacheConnector,
       mockStatusService,
-      self.authConnector,
+      SuccessfulAuthAction,
       mockServiceFlow
     )
 
-    mockIsNewActivity(false)
+    mockIsNewActivityNewAuth(false)
     mockCacheSave[Hvd]
   }
 

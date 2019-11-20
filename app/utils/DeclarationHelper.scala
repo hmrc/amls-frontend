@@ -21,8 +21,6 @@ import models.responsiblepeople.{Partner, ResponsiblePerson}
 import models.status._
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -69,8 +67,8 @@ object DeclarationHelper {
     }
   }
 
-  def statusSubtitle()(implicit statusService: StatusService, hc: HeaderCarrier, auth: AuthContext): Future[String] = {
-    statusService.getStatus map {
+  def statusSubtitle(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)(implicit statusService: StatusService, hc: HeaderCarrier): Future[String] = {
+    statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) map {
       case SubmissionReady => "submit.registration"
       case SubmissionReadyForReview | SubmissionDecisionApproved => "submit.amendment.application"
       case ReadyForRenewal(_) | RenewalSubmitted(_) => "submit.renewal.application"

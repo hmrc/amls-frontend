@@ -21,12 +21,12 @@
 @(paymentReference: Option[String], total: Currency, breakdown: Seq[BreakdownRow], amountToPay: Currency, paymentsUrl: String)(implicit request: Request[_],m:Messages)
 
 @main(
-    title = Messages("confirmation.renewal.title")
+    title = Messages("confirmation.renewal.title") + " - " + Messages("confirmation.renewal.header.secondary")
 ) {
 
     <header class="page-header">
-        <h1 class="heading-xlarge">@Messages("confirmation.renewal.header")</h1>
         <p class="heading-secondary"><span class="visuallyhidden">This section is </span>@Messages("confirmation.renewal.header.secondary")</p>
+        <h1 class="heading-xlarge">@Messages("confirmation.renewal.header")</h1>
     </header>
 
     <p class="info">@Messages("confirmation.renewal.info")</p>
@@ -41,6 +41,12 @@
     </div>
 
     @breakdown_display(total, breakdown, Messages("confirmation.renewal.summary"))
+
+    <div id="timelimit"><p>@Messages("confirmation.timelimit")</p></div>
+
+    @printLink(linkId = "confirmation-print",
+        gaTag = Some("fee-reference:click:print")
+    )
 
     <p><a id='continue-pay' class="button" href="@paymentsUrl">@Messages("button.continuetopayment")</a></p>
 

@@ -18,24 +18,23 @@ package controllers.responsiblepeople
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{ContactDetails, ResponsiblePerson}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.contact_details
 
 import scala.concurrent.Future
 
 class ContactDetailsController @Inject () (
-                                      val dataCacheConnector: DataCacheConnector,
-                                      val authConnector: AuthConnector
-                                          ) extends RepeatingSection with BaseController {
+                                           val dataCacheConnector: DataCacheConnector,
+                                           authAction: AuthAction
+                                          ) extends RepeatingSection with DefaultBaseController {
 
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-      implicit authContext => implicit request =>
-        getData[ResponsiblePerson](index) map {
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
+      implicit request =>
+        getData[ResponsiblePerson](request.credId, index) map {
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_, Some(name),_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(contact_details(Form2[ContactDetails](name), edit, index, flow, personName.titleName))
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
@@ -45,23 +44,21 @@ class ContactDetailsController @Inject () (
     }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
-    Authorised.async {
-      implicit authContext => implicit request => {
-
+    authAction.async {
+      implicit request => {
         Form2[ContactDetails](request.body) match {
           case f: InvalidForm =>
-            getData[ResponsiblePerson](index) map { rp =>
+            getData[ResponsiblePerson](request.credId, index) map { rp =>
               BadRequest(views.html.responsiblepeople.contact_details(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
             for {
-              _ <- updateDataStrict[ResponsiblePerson](index) { rp =>
+              _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
                 rp.contactDetails(data)
               }
             } yield edit match {
               case true => Redirect(routes.DetailedAnswersController.get(index, flow))
-              case false if index > 1 => Redirect(routes.CurrentAddressController.get(index, edit, flow))
-              case false if index == 1 => Redirect(routes.ConfirmAddressController.get(index))
+              case false => Redirect(controllers.responsiblepeople.address.routes.CurrentAddressController.get(index, edit, flow))
             }
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

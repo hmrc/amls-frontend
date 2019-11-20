@@ -29,48 +29,45 @@ import play.twirl.api.Template3
 import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, NotificationService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.BusinessName
+import utils.{AuthAction, BusinessName}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
-class NotificationController @Inject()(
-                                        val authEnrolmentsService: AuthEnrolmentsService,
-                                        val statusService: StatusService,
-                                        val businessMatchingService: BusinessMatchingService,
-                                        val authConnector: AuthConnector,
-                                        val amlsNotificationService: NotificationService,
-                                        implicit val amlsConnector: AmlsConnector,
-                                        implicit val dataCacheConnector: DataCacheConnector
-                                      ) extends BaseController {
+class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolmentsService,
+                                       val statusService: StatusService,
+                                       val businessMatchingService: BusinessMatchingService,
+                                       authAction: AuthAction,
+                                       val amlsNotificationService: NotificationService,
+                                       implicit val amlsConnector: AmlsConnector,
+                                       implicit val dataCacheConnector: DataCacheConnector) extends DefaultBaseController {
 
-  def getMessages = Authorised.async {
-    implicit authContext =>
+  def getMessages = authAction.async {
       implicit request =>
-        authEnrolmentsService.amlsRegistrationNumber flatMap {
+        request.amlsRefNumber match {
           case Some(mlrRegNumber) => {
-              statusService.getReadStatus(mlrRegNumber) flatMap {
-                case readStatus if readStatus.safeId.isDefined => generateNotificationView(readStatus.safeId.get, Some(mlrRegNumber))
+              statusService.getReadStatus(mlrRegNumber, request.accountTypeId) flatMap {
+                case readStatus if readStatus.safeId.isDefined =>
+                  generateNotificationView(request.credId, readStatus.safeId.get, Some(mlrRegNumber), request.accountTypeId)
                 case _ => throw new Exception("Unable to retrieve SafeID")
               }
             }
           case _ => {
-              businessMatchingService.getModel.value flatMap {
-                case Some(model) if model.reviewDetails.isDefined => generateNotificationView(model.reviewDetails.get.safeId, None)
+              businessMatchingService.getModel(request.credId).value flatMap {
+                case Some(model) if model.reviewDetails.isDefined =>
+                  generateNotificationView(request.credId, model.reviewDetails.get.safeId, None, request.accountTypeId)
                 case _ => throw new Exception("Unable to retrieve SafeID from reviewDetails")
               }
             }
         }
   }
 
-  private def generateNotificationView(safeId: String, refNumber: Option[String])
-                                      (implicit hc: HeaderCarrier, authContext: AuthContext, request: Request[_]): Future[Result] = {
+  private def generateNotificationView(credId: String, safeId: String, refNumber: Option[String], accountTypeId: (String, String))
+                                      (implicit hc: HeaderCarrier, request: Request[_]): Future[Result] = {
     (for {
-      businessName <- BusinessName.getName(Some(safeId))
-      records: Seq[NotificationRow] <- OptionT.liftF(amlsNotificationService.getNotifications(safeId))
+      businessName <- BusinessName.getName(credId, Some(safeId), accountTypeId)
+      records: Seq[NotificationRow] <- OptionT.liftF(amlsNotificationService.getNotifications(safeId, accountTypeId))
     } yield {
       val currentRecords: Seq[NotificationRow] = (for {
         amls <- refNumber
@@ -82,29 +79,27 @@ class NotificationController @Inject()(
     }) getOrElse (throw new Exception("Cannot retrieve business name"))
   }
 
-  def messageDetails(id: String, contactType: ContactType, amlsRegNo: String, templateVersion: String) = Authorised.async {
-    implicit authContext =>
+  def messageDetails(id: String, contactType: ContactType, amlsRegNo: String, templateVersion: String) = authAction.async {
       implicit request =>
-        statusService.getReadStatus(amlsRegNo) flatMap {
+        statusService.getReadStatus(amlsRegNo, request.accountTypeId) flatMap {
           case readStatus if readStatus.safeId.isDefined =>
             (for {
               safeId <- OptionT.fromOption[Future](readStatus.safeId)
-              businessName <- BusinessName.getName(readStatus.safeId)
-              details <- OptionT(amlsNotificationService.getMessageDetails(amlsRegNo, id, contactType, templateVersion))
-              status <- OptionT.liftF(statusService.getStatus(amlsRegNo))
+              businessName <- BusinessName.getName(request.credId, readStatus.safeId, request.accountTypeId)
+              details <- OptionT(amlsNotificationService.getMessageDetails(amlsRegNo, id, contactType, templateVersion, request.accountTypeId))
+              status <- OptionT.liftF(statusService.getStatus(Some(amlsRegNo), request.accountTypeId, request.credId))
             } yield contactTypeToResponse(contactType, (amlsRegNo, safeId), businessName, details, status, templateVersion)) getOrElse NotFound(notFoundView)
           case r if r.safeId.isEmpty => throw new Exception("Unable to retrieve SafeID")
           case _ => Future.successful(BadRequest)
         }
   }
 
-  private def contactTypeToResponse(
-                                     contactType: ContactType,
-                                     reference: (String, String),
-                                     businessName: String,
-                                     details: NotificationDetails,
-                                     status: SubmissionStatus,
-                                     templateVersion: String)(implicit request: Request[_], m: Messages) = {
+  private def contactTypeToResponse(contactType: ContactType,
+                                    reference: (String, String),
+                                    businessName: String,
+                                    details: NotificationDetails,
+                                    status: SubmissionStatus,
+                                    templateVersion: String)(implicit request: Request[_], m: Messages) = {
 
     val msgText = details.messageText.getOrElse("")
 

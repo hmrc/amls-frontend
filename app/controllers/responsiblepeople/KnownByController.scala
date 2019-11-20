@@ -18,25 +18,23 @@ package controllers.responsiblepeople
 
 import config.AppConfig
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.responsiblepeople.{KnownBy, ResponsiblePerson}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.known_by
 
 import scala.concurrent.Future
 
 @Singleton
 class KnownByController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                  val authConnector: AuthConnector,
-                                  val appConfig: AppConfig) extends RepeatingSection with BaseController {
+                                  authAction: AuthAction,
+                                  val appConfig: AppConfig) extends RepeatingSection with DefaultBaseController {
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext =>
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>
-        getData[ResponsiblePerson](index) map {
+        getData[ResponsiblePerson](request.credId, index) map {
           case Some(ResponsiblePerson(Some(personName), _, _, Some(otherName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
           => Ok(known_by(Form2[KnownBy](otherName), edit, index, flow, personName.titleName))
           case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
@@ -46,22 +44,21 @@ class KnownByController @Inject()(val dataCacheConnector: DataCacheConnector,
         }
   }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext =>
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request => {
         Form2[KnownBy](request.body) match {
           case f: InvalidForm =>
-            getData[ResponsiblePerson](index) map { rp =>
+            getData[ResponsiblePerson](request.credId, index) map { rp =>
               BadRequest(views.html.responsiblepeople.known_by(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
             for {
               _ <- {
                 data.hasOtherNames match {
-                  case Some(true) => updateDataStrict[ResponsiblePerson](index) { rp =>
+                  case Some(true) => updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
                     rp.knownBy(data)
                   }
-                  case Some(false) => updateDataStrict[ResponsiblePerson](index) { rp =>
+                  case Some(false) => updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
                     rp.knownBy(KnownBy(Some(false), None))
                   }
                 }

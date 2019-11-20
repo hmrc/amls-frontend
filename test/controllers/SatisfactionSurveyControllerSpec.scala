@@ -16,7 +16,7 @@
 
 package controllers
 
-import connectors.KeystoreConnector
+import controllers.actions.SuccessfulAuthAction
 import models.businessactivities._
 import org.jsoup.Jsoup
 import org.mockito.Matchers
@@ -24,8 +24,6 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
@@ -40,7 +38,7 @@ class SatisfactionSurveyControllerSpec extends AmlsSpec with MockitoSugar with S
 
     val controller = new SatisfactionSurveyController (
       mock[AuditConnector],
-      self.authConnector
+      SuccessfulAuthAction
     )
 
     def model: Option[BusinessActivities] = None

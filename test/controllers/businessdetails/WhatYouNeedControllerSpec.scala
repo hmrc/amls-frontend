@@ -16,9 +16,10 @@
 
 package controllers.businessdetails
 
+import controllers.actions.SuccessfulAuthAction
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.AuthorisedFixture
@@ -29,7 +30,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     self => val request = addToken(authRequest)
 
     val controller = new WhatYouNeedController (
-      authConnector = self.authConnector
+      authAction = SuccessfulAuthAction
     )
   }
 

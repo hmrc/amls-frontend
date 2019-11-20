@@ -16,6 +16,7 @@
 
 package models
 
+import models.amp.Amp
 import models.businessdetails.BusinessDetails
 import models.asp.Asp
 import models.bankdetails.BankDetails
@@ -46,6 +47,7 @@ case class ViewResponse(
                          aspSection: Option[Asp],
                          msbSection: Option[MoneyServiceBusiness],
                          hvdSection: Option[Hvd],
+                         ampSection: Option[Amp],
                          supervisionSection: Option[Supervision]
                        )
 
@@ -54,8 +56,6 @@ object ViewResponse {
   val key = "View"
 
   implicit val jsonWrites = Json.writes[ViewResponse]
-
-  implicit val formatOption = Reads.optionWithNull[ViewResponse]
 
   def constructReads(
                  etmpFormBundleNumber:String,
@@ -72,6 +72,7 @@ object ViewResponse {
                  aspSection: Option[Asp],
                  msbSection: Option[MoneyServiceBusiness],
                  hvdSection: Option[Hvd],
+                 ampSection: Option[Amp],
                  supervisionSection: Option[Supervision]
                ) =  {
 
@@ -97,6 +98,7 @@ object ViewResponse {
       aspSection,
       msbSection,
       hvdSection,
+      ampSection,
       supervisionSection
     )
   }
@@ -116,7 +118,10 @@ object ViewResponse {
       (__ \ "aspSection").readNullable[Asp] and
       (__ \ "msbSection").readNullable[MoneyServiceBusiness] and
       (__ \ "hvdSection").readNullable[Hvd] and
+      (__ \ "ampSection").readNullable[Amp] and
       (__ \ "supervisionSection").readNullable[Supervision]
   }.apply(ViewResponse.constructReads _)
+
+  implicit val formatOption = Reads.optionWithNull[ViewResponse]
 
 }

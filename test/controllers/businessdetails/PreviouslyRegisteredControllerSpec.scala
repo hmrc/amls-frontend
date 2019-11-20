@@ -17,6 +17,7 @@
 package controllers.businessdetails
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessdetails._
@@ -35,14 +36,13 @@ import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
-
 class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
     val controller = new PreviouslyRegisteredController (
       dataCacheConnector = mock[DataCacheConnector],
-      authConnector = self.authConnector
+      authAction = SuccessfulAuthAction
     )
   }
 
@@ -51,8 +51,8 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
   "BusinessRegisteredWithHMRCBeforeController" must {
 
     "on get display the previously registered with HMRC page" in new Fixture {
-      when(controller.dataCacheConnector.fetch[BusinessDetails](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[BusinessDetails](any(), any())
+        (any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
       contentAsString(result) must include(Messages("businessdetails.registeredformlr.title"))
@@ -60,8 +60,8 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
 
     "on get display the previously registered with HMRC with pre populated data" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[BusinessDetails](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessDetails(Some(PreviouslyRegisteredYes("12345678"))))))
+      when(controller.dataCacheConnector.fetch[BusinessDetails](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(BusinessDetails(Some(PreviouslyRegisteredYes(Some("12345678")))))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -76,6 +76,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
         "previouslyRegistered" -> "true",
         "prevMLRRegNo" -> "12345678"
       )
+
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
         Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
 
@@ -85,13 +86,14 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
         .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
       when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
         .thenReturn(Some(BusinessDetails(Some(PreviouslyRegisteredNo))))
-
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
+      when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
+        .thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.businessdetails.routes.VATRegisteredController.get().url))
+      redirectLocation(result) must be(Some(controllers.businessdetails.routes.ActivityStartDateController.get(false).url))
     }
 
     "on post with valid data and load confirm address page when businessType is SoleProprietor" in new Fixture {
@@ -110,7 +112,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
       when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
         .thenReturn(Some(BusinessDetails(Some(PreviouslyRegisteredNo))))
 
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       val result = controller.post()(newRequest)
@@ -134,7 +136,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
       when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
         .thenReturn(None)
 
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       val result = controller.post()(newRequest)
@@ -158,12 +160,14 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
       when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
         .thenReturn(Some(BusinessDetails(Some(PreviouslyRegisteredNo))))
 
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
+      when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
+        .thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.businessdetails.routes.VATRegisteredController.get(true).url))
+      redirectLocation(result) must be(Some(controllers.businessdetails.routes.SummaryController.get().url))
     }
 
     "on post with invalid data" in new Fixture {

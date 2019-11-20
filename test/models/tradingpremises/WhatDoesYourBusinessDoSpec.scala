@@ -31,7 +31,7 @@ class WhatDoesYourBusinessDoSpec extends WordSpec with MustMatchers{
   "WhatDoesYourBusinessDo" when {
     "input data is valid" must {
       "convert form data correctly" in {
-        val formData = Map("activities[]" -> Seq("02", "03", "05"))
+        val formData = Map("activities[]" -> Seq("03", "04", "06"))
         WhatDoesYourBusinessDo.formRule.validate(formData) must be (Valid(model))
       }
     }
@@ -47,7 +47,7 @@ class WhatDoesYourBusinessDoSpec extends WordSpec with MustMatchers{
 
   it must {
     "write correctly to a form" in {
-      val formData = Map("activities[]" -> Seq("02", "03", "05"))
+      val formData = Map("activities[]" -> Seq("03", "04", "06"))
       WhatDoesYourBusinessDo.formWrite.writes(model) must be (formData)
     }
   }

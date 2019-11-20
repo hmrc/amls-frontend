@@ -19,37 +19,35 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement.{AddBusinessTypeFlowModel, NoPSRPageId}
 import services.flowmanagement.Router
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.businessmatching.updateservice.add.cannot_add_services
 
 import scala.concurrent.Future
 
 @Singleton
 class NoPsrController @Inject()(
-                                 val authConnector: AuthConnector,
+                                 authAction: AuthAction,
                                  implicit val dataCacheConnector: DataCacheConnector,
                                  val helper: AddBusinessTypeHelper,
                                  val router: Router[AddBusinessTypeFlowModel]
-                               ) extends BaseController {
+                               ) extends DefaultBaseController {
 
-  def get = Authorised.async {
-    implicit authContext =>
+  def get = authAction.async {
       implicit request =>
         Future.successful(Ok(cannot_add_services(EmptyForm)))
   }
 
-  def post() = Authorised.async {
-    implicit authContext =>
+  def post() = authAction.async {
       implicit request =>
         (for {
-          _ <- helper.clearFlowModel()
-          route <- OptionT.liftF(router.getRoute(NoPSRPageId, AddBusinessTypeFlowModel()))
+          _ <- helper.clearFlowModel(request.credId)
+          route <- OptionT.liftF(router.getRoute(request.credId, NoPSRPageId, AddBusinessTypeFlowModel()))
         } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: NoPsrController")
   }
 }

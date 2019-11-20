@@ -16,6 +16,7 @@
 
 package models
 
+import models.amp.Amp
 import models.businessdetails.BusinessDetails
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
@@ -46,6 +47,7 @@ case class SubscriptionRequest(
                                 aspSection: Option[Asp],
                                 msbSection: Option[MoneyServiceBusiness],
                                 hvdSection: Option[Hvd],
+                                ampSection: Option[Amp],
                                 supervisionSection: Option[Supervision]
                               )
 

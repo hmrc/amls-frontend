@@ -19,7 +19,7 @@
 @import utils.HtmlElementHelpers._
 
 
-@(f: forms.Form2[_], existing: Set[String])(implicit request: Request[_], m:Messages)
+@(f: forms.Form2[_], existing: List[String])(implicit request: Request[_], m:Messages)
 
 @header = {
     @components.back_link()
@@ -31,7 +31,6 @@
     heading = header
 )  {
 
-
     @form(f, controllers.businessmatching.updateservice.add.routes.AddMoreBusinessTypesController.post()) {
 
         @fieldsetWithErrorGroup(
@@ -39,7 +38,7 @@
             heading = "businessmatching.updateservice.addmoreactivities.heading",
             section = "summary.updateservice",
             panel = false,
-            supportingContent = current_business_types(existing)
+            classes = Seq("inline")
         ) {
             @radio(
                 f = f("addmoreactivities"),

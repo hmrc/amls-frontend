@@ -16,6 +16,7 @@
 
 package controllers.bankdetails
 
+import controllers.actions.SuccessfulAuthAction
 import models.bankdetails._
 import models.status.SubmissionReady
 import org.mockito.Matchers.{eq => meq, _}
@@ -33,7 +34,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
     val controller = new SummaryController(
       dataCacheConnector = mockCacheConnector,
-      authConnector = self.authConnector
+      authAction = SuccessfulAuthAction
     )
   }
 
@@ -118,8 +119,8 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
       status(result) must be(SEE_OTHER)
 
-      verify(controller.dataCacheConnector).save[Seq[BankDetails]](any(),
-        meq(Seq(completeModel1, completeModel2)))(any(), any(), any())
+      verify(controller.dataCacheConnector).save[Seq[BankDetails]](any(), any(),
+        meq(Seq(completeModel1, completeModel2)))(any(), any())
     }
   }
 }

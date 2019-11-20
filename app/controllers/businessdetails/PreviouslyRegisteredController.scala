@@ -19,25 +19,23 @@ package controllers.businessdetails
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import models.businessdetails._
 import models.businessmatching.{BusinessMatching, BusinessType}
-import models.businessmatching.BusinessType._
 import play.api.mvc.Result
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
+import utils.{AuthAction, ControllerHelper}
 import views.html.businessdetails._
 
 import scala.concurrent.Future
 
 class PreviouslyRegisteredController @Inject () (
                                                   val dataCacheConnector: DataCacheConnector,
-                                                  val authConnector: AuthConnector
-                                                ) extends BaseController {
+                                                  val authAction: AuthAction
+                                                ) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
         response =>
           val form: Form2[PreviouslyRegistered] = (for {
             businessDetails <- response
@@ -47,45 +45,36 @@ class PreviouslyRegisteredController @Inject () (
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request => {
       Form2[PreviouslyRegistered](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(previously_registered(f, edit)))
         case ValidForm(_, data) =>
-          dataCacheConnector.fetchAll map {
+          dataCacheConnector.fetchAll(request.credId) flatMap {
             optionalCache =>
               (for {
                 cache <- optionalCache
                 businessType <- ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
-              } yield {
-                dataCacheConnector.save[BusinessDetails](BusinessDetails.key,
+                saved <- Option(dataCacheConnector.save[BusinessDetails](request.credId, BusinessDetails.key,
                   getUpdatedModel(businessType,  cache.getEntry[BusinessDetails](BusinessDetails.key), data))
-                getRouting(businessType, edit, data)
-              }).getOrElse(Redirect(routes.ConfirmRegisteredOfficeController.get(edit)))
+                )
+              } yield {
+                saved.map(_ => getRouting(businessType, edit, data))
+              }).getOrElse(Future.successful(Redirect(routes.ConfirmRegisteredOfficeController.get(edit))))
           }
       }
     }
   }
 
   private def getUpdatedModel(businessType: BusinessType, businessDetails: BusinessDetails, data: PreviouslyRegistered): BusinessDetails = {
-    data match {
-      case PreviouslyRegisteredYes(_) => businessDetails.copy(previouslyRegistered = Some(data), activityStartDate = None,
-                                                                hasChanged = true)
-      case PreviouslyRegisteredNo => businessDetails.copy(previouslyRegistered = Some(data),
-                                                                hasChanged = true)
-    }
+    businessDetails.copy(previouslyRegistered = Some(data), hasChanged = true)
   }
 
   private def getRouting(businessType: BusinessType, edit: Boolean, data: PreviouslyRegistered): Result = {
-    (businessType, edit, data) match {
-      case (UnincorporatedBody | LPrLLP | LimitedCompany | Partnership, _, PreviouslyRegisteredYes(_)) =>
-          Redirect (routes.VATRegisteredController.get (edit))
-      case (_, _, PreviouslyRegisteredNo) =>
-        Redirect (routes.ActivityStartDateController.get (edit))
-      case (_, true, PreviouslyRegisteredYes(_)) => Redirect(routes.SummaryController.get())
-      case (_, false, PreviouslyRegisteredYes(_)) =>
-        Redirect(routes.ConfirmRegisteredOfficeController.get(edit))
+    (edit) match {
+      case true => Redirect(routes.SummaryController.get())
+      case _    => Redirect (routes.ActivityStartDateController.get(edit))
     }
   }
 }

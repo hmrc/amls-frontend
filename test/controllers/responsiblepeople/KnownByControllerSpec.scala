@@ -18,14 +18,14 @@ package controllers.responsiblepeople
 
 import config.AppConfig
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople.{KnownBy, PersonName, ResponsiblePerson}
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils._
 
 
 class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
@@ -37,7 +37,7 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
     val mockAppConfig = mock[AppConfig]
 
     val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
       .overrides(bind[AppConfig].to(mockAppConfig))
       .build()

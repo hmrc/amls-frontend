@@ -17,6 +17,7 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.businessactivities.{BusinessActivities, InvolvedInOtherYes}
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
 import models.responsiblepeople.ResponsiblePerson._
@@ -31,7 +32,6 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
@@ -50,7 +50,7 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
 
     val controller = new ExperienceTrainingController (
       dataCacheConnector = dataCacheConnector,
-      authConnector = self.authConnector
+      authAction = SuccessfulAuthAction
     )
   }
 
@@ -70,11 +70,11 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
 
         val mockCacheMap = mock[CacheMap]
 
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
 
         val businessActivities = BusinessActivities(involvedInOther = Some(InvolvedInOtherYes("test")))
         when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
@@ -101,14 +101,14 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
 
       val mockCacheMap = mock[CacheMap]
 
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName,experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName,experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
 
       val result = controller.get(RecordId)(request)
 
@@ -122,14 +122,14 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
 
       val mockCacheMap = mock[CacheMap]
 
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, experienceTraining = Some(ExperienceTrainingNo))))))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, experienceTraining = Some(ExperienceTrainingNo))))))
       val result = controller.get(RecordId)(request)
       status(result) must be(OK)
       val document = Jsoup.parse(contentAsString(result))
@@ -148,17 +148,17 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
 
       val mockCacheMap = mock[CacheMap]
 
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
 
-      when(controller.dataCacheConnector.save[ResponsiblePerson](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[ResponsiblePerson](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(RecordId)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -172,17 +172,17 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
 
       val mockCacheMap = mock[CacheMap]
 
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
 
-      when(controller.dataCacheConnector.save[ResponsiblePerson](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[ResponsiblePerson](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(RecordId)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -195,20 +195,20 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
       )
       val mockCacheMap = mock[CacheMap]
 
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
 
       val result = controller.post(RecordId)(newRequest)
 
       status(result) must be(BAD_REQUEST)
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.title must be(pageTitle)
+      document.title must be(s"Error: $pageTitle")
     }
 
 
@@ -216,7 +216,7 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
 
       val mockCacheMap = mock[CacheMap]
 
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
@@ -227,11 +227,11 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
         "experienceInformation" -> "I do not remember when I did the training"
       )
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
 
-      when(controller.dataCacheConnector.save[ResponsiblePerson](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[ResponsiblePerson](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(RecordId, true, Some(flowFromDeclaration))(newRequest)
       status(result) must be(SEE_OTHER)

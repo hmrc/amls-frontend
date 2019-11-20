@@ -60,12 +60,12 @@ class summarySpec extends AmlsSpec
 
     val fullActivitiesSet = Set(
       "businessmatching.registerservices.servicename.lbl.01",
-      "businessmatching.registerservices.servicename.lbl.02",
       "businessmatching.registerservices.servicename.lbl.03",
       "businessmatching.registerservices.servicename.lbl.04",
       "businessmatching.registerservices.servicename.lbl.05",
       "businessmatching.registerservices.servicename.lbl.06",
-      "businessmatching.registerservices.servicename.lbl.07"
+      "businessmatching.registerservices.servicename.lbl.07",
+      "businessmatching.registerservices.servicename.lbl.08"
     )
 
     val sectionChecks = Table[String, Element=>Boolean, String](
@@ -143,10 +143,10 @@ class summarySpec extends AmlsSpec
       }
 
       forAll(sectionChecks) { (key, check, editLink) => {
-        val headers = doc.select("section.check-your-answers h2")
+        val headers = doc.select("span.bold")
         val header = headers.toList.find(e => e.text() == Messages(key))
         header must not be None
-        val section = header.get.parents().select("section").first()
+        val section = header.get.parents().select("div").first()
         check(section) must be(true)
         section.select("a[href]").attr("href") must include(editLink)
       }}

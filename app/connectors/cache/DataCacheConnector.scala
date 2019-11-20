@@ -21,38 +21,38 @@ import javax.inject.Inject
 import play.api.libs.json.Format
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.Future
 
+// $COVERAGE-OFF$
+// Coverage has been turned off for these types until we remove the deprecated methods
 class DataCacheConnector @Inject()(val cacheConnector: MongoCacheConnector){
 
-  def fetch[T](cacheId: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
-    cacheConnector.fetch(cacheId)
+  def fetch[T](credId: String, key: String)(implicit hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
+    cacheConnector.fetch(credId, key)
 
-  def save[T](cacheId: String, data: T)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
-    cacheConnector.save(cacheId, data)
+  def save[T](credId: String, key: String, data: T)(implicit hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
+    cacheConnector.save(credId, key, data)
 
-  def upsert[T](targetCache: CacheMap, cacheId: String, data: T)
-               (implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): CacheMap =
-    cacheConnector.upsert(targetCache, cacheId, data)
+  def upsertNewAuth[T](targetCache: CacheMap, cacheId: String, data: T)
+               (implicit hc: HeaderCarrier, format: Format[T]): CacheMap =
+    cacheConnector.upsertNewAuth(targetCache, cacheId, data)
 
-  def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =
-    cacheConnector.fetchAll
+  def fetchAll(credId: String)(implicit hc: HeaderCarrier): Future[Option[CacheMap]] =
+    cacheConnector.fetchAll(credId)
 
-  def fetchAllWithDefault(implicit hc: HeaderCarrier, authContext: AuthContext): Future[CacheMap] =
-    cacheConnector.fetchAllWithDefault
+  def fetchAllWithDefault(credId: String)(implicit hc: HeaderCarrier): Future[CacheMap] =
+    cacheConnector.fetchAllWithDefault(credId)
 
-  def remove(implicit hc: HeaderCarrier, ac: AuthContext): Future[Boolean] =
-    cacheConnector.remove
+  def remove(credId: String)(implicit hc: HeaderCarrier): Future[Boolean] =
+    cacheConnector.remove(credId)
 
-  def removeByKey[T](cacheId: String)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] = {
-    cacheConnector.removeByKey(cacheId)
+  def removeByKey[T](credId: String, key: String)(implicit hc: HeaderCarrier, format: Format[T]): Future[CacheMap] = {
+    cacheConnector.removeByKey(credId, key)
   }
 
-  def update[T](cacheId: String)(f: Option[T] => T)(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
-    cacheConnector.update(cacheId)(f)
+  def update[T](credId: String, key: String)(f: Option[T] => T)(implicit hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
+    cacheConnector.update(credId, key)(f)
 
-  def saveAll(cacheMap: Future[CacheMap])(implicit hc: HeaderCarrier, ac: AuthContext): Future[CacheMap] =
-    cacheConnector.saveAll(cacheMap)
+  def saveAll(credId: String, cacheMap: Future[CacheMap])(implicit hc: HeaderCarrier): Future[CacheMap] =
+    cacheConnector.saveAll(credId, cacheMap)
 }

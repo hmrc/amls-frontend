@@ -72,11 +72,6 @@ class select_activitiesSpec extends AmlsSpec with MustMatchers {
         doc.body().text must include(Messages(a.getMessage()))
         doc.body().html() must include(BusinessActivities.getValue(a))
       }
-
-      submittedActivities foreach { a =>
-        doc.body().text() must include(Messages(a.getMessage()))
-      }
-
     }
 
     "not show the return link" in new ViewFixture {

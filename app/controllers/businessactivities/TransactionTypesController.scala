@@ -17,37 +17,33 @@
 package controllers.businessactivities
 
 import javax.inject.Inject
-
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, TransactionTypes}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.businessactivities.transaction_types
 
 import scala.concurrent.Future
 
-class TransactionTypesController @Inject()
-(
-  val authConnector: AuthConnector,
-  val cacheConnector: DataCacheConnector
-) extends BaseController {
+class TransactionTypesController @Inject()(val authAction: AuthAction,
+                                           val cacheConnector: DataCacheConnector) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit auth => implicit request => {
-
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request => {
       def form(ba: BusinessActivities) = ba.transactionRecordTypes.fold[Form2[TransactionTypes]](EmptyForm)(Form2(_))
 
       for {
-        ba <- OptionT(cacheConnector.fetch[BusinessActivities](BusinessActivities.key))
+        ba <- OptionT(cacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key))
       } yield Ok(transaction_types(form(ba), edit))
     } getOrElse InternalServerError("Cannot fetch business activities")
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit auth => implicit request => {
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request => {
       lazy val redirect = Redirect(if(edit) {
         routes.SummaryController.get()
       } else {
@@ -57,8 +53,8 @@ class TransactionTypesController @Inject()
       Form2[TransactionTypes](request.body) match {
         case ValidForm(_, data) => {
           for {
-            bm <- OptionT(cacheConnector.fetch[BusinessActivities](BusinessActivities.key))
-            _ <- OptionT.liftF(cacheConnector.save[BusinessActivities](BusinessActivities.key, bm.transactionRecordTypes(data)))
+            bm <- OptionT(cacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key))
+            _ <- OptionT.liftF(cacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key, bm.transactionRecordTypes(data)))
           } yield redirect
         } getOrElse InternalServerError("Unable to update Business Activities Transaction Types")
 

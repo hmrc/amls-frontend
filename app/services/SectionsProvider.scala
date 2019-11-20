@@ -18,6 +18,7 @@ package services
 
 import connectors.DataCacheConnector
 import javax.inject.Inject
+import models.amp.Amp
 import models.businessdetails.BusinessDetails
 import models.asp.Asp
 import models.bankdetails.BankDetails
@@ -33,17 +34,14 @@ import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnector) {
-  def sections
-  (implicit hc: HeaderCarrier,
-            ac: AuthContext,
-            ec: ExecutionContext): Future[Seq[Section]] =
 
-    cacheConnector.fetchAll map {
+  def sections(cacheId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[Section]] =
+
+    cacheConnector.fetchAll(cacheId) map {
       optionCache =>
         optionCache map {
           cache =>
@@ -51,18 +49,21 @@ class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnecto
         } getOrElse Seq.empty
     }
 
-  def sections(cache : CacheMap) : Seq[Section] = {
+  def sections(cache: CacheMap) : Seq[Section] = {
       mandatorySections(cache) ++
       dependentSections(cache)
   }
 
   def sectionsFromBusinessActivities(activities: Set[BusinessActivity],
-                                     msbServices: Option[BusinessMatchingMsbServices]
-                                    )(implicit cache: CacheMap): Set[Section] =
+                                     msbServices: Option[BusinessMatchingMsbServices])
+                                    (implicit cache: CacheMap): Set[Section] =
+
     activities.foldLeft[Set[Section]](Set.empty) {
       (m, n) => n match {
         case AccountancyServices =>
           m + Asp.section + Supervision.section
+        case ArtMarketParticipant =>
+          m + Amp.section
         case EstateAgentBusinessService =>
           m + EstateAgentBusiness.section
         case HighValueDealing =>

@@ -44,6 +44,17 @@
             supportingContent = supportingContent,
             classes = Seq("inline")
         ) {
+            @detailsSummary(
+                summary = Messages("businessmatching.updateservice.fitandproper.text.info")
+            ) {
+                @panel(
+                    jsHidden = false,
+                    wide = false
+                ) {
+                    <p>@Messages("businessmatching.updateservice.fitandproper.text.info.line1")</p>
+                }
+            }
+
             @radio(
                 f = f("passedFitAndProper"),
                 labelText = "lbl.yes",
@@ -56,19 +67,7 @@
             )
         }
 
-        @detailsSummary(
-            summary = Messages("businessmatching.updateservice.fitandproper.text.info")
-        ) {
-            @panel(
-                jsHidden = false,
-                wide = false
-            ) {
-                <p>@Messages("businessmatching.updateservice.fitandproper.text.info.line1")</p>
-                <p>@Messages("businessmatching.updateservice.fitandproper.text.info.line2")</p>
-            }
-        }
-
-        @submit(returnLink = false, buttonId = Some("fitandproper-submit"))
+        @submit(returnLink = false, buttonMessageKey = Some("button.continue"), buttonId = Some("fitandproper-submit"))
 
     }
 }

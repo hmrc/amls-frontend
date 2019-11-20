@@ -16,12 +16,12 @@
 
 package controllers.bankdetails
 
-import controllers.BaseController
+import controllers.DefaultBaseController
 import models.bankdetails.BankDetails
 import models.status.{NotCompleted, SubmissionReady, SubmissionStatus}
 import utils.RepeatingSection
 
-trait BankDetailsController extends BaseController with RepeatingSection {
+trait BankDetailsController extends DefaultBaseController with RepeatingSection {
 
   implicit class BankDetailsSyntax(model: BankDetails) {
     def canEdit(status: SubmissionStatus): Boolean = status match {

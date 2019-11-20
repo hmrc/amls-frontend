@@ -17,6 +17,7 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.tradingpremises.TradingPremises
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -35,22 +36,21 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
 
   trait Fixture extends AuthorisedFixture {
     self =>
-
     implicit val request = addToken(authRequest)
 
     val controller = new RemoveAgentPremisesReasonsController (
       dataCacheConnector = mock[DataCacheConnector],
-      authConnector = self.authConnector
+      authAction = SuccessfulAuthAction
     )
 
     val tradingPremises = TradingPremises()
     val cache = CacheMap("", Map.empty[String, JsValue])
 
     def mockFetch(model: Option[Seq[TradingPremises]]) =
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(model))
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())
+        (any(), any())).thenReturn(Future.successful(model))
 
-    when(controller.dataCacheConnector.save(eqTo(TradingPremises.key), any())(any(), any(), any())).
+    when(controller.dataCacheConnector.save( any(), eqTo(TradingPremises.key), any())(any(), any())).
       thenReturn(Future.successful(cache))
 
     mockFetch(Some(Seq(tradingPremises)))
@@ -101,7 +101,7 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
         val result = await(controller.post(1)(formRequest))
 
         val captor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
-        verify(controller.dataCacheConnector).save(eqTo(TradingPremises.key), captor.capture())(any(), any(), any())
+        verify(controller.dataCacheConnector).save( any(), eqTo(TradingPremises.key), captor.capture())(any(), any())
 
         captor.getValue match {
           case tp :: tail =>

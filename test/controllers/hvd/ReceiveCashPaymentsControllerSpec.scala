@@ -16,6 +16,7 @@
 
 package controllers.hvd
 
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.HighValueDealing
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.hvd.{Hvd, PaymentMethods}
@@ -33,7 +34,7 @@ class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
     val request = addToken(authRequest)
 
     val controller = new ReceiveCashPaymentsController(
-      self.authConnector,
+      SuccessfulAuthAction,
       mockCacheConnector,
       mockServiceFlow,
       mockStatusService
@@ -42,7 +43,7 @@ class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
     mockCacheFetch[Hvd](None, Some(Hvd.key))
     mockCacheFetch[ServiceChangeRegister](None, None)
     mockCacheSave[Hvd]
-    mockIsNewActivity(false)
+    mockIsNewActivityNewAuth(false)
   }
 
   "ReceiveCashPaymentsController" must {
@@ -58,7 +59,7 @@ class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
 
       "status is approved but the service has just been added" in new Fixture {
         mockApplicationStatus(SubmissionDecisionApproved)
-        mockIsNewActivity(true, Some(HighValueDealing))
+        mockIsNewActivityNewAuth(true, Some(HighValueDealing))
 
         val result = controller.get()(request)
         status(result) mustBe OK
@@ -140,10 +141,10 @@ class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
         val result = controller.post(true)(newRequest)
 
         status(result) mustEqual SEE_OTHER
-        verify(controller.cacheConnector).save[Hvd](any(), eqTo(Hvd(
+        verify(controller.cacheConnector).save[Hvd](any(), any(), eqTo(Hvd(
           receiveCashPayments = Some(false),
           hasChanged = true
-        )))(any(), any(), any())
+        )))(any(), any())
       }
     }
   }

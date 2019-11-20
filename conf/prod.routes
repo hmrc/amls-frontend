@@ -2,4 +2,5 @@
 ->          /anti-money-laundering      app.Routes
 ->          /template                   template.Routes
 ->          /                           health.Routes
+->          /amp                        amp.Routes
 GET         /admin/metrics              @com.kenshoo.play.metrics.MetricsController.metrics

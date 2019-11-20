@@ -16,17 +16,13 @@
 
 package controllers.bankdetails
 
+import controllers.actions.SuccessfulAuthAction
 import models.bankdetails._
-import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
-import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => meq, _}
-import org.mockito.Mockito._
+import models.status.SubmissionReady
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
-
-import scala.collection.JavaConversions._
 
 class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
 
@@ -88,7 +84,7 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
 
     val controller = new YourBankAccountsController(
       dataCacheConnector = mockCacheConnector,
-      authConnector = self.authConnector
+      authAction = SuccessfulAuthAction
     )
   }
 
@@ -185,7 +181,6 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
       val result = controller.get()(request)
 
       status(result) mustBe OK
-
 
       contentAsString(result) must not include Messages("bankdetails.yourbankaccounts.noaccountname")
     }

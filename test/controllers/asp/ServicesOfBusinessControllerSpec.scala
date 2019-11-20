@@ -16,6 +16,7 @@
 
 package controllers.asp
 
+import controllers.actions.SuccessfulAuthAction
 import models.asp._
 import models.businessmatching.AccountancyServices
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
@@ -38,13 +39,13 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
     val controller = new ServicesOfBusinessController(
       mockCacheConnector,
       mockStatusService,
-      self.authConnector,
+      authAction = SuccessfulAuthAction,
       mockServiceFlow
     )
 
     mockCacheFetch[Asp](None)
     mockCacheSave[Asp]
-    mockIsNewActivity(false)
+    mockIsNewActivityNewAuth(false)
   }
 
   "ServicesOfBusinessController" must {
@@ -162,7 +163,7 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
               "services[2]" -> "03")
 
             mockApplicationStatus(SubmissionDecisionApproved)
-            mockIsNewActivity(true, Some(AccountancyServices))
+            mockIsNewActivityNewAuth(true, Some(AccountancyServices))
 
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)

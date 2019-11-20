@@ -19,7 +19,7 @@ package controllers.renewal
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
 import models.registrationprogress.Completed
@@ -27,8 +27,7 @@ import models.status.{ReadyForRenewal, RenewalSubmitted}
 import play.api.i18n.MessagesApi
 import services.businessmatching.BusinessMatchingService
 import services.{ProgressService, RenewalService, SectionsProvider, StatusService}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
+import utils.{AuthAction, ControllerHelper}
 import views.html.renewal.renewal_progress
 
 import scala.concurrent.Future
@@ -37,7 +36,7 @@ import scala.concurrent.Future
 @Singleton
 class RenewalProgressController @Inject()
 (
-  val authConnector: AuthConnector,
+  val authAction: AuthAction,
   val dataCacheConnector: DataCacheConnector,
   val progressService: ProgressService,
   val sectionsProvider: SectionsProvider,
@@ -45,18 +44,16 @@ class RenewalProgressController @Inject()
   val renewals: RenewalService,
   val businessMatchingService: BusinessMatchingService,
   val statusService: StatusService
-) extends BaseController {
+) extends DefaultBaseController {
 
-  def get = Authorised.async {
-    implicit authContext =>
+  def get = authAction.async {
       implicit request =>
-        val statusInfo = statusService.getDetailedStatus
-
+        val statusInfo = statusService.getDetailedStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
         val result = statusInfo map {
           case (r: ReadyForRenewal, _) => {
             for {
-              renewalSection <- OptionT.liftF(renewals.getSection)
-              cache <- OptionT(dataCacheConnector.fetchAll)
+              renewalSection <- OptionT.liftF(renewals.getSection(request.credId))
+              cache <- OptionT(dataCacheConnector.fetchAll(request.credId))
               businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
             } yield {
               val businessName = businessMatching.reviewDetails.map(r => r.businessName).getOrElse("")
@@ -73,14 +70,11 @@ class RenewalProgressController @Inject()
         result.flatMap(_.getOrElse(InternalServerError("Cannot get business matching or renewal date")))
   }
 
-
-  def post() = Authorised.async {
-    implicit authContext =>
+  def post() = authAction.async {
       implicit request =>
-        progressService.getSubmitRedirect map {
+        progressService.getSubmitRedirect(request.amlsRefNumber, request.accountTypeId, request.credId) map {
           case Some(url) => Redirect(url)
           case _ => InternalServerError("Could not get data for redirect")
         }
   }
-
 }

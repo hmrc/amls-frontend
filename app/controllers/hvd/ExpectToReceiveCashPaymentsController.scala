@@ -17,28 +17,27 @@
 package controllers.hvd
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import jto.validation.{Path, ValidationError}
 import models.hvd.{Hvd, PaymentMethods}
 import services.StatusService
 import services.businessmatching.ServiceFlow
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 import views.html.hvd.expect_to_receive
 
 import scala.concurrent.Future
 
 @Singleton
-class ExpectToReceiveCashPaymentsController @Inject()( val authConnector: AuthConnector,
+class ExpectToReceiveCashPaymentsController @Inject()( val authAction: AuthAction,
                                                        implicit val cacheConnector: DataCacheConnector,
                                                        implicit val statusService: StatusService,
-                                                       implicit val serviceFlow: ServiceFlow
-                                                     ) extends BaseController {
+                                                       implicit val serviceFlow: ServiceFlow) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      cacheConnector.fetch[Hvd](Hvd.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      cacheConnector.fetch[Hvd](request.credId, Hvd.key) map {
         response =>
           val form: Form2[PaymentMethods] = (for {
             hvd <- response
@@ -51,8 +50,8 @@ class ExpectToReceiveCashPaymentsController @Inject()( val authConnector: AuthCo
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request =>
       Form2[PaymentMethods](request.body) match {
         case f: InvalidForm =>
           val message = "error.required.hvd.choose.option"
@@ -66,8 +65,8 @@ class ExpectToReceiveCashPaymentsController @Inject()( val authConnector: AuthCo
 
         case ValidForm(_, data) =>
           for {
-            hvd <- cacheConnector.fetch[Hvd](Hvd.key)
-            _ <- cacheConnector.save[Hvd](Hvd.key,
+            hvd <- cacheConnector.fetch[Hvd](request.credId, Hvd.key)
+            _ <- cacheConnector.save[Hvd](request.credId, Hvd.key,
               hvd.cashPaymentMethods(data)
             )
           } yield edit match {

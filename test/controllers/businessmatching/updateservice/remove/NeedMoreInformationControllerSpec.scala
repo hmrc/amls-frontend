@@ -16,9 +16,9 @@
 
 package controllers.businessmatching.updateservice.remove
 
-import models.DateOfChange
-import models.businessmatching.HighValueDealing
-import models.flowmanagement.{AddBusinessTypeFlowModel, NeedMoreInformationPageId, NeedToUpdatePageId, RemoveBusinessTypeFlowModel}
+import controllers.actions.SuccessfulAuthAction
+import models.businessmatching.{AccountancyServices}
+import models.flowmanagement.{NeedToUpdatePageId, RemoveBusinessTypeFlowModel}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import play.api.i18n.Messages
@@ -33,7 +33,7 @@ class NeedMoreInformationControllerSpec extends AmlsSpec {
     val request = addToken(authRequest)
 
     val controller = new NeedMoreInformationController(
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[RemoveBusinessTypeFlowModel]
     )
@@ -45,7 +45,7 @@ class NeedMoreInformationControllerSpec extends AmlsSpec {
     "get is called" must {
 
       "return OK with need_to_update view" in new Fixture {
-        mockCacheFetch(Some(RemoveBusinessTypeFlowModel(Some(Set(HighValueDealing)))), Some(RemoveBusinessTypeFlowModel.key))
+        mockCacheFetch(Some(RemoveBusinessTypeFlowModel(Some(Set(AccountancyServices)))), Some(RemoveBusinessTypeFlowModel.key))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -61,7 +61,7 @@ class NeedMoreInformationControllerSpec extends AmlsSpec {
         val result = controller.post()(request)
 
         status(result) mustBe SEE_OTHER
-        controller.router.verify(NeedToUpdatePageId, new RemoveBusinessTypeFlowModel())
+        controller.router.verify("internalId", NeedToUpdatePageId, new RemoveBusinessTypeFlowModel())
       }
     }
   }

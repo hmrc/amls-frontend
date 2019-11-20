@@ -17,17 +17,15 @@
 package services
 
 import config.AppConfig
+import connectors.{EnrolmentStubConnector, TaxEnrolmentsConnector}
 import javax.inject.Inject
 import models.enrolment.{AmlsEnrolmentKey, TaxEnrolment}
-import connectors.{AuthConnector, TaxEnrolmentsConnector, EnrolmentStubConnector}
 import play.api.Logger
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector,
-                                      val enrolmentStore: TaxEnrolmentsConnector,
+class AuthEnrolmentsService @Inject()(val enrolmentStore: TaxEnrolmentsConnector,
                                       val config: AppConfig,
                                       val stubConnector: EnrolmentStubConnector) {
 
@@ -35,57 +33,46 @@ class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector,
   private val amlsNumberKey = "MLRRefNumber"
   private val prefix = "AuthEnrolmentsService"
 
-  def amlsRegistrationNumber(implicit authContext: AuthContext,
-                             headerCarrier: HeaderCarrier,
-                             ec: ExecutionContext): Future[Option[String]] = {
+  def amlsRegistrationNumber(amlsRegistrationNumber: Option[String], groupIdentifier: Option[String])
+                            (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Option[String]] = {
 
     Logger.debug(s"[$prefix][amlsRegistrationNumber] - Begin...)")
-
-    val authEnrolments = authContext.enrolmentsUri map { uri =>
-      authConnector.enrolments(uri)
-    } getOrElse Future.successful(Seq.empty)
-
     Logger.debug(s"[$prefix][amlsRegistrationNumber] - config.enrolmentStubsEnabled: ${config.enrolmentStubsEnabled})")
-    lazy val stubbedEnrolments = if (config.enrolmentStubsEnabled) {
-      authConnector.userDetails flatMap { details =>
-        stubConnector.enrolments(details.groupIdentifier.getOrElse(throw new Exception("Group ID is unavailable")))
-      }
+
+    val stubbedEnrolments =  if (config.enrolmentStubsEnabled) {
+      stubConnector.enrolments(groupIdentifier.getOrElse(throw new Exception("Group ID is unavailable")))
     } else {
-      Logger.debug(s"[$prefix][amlsRegistrationNumber] - Return empty sequence...)")
+      Logger.debug(s"[$prefix][amlsRegistrationNumber] - Returning empty sequence...)")
       Future.successful(Seq.empty)
     }
 
-    val enrolmentQuery = authEnrolments flatMap {
-      case enrolments if enrolments.count(_.key == amlsKey) > 0 => Future.successful(enrolments)
-      case _ => stubbedEnrolments
-    }
-
-    enrolmentQuery map { enrolmentsList =>
-      Logger.debug(s"[$prefix][amlsRegistrationNumber] - enrolmentsList: $enrolmentsList)")
-      for {
-        amlsEnrolment <- enrolmentsList.find(enrolment => enrolment.key == amlsKey)
-        amlsIdentifier <- amlsEnrolment.identifiers.find(identifier => identifier.key == amlsNumberKey)
-      } yield {
-        Logger.debug(s"[$prefix][amlsRegistrationNumber] - amlsEnrolment: $amlsEnrolment)")
-        Logger.debug(s"[$prefix][amlsRegistrationNumber] : ${amlsIdentifier.value}")
-        amlsIdentifier.value
-      }
+    amlsRegistrationNumber match {
+      case regNo@Some(_) => Future.successful(regNo)
+      case None => stubbedEnrolments map { enrolmentsList =>
+        Logger.debug(s"[$prefix][amlsRegistrationNumber] - enrolmentsList: $enrolmentsList)")
+          for {
+            amlsEnrolment   <- enrolmentsList.find(enrolment => enrolment.key == amlsKey)
+            amlsIdentifier  <- amlsEnrolment.identifiers.find(identifier => identifier.key == amlsNumberKey)
+          } yield {
+            Logger.debug(s"[$prefix][amlsRegistrationNumber] - amlsEnrolment: $amlsEnrolment)")
+            Logger.debug(s"[$prefix][amlsRegistrationNumber] : ${amlsIdentifier.value}")
+            amlsIdentifier.value
+          }
+        }
     }
   }
 
-  def enrol(amlsRegistrationNumber: String, postcode: String)
-           (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[HttpResponse] = {
-    authConnector.getCurrentAuthority flatMap {
-      authority =>
-        enrolmentStore.enrol(AmlsEnrolmentKey(amlsRegistrationNumber), TaxEnrolment(authority.credId, postcode))
-    }
+  def enrol(amlsRegistrationNumber: String, postcode: String, groupId: Option[String], credId: String)
+           (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+
+    enrolmentStore.enrol(AmlsEnrolmentKey(amlsRegistrationNumber), TaxEnrolment(credId, postcode), groupId)
   }
 
-  def deEnrol(amlsRegistrationNumber: String)
-             (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Boolean] = {
+  def deEnrol(amlsRegistrationNumber: String, groupId: Option[String])
+             (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] = {
     for {
       _ <- enrolmentStore.removeKnownFacts(amlsRegistrationNumber)
-      _ <- enrolmentStore.deEnrol(amlsRegistrationNumber)
+      _ <- enrolmentStore.deEnrol(amlsRegistrationNumber, groupId)
     } yield true
   }
 

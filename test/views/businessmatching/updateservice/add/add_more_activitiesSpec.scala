@@ -29,7 +29,7 @@ class add_more_activitiesSpec extends AmlsSpec with MustMatchers  {
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
-    def view = add_more_activities(EmptyForm, Set.empty[String])
+    def view = add_more_activities(EmptyForm, List.empty[String])
   }
 
   "The add_more_activities view" must {
@@ -56,7 +56,7 @@ class add_more_activitiesSpec extends AmlsSpec with MustMatchers  {
     }
 
     "not show the return link when specified" in new ViewFixture {
-      override def view = views.html.businessmatching.updateservice.add.add_more_activities(EmptyForm, Set.empty[String])
+      override def view = views.html.businessmatching.updateservice.add.add_more_activities(EmptyForm, List.empty[String])
 
       doc.body().text() must not include Messages("link.return.registration.progress")
     }
@@ -66,7 +66,7 @@ class add_more_activitiesSpec extends AmlsSpec with MustMatchers  {
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq((Path \ "businessmatching.updateservice.addmoreactivities") -> Seq(ValidationError("not a message Key"))))
 
-      override def view = views.html.businessmatching.updateservice.add.add_more_activities(form2, Set.empty[String])
+      override def view = views.html.businessmatching.updateservice.add.add_more_activities(form2, List.empty[String])
 
       errorSummary.html() must include("not a message Key")
     }

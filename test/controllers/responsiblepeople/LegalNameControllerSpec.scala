@@ -17,16 +17,14 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople._
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo}
 import org.scalatest.concurrent.ScalaFutures
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils._
 
 
 class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
@@ -36,7 +34,7 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
     val RecordId = 1
 
     val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
       .build()
 
@@ -79,9 +77,9 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
 
         val previousPerson = PreviousName(
           hasPreviousName = Some(true),
-          firstName = Some("firstPrevious"),
-          middleName = Some("middlePrevious"),
-          lastName = Some("lastPrevious")
+          None,
+          None,
+          None
         )
 
         val responsiblePeople = ResponsiblePerson(personName = Some(addPerson), legalName = Some(previousPerson))
@@ -95,9 +93,7 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
 
         val document = Jsoup.parse(contentAsString(result))
 
-        document.select("input[name=firstName]").`val` must be("firstPrevious")
-        document.select("input[name=middleName]").`val` must be("middlePrevious")
-        document.select("input[name=lastName]").`val` must be("lastPrevious")
+        document.select("input[name=hasPreviousName]").`val` must be("true")
       }
 
     }
@@ -119,7 +115,7 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
 
             val result = controller.post(RecordId)(requestWithParams)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.LegalNameChangeDateController.get(RecordId).url))
+            redirectLocation(result) must be(Some(routes.LegalNameInputController.get(RecordId).url))
           }
         }
 
@@ -159,7 +155,7 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
         "return BAD_REQUEST" in new TestFixture {
 
           val NameMissingInRequest = request.withFormUrlEncodedBody(
-            "hasPreviousName" -> "true"
+            "hasPreviousName" -> "fail"
           )
 
           mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
@@ -169,7 +165,24 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
           status(result) must be(BAD_REQUEST)
 
         }
+      }
 
+      "form is invalid" when {
+        "hasPreviousName is true" must {
+          "redirect to LegalNameInputController" in new TestFixture {
+
+            val requestWithHasPreviousNameTrue = request.withFormUrlEncodedBody(
+              "hasPreviousName" -> "true"
+            )
+
+            mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
+            mockCacheSave[PreviousName]
+
+            val result = controller.post(RecordId)(requestWithHasPreviousNameTrue)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.LegalNameInputController.get(RecordId).url))
+          }
+        }
       }
 
       "model cannot be found with given index" must {

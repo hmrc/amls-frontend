@@ -1,0 +1,51 @@
+@*
+ * Copyright 2019 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.Form2
+@import include._
+@import forms2._
+
+@(f: Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
+
+@header = {
+    @components.back_link()
+    @errorSummaryWithPlaceholder(f, personName)
+}
+
+@main(
+    title = Messages("responsiblepeople.legalNameInput.title") + " - " + Messages("summary.responsiblepeople"),
+    heading = header
+) {
+    @form(f, controllers.responsiblepeople.routes.LegalNameInputController.post(index, edit, flow)) {
+
+        @fieldsetWithErrorGroup(
+            f = f("previous"),
+            heading = Messages("responsiblepeople.legalNameInput.heading", personName),
+            section = "summary.responsiblepeople",
+            hint = "responsiblepeople.legalnamechangedate.hint",
+            panel = false,
+            errorGroupPlaceholder = personName
+        ) {
+            <input type ="hidden" name="hasPreviousName" value=true />
+
+            @inputWithErrorPlaceholder(f("firstName"), "responsiblepeople.personName.otherfirstnames", personName)
+            @input(f("middleName"), "responsiblepeople.personName.othermiddlenames")
+            @inputWithErrorPlaceholder(f("lastName"), "responsiblepeople.personName.otherlastnames", personName)
+        }
+
+        @submit(edit)
+    }
+}

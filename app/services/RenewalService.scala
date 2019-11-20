@@ -26,7 +26,6 @@ import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.renewal.Renewal.ValidationRules._
 import models.renewal._
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.MappingUtils._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -34,13 +33,13 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class RenewalService @Inject()(dataCache: DataCacheConnector) {
 
-  def getSection(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, ec: ExecutionContext) = {
+  def getSection(credId: String)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext) = {
 
     val notStarted = Section(Renewal.sectionKey, NotStarted, hasChanged = false, controllers.renewal.routes.WhatYouNeedController.get())
 
-    this.getRenewal flatMap {
+    this.getRenewal(credId).flatMap {
       case Some(model) =>
-        isRenewalComplete(model) flatMap { x =>
+        isRenewalComplete(model, credId) flatMap { x =>
           if (x) {
             Future.successful(Section(Renewal.sectionKey, Completed, model.hasChanged, controllers.renewal.routes.SummaryController.get()))
           } else {
@@ -54,16 +53,16 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
     }
   }
 
-  def getRenewal(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, ec: ExecutionContext) =
-    dataCache.fetch[Renewal](Renewal.key)
+  def getRenewal(cacheId: String)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext) =
+    dataCache.fetch[Renewal](cacheId, Renewal.key)
 
-  def updateRenewal(renewal: Renewal)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, ec: ExecutionContext) =
-    dataCache.save[Renewal](Renewal.key, renewal)
+  def updateRenewal(credId: String, renewal: Renewal)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext) =
+    dataCache.save[Renewal](credId, Renewal.key, renewal)
 
-  def isRenewalComplete(renewal: Renewal)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, ec: ExecutionContext) = {
+  def isRenewalComplete(renewal: Renewal, credId: String)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext) = {
 
     val isComplete = for {
-      cache <- OptionT(dataCache.fetchAll)
+      cache <- OptionT(dataCache.fetchAll(credId))
       businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
       activities <- OptionT.fromOption[Future](businessMatching.activities)
     } yield {

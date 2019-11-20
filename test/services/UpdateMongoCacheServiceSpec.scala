@@ -21,6 +21,7 @@ import config.WSHttp
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
+import models.amp.Amp
 import models.businessdetails._
 import models.asp.{Accountancy, Asp, OtherBusinessTaxMattersNo, ServicesOfBusiness}
 import models.bankdetails.{BankDetails, PersonalAccount, UKAccount}
@@ -41,6 +42,7 @@ import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.verify
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
+import play.api.libs.json.Json
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
 
@@ -58,6 +60,8 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
     val http = mock[WSHttp]
     val updateMongoCacheService = new UpdateMongoCacheService(http, mockCacheConnector)
 
+    val credId = "12341234"
+
     val viewResponse = ViewResponse(
       etmpFormBundleNumber = "FORMBUNDLENUMBER",
       businessMatchingSection = BusinessMatching(),
@@ -72,6 +76,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
       aspSection = None,
       msbSection = None,
       hvdSection = None,
+      ampSection = None,
       supervisionSection = None
     )
 
@@ -87,7 +92,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
     val tradingPremises = Seq(tradingPremisesGen.sample.get, tradingPremisesGen.sample.get)
 
     val businessDetails = BusinessDetails(
-      previouslyRegistered = Some(PreviouslyRegisteredYes("12345678")),
+      previouslyRegistered = Some(PreviouslyRegisteredYes(Some("12345678"))),
       activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))),
       vatRegistered = Some(VATRegisteredYes("123456789")),
       corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1234567890")),
@@ -179,6 +184,16 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
       Some(LinkedCashPayments(false)),
       Some(DateOfChange(new LocalDate("2016-02-24"))))
 
+    val ampData = Json.obj(
+      "typeOfParticipant"     -> Seq("artGalleryOwner"),
+      "boughtOrSoldOverThreshold"     -> true,
+      "dateTransactionOverThreshold"  -> LocalDate.now,
+      "identifyLinkedTransactions"    -> true,
+      "percentageExpectedTurnover"    -> "fortyOneToSixty"
+    )
+
+    val amp = Amp(data = ampData)
+
     val supervision = Supervision(
       Some(AnotherBodyNo),
       Some(ProfessionalBodyMemberYes),
@@ -226,6 +241,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
       Some(asp),
       Some(msb),
       Some(hvd),
+      Some(amp),
       Some(supervision),
       Some(subscription),
       Some(amendVariationRenewalResponse))
@@ -255,25 +271,25 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
         mockCacheSave[AmendVariationRenewalResponse]
         mockCacheSave[DataImport]
 
-        await(updateMongoCacheService.update(updateMongoCacheResponse))
+        await(updateMongoCacheService.update(credId, updateMongoCacheResponse))
 
-        verify(mockCacheConnector).save[ViewResponse](eqTo(ViewResponse.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[Seq[TradingPremises]](eqTo(TradingPremises.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[Seq[BankDetails]](eqTo(BankDetails.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[AddPerson](eqTo(AddPerson.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[BusinessActivities](eqTo(BusinessActivities.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[Tcsp](eqTo(Tcsp.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[Asp](eqTo(Asp.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[Hvd](eqTo(Hvd.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[Supervision](eqTo(Supervision.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[BusinessDetails](eqTo(BusinessDetails.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[EstateAgentBusiness](eqTo(EstateAgentBusiness.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[SubscriptionResponse](eqTo(SubscriptionResponse.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
-        verify(mockCacheConnector).save[DataImport](eqTo(DataImport.key), eqTo(dataImport))(any(), any(), any())
+        verify(mockCacheConnector).save[ViewResponse](any(), eqTo(ViewResponse.key), any())(any(), any())
+        verify(mockCacheConnector).save[BusinessMatching](any(), eqTo(BusinessMatching.key), any())(any(), any())
+        verify(mockCacheConnector).save[Seq[TradingPremises]](any(), eqTo(TradingPremises.key), any())(any(), any())
+        verify(mockCacheConnector).save[Seq[BankDetails]](any(), eqTo(BankDetails.key), any())(any(), any())
+        verify(mockCacheConnector).save[AddPerson](any(), eqTo(AddPerson.key), any())(any(), any())
+        verify(mockCacheConnector).save[BusinessActivities](any(), eqTo(BusinessActivities.key), any())(any(), any())
+        verify(mockCacheConnector).save[Tcsp](any(), eqTo(Tcsp.key), any())(any(), any())
+        verify(mockCacheConnector).save[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key), any())(any(), any())
+        verify(mockCacheConnector).save[Asp](any(), eqTo(Asp.key), any())(any(), any())
+        verify(mockCacheConnector).save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), any())(any(), any())
+        verify(mockCacheConnector).save[Hvd](any(), eqTo(Hvd.key), any())(any(), any())
+        verify(mockCacheConnector).save[Supervision](any(), eqTo(Supervision.key), any())(any(), any())
+        verify(mockCacheConnector).save[BusinessDetails](any(), eqTo(BusinessDetails.key), any())(any(), any())
+        verify(mockCacheConnector).save[EstateAgentBusiness](any(), eqTo(EstateAgentBusiness.key), any())(any(), any())
+        verify(mockCacheConnector).save[SubscriptionResponse](any(), eqTo(SubscriptionResponse.key), any())(any(), any())
+        verify(mockCacheConnector).save[AmendVariationRenewalResponse](any(), eqTo(AmendVariationRenewalResponse.key), any())(any(), any())
+        verify(mockCacheConnector).save[DataImport](any(), eqTo(DataImport.key), eqTo(dataImport))(any(), any())
       }
     }
   }

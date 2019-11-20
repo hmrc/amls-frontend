@@ -18,11 +18,11 @@ package controllers.businessmatching.updateservice.remove
 
 import cats.data.OptionT
 import cats.implicits._
+import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
 import models.DateOfChange
 import models.businessmatching._
-import models.businessmatching.updateservice.ServiceChangeRegister
-import models.flowmanagement.{RemoveBusinessTypeFlowModel, WhatBusinessTypesToRemovePageId, WhatDateRemovedPageId}
+import models.flowmanagement.{RemoveBusinessTypeFlowModel, WhatBusinessTypesToRemovePageId}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -49,7 +49,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
 
     val controller = new RemoveBusinessTypesController(
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       dataCacheConnector = mockCacheConnector,
       businessMatchingService = mockBusinessMatchingService,
       removeBusinessTypeHelper = mockRemoveBusinessTypeHelper,
@@ -57,13 +57,13 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
     )
 
     when {
-      controller.businessMatchingService.getModel(any(), any(), any())
+      controller.businessMatchingService.getModel(any())(any(), any())
     } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
       activities = Some(BusinessActivities(Set(BillPaymentServices)))
     ))
 
     when {
-      controller.businessMatchingService.getSubmittedBusinessActivities(any(), any(), any())
+      controller.businessMatchingService.getSubmittedBusinessActivities(any())(any(), any())
     } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(BillPaymentServices))
 
     mockCacheFetch[RemoveBusinessTypeFlowModel](Some(RemoveBusinessTypeFlowModel(Some(Set(BillPaymentServices)))), Some(RemoveBusinessTypeFlowModel.key))
@@ -76,7 +76,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.removeactivities.title"))
+        Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.removeactivities.title.multibusinesses"))
       }
     }
 
@@ -91,14 +91,14 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
       "return the next page in the flow when valid data has been posted" in new Fixture {
 
         when {
-          controller.businessMatchingService.getModel(any(), any(), any())
+          controller.businessMatchingService.getModel(any())(any(), any())
         } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
           activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
         ))
 
         mockCacheFetch(Some(RemoveBusinessTypeFlowModel()), Some(RemoveBusinessTypeFlowModel.key))
 
-        when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any())(any(), any(), any())).thenReturn(OptionT.some[Future, Boolean](true))
+        when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any(), any())(any(), any())).thenReturn(OptionT.some[Future, Boolean](true))
 
         mockCacheSave[RemoveBusinessTypeFlowModel]
 
@@ -111,7 +111,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
       "save the list of business activites to the data cache" in new Fixture {
         when {
-          controller.businessMatchingService.getModel(any(), any(), any())
+          controller.businessMatchingService.getModel(any())(any(), any())
         } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
           activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
         ))
@@ -122,80 +122,80 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
         mockCacheFetch(Some(flowModel), Some(RemoveBusinessTypeFlowModel.key))
 
-        when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any())(any(), any(), any())).thenReturn(OptionT.some[Future, Boolean](true))
+        when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any(), any())(any(), any())).thenReturn(OptionT.some[Future, Boolean](true))
 
         mockCacheSave[RemoveBusinessTypeFlowModel]
 
         val result = await(controller.post()(request.withFormUrlEncodedBody(
-          "businessActivities[]" -> "04"
+          "businessActivities[]" -> "05"
         )))
 
-        controller.router.verify(WhatBusinessTypesToRemovePageId, flowModel.copy(dateOfChange = None, activitiesToRemove = Some(Set(HighValueDealing))))
+        controller.router.verify("internalId", WhatBusinessTypesToRemovePageId, flowModel.copy(dateOfChange = None, activitiesToRemove = Some(Set(HighValueDealing))))
       }
 
       "wipe the date of change if its not required" in new Fixture {
         when {
-          controller.businessMatchingService.getModel(any(), any(), any())
+          controller.businessMatchingService.getModel(any())(any(), any())
         } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
           activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
         ))
 
         mockCacheFetch(Some(RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(LocalDate.now)))), Some(RemoveBusinessTypeFlowModel.key))
 
-        when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any())(any(), any(), any())).thenReturn(OptionT.some[Future, Boolean](false))
+        when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any(), any())(any(), any())).thenReturn(OptionT.some[Future, Boolean](false))
 
         mockCacheSave[RemoveBusinessTypeFlowModel]
 
         val result = await(controller.post()(request.withFormUrlEncodedBody(
-          "businessActivities[]" -> "04"
+          "businessActivities[]" -> "05"
         )))
 
-        controller.router.verify(WhatBusinessTypesToRemovePageId, RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing))))
+        controller.router.verify("internalId", WhatBusinessTypesToRemovePageId, RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing))))
       }
 
       "wipe the date of change if the services to remove have been edited and changed" in new Fixture {
         when {
-          controller.businessMatchingService.getModel(any(), any(), any())
+          controller.businessMatchingService.getModel(any())(any(), any())
         } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
           activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
         ))
 
         mockCacheFetch(Some(RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness)), dateOfChange = Some(DateOfChange(LocalDate.now)))), Some(RemoveBusinessTypeFlowModel.key))
 
-        when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any())(any(), any(), any())).thenReturn(OptionT.some[Future, Boolean](true))
+        when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any(), any())(any(), any())).thenReturn(OptionT.some[Future, Boolean](true))
 
         mockCacheSave[RemoveBusinessTypeFlowModel]
 
         val result = await(controller.post()(request.withFormUrlEncodedBody(
-          "businessActivities[]" -> "04"
+          "businessActivities[]" -> "05"
         )))
 
-        controller.router.verify(WhatBusinessTypesToRemovePageId, RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing))))
+        controller.router.verify("internalId", WhatBusinessTypesToRemovePageId, RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing))))
       }
 
       "leave the date of change if the services to remove have not been changed" in new Fixture {
         when {
-          controller.businessMatchingService.getModel(any(), any(), any())
+          controller.businessMatchingService.getModel(any())(any(), any())
         } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
           activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
         ))
 
         mockCacheFetch(Some(RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing)), dateOfChange = Some(DateOfChange(LocalDate.now)))), Some(RemoveBusinessTypeFlowModel.key))
 
-        when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any())(any(), any(), any())).thenReturn(OptionT.some[Future, Boolean](true))
+        when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any(), any())(any(), any())).thenReturn(OptionT.some[Future, Boolean](true))
 
         mockCacheSave[RemoveBusinessTypeFlowModel]
 
         val result = await(controller.post()(request.withFormUrlEncodedBody(
-          "businessActivities[]" -> "04"
+          "businessActivities[]" -> "05"
         )))
 
-        controller.router.verify(WhatBusinessTypesToRemovePageId, RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing)), dateOfChange = Some(DateOfChange(LocalDate.now))))
+        controller.router.verify("internalId", WhatBusinessTypesToRemovePageId, RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing)), dateOfChange = Some(DateOfChange(LocalDate.now))))
       }
 
       "throw an error message when trying to select all business types the users has" in new Fixture {
         when {
-          controller.businessMatchingService.getModel(any(), any(), any())
+          controller.businessMatchingService.getModel(any())(any(), any())
         } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
           activities = Some(BusinessActivities(Set(AccountancyServices,
             BillPaymentServices,
@@ -221,12 +221,12 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
         val result = controller.post()(request.withFormUrlEncodedBody(
 
         "businessActivities[]" -> "01",
-        "businessActivities[]" -> "02",
         "businessActivities[]" -> "03",
         "businessActivities[]" -> "04",
         "businessActivities[]" -> "05",
         "businessActivities[]" -> "06",
-        "businessActivities[]" -> "07"
+        "businessActivities[]" -> "07",
+        "businessActivities[]" -> "08"
         ))
 
         status(result) must be(BAD_REQUEST)

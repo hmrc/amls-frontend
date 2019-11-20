@@ -55,5 +55,17 @@ class EnrolmentStubConnectorSpec extends AmlsSpec with BaseGenerator {
 
       verify(http).GET[Seq[GovernmentGatewayEnrolment]](eqTo(s"http://stubs/auth/oid/$groupId/enrolments"))(any(), any(), any())
     }
+
+    "get the enrolments from the stubs service for new auth" in new TestFixture {
+      when {
+        http.GET[Seq[GovernmentGatewayEnrolment]](any())(any(), any(), any())
+      } thenReturn Future.successful(enrolments)
+
+      val result = await(connector.enrolments(groupId))
+
+      result mustBe enrolments
+
+      verify(http).GET[Seq[GovernmentGatewayEnrolment]](eqTo(s"http://stubs/auth/oid/$groupId/enrolments"))(any(), any(), any())
+    }
   }
 }

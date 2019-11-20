@@ -17,6 +17,7 @@
 package controllers
 
 import connectors._
+import controllers.actions.SuccessfulAuthAction
 import generators.submission.SubscriptionResponseGenerator
 import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
@@ -55,15 +56,19 @@ class ConfirmationControllerSpec extends AmlsSpec
 
     val controller = new ConfirmationController(
       keystoreConnector = mock[KeystoreConnector],
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       statusService = mock[StatusService],
       dataCacheConnector = mock[DataCacheConnector],
       amlsConnector = mock[AmlsConnector],
-      authEnrolmentsService = mock[AuthEnrolmentsService],
+      enrolmentService = mock[AuthEnrolmentsService],
       feeResponseService = mock[FeeResponseService],
       authenticator = mock[AuthenticatorConnector],
-      confirmationService = mock[ConfirmationService]
-    )
+      confirmationService = mock[ConfirmationService])
+
+    val amlsRegistrationNumber = "amlsRefNumber"
+
+    when(controller.enrolmentService.amlsRegistrationNumber(any(), any())(any(), any()))
+      .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
     val response = subscriptionResponseGen(hasFees = true).sample.get
 
@@ -82,55 +87,52 @@ class ConfirmationControllerSpec extends AmlsSpec
     } thenReturn Future.successful()
 
     when {
-      controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
-    } thenReturn Future.successful(Some(amlsRegistrationNumber))
-
-    when {
-      controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
+      controller.amlsConnector.refreshPaymentStatus(any(), any())(any(), any())
     } thenReturn Future.successful(paymentStatusResultGen.sample.get.copy(currentStatus = PaymentStatuses.Successful))
 
     when {
-      controller.amlsConnector.getPaymentByPaymentReference(any())(any(), any(), any())
+      controller.amlsConnector.getPaymentByPaymentReference(any(), any())(any(), any())
     } thenReturn Future.successful(paymentGen.sample)
 
     when {
-      controller.amlsConnector.savePayment(any(), any(), any())(any(), any(), any())
+      controller.amlsConnector.savePayment(any(), any(), any(), any())(any(), any())
     } thenReturn Future.successful(HttpResponse(CREATED))
 
     when {
-      controller.amlsConnector.registrationDetails(any())(any(), any(), any())
+      controller.amlsConnector.registrationDetails(any(), any())(any(), any())
     } thenReturn Future.successful(RegistrationDetails(companyNameFromRegistration, isIndividual = false))
 
     when {
-      controller.dataCacheConnector.fetch[SubmissionRequestStatus](eqTo(SubmissionRequestStatus.key))(any(),any(),any())
+      controller.dataCacheConnector.fetch[SubmissionRequestStatus](any(), eqTo(SubmissionRequestStatus.key))(any(), any())
     } thenReturn Future.successful(Some(SubmissionRequestStatus(true)))
 
     def feeResponse(responseType: ResponseType) = FeeResponse(
-      responseType,
-      amlsRegistrationNumber,
-      100,
-      None,
-      None,
-      0,
-      200,
-      Some(paymentReferenceNumber),
-      Some(115),
-      DateTime.now
+      responseType = responseType,
+      amlsReferenceNumber = amlsRegistrationNumber,
+      registrationFee = 100,
+      fpFee = None,
+      approvalCheckFee = None,
+      premiseFee = 0,
+      totalFees = 200,
+      paymentReference = Some(paymentReferenceNumber),
+      difference = Some(115),
+      createdAt = DateTime.now
     )
 
     when {
-      controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber))(any(), any(), any())
+      controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any[(String, String)]())(any(), any())
     } thenReturn Future.successful(Some(feeResponse(SubscriptionResponseType)))
 
     val breakdownRows = Seq.empty[BreakdownRow]
 
     when {
-      controller.confirmationService.getBreakdownRows(any(), any())(any(), any(), any())
+      controller.confirmationService.getBreakdownRows(any(), any(), any())(any(), any())
     } thenReturn Future.successful(Some(breakdownRows))
 
     val businessDetails = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredNo))
+
     when {
-      controller.dataCacheConnector.fetch[BusinessDetails](eqTo(BusinessDetails.key))(any(), any(), any())
+      controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any(), any())
     } thenReturn Future.successful(Some(businessDetails))
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))
@@ -142,7 +144,7 @@ class ConfirmationControllerSpec extends AmlsSpec
       )
 
       when {
-        controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+        controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any())
       } thenReturn Future.successful(Some(model))
 
     }
@@ -150,14 +152,14 @@ class ConfirmationControllerSpec extends AmlsSpec
     def setupStatus(status: SubmissionStatus): Unit = {
 
       when {
-        controller.statusService.getStatus(any(), any(), any())
+        controller.statusService.getStatus(any[Option[String]](), any(), any())(any(), any())
       } thenReturn Future.successful(status)
 
       val statusResponse = mock[ReadStatusResponse]
       when(statusResponse.safeId) thenReturn safeIdGen.sample
 
       when {
-        controller.statusService.getDetailedStatus(any(), any(), any())
+        controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any())
       } thenReturn Future.successful((status, Some(statusResponse)))
     }
   }
@@ -171,7 +173,7 @@ class ConfirmationControllerSpec extends AmlsSpec
       setupStatus(submissionStatus)
 
       when {
-        controller.confirmationService.getBreakdownRows(eqTo(SubmissionReady), any())(any(), any(), any())
+        controller.confirmationService.getBreakdownRows(any(), eqTo(SubmissionReady), any())(any(), any())
       } thenReturn Future.successful(Some(Seq.empty))
 
       val result = controller.get()(request)
@@ -189,12 +191,12 @@ class ConfirmationControllerSpec extends AmlsSpec
       setupStatus(submissionStatus)
 
       when {
-        controller.confirmationService.getBreakdownRows(eqTo(SubmissionReady), any())(any(), any(), any())
+        controller.confirmationService.getBreakdownRows(any(), eqTo(SubmissionReady), any())(any(), any())
       } thenReturn Future.successful(Some(Seq.empty))
 
       val result = controller.get()(request)
       status(result) mustBe OK
-      Jsoup.parse(contentAsString(result)).title must include("Application fee and reference")
+      Jsoup.parse(contentAsString(result)).title must include("Your fee and payment reference")
       contentAsString(result) must include(paymentReferenceNumber)
     }
 
@@ -208,11 +210,11 @@ class ConfirmationControllerSpec extends AmlsSpec
           val rows = Gen.listOfN(5, breakdownRowGen).sample
 
           when {
-            controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber))(any(), any(), any())
+            controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any())(any(), any())
           } thenReturn Future.successful(Some(fees))
 
           when {
-            controller.confirmationService.getBreakdownRows(eqTo(SubmissionReadyForReview), eqTo(fees))(any(), any(), any())
+            controller.confirmationService.getBreakdownRows(any(), eqTo(SubmissionReadyForReview), eqTo(fees))(any(), any())
           } thenReturn Future.successful(rows)
 
           val result = controller.get()(request)
@@ -231,11 +233,11 @@ class ConfirmationControllerSpec extends AmlsSpec
           val fees = feeResponse(SubscriptionResponseType)
 
           when {
-            controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber))(any(), any(), any())
+            controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any())(any(), any())
           } thenReturn Future.successful(Some(fees))
 
           when {
-            controller.confirmationService.getBreakdownRows(eqTo(SubmissionReadyForReview), eqTo(fees))(any(), any(), any())
+            controller.confirmationService.getBreakdownRows(any(), eqTo(SubmissionReadyForReview), eqTo(fees))(any(), any())
           } thenReturn Future.successful(None)
 
           val result = controller.get()(request)
@@ -258,11 +260,11 @@ class ConfirmationControllerSpec extends AmlsSpec
           val rows = Gen.listOfN(5, breakdownRowGen).sample
 
           when {
-            controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber))(any(), any(), any())
+            controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any())(any(), any())
           } thenReturn Future.successful(Some(fees))
 
           when {
-            controller.confirmationService.getBreakdownRows(eqTo(SubmissionReadyForReview), eqTo(fees))(any(), any(), any())
+            controller.confirmationService.getBreakdownRows(any(), eqTo(SubmissionReadyForReview), eqTo(fees))(any(), any())
           } thenReturn Future.successful(rows)
 
           val result = controller.get()(request)
@@ -281,11 +283,11 @@ class ConfirmationControllerSpec extends AmlsSpec
           val fees = feeResponse(AmendOrVariationResponseType)
 
           when {
-            controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber))(any(), any(), any())
+            controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any())(any(), any())
           } thenReturn Future.successful(Some(fees))
 
           when {
-            controller.confirmationService.getBreakdownRows(eqTo(SubmissionReadyForReview), eqTo(fees))(any(), any(), any())
+            controller.confirmationService.getBreakdownRows(any(), eqTo(SubmissionReadyForReview), eqTo(fees))(any(), any())
           } thenReturn Future.successful(None)
 
           val result = controller.get()(request)
@@ -304,7 +306,7 @@ class ConfirmationControllerSpec extends AmlsSpec
           setupStatus(SubmissionDecisionApproved)
 
           when {
-            controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber))(any(), any(), any())
+            controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any())(any(), any())
           } thenReturn Future.successful(Some(feeResponse(AmendOrVariationResponseType)))
 
           val result = controller.get()(request)
@@ -321,11 +323,11 @@ class ConfirmationControllerSpec extends AmlsSpec
         setupStatus(RenewalSubmitted(None))
 
         when {
-          controller.confirmationService.isRenewalDefined(any(), any(), any())
+          controller.confirmationService.isRenewalDefined(any[String]())(any(), any())
         } thenReturn Future.successful(true)
 
         when {
-          controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber))(any(), any(), any())
+          controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any())(any(), any())
         } thenReturn Future.successful(Some(feeResponse(AmendOrVariationResponseType)))
 
         val result = controller.get()(request)
@@ -346,11 +348,11 @@ class ConfirmationControllerSpec extends AmlsSpec
         setupStatus(SubmissionReadyForReview)
 
         when {
-          controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber))(any(), any(), any())
+          controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any())(any(), any())
         } thenReturn Future.successful(None)
 
         when {
-          controller.confirmationService.getBreakdownRows(eqTo(SubmissionReadyForReview), any())(any(), any(), any())
+          controller.confirmationService.getBreakdownRows(any(), eqTo(SubmissionReadyForReview), any())(any(), any())
         } thenReturn Future.successful(Some(Seq.empty))
 
         val result = controller.get()(request)
@@ -366,11 +368,11 @@ class ConfirmationControllerSpec extends AmlsSpec
         setupStatus(SubmissionDecisionApproved)
 
         when {
-          controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber))(any(), any(), any())
+          controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any())(any(), any())
         } thenReturn Future.successful(Some(feeResponse(SubscriptionResponseType).copy(paymentReference = None)))
 
         when {
-          controller.confirmationService.getBreakdownRows(eqTo(SubmissionDecisionApproved), any())(any(), any(), any())
+          controller.confirmationService.getBreakdownRows(any(), eqTo(SubmissionDecisionApproved), any())(any(), any())
         } thenReturn Future.successful(Some(Seq.empty))
 
         val result = controller.get()(request)

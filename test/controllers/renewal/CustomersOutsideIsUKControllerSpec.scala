@@ -17,6 +17,7 @@
 package controllers.renewal
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businessmatching._
 import models.renewal._
@@ -32,7 +33,7 @@ import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -44,6 +45,7 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
 
     val dataCacheConnector = mock[DataCacheConnector]
     val renewalService = mock[RenewalService]
+    val authAction = SuccessfulAuthAction
 
     val emptyCache = CacheMap("", Map.empty)
     val mockCacheMap = mock[CacheMap]
@@ -51,8 +53,8 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
-      .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[RenewalService].to(renewalService))
+      .overrides(bind[AuthAction].to(authAction))
       .build()
 
     val controller = app.injector.instanceOf[CustomersOutsideIsUKController]
@@ -76,11 +78,11 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
     val customersOutsideIsUK = CustomersOutsideIsUK(true)
 
     when {
-      renewalService.updateRenewal(any())(any(), any(), any())
+      renewalService.updateRenewal(any(),any())(any(), any())
     } thenReturn Future.successful(cache)
 
     when {
-      dataCacheConnector.fetchAll(any(), any())
+      dataCacheConnector.fetchAll(any())(any())
     } thenReturn Future.successful(Some(cache))
 
     when {
@@ -125,7 +127,7 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
     "get is called" must {
       "load the page" in new Fixture {
 
-        when(renewalService.getRenewal(any(), any(), any()))
+        when(renewalService.getRenewal(any())(any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -142,7 +144,7 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
 
       "pre-populate the Customer outside UK Page" in new Fixture {
 
-        when(renewalService.getRenewal(any(), any(), any()))
+        when(renewalService.getRenewal(any())(any(), any()))
           .thenReturn(Future.successful(Some(Renewal(customersOutsideIsUK = Some(CustomersOutsideIsUK(true))))))
 
         val result = controller.get()(request)

@@ -17,24 +17,24 @@
 package controllers
 
 import connectors._
+import controllers.actions.SuccessfulAuthAction
 import generators.submission.SubscriptionResponseGenerator
 import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
-import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
+import models.ResponseType.SubscriptionResponseType
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessdetails.{BusinessDetails, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
 import models.businessmatching.BusinessMatching
-import models.confirmation.{BreakdownRow, Currency}
+import models.confirmation.BreakdownRow
 import models.payments.PaymentStatuses.{Cancelled, Created, Failed}
 import models.payments._
 import models.registrationdetails.RegistrationDetails
 import models.renewal.{InvolvedInOtherNo, Renewal}
 import models.status.{SubmissionDecisionApproved, _}
 import models.{status => _, _}
-import org.joda.time.{DateTime, LocalDate, LocalDateTime}
+import org.joda.time.{DateTime, LocalDate}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalacheck.Gen
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services._
@@ -57,14 +57,18 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
     val request = addToken(authRequest).copyFakeRequest(uri = baseUrl)
 
     val controller = new PaymentConfirmationController(
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       statusService = mock[StatusService],
       dataCacheConnector = mock[DataCacheConnector],
       amlsConnector = mock[AmlsConnector],
-      authEnrolmentsService = mock[AuthEnrolmentsService],
+      enrolmentService = mock[AuthEnrolmentsService],
       feeResponseService = mock[FeeResponseService],
-      auditConnector = mock[AuditConnector]
-    )
+      auditConnector = mock[AuditConnector])
+
+    val amlsRegistrationNumber = "amlsRefNumber"
+
+    when(controller.enrolmentService.amlsRegistrationNumber(any(), any())(any(), any()))
+      .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
     val response = subscriptionResponseGen(hasFees = true).sample.get
 
@@ -79,51 +83,47 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
     } thenReturn Future.successful(mock[AuditResult])
 
     when {
-      controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
-    } thenReturn Future.successful(Some(amlsRegistrationNumber))
-
-    when {
-      controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
+      controller.amlsConnector.refreshPaymentStatus(any(), any())(any(), any())
     } thenReturn Future.successful(paymentStatusResultGen.sample.get.copy(currentStatus = PaymentStatuses.Successful))
 
     when {
-      controller.amlsConnector.getPaymentByPaymentReference(any())(any(), any(), any())
+      controller.amlsConnector.getPaymentByPaymentReference(any(), any())(any(), any())
     } thenReturn Future.successful(paymentGen.sample)
 
     when {
-      controller.amlsConnector.savePayment(any(), any(), any())(any(), any(), any())
+      controller.amlsConnector.savePayment(any(), any(), any(), any())(any(), any())
     } thenReturn Future.successful(HttpResponse(CREATED))
 
     when {
-      controller.amlsConnector.registrationDetails(any())(any(), any(), any())
+      controller.amlsConnector.registrationDetails(any(), any())(any(), any())
     } thenReturn Future.successful(RegistrationDetails(companyNameFromRegistration, isIndividual = false))
 
     when {
-      controller.dataCacheConnector.fetch[SubmissionRequestStatus](eqTo(SubmissionRequestStatus.key))(any(),any(),any())
+      controller.dataCacheConnector.fetch[SubmissionRequestStatus](any(), eqTo(SubmissionRequestStatus.key))(any(), any())
     } thenReturn Future.successful(Some(SubmissionRequestStatus(true)))
 
     def feeResponse(responseType: ResponseType) = FeeResponse(
-      responseType,
-      amlsRegistrationNumber,
-      100,
-      None,
-      None,
-      0,
-      200,
-      Some(paymentReferenceNumber),
-      Some(115),
-      DateTime.now
+      responseType = responseType,
+      amlsReferenceNumber = amlsRegistrationNumber,
+      registrationFee = 100,
+      fpFee = None,
+      approvalCheckFee = None,
+      premiseFee = 0,
+      totalFees = 200,
+      paymentReference = Some(paymentReferenceNumber),
+      difference = Some(115),
+      createdAt = DateTime.now
     )
 
     when {
-      controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber))(any(), any(), any())
+      controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any[(String, String)]())(any(), any())
     } thenReturn Future.successful(Some(feeResponse(SubscriptionResponseType)))
 
     val breakdownRows = Seq.empty[BreakdownRow]
 
     val businessDetails = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredNo))
     when {
-      controller.dataCacheConnector.fetch[BusinessDetails](eqTo(BusinessDetails.key))(any(), any(), any())
+      controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any(), any())
     } thenReturn Future.successful(Some(businessDetails))
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))
@@ -135,7 +135,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
       )
 
       when {
-        controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+        controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any())
       } thenReturn Future.successful(Some(model))
 
     }
@@ -143,14 +143,14 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
     def setupStatus(status: SubmissionStatus): Unit = {
 
       when {
-        controller.statusService.getStatus(any(), any(), any())
+        controller.statusService.getStatus(any[Option[String]](), any(), any())(any(), any())
       } thenReturn Future.successful(status)
 
       val statusResponse = mock[ReadStatusResponse]
       when(statusResponse.safeId) thenReturn safeIdGen.sample
 
       when {
-        controller.statusService.getDetailedStatus(any(), any(), any())
+        controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any())
       } thenReturn Future.successful((status, Some(statusResponse)))
     }
   }
@@ -164,7 +164,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
         setupStatus(SubmissionReady)
 
         when {
-          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
+          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any())
         } thenReturn Future.successful(None)
 
         val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
@@ -183,14 +183,14 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
         setupStatus(SubmissionReady)
 
         when {
-          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
+          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any())
         } thenReturn Future.successful(None)
 
 
-        val businessDetailsYes = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredYes("123456")))
+        val businessDetailsYes = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredYes(Some("123456"))))
 
         when {
-          controller.dataCacheConnector.fetch[BusinessDetails](eqTo(BusinessDetails.key))(any(), any(), any())
+          controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any(), any())
         } thenReturn Future.successful(Some(businessDetailsYes))
 
         val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
@@ -208,7 +208,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
         setupStatus(SubmissionReadyForReview)
 
         when {
-          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
+          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any())
         } thenReturn Future.successful(None)
 
         val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
@@ -229,7 +229,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
         setupStatus(SubmissionDecisionApproved)
 
         when {
-          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
+          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any())
         } thenReturn Future.successful(None)
 
         val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
@@ -250,7 +250,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
         setupStatus(RenewalSubmitted(None))
 
         when {
-          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
+          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any())
         } thenReturn Future.successful(None)
 
         val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
@@ -271,7 +271,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
         setupStatus(ReadyForRenewal(Some(new LocalDate())))
 
         when {
-          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
+          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any())
         }.thenReturn(Future.successful(Some(Renewal(Some(InvolvedInOtherNo)))))
 
         val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
@@ -292,7 +292,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
         setupStatus(ReadyForRenewal(Some(new LocalDate())))
 
         when {
-          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
+          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any())
         } thenReturn Future.successful(None)
 
         val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
@@ -313,14 +313,14 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
         setupStatus(SubmissionReadyForReview)
 
         when {
-          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
+          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any())
         } thenReturn Future.successful(None)
 
         val payment = paymentGen.sample.get.copy(status = Failed)
         val paymentStatus = paymentStatusResultGen.sample.get.copy(currentStatus = payment.status)
 
         when {
-          controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
+          controller.amlsConnector.refreshPaymentStatus(any(), any())(any(), any())
         } thenReturn Future.successful(paymentStatus)
 
         val failedRequest = addToken(authRequest).copyFakeRequest(uri = baseUrl + "?paymentStatus=Failed")
@@ -328,7 +328,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
 
         status(result) mustBe OK
 
-        verify(controller.amlsConnector).refreshPaymentStatus(eqTo(payment.reference))(any(), any(), any())
+        verify(controller.amlsConnector).refreshPaymentStatus(eqTo(payment.reference), eqTo(("accType", "id")))(any(), any())
         contentAsString(result) must include(Messages("confirmation.payment.failed.header"))
         contentAsString(result) must include(Messages("confirmation.payment.failed.reason.failure"))
       }
@@ -338,14 +338,14 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
         setupStatus(SubmissionReadyForReview)
 
         when {
-          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
+          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any())
         } thenReturn Future.successful(None)
 
         val payment = paymentGen.sample.get.copy(status = Cancelled)
         val paymentStatus = paymentStatusResultGen.sample.get.copy(currentStatus = payment.status)
 
         when {
-          controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
+          controller.amlsConnector.refreshPaymentStatus(any(), any())(any(), any())
         } thenReturn Future.successful(paymentStatus)
 
         val cancelledRequest = request.copyFakeRequest(uri = baseUrl + "?paymentStatus=Cancelled")
@@ -353,7 +353,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
 
         status(result) mustBe OK
 
-        verify(controller.amlsConnector).refreshPaymentStatus(eqTo(payment.reference))(any(), any(), any())
+        verify(controller.amlsConnector).refreshPaymentStatus(eqTo(payment.reference), eqTo(("accType", "id")))(any(), any())
         contentAsString(result) must include(Messages("confirmation.payment.failed.header"))
         contentAsString(result) must include(Messages("confirmation.payment.failed.reason.cancelled"))
       }
@@ -362,18 +362,18 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
         setupStatus(SubmissionReadyForReview)
 
         when {
-          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
+          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any())
         } thenReturn Future.successful(None)
 
         val payment = paymentGen.sample.get.copy(status = Created)
         val paymentStatus = paymentStatusResultGen.sample.get.copy(currentStatus = payment.status)
 
         when {
-          controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
+          controller.amlsConnector.refreshPaymentStatus(any(), any())(any(), any())
         } thenReturn Future.successful(paymentStatus)
 
         when {
-          controller.amlsConnector.getPaymentByAmlsReference(any())(any(), any(), any())
+          controller.amlsConnector.getPaymentByAmlsReference(any(), any())(any(), any())
         } thenReturn Future.successful(Some(payment))
 
         val cancelledRequest = request.copyFakeRequest(uri = baseUrl + "?paymentStatus=Cancelled")
@@ -381,7 +381,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
 
         status(result) mustBe OK
 
-        verify(controller.amlsConnector).refreshPaymentStatus(eqTo(payment.reference))(any(), any(), any())
+        verify(controller.amlsConnector).refreshPaymentStatus(eqTo(payment.reference), eqTo(("accType", "id")))(any(), any())
         contentAsString(result) must include(Messages("confirmation.payment.failed.header"))
         contentAsString(result) must include(Messages("confirmation.payment.failed.reason.cancelled"))
       }

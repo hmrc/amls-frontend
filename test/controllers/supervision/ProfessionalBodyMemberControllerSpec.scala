@@ -16,6 +16,7 @@
 
 package controllers.supervision
 
+import controllers.actions.SuccessfulAuthAction
 import models.supervision._
 import org.jsoup.Jsoup
 import org.scalatest.mock.MockitoSugar
@@ -37,7 +38,7 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
 
     val controller = new ProfessionalBodyMemberController (
       dataCacheConnector = mockCacheConnector,
-      authConnector = self.authConnector
+      authAction = SuccessfulAuthAction
     )
 
     mockCacheSave[Supervision]
@@ -269,10 +270,10 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
 
-        verify(controller.dataCacheConnector).save[Supervision](any(),eqTo(Supervision(
+        verify(controller.dataCacheConnector).save[Supervision](any(), any(), eqTo(Supervision(
           professionalBodyMember = Some(ProfessionalBodyMemberNo),
           hasChanged = true
-        )))(any(),any(),any())
+        )))(any(),any())
 
       }
       "ProfessionalBodyMemberNo and professionalBodies is defined" in new Fixture {
@@ -290,10 +291,10 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
 
-        verify(controller.dataCacheConnector).save[Supervision](any(),eqTo(Supervision(
+        verify(controller.dataCacheConnector).save[Supervision](any(), any(), eqTo(Supervision(
           professionalBodyMember = Some(ProfessionalBodyMemberNo),
           hasChanged = true
-        )))(any(),any(),any())
+        )))(any(),any())
 
       }
     }

@@ -16,29 +16,27 @@
 
 package controllers.renewal
 
-import javax.inject.Inject
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching._
+import javax.inject.Inject
 import models.renewal.{Renewal, WhichCurrencies}
 import services.RenewalService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{AuthAction, ControllerHelper}
 import views.html.renewal.which_currencies
 
 import scala.concurrent.Future
 
-class WhichCurrenciesController @Inject()(val authConnector: AuthConnector,
+class WhichCurrenciesController @Inject()(val authAction: AuthAction,
                                           renewalService: RenewalService,
-                                          dataCacheConnector: DataCacheConnector) extends BaseController {
+                                          dataCacheConnector: DataCacheConnector) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
         val block = for {
-          renewal <- OptionT(renewalService.getRenewal)
+          renewal <- OptionT(renewalService.getRenewal(request.credId))
           whichCurrencies <- OptionT.fromOption[Future](renewal.whichCurrencies)
         } yield {
           Ok(which_currencies(Form2[WhichCurrencies](whichCurrencies), edit))
@@ -48,19 +46,18 @@ class WhichCurrenciesController @Inject()(val authConnector: AuthConnector,
 
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request =>
         Form2[WhichCurrencies](request.body) match {
-          case f: InvalidForm => Future.successful(BadRequest(which_currencies(f, edit)))
+          case f: InvalidForm => Future.successful(BadRequest(which_currencies(alignFormDataWithValidationErrors(f), edit)))
           case ValidForm(_, model) =>
-            dataCacheConnector.fetchAll flatMap {
+            dataCacheConnector.fetchAll(request.credId).flatMap {
               optMap =>
                 val result = for {
                   cacheMap <- optMap
                   renewal <- cacheMap.getEntry[Renewal](Renewal.key)
                 } yield {
-                  renewalService.updateRenewal(updateWhichCurrencies(renewal, model)) map { _ =>
+                  renewalService.updateRenewal(request.credId, updateWhichCurrencies(renewal, model)) map { _ =>
                     edit match {
                       case true => Redirect(routes.SummaryController.get())
                       case _ => Redirect(routes.UsesForeignCurrenciesController.get())
@@ -72,6 +69,9 @@ class WhichCurrenciesController @Inject()(val authConnector: AuthConnector,
             }
         }
   }
+
+  def alignFormDataWithValidationErrors(form: InvalidForm): InvalidForm =
+    ControllerHelper.stripEmptyValuesFromFormWithArray(form, "currencies")
 
   def updateWhichCurrencies(oldRenewal: Renewal, whichCurrencies: WhichCurrencies) = {
     oldRenewal.whichCurrencies match {

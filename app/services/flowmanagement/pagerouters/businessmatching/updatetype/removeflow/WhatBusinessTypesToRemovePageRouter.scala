@@ -26,8 +26,6 @@ import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.PageRouter
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.{ExecutionContext, Future}
 import cats.implicits._
 
@@ -36,16 +34,13 @@ class WhatBusinessTypesToRemovePageRouter @Inject()(val statusService: StatusSer
                                                     val businessMatchingService: BusinessMatchingService,
                                                     val removeBusinessTypeHelper: RemoveBusinessTypeHelper) extends PageRouter[RemoveBusinessTypeFlowModel] {
 
-  override def getPageRoute(model: RemoveBusinessTypeFlowModel, edit: Boolean = false)
-                           (implicit ac: AuthContext,
-                            hc: HeaderCarrier,
-                            ec: ExecutionContext
-                           ): Future[Result] = {
+  override def getRoute(credId: String, model: RemoveBusinessTypeFlowModel, edit: Boolean = false)
+                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
 
     if (edit && model.dateOfChange.isDefined) {
       Future.successful(Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get()))
     } else {
-      removeBusinessTypeHelper.dateOfChangeApplicable(model.activitiesToRemove.getOrElse(Set.empty)) map {
+      removeBusinessTypeHelper.dateOfChangeApplicable(credId, model.activitiesToRemove.getOrElse(Set.empty)) map {
         case true => Redirect(removeRoutes.WhatDateRemovedController.get())
         case false => Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get())
       } getOrElse InternalServerError("Unable to determine route from the WhatBusinessTypesToRemovePage")

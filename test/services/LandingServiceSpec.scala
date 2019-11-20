@@ -16,34 +16,36 @@
 
 package services
 
+import java.time.LocalDate
+
 import connectors._
-import models.asp.{Accountancy, BookKeeping, ServicesOfBusiness}
-import models.businessdetails.{BusinessDetails, CorrespondenceAddress, CorrespondenceAddressIsUk, CorrespondenceAddressNonUk}
-import models.asp.Asp
+import models._
+import models.amp.Amp
+import models.asp.{Accountancy, Asp, BookKeeping, ServicesOfBusiness}
 import models.bankdetails.BankDetails
 import models.businessactivities.{CustomersOutsideUK => BACustomersOutsideUK, InvolvedInOtherYes => BAInvolvedInOtherYes, _}
 import models.businesscustomer.{Address, ReviewDetails}
+import models.businessdetails.{BusinessDetails, CorrespondenceAddress, CorrespondenceAddressIsUk, CorrespondenceAddressNonUk}
 import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.estateagentbusiness.{Auction, EstateAgentBusiness, Residential, Services}
 import models.hvd._
 import models.moneyservicebusiness.{MostTransactions => MsbMostTransactions, SendTheLargestAmountsOfMoney => MsbSendTheLargestAmountsOfMoney, WhichCurrencies => MsbWhichCurrencies, _}
-import models.renewal.{MoneySources => RMoneySources, PaymentMethods => RPaymentMethods, PercentageOfCashPaymentOver15000 => RPercentageOfCashPaymentOver15000, CashPayments => RCashPayments, WhichCurrencies => RenWhichCurrencies, _}
+import models.renewal.{CashPayments => RCashPayments, MoneySources => RMoneySources, PaymentMethods => RPaymentMethods, PercentageOfCashPaymentOver15000 => RPercentageOfCashPaymentOver15000, WhichCurrencies => RenWhichCurrencies, _}
 import models.responsiblepeople.ResponsiblePerson
 import models.status.{RenewalSubmitted, SubmissionReadyForReview}
 import models.supervision.Supervision
 import models.tcsp._
 import models.tradingpremises.TradingPremises
-import models._
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import play.api.libs.json.Writes
+import play.api.libs.json.{Json, Writes}
 import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser}
+import uk.gov.hmrc.play.frontend.auth.LoggedInUser
 import utils.AmlsSpec
 
 import scala.concurrent.ExecutionContext.Implicits._
@@ -85,6 +87,26 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
     hasAccepted = true
   )
 
+  val credId = "internalId"
+
+  val ampSection = Amp(
+    data = Json.obj(
+      "typeOfParticipant"     -> Seq("artGalleryOwner"),
+      "boughtOrSoldOverThreshold"     -> true,
+      "dateTransactionOverThreshold"  -> LocalDate.now,
+      "identifyLinkedTransactions"    -> true,
+      "percentageExpectedTurnover"    -> "fortyOneToSixty"
+    ),
+    hasAccepted = false,
+    hasChanged = false
+  )
+
+  def setUpMockView[T](mock: DataCacheConnector, result: CacheMap, key: String, section: T) = {
+    when {
+      mock.save[T](any(), eqTo(key), eqTo(section))(any(), any())
+    } thenReturn Future.successful(result)
+  }
+
   "setAltCorrespondenceAddress" must {
 
     val cacheMap = CacheMap("", Map.empty)
@@ -95,19 +117,13 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
       implicit val r = FakeRequest()
 
-      when(service.cacheConnector.save[BusinessDetails](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(cacheMap))
-
-      def setUpMockView[T](mock: DataCacheConnector, result: CacheMap, key: String, section: T) = {
-        when {
-          mock.save[T](eqTo(key), eqTo(section))(any(), any(), any())
-        } thenReturn Future.successful(result)
-      }
+      when(service.cacheConnector.save[BusinessDetails](any(), any(), any())(any(), any()))
+        .thenReturn(Future.successful(cacheMap))
 
       setUpMockView(service.cacheConnector, cacheMap, BusinessDetails.key, businessDetails.copy(altCorrespondenceAddress = Some(true)))
 
 
-      await(service.setAltCorrespondenceAddress(businessDetails)) mustEqual cacheMap
+      await(service.setAltCorrespondenceAddress(businessDetails, credId)) mustEqual cacheMap
 
     }
 
@@ -116,19 +132,12 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
       val businessDetails = BusinessDetails(None, None, None, None, None,None, None, None)
 
-      when(service.cacheConnector.save[BusinessDetails](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(cacheMap))
-
-      def setUpMockView[T](mock: DataCacheConnector, result: CacheMap, key: String, section: T) = {
-        when {
-          mock.save[T](eqTo(key), eqTo(section))(any(), any(), any())
-        } thenReturn Future.successful(result)
-      }
+      when(service.cacheConnector.save[BusinessDetails](any(), any(), any())(any(), any()))
+        .thenReturn(Future.successful(cacheMap))
 
       setUpMockView(service.cacheConnector, cacheMap, BusinessDetails.key, businessDetails.copy(altCorrespondenceAddress = Some(false)))
 
-
-      await(service.setAltCorrespondenceAddress(businessDetails)) mustEqual cacheMap
+      await(service.setAltCorrespondenceAddress(businessDetails, credId)) mustEqual cacheMap
 
     }
   }
@@ -151,35 +160,30 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       aspSection = aspSection,
       msbSection = Some(msbSection),
       hvdSection = Some(hvdSection),
+      ampSection = Some(ampSection),
       supervisionSection = None
     )
-
-    def setUpMockView[T](mock: DataCacheConnector, result: CacheMap, key: String, section : T) = {
-      when {
-        mock.save[T](eqTo(key), eqTo(section))(any(), any(), any())
-      } thenReturn Future.successful(result)
-    }
 
     "return a cachmap of the saved alternative correspondence address" in {
 
       val cache = mock[CacheMap]
 
-      when(service.cacheConnector.save[BusinessDetails](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(cache))
+      when(service.cacheConnector.save[BusinessDetails](any(), any(), any())(any(), any()))
+        .thenReturn(Future.successful(cache))
 
       when {
         cache.getEntry[BusinessDetails](eqTo(BusinessDetails.key))(any())
       } thenReturn None
 
       when {
-        service.desConnector.view(any[String])(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]], any[AuthContext])
+        service.desConnector.view(any[String], any())(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]])
       } thenReturn Future.successful(viewResponse)
 
       setUpMockView(service.cacheConnector, cache, BusinessDetails.key, viewResponse.businessDetailsSection.copy(altCorrespondenceAddress = Some(true)))
 
-      await(service.setAltCorrespondenceAddress("regNo", None)) mustEqual cache
+      await(service.setAltCorrespondenceAddress("regNo", None, ("accType", "id"), credId)) mustEqual cache
 
-      verify(service.desConnector).view(any())(any(), any(), any(), any())
+      verify(service.desConnector).view(any(), any())(any(), any(), any())
     }
 
     "only call API 5 data" when {
@@ -195,14 +199,14 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
           cache.getEntry[BusinessDetails](eqTo(BusinessDetails.key))(any())
         } thenReturn Some(model)
 
-        when(service.cacheConnector.save[BusinessDetails](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(cacheMap))
+        when(service.cacheConnector.save[BusinessDetails](any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(cacheMap))
 
         setUpMockView(service.cacheConnector, cache, BusinessDetails.key, viewResponse.businessDetailsSection.copy(altCorrespondenceAddress = Some(true)))
 
-        await(service.setAltCorrespondenceAddress("regNo", Some(cache)))
+        await(service.setAltCorrespondenceAddress("regNo", Some(cache), ("accType", "id"), credId))
 
-        verify(service.desConnector, never()).view(any())(any(), any(), any(), any())
+        verify(service.desConnector, never()).view(any(), any())(any(), any(), any())
       }
     }
 
@@ -225,77 +229,77 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       aspSection = aspSection,
       msbSection = Some(msbSection),
       hvdSection = Some(hvdSection),
+      ampSection = Some(ampSection),
       supervisionSection = None
     )
 
     "update all saved sections" in {
       reset(service.cacheConnector)
 
-      when(service.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
+      when(service.statusService.getStatus(any[Option[String]], any(), any())(any(), any()))
+        .thenReturn(Future.successful(SubmissionReadyForReview))
 
       when {
-        service.desConnector.view(any[String])(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]], any[AuthContext])
+        service.desConnector.view(any[String], any())(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]])
       } thenReturn Future.successful(viewResponse)
 
       val user = mock[LoggedInUser]
 
-      when(authContext.user).thenReturn(user)
-      when(user.oid).thenReturn("")
-      when(service.cacheConnector.remove(any(), any())).thenReturn(Future.successful(true))
+      when(service.cacheConnector.remove(any[String])(any())).thenReturn(Future.successful(true))
 
       when {
-        service.cacheConnector.fetchAllWithDefault
+        service.cacheConnector.fetchAllWithDefault(any())(any())
       } thenReturn Future.successful(cacheMap)
 
       val subscriptionResponse = mock[SubscriptionResponse]
       val amendVariationResponse = mock[AmendVariationRenewalResponse]
 
       when {
-        service.cacheConnector.fetch[SubscriptionResponse](eqTo(SubscriptionResponse.key))(any(), any(), any())
+        service.cacheConnector.fetch[SubscriptionResponse](any(), eqTo(SubscriptionResponse.key))(any(), any())
       } thenReturn Future.successful(Some(subscriptionResponse))
 
       when {
-        service.cacheConnector.fetch[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any(), any(), any())
+        service.cacheConnector.fetch[AmendVariationRenewalResponse](any(), eqTo(AmendVariationRenewalResponse.key))(any(), any())
       } thenReturn Future.successful(Some(amendVariationResponse))
 
       when {
-        service.cacheConnector.saveAll(any())(any(),any())
+        service.cacheConnector.saveAll(any(), any())(any())
       } thenReturn Future.successful(cacheMap)
 
-      await(service.refreshCache("regNo")) mustEqual cacheMap
+      await(service.refreshCache("regNo", credId, ("accType", "id"))) mustEqual cacheMap
 
-      verify(service.cacheConnector).upsert(any(), eqTo(ViewResponse.key),
-        eqTo(Some(viewResponse)))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(BusinessMatching.key),
-        eqTo(viewResponse.businessMatchingSection.copy(hasAccepted = true, preAppComplete = true)))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(EstateAgentBusiness.key),
-        eqTo(Some(viewResponse.eabSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(TradingPremises.key),
-        eqTo(Some(viewResponse.tradingPremisesSection.fold(Seq.empty[TradingPremises])(_.map(tp => tp.copy(hasAccepted = true))))))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(BusinessDetails.key),
-        eqTo(viewResponse.businessDetailsSection.copy(hasAccepted = true)))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(BankDetails.key),
-        eqTo(viewResponse.bankDetailsSection.map(b => b.copy(hasAccepted = true))))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(AddPerson.key),
-        eqTo(viewResponse.aboutYouSection))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(BusinessActivities.key),
-        eqTo(viewResponse.businessActivitiesSection.copy(hasAccepted = true)))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(Tcsp.key),
-        eqTo(Some(viewResponse.tcspSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(Asp.key),
-        eqTo(Some(viewResponse.aspSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(MoneyServiceBusiness.key),
-        eqTo(Some(viewResponse.msbSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(Hvd.key),
-        eqTo(Some(viewResponse.hvdSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(Supervision.key),
-        eqTo(Some(viewResponse.supervisionSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(SubscriptionResponse.key),
-        eqTo(Some(subscriptionResponse)))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(AmendVariationRenewalResponse.key),
-        eqTo(Some(amendVariationResponse)))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(ResponsiblePerson.key),
-        eqTo(Some(viewResponse.responsiblePeopleSection.fold(Seq.empty[ResponsiblePerson])(_.map(rp => rp.copy(hasAccepted = true))))))(any(), any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(ViewResponse.key),
+        eqTo(Some(viewResponse)))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(BusinessMatching.key),
+        eqTo(viewResponse.businessMatchingSection.copy(hasAccepted = true, preAppComplete = true)))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(EstateAgentBusiness.key),
+        eqTo(Some(viewResponse.eabSection.copy(hasAccepted = true))))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(TradingPremises.key),
+        eqTo(Some(viewResponse.tradingPremisesSection.fold(Seq.empty[TradingPremises])(_.map(tp => tp.copy(hasAccepted = true))))))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(BusinessDetails.key),
+        eqTo(viewResponse.businessDetailsSection.copy(hasAccepted = true)))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(BankDetails.key),
+        eqTo(viewResponse.bankDetailsSection.map(b => b.copy(hasAccepted = true))))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(AddPerson.key),
+        eqTo(viewResponse.aboutYouSection))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(BusinessActivities.key),
+        eqTo(viewResponse.businessActivitiesSection.copy(hasAccepted = true)))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(Tcsp.key),
+        eqTo(Some(viewResponse.tcspSection.copy(hasAccepted = true))))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(Asp.key),
+        eqTo(Some(viewResponse.aspSection.copy(hasAccepted = true))))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(MoneyServiceBusiness.key),
+        eqTo(Some(viewResponse.msbSection.copy(hasAccepted = true))))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(Hvd.key),
+        eqTo(Some(viewResponse.hvdSection.copy(hasAccepted = true))))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(Supervision.key),
+        eqTo(Some(viewResponse.supervisionSection.copy(hasAccepted = true))))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(SubscriptionResponse.key),
+        eqTo(Some(subscriptionResponse)))(any(),any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(AmendVariationRenewalResponse.key),
+        eqTo(Some(amendVariationResponse)))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(ResponsiblePerson.key),
+        eqTo(Some(viewResponse.responsiblePeopleSection.fold(Seq.empty[ResponsiblePerson])(_.map(rp => rp.copy(hasAccepted = true))))))(any(), any())
     }
   }
 
@@ -316,6 +320,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       aspSection = None,
       msbSection = None,
       hvdSection = None,
+      ampSection = None,
       supervisionSection = None
     )
 
@@ -323,71 +328,70 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
       reset(service.cacheConnector)
 
-      when(service.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
+      when(service.statusService.getStatus(any[Option[String]], any(), any())(any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
 
       when {
-        service.desConnector.view(any[String])(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]], any[AuthContext])
+        service.desConnector.view(any[String], any())(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]])
       } thenReturn Future.successful(viewResponse)
 
       val user = mock[LoggedInUser]
 
-      when(authContext.user).thenReturn(user)
       when(user.oid).thenReturn("")
-      when(service.cacheConnector.remove(any(), any())).thenReturn(Future.successful(true))
+      when(service.cacheConnector.remove(any())(any())).thenReturn(Future.successful(true))
 
       when {
-        service.cacheConnector.fetchAllWithDefault
+        service.cacheConnector.fetchAllWithDefault(any())(any())
       } thenReturn Future.successful(cacheMap)
 
       val subscriptionResponse = mock[SubscriptionResponse]
       val amendVariationResponse = mock[AmendVariationRenewalResponse]
 
       when {
-        service.cacheConnector.fetch[SubscriptionResponse](eqTo(SubscriptionResponse.key))(any(), any(), any())
+        service.cacheConnector.fetch[SubscriptionResponse](any(), eqTo(SubscriptionResponse.key))(any(), any())
       } thenReturn Future.successful(Some(subscriptionResponse))
 
       when {
-        service.cacheConnector.fetch[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any(), any(), any())
+        service.cacheConnector.fetch[AmendVariationRenewalResponse](any(), eqTo(AmendVariationRenewalResponse.key))(any(), any())
       } thenReturn Future.successful(Some(amendVariationResponse))
 
       when {
-        service.cacheConnector.saveAll(any())(any(),any())
+        service.cacheConnector.saveAll(any(), any())(any())
       } thenReturn Future.successful(cacheMap)
 
-      await(service.refreshCache("regNo")) mustEqual cacheMap
+      await(service.refreshCache("regNo", credId, ("accType", "id"))) mustEqual cacheMap
 
-      verify(service.cacheConnector).upsert(any(), eqTo(ViewResponse.key),
-        eqTo(Some(viewResponse)))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(BusinessMatching.key),
-        eqTo(viewResponse.businessMatchingSection.copy(hasAccepted = true, preAppComplete = true)))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(EstateAgentBusiness.key),
-        eqTo(None))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(TradingPremises.key),
-        eqTo(Some(viewResponse.tradingPremisesSection.fold(Seq.empty[TradingPremises])(_.map(tp => tp.copy(hasAccepted = true))))))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(BusinessDetails.key),
-        eqTo(viewResponse.businessDetailsSection.copy(hasAccepted = true)))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(BankDetails.key),
-        eqTo(viewResponse.bankDetailsSection.map(b => b.copy(hasAccepted = true))))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(AddPerson.key),
-        eqTo(viewResponse.aboutYouSection))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(BusinessActivities.key),
-        eqTo(viewResponse.businessActivitiesSection.copy(hasAccepted = true)))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(Tcsp.key),
-        eqTo(None))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(Asp.key),
-        eqTo(None))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(MoneyServiceBusiness.key),
-        eqTo(None))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(Hvd.key),
-        eqTo(None))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(Supervision.key),
-        eqTo(Some(viewResponse.supervisionSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(SubscriptionResponse.key),
-        eqTo(Some(subscriptionResponse)))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(AmendVariationRenewalResponse.key),
-        eqTo(Some(amendVariationResponse)))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(ResponsiblePerson.key),
-        eqTo(Some(viewResponse.responsiblePeopleSection.fold(Seq.empty[ResponsiblePerson])(_.map(rp => rp.copy(hasAccepted = true))))))(any(), any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(ViewResponse.key),
+        eqTo(Some(viewResponse)))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(BusinessMatching.key),
+        eqTo(viewResponse.businessMatchingSection.copy(hasAccepted = true, preAppComplete = true)))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(EstateAgentBusiness.key),
+        eqTo(None))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(TradingPremises.key),
+        eqTo(Some(viewResponse.tradingPremisesSection.fold(Seq.empty[TradingPremises])(_.map(tp => tp.copy(hasAccepted = true))))))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(BusinessDetails.key),
+        eqTo(viewResponse.businessDetailsSection.copy(hasAccepted = true)))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(BankDetails.key),
+        eqTo(viewResponse.bankDetailsSection.map(b => b.copy(hasAccepted = true))))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(AddPerson.key),
+        eqTo(viewResponse.aboutYouSection))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(BusinessActivities.key),
+        eqTo(viewResponse.businessActivitiesSection.copy(hasAccepted = true)))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(Tcsp.key),
+        eqTo(None))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(Asp.key),
+        eqTo(None))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(MoneyServiceBusiness.key),
+        eqTo(None))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(Hvd.key),
+        eqTo(None))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(Supervision.key),
+        eqTo(Some(viewResponse.supervisionSection.copy(hasAccepted = true))))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(SubscriptionResponse.key),
+        eqTo(Some(subscriptionResponse)))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(AmendVariationRenewalResponse.key),
+        eqTo(Some(amendVariationResponse)))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(ResponsiblePerson.key),
+        eqTo(Some(viewResponse.responsiblePeopleSection.fold(Seq.empty[ResponsiblePerson])(_.map(rp => rp.copy(hasAccepted = true))))))(any(), any())
     }
   }
 
@@ -448,76 +452,76 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       aspSection = aspSection,
       msbSection = Some(msbSection),
       hvdSection = Some(hvdSection),
+      ampSection = Some(ampSection),
       supervisionSection = None
     )
 
     "update all saved sections" in {
       reset(service.cacheConnector)
 
-      when(service.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(RenewalSubmitted(None)))
+      when(service.statusService.getStatus(any[Option[String]], any(), any())(any(), any())).thenReturn(Future.successful(RenewalSubmitted(None)))
 
       when {
-        service.cacheConnector.fetchAllWithDefault
+        service.cacheConnector.fetchAllWithDefault(any())(any())
       } thenReturn Future.successful(cacheMap)
 
       when {
-        service.desConnector.view(any[String])(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]], any[AuthContext])
+        service.desConnector.view(any[String], any())(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]])
       } thenReturn Future.successful(viewResponse)
 
       when {
-        service.cacheConnector.fetch[SubscriptionResponse](eqTo(SubscriptionResponse.key))(any(), any(), any())
+        service.cacheConnector.fetch[SubscriptionResponse](any(), eqTo(SubscriptionResponse.key))(any(), any())
       } thenReturn Future.successful(None)
 
       when {
-        service.cacheConnector.fetch[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any(), any(), any())
+        service.cacheConnector.fetch[AmendVariationRenewalResponse](any(), eqTo(AmendVariationRenewalResponse.key))(any(), any())
       } thenReturn Future.successful(None)
 
       val user = mock[LoggedInUser]
 
-      when(authContext.user).thenReturn(user)
       when(user.oid).thenReturn("")
-      when(service.cacheConnector.remove(any(), any())).thenReturn(Future.successful(true))
+      when(service.cacheConnector.remove(any())(any())).thenReturn(Future.successful(true))
 
       when {
-        service.cacheConnector.saveAll(any())(any(), any())
+        service.cacheConnector.saveAll(any(), any())(any())
       } thenReturn Future.successful(cacheMap)
 
-      await(service.refreshCache("regNo")) mustEqual cacheMap
+      await(service.refreshCache("regNo", credId, ("accType", "id"))) mustEqual cacheMap
 
-      verify(service.cacheConnector).upsert(any(), eqTo(ViewResponse.key),
-        eqTo(Some(viewResponse)))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(BusinessMatching.key),
-        eqTo(viewResponse.businessMatchingSection.copy(hasAccepted = true, preAppComplete = true)))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(EstateAgentBusiness.key),
-        eqTo(Some(viewResponse.eabSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(TradingPremises.key),
-        eqTo(Some(viewResponse.tradingPremisesSection.fold(Seq.empty[TradingPremises])(_.map(tp => tp.copy(hasAccepted = true))))))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(BusinessDetails.key),
-        eqTo(viewResponse.businessDetailsSection.copy(hasAccepted = true)))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(BankDetails.key),
-        eqTo(viewResponse.bankDetailsSection.map(b => b.copy(hasAccepted = true))))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(AddPerson.key),
-        eqTo(viewResponse.aboutYouSection))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(BusinessActivities.key),
-        eqTo(viewResponse.businessActivitiesSection.copy(hasAccepted = true)))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(Tcsp.key),
-        eqTo(Some(viewResponse.tcspSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(Asp.key),
-        eqTo(Some(viewResponse.aspSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(MoneyServiceBusiness.key),
-        eqTo(Some(viewResponse.msbSection.copy(hasAccepted = true))))(any(), any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(ViewResponse.key),
+        eqTo(Some(viewResponse)))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(BusinessMatching.key),
+        eqTo(viewResponse.businessMatchingSection.copy(hasAccepted = true, preAppComplete = true)))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(EstateAgentBusiness.key),
+        eqTo(Some(viewResponse.eabSection.copy(hasAccepted = true))))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(TradingPremises.key),
+        eqTo(Some(viewResponse.tradingPremisesSection.fold(Seq.empty[TradingPremises])(_.map(tp => tp.copy(hasAccepted = true))))))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(BusinessDetails.key),
+        eqTo(viewResponse.businessDetailsSection.copy(hasAccepted = true)))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(BankDetails.key),
+        eqTo(viewResponse.bankDetailsSection.map(b => b.copy(hasAccepted = true))))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(AddPerson.key),
+        eqTo(viewResponse.aboutYouSection))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(BusinessActivities.key),
+        eqTo(viewResponse.businessActivitiesSection.copy(hasAccepted = true)))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(Tcsp.key),
+        eqTo(Some(viewResponse.tcspSection.copy(hasAccepted = true))))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(Asp.key),
+        eqTo(Some(viewResponse.aspSection.copy(hasAccepted = true))))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(MoneyServiceBusiness.key),
+        eqTo(Some(viewResponse.msbSection.copy(hasAccepted = true))))(any(), any())
 
-      verify(service.cacheConnector).upsert(any(), eqTo(Hvd.key),
-        eqTo(Some(viewResponse.hvdSection.copy(hasAccepted = true))))(any(), any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(Hvd.key),
+        eqTo(Some(viewResponse.hvdSection.copy(hasAccepted = true))))(any(), any())
 
-      verify(service.cacheConnector).upsert(any(), eqTo(Supervision.key),
-        eqTo(Some(viewResponse.supervisionSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(SubscriptionResponse.key),
-        eqTo(None))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(AmendVariationRenewalResponse.key),
-        eqTo(None))(any(), any(), any())
-      verify(service.cacheConnector).upsert(any(), eqTo(ResponsiblePerson.key),
-        eqTo(Some(viewResponse.responsiblePeopleSection.fold(Seq.empty[ResponsiblePerson])(_.map(rp => rp.copy(hasAccepted = true))))))(any(), any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(Supervision.key),
+        eqTo(Some(viewResponse.supervisionSection.copy(hasAccepted = true))))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(SubscriptionResponse.key),
+        eqTo(None))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(AmendVariationRenewalResponse.key),
+        eqTo(None))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(ResponsiblePerson.key),
+        eqTo(Some(viewResponse.responsiblePeopleSection.fold(Seq.empty[ResponsiblePerson])(_.map(rp => rp.copy(hasAccepted = true))))))(any(), any())
     }
   }
 
@@ -563,20 +567,20 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
     "save BusinessMatching succeed" in {
       when {
-        service.cacheConnector.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any())
+        service.cacheConnector.save[BusinessMatching](any(), eqTo(BusinessMatching.key), any())(any(), any())
       } thenReturn Future.successful(cacheMap)
 
-      whenReady (service.updateReviewDetails(reviewDetails)) {
+      whenReady (service.updateReviewDetails(reviewDetails, credId)) {
         _ mustEqual cacheMap
       }
     }
 
     "pass back a failed future when updating BusinessMatching fails" in {
       when {
-        service.cacheConnector.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any())
+        service.cacheConnector.save[BusinessMatching](any(), eqTo(BusinessMatching.key), any())(any(), any())
       } thenReturn Future.failed(new Exception(""))
 
-      whenReady (service.updateReviewDetails(reviewDetails).failed) {
+      whenReady (service.updateReviewDetails(reviewDetails, credId).failed) {
         _ mustBe an[Exception]
       }
     }

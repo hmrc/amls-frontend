@@ -19,29 +19,29 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BillPaymentServices, TelephonePaymentService}
 import models.flowmanagement.{AddBusinessTypeFlowModel, NeedMoreInformationPageId}
 import services.flowmanagement.Router
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{AuthAction, ControllerHelper}
 import views.html.businessmatching.updateservice.add.new_service_information
 
 import scala.concurrent.Future
 
 @Singleton
-class NeedMoreInformationController @Inject()( val authConnector: AuthConnector,
-                                               implicit val dataCacheConnector: DataCacheConnector,
-                                               val router: Router[AddBusinessTypeFlowModel]
-                                               ) extends BaseController {
+class NeedMoreInformationController @Inject()(authAction: AuthAction,
+                                              implicit val dataCacheConnector: DataCacheConnector,
+                                              val router: Router[AddBusinessTypeFlowModel]
+                                             ) extends DefaultBaseController {
 
-  def get() = Authorised.async {
-    implicit authContext =>
+  def get() = authAction.async {
       implicit request =>
         (for {
-          model <- OptionT(dataCacheConnector.fetch[ServiceChangeRegister](ServiceChangeRegister.key))
+          model <- OptionT(dataCacheConnector.fetch[ServiceChangeRegister](request.credId, ServiceChangeRegister.key))
           activity <- OptionT.fromOption[Future](model.addedActivities)
+          cacheMap <- OptionT(dataCacheConnector.fetchAll(request.credId))
         } yield {
           val activityNames = activity filterNot {
             case BillPaymentServices | TelephonePaymentService => true
@@ -50,16 +50,14 @@ class NeedMoreInformationController @Inject()( val authConnector: AuthConnector,
             _.getMessage()
           }
 
-          Ok(new_service_information(activityNames))
+          Ok(new_service_information(activityNames, ControllerHelper.supervisionComplete(cacheMap)))
         }) getOrElse InternalServerError("Get: Unable to show New Service Information page")
   }
 
-  def post() = Authorised.async {
-    implicit authContext =>
+  def post() = authAction.async {
       implicit request =>
         (for {
-          //model <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key))
-          route <- OptionT.liftF(router.getRoute(NeedMoreInformationPageId, new AddBusinessTypeFlowModel))
+          route <- OptionT.liftF(router.getRoute(request.credId, NeedMoreInformationPageId, new AddBusinessTypeFlowModel))
         } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: Add : NewServiceInformationController")
   }
 }

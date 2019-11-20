@@ -28,8 +28,6 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -39,20 +37,21 @@ class BusinessNameSpec extends AmlsSpec with ScalaFutures {
     implicit val amlsConnector = mock[AmlsConnector]
     implicit val cacheConnector = mock[DataCacheConnector]
     implicit val headerCarrier = HeaderCarrier()
-    implicit val authContext = mock[AuthContext]
     implicit val statusResponse = mock[ReadStatusResponse]
     implicit val statusService = mock[StatusService]
 
+    val credId = "123456789"
     val safeId = "X87FUDIKJJKJH87364"
+    val accountTypeId = ("accountType", "accountId")
   }
 
   "The BusinessName helper utility" must {
     "get the business name from amls" in new Fixture {
       when {
-        amlsConnector.registrationDetails(eqTo(safeId))(any(), any(), any())
+        amlsConnector.registrationDetails(any(), eqTo(safeId))(any(), any())
       } thenReturn Future.successful(RegistrationDetails("Test Business", isIndividual = false))
 
-      whenReady(BusinessName.getName(safeId.some).value) { result =>
+      whenReady(BusinessName.getName(credId, safeId.some, accountTypeId).value) { result =>
         result mustBe "Test Business".some
       }
     }
@@ -64,10 +63,10 @@ class BusinessNameSpec extends AmlsSpec with ScalaFutures {
         when(reviewDetails.businessName) thenReturn "Test Business from the cache"
 
         when {
-          cacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
+          cacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any())
         } thenReturn Future.successful(BusinessMatching(reviewDetails = reviewDetails.some).some)
 
-        whenReady(BusinessName.getName(None).value) { result =>
+        whenReady(BusinessName.getName(credId, None, accountTypeId).value) { result =>
           result mustBe "Test Business from the cache".some
         }
       }
@@ -79,14 +78,14 @@ class BusinessNameSpec extends AmlsSpec with ScalaFutures {
         when(statusResponse.safeId) thenReturn Some(safeId)
 
         when {
-          statusService.getDetailedStatus(any(), any(), any())
+          statusService.getDetailedStatus(any(), any(), any())(any(), any())
         } thenReturn Future.successful((SubmissionReady, Some(statusResponse)))
 
         when {
-          amlsConnector.registrationDetails(eqTo(safeId))(any(), any(), any())
+          amlsConnector.registrationDetails(any(), eqTo(safeId))(any(), any())
         } thenReturn Future.successful(RegistrationDetails("Test Business", isIndividual = false))
 
-        whenReady(BusinessName.getBusinessNameFromAmls().value) { result =>
+        whenReady(BusinessName.getBusinessNameFromAmls(Some("regNo"), accountTypeId, credId).value) { result =>
           result mustBe "Test Business".some
         }
       }

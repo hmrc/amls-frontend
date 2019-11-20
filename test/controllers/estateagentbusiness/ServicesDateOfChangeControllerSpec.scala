@@ -17,30 +17,28 @@
 package controllers.estateagentbusiness
 
 import connectors.DataCacheConnector
-import models.businessdetails.{BusinessDetails, ActivityStartDate}
-import models.estateagentbusiness.EstateAgentBusiness
+import controllers.actions.SuccessfulAuthAction
+import models.businessdetails.{ActivityStartDate, BusinessDetails}
+import models.estateagentbusiness._
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
-class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
+class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar  {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
     val controller = new ServicesDateOfChangeController (
       dataCacheConnector = mock[DataCacheConnector],
-      authConnector = self.authConnector
+      SuccessfulAuthAction
     )
   }
 
@@ -54,7 +52,7 @@ class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
       contentAsString(result) must include(Messages("summary.estateagentbusiness"))
     }
 
-    "submit with valid data" in new Fixture {
+    "submit with valid data and redirect to CYA for non residential" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
         "dateOfChange.day" -> "24",
@@ -62,22 +60,52 @@ class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
         "dateOfChange.year" -> "1990"
       )
 
+      val eab = EstateAgentBusiness(Some(Services(Set(Commercial),None)),None,None)
+
       val mockCacheMap = mock[CacheMap]
       when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
-        .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
+        .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 22))))))
 
       when(mockCacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key))
-        .thenReturn(None)
+        .thenReturn(Some(eab))
 
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(controller.dataCacheConnector.fetchAll(any())( any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any(), any())
+        ( any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.SummaryController.get().url))
+    }
+
+    "submit and redirect to redress scheme for residential" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "dateOfChange.day" -> "24",
+        "dateOfChange.month" -> "2",
+        "dateOfChange.year" -> "1990"
+      )
+
+      val eab = EstateAgentBusiness(Some(Services(Set(Residential),None)),None,None)
+
+      val mockCacheMap = mock[CacheMap]
+      when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
+        .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 22))))))
+
+      when(mockCacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key))
+        .thenReturn(Some(eab))
+
+      when(controller.dataCacheConnector.fetchAll(any())( any()))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any(), any())
+        ( any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.ResidentialRedressSchemeController.get(true).url))
     }
 
     "fail submission when invalid date is supplied" in new Fixture {
@@ -95,11 +123,11 @@ class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
       when(mockCacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key))
         .thenReturn(None)
 
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(controller.dataCacheConnector.fetchAll(any())( any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(),any(), any())
+        ( any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -121,11 +149,11 @@ class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
       when(mockCacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key))
         .thenReturn(Some(EstateAgentBusiness()))
 
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      when(controller.dataCacheConnector.fetchAll(any())( any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)

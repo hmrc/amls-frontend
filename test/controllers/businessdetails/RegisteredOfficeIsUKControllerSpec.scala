@@ -17,6 +17,7 @@
 package controllers.businessdetails
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businessdetails._
 import org.jsoup.Jsoup
@@ -43,10 +44,10 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
 
     val controller = new RegisteredOfficeIsUKController(
       dataCacheConnector = mockDataCacheConnector,
-      authConnector = self.authConnector
+      authAction = SuccessfulAuthAction
     )
 
-    when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
+    when(controller.dataCacheConnector.fetch[BusinessDetails](any(), any())(any(), any()))
       .thenReturn(Future.successful(None))
     val ukAddress = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "AA1 1AA")
     val nonUKAddress = RegisteredOfficeNonUK("305", "address line", Some("address line2"), Some("address line3"), Country("Albania", "AL"))
@@ -60,7 +61,7 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
     }
 
     "successfully submit form and navigate to RegisteredOfficeUK when true and edit false" in new Fixture {
-      when(mockDataCacheConnector.save[BusinessDetails](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+      when(mockDataCacheConnector.save[BusinessDetails](any(), any(), any())(any(), any())).thenReturn(Future.successful(mockCacheMap))
 
       val newRequest = request.withFormUrlEncodedBody(
         "isUK"-> "true"
@@ -73,7 +74,7 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
     }
 
     "successfully submit form and navigate to RegisteredOfficeNonUK when false and edit false" in new Fixture {
-      when(mockDataCacheConnector.save[BusinessDetails](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+      when(mockDataCacheConnector.save[BusinessDetails](any(), any(), any())(any(), any())).thenReturn(Future.successful(mockCacheMap))
       val newRequest = request.withFormUrlEncodedBody(
         "isUK"-> "false"
       )
@@ -85,8 +86,8 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
     }
 
     "successfully submit form and navigate to RegisteredOfficeUK when true and edit true and UKAddressSaved" in new Fixture {
-      when(mockDataCacheConnector.save[BusinessDetails](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-      when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
+      when(mockDataCacheConnector.save[BusinessDetails](any(), any(), any())(any(), any())).thenReturn(Future.successful(mockCacheMap))
+      when(controller.dataCacheConnector.fetch[BusinessDetails](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(RegisteredOfficeIsUK(true)), Some(ukAddress), None))))
 
       val newRequest = request.withFormUrlEncodedBody(
@@ -100,8 +101,8 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
     }
 
     "successfully submit form and navigate to RegisteredOfficeNonUK when false and edit true and UKAddressSaved" in new Fixture {
-      when(mockDataCacheConnector.save[BusinessDetails](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-      when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
+      when(mockDataCacheConnector.save[BusinessDetails](any(), any(), any())(any(), any())).thenReturn(Future.successful(mockCacheMap))
+      when(controller.dataCacheConnector.fetch[BusinessDetails](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(RegisteredOfficeIsUK(false)), Some(ukAddress), None))))
 
       val newRequest = request.withFormUrlEncodedBody(
@@ -115,8 +116,8 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
     }
 
     "successfully submit form and navigate to RegisteredOfficeUK when true and edit true and NonUKAddressSaved" in new Fixture {
-      when(mockDataCacheConnector.save[BusinessDetails](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-      when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
+      when(mockDataCacheConnector.save[BusinessDetails](any(), any(), any())(any(), any())).thenReturn(Future.successful(mockCacheMap))
+      when(controller.dataCacheConnector.fetch[BusinessDetails](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(RegisteredOfficeIsUK(true)), Some(nonUKAddress), None))))
 
       val newRequest = request.withFormUrlEncodedBody(
@@ -130,8 +131,8 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
     }
 
     "successfully submit form and navigate to RegisteredOfficeNonUK when false and edit true and NonUKAddressSaved" in new Fixture {
-      when(mockDataCacheConnector.save[BusinessDetails](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-      when(controller.dataCacheConnector.fetch[BusinessDetails](any())(any(), any(), any()))
+      when(mockDataCacheConnector.save[BusinessDetails](any(), any(), any())(any(), any())).thenReturn(Future.successful(mockCacheMap))
+      when(controller.dataCacheConnector.fetch[BusinessDetails](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(RegisteredOfficeIsUK(false)), Some(nonUKAddress), None))))
 
       val newRequest = request.withFormUrlEncodedBody(
@@ -162,7 +163,7 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
 
       "form validation fails" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch(any())(any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.fetch(any(), any())(any(), any())).thenReturn(Future.successful(None))
 
         val newRequest = request.withFormUrlEncodedBody(
           "isUK" -> "*"

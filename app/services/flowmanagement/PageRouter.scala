@@ -20,15 +20,11 @@ import models.flowmanagement.PageId
 import play.api.mvc.{Call, Result}
 import play.api.mvc.Results.InternalServerError
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import play.api.mvc.Results.Redirect
 import scala.concurrent.{ExecutionContext, Future}
 
 trait PageRouter[A] {
-  def getPageRoute(model: A, edit: Boolean = false)(implicit ac: AuthContext,
-                                                              hc: HeaderCarrier,
-                                                              ec: ExecutionContext
-  ): Future[Result]
+  def getRoute(credId: String, model: A, edit: Boolean = false)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result]
 
   implicit def toFutureRedirect(call: Call): Future[Result] = Future.successful(Redirect(call))
   implicit def toFuture(result: Result): Future[Result] = Future.successful(result)

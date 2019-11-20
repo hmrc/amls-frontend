@@ -17,22 +17,20 @@
 package controllers.tcsp
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.tcsp.{ServicesOfAnotherTCSP, Tcsp}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthAction
 
 import scala.concurrent.Future
 
-class AnotherTCSPSupervisionController @Inject()(
-                                                 val authConnector: AuthConnector,
-                                                 val dataCacheConnector: DataCacheConnector
-                                               ) extends BaseController {
+class AnotherTCSPSupervisionController @Inject()(val authAction: AuthAction,
+                                                 val dataCacheConnector: DataCacheConnector) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[Tcsp](Tcsp.key) map {
+  def get(edit: Boolean = false) = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[Tcsp](request.credId, Tcsp.key) map {
         response =>
           val form: Form2[ServicesOfAnotherTCSP] = (for {
             tcsp <- response
@@ -42,15 +40,16 @@ class AnotherTCSPSupervisionController @Inject()(
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+  def post(edit: Boolean = false) = authAction.async {
+    implicit request => {
       Form2[ServicesOfAnotherTCSP](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.tcsp.another_tcsp_supervision(f, edit)))
         case ValidForm(_, data) =>
+
           for {
-            tcsp <- dataCacheConnector.fetch[Tcsp](Tcsp.key)
-            _ <- dataCacheConnector.save[Tcsp](Tcsp.key, tcsp.servicesOfAnotherTCSP(data))
+            tcsp <- dataCacheConnector.fetch[Tcsp](request.credId, Tcsp.key)
+            _ <- dataCacheConnector.save[Tcsp](request.credId, Tcsp.key, tcsp.servicesOfAnotherTCSP(data))
           } yield Redirect(routes.SummaryController.get())
       }
     }

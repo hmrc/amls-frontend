@@ -16,12 +16,12 @@
 
 package controllers.hvd
 
+import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.HighValueDealing
 import models.hvd.{HowWillYouSellGoods, Hvd, Retail, Wholesale}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import play.api.i18n.Messages
-import play.api.test.FakeRequest
 import play.api.test.Helpers.{BAD_REQUEST, OK, SEE_OTHER, contentAsString, redirectLocation, status, _}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DateOfChangeHelper, DependencyMocks}
@@ -35,13 +35,13 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
     val controller = new HowWillYouSellGoodsController(
       mockCacheConnector,
       mockStatusService,
-      self.authConnector,
+      SuccessfulAuthAction,
       mockServiceFlow
     )
 
     mockCacheFetch[Hvd](None)
     mockCacheSave[Hvd]
-    mockIsNewActivity(false)
+    mockIsNewActivityNewAuth(false)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -54,9 +54,12 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
   }
 
   "load UI from mongoCache" in new Fixture {
+
     mockCacheFetch(Some(Hvd(howWillYouSellGoods = Some(HowWillYouSellGoods(Set(Retail))))))
+
     val result = controller.get()(request)
     status(result) must be(OK)
+
     val htmlValue = Jsoup.parse(contentAsString(result))
     htmlValue.title mustBe Messages("hvd.how-will-you-sell-goods.title") + " - " + Messages("summary.hvd") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
     htmlValue.getElementById("salesChannels-Retail").`val`() mustBe "Retail"
@@ -145,7 +148,7 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
           val newRequest = request.withFormUrlEncodedBody("salesChannels" -> "Retail")
 
           mockApplicationStatus(SubmissionDecisionApproved)
-          mockIsNewActivity(true, Some(HighValueDealing))
+          mockIsNewActivityNewAuth(true, Some(HighValueDealing))
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)

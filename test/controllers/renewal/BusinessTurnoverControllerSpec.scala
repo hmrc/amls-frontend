@@ -17,7 +17,8 @@
 package controllers.renewal
 
 import connectors.DataCacheConnector
-import models.renewal.{Renewal, BusinessTurnover}
+import controllers.actions.SuccessfulAuthAction
+import models.renewal.{BusinessTurnover, Renewal}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -27,7 +28,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -46,11 +47,11 @@ class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
     val controller = new BusinessTurnoverController(
       dataCacheConnector = mockDataCacheConnector,
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       renewalService = mockRenewalService
     )
 
-    when(mockRenewalService.getRenewal(any(), any(), any()))
+    when(mockRenewalService.getRenewal(any())(any(), any()))
       .thenReturn(Future.successful(Some(Renewal(businessTurnover = Some(BusinessTurnover.First)))))
   }
 
@@ -87,10 +88,10 @@ class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with Sca
           "businessTurnover" -> "01"
         )
 
-        when(controller.dataCacheConnector.fetch[BusinessTurnover](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessTurnover](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+        when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
@@ -104,10 +105,10 @@ class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with Sca
           "businessTurnover" -> "01"
         )
 
-        when(controller.dataCacheConnector.fetch[BusinessTurnover](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessTurnover](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+        when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(true)(newRequest)

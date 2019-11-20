@@ -21,29 +21,27 @@ import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import models.bankdetails.BankDetails
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.StatusConstants
+import utils.{AuthAction, StatusConstants}
 
 @Singleton
 class RemoveBankDetailsController @Inject()(
-                                             val authConnector: AuthConnector,
+                                             val authAction: AuthAction,
                                              val dataCacheConnector: DataCacheConnector
                                            ) extends BankDetailsController {
 
-  def get(index: Int) = Authorised.async {
-    implicit authContext =>
+  def get(index: Int) = authAction.async {
       implicit request =>
-        getData[BankDetails](index) map {
+        getData[BankDetails](request.credId, index) map {
           case Some(BankDetails(_, Some(name), _, _, _, _, _)) =>
             Ok(views.html.bankdetails.remove_bank_details(EmptyForm, index, name))
           case _ => NotFound(notFoundView)
         }
   }
 
-  def remove(index: Int) = Authorised.async {
-    implicit authContext =>
+  def remove(index: Int) = authAction.async {
       implicit request => {
         for {
-          _ <- updateDataStrict[BankDetails](index) { ba =>
+          _ <- updateDataStrict[BankDetails](request.credId, index) { ba =>
             ba.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
           }
         } yield Redirect(routes.YourBankAccountsController.get())

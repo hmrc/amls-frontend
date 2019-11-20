@@ -21,15 +21,17 @@
 @(paymentReference: Option[String], total: Currency, amountToPay: Currency, maybeBreakdown: Option[Seq[BreakdownRow]], paymentsUrl: String)(implicit request: Request[_], m:Messages)
 
 @main(
-    title = Messages("confirmation.amendment.header")
+    title = Messages("confirmation.amendment.header") + " - " + Messages("confirmation.amendment.header.secondary")
 ) {
 
     <header class="page-header">
-        <h1 class="heading-xlarge">@Messages("confirmation.amendment.header")</h1>
         <p class="heading-secondary"><span class="visuallyhidden">This section is </span>@Messages("confirmation.amendment.header.secondary")</p>
+        <h1 class="heading-xlarge">@Messages("confirmation.amendment.header")</h1>
     </header>
 
     <p class="info"> @Messages("confirmation.amendment.info")</p>
+
+    <p class="make-note"> @Messages("confirmation.amendment.makenote")</p>
 
     <div class="reg-online--pay-fee">
         <p>@Messages("confirmation.fee") <span class="visuallyhidden">is</span>
@@ -43,6 +45,13 @@
     @maybeBreakdown.map { breakdown =>
         @breakdown_display(total, breakdown, Messages("confirmation.amendment.summary"))
     }
+
+    <div id="timelimit"><p>@Messages("confirmation.timelimit")</p></div>
+
+
+    @printLink(linkId = "confirmation-print",
+        gaTag = Some("fee-reference:click:print")
+    )
 
     <p><a id='continue-pay' class="button" href="@paymentsUrl">@Messages("button.continuetopayment")</a></p>
 

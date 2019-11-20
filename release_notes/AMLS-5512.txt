@@ -1,0 +1,1 @@
+ + [AMLS-5512] - 'Removed tabindex from back button'

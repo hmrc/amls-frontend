@@ -18,28 +18,26 @@ package controllers.responsiblepeople
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ThreeYearsPlus}
 import models.responsiblepeople._
 import play.api.mvc.{AnyContent, Request}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.time_at_additional_address
+import utils.{AuthAction, ControllerHelper, RepeatingSection}
+import views.html.responsiblepeople.address.time_at_additional_address
 
 import scala.concurrent.Future
 
 class TimeAtAdditionalAddressController @Inject () (
                                                    val dataCacheConnector: DataCacheConnector,
-                                                   val authConnector: AuthConnector
-                                                   ) extends RepeatingSection with BaseController {
+                                                   authAction: AuthAction
+                                                   ) extends RepeatingSection with DefaultBaseController {
 
   final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None)
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext => implicit request =>
-        getData[ResponsiblePerson](index) map {
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
+    implicit request =>
+        getData[ResponsiblePerson](request.credId, index) map {
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,Some(ResponsiblePersonAddressHistory(_,Some(ResponsiblePersonAddress(_,Some(additionalAddress))),_)),_,_,_,_,_,_,_,_,_,_,_, _)) =>
             Ok(time_at_additional_address(Form2[TimeAtAddress](additionalAddress), edit, index, flow, personName.titleName))
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
@@ -48,15 +46,15 @@ class TimeAtAdditionalAddressController @Inject () (
         }
   }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext => implicit request => {
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
+    implicit request => {
         (Form2[TimeAtAddress](request.body) match {
           case f: InvalidForm =>
-            getData[ResponsiblePerson](index) map { rp =>
+            getData[ResponsiblePerson](request.credId, index) map { rp =>
               BadRequest(time_at_additional_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
-            getData[ResponsiblePerson](index) flatMap { responsiblePerson =>
+            getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>
               (for {
                 rp <- responsiblePerson
                 addressHistory <- rp.addressHistory
@@ -65,7 +63,7 @@ class TimeAtAdditionalAddressController @Inject () (
                 val additionalAddressWithTime = additionalAddress.copy(
                   timeAtAddress = Some(data)
                 )
-                doUpdate(index, additionalAddressWithTime).map { _ =>
+                doUpdate(request.credId, index, additionalAddressWithTime).map { _ =>
                   redirectTo(index, edit, flow, data)
                 }
               }) getOrElse Future.successful(NotFound(notFoundView))
@@ -81,12 +79,12 @@ class TimeAtAdditionalAddressController @Inject () (
     data match {
       case ThreeYearsPlus | OneToThreeYears if !edit => Redirect(routes.PositionWithinBusinessController.get(index, edit, flow))
       case ThreeYearsPlus | OneToThreeYears if edit => Redirect(routes.DetailedAnswersController.get(index, flow))
-      case _ => Redirect(routes.AdditionalExtraAddressController.get(index, edit, flow))
+      case _ => Redirect(address.routes.AdditionalExtraAddressController.get(index, edit, flow))
     }
   }
 
-  private def doUpdate(index: Int, data: ResponsiblePersonAddress)(implicit authContext: AuthContext, request: Request[AnyContent]) = {
-    updateDataStrict[ResponsiblePerson](index) { res =>
+  private def doUpdate(credId: String, index: Int, data: ResponsiblePersonAddress)(implicit request: Request[AnyContent]) = {
+    updateDataStrict[ResponsiblePerson](credId, index) { res =>
       res.addressHistory(
         res.addressHistory match {
           case Some(a) if data.timeAtAddress.contains(ThreeYearsPlus) | data.timeAtAddress.contains(OneToThreeYears) =>

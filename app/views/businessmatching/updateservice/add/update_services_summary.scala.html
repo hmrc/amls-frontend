@@ -21,7 +21,9 @@
 @import controllers.businessmatching.updateservice.add.routes
 @import models.flowmanagement.AddBusinessTypeFlowModel
 
-@(f: forms.Form2[_], flowModel: AddBusinessTypeFlowModel)(implicit request: Request[_],messages:Messages)
+@import models.tradingpremises.TradingPremises
+@import models.responsiblepeople.ResponsiblePerson
+@(f: forms.Form2[_], flowModel: AddBusinessTypeFlowModel, tradingPremises: Seq[(TradingPremises, Int)], responsiblePeople: Seq[(ResponsiblePerson, Int)])(implicit request: Request[_],messages:Messages)
 
 @header = {
     @heading("title.cya", "summary.updateservice")
@@ -32,7 +34,9 @@
     heading = header
 ) {
 
-    @checkYourAnswers(
+    <dl class="cya-summary-list">
+
+    @checkYourAnswersRow(
         question = Messages("businessmatching.updateservice.selectactivities.title"),
         editUrl = routes.SelectBusinessTypeController.get(edit = true).url,
         editLinkTag = "selectactivities-edit"
@@ -42,14 +46,14 @@
 
     @if(flowModel.activity.equals(Some(MoneyServiceBusiness))) {
         @flowModel.subSectors.map { services =>
-            @checkYourAnswers(
-                question = Messages("businessmatching.services.title"),
+            @checkYourAnswersRow(
+                question = Messages("businessmatching.updateservice.msb.services.title"),
                 editUrl = routes.SubSectorsController.get(true).toString,
                 allowEdit = true,
                 editLinkTag="msbservices-edit"
             ) {
-                <ul id="msb-service" class="list list--comma">
-                    @services.msbServices.map { svc =>
+                <ul id="msb-service" class="list list-bullet">
+                    @services.msbServices.toList.sortBy(_.getMessage).map { svc =>
                     <li>@svc match {
                         case TransmittingMoney => {@Messages("businessmatching.services.list.lbl.01")}
                         case CurrencyExchange => {@Messages("businessmatching.services.list.lbl.02")}
@@ -63,7 +67,7 @@
 
                 @if(services.msbServices.contains(TransmittingMoney)) {
                 @flowModel.businessAppliedForPSRNumber.map { psr =>
-                @checkYourAnswers(
+                @checkYourAnswersRow(
                     question = Messages("businessmatching.psr.number.title"),
                     editUrl = routes.BusinessAppliedForPSRNumberController.get(true).toString,
                     editLinkTag="psr-edit",
@@ -81,7 +85,7 @@
 
 
     @if(flowModel.fitAndProper.isDefined) {
-        @checkYourAnswers(
+        @checkYourAnswersRow(
                 question = Messages("businessmatching.updateservice.fitandproper.heading", flowModel.activityName.getOrElse("").toLowerCase),
                 editUrl = routes.FitAndProperController.get(edit = true).url,
                 editLinkTag = "fitandproper-edit"
@@ -93,25 +97,29 @@
         }
 
         @if(flowModel.fitAndProper.contains(true)) {
-            @checkYourAnswers(
+            @checkYourAnswersRow(
                 question = Messages("businessmatching.updateservice.whichfitandproper.heading", flowModel.activityName.getOrElse("").toLowerCase),
                 editUrl = routes.WhichFitAndProperController.get(edit = true).url,
                 editLinkTag = "whichfitandproper-edit"
             ) {
-            <p id = "fit-and-proper-count">
-                @(flowModel.responsiblePeople map { fp =>
-                    if(fp.index.size < 2) {
-                        Messages("businessmatching.updateservice.summary.whichfitandproper.count", fp.index.size)
-                    } else {
-                        Messages("businessmatching.updateservice.summary.whichfitandproper.count.plural", fp.index.size)
+                @if(responsiblePeople.size > 1) {
+                    <ul id="responsible-person" class="list list-bullet list-responsible-multiple">
+                        @responsiblePeople.map { case (rp, index) =>
+                            <li> @rp.personName.map { name => @name.fullName } </li>
                     }
-                })
-            </p>
+                    </ul>
+                } else {
+                    <ul id="responsible-person" class="list">
+                        @responsiblePeople.map { case (rp, index) =>
+                            <li> @rp.personName.map { name => @name.fullName } </li>
+                    }
+                    </ul>
+                }
             }
         }
     }
 
-    @checkYourAnswers(
+    @checkYourAnswersRow(
         question = Messages("businessmatching.updateservice.tradingpremises.summary", flowModel.activity.map(a => a.getMessage(true)).getOrElse("")),
         editUrl = routes.TradingPremisesController.get(edit = true).url,
         editLinkTag = "tradingpremises-edit"
@@ -123,27 +131,35 @@
     }
 
     @if(flowModel.areNewActivitiesAtTradingPremises.contains(true)) {
-        @checkYourAnswers(
-            question = Messages("businessmatching.updateservice.whichtradingpremises.summary", flowModel.activity.map(a => a.getMessage(true)).getOrElse("")),
+        @checkYourAnswersRow(
+            question = Messages("businessmatching.updateservice.whichtradingpremises.heading", flowModel.activity.map(a => a.getMessage(true)).getOrElse("")),
             editUrl = routes.WhichTradingPremisesController.get().url,
             editLinkTag = "whichtradingpremises-edit"
         ) {
-            <p id="tp-premises-activities-count">
-                @(flowModel.tradingPremisesActivities map { tp =>
-                    Messages("businessmatching.updateservice.summary.whichtradingpremises.count", tp.index.size)
-                })
-            </p>
+            @if(tradingPremises.size > 1) {
+                <ul id="tp-premises" class="trading-premises-list list list-bullet">
+                    @tradingPremises.map { case (tp, index) =>
+                        <li> @tp.label </li>
+                }
+                </ul>
+            } else {
+                <ul id="tp-premises" class="trading-premises-list">
+                    @tradingPremises.map { case (tp, index) =>
+                        <li> @tp.label </li>
+                }
+                </ul>
+            }
         }
 
             @flowModel.tradingPremisesMsbServices.map { tpMsbServices =>
-                @checkYourAnswers(
+                @checkYourAnswersRow(
                     question = Messages("businessmatching.updateservice.whatdoyoudohere.heading", flowModel.activityName.getOrElse("").toLowerCase),
                     editUrl = routes.WhatDoYouDoHereController.get(true).url,
                     allowEdit = flowModel.subSectors.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.size > 1,
                     editLinkTag = "whatdoyoudohere-edit"
                 ) {
-                    <ul id="tp-msb-services" class="list list--comma">
-                        @tpMsbServices.msbServices.map { service =>
+                    <ul id="tp-msb-services" class="list list-bullet">
+                        @tpMsbServices.msbServices.toList.sortBy(_.getMessage).map { service =>
                             <li>@service match {
                                 case TransmittingMoney => {@Messages("businessmatching.updateservice.msb.services.list.lbl.01")}
                                 case CurrencyExchange => {@Messages("businessmatching.updateservice.msb.services.list.lbl.02")}
@@ -157,6 +173,8 @@
 
         }
     }
+
+    </dl>
 
     @form(f, controllers.businessmatching.updateservice.add.routes.AddBusinessTypeSummaryController.post()) {
         @submit(edit = false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false, buttonId = Some("updatesummary-submit"))

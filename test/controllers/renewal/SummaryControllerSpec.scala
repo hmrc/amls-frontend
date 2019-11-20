@@ -17,11 +17,13 @@
 package controllers.renewal
 
 import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.registrationprogress.{Completed, Section}
 import models.renewal._
 import org.jsoup.Jsoup
+import org.jsoup.select.Elements
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -51,18 +53,18 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
     val controller = new SummaryController(
       dataCacheConnector = mockDataCacheConnector,
-      authConnector = self.authConnector,
+      authAction = SuccessfulAuthAction,
       renewalService = mockRenewalService,
       progressService = mockProgressService,
       sectionsProvider = mockSectionsProvider
     )
 
     when {
-      mockSectionsProvider.sections(any())
+      mockSectionsProvider.sections(any[CacheMap])
     } thenReturn Seq.empty[Section]
 
     when {
-      mockRenewalService.getSection(any(),any(),any())
+      mockRenewalService.getSection(any())(any(),any())
     } thenReturn Future.successful(Section("", Completed, false, mock[Call]))
 
     val renewalModel = Renewal(
@@ -93,7 +95,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
     "load the summary page when there is data in the renewal" in new Fixture {
 
-      when(mockDataCacheConnector.fetchAll(any(),any()))
+      when(mockDataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
       when(mockCacheMap.getEntry[Renewal](Renewal.key))
         .thenReturn(Some(Renewal(Some(models.renewal.InvolvedInOtherYes("test")))))
@@ -105,7 +107,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
     }
 
     "redirect to the renewal progress page when section data is unavailable" in new Fixture {
-      when(mockDataCacheConnector.fetchAll(any(),any()))
+      when(mockDataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(emptyCache)))
 
       val result = controller.get()(request)
@@ -114,7 +116,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
     "pre load Business matching business activities data in " +
       "'How much total net profit does your business expect in the next 12 months, from the following activities?'" in new Fixture {
-      when(mockDataCacheConnector.fetchAll(any(),any()))
+      when(mockDataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(activities = bmBusinessActivities)))
@@ -124,7 +126,8 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       val result = controller.get()(request)
       status(result) must be(OK)
       val document = Jsoup.parse(contentAsString(result))
-      val listElement = document.getElementsByTag("section").get(2).getElementsByClass("list-bullet").get(0)
+      val listElement = document.select(".cya-summary-list__row:nth-child(3) > .cya-summary-list__value > .list-bullet").get(0)
+      println(listElement.toString)
       listElement.children().size() must be(bmBusinessActivities.fold(0)(x => x.businessActivities.size))
 
     }
@@ -135,11 +138,11 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       val cache = mock[CacheMap]
 
       when {
-        controller.dataCacheConnector.fetch[Renewal](any())(any(), any(), any())
+        controller.dataCacheConnector.fetch[Renewal](any(), any())(any(), any())
       } thenReturn Future.successful(Some(renewalModel.copy(hasAccepted = false)))
 
       when {
-        controller.dataCacheConnector.save[Renewal](eqTo(Renewal.key), any())(any(), any(), any())
+        controller.dataCacheConnector.save[Renewal](any(), eqTo(Renewal.key), any())(any(), any())
       } thenReturn Future.successful(cache)
 
       val result = controller.post()(request)
@@ -148,7 +151,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       redirectLocation(result) mustBe Some(controllers.renewal.routes.RenewalProgressController.get.url)
 
       val captor = ArgumentCaptor.forClass(classOf[Renewal])
-      verify(controller.dataCacheConnector).save[Renewal](eqTo(Renewal.key), captor.capture())(any(), any(), any())
+      verify(controller.dataCacheConnector).save[Renewal](any(), eqTo(Renewal.key), captor.capture())(any(), any())
       captor.getValue.hasAccepted mustBe true
     }
   }

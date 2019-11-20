@@ -19,25 +19,22 @@ package controllers.tcsp
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import javax.inject.Inject
 import models.tcsp._
 import play.api.i18n.Messages
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.tcsp.summary
 import play.api.Logger
+import utils.AuthAction
 
-class SummaryController @Inject()
-(
-  val dataCache: DataCacheConnector,
-  val authConnector: AuthConnector,
-  val serviceFlow: ServiceFlow,
-  val statusService: StatusService
-) extends BaseController {
+class SummaryController @Inject()(
+                                  val dataCache: DataCacheConnector,
+                                  val authAction: AuthAction,
+                                  val serviceFlow: ServiceFlow,
+                                  val statusService: StatusService) extends DefaultBaseController {
 
   def sortProviders(data: Tcsp): List[String] = {
 
@@ -62,23 +59,21 @@ class SummaryController @Inject()
     sortedList
   }
 
-  def get = Authorised.async {
-    implicit authContext =>
+  def get = authAction.async {
       implicit request =>
-        fetchModel map {
+        fetchModel(request.credId) map {
           case Some(data) => Ok(summary(data, sortProviders(data)))
           case _ => Redirect(controllers.routes.RegistrationProgressController.get())
         }
   }
 
-  def post = Authorised.async {
-    implicit authContext =>
+  def post = authAction.async {
       implicit request =>
         (for {
-          model <- OptionT(fetchModel)
-          _ <- OptionT.liftF(dataCache.save[Tcsp](Tcsp.key, model.copy(hasAccepted = true)))
+          model <- OptionT(fetchModel(request.credId))
+          _ <- OptionT.liftF(dataCache.save[Tcsp](request.credId, Tcsp.key, model.copy(hasAccepted = true)))
         } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Cannot update Tcsp")
   }
 
-  private def fetchModel(implicit authContext: AuthContext, hc: HeaderCarrier) = dataCache.fetch[Tcsp](Tcsp.key)
+  private def fetchModel(credId: String)(implicit hc: HeaderCarrier) = dataCache.fetch[Tcsp](credId, Tcsp.key)
 }

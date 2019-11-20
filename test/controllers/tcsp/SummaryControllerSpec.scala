@@ -16,6 +16,7 @@
 
 package controllers.tcsp
 
+import controllers.actions.SuccessfulAuthAction
 import models.tcsp._
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -23,13 +24,14 @@ import play.api.test.Helpers._
 import services.businessmatching.ServiceFlow
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class SummaryControllerSpec extends AmlsSpec {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
     val request = addToken(authRequest)
+    implicit val ec = app.injector.instanceOf[ExecutionContext]
 
     val defaultProvidedServices = ProvidedServices(Set(PhonecallHandling, Other("other service")))
     val defaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes("12345678")
@@ -48,13 +50,13 @@ class SummaryControllerSpec extends AmlsSpec {
 
     val controller = new SummaryController(
       mockCacheConnector,
-      self.authConnector,
+      authAction = SuccessfulAuthAction,
       mock[ServiceFlow],
       mockStatusService
     )
 
     when {
-      controller.statusService.isPreSubmission(any(), any(), any())
+      controller.statusService.isPreSubmission(any(), any(), any())(any(), any())
     } thenReturn Future.successful(false)
   }
 
@@ -171,7 +173,7 @@ class SummaryControllerSpec extends AmlsSpec {
 
         redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
 
-        verify(controller.dataCache).save[Tcsp](any(), eqTo(model.copy(hasAccepted = true)))(any(),any(),any())
+        verify(controller.dataCache).save[Tcsp](any(), any(), eqTo(model.copy(hasAccepted = true)))(any(),any())
 
       }
     }

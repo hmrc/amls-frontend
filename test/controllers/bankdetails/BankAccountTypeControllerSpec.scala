@@ -16,26 +16,14 @@
 
 package controllers.bankdetails
 
-import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import models.bankdetails._
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.jsoup.Jsoup
-import org.mockito.Matchers
-import org.mockito.Matchers._
-import org.mockito.Mockito._
-import org.scalatest.matchers.Matcher
 import org.scalatest.mock.MockitoSugar
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec, StatusConstants}
 import play.api.i18n.Messages
-import play.api.inject.bind
-import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
-import services.StatusService
-import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-
-import scala.concurrent.Future
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
 
 class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
 
@@ -43,15 +31,11 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
 
     val request = addToken(authRequest)
 
-    val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthConnector].to(self.authConnector))
-      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
-      .overrides(bind[StatusService].to(mockStatusService))
-      .overrides(bind[AuditConnector].to(mock[AuditConnector]))
-      .build()
-
-    lazy val controller = injector.instanceOf[BankAccountTypeController]
-
+    val controller = new BankAccountTypeController(
+      SuccessfulAuthAction,
+      mockCacheConnector,
+      mockStatusService
+    )
   }
 
   "BankAccountTypeController" when {
@@ -119,7 +103,6 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
             BankDetails(Some(PersonalAccount), hasAccepted = true),
             BankDetails(Some(PersonalAccount), hasAccepted = true)
           )))
-
           mockApplicationStatus(SubmissionReadyForReview)
 
           val result = controller.get(1, true)(request)
@@ -133,14 +116,12 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
             BankDetails(Some(PersonalAccount), hasAccepted = true),
             BankDetails(Some(PersonalAccount), hasAccepted = true)
           )))
-
           mockApplicationStatus(SubmissionDecisionApproved)
 
           val result = controller.get(1, true)(request)
 
           status(result) must be(NOT_FOUND)
         }
-
       }
     }
 

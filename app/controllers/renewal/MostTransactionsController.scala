@@ -16,28 +16,27 @@
 
 package controllers.renewal
 
-import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.{Inject, Singleton}
 import models.businessmatching._
 import models.renewal.{MostTransactions, Renewal}
 import play.api.mvc.Result
 import services.{AutoCompleteService, RenewalService}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{AuthAction, ControllerHelper}
 
 import scala.concurrent.Future
 
 @Singleton
-class MostTransactionsController @Inject()(val authConnector: AuthConnector,
+class MostTransactionsController @Inject()(val authAction: AuthAction,
                                            val cache: DataCacheConnector,
                                            val renewalService: RenewalService,
-                                           val autoCompleteService: AutoCompleteService) extends BaseController {
+                                           val autoCompleteService: AutoCompleteService) extends DefaultBaseController {
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        cache.fetch[Renewal](Renewal.key) map {
+        cache.fetch[Renewal](request.credId, Renewal.key) map {
           response =>
             val form = (for {
               msb <- response
@@ -48,14 +47,13 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector,
   }
 
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
+  def post(edit: Boolean = false) = authAction.async {
       implicit request =>
         Form2[MostTransactions](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.renewal.most_transactions(f, edit, autoCompleteService.getCountries)))
+            Future.successful(BadRequest(views.html.renewal.most_transactions(alignFormDataWithValidationErrors(f), edit, autoCompleteService.getCountries)))
           case ValidForm(_, data) =>
-            cache.fetchAll flatMap {
+            cache.fetchAll(request.credId).flatMap {
               optMap =>
                 val result = for {
                   cacheMap <- optMap
@@ -63,7 +61,7 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector,
                   bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
                   ba <- bm.activities
                   services <- bm.msbServices
-                } yield renewalService.updateRenewal(renewal.mostTransactions(data)) map { _ =>
+                } yield renewalService.updateRenewal(request.credId, renewal.mostTransactions(data)) map { _ =>
                   if (!edit) {
                     redirectTo(services.msbServices, ba.businessActivities)
                   } else {
@@ -75,12 +73,16 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector,
         }
   }
 
+  def alignFormDataWithValidationErrors(form: InvalidForm): InvalidForm =
+    ControllerHelper.stripEmptyValuesFromFormWithArray(form, "mostTransactionsCountries", index => index / 2)
+
+
   private def redirectTo(services: Set[BusinessMatchingMsbService], businessActivities: Set[BusinessActivity]): Result = {
       (services, businessActivities) match {
         case (x, _) if x.contains(CurrencyExchange) => Redirect(routes.CETransactionsInLast12MonthsController.get())
         case (x, _) if x.contains(ForeignExchange) => Redirect(routes.FXTransactionsInLast12MonthsController.get())
         case (_, x) if x.contains(HighValueDealing) && x.contains(AccountancyServices) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
-        case (_, x) if x.contains(HighValueDealing) => Redirect(routes.CustomersOutsideIsUKController.get())
+        case (_, x) if x.contains(HighValueDealing) || x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideIsUKController.get())
         case _ => Redirect(routes.SummaryController.get())
       }
   }
