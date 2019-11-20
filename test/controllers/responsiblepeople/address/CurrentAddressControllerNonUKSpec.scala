@@ -231,8 +231,8 @@ class CurrentAddressControllerNonUKSpec extends AmlsSpec with MockitoSugar {
             "isUK" -> "false",
             "addressLineNonUK1" -> "Line 1",
             "addressLineNonUK2" -> "Line 2",
-            "country" -> "ES"
-          )
+            "country" -> "ES")
+
           val ukAddress = PersonAddressNonUK("Line 1", "Line 2", Some("Line 3"), None, Country("Spain", "ES"))
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
@@ -250,6 +250,87 @@ class CurrentAddressControllerNonUKSpec extends AmlsSpec with MockitoSugar {
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.get(RecordId,true).url))
 
+        }
+      }
+
+      "redirect to CurrentAddressDateOfChangeController" when {
+        "address changed and in eligible state for date of change and not in edit mode" in new Fixture {
+          val requestWithParams = request.withFormUrlEncodedBody(
+            "isUK" -> "false",
+            "addressLineNonUK1" -> "Line 1",
+            "addressLineNonUK2" -> "Line 2",
+            "country" -> "ES")
+
+          val ukAddress = PersonAddressNonUK("Line 1", "Line 2", Some("Line 3"), None, Country("Spain", "ES"))
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
+          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
+
+          when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          val result = currentAddressController.post(RecordId)(requestWithParams)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.get(RecordId).url))
+        }
+      }
+
+      "redirect to CurrentAddressDateOfChangeController" when {
+        "changed address from uk to non-uk and in eligible state for date of change and not in edit mode" in new Fixture {
+          val requestWithParams = request.withFormUrlEncodedBody(
+            "isUK" -> "false",
+            "addressLineNonUK1" -> "Line 1",
+            "addressLineNonUK2" -> "Line 2",
+            "country" -> "ES")
+
+          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
+          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
+
+          when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          val result = currentAddressController.post(RecordId)(requestWithParams)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.get(RecordId).url))
+        }
+      }
+
+      "redirect to TimeAtCurrentAddressController" when {
+        "not in edit mode and no line id defined" in new Fixture {
+          val requestWithParams = request.withFormUrlEncodedBody(
+            "isUK" -> "false",
+            "addressLineNonUK1" -> "Line 1",
+            "addressLineNonUK2" -> "Line 2",
+            "country" -> "ES")
+
+          val ukAddress = PersonAddressNonUK("Line 1", "Line 2", Some("Line 3"), None, Country("Spain", "ES"))
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
+          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
+
+          when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          val result = currentAddressController.post(RecordId)(requestWithParams)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.address.routes.TimeAtCurrentAddressController.get(RecordId).url))
         }
       }
 

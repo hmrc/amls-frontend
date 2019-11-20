@@ -109,7 +109,9 @@ class CurrentAddressUKController @Inject ()(val dataCacheConnector: DataCacheCon
             }
           }
         }
-        case (false, Some(address)) if address.addressLine1.isEmpty => {
+        case (false, Some(address)) if (address.isEmpty | address.isComplete) & isEligibleForDateOfChange(status) & originalResponsiblePerson.flatMap {
+          orp => orp.lineId
+        }.isDefined => {
           auditConnector.sendEvent(AddressModifiedEvent(data.personAddress, originalAddress)) map { _ =>
             Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))
           }
