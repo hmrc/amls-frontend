@@ -20,10 +20,13 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.autocomplete.NameValuePair
+import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
 import org.jsoup.Jsoup
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.mockito.Matchers.{any, eq => eqTo}
 import org.scalatest.{BeforeAndAfter, OptionValues}
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
@@ -163,7 +166,6 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar wi
   }
 
   "post is called" when {
-
     "form is valid" must {
       "go to AdditionalExtraAddressUKController" when {
         "user selected Yes" in new Fixture {
@@ -260,6 +262,68 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar wi
         val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.responsiblepeople.address.routes.AdditionalExtraAddressUKController.get(RecordId).url))
+      }
+    }
+
+    "redirect to AdditionalExtraAddressNonUK and wipe old address" when {
+      "changed the answer from yes to no" in new Fixture {
+
+        val requestWithParams = request.withFormUrlEncodedBody(
+          "isUK" -> "false")
+
+        val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+        val currentAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
+        val additionalAddress = ResponsiblePersonAddress(ukAddress, Some(ZeroToFiveMonths))
+        val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress),
+          additionalAddress = Some(additionalAddress),
+          additionalExtraAddress = Some(additionalAddress))
+        val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
+
+        when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.AdditionalExtraAddressNonUKController.get(RecordId).url))
+
+        val captor = ArgumentCaptor.forClass(classOf[Seq[ResponsiblePerson]])
+        verify(additionalExtraAddressController.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key), captor.capture())(any(), any())
+        captor.getValue.head.isComplete mustBe false
+        captor.getValue.head.addressHistory.value.additionalExtraAddress mustBe Some(ResponsiblePersonAddress(PersonAddressNonUK("", "", None, None, Country("", "")), None))
+      }
+    }
+
+    "redirect to AdditionalExtraAddressUkController and wipe old address" when {
+      "changed the answer from no to yes" in new Fixture {
+
+        val requestWithParams = request.withFormUrlEncodedBody(
+          "isUK" -> "true")
+
+        val ukAddress = PersonAddressNonUK("Line 1", "Line 2", Some("Line 3"), None, Country("", ""))
+        val currentAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
+        val additionalAddress = ResponsiblePersonAddress(ukAddress, Some(ZeroToFiveMonths))
+        val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress),
+          additionalAddress = Some(additionalAddress),
+          additionalExtraAddress = Some(additionalAddress))
+        val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
+
+        when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.AdditionalExtraAddressUKController.get(RecordId).url))
+
+        val captor = ArgumentCaptor.forClass(classOf[Seq[ResponsiblePerson]])
+        verify(additionalExtraAddressController.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key), captor.capture())(any(), any())
+        captor.getValue.head.isComplete mustBe false
+        captor.getValue.head.addressHistory.value.additionalExtraAddress mustBe Some(ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None))
       }
     }
   }
