@@ -1310,6 +1310,10 @@ fieldset.panel-indent legend {
 
 /* -- notifications -- */
 
+.messages-area {
+  margin-bottom: 75px;
+}
+
 table.notifications thead th,
 table.notifications thead td {
   background-color: #1d70b8;

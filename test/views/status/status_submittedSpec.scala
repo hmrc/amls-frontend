@@ -139,6 +139,14 @@ class status_submittedSpec extends AmlsSpec with MustMatchers with AmlsReference
 
     }
 
+    "contain fee information and link" in new ViewFixture {
+
+      def view = views.html.status.status_submitted(amlsRegistrationNumber, Some("business Name"), None)
+
+      doc.getElementsByClass("statusblock").first().html() must include(Messages("status.fees"))
+      doc.getElementsByClass("statusblock").first().html() must include(Messages("status.howtopay"))
+    }
+
     "contain 'update/amend information' content and link" in new ViewFixture {
 
       def view = views.html.status.status_submitted(amlsRegistrationNumber, Some("business Name"), None)
