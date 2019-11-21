@@ -133,7 +133,7 @@ error.invalid.bm.business.type = Enter a valid type of business. You can’t ent
 error.max.length.bm.businesstype.type = You can’t enter more than 40 characters
 
 ###############################  Business Details ###############################
-error.required.atb.previously.registered = Select yes if your business is currently registered with HMRC for anti-money laundering supervision
+error.required.atb.previously.registered = Select yes if your business is currently registered with HMRC under the Money Laundering Regulations
 error.required.atb.confirm.office = Select yes if this is the address of your registered office
 error.required.atb.registered.office.uk.or.overseas = Select yes if your registered office is in the UK
 error.required.atb.registered.office.not.uk= Enter a country that is not the United Kingdom because your registered office is not in the UK
