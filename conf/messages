@@ -21,8 +21,17 @@ error.browser.title.prefix = Error:
 error.required.address.line1 = Enter address line 1
 error.required.address.line2 = Enter address line 2
 error.max.length.address.line = You can’t enter more than 35 characters
+error.max.length.address.line1 = Address line 1 must be 35 characters or less
+error.max.length.address.line2 = Address line 2 must be 35 characters or less
+error.max.length.address.line3 = Address line 3 must be 35 characters or less
+error.max.length.address.line4 = Address line 4 must be 35 characters or less
+error.text.validation.address.line1 = Address line 1 must only include letters a to z, numbers, apostrophes, commas, dashes, exclamation marks, full stops, hyphens, quotation marks, slashes, spaces and round brackets
+error.text.validation.address.line2 = Address line 2 must only include letters a to z, numbers, apostrophes, commas, dashes, exclamation marks, full stops, hyphens, quotation marks, slashes, spaces and round brackets
+error.text.validation.address.line3 = Address line 3 must only include letters a to z, numbers, apostrophes, commas, dashes, exclamation marks, full stops, hyphens, quotation marks, slashes, spaces and round brackets
+error.text.validation.address.line4 = Address line 4 must only include letters a to z, numbers, apostrophes, commas, dashes, exclamation marks, full stops, hyphens, quotation marks, slashes, spaces and round brackets
+error.required.postcode = Enter a postcode
 error.invalid.postcode = Enter a postcode, like AA1 1AA
-error.required.country = Enter a country name, like France
+error.required.country = Enter a country
 error.invalid.country = Enter a country name, like France
 error.required.country.name = Enter a country name, like France
 error.required.nationality = Select one or more options to show this person’s nationality
@@ -37,8 +46,9 @@ error.required.lastname = Enter a last name.
 error.required.otherfirstnames = Enter the responsible person’s previous first name
 error.required.otherlastnames = Enter the responsible person’s previous last name
 error.required.yourname = Enter your name
-error.invalid.yourname = You can’t enter more than 140 characters
+error.invalid.yourname = Your name must be 140 characters or less
 error.invalid.common_name.validation = Only use letters A to Z, accented letters, spaces and dashes
+error.invalid.yourname.validation = Your name can include letters a to z, numbers, spaces, and most punctuation and special characters
 error.invalid.common_name.length = You can’t enter more than 35 characters
 error.invalid.firstname.length = First name must be 35 characters or less
 error.invalid.middlename.length = Middle name must be 35 characters or less
@@ -48,11 +58,13 @@ error.invalid.middlename.validation = Middle name must only include letters a to
 error.invalid.lastname.validation = Last name must only include letters a to z, hyphens, spaces, and apostrophes
 error.invalid.position.validation = Select if you are a beneficial shareholder, director, nominated officer, an external accountant, or another role in the business
 
-error.required.vat.number = Enter a valid VAT registration number
-error.invalid.vat.number = Enter a valid VAT registration number
+error.required.vat.number = Enter your VAT registration number
+error.invalid.vat.number.length = VAT registration number must be 9 numbers
+error.invalid.vat.number = VAT registration number must only include numbers
 
-error.required.name.of.business = Enter the name of the business
-error.invalid.name.of.business = You can’t enter more than 120 characters for the name of the business
+error.required.name.of.business = Enter business name
+error.invalid.name.of.business = Business name must be 120 characters or less
+error.invalid.name.of.business.validation = Business name can include letters a to z, numbers, spaces, and most punctuation and special characters
 
 error.required.nino = Enter a valid National Insurance number
 error.invalid.nino = Enter a valid National Insurance number
@@ -84,8 +96,8 @@ error.invalid.role.in.business.maxlength.255 = Role in the business must be 255 
 
 error.survey.satisfaction.required = Select one option to show how you feel about using the service
 
-error.required.phone.number = Enter a telephone number, like 01632 960 001, 07700 900 982 or +44 0808 157 0192
-err.invalid.phone.number = Enter a telephone number, like 01632 960 001, 07700 900 982 or +44 0808 157 0192
+error.required.phone.number = Enter your business telephone number
+err.invalid.phone.number = Enter a telephone number, like 01632 960 001, 07700900982 or +44 808 157 0192
 error.max.length.phone = You can’t enter more than 24 characters for the phone number
 
 error.expected.dateofchange.date.after.activitystartdate = The date must be after you started activities that need to be registered for anti-money laundering supervision, which was {0}
@@ -134,7 +146,7 @@ error.max.length.bm.businesstype.type = You can’t enter more than 40 character
 
 ###############################  Business Details ###############################
 error.required.atb.previously.registered = Select yes if your business is currently registered with HMRC under the Money Laundering Regulations
-error.required.atb.confirm.office = Select yes if this is the address of your registered office
+error.required.atb.confirm.office = Select yes if this is your registered office
 error.required.atb.registered.office.uk.or.overseas = Select yes if your registered office is in the UK
 error.required.atb.registered.office.not.uk= Enter a country that is not the United Kingdom because your registered office is not in the UK
 error.required.atb.letters.address.not.uk= Enter a country that is not the United Kingdom because your address for letters is not in the UK
@@ -144,6 +156,12 @@ error.required.atb.corporation.tax.number = Enter a valid Corporation Tax refere
 error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax reference number
 error.required.atb.lettersaddress = Select yes if this is the right address to send you letters about your supervision
 error.mismatch.atb.email = The email addresses you’ve entered do not match
+error.required.email = Enter your business email address
+error.invalid.email = Enter an email address in the correct format, like myname@example.com
+error.required.email.reenter = Reenter your business email address
+error.invalid.email.reenter = Reenter your business email address in the correct format, like name@example.com
+error.invalid.email.match = The email addresses you enter must match
+error.invalid.email.max.length = Email address must be 100 characters or less
 
 error.businessmatching.updateservice.responsiblepeople = Select at least one option to show which responsible people have passed the HMRC Money Laundering Regulations fit and proper test
 error.businessmatching.updateservice.addmoreactivities = Select yes if you want to add another type of business

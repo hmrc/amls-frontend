@@ -63,6 +63,7 @@ object FormTypes {
   /** Helper Functions **/
 
   def maxWithMsg(length: Int, msg: String) = maxLength(length).withMessage(msg)
+  def minWithMsg(length: Int, msg: String) = minLength(length).withMessage(msg)
 
   def regexWithMsg(regex: Regex, msg: String) = pattern(regex).withMessage(msg)
 
@@ -118,21 +119,25 @@ object FormTypes {
   private val vrnRequired = required("error.required.vat.number")
   private val vrnRegex = regexWithMsg(vrnTypeRegex, "error.invalid.vat.number")
 
-  val vrnType = vrnRequired andThen vrnRegex
+  val vrnType = vrnRequired andThen
+    maxWithMsg(9, "error.invalid.vat.number.length") andThen
+    minWithMsg(9, "error.invalid.vat.number.length") andThen vrnRegex
 
   /** Corporation Tax Type Rules **/
 
   private val corporationTaxRequired = required("error.required.atb.corporation.tax.number")
   private val corporationTaxPattern = regexWithMsg(corporationTaxRegex, "error.invalid.atb.corporation.tax.number")
   private val addressTypePattern = regexWithMsg(addressTypeRegex, "err.text.validation")
+  private def addressTypePatternWithMessage(message: String) = regexWithMsg(addressTypeRegex, message)
 
   val corporationTaxType = corporationTaxRequired andThen corporationTaxPattern
 
   /** Address Rules **/
 
   val validateAddress = maxLength(maxAddressLength).withMessage("error.max.length.address.line") andThen addressTypePattern
+  def validateAddress(line: String) = maxLength(maxAddressLength).withMessage(s"error.max.length.address.$line") andThen addressTypePatternWithMessage(s"error.text.validation.address.$line")
 
-  private val postcodeRequired = required("error.invalid.postcode")
+  private val postcodeRequired = required("error.required.postcode")
 
   val postcodeType = postcodeRequired andThen postcodePattern
 
@@ -148,10 +153,10 @@ object FormTypes {
   private val phoneNumberPattern = regexWithMsg(phoneNumberRegex, "err.invalid.phone.number")
 
   private val emailRequired = required("error.required.rp.email")
-  private val confirmEmailRequired = required("error.invalid.rp.email")
-  private val emailLength = maxWithMsg(maxEmailLength, "error.max.length.rp.email")
+  private val confirmEmailRequired = required("error.required.email.reenter")
+  private val emailLength = maxWithMsg(maxEmailLength, "error.invalid.email.max.length")
 
-  private val confirmEmailPattern = regexWithMsg(emailRegex, "error.invalid.rp.email")
+  private val confirmEmailPattern = regexWithMsg(emailRegex, "error.invalid.email.reenter")
   private val emailPattern = regexWithMsg(emailRegex, "error.required.rp.email")
 
   private val dayRequired = required("error.required.tp.date")
@@ -166,6 +171,10 @@ object FormTypes {
 
   val phoneNumberType = notEmptyStrip andThen phoneNumberRequired andThen phoneNumberLength andThen phoneNumberPattern
   val emailType = emailRequired andThen emailLength andThen emailPattern
+  val emailTypeBusinessDetails = required("error.required.email") andThen
+    maxWithMsg(maxEmailLength, "error.invalid.email.max.length") andThen
+    regexWithMsg(emailRegex, "error.invalid.email")
+
   val confirmEmailType = confirmEmailRequired andThen emailLength andThen confirmEmailPattern
   val dayType = dayRequired andThen dayPattern
   val monthType = monthRequired andThen monthPattern
@@ -249,12 +258,12 @@ object FormTypes {
 
   val confirmEmailMatchRuleMapping = Rule.fromMapping[(String, String), (String,String)] {
     case email@(s1, s2) if s1.equals(s2) => Valid(email)
-    case _ => Invalid(Seq(ValidationError(List("error.mismatch.atb.email"))))
+    case _ => Invalid(Seq(ValidationError(List("error.invalid.email.match"))))
   }
 
   val confirmEmailMatchRule = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    ((__ \ "email").read(emailType) ~
+    ((__ \ "email").read(emailTypeBusinessDetails) ~
       (__ \ "confirmEmail").read(confirmEmailType)).tupled.andThen(confirmEmailMatchRuleMapping)
   }
 
