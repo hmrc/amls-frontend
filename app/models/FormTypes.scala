@@ -191,6 +191,31 @@ object FormTypes {
           jodaLocalDateR("yyyy-MM-dd")
       }.repath(_ => Path)
 
+  val dateRuleMapping = Rule.fromMapping[(String, String, String), String] { date =>
+    val (year, month, day) = date
+    val dateMap = Map("year" -> year, "month" -> month, "day" -> day)
+    val elements = (dateMap collect { case (id, value) if value.isEmpty => id}).toList
+
+    if (elements.isEmpty) {
+      Valid(s"$year-$month-$day")
+    } else {
+      val errors = elements match {
+        case el::Nil => ValidationError(List(s"error.required.date.$el"))
+        case el1::el2::Nil => ValidationError(List(s"error.required.date.$el1.$el2"))
+        case el1::el2::el3::Nil => ValidationError(List(s"error.required.date.$el1.$el2.$el3"))
+      }
+      Invalid(Seq(errors))
+    }
+  }
+
+  def newLocalDateRuleWithPattern: Rule[UrlFormEncoded, LocalDate] = From[UrlFormEncoded] { __ =>
+    (
+      (__ \ "year").read[String] ~
+        (__ \ "month").read[String] ~
+        (__ \ "day").read[String]
+      ).tupled andThen dateRuleMapping andThen jodaLocalDateR("yyyy-MM-dd").withMessage("error.invalid.date.not.real")
+  }.repath(_ => Path)
+
   val localDateWrite: Write[LocalDate, UrlFormEncoded] =
     To[UrlFormEncoded] { __ =>
       import jto.validation.forms.Writes._
@@ -244,9 +269,16 @@ object FormTypes {
   }
 
   val endOfCenturyDateRule: Rule[LocalDate, LocalDate] = maxDateWithMsg(new LocalDate(2099, 12, 31), "error.future.date")
+  def endOfCenturyDateRuleWithMsg(message: String): Rule[LocalDate, LocalDate] = maxDateWithMsg(new LocalDate(2099, 12, 31), message)
   val pastStartDateRule: Rule[LocalDate, LocalDate] = minDateWithMsg(new LocalDate(1900, 1, 1), "error.allowed.start.date")
+  def pastStartDateRuleWithMsg(message: String): Rule[LocalDate, LocalDate] = minDateWithMsg(new LocalDate(1900, 1, 1), message)
   val pastStartDateRuleExtended: Rule[LocalDate, LocalDate] = minDateWithMsg(new LocalDate(1700, 1, 1), "error.allowed.start.date.extended")
   val allowedPastAndFutureDateRule: Rule[UrlFormEncoded, LocalDate] = localDateRuleWithPattern andThen pastStartDateRule andThen endOfCenturyDateRule
+
+  val newAllowedPastAndFutureDateRule: Rule[UrlFormEncoded, LocalDate] = newLocalDateRuleWithPattern andThen
+    pastStartDateRuleWithMsg("error.invalid.date.after.1900") andThen
+    endOfCenturyDateRuleWithMsg("error.invalid.date.before.2100")
+
   val allowedPastAndFutureDateRuleExtended: Rule[UrlFormEncoded, LocalDate] = localDateRuleWithPattern andThen pastStartDateRuleExtended andThen endOfCenturyDateRule
 
   val dateOfChangeActivityStartDateRuleMapping = Rule.fromMapping[(Option[LocalDate], LocalDate), LocalDate] {
