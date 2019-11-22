@@ -120,17 +120,20 @@ error.submission.wrong_credentials.content = Your account doesn’t have enough 
 ############################        Custom Error Messages for Different Sections         ###############################
 ########################################################################################################################
 ####  Business Matching ####
-error.required.bm.register.service = Select one or more options to show what you need to register
+error.required.bm.register.service = Select the services you need to register
 error.required.bm.register.service.single = Select which service you need to register
 error.required.bm.remove.service = Select which service you need to remove
 error.required.bm.remove.service.multiple = Select which services you need to remove
 error.required.bm.remove.leave.twobusinesses = You cannot remove both of your registered services
 error.required.bm.remove.leave.one = You cannot remove all of your registered services
-error.required.bm.registration.number = Enter a valid company registration number
-error.invalid.bm.registration.number = Enter a valid company registration number
-error.required.bm.businesstype.type = Enter your type of business, such as association, charity, or trust
+error.required.bm.registration.number = Enter your company registration number
+error.invalid.bm.registration.number.length = Company registration number must be 8 characters
+error.invalid.bm.registration.number.allowed = Company registration number must only include capital letters and numbers
+error.invalid.bm.registration.number = Enter a company registration number
+error.required.bm.businesstype.type = Enter the type of unincorporated association or trust you’re registering
 error.invalid.bm.business.type = Enter a valid type of business. You can’t enter more than 40 characters for the type of business.
-error.max.length.bm.businesstype.type = You can’t enter more than 40 characters
+error.max.length.bm.businesstype.type = Type of unincorporated association or trust must be 40 characters or less
+error.bm.businesstype.type.characters = Type of unincorporated association or trust can include letters a to z, numbers, spaces, and most punctuation and special characters
 
 ###############################  Business Details ###############################
 error.required.atb.previously.registered = Select yes if your business is currently registered with HMRC for anti-money laundering supervision
@@ -346,14 +349,15 @@ error.required.professionalbody.penalised.by.professional.body = Select yes if t
 
 
 ############################### Money Services Business ###############################
-error.required.msb.services = Select one or more options to show the services your business provides
+error.required.msb.services = Select the money service business activities you will do
 error.required.msb.throughput = Select one option to show how much throughput you expect in the next 12 months
 error.required.msb.ipsp = Select yes if your business uses an IPSP
 error.required.msb.ipsp.name = Enter your IPSP’s name
 error.invalid.msb.ipsp.name = You can’t enter more than 140 characters
 error.required.msb.linked.txn = Select yes if your systems can identify linked transactions
 error.required.msb.psr.options = Select yes if your business has a PSR number
-error.invalid.msb.psr.number = Enter a valid PSR registration number
+error.invalid.msb.psr.number = Enter your PSR number
+error.max.length.msb.psr.number = PSR number must be 6 numbers
 error.required.msb.send.money = Select yes if you send money to other countries
 error.required.msb.transactions.in.12months = Enter the number of transactions you expect in the next 12 months
 error.required.msb.fx.transactions.in.12months = Enter the number of foreign exchange transactions you expect in the next 12 months
