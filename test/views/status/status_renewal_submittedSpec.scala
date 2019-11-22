@@ -88,6 +88,14 @@ class status_renewal_submittedSpec extends AmlsSpec with MustMatchers {
 
     }
 
+    "contain fee information and link" in new ViewFixture {
+
+      def view = views.html.status.status_renewal_submitted("XAML00000567890", Some("business Name"), None, None)
+
+      doc.getElementsByClass("statusblock").first().html() must include(Messages("status.fees"))
+      doc.getElementsByClass("statusblock").first().html() must include(Messages("status.howtopay"))
+    }
+
     "contains 'update/amend information' content and link" in new ViewFixture {
 
       def view = views.html.status.status_renewal_submitted("XAML00000567890", Some("business Name"), None, None)

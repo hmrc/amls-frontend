@@ -97,7 +97,7 @@ class status_submittedSpec extends AmlsSpec with MustMatchers with AmlsReference
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") mustBe controllers.routes.NotificationController.getMessages().url
 
       doc.getElementsMatchingOwnText(Messages("status.submissionreadyforreview.description.5.link"))
-        .attr("href") must be("https://www.gov.uk/government/collections/anti-money-laundering-businesses-supervised-by-hm-revenue-and-customs")
+        .attr("href") must be("https://www.gov.uk/government/organisations/hm-revenue-customs/contact/money-laundering")
     }
 
     "contain the no fee response content elements" in new ViewFixture {

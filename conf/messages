@@ -625,17 +625,18 @@ status.submissionready.description3 = To submit your application you need to com
 status.hassomethingchanged = About your business
 status.submissionready.changelink1 = Check or update your business information
 status.submissionready.buttontext = Continue
+
 status.submissionreadyforreview.heading = Application pending
 status.submissionreadyforreview.description = You have 28 days to pay your fees from the date you submitted your application. Your application will be refused if you do not pay the fees.
 status.submissionreadyforreview.description.no.fee = You have 28 days to pay your fees from the date you submitted your application. Your application will be refused if you do not pay the fees.
-status.submissionreadyforreview.description.2 = HMRC will review your application after we’ve received payment. Our review usually takes 45 days. It will take longer if:
+status.submissionreadyforreview.description.2 = HMRC will review your application after we have received payment. Our review will take longer if:
 status.submissionreadyforreview.description.2.listline1 = we need to contact you for extra information
 status.submissionreadyforreview.description.2.listline2 = we need to contact you about additional fees you need to pay
 status.submissionreadyforreview.description.2.listline3 = you make an update to your application
 status.submissionreadyforreview.description.3 = We’ll email you when we have made a decision.
 status.submissionreadyforreview.description.4 = You can trade and carry out business activities while your application is pending.
-status.submissionreadyforreview.description.5 = Contact HMRC if you have a question about
-status.submissionreadyforreview.description.5.link = the Money Laundering Regulations
+status.submissionreadyforreview.description.5 = If you have a question about the Money Laundering Regulations.
+status.submissionreadyforreview.description.5.link = contact HMRC
 status.submissionreadyforreview.description.link = pay your fees now
 status.submissionreadyforreview.nofee.description = You have submitted your application. You have 28 days to pay the fees from the date you submitted.
 status.submissionreadyforreview.nofee.description.link = If you have not already paid
@@ -643,6 +644,7 @@ status.submissionreadyforreview.duplicate.title = Something went wrong with your
 status.submissionreadyforreview.duplicate.description = We’ve definitely received your application, but we can’t tell if you paid your application fee.
 status.submissionreadyforreview.duplicate.description2 = If you’ve paid, there’s nothing to worry about. When HMRC deals with your application they’ll be able to match your payment to your submission.
 status.submissionreadyforreview.bacs = Your application will be reviewed when HM Revenue and Customs receives your payment.
+
 status.submissiondecisionapproved.heading = Application approved
 status.submissiondecisionsupervised.heading = Supervised
 status.submissiondecisionsupervised.renewal.btn = Start your renewal
@@ -674,10 +676,10 @@ status.submissionderegistered.button-text = Submit new application
 
 status.renewalsubmitted.text = Supervised, renewal under review
 status.renewalsubmitted.description = Renewal under review
-status.renewalsubmitted.description2 = You have submitted your renewal application. You have 28 days to pay the fees from the date you submitted. If you have not already paid, pay your fees now.
-status.renewalsubmitted.description3 = HMRC will then review your renewal application.
-status.renewalsubmitted.description4 = You’ll get an email when HMRC has made a decision. You’ll need to sign into your anti-money laundering supervision account to see the decision.
-status.renewalsubmitted.description5 = You’re still registered for anti-money laundering supervision, and can continue trading while your application is reviewed.
+status.renewalsubmitted.description2 = You have 28 days to pay the fees from the date you submitted.
+status.renewalsubmitted.description3 = HMRC will review your application after we have received payment.
+status.renewalsubmitted.description4 = We’ll email you when we have made a decision.
+status.renewalsubmitted.description5 = You’re still registered with HMRC under the Money Laundering Regulations. You can trade and carry out business activities while your application is reviewed.
 
 status.renewalincomplete.description = Renewal incomplete
 status.renewalincomplete.description2 = You have started the renewal application but you have not finished it.
