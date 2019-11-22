@@ -145,7 +145,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+        contentAsString(result) must include(Messages("error.required.date.year.month.day"))
 
       }
 
@@ -160,7 +160,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+        contentAsString(result) must include(Messages("error.invalid.date.after.1900"))
       }
 
       "show error with year field too long" in new Fixture {
@@ -174,7 +174,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+        contentAsString(result) must include(Messages("error.invalid.date.before.2100"))
       }
     }
   }

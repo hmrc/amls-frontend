@@ -109,7 +109,7 @@ class ContactDetailsSpec extends PlaySpec with MockitoSugar {
           )
           ContactDetails.formReads.validate(urlFormEncoded) must
             be(Invalid(Seq(
-              (Path \ "emailAddress") -> Seq(ValidationError("error.max.length.rp.email"))
+              (Path \ "emailAddress") -> Seq(ValidationError("error.invalid.email.max.length"))
             )))
         }
 

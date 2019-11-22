@@ -119,7 +119,7 @@ object FormTypes {
   private val vrnRequired = required("error.required.vat.number")
   private val vrnRegex = regexWithMsg(vrnTypeRegex, "error.invalid.vat.number")
 
-  val vrnType = vrnRequired andThen
+  val vrnType = notEmptyStrip.withMessage("error.invalid.vat.number") andThen vrnRequired andThen
     maxWithMsg(9, "error.invalid.vat.number.length") andThen
     minWithMsg(9, "error.invalid.vat.number.length") andThen vrnRegex
 
