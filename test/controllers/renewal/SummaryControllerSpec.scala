@@ -127,7 +127,6 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       status(result) must be(OK)
       val document = Jsoup.parse(contentAsString(result))
       val listElement = document.select(".cya-summary-list__row:nth-child(3) > .cya-summary-list__value > .list-bullet").get(0)
-      println(listElement.toString)
       listElement.children().size() must be(bmBusinessActivities.fold(0)(x => x.businessActivities.size))
 
     }
