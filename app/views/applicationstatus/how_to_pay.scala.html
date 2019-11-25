@@ -31,9 +31,24 @@
 
     <h2 class="heading-small">@Messages("howtopay.title2")</h2>
     <p>@Messages("howtopay.para.1")</p>
-    <p>@Messages("howtopay.para.2") <a id="your-messages" href="your-registration/your-messages">@if(!paymentReference.getOrElse("").isEmpty) { @Messages("howtopay.para.2.link") } else { @Messages("howtopay.para.2.link.stop") }</a>@if(!paymentReference.getOrElse("").isEmpty) { @Messages("howtopay.para.2.b") }</p>
+    <p>@Messages("howtopay.para.2")
+        <a id="your-messages" href="your-registration/your-messages">
+            @if(!paymentReference.getOrElse("").isEmpty) {
+                @Messages("howtopay.para.2.link")
+            } else {
+                @Messages("howtopay.para.2.link.stop")
+            }
+        </a>
+        @if(!paymentReference.getOrElse("").isEmpty) {
+            @Messages("howtopay.para.2.b")
+        }
+    </p>
     @if(!paymentReference.getOrElse("").isEmpty) {
-        <p>@Messages("howtopay.para.3") <a id="find-email" href="https://www.gov.uk/guidance/money-laundering-regulations-registration-fees#how-to-pay">@Messages("howtopay.para.3.link")</a></p>
+        <p>@Messages("howtopay.para.3")
+            <a id="find-email" href="https://www.gov.uk/guidance/money-laundering-regulations-registration-fees#how-to-pay">
+                @Messages("howtopay.para.3.link")
+            </a>
+        </p>
     }
 
     <h2 class="heading-small">@Messages("howtopay.title3")</h2>
@@ -41,17 +56,33 @@
         <p id="payment-ref">@Messages("howtopay.para.4") @paymentReference @Messages("howtopay.para.4.a")</p>
     } else {
         <p>@Messages("howtopay.para.4.b")</p>
-        <p>@Messages("howtopay.para.4.c") <a id="your-messages-no-ref" href="your-registration/your-messages">@Messages("howtopay.para.2.link")@Messages("full.stop")</a></p>
+        <p>@Messages("howtopay.para.4.c")
+            <a id="your-messages-no-ref" href="your-registration/your-messages">
+                @Messages("howtopay.para.2.link")@Messages("full.stop")
+            </a>
+        </p>
     }
 
     @if(paymentReference.getOrElse("").isEmpty) {
         <h2 class="heading-small">@Messages("howtopay.title3.b")</h2>
-        <p>@Messages("howtopay.para.3.b") <a id="find-email-no-reference" href="https://www.gov.uk/guidance/money-laundering-regulations-registration-fees#how-to-pay">@Messages("howtopay.para.3.link")</a></p>
+        <p>@Messages("howtopay.para.3.b")
+            <a id="find-email-no-reference" href="https://www.gov.uk/guidance/money-laundering-regulations-registration-fees#how-to-pay">
+                @Messages("howtopay.para.3.link")
+            </a>
+        </p>
     }
 
     <h2 class="heading-small">@Messages("howtopay.title4")</h2>
-    <p>@Messages("howtopay.para.5") <a id="card-payment" href="https://www.gov.uk/pay-tax-debit-credit-card">@Messages("howtopay.para.5.link")</a></p>
-    <p>@Messages("howtopay.para.6") <a id="ways-to-pay" href="https://www.gov.uk/guidance/pay-money-laundering-regulations-fees-and-penalty-charges#ways-to-pay">@Messages("howtopay.para.6.link")</a></p>
+    <p>@Messages("howtopay.para.5")
+        <a id="card-payment" href="https://www.gov.uk/pay-tax-debit-credit-card">
+            @Messages("howtopay.para.5.link")
+        </a>
+    </p>
+    <p>@Messages("howtopay.para.6")
+        <a id="ways-to-pay" href="https://www.gov.uk/guidance/pay-money-laundering-regulations-fees-and-penalty-charges#ways-to-pay">
+            @Messages("howtopay.para.6.link")
+        </a>
+    </p>
 
     @if(!paymentReference.getOrElse("").isEmpty) {
         <p>@Messages("howtopay.para.7")</p>
