@@ -1,0 +1,100 @@
+/*
+ * Copyright 2019 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package controllers.applicationstatus
+
+import controllers.actions.SuccessfulAuthAction
+import generators.submission.SubscriptionResponseGenerator
+import models.{FeeResponse, ResponseType}
+import models.ResponseType.SubscriptionResponseType
+import org.joda.time.DateTime
+import org.jsoup.Jsoup
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.mock.MockitoSugar
+import play.api.test.Helpers._
+import services.{AuthEnrolmentsService, FeeResponseService}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import org.mockito.Matchers.{eq => eqTo, _}
+
+import scala.concurrent.Future
+
+class HowToPayControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with SubscriptionResponseGenerator {
+
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self =>
+
+    val request = addToken(authRequest)
+    val controller = new HowToPayController(
+      authAction = SuccessfulAuthAction,
+      feeResponseService = mock[FeeResponseService],
+      enrolmentService = mock[AuthEnrolmentsService]
+    )
+  }
+
+  "HowToPayController" must {
+    "get" must {
+      "redirect to HowToPay" when {
+        "There is a payment reference number" in new Fixture {
+
+          val amlsRegistrationNumber = "amlsRefNumber"
+
+          def feeResponse(responseType: ResponseType) = FeeResponse(
+            responseType = responseType,
+            amlsReferenceNumber = amlsRegistrationNumber,
+            registrationFee = 100,
+            fpFee = None,
+            approvalCheckFee = None,
+            premiseFee = 0,
+            totalFees = 200,
+            paymentReference = Some(paymentReferenceNumber),
+            difference = Some(115),
+            createdAt = DateTime.now
+          )
+
+          when(controller.enrolmentService.amlsRegistrationNumber(any(), any())(any(), any()))
+            .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
+
+          when {
+            controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any[(String, String)]())(any(), any())
+          } thenReturn Future.successful(Some(feeResponse(SubscriptionResponseType)))
+
+          val result = controller.get(request)
+          status(result) must be(OK)
+
+          val doc = Jsoup.parse(contentAsString(result))
+          doc.getElementById("payment-ref").html must include(paymentReferenceNumber)
+        }
+
+        "There is no payment reference number" in new Fixture {
+
+          val amlsRegistrationNumber = "amlsRefNumber"
+
+          when(controller.enrolmentService.amlsRegistrationNumber(any(), any())(any(), any()))
+            .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
+
+          when {
+            controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any[(String, String)]())(any(), any())
+          } thenReturn Future.successful(None)
+
+          val result = controller.get(request)
+          status(result) must be(OK)
+        }
+      }
+    }
+  }
+}

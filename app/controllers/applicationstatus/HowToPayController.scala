@@ -21,7 +21,6 @@ import cats.implicits._
 import controllers.DefaultBaseController
 import javax.inject.{Inject, Singleton}
 import models.FeeResponse
-import play.api.Logger
 import services.{FeeResponseService, _}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
@@ -35,8 +34,6 @@ class HowToPayController @Inject()(authAction: AuthAction,
                                    private[controllers] val feeResponseService: FeeResponseService,
                                    private[controllers] val enrolmentService: AuthEnrolmentsService) extends DefaultBaseController {
 
-  val prefix = "[HowToPayController]"
-
   def get = authAction.async {
     implicit request =>
       retrieveFeeResponse(request.amlsRefNumber, request.accountTypeId, request.groupIdentifier) map {
@@ -47,8 +44,6 @@ class HowToPayController @Inject()(authAction: AuthAction,
 
   private def retrieveFeeResponse(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), groupIdentifier: Option[String])
                                  (implicit hc: HeaderCarrier): Future[Option[FeeResponse]] = {
-
-    Logger.debug(s"[$prefix][retrieveFeeResponse] - Begin...)")
     (for {
       amlsRegNo <- OptionT(enrolmentService.amlsRegistrationNumber(amlsRegistrationNumber, groupIdentifier))
       fees <- OptionT(feeResponseService.getFeeResponse(amlsRegNo, accountTypeId))

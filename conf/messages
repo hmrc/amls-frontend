@@ -729,6 +729,29 @@ fee.details.registration.fee.lbl = Your registration fee
 fee.reference.number.lbl = Your reference number
 fee.details.note = You must keep a record of the fee amount and reference number. You’ll need them to make the payment.
 
+howtopay.title = How to pay your fees
+howtopay.title2 = Your fees
+howtopay.title3 = Your payment reference
+howtopay.title3.b = Fees or payment reference not known
+howtopay.title4 = Ways to pay
+howtopay.para.1 = If you have not already paid, you have 28 days to pay your fees from the date you submitted your application or update.
+howtopay.para.2 = Your fees were shown when you submitted your declaration. You’ll also find them in a ‘reminder to pay’ in
+howtopay.para.2.b = 14 days after you submit your application or update.
+howtopay.para.2.link = your messages
+howtopay.para.2.link.stop = your messages.
+howtopay.para.3 = If you do not know what your fees are, you’ll need to email HMRC. You should write ‘fees not known’ in the subject line of your email.
+howtopay.para.3.b = If you do not know your payment reference or fees, you’ll need to email HMRC. You should write ‘fees and payment reference not known’ in the subject line of your email.
+howtopay.para.3.link = Find the email address and how to pay
+howtopay.para.4 = Your payment reference number is
+howtopay.para.4.a = . You’ll need this to pay your fees.
+howtopay.para.4.b = To pay your fees you’ll need your payment reference. This has 12 digits, 2 letters and starts with X.
+howtopay.para.4.c = Your payment reference was shown when you submitted your declaration. You’ll also find it in a ‘reminder to pay’ in
+howtopay.para.5 = You can pay by
+howtopay.para.5.link = debit or corporate credit card.
+howtopay.para.6 = You can also pay by Faster Payments, CHAPS or Bacs.
+howtopay.para.6.link = Find account details and ways to pay.
+howtopay.para.7 = Bacs and card payments usually take 3 working days.
+
 ############################### Progress page ###############################
 progress.title = About your business
 progress.lede = You need to add information about your business to apply for supervision. 
