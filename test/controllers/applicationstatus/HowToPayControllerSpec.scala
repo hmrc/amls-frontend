@@ -30,6 +30,7 @@ import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, FeeResponseService}
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import org.mockito.Matchers.{eq => eqTo, _}
+import play.api.i18n.Messages
 
 import scala.concurrent.Future
 
@@ -93,6 +94,9 @@ class HowToPayControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
 
           val result = controller.get(request)
           status(result) must be(OK)
+
+          val doc = Jsoup.parse(contentAsString(result))
+          doc.getElementById("find-email-no-reference").html must include(Messages("howtopay.para.3.link"))
         }
       }
     }
