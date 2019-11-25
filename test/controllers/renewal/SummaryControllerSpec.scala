@@ -23,7 +23,6 @@ import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.registrationprogress.{Completed, Section}
 import models.renewal._
 import org.jsoup.Jsoup
-import org.jsoup.select.Elements
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._

@@ -41,7 +41,7 @@ class TypeOfBusinessSpec extends PlaySpec {
 
     "throw error given invalid characters" in {
       val formInput = Map("typeOfBusiness" -> Seq("abc{}abc"))
-      TypeOfBusiness.formRead.validate(formInput) must be (Invalid(Seq((Path \ "typeOfBusiness", Seq(ValidationError("err.text.validation"))))))
+      TypeOfBusiness.formRead.validate(formInput) must be (Invalid(Seq((Path \ "typeOfBusiness", Seq(ValidationError("error.bm.businesstype.type.characters"))))))
     }
 
     "throw error given whitespace only" in {
