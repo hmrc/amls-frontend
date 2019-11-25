@@ -36,7 +36,7 @@ object BusinessFranchise {
 
   private val maxFranchiseName = 140
   private val franchiseNameType =  notEmptyStrip andThen notEmpty.withMessage("error.required.ba.franchise.name") andThen
-    maxLength(maxFranchiseName).withMessage("error.max.length.ba.franchise.name") andThen basicPunctuationPattern()
+    maxLength(maxFranchiseName).withMessage("error.max.length.ba.franchise.name") andThen regexWithMsg(basicPunctuationRegex, "error.invalid.characters.ba.involved.in.other.text")
 
   implicit val formRule: Rule[UrlFormEncoded, BusinessFranchise] = From[UrlFormEncoded] { __ =>
   import jto.validation.forms.Rules._
