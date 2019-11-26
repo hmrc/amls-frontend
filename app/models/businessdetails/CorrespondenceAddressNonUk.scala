@@ -62,19 +62,19 @@ object CorrespondenceAddressNonUk {
       val alternativeAddressNameType = notEmptyStrip andThen
         nameRequired andThen
         maxLength(nameMaxLength).withMessage("error.invalid.yourname") andThen
-        basicPunctuationPattern()
+        basicPunctuationPattern("error.invalid.yourname.validation")
 
       val alternativeAddressTradingNameType = notEmptyStrip andThen
         required("error.required.name.of.business") andThen
         maxLength(businessNameMaxLength).withMessage("error.invalid.name.of.business") andThen
-        basicPunctuationPattern()
+        basicPunctuationPattern("error.invalid.name.of.business.validation")
      (
             (__ \ "yourName").read(alternativeAddressNameType) ~
             (__ \ "businessName").read(alternativeAddressTradingNameType) ~
-            (__ \ "addressLineNonUK1").read(notEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
-            (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
-            (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
-            (__ \ "addressLineNonUK4").read(optionR(validateAddress)) ~
+            (__ \ "addressLineNonUK1").read(notEmpty.withMessage("error.required.address.line1") andThen validateAddress("line1")) ~
+            (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress("line2")) ~
+            (__ \ "addressLineNonUK3").read(optionR(validateAddress("line3"))) ~
+            (__ \ "addressLineNonUK4").read(optionR(validateAddress("line4"))) ~
             (__ \ "country").read(validateCountry)
           )(CorrespondenceAddressNonUk.apply _)
     }

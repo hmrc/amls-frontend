@@ -121,21 +121,25 @@ object FormTypes {
   private val vrnRequired = required("error.required.vat.number")
   private val vrnRegex = regexWithMsg(vrnTypeRegex, "error.invalid.vat.number")
 
-  val vrnType = vrnRequired andThen vrnRegex
+  val vrnType = notEmptyStrip.withMessage("error.invalid.vat.number") andThen vrnRequired andThen
+    maxWithMsg(9, "error.invalid.vat.number.length") andThen
+    minWithMsg(9, "error.invalid.vat.number.length") andThen vrnRegex
 
   /** Corporation Tax Type Rules **/
 
   private val corporationTaxRequired = required("error.required.atb.corporation.tax.number")
   private val corporationTaxPattern = regexWithMsg(corporationTaxRegex, "error.invalid.atb.corporation.tax.number")
   private val addressTypePattern = regexWithMsg(addressTypeRegex, "err.text.validation")
+  private def addressTypePatternWithMessage(message: String) = regexWithMsg(addressTypeRegex, message)
 
   val corporationTaxType = corporationTaxRequired andThen corporationTaxPattern
 
   /** Address Rules **/
 
   val validateAddress = maxLength(maxAddressLength).withMessage("error.max.length.address.line") andThen addressTypePattern
+  def validateAddress(line: String) = maxLength(maxAddressLength).withMessage(s"error.max.length.address.$line") andThen addressTypePatternWithMessage(s"error.text.validation.address.$line")
 
-  private val postcodeRequired = required("error.invalid.postcode")
+  private val postcodeRequired = required("error.required.postcode")
 
   val postcodeType = postcodeRequired andThen postcodePattern
 
@@ -151,10 +155,10 @@ object FormTypes {
   private val phoneNumberPattern = regexWithMsg(phoneNumberRegex, "err.invalid.phone.number")
 
   private val emailRequired = required("error.required.rp.email")
-  private val confirmEmailRequired = required("error.invalid.rp.email")
-  private val emailLength = maxWithMsg(maxEmailLength, "error.max.length.rp.email")
+  private val confirmEmailRequired = required("error.required.email.reenter")
+  private val emailLength = maxWithMsg(maxEmailLength, "error.invalid.email.max.length")
 
-  private val confirmEmailPattern = regexWithMsg(emailRegex, "error.invalid.rp.email")
+  private val confirmEmailPattern = regexWithMsg(emailRegex, "error.invalid.email.reenter")
   private val emailPattern = regexWithMsg(emailRegex, "error.required.rp.email")
 
   private val dayRequired = required("error.required.tp.date")
@@ -169,6 +173,10 @@ object FormTypes {
 
   val phoneNumberType = notEmptyStrip andThen phoneNumberRequired andThen phoneNumberLength andThen phoneNumberPattern
   val emailType = emailRequired andThen emailLength andThen emailPattern
+  val emailTypeBusinessDetails = required("error.required.email") andThen
+    maxWithMsg(maxEmailLength, "error.invalid.email.max.length") andThen
+    regexWithMsg(emailRegex, "error.invalid.email")
+
   val confirmEmailType = confirmEmailRequired andThen emailLength andThen confirmEmailPattern
   val dayType = dayRequired andThen dayPattern
   val monthType = monthRequired andThen monthPattern
@@ -184,6 +192,31 @@ object FormTypes {
           Rule[UrlFormEncoded, String](__ => Valid("INVALID DATE STRING")) andThen
           jodaLocalDateR("yyyy-MM-dd")
       }.repath(_ => Path)
+
+  val dateRuleMapping = Rule.fromMapping[(String, String, String), String] { date =>
+    val (year, month, day) = date
+    val dateMap = Map("year" -> year, "month" -> month, "day" -> day)
+    val elements = (dateMap collect { case (id, value) if value.isEmpty => id}).toList
+
+    if (elements.isEmpty) {
+      Valid(s"$year-$month-$day")
+    } else {
+      val errors = elements match {
+        case el::Nil => ValidationError(List(s"error.required.date.$el"))
+        case el1::el2::Nil => ValidationError(List(s"error.required.date.$el1.$el2"))
+        case el1::el2::el3::Nil => ValidationError(List(s"error.required.date.$el1.$el2.$el3"))
+      }
+      Invalid(Seq(errors))
+    }
+  }
+
+  def newLocalDateRuleWithPattern: Rule[UrlFormEncoded, LocalDate] = From[UrlFormEncoded] { __ =>
+    (
+      (__ \ "year").read[String] ~
+        (__ \ "month").read[String] ~
+        (__ \ "day").read[String]
+      ).tupled andThen dateRuleMapping andThen jodaLocalDateR("yyyy-MM-dd").withMessage("error.invalid.date.not.real")
+  }.repath(_ => Path)
 
   val localDateWrite: Write[LocalDate, UrlFormEncoded] =
     To[UrlFormEncoded] { __ =>
@@ -238,9 +271,16 @@ object FormTypes {
   }
 
   val endOfCenturyDateRule: Rule[LocalDate, LocalDate] = maxDateWithMsg(new LocalDate(2099, 12, 31), "error.future.date")
+  def endOfCenturyDateRuleWithMsg(message: String): Rule[LocalDate, LocalDate] = maxDateWithMsg(new LocalDate(2099, 12, 31), message)
   val pastStartDateRule: Rule[LocalDate, LocalDate] = minDateWithMsg(new LocalDate(1900, 1, 1), "error.allowed.start.date")
+  def pastStartDateRuleWithMsg(message: String): Rule[LocalDate, LocalDate] = minDateWithMsg(new LocalDate(1900, 1, 1), message)
   val pastStartDateRuleExtended: Rule[LocalDate, LocalDate] = minDateWithMsg(new LocalDate(1700, 1, 1), "error.allowed.start.date.extended")
   val allowedPastAndFutureDateRule: Rule[UrlFormEncoded, LocalDate] = localDateRuleWithPattern andThen pastStartDateRule andThen endOfCenturyDateRule
+
+  val newAllowedPastAndFutureDateRule: Rule[UrlFormEncoded, LocalDate] = newLocalDateRuleWithPattern andThen
+    pastStartDateRuleWithMsg("error.invalid.date.after.1900") andThen
+    endOfCenturyDateRuleWithMsg("error.invalid.date.before.2100")
+
   val allowedPastAndFutureDateRuleExtended: Rule[UrlFormEncoded, LocalDate] = localDateRuleWithPattern andThen pastStartDateRuleExtended andThen endOfCenturyDateRule
 
   val dateOfChangeActivityStartDateRuleMapping = Rule.fromMapping[(Option[LocalDate], LocalDate), LocalDate] {
@@ -252,12 +292,12 @@ object FormTypes {
 
   val confirmEmailMatchRuleMapping = Rule.fromMapping[(String, String), (String,String)] {
     case email@(s1, s2) if s1.equals(s2) => Valid(email)
-    case _ => Invalid(Seq(ValidationError(List("error.mismatch.atb.email"))))
+    case _ => Invalid(Seq(ValidationError(List("error.invalid.email.match"))))
   }
 
   val confirmEmailMatchRule = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    ((__ \ "email").read(emailType) ~
+    ((__ \ "email").read(emailTypeBusinessDetails) ~
       (__ \ "confirmEmail").read(confirmEmailType)).tupled.andThen(confirmEmailMatchRuleMapping)
   }
 
