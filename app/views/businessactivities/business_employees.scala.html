@@ -37,10 +37,9 @@
     @form(f, controllers.businessactivities.routes.HowManyEmployeesController.post(edit)) {
 
         @input(
-            attrMinMax = AttrMinMax(attrMin = "1"),
+            attrType = "number",
             attrPattern = "[0-9]*",
             attrStep = "1",
-            attrType = "number",
             classes = Seq("form-control-1-4"),
             field = f("employeeCount"),
             heading = "businessactivities.employees.title",

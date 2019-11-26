@@ -65,19 +65,19 @@ object CorrespondenceAddressUk {
     val alternativeAddressNameType = notEmptyStrip andThen
       nameRequired andThen
       maxLength(nameMaxLength).withMessage("error.invalid.yourname") andThen
-      basicPunctuationPattern()
+      basicPunctuationPattern("error.invalid.yourname.validation")
 
     val alternativeAddressTradingNameType = notEmptyStrip andThen
       required("error.required.name.of.business") andThen
       maxLength(businessNameMaxLength).withMessage("error.invalid.name.of.business") andThen
-      basicPunctuationPattern()
+      basicPunctuationPattern("error.invalid.name.of.business.validation")
 
     ((__ \ "yourName").read(alternativeAddressNameType) ~
       (__ \ "businessName").read(alternativeAddressTradingNameType) ~
-      (__ \ "addressLine1").read(notEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
-      (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
-      (__ \ "addressLine3").read(optionR(validateAddress)) ~
-      (__ \ "addressLine4").read(optionR(validateAddress)) ~
+      (__ \ "addressLine1").read(notEmpty.withMessage("error.required.address.line1") andThen validateAddress("line1")) ~
+      (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress("line2")) ~
+      (__ \ "addressLine3").read(optionR(validateAddress("line3"))) ~
+      (__ \ "addressLine4").read(optionR(validateAddress("line4"))) ~
       (__ \ "postCode").read(notEmptyStrip andThen postcodeType)
     )(CorrespondenceAddressUk.apply _)
   }

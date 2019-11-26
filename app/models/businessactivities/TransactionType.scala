@@ -20,7 +20,7 @@ import cats.data.Validated.{Invalid, Valid}
 import play.api.data.validation.{ValidationError => VE}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Path, Rule, To, ValidationError, Write}
-import models.FormTypes.{basicPunctuationPattern, notEmptyStrip}
+import models.FormTypes.{basicPunctuationPattern, basicPunctuationRegex, notEmptyStrip, regexWithMsg}
 import play.api.libs.json._
 import utils.TraversableValidators.minLengthR
 
@@ -102,8 +102,8 @@ object TransactionTypes {
 
   private val softwareNameType = notEmptyStrip andThen
     notEmpty.withMessage("error.required.ba.software.package.name") andThen
-    maxLength(maxSoftwareNameLength).withMessage("error.invalid.maxlength.40") andThen
-    basicPunctuationPattern()
+    maxLength(maxSoftwareNameLength).withMessage("error.max.length.ba.software.package.name") andThen
+    regexWithMsg(basicPunctuationRegex, "error.invalid.characters.ba.software.package.name")
 
   implicit val formRule: Rule[UrlFormEncoded, TransactionTypes] = From[UrlFormEncoded] { __ =>
     (__ \ "types").read(minLengthR[Set[String]](1).withMessage("error.required.ba.atleast.one.transaction.record")) flatMap { r =>

@@ -18,11 +18,31 @@ err.text.role.in.business.text.validation = Role in the business must only inclu
 
 error.browser.title.prefix = Error:
 
+error.required.date.day = Date your business started or will start activities must include a day
+error.required.date.month = Date your business started or will start activities must include a month
+error.required.date.year = Date your business started or will start activities must include a year
+error.required.date.month.day = Date your business started or will start activities must include a day and month
+error.required.date.year.month = Date your business started or will start activities must include a month and year
+error.required.date.year.month.day = Enter the date your business did or will start activities that need to be registered
+error.required.date.year.day = Date your business started or will start activities must include a day and year
+error.invalid.date.after.1900 = The date your business started or will start activities must be on or after 1900
+error.invalid.date.before.2100 = The date your business started or will start activities must be before 2100
+error.invalid.date.not.real = Enter a real date for when your business started or will start activities
+
 error.required.address.line1 = Enter address line 1
 error.required.address.line2 = Enter address line 2
 error.max.length.address.line = You can’t enter more than 35 characters
+error.max.length.address.line1 = Address line 1 must be 35 characters or less
+error.max.length.address.line2 = Address line 2 must be 35 characters or less
+error.max.length.address.line3 = Address line 3 must be 35 characters or less
+error.max.length.address.line4 = Address line 4 must be 35 characters or less
+error.text.validation.address.line1 = Address line 1 must only include letters a to z, numbers, apostrophes, commas, dashes, exclamation marks, full stops, hyphens, quotation marks, slashes, spaces and round brackets
+error.text.validation.address.line2 = Address line 2 must only include letters a to z, numbers, apostrophes, commas, dashes, exclamation marks, full stops, hyphens, quotation marks, slashes, spaces and round brackets
+error.text.validation.address.line3 = Address line 3 must only include letters a to z, numbers, apostrophes, commas, dashes, exclamation marks, full stops, hyphens, quotation marks, slashes, spaces and round brackets
+error.text.validation.address.line4 = Address line 4 must only include letters a to z, numbers, apostrophes, commas, dashes, exclamation marks, full stops, hyphens, quotation marks, slashes, spaces and round brackets
+error.required.postcode = Enter a postcode
 error.invalid.postcode = Enter a postcode, like AA1 1AA
-error.required.country = Enter a country name, like France
+error.required.country = Enter a country
 error.invalid.country = Enter a country name, like France
 error.required.country.name = Enter a country name, like France
 error.required.nationality = Select one or more options to show this person’s nationality
@@ -37,8 +57,9 @@ error.required.lastname = Enter a last name.
 error.required.otherfirstnames = Enter the responsible person’s previous first name
 error.required.otherlastnames = Enter the responsible person’s previous last name
 error.required.yourname = Enter your name
-error.invalid.yourname = You can’t enter more than 140 characters
+error.invalid.yourname = Your name must be 140 characters or less
 error.invalid.common_name.validation = Only use letters A to Z, accented letters, spaces and dashes
+error.invalid.yourname.validation = Your name can include letters a to z, numbers, spaces, and most punctuation and special characters
 error.invalid.common_name.length = You can’t enter more than 35 characters
 error.invalid.firstname.length = First name must be 35 characters or less
 error.invalid.middlename.length = Middle name must be 35 characters or less
@@ -48,11 +69,13 @@ error.invalid.middlename.validation = Middle name must only include letters a to
 error.invalid.lastname.validation = Last name must only include letters a to z, hyphens, spaces, and apostrophes
 error.invalid.position.validation = Select if you are a beneficial shareholder, director, nominated officer, an external accountant, or another role in the business
 
-error.required.vat.number = Enter a valid VAT registration number
-error.invalid.vat.number = Enter a valid VAT registration number
+error.required.vat.number = Enter your VAT registration number
+error.invalid.vat.number.length = VAT registration number must be 9 numbers
+error.invalid.vat.number = VAT registration number must only include numbers
 
-error.required.name.of.business = Enter the name of the business
-error.invalid.name.of.business = You can’t enter more than 120 characters for the name of the business
+error.required.name.of.business = Enter business name
+error.invalid.name.of.business = Business name must be 120 characters or less
+error.invalid.name.of.business.validation = Business name can include letters a to z, numbers, spaces, and most punctuation and special characters
 
 error.required.nino = Enter a valid National Insurance number
 error.invalid.nino = Enter a valid National Insurance number
@@ -84,8 +107,8 @@ error.invalid.role.in.business.maxlength.255 = Role in the business must be 255 
 
 error.survey.satisfaction.required = Select one option to show how you feel about using the service
 
-error.required.phone.number = Enter a telephone number, like 01632 960 001, 07700 900 982 or +44 0808 157 0192
-err.invalid.phone.number = Enter a telephone number, like 01632 960 001, 07700 900 982 or +44 0808 157 0192
+error.required.phone.number = Enter your business telephone number
+err.invalid.phone.number = Enter a telephone number, like 01632 960 001, 07700900982 or +44 808 157 0192
 error.max.length.phone = You can’t enter more than 24 characters for the phone number
 
 error.expected.dateofchange.date.after.activitystartdate = The date must be after you started activities that need to be registered for anti-money laundering supervision, which was {0}
@@ -120,21 +143,24 @@ error.submission.wrong_credentials.content = Your account doesn’t have enough 
 ############################        Custom Error Messages for Different Sections         ###############################
 ########################################################################################################################
 ####  Business Matching ####
-error.required.bm.register.service = Select one or more options to show what you need to register
+error.required.bm.register.service = Select the services you need to register
 error.required.bm.register.service.single = Select which service you need to register
 error.required.bm.remove.service = Select which service you need to remove
 error.required.bm.remove.service.multiple = Select which services you need to remove
 error.required.bm.remove.leave.twobusinesses = You cannot remove both of your registered services
 error.required.bm.remove.leave.one = You cannot remove all of your registered services
-error.required.bm.registration.number = Enter a valid company registration number
-error.invalid.bm.registration.number = Enter a valid company registration number
-error.required.bm.businesstype.type = Enter your type of business, such as association, charity, or trust
+error.required.bm.registration.number = Enter your company registration number
+error.invalid.bm.registration.number.length = Company registration number must be 8 characters
+error.invalid.bm.registration.number.allowed = Company registration number must only include capital letters and numbers
+error.invalid.bm.registration.number = Enter a company registration number
+error.required.bm.businesstype.type = Enter the type of unincorporated association or trust you’re registering
 error.invalid.bm.business.type = Enter a valid type of business. You can’t enter more than 40 characters for the type of business.
-error.max.length.bm.businesstype.type = You can’t enter more than 40 characters
+error.max.length.bm.businesstype.type = Type of unincorporated association or trust must be 40 characters or less
+error.bm.businesstype.type.characters = Type of unincorporated association or trust can include letters a to z, numbers, spaces, and most punctuation and special characters
 
 ###############################  Business Details ###############################
-error.required.atb.previously.registered = Select yes if your business is currently registered with HMRC for anti-money laundering supervision
-error.required.atb.confirm.office = Select yes if this is the address of your registered office
+error.required.atb.previously.registered = Select yes if your business is currently registered with HMRC under the Money Laundering Regulations
+error.required.atb.confirm.office = Select yes if this is your registered office
 error.required.atb.registered.office.uk.or.overseas = Select yes if your registered office is in the UK
 error.required.atb.registered.office.not.uk= Enter a country that is not the United Kingdom because your registered office is not in the UK
 error.required.atb.letters.address.not.uk= Enter a country that is not the United Kingdom because your address for letters is not in the UK
@@ -144,6 +170,12 @@ error.required.atb.corporation.tax.number = Enter a valid Corporation Tax refere
 error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax reference number
 error.required.atb.lettersaddress = Select yes if this is the right address to send you letters about your supervision
 error.mismatch.atb.email = The email addresses you’ve entered do not match
+error.required.email = Enter your business email address
+error.invalid.email = Enter an email address in the correct format, like myname@example.com
+error.required.email.reenter = Reenter your business email address
+error.invalid.email.reenter = Reenter your business email address in the correct format, like name@example.com
+error.invalid.email.match = The email addresses you enter must match
+error.invalid.email.max.length = Email address must be 100 characters or less
 
 error.businessmatching.updateservice.responsiblepeople = Select at least one option to show which responsible people have passed the HMRC Money Laundering Regulations fit and proper test
 error.businessmatching.updateservice.addmoreactivities = Select yes if you want to add another type of business
@@ -174,31 +206,40 @@ error.max.length.bankdetails.account = Enter a valid account number
 error.required.bankdetails.register.another.bank = Select yes if you want to register another bank account
 
 ###############################  Business Activities ###############################
-error.required.ba.involved.in.other = Select yes if your business is involved in other activities
-error.required.ba.involved.in.other.text = Give details of the other activities your business is involved in
-error.invalid.ba.involved.in.other.text = You can’t enter more than 255 characters
-error.required.ba.business.turnover = Select one option to show how much net profit your business expects in the next 12 months
-error.required.ba.turnover.from.mlr = Select one option to show how much net profit your business expects in the next 12 months from activities covered by the Money Laundering Regulations
+error.required.ba.involved.in.other = Select yes if your business is involved in any other activities
+error.required.ba.involved.in.other.text = Enter the other activities your business is involved in
+error.invalid.ba.involved.in.other.text = Other activities must be 255 characters or less
+error.invalid.characters.ba.involved.in.other.text = Other activities can include letters a to z, spaces, and most punctuation and special characters
+error.required.ba.business.turnover = Select how much total net profit your business expects in the next 12 months
+error.required.ba.turnover.from.mlr = Select how much total net profit your business expects in the next 12 months from the services you’re registering
 error.required.ba.is.your.franchise = Select yes if your business is a franchise
-error.required.ba.franchise.name = Enter the franchisor’s name
-error.max.length.ba.franchise.name = You can’t enter more than 140 characters
+error.required.ba.franchise.name = Enter franchisor’s name
+error.max.length.ba.franchise.name = Franchisor’s name must be 140 characters or less
+error.invalid.characters.ba.franchise.name = Franchisor’s name can include letters a to z, numbers, spaces, and most punctuation and special characters
 error.required.ba.employee.count1 = Enter the number of people in your business, it must be at least 1
-error.invalid.ba.employee.count = Enter numbers only
-error.max.length.ba.employee.count = You can’t enter a number larger than 99999999999
+error.invalid.ba.employee.count = Number of people must only include numbers
+error.max.length.ba.employee.count = Number of people must be less than 99999999999
+error.empty.ba.mlr.employee.count = Enter how many people work on activities covered by the Money Laundering Regulations
+error.empty.ba.employee.count = Enter how many people work for the business
 error.required.ba.employee.count2 = Enter the number of people in your business who work on activities covered by Money Laundering Regulations, it must be at least 1
 error.required.ba.select.country = Select yes if you have customers who live or work outside the UK
 error.invalid.ba.select.country = Enter a country name, like France
 error.required.ba.select.transaction.record = Select yes if you keep records of all your transaction with customers
-error.required.ba.atleast.one.transaction.record = Select one or more options to show how you record transactions
-error.required.ba.software.package.name = Enter the names of the software packages you use to record transactions
-error.max.length.ba.software.package.name = You can’t enter more than 40 characters
-error.required.ba.select.nca = Select yes if your business is registered online with the National Crime Agency
+error.required.ba.atleast.one.transaction.record = Select how you record your transactions with customers
+error.required.ba.software.package.name = Enter the names of the software packages you use
+error.max.length.ba.software.package.name = Names of the software packages must be 40 characters or less
+error.invalid.characters.ba.software.package.name = Names of the software packages can include letters a to z, numbers, spaces, and most punctuation and special characters
+error.required.ba.select.nca = Select yes if your business is registered with the National Crime Agency
 error.required.ba.option.risk.assessment = Select yes if your business has a documented risk assessment policy and procedure
-error.required.ba.risk.assessment.format = Select one or more options to show what formats you use for your risk assessment policy and procedure
-error.required.ba.business.use.accountant = Select yes if your business receives advice on Money Laundering regulations and due diligence
-error.required.ba.suspicious.activity = Select yes if your business has written guidance for staff on how to report suspicious activity
-error.required.ba.tax.matters = Select yes if your professional adviser also manages your tax affairs with HMRC
-error.required.ba.advisor.name = Enter your professional adviser’s name
+error.required.ba.risk.assessment.format = Select how you document your risk assessment policy and procedure
+error.required.ba.business.use.accountant = Select yes if your business receives professional advice on Money Laundering Regulations and due diligence
+error.required.ba.suspicious.activity = Select yes if you have written guidance on how to identify and report suspicious activity
+error.required.ba.tax.matters = Select yes if {0} manages your tax affairs with HMRC
+error.required.ba.advisor.name = Enter your adviser’s name
+error.max.length.ba.advisor.name = Adviser’s name must be 140 characters or less
+error.invalid.character.ba.advisor.name = Adviser’s name can include letters a to z, numbers, spaces, and most punctuation and special characters
+error.required.ba.trading.name = Adviser’s trading name must be 120 characters or less
+error.invalid.character.ba.trading.name = Adviser’s trading name can include letters a to z, numbers, spaces, and most punctuation and special characters
 error.required.ba.select.yes = Select yes if you had customers who lived or worked outside of the UK in the last 12 months
 
 ###############################  Trading premises ###############################
@@ -346,14 +387,15 @@ error.required.professionalbody.penalised.by.professional.body = Select yes if t
 
 
 ############################### Money Services Business ###############################
-error.required.msb.services = Select one or more options to show the services your business provides
+error.required.msb.services = Select the money service business activities you will do
 error.required.msb.throughput = Select one option to show how much throughput you expect in the next 12 months
 error.required.msb.ipsp = Select yes if your business uses an IPSP
 error.required.msb.ipsp.name = Enter your IPSP’s name
 error.invalid.msb.ipsp.name = You can’t enter more than 140 characters
 error.required.msb.linked.txn = Select yes if your systems can identify linked transactions
 error.required.msb.psr.options = Select yes if your business has a PSR number
-error.invalid.msb.psr.number = Enter a valid PSR registration number
+error.invalid.msb.psr.number = Enter your PSR number
+error.max.length.msb.psr.number = PSR number must be 6 numbers
 error.required.msb.send.money = Select yes if you send money to other countries
 error.required.msb.transactions.in.12months = Enter the number of transactions you expect in the next 12 months
 error.required.msb.fx.transactions.in.12months = Enter the number of foreign exchange transactions you expect in the next 12 months
@@ -911,7 +953,7 @@ confirmation.payment.button.retry = Try to pay again
 payments.waystopay.title = How do you want to pay your fees?
 payments.waystopay.header = How do you want to pay your fees?
 
-payments.waystopay.info = If paying by Bacs Payment Schemes Limited (Bacs), check transaction limits and processing times for your bank.
+payments.waystopay.info = If paying by Bacs, check transaction limits and processing times for your bank.
 payments.waystopay.info2 = There is a fee if you pay by corporate credit card. You cannot pay by personal credit card.
 payments.waystopay.lead.time = Payments normally take 3 working days.
 
@@ -1068,7 +1110,7 @@ businessdetails.correspondenceaddress.nonUkAddress = No
 businessdetails.correspondenceaddress.address = Address
 businessdetails.correspondenceaddress.postCode = Postcode
 businessdetails.correspondenceaddress.country = Country
-businessdetails.registeredformlr.title = Is your business currently registered with HMRC under the Money Laundering regulations?
+businessdetails.registeredformlr.title = Is your business currently registered with HMRC under the Money Laundering Regulations?
 businessdetails.registeredformlr.lbl = This only refers to registration with HMRC
 businessdetails.registeredformlr.mlrregno.lbl = Money Laundering Regulations registration number
 businessdetails.registeredformlr.taxReferenceHint = This is 8 numbers, like 12345678. Find it on the certificate you received from HMRC when you registered for anti-money laundering supervision.
@@ -1258,7 +1300,7 @@ businessmatching.registerservices.servicename.lbl.06.phrased = money service bus
 businessmatching.registerservices.servicename.lbl.07.phrased = trust or company services
 businessmatching.registerservices.servicename.lbl.08.phrased = telecommunications, digital and IT payment services
 businessmatching.registerservices.servicename.details.01 = They provide services like professional bookkeeping, accounts preparation and signing, and tax advice.
-businessmatching.registerservices.servicename.details.02 = They facilitate and engage in the buying or selling of art for €10,000 or more. This includes roles like art agents, art auctioneers, art dealers, and gallery owners.
+businessmatching.registerservices.servicename.details.02 = They facilitate and engage in the selling of art for €10,000 or more. Roles include things like art agents, art auctioneers, art dealers, and gallery owners.
 businessmatching.registerservices.servicename.details.03 = They handle payments for utility and other household bills on behalf of customers.
 businessmatching.registerservices.servicename.details.04 = They introduce and act on instructions from people who want to buy or sell property. They also secure the purchase or sale of property.
 businessmatching.registerservices.servicename.details.05 = They accept or make cash payments of €10,000 or more (or equivalent) in exchange for goods. This includes when a customer deposits cash directly into a bank account. Estate agents are not classed as high value dealers.
@@ -1498,10 +1540,18 @@ bankdetails.hasbankaccount.title = Does your business have a bank account?
 bankdetails.hasbankaccount.validation = Select yes if your business has a bank account
 
 
-businessactivities.whatyouneed.requiredinfo.heading = In this section you’ll be asked for things like:
-businessactivities.whatyouneed.line_1 = your anticipated net profit
-businessactivities.whatyouneed.line_2 = how many people your business employs
-businessactivities.whatyouneed.line_3 = how you record transactions
+businessactivities.whatyouneed.requiredinfo.heading = In this section you’ll need to tell us:
+businessactivities.whatyouneed.line_1 = about any business activities that are not covered by the Money Laundering Regulations
+businessactivities.whatyouneed.line_2 = your total net profit in the next 12 months, if you carry out business activities not covered by the regulations
+businessactivities.whatyouneed.line_3 = the net profit you expect to make in the next 12 months from the services you have registered
+businessactivities.whatyouneed.line_4 = the franchisor’s name if your business is a franchise
+businessactivities.whatyouneed.line_5 = how many people work on activities covered by the regulations
+businessactivities.whatyouneed.line_6 = how many people work for the business
+businessactivities.whatyouneed.line_7 = how you record customer transactions
+businessactivities.whatyouneed.line_8 = if you have written guidance on how to identify and report suspicious activity
+businessactivities.whatyouneed.line_9 = if your business has registered with the National Crime Agency (NCA)
+businessactivities.whatyouneed.line_10 = how you document your risk assessment policy and procedure, if your business has one
+businessactivities.whatyouneed.line_11 = details of your professional adviser for Money Laundering Regulations and due diligence, if you have one
 businessactivities.businessfranchise.title = Is your business a franchise?
 businessactivities.businessfranchise.lbl.franchisename = Franchisor’s name
 businessactivities.businessfranchise.lbl.hint = Use their legal name if it is different to their trading name.

@@ -80,7 +80,7 @@ class VATRegisteredSpec extends PlaySpec with MockitoSugar {
 
         val data = Map(
           "registeredForVAT" -> Seq("true"),
-          "vrnNumber" -> Seq("%^&*(")
+          "vrnNumber" -> Seq("%^&*(1231")
         )
 
         VATRegistered.formRule.validate(data) must

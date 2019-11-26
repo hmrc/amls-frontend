@@ -100,9 +100,10 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
       }
 
       "respond with Bad Request on post with invalid data" in new Fixture {
+        val accountantsName = "Accountant name"
         when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(BusinessActivities(
-            whoIsYourAccountant = Some(WhoIsYourAccountant(accountantsName = "Accountant name",
+            whoIsYourAccountant = Some(WhoIsYourAccountant(accountantsName = accountantsName,
               accountantsTradingName = None,
               address = UkAccountantsAddress("", "", None, None, "")))))))
 
@@ -113,7 +114,7 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
         val document: Document = Jsoup.parse(contentAsString(result))
-        document.select("span").html() must include(Messages("error.required.ba.tax.matters"))
+        document.select("span").html() must include(Messages("error.required.ba.tax.matters", accountantsName))
       }
 
       "redirect to Check Your Answers on post with valid data in edit mode" in new Fixture {
