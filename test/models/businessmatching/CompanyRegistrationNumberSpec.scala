@@ -56,24 +56,19 @@ class CompanyRegistrationNumberSpec extends PlaySpec with MockitoSugar {
         "given an alphanumeric value with 8 digits containing lower case letters" in {
           val data = Map("companyRegistrationNumber" -> Seq("ab765bhd"))
           val result = CompanyRegistrationNumber.formReads.validate(data)
-          result mustBe Invalid(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number"))))
-        }
-        "given a value with length greater than 8" in {
-          val data = Map("companyRegistrationNumber" -> Seq("1" * 9))
-          val result = CompanyRegistrationNumber.formReads.validate(data)
-          result mustBe Invalid(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number"))))
+          result mustBe Invalid(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number.allowed"))))
         }
 
         "given a value with length less than 8" in {
           val data = Map("companyRegistrationNumber" -> Seq("1" * 7))
           val result = CompanyRegistrationNumber.formReads.validate(data)
-          result mustBe Invalid(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number"))))
+          result mustBe Invalid(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number.length"))))
         }
 
         "given a value containing non-alphanumeric characters" in {
           val data = Map("companyRegistrationNumber" -> Seq("1234567!"))
           val result = CompanyRegistrationNumber.formReads.validate(data)
-          result mustBe Invalid(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number"))))
+          result mustBe Invalid(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number.allowed"))))
         }
       }
 
@@ -111,22 +106,17 @@ class CompanyRegistrationNumberSpec extends PlaySpec with MockitoSugar {
           be(Valid(CompanyRegistrationNumber("ABCDEFGH")))
       }
 
-      "fail to validate when given data with length greater than 8" in {
-        val model = Map("companyRegistrationNumber" -> Seq("1234567890"))
-        CompanyRegistrationNumber.formReads.validate(model) mustBe Invalid(Seq(
-          (Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number"))))
-      }
 
       "fail to validate when given data with length less than 8" in {
         val model = Map("companyRegistrationNumber" -> Seq("123"))
         CompanyRegistrationNumber.formReads.validate(model) mustBe Invalid(Seq(
-          (Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number"))))
+          (Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number.length"))))
       }
 
       "fail to validate when given data with non-alphanumeric characters" in {
         val model = Map("companyRegistrationNumber" -> Seq("1234567!"))
         CompanyRegistrationNumber.formReads.validate(model) mustBe Invalid(Seq(
-          (Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number"))))
+          (Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number.allowed"))))
       }
     }
   }

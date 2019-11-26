@@ -38,6 +38,7 @@ object FormTypes {
   val maxNameTypeLength = 35
   val maxDescriptionTypeLength = 140
   val maxAddressLength = 35
+  val maxRegLength = 8
   val maxPhoneNumberLength = 24
   val maxEmailLength = 100
   val minAccountantRefNoTypeLength = 11
@@ -50,19 +51,21 @@ object FormTypes {
   private val phoneNumberRegex = "^[0-9 ()+\u2010\u002d]{1,24}$".r
   private val addressTypeRegex = "^[A-Za-z0-9 !'‘’\"“”(),./\u2014\u2013\u2010\u002d]{1,35}$".r
   val emailRegex = "(?:[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-zA-Z0-9-]*[a-zA-Z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])".r
-  
+
+  val capitalsAndNumbers = "^[A-Z0-9]$".r
   val dayRegex = "(0?[1-9]|[12][0-9]|3[01])".r
   val monthRegex = "(0?[1-9]|1[012])".r
   val yearRegexPost1900 = "((19|20)\\d\\d)".r
   val yearRegexFourDigits = "(?<!\\d)(?!0000)\\d{4}(?!\\d)".r
   val corporationTaxRegex = "^[0-9]{10}$".r
 
-  private val basicPunctuationRegex = "^[a-zA-Z0-9\u00C0-\u00FF !#$%&'‘’\"“”«»()*+,./:;=?@\\[\\]|~£€¥\\u005C\u2014\u2013\u2010\u005F\u005E\u0060\u000A\u000D\u002d]+$".r
+  val basicPunctuationRegex = "^[a-zA-Z0-9\u00C0-\u00FF !#$%&'‘’\"“”«»()*+,./:;=?@\\[\\]|~£€¥\\u005C\u2014\u2013\u2010\u005F\u005E\u0060\u000A\u000D\u002d]+$".r
   private val postcodeRegex = "^[A-Za-z]{1,2}[0-9][0-9A-Za-z]?\\s?[0-9][A-Za-z]{2}$".r
 
   /** Helper Functions **/
 
   def maxWithMsg(length: Int, msg: String) = maxLength(length).withMessage(msg)
+  def minWithMsg(length: Int, msg: String) = minLength(length).withMessage(msg)
 
   def regexWithMsg(regex: Regex, msg: String) = pattern(regex).withMessage(msg)
 
