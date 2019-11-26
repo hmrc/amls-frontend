@@ -130,7 +130,7 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
 
         WhoIsYourAccountant.formRule.validate(WhoIsYourAccountant.formWrites.writes(DefaultWhoIsYourAccountant)
         ) should be(Invalid(Seq(
-          (Path \ "name") -> Seq(ValidationError("error.invalid.maxlength.140"))
+          (Path \ "name") -> Seq(ValidationError("error.max.length.ba.advisor.name"))
         )))
       }
 
@@ -141,7 +141,7 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
 
         WhoIsYourAccountant.formRule.validate(WhoIsYourAccountant.formWrites.writes(DefaultWhoIsYourAccountant)
         ) should be(Invalid(Seq(
-          (Path \ "name") -> Seq(ValidationError("err.text.validation"))
+          (Path \ "name") -> Seq(ValidationError("error.invalid.character.ba.advisor.name"))
         )))
       }
 
@@ -153,7 +153,7 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
 
         WhoIsYourAccountant.formRule.validate(WhoIsYourAccountant.formWrites.writes(DefaultWhoIsYourAccountant)
         ) should be(Invalid(Seq(
-          (Path \ "tradingName") -> Seq(ValidationError("error.invalid.maxlength.120"))
+          (Path \ "tradingName") -> Seq(ValidationError("error.required.ba.trading.name"))
         )))
       }
 
@@ -164,7 +164,7 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
 
         WhoIsYourAccountant.formRule.validate(WhoIsYourAccountant.formWrites.writes(DefaultWhoIsYourAccountant)
         ) should be(Invalid(Seq(
-          (Path \ "tradingName") -> Seq(ValidationError("err.text.validation"))
+          (Path \ "tradingName") -> Seq(ValidationError("error.invalid.character.ba.trading.name"))
         )))
       }
     }
