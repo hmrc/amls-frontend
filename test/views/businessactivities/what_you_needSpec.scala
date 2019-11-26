@@ -48,6 +48,14 @@ class what_you_needSpec extends AmlsSpec with MustMatchers {
       html must include(Messages("businessactivities.whatyouneed.line_1"))
       html must include(Messages("businessactivities.whatyouneed.line_2"))
       html must include(Messages("businessactivities.whatyouneed.line_3"))
+      html must include(Messages("businessactivities.whatyouneed.line_4"))
+      html must include(Messages("businessactivities.whatyouneed.line_5"))
+      html must include(Messages("businessactivities.whatyouneed.line_6"))
+      html must include(Messages("businessactivities.whatyouneed.line_7"))
+      html must include(Messages("businessactivities.whatyouneed.line_8"))
+      html must include(Messages("businessactivities.whatyouneed.line_9"))
+      html must include(Messages("businessactivities.whatyouneed.line_10"))
+      html must include(Messages("businessactivities.whatyouneed.line_11"))
     }
 
     "have a back link" in new ViewFixture {

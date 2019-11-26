@@ -16,9 +16,9 @@
 
 package views.businessmatching.updateservice.add
 
-import forms.{EmptyForm, InvalidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.businessmatching.{AccountancyServices, BillPaymentServices, BusinessActivities, MoneyServiceBusiness}
+import models.businessmatching.{AccountancyServices, ArtMarketParticipant, BillPaymentServices, BusinessActivities, EstateAgentBusinessService, HighValueDealing, MoneyServiceBusiness, TelephonePaymentService, TrustAndCompanyServices}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -92,6 +92,29 @@ class select_activitiesSpec extends AmlsSpec with MustMatchers {
       override def view = select_activities(form2, edit = true, Seq.empty[String], Seq.empty[String])
 
       errorSummary.html() must include("not a message Key")
+    }
+
+    "have correct hint content" in new ViewFixture {
+      val form2: ValidForm[BusinessActivities] = Form2(BusinessActivities(Set(
+        AccountancyServices,
+        MoneyServiceBusiness,
+        TrustAndCompanyServices,
+        TelephonePaymentService,
+        ArtMarketParticipant,
+        BillPaymentServices,
+        EstateAgentBusinessService,
+        HighValueDealing)))
+
+      override def view = select_activities(form2, edit = true, Seq("01", "02", "03", "04", "05", "06", "07", "08"), Seq.empty[String])
+
+      doc.html must include("They provide services like professional bookkeeping, accounts preparation and signing, and tax advice.")
+      doc.html must include("They facilitate and engage in the selling of art for €10,000 or more. Roles include things like art agents, art auctioneers, art dealers, and gallery owners.")
+      doc.html must include("They handle payments for utility and other household bills on behalf of customers.")
+      doc.html must include("They introduce and act on instructions from people who want to buy or sell property. They also secure the purchase or sale of property.")
+      doc.html must include("They accept or make cash payments of €10,000 or more (or equivalent) in exchange for goods. This includes when a customer deposits cash directly into a bank account. Estate agents are not classed as high value dealers.")
+      doc.html must include("They exchange currency, transmit money, or cash cheques for their customers.")
+      doc.html must include("They form companies, and supply services like providing a business or correspondence address. They also act, or arrange for another person to act, in a certain role. For example, a director in a company or a trustee of an express trust.")
+      doc.html must include("They act as a link between customers and suppliers. They handle payments made through devices like mobile phones, computers, and smart TVs.")
     }
   }
 }
