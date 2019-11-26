@@ -28,6 +28,10 @@ a.block-link {
   margin: 0;
 }
 
+.heading-medium.no-bottom-margin {
+  margin-bottom: 0;
+}
+
 /* new-style page headers */
 
 .page-header {
@@ -1342,6 +1346,11 @@ table.notifications thead td {
   height: 12px;
   margin-left: 10px;
   width: 12px;
+}
+
+.message-inbox__list
+.message-inbox__list-item a:link {
+  text-decoration: underline;
 }
 
 .column-full {
