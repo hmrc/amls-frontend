@@ -27,9 +27,7 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
-import services.{AuthEnrolmentsService, FeeResponseService}
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
-import org.mockito.Matchers.{eq => eqTo, _}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, FeeHelper}
 import play.api.i18n.Messages
 
 import scala.concurrent.Future
@@ -42,8 +40,7 @@ class HowToPayControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
     val request = addToken(authRequest)
     val controller = new HowToPayController(
       authAction = SuccessfulAuthAction,
-      feeResponseService = mock[FeeResponseService],
-      enrolmentService = mock[AuthEnrolmentsService]
+      feeHelper = mock[FeeHelper]
     )
   }
 
@@ -67,11 +64,8 @@ class HowToPayControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
             createdAt = DateTime.now
           )
 
-          when(controller.enrolmentService.amlsRegistrationNumber(any(), any())(any(), any()))
-            .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
-
           when {
-            controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any[(String, String)]())(any(), any())
+            controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
           } thenReturn Future.successful(Some(feeResponse(SubscriptionResponseType)))
 
           val result = controller.get(request)
@@ -85,11 +79,8 @@ class HowToPayControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
 
           val amlsRegistrationNumber = "amlsRefNumber"
 
-          when(controller.enrolmentService.amlsRegistrationNumber(any(), any())(any(), any()))
-            .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
-
           when {
-            controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any[(String, String)]())(any(), any())
+            controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
           } thenReturn Future.successful(None)
 
           val result = controller.get(request)

@@ -16,37 +16,24 @@
 
 package controllers.applicationstatus
 
-import cats.data.OptionT
-import cats.implicits._
 import controllers.DefaultBaseController
 import javax.inject.{Inject, Singleton}
-import models.FeeResponse
-import services.{FeeResponseService, _}
-import uk.gov.hmrc.http.HeaderCarrier
-import utils.AuthAction
+import utils.{AuthAction, FeeHelper}
 import views.html.applicationstatus.how_to_pay
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 @Singleton
 class HowToPayController @Inject()(authAction: AuthAction,
-                                   private[controllers] val feeResponseService: FeeResponseService,
-                                   private[controllers] val enrolmentService: AuthEnrolmentsService) extends DefaultBaseController {
+                                   val feeHelper: FeeHelper) extends DefaultBaseController {
+
+  val prefix = "[HowToPayController]"
 
   def get = authAction.async {
     implicit request =>
-      retrieveFeeResponse(request.amlsRefNumber, request.accountTypeId, request.groupIdentifier) map {
+      feeHelper.retrieveFeeResponse(request.amlsRefNumber, request.accountTypeId, request.groupIdentifier, prefix) map {
         case Some(fees) => Ok(how_to_pay(fees.paymentReference))
         case _          => Ok(how_to_pay(None))
       }
-  }
-
-  private def retrieveFeeResponse(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), groupIdentifier: Option[String])
-                                 (implicit hc: HeaderCarrier): Future[Option[FeeResponse]] = {
-    (for {
-      amlsRegNo <- OptionT(enrolmentService.amlsRegistrationNumber(amlsRegistrationNumber, groupIdentifier))
-      fees <- OptionT(feeResponseService.getFeeResponse(amlsRegNo, accountTypeId))
-    } yield fees).value
   }
 }
