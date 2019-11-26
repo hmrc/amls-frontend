@@ -1353,6 +1353,11 @@ table.notifications thead td {
   text-decoration: underline;
 }
 
+.message-inbox__list
+.message-inbox__list-item a:focus {
+  text-decoration: none;
+}
+
 .column-full {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
