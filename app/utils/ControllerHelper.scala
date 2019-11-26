@@ -184,7 +184,7 @@ object ControllerHelper {
   }
 
   def accountantName(ba: Option[BA]): String = ba match {
-    case Some(activities) if activities.whoIsYourAccountant.isDefined => activities.whoIsYourAccountant.get.accountantsName
+    case Some(activities) if activities.whoIsYourAccountant.isDefined && activities.whoIsYourAccountant.get.names.isDefined => activities.whoIsYourAccountant.get.names.get.accountantsName
     case _ => ""
   }
 

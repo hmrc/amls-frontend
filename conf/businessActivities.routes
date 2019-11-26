@@ -39,8 +39,17 @@ POST        /employees                                            @controllers.b
 GET         /people-working-on-anti-money-laundering-activities   @controllers.businessactivities.EmployeeCountAMLSSupervisionController.get(edit: Boolean ?= false)
 POST        /people-working-on-anti-money-laundering-activities   @controllers.businessactivities.EmployeeCountAMLSSupervisionController.post(edit: Boolean ?= false)
 
-GET         /accountant-details                                   @controllers.businessactivities.WhoIsYourAccountantController.get(edit: Boolean ?= false)
-POST        /accountant-details                                   @controllers.businessactivities.WhoIsYourAccountantController.post(edit: Boolean ?= false)
+GET         /adviser-name                                         @controllers.businessactivities.WhoIsYourAccountantController.get(edit: Boolean ?= false)
+POST        /adviser-name                                         @controllers.businessactivities.WhoIsYourAccountantController.post(edit: Boolean ?= false)
+
+GET         /adviser-address-country                              @controllers.businessactivities.WhoIsYourAccountantIsUkController.get(edit: Boolean ?= false)
+POST        /adviser-address-country                              @controllers.businessactivities.WhoIsYourAccountantIsUkController.post(edit: Boolean ?= false)
+
+GET         /adviser-address-uk                                   @controllers.businessactivities.WhoIsYourAccountantUkAddressController.get(edit: Boolean ?= false)
+POST        /adviser-address-uk                                   @controllers.businessactivities.WhoIsYourAccountantUkAddressController.post(edit: Boolean ?= false)
+
+GET         /adviser-address-non-uk                               @controllers.businessactivities.WhoIsYourAccountantNonUkAddressController.get(edit: Boolean ?= false)
+POST        /adviser-address-non-uk                               @controllers.businessactivities.WhoIsYourAccountantNonUkAddressController.post(edit: Boolean ?= false)
 
 GET         /tax-matters                                          @controllers.businessactivities.TaxMattersController.get(edit: Boolean ?= false)
 POST        /tax-matters                                          @controllers.businessactivities.TaxMattersController.post(edit: Boolean ?= false)

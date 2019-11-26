@@ -231,15 +231,18 @@ error.max.length.ba.software.package.name = Names of the software packages must 
 error.invalid.characters.ba.software.package.name = Names of the software packages can include letters a to z, numbers, spaces, and most punctuation and special characters
 error.required.ba.select.nca = Select yes if your business is registered with the National Crime Agency
 error.required.ba.option.risk.assessment = Select yes if your business has a documented risk assessment policy and procedure
-error.required.ba.risk.assessment.format = Select how you document your risk assessment policy and procedure
-error.required.ba.business.use.accountant = Select yes if your business receives professional advice on Money Laundering Regulations and due diligence
-error.required.ba.suspicious.activity = Select yes if you have written guidance on how to identify and report suspicious activity
-error.required.ba.tax.matters = Select yes if {0} manages your tax affairs with HMRC
+error.required.ba.risk.assessment.format = Select one or more options to show what formats you use for your risk assessment policy and procedure
+error.required.ba.business.use.accountant = Select yes if your business receives advice on Money Laundering regulations and due diligence
+error.required.ba.suspicious.activity = Select yes if your business has written guidance for staff on how to report suspicious activity
+error.required.ba.tax.matters = Select yes if your professional adviser also manages your tax affairs with HMRC
+
 error.required.ba.advisor.name = Enter your adviser’s name
-error.max.length.ba.advisor.name = Adviser’s name must be 140 characters or less
-error.invalid.character.ba.advisor.name = Adviser’s name can include letters a to z, numbers, spaces, and most punctuation and special characters
-error.required.ba.trading.name = Adviser’s trading name must be 120 characters or less
-error.invalid.character.ba.trading.name = Adviser’s trading name can include letters a to z, numbers, spaces, and most punctuation and special characters
+error.length.ba.advisor.name = Adviser’s name must be 140 characters or less
+error.punctuation.ba.advisor.name = Adviser’s name can include letters a to z, numbers, spaces, and most punctuation and special characters
+error.length.ba.advisor.tradingname = Adviser's trading name must be 120 characters or less
+error.punctuation.ba.advisor.tradingname = Adviser’s trading name can include letters a to z, numbers, spaces, and most punctuation and special characters
+error.required.ba.advisor.isuk = Select yes if your adviser’s address is in the UK
+
 error.required.ba.select.yes = Select yes if you had customers who lived or worked outside of the UK in the last 12 months
 
 ###############################  Trading premises ###############################
@@ -1618,16 +1621,29 @@ businessactivities.employees.line2.text = How many people work on activities cov
 businessactivities.employees.line2.label = Include directors, temporary and seasonal staff.
 businessactivities.employees.line2.hint = If you are a sole proprietor with no employees, enter 1.
 businessactivities.employees.line2.cya = How many people work on activities covered by the Money Laundering Regulations?
-businessactivities.whoisyouraccountant.title = Who advises you on Money Laundering Regulations and due diligence?
 businessactivities.involved.other.title = Is your business involved in any other activities?
 businessactivities.involved.other.hint = Other activities include things like:
 businessactivities.involved.listline1 = running a newsagent’s
 businessactivities.involved.listline2 = recruitment
 businessactivities.involved.listline3 = selling software packages
-businessactivities.whoisyouraccountant.name = Name
+
+businessactivities.whoisyouraccountant.title = What is your adviser’s name?
+businessactivities.whoisyouraccountant.name = Full name
 businessactivities.whoisyouraccountant.tradingName = Trading name (if different)
+businessactivities.whoisyouraccountant.summary.tradingName = Adviser’s trading name
+
+businessactivities.whoisyouraccountant.location.title = Is your adviser's address in the UK?
+businessactivities.whoisyouraccountant.location.header = Is {0}’s address in the UK?
+
+
+
+businessactivities.whoisyouraccountant.address.title = What is your adviser’s address?
+businessactivities.whoisyouraccountant.address.header = What is {0}’s address?
 businessactivities.whoisyouraccountant.address = Address
-businessactivities.whoisyouraccountant.address.location = Do they have a UK address?
+
+
+
+
 businessactivities.whoisyouraccountant.ukAddress = This is a UK address
 businessactivities.whoisyouraccountant.nonUkAddress = This is an overseas address
 businessactivities.whoisyouraccountant.country = Country

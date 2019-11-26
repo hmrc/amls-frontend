@@ -19,21 +19,19 @@ package controllers.businessactivities
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
-import forms.{Form2, InvalidForm, ValidForm}
-import models.businessactivities.{BusinessActivities, WhoIsYourAccountantName}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessactivities.{AccountantsAddress, BusinessActivities, UkAccountantsAddress}
 import services.AutoCompleteService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthAction
 
-import scala.concurrent.Future
-
-class WhoIsYourAccountantController @Inject() ( val dataCacheConnector: DataCacheConnector,
-                                                val autoCompleteService: AutoCompleteService,
-                                                val authAction: AuthAction
+class WhoIsYourAccountantUkAddressController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                                       val autoCompleteService: AutoCompleteService,
+                                                       val authAction: AuthAction
                                               )extends DefaultBaseController {
 
   //Joe - cannot seem to provide a default for UK/Non UK without providing defaults for other co-products
-  private val defaultValues = WhoIsYourAccountantName("", None)
+  private val defaultValues:AccountantsAddress = UkAccountantsAddress("", "", None, None, "")
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
@@ -41,31 +39,39 @@ class WhoIsYourAccountantController @Inject() ( val dataCacheConnector: DataCach
         response =>
           val form = (for {
             businessActivities <- response
-            whoIsYourAccountant <- businessActivities.whoIsYourAccountant.flatMap(acc => acc.names)
+            whoIsYourAccountant <- businessActivities.whoIsYourAccountant.flatMap(acc => acc.address)
           } yield {
-            Form2[WhoIsYourAccountantName](whoIsYourAccountant)
+            if(whoIsYourAccountant.isUk) { Form2[AccountantsAddress](whoIsYourAccountant) } else { EmptyForm }
           }).getOrElse(Form2(defaultValues))
-          Ok(views.html.businessactivities.who_is_your_accountant(form, edit))
+          Ok(views.html.businessactivities.who_is_your_accountant_uk_address(
+            form, edit,
+            response.flatMap(ba => ba.whoIsYourAccountant).flatMap(acc => acc.names).map(names => names.accountantsName).getOrElse("!!")))
       }
   }
 
   def post(edit : Boolean = false) = authAction.async {
     implicit request =>
-      Form2[WhoIsYourAccountantName](request.body) match {
+      Form2[UkAccountantsAddress](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.businessactivities.who_is_your_accountant(f, edit)))
+          dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
+            response => BadRequest(views.html.businessactivities.who_is_your_accountant_uk_address(f, edit, getName(response)))
+          }
         case ValidForm(_, data) => {
           for {
             businessActivity <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
             _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
-              businessActivity.whoIsYourAccountant(businessActivity.flatMap(ba => ba.whoIsYourAccountant).map(acc => acc.copy(names = Option(data))))
+              businessActivity.whoIsYourAccountant(businessActivity.flatMap(ba => ba.whoIsYourAccountant).map(acc => acc.copy(address = Option(data))))
             )
           } yield if (edit) {
             Redirect(routes.SummaryController.get())
           } else {
-            Redirect(routes.WhoIsYourAccountantIsUkController.get())
+            Redirect(routes.TaxMattersController.get())
           }
         }
       }
   }
+
+  private def getName(response: Option[BusinessActivities]): String = response
+    .flatMap(ba => ba.whoIsYourAccountant).flatMap(acc => acc.names).map(acc => acc.accountantsName).getOrElse("")
+
 }
