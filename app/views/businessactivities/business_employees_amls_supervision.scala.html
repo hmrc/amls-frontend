@@ -34,6 +34,8 @@
     @form(f, controllers.businessactivities.routes.EmployeeCountAMLSSupervisionController.post(edit)) {
 
         @input(
+            attrType = "number",
+            attrPattern = "[0-9]*",
             classes = Seq("form-control-1-4"),
             field = f("employeeCountAMLSSupervision"),
             heading = "businessactivities.employees.amls.supervision.title",
