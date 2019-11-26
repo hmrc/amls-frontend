@@ -98,7 +98,7 @@ trait AmpValues {
   val completeModel                             = Amp(completeData, false, true)
   val missingTypeOfParticipantModel             = Amp(missingTypeOfParticipantData)
   val missingTypeOfParticipantDetailModel       = Amp(missingTypeOfParticipantDetailData)
-  val missingBoughtOrSoldOverTheThresholdModel  = Amp(missingSoldOverThresholdData)
+  val missingSoldOverTheThresholdModel          = Amp(missingSoldOverThresholdData)
   val missingDateTransactionOverThresholdModel  = Amp(missingDateTransactionOverThresholdData)
   val missingIdentifyLinkedTransactionsModel    = Amp(missingIdentifyLinkedTransactionsData)
   val MissingPercentageExpectedTurnoverModel    = Amp(MissingPercentageExpectedTurnoverData)
@@ -166,7 +166,7 @@ class AmpSpec extends AmlsSpec with AmpValues {
         }
 
         "missing soldOverThreshold" in {
-          missingBoughtOrSoldOverTheThresholdModel.isComplete must be(false)
+          missingSoldOverTheThresholdModel.isComplete must be(false)
         }
 
         "soldOverThreshold true and missing dateTransactionOverThreshold" in {

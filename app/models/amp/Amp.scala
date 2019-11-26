@@ -37,7 +37,7 @@ final case class Amp(data: JsObject = Json.obj(),
 
   val typeOfParticipant            = JsPath \ "typeOfParticipant"
   val typeOfParticipantDetail      = JsPath \ "typeOfParticipantDetail"
-  val soldOverThreshold    = JsPath \ "soldOverThreshold"
+  val soldOverThreshold            = JsPath \ "soldOverThreshold"
   val identifyLinkedTransactions   = JsPath \ "identifyLinkedTransactions"
   val dateTransactionOverThreshold = JsPath \ "dateTransactionOverThreshold"
   val percentageExpectedTurnover   = JsPath \ "percentageExpectedTurnover"
@@ -58,7 +58,7 @@ final case class Amp(data: JsObject = Json.obj(),
         (!valueAt(typeOfParticipant).contains(otherTypeOfParticipant)))
   }
 
-  private def isBoughtOrSoldOverThresholdComplete: Boolean = {
+  private def isSoldOverThresholdComplete: Boolean = {
     valueAt(soldOverThreshold) != notPresent &&
       ((valueAt(soldOverThreshold) == "true" &&
         valueAt(dateTransactionOverThreshold) != notPresent) ||
@@ -67,7 +67,7 @@ final case class Amp(data: JsObject = Json.obj(),
 
   def isComplete: Boolean = {
     isTypeOfParticipantComplete &&
-    isBoughtOrSoldOverThresholdComplete &&
+    isSoldOverThresholdComplete &&
     valueAt(identifyLinkedTransactions) != notPresent &&
     valueAt(percentageExpectedTurnover) != notPresent
   }
