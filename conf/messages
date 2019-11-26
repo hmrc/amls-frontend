@@ -1498,7 +1498,7 @@ bankdetails.hasbankaccount.title = Does your business have a bank account?
 bankdetails.hasbankaccount.validation = Select yes if your business has a bank account
 
 
-businessactivities.whatyouneed.requiredinfo.heading = In this section you’ll be asked for things like:
+businessactivities.whatyouneed.requiredinfo.heading = In this section you’ll need to tell us:
 businessactivities.whatyouneed.line_1 = about any business activities that are not covered by the Money Laundering Regulations
 businessactivities.whatyouneed.line_2 = your total net profit in the next 12 months, if you carry out business activities not covered by the regulations
 businessactivities.whatyouneed.line_3 = the net profit you expect to make in the next 12 months from the services you have registered
