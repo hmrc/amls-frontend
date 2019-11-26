@@ -206,7 +206,7 @@ error.required.ba.tax.matters = Select yes if {0} manages your tax affairs with 
 error.required.ba.advisor.name = Enter your adviser’s name
 error.max.length.ba.advisor.name = Adviser’s name must be 140 characters or less
 error.invalid.character.ba.advisor.name = Adviser’s name can include letters a to z, numbers, spaces, and most punctuation and special characters
-error.required.ba.trading.name = Adviser's trading name must be 120 characters or less
+error.required.ba.trading.name = Adviser’s trading name must be 120 characters or less
 error.invalid.character.ba.trading.name = Adviser’s trading name can include letters a to z, numbers, spaces, and most punctuation and special characters
 error.required.ba.select.yes = Select yes if you had customers who lived or worked outside of the UK in the last 12 months
 
