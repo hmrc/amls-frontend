@@ -1498,10 +1498,18 @@ bankdetails.hasbankaccount.title = Does your business have a bank account?
 bankdetails.hasbankaccount.validation = Select yes if your business has a bank account
 
 
-businessactivities.whatyouneed.requiredinfo.heading = In this section you’ll be asked for things like:
-businessactivities.whatyouneed.line_1 = your anticipated net profit
-businessactivities.whatyouneed.line_2 = how many people your business employs
-businessactivities.whatyouneed.line_3 = how you record transactions
+businessactivities.whatyouneed.requiredinfo.heading = In this section you’ll need to tell us:
+businessactivities.whatyouneed.line_1 = about any business activities that are not covered by the Money Laundering Regulations
+businessactivities.whatyouneed.line_2 = your total net profit in the next 12 months, if you carry out business activities not covered by the regulations
+businessactivities.whatyouneed.line_3 = the net profit you expect to make in the next 12 months from the services you have registered
+businessactivities.whatyouneed.line_4 = the franchisor’s name if your business is a franchise
+businessactivities.whatyouneed.line_5 = how many people work on activities covered by the regulations
+businessactivities.whatyouneed.line_6 = how many people work for the business
+businessactivities.whatyouneed.line_7 = how you record customer transactions
+businessactivities.whatyouneed.line_8 = if you have written guidance on how to identify and report suspicious activity
+businessactivities.whatyouneed.line_9 = if your business has registered with the National Crime Agency (NCA)
+businessactivities.whatyouneed.line_10 = how you document your risk assessment policy and procedure, if your business has one
+businessactivities.whatyouneed.line_11 = details of your professional adviser for Money Laundering Regulations and due diligence, if you have one
 businessactivities.businessfranchise.title = Is your business a franchise?
 businessactivities.businessfranchise.lbl.franchisename = Franchisor’s name
 businessactivities.businessfranchise.lbl.hint = Use their legal name if it is different to their trading name.
