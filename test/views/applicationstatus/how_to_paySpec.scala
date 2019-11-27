@@ -63,6 +63,22 @@ class how_to_paySpec extends AmlsSpec with MustMatchers {
       html must include(Messages("howtopay.para.6"))
       html must include(Messages("howtopay.para.6.link"))
       html must include(Messages("howtopay.para.7"))
+
+      doc.getElementById("your-messages").attr("href") must be(
+        "your-registration/your-messages"
+      )
+
+      doc.getElementById("find-email").attr("href") must be(
+        "https://www.gov.uk/guidance/money-laundering-regulations-registration-fees#how-to-pay"
+      )
+
+      doc.getElementById("card-payment").attr("href") must be(
+        "https://www.gov.uk/pay-tax-debit-credit-card"
+      )
+
+      doc.getElementById("ways-to-pay").attr("href") must be(
+        "https://www.gov.uk/guidance/pay-money-laundering-regulations-fees-and-penalty-charges#ways-to-pay"
+      )
     }
 
     "contain the expected content elements where there is not a payment reference" in new ViewFixture{
@@ -88,6 +104,22 @@ class how_to_paySpec extends AmlsSpec with MustMatchers {
       html must include(Messages("howtopay.para.5.link"))
       html must include(Messages("howtopay.para.6"))
       html must include(Messages("howtopay.para.6.link"))
+
+      doc.getElementById("your-messages-no-ref").attr("href")must be(
+        "your-registration/your-messages"
+      )
+
+      doc.getElementById("find-email-no-reference").attr("href") must be(
+        "https://www.gov.uk/guidance/money-laundering-regulations-registration-fees#how-to-pay"
+      )
+
+      doc.getElementById("card-payment").attr("href") must be(
+        "https://www.gov.uk/pay-tax-debit-credit-card"
+      )
+
+      doc.getElementById("ways-to-pay").attr("href") must be(
+        "https://www.gov.uk/guidance/pay-money-laundering-regulations-fees-and-penalty-charges#ways-to-pay"
+      )
     }
 
     "have a back link" in new ViewFixture {
