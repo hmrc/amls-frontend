@@ -31,7 +31,7 @@ import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
-class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with MockitoSugar {
+class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
   val recordId = 1

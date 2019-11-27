@@ -148,7 +148,7 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
       "form is invalid" must {
         "return BAD_REQUEST" in new TestFixture {
 
-          val notValidData = request.withFormUrlEncodedBody(
+          val notValidData = requestWithUrlEncodedBody(
             "hasPreviousName" -> "fail"
           )
 
@@ -165,7 +165,7 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
         "hasPreviousName is true" must {
           "redirect to LegalNameInputController" in new TestFixture {
 
-            val requestWithHasPreviousNameTrue = request.withFormUrlEncodedBody(
+            val requestWithHasPreviousNameTrue = requestWithUrlEncodedBody(
               "hasPreviousName" -> "true"
             )
 

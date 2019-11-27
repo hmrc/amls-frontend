@@ -21,13 +21,13 @@ import jto.validation.{Path, ValidationError}
 import models.autocomplete.NameValuePair
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.{AmlsSpec, AmlsViewSpec}
 import views.Fixture
 
-class additional_address_UKSpec extends AmlsSpec with MustMatchers {
+class additional_address_UKSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     val name = "firstName lastName"
   }

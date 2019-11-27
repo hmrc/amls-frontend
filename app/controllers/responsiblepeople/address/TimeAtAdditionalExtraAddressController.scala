@@ -18,19 +18,20 @@ package controllers.responsiblepeople.address
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople._
-import play.api.mvc.{AnyContent, Request}
+import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.address.time_at_additional_extra_address
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
-class TimeAtAdditionalExtraAddressController @Inject () (
-                                                        val dataCacheConnector: DataCacheConnector,
-                                                        authAction: AuthAction
-                                                        ) extends RepeatingSection with DefaultBaseController {
+class TimeAtAdditionalExtraAddressController @Inject() (val dataCacheConnector: DataCacheConnector,
+                                                        authAction: AuthAction,
+                                                        val ds: CommonPlayDependencies,
+                                                        val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None)
 

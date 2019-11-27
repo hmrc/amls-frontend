@@ -38,7 +38,9 @@ class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar  {
 
     val controller = new ServicesDateOfChangeController (
       dataCacheConnector = mock[DataCacheConnector],
-      SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -81,7 +83,7 @@ class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar  {
 
     "submit and redirect to redress scheme for residential" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "dateOfChange.day" -> "24",
         "dateOfChange.month" -> "2",
         "dateOfChange.year" -> "1990"

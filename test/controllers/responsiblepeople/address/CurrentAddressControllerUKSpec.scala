@@ -57,6 +57,8 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
   val RecordId = 1
 
   trait Fixture {
+    self => val request = addToken(authRequest)
+
   val viewResponse = ViewResponse(
     "",
     businessMatchingSection = BusinessMatching(
@@ -79,9 +81,6 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
     aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
   )
 
-  trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
-
     val auditConnector = mock[AuditConnector]
     val autoCompleteService = mock[AutoCompleteService]
     val statusService = mock[StatusService]
@@ -89,7 +88,8 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
     val currentAddressController = new CurrentAddressUKController (
       dataCacheConnector = mockDataCacheConnector,
       auditConnector = auditConnector,
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       statusService = statusService,
       autoCompleteService = autoCompleteService,
       cc = mockMcc
@@ -240,6 +240,10 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
           when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
+          when {
+            currentAddressController.dataCacheConnector.fetch[ViewResponse](any(), eqTo(ViewResponse.key))(any(), any())
+          } thenReturn Future.successful(Some(viewResponse))
+
           val result = currentAddressController.post(RecordId)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
@@ -255,7 +259,6 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
               d.detail("country") mustBe "Spain"
           }
         }
-
       }
 
       "redirect to CurrentAddressDateOfChangeController" when {
@@ -336,7 +339,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
 
       "redirect to CurrentAddressDateOfChangeController" when {
         "address changed and in eligible state for date of change and not in edit mode" in new Fixture {
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "true",
             "addressLine1" -> "Line 1",
             "addressLine2" -> "Line 2",
@@ -367,7 +370,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
 
       "redirect to CurrentAddressDateOfChangeController" when {
         "changed address from non-uk to uk and in eligible state for date of change and not in edit mode" in new Fixture {
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "true",
             "addressLine1" -> "Line 1",
             "addressLine2" -> "Line 2",
@@ -398,7 +401,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
 
       "redirect to TimeAtCurrentAddressController" when {
         "not in edit mode and no line id defined" in new Fixture {
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "true",
             "addressLine1" -> "Line 1",
             "addressLine2" -> "Line 2",
@@ -531,7 +534,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
           val document: Document = Jsoup.parse(contentAsString(result))
           document.select("a[href=#addressLine1]").html() must include(Messages("error.required.address.line1"))
           document.select("a[href=#addressLine2]").html() must include(Messages("error.required.address.line2"))
-          document.select("a[href=#postcode]").html() must include(Messages("error.invalid.postcode"))
+          document.select("a[href=#postcode]").html() must include(Messages("error.required.postcode"))
         }
 
         "there is no country supplied" in new Fixture {
@@ -555,7 +558,6 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
           document.select("a[href=#addressLineNonUK1]").html() must include(Messages("error.required.address.line1"))
           document.select("a[href=#addressLineNonUK2]").html() must include(Messages("error.required.address.line2"))
           document.select("a[href=#country]").html() must include(Messages("error.required.country"))
-          document.select("a[href=#postcode]").html() must include(Messages("error.required.postcode"))
         }
 
         "the country selected is United Kingdom" in new Fixture {

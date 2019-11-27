@@ -81,7 +81,7 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
 
       "the user has inactive credentials for sa" must {
         "redirect the user to amls frontend" in {
-          val authAction = new DefaultAuthAction(fakeAuthConnector(agentSaAuthRetrievalsInactive))
+          val authAction = new DefaultAuthAction(fakeAuthConnector(agentSaAuthRetrievalsInactive), mockApplicationConfig, mockParser)
           val controller = new Harness(authAction)
 
           val result = controller.onPageLoad()(fakeRequest)
@@ -101,7 +101,7 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
       }
       "the user has inactive credentials for ct" must {
         "redirect the user to amls frontend" in {
-          val authAction = new DefaultAuthAction(fakeAuthConnector(agentCtAuthRetrievalsInactive))
+          val authAction = new DefaultAuthAction(fakeAuthConnector(agentCtAuthRetrievalsInactive), mockApplicationConfig, mockParser)
           val controller = new Harness(authAction)
 
           val result = controller.onPageLoad()(fakeRequest)

@@ -22,24 +22,27 @@ import cats.data.OptionT
 import cats.implicits._
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.ViewResponse
 import models.responsiblepeople._
 import models.status.SubmissionStatus
-import play.api.mvc.{AnyContent, Request}
+import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import services.{AutoCompleteService, StatusService}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, ControllerHelper, DateOfChangeHelper, RepeatingSection}
 import views.html.responsiblepeople.address.current_address_UK
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class CurrentAddressUKController @Inject ()(val dataCacheConnector: DataCacheConnector,
                                             auditConnector: AuditConnector,
                                             autoCompleteService: AutoCompleteService,
                                             statusService: StatusService,
-                                            authAction: AuthAction) extends RepeatingSection with DefaultBaseController with DateOfChangeHelper {
+                                            authAction: AuthAction,
+                                            val ds: CommonPlayDependencies,
+                                            val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request =>

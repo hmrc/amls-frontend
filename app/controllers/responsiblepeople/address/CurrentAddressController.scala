@@ -18,21 +18,23 @@ package controllers.responsiblepeople.address
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople._
+import play.api.mvc.MessagesControllerComponents
 import services.AutoCompleteService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, ControllerHelper, DateOfChangeHelper, RepeatingSection}
 import views.html.responsiblepeople.address.current_address
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
-class CurrentAddressController @Inject ()(
-                                            val dataCacheConnector: DataCacheConnector,
-                                            autoCompleteService: AutoCompleteService,
-                                            authAction: AuthAction
-                                          ) extends RepeatingSection with DefaultBaseController with DateOfChangeHelper {
+class CurrentAddressController @Inject ()(val dataCacheConnector: DataCacheConnector,
+                                          autoCompleteService: AutoCompleteService,
+                                          authAction: AuthAction,
+                                          val ds: CommonPlayDependencies,
+                                          val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request =>

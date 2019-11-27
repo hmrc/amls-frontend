@@ -18,10 +18,10 @@ package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
-import models.responsiblepeople._
 import models.Country
 import models.autocomplete.{CountryDataProvider, NameValuePair}
 import models.responsiblepeople.ResponsiblePerson._
+import models.responsiblepeople._
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
@@ -31,7 +31,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
+import utils.{AmlsSpec, AuthAction}
 
 import scala.concurrent.Future
 

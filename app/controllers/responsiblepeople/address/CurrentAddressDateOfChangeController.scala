@@ -32,8 +32,7 @@ import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class CurrentAddressDateOfChangeController @Inject ()(
-                                                      val dataCacheConnector: DataCacheConnector,
+class CurrentAddressDateOfChangeController @Inject ()(val dataCacheConnector: DataCacheConnector,
                                                       authAction: AuthAction,
                                                       val ds: CommonPlayDependencies,
                                                       statusService: StatusService,
