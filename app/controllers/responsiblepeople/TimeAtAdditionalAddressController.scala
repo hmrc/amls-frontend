@@ -24,7 +24,7 @@ import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ThreeYearsPlus}
 import models.responsiblepeople._
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.time_at_additional_address
+import views.html.responsiblepeople.address.time_at_additional_address
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -81,7 +81,7 @@ class TimeAtAdditionalAddressController @Inject () (
     data match {
       case ThreeYearsPlus | OneToThreeYears if !edit => Redirect(routes.PositionWithinBusinessController.get(index, edit, flow))
       case ThreeYearsPlus | OneToThreeYears if edit => Redirect(routes.DetailedAnswersController.get(index, flow))
-      case _ => Redirect(routes.AdditionalExtraAddressController.get(index, edit, flow))
+      case _ => Redirect(address.routes.AdditionalExtraAddressController.get(index, edit, flow))
     }
   }
 

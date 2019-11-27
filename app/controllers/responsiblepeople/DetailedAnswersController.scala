@@ -70,7 +70,7 @@ class DetailedAnswersController @Inject () (
     (for {
       responsiblePeople <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
     } yield responsiblePeople.lift(index - 1) match {
-      case Some(x) => showHideAddressMove(amlsRegistrationNo, accountTypeId, credId, x.lineId) flatMap { showHide =>
+      case Some(x) if x.copy(hasAccepted = true).isComplete => showHideAddressMove(amlsRegistrationNo, accountTypeId, credId, x.lineId) flatMap { showHide =>
         isMsbOrTcsp(credId).map {
           msbOrTcsp: Option[Boolean] =>
 
@@ -78,6 +78,7 @@ class DetailedAnswersController @Inject () (
             Ok(views.html.responsiblepeople.detailed_answers(Some(x), index, showHide, ControllerHelper.rpTitleName(Some(x)), flow, shouldShowApprovalSection, businessMatching))
         }
       }
+      case Some(_) => Future.successful(Redirect(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get()))
       case _ => Future.successful(NotFound(notFoundView))
     }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
 

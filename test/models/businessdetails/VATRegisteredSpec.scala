@@ -99,7 +99,7 @@ class VATRegisteredSpec extends PlaySpec with MockitoSugar {
 
         VATRegistered.formRule.validate(data) must
           be(Invalid(Seq(
-            (Path \ "vrnNumber") -> Seq(ValidationError("error.invalid.vat.number"))
+            (Path \ "vrnNumber") -> Seq(ValidationError("error.required.vat.number"))
           )))
       }
 
@@ -112,7 +112,7 @@ class VATRegisteredSpec extends PlaySpec with MockitoSugar {
 
         VATRegistered.formRule.validate(data) must
           be(Invalid(Seq(
-            (Path \ "vrnNumber") -> Seq(ValidationError("error.invalid.vat.number"))
+            (Path \ "vrnNumber") -> Seq(ValidationError("error.invalid.vat.number.length"))
           )))
       }
 
@@ -125,7 +125,7 @@ class VATRegisteredSpec extends PlaySpec with MockitoSugar {
 
         VATRegistered.formRule.validate(data) must
           be(Invalid(Seq(
-            (Path \ "vrnNumber") -> Seq(ValidationError("error.invalid.vat.number"))
+            (Path \ "vrnNumber") -> Seq(ValidationError("error.invalid.vat.number.length"))
           )))
       }
 

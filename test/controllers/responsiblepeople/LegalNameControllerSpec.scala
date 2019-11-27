@@ -72,9 +72,9 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
 
         val previousPerson = PreviousName(
           hasPreviousName = Some(true),
-          firstName = Some("firstPrevious"),
-          middleName = Some("middlePrevious"),
-          lastName = Some("lastPrevious")
+          None,
+          None,
+          None
         )
 
         val responsiblePeople = ResponsiblePerson(personName = Some(addPerson), legalName = Some(previousPerson))
@@ -88,11 +88,8 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
 
         val document = Jsoup.parse(contentAsString(result))
 
-        document.select("input[name=firstName]").`val` must be("firstPrevious")
-        document.select("input[name=middleName]").`val` must be("middlePrevious")
-        document.select("input[name=lastName]").`val` must be("lastPrevious")
+        document.select("input[name=hasPreviousName]").`val` must be("true")
       }
-
     }
 
     "post is called" must {
@@ -112,7 +109,7 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
 
             val result = controller.post(RecordId)(requestWithParams)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.LegalNameChangeDateController.get(RecordId).url))
+            redirectLocation(result) must be(Some(routes.LegalNameInputController.get(RecordId).url))
           }
         }
 
@@ -151,18 +148,35 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
       "form is invalid" must {
         "return BAD_REQUEST" in new TestFixture {
 
-          val NameMissingInRequest = requestWithUrlEncodedBody(
-            "hasPreviousName" -> "true"
+          val notValidData = request.withFormUrlEncodedBody(
+            "hasPreviousName" -> "fail"
           )
 
           mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
           mockCacheSave[PreviousName]
 
-          val result = controller.post(RecordId)(NameMissingInRequest)
+          val result = controller.post(RecordId)(notValidData)
           status(result) must be(BAD_REQUEST)
 
         }
+      }
 
+      "form is invalid" when {
+        "hasPreviousName is true" must {
+          "redirect to LegalNameInputController" in new TestFixture {
+
+            val requestWithHasPreviousNameTrue = request.withFormUrlEncodedBody(
+              "hasPreviousName" -> "true"
+            )
+
+            mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
+            mockCacheSave[PreviousName]
+
+            val result = controller.post(RecordId)(requestWithHasPreviousNameTrue)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.LegalNameInputController.get(RecordId).url))
+          }
+        }
       }
 
       "model cannot be found with given index" must {

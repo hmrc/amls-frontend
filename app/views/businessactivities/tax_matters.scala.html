@@ -22,7 +22,7 @@
 
 @header = {
     @components.back_link()
-    @errorSummary(f)
+    @errorSummaryWithPlaceholder(f, personName)
 }
 
 @question = @{
@@ -41,7 +41,8 @@
             heading = question,
             section = "summary.businessactivities",
             panel = false,
-            classes = Seq("inline")
+            classes = Seq("inline"),
+            errorGroupPlaceholder = personName
         ) {
             @radio(
                 f = f("manageYourTaxAffairs"),

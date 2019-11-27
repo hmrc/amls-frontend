@@ -38,6 +38,9 @@ class ways_to_paySpec extends AmlsViewSpec {
       doc.title must startWith(Messages("payments.waystopay.title"))
       heading.html must be(Messages("payments.waystopay.header"))
       subHeading.html must include(Messages("submit.registration"))
+      doc.html must include(Messages("payments.waystopay.info"))
+      doc.html must include(Messages("payments.waystopay.info2"))
+      doc.html must include(Messages("payments.waystopay.lead.time"))
     }
 
     "have a back link" in new ViewFixture {

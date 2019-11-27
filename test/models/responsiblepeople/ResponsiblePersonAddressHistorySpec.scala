@@ -104,6 +104,34 @@ class ResponsiblePersonAddressHistorySpec extends PlaySpec with MockitoSugar {
       }
 
     }
+
+    "have isRPAddressInUK method which" when {
+      "called with uk address will return true" in {
+        ResponsiblePersonAddressHistory.isRPAddressInUK(Some(DefaultAdditionalExtraAddress)) mustBe true
+      }
+
+      "called with non-uk address will return false" in {
+        ResponsiblePersonAddressHistory.isRPAddressInUK(Some(DefaultAdditionalAddress)) mustBe false
+      }
+
+      "called without address will return false" in {
+        ResponsiblePersonAddressHistory.isRPAddressInUK(None) mustBe false
+      }
+    }
+
+    "have isRPCurrentAddressInUK method which" when {
+      "called with uk address will return true" in {
+        ResponsiblePersonAddressHistory.isRPCurrentAddressInUK(Some(DefaultCurrentAddress)) mustBe true
+      }
+
+      "called with non-uk address will return false" in {
+        ResponsiblePersonAddressHistory.isRPCurrentAddressInUK(Some(NewCurrentAddress)) mustBe false
+      }
+
+      "called without address will return false" in {
+        ResponsiblePersonAddressHistory.isRPCurrentAddressInUK(None) mustBe false
+      }
+    }
   }
 
   "Successfully validate if the model is complete" when {

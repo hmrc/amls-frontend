@@ -109,7 +109,7 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
             val result = controller.post(2)(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CurrentAddressController.get(2).url))
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.address.routes.CurrentAddressController.get(2).url))
           }
 
         "there is no responsible person for the index" must {

@@ -71,6 +71,15 @@ class status_renewal_incompleteSpec extends AmlsViewSpec with MustMatchers {
 
     }
 
+    "contain fee information and link" in new ViewFixture {
+
+      val endDate = new LocalDate(2017,1,1)
+      def view = views.html.status.status_renewal_incomplete("XAML00000567890", Some("business Name"), Some(endDate), None, false)
+
+      doc.getElementsByClass("statusblock").first().html() must include(Messages("status.fees"))
+      doc.getElementsByClass("statusblock").first().html() must include(Messages("status.howtopay"))
+    }
+
     "not contain the link to change the nominated officer" in new ViewFixture {
 
       val endDate = new LocalDate(2017,1,1)

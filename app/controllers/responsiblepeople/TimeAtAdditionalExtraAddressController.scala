@@ -23,7 +23,7 @@ import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople._
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.time_at_additional_extra_address
+import views.html.responsiblepeople.address.time_at_additional_extra_address
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global

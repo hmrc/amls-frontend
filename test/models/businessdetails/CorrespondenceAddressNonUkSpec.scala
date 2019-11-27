@@ -95,10 +95,10 @@ class CorrespondenceAddressNonUkSpec extends PlaySpec with MockitoSugar {
             Invalid(Seq(
               (Path \ "yourName") -> Seq(ValidationError("error.invalid.yourname")),
               (Path \ "businessName") -> Seq(ValidationError("error.invalid.name.of.business")),
-              (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.max.length.address.line")),
-              (Path \ "addressLineNonUK2") -> Seq(ValidationError("error.max.length.address.line")),
-              (Path \ "addressLineNonUK3") -> Seq(ValidationError("error.max.length.address.line")),
-              (Path \ "addressLineNonUK4") -> Seq(ValidationError("error.max.length.address.line")),
+              (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.max.length.address.line1")),
+              (Path \ "addressLineNonUK2") -> Seq(ValidationError("error.max.length.address.line2")),
+              (Path \ "addressLineNonUK3") -> Seq(ValidationError("error.max.length.address.line3")),
+              (Path \ "addressLineNonUK4") -> Seq(ValidationError("error.max.length.address.line4")),
               (Path \ "country") -> Seq(ValidationError("error.invalid.country"))
             )))
         }

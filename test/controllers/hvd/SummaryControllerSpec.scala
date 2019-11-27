@@ -23,6 +23,7 @@ import models.hvd._
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Element
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
@@ -116,15 +117,12 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
 
-        document.getElementsByTag("section").get(0).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByTag("section").get(1).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByTag("section").get(2).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByTag("section").get(3).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByTag("section").get(4).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByTag("section").get(5).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByTag("section").get(6).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByTag("section").get(7).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByTag("section").get(8).getElementsByTag("a").hasClass("change-answer") must be(true)
+        val answerRows = document.getElementsByClass("cya-summary-list__row").toArray(Array[Element]())
+        answerRows.size mustBe 9
+
+        for ( el <- answerRows ) {
+          el.getElementsByTag("a").hasClass("change-answer") must be(true)
+        }
       }
     }
 

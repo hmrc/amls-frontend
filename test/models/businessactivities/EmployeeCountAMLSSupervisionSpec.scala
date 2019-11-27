@@ -52,7 +52,7 @@ class EmployeeCountAMLSSupervisionSpec extends PlaySpec with MockitoSugar {
 
         EmployeeCountAMLSSupervision.formRule.validate(data) must
           be(Invalid(Seq(
-            (Path \ "employeeCountAMLSSupervision") -> Seq(ValidationError("error.invalid.ba.employee.count"))
+            (Path \ "employeeCountAMLSSupervision") -> Seq(ValidationError("error.empty.ba.mlr.employee.count"))
           )))
       }
 

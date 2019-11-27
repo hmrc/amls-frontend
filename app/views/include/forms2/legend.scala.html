@@ -26,14 +26,15 @@
 )(implicit m: Messages)
 
 <legend>
-    <span class="form-label@if(bold){-bold}@if(legendHidden){ visuallyhidden}">
         @if(heading.nonEmpty) {
-            <div class="page-header"><h1 class="heading-xlarge">@Messages(heading)</h1></div>
+            <div class="page-header form-label@if(bold){-bold}@if(legendHidden){ visuallyhidden}"><h1 class="heading-xlarge">@Messages(heading)</h1></div>
         }
         @if(legend.nonEmpty) {
-            @Messages(legend)
+            <span class="form-label@if(bold){-bold}@if(legendHidden){ visuallyhidden}">
+                @Messages(legend)
+            </span>
         }
-    </span>
+
 </legend>
 @supportingContent
 @if(hint.nonEmpty) {<span id="@if(fieldId.nonEmpty){@fieldId-hint}" class="form-hint clear">@Messages(hint)</span>}

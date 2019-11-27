@@ -33,164 +33,168 @@
     heading = header
 ) {
 
-    @model.products.map { p =>
-        @checkYourAnswers(
-            question = Messages("hvd.products.title"),
-            editUrl = controllers.hvd.routes.ProductsController.get(true).toString,
-            editLinkTag = "hvdproducts-edit"
-        ) {
+    <dl class="cya-summary-list">
 
-            <ul class="list">
-                @p.sorted.map { i =>
-                    <li>@i match {
-                        case Alcohol => {@Messages("hvd.products.option.01")}
-                        case Tobacco => {@Messages("hvd.products.option.02")}
-                        case Antiques => {@Messages("hvd.products.option.03")}
-                        case Cars => {@Messages("hvd.products.option.04")}
-                        case OtherMotorVehicles => {@Messages("hvd.products.option.05")}
-                        case Caravans => {@Messages("hvd.products.option.06")}
-                        case Jewellery => {@Messages("hvd.products.option.07")}
-                        case Gold => {@Messages("hvd.products.option.08")}
-                        case ScrapMetals => {@Messages("hvd.products.option.09")}
-                        case MobilePhones => {@Messages("hvd.products.option.10")}
-                        case Clothing => {@Messages("hvd.products.option.11")}
-                        case Other(x) => {Other: @x}
-                    }</li>
-                }
-            </ul>
-        }
+        @model.products.map { p =>
+            @checkYourAnswersRow(
+                question = Messages("hvd.products.title"),
+                editUrl = controllers.hvd.routes.ProductsController.get(true).toString,
+                editLinkTag = "hvdproducts-edit"
+            ) {
 
-        @if(p.items.contains(Alcohol) | p.items.contains(Tobacco)) {
-            @model.exciseGoods.map { eg =>
-                @checkYourAnswers(
-                    question = Messages("hvd.excise.goods.title"),
-                    editUrl = controllers.hvd.routes.ExciseGoodsController.get(true).toString,
-                    editLinkTag = "hvdexcisegoods-edit"
-                ) {
-                    <p>@if(eg.exciseGoods) {
-                        @Messages("lbl.yes")
-                    } else {
-                        @Messages("lbl.no")
-                    }</p>
-                }
-            }
-        }
-    }
-
-    @model.howWillYouSellGoods.map { goods =>
-        @checkYourAnswers(
-            question = Messages("hvd.how-will-you-sell-goods.title"),
-            editUrl = controllers.hvd.routes.HowWillYouSellGoodsController.get(true).toString,
-            editLinkTag = "hvdsellgoods-edit"
-        ) {
-            <ul class="list">
-                @goods.channels.map { i =>
-                    <li>@i match {
-                    case Retail => {@Messages("hvd.how-will-you-sell-goods.channels.retail")}
-                    case Wholesale => {@Messages("hvd.how-will-you-sell-goods.channels.wholesale")}
-                    case Auction => {@Messages("hvd.how-will-you-sell-goods.channels.auction")}
-                    }</li>
-                }
-            </ul>
-        }
-    }
-
-    @model.cashPayment.map { cp =>
-
-        @checkYourAnswers(
-            question = Messages("hvd.cash.payment.title"),
-            editUrl = controllers.hvd.routes.CashPaymentController.get(true).toString,
-            editLinkTag = "hvdcashpayment-edit"
-        ) {
-            @cp.acceptedPayment match {
-                case CashPaymentOverTenThousandEuros(true) => { <p>@Messages("lbl.yes")</p> }
-                case _ => { <p>@Messages("lbl.no")</p> }
-            }
-        }
-
-        @cp.firstDate match {
-            case Some(CashPaymentFirstDate(date)) => {
-                @checkYourAnswers(
-                    question = Messages("hvd.cash.payment.date.title"),
-                    editUrl = controllers.hvd.routes.CashPaymentFirstDateController.get(true).toString,
-                    editLinkTag = "hvdcashpaymentfirstdate-edit"
-                ) {
-                    <p>@DateHelper.formatDate(date)</p>
-                }
-            }
-            case _ => {}
-        }
-    }
-
-    @model.linkedCashPayment.map { p =>
-        @checkYourAnswers(
-            question = Messages("hvd.identify.linked.cash.payment.title"),
-            editUrl = controllers.hvd.routes.LinkedCashPaymentsController.get(true).toString,
-            editLinkTag = "hvdlinkedcashpayments-edit"
-        ) {
-            <p>@if(p.linkedCashPayments) {
-                @Messages("lbl.yes")
-            } else {
-                @Messages("lbl.no")
-            }</p>
-        }
-    }
-
-    @model.receiveCashPayments.map { rcp =>
-        @checkYourAnswers(
-            question = Messages("hvd.receiving.title"),
-            editLinkTag = "hvdreceivecashpayments-edit",
-            editUrl = controllers.hvd.routes.ReceiveCashPaymentsController.get(true).toString
-        ) {
-            @if(rcp){
-                <p>@Messages("lbl.yes")</p>
-            } else {
-                <p>@Messages("lbl.no")</p>
-            }
-        }
-    }
-
-    @model.cashPaymentMethods.map { pm =>
-        @checkYourAnswers(
-            question = Messages("hvd.receiving.expect.to.receive"),
-            editLinkTag = "hvdcashpaymentmethods-edit",
-            editUrl = controllers.hvd.routes.ExpectToReceiveCashPaymentsController.get(true).toString
-        ) {
-            <ul class="list">
-                @pm match {
-                    case PaymentMethods(false, false, None) => {     <li>Unknown</li> }
-                    case PaymentMethods(false, false, Some(txt)) => {<li>Other: @txt</li> }
-                    case PaymentMethods(false, true, None) => {      <li>@Messages("hvd.receiving.option.02")</li> }
-                    case PaymentMethods(false, true, Some(txt)) => { <li>@Messages("hvd.receiving.option.02")</li>
-                                                                     <li>Other: @txt</li> }
-                    case PaymentMethods(true, false, None) => {      <li>@Messages("hvd.receiving.option.01")</li> }
-                    case PaymentMethods(true, false, Some(txt)) => { <li>@Messages("hvd.receiving.option.01")</li>
-                                                                     <li>Other: @txt</li> }
-                    case PaymentMethods(true, true, None) => {       <li>@Messages("hvd.receiving.option.01")</li>
-                                                                     <li>@Messages("hvd.receiving.option.02")</li> }
-                    case PaymentMethods(true, true, Some(txt)) => {  <li>@Messages("hvd.receiving.option.01")</li>
-                                                                     <li>@Messages("hvd.receiving.option.02")</li>
-                                                                     <li>Other: @txt</li> }
+                <ul class="list list-bullet">
+                    @p.sorted.map { i =>
+                        <li>@i match {
+                            case Alcohol => {@Messages("hvd.products.option.01")}
+                            case Tobacco => {@Messages("hvd.products.option.02")}
+                            case Antiques => {@Messages("hvd.products.option.03")}
+                            case Cars => {@Messages("hvd.products.option.04")}
+                            case OtherMotorVehicles => {@Messages("hvd.products.option.05")}
+                            case Caravans => {@Messages("hvd.products.option.06")}
+                            case Jewellery => {@Messages("hvd.products.option.07")}
+                            case Gold => {@Messages("hvd.products.option.08")}
+                            case ScrapMetals => {@Messages("hvd.products.option.09")}
+                            case MobilePhones => {@Messages("hvd.products.option.10")}
+                            case Clothing => {@Messages("hvd.products.option.11")}
+                            case Other(x) => {@x}
+                        }</li>
                     }
-            </ul>
-        }
-    }
+                </ul>
+            }
 
-    @model.percentageOfCashPaymentOver15000.map { p =>
-        @checkYourAnswers(
-            question = Messages("hvd.percentage.title"),
-            editLinkTag = "hvdpercentcashpayment-edit",
-            editUrl = controllers.hvd.routes.PercentageOfCashPaymentOver15000Controller.get(true).toString
-        ) {
-            <p>@p match {
-                case First => {@Messages("hvd.percentage.lbl.01")}
-                case Second => {@Messages("hvd.percentage.lbl.02")}
-                case Third => {@Messages("hvd.percentage.lbl.03")}
-                case Fourth => {@Messages("hvd.percentage.lbl.04")}
-                case Fifth => {@Messages("hvd.percentage.lbl.05")}
-            }</p>
+            @if(p.items.contains(Alcohol) | p.items.contains(Tobacco)) {
+                @model.exciseGoods.map { eg =>
+                    @checkYourAnswersRow(
+                        question = Messages("hvd.excise.goods.title"),
+                        editUrl = controllers.hvd.routes.ExciseGoodsController.get(true).toString,
+                        editLinkTag = "hvdexcisegoods-edit"
+                    ) {
+                        @if(eg.exciseGoods) {
+                            @Messages("lbl.yes")
+                        } else {
+                            @Messages("lbl.no")
+                        }
+                    }
+                }
+            }
         }
-    }
+
+        @model.howWillYouSellGoods.map { goods =>
+            @checkYourAnswersRow(
+                question = Messages("hvd.how-will-you-sell-goods.title"),
+                editUrl = controllers.hvd.routes.HowWillYouSellGoodsController.get(true).toString,
+                editLinkTag = "hvdsellgoods-edit"
+            ) {
+                <ul class="list list-bullet">
+                    @goods.channels.map { i =>
+                        <li>@i match {
+                        case Retail => {@Messages("hvd.how-will-you-sell-goods.channels.retail")}
+                        case Wholesale => {@Messages("hvd.how-will-you-sell-goods.channels.wholesale")}
+                        case Auction => {@Messages("hvd.how-will-you-sell-goods.channels.auction")}
+                        }</li>
+                    }
+                </ul>
+            }
+        }
+
+        @model.cashPayment.map { cp =>
+
+            @checkYourAnswersRow(
+                question = Messages("hvd.cash.payment.title"),
+                editUrl = controllers.hvd.routes.CashPaymentController.get(true).toString,
+                editLinkTag = "hvdcashpayment-edit"
+            ) {
+                @cp.acceptedPayment match {
+                    case CashPaymentOverTenThousandEuros(true) => { @Messages("lbl.yes") }
+                    case _ => { @Messages("lbl.no") }
+                }
+            }
+
+            @cp.firstDate match {
+                case Some(CashPaymentFirstDate(date)) => {
+                    @checkYourAnswersRow(
+                        question = Messages("hvd.cash.payment.date.title"),
+                        editUrl = controllers.hvd.routes.CashPaymentFirstDateController.get(true).toString,
+                        editLinkTag = "hvdcashpaymentfirstdate-edit"
+                    ) {
+                        @DateHelper.formatDate(date)
+                    }
+                }
+                case _ => {}
+            }
+        }
+
+        @model.linkedCashPayment.map { p =>
+            @checkYourAnswersRow(
+                question = Messages("hvd.identify.linked.cash.payment.title"),
+                editUrl = controllers.hvd.routes.LinkedCashPaymentsController.get(true).toString,
+                editLinkTag = "hvdlinkedcashpayments-edit"
+            ) {
+                @if(p.linkedCashPayments) {
+                    @Messages("lbl.yes")
+                } else {
+                    @Messages("lbl.no")
+                }
+            }
+        }
+
+        @model.receiveCashPayments.map { rcp =>
+            @checkYourAnswersRow(
+                question = Messages("hvd.receiving.title"),
+                editLinkTag = "hvdreceivecashpayments-edit",
+                editUrl = controllers.hvd.routes.ReceiveCashPaymentsController.get(true).toString
+            ) {
+                @if(rcp){
+                    <p>@Messages("lbl.yes")</p>
+                } else {
+                    <p>@Messages("lbl.no")</p>
+                }
+            }
+        }
+
+        @model.cashPaymentMethods.map { pm =>
+            @checkYourAnswersRow(
+                question = Messages("hvd.receiving.expect.to.receive"),
+                editLinkTag = "hvdcashpaymentmethods-edit",
+                editUrl = controllers.hvd.routes.ExpectToReceiveCashPaymentsController.get(true).toString
+            ) {
+                <ul class="list list-bullet">
+                    @pm match {
+                        case PaymentMethods(false, false, None) => {     <li>Unknown</li> }
+                        case PaymentMethods(false, false, Some(txt)) => {<li>@txt</li> }
+                        case PaymentMethods(false, true, None) => {      <li>@Messages("hvd.receiving.option.02")</li> }
+                        case PaymentMethods(false, true, Some(txt)) => { <li>@Messages("hvd.receiving.option.02")</li>
+                                                                         <li>@txt</li> }
+                        case PaymentMethods(true, false, None) => {      <li>@Messages("hvd.receiving.option.01")</li> }
+                        case PaymentMethods(true, false, Some(txt)) => { <li>@Messages("hvd.receiving.option.01")</li>
+                                                                         <li>@txt</li> }
+                        case PaymentMethods(true, true, None) => {       <li>@Messages("hvd.receiving.option.01")</li>
+                                                                         <li>@Messages("hvd.receiving.option.02")</li> }
+                        case PaymentMethods(true, true, Some(txt)) => {  <li>@Messages("hvd.receiving.option.01")</li>
+                                                                         <li>@Messages("hvd.receiving.option.02")</li>
+                                                                         <li>@txt</li> }
+                        }
+                </ul>
+            }
+        }
+
+        @model.percentageOfCashPaymentOver15000.map { p =>
+            @checkYourAnswersRow(
+                question = Messages("hvd.percentage.title"),
+                editLinkTag = "hvdpercentcashpayment-edit",
+                editUrl = controllers.hvd.routes.PercentageOfCashPaymentOver15000Controller.get(true).toString
+            ) {
+                @p match {
+                    case First => {@Messages("hvd.percentage.lbl.01")}
+                    case Second => {@Messages("hvd.percentage.lbl.02")}
+                    case Third => {@Messages("hvd.percentage.lbl.03")}
+                    case Fourth => {@Messages("hvd.percentage.lbl.04")}
+                    case Fifth => {@Messages("hvd.percentage.lbl.05")}
+                }
+            }
+        }
+
+    </dl>
 
     @form(f, controllers.hvd.routes.SummaryController.post()) {
         @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)

@@ -33,97 +33,96 @@
     heading = header
 ) {
 
-    @checkYourAnswers(
-        question = Messages("tcsp.kind.of.service.provider.title"),
-        editLinkTag = "tcspkindserviceprovider-edit",
-        editUrl = controllers.tcsp.routes.TcspTypesController.get(true).toString
-    ) {
+    <dl class="cya-summary-list">
 
-        <ul class="list">
-        @sortedProviders.map{line =>
-            <li>@line</li>
-        }
-        </ul>
-    }
-
-    @model.onlyOffTheShelfCompsSold.map { s =>
-        @checkYourAnswers(
-            question = Messages("tcsp.off-the-shelf.companies.lbl"),
-            editLinkTag = "onlyOffTheShelfCompsSold-edit",
-            editUrl = controllers.tcsp.routes.OnlyOffTheShelfCompsSoldController.get(true).toString
+        @checkYourAnswersRow(
+            question = Messages("tcsp.kind.of.service.provider.title"),
+            editLinkTag = "tcspkindserviceprovider-edit",
+            editUrl = controllers.tcsp.routes.TcspTypesController.get(true).toString
         ) {
-            <p>
-            @s match {
-                case OnlyOffTheShelfCompsSoldNo => { @Messages("lbl.no") }
-                case OnlyOffTheShelfCompsSoldYes => { @Messages("lbl.yes") }
-            }
-            </p>
-        }
-    }
 
-    @model.complexCorpStructureCreation.map { s =>
-        @checkYourAnswers(
-            question = Messages("tcsp.create.complex.corporate.structures.lbl"),
-            editLinkTag = "complexCorpStructureCreation-edit",
-            editUrl = controllers.tcsp.routes.ComplexCorpStructureCreationController.get(true).toString
-        ) {
-            <p>
-            @s match {
-                case ComplexCorpStructureCreationNo => { @Messages("lbl.no") }
-                case ComplexCorpStructureCreationYes => { @Messages("lbl.yes") }
-            }
-            </p>
+            <ul class="list list-bullet">
+                @sortedProviders.map{line =>
+                    <li>@line</li>
+              }
+            </ul>
         }
-    }
 
-    @model.tcspTypes.map { v =>
-        @if(v.serviceProviders.contains(RegisteredOfficeEtc)) {
-            @checkYourAnswers(
-                question = Messages("tcsp.provided_services.title"),
-                editLinkTag = "tcsptypes-edit",
-                editUrl = controllers.tcsp.routes.ProvidedServicesController.get(true).toString
+        @model.onlyOffTheShelfCompsSold.map { s =>
+            @checkYourAnswersRow(
+                question = Messages("tcsp.off-the-shelf.companies.lbl"),
+                editLinkTag = "onlyOffTheShelfCompsSold-edit",
+                editUrl = controllers.tcsp.routes.OnlyOffTheShelfCompsSoldController.get(true).toString
             ) {
-                <ul class="list">
-                    @model.providedServices.map { a =>
-                        @a.services.toSeq.filterNot(_.isInstanceOf[Other]).sortBy(_.getMessage).map { x =>
-                            <li>@x.getMessage</li>
-                        }
-                        @a.services.toSeq.filter(_.isInstanceOf[Other]).sortBy(_.getMessage).map { x =>
-                            <li>@x.getMessage</li>
-                        }
-                    }
-                </ul>
+                @s match {
+                    case OnlyOffTheShelfCompsSoldNo => { @Messages("lbl.no") }
+                    case OnlyOffTheShelfCompsSoldYes => { @Messages("lbl.yes") }
+                }
             }
         }
-    }
 
-    @checkYourAnswers(
-        question = Messages("tcsp.servicesOfAnotherTcsp.title"),
-        editLinkTag = "servicesofanothertcsp-edit",
-        editUrl = controllers.tcsp.routes.ServicesOfAnotherTCSPController.get(true).toString
-    ) {
-        <p>@model.doesServicesOfAnotherTCSP.map {
-            case true => { @Messages("lbl.yes") }
-            case false => { @Messages("lbl.no") }
-        }</p>
-    }
-
-    @model.servicesOfAnotherTCSP.map { s =>
-
-        @checkYourAnswers(
-            question = Messages("tcsp.anothertcspsupervision.title"),
-            editLinkTag = "servicesofanothertcsp-edit",
-            editUrl = controllers.tcsp.routes.AnotherTCSPSupervisionController.get(true).toString
-        ) {
-            <p>
+        @model.complexCorpStructureCreation.map { s =>
+            @checkYourAnswersRow(
+                question = Messages("tcsp.create.complex.corporate.structures.lbl"),
+                editLinkTag = "complexCorpStructureCreation-edit",
+                editUrl = controllers.tcsp.routes.ComplexCorpStructureCreationController.get(true).toString
+            ) {
                 @s match {
-                    case ServicesOfAnotherTCSPNo => { @Messages("lbl.no") }
-                    case ServicesOfAnotherTCSPYes(v) => { @Messages("tcsp.cya.mlrregno"): @v }
+                    case ComplexCorpStructureCreationNo => { @Messages("lbl.no") }
+                    case ComplexCorpStructureCreationYes => { @Messages("lbl.yes") }
                 }
-            </p>
+            }
         }
 
-    }
+        @model.tcspTypes.map { v =>
+            @if(v.serviceProviders.contains(RegisteredOfficeEtc)) {
+                @checkYourAnswersRow(
+                    question = Messages("tcsp.provided_services.title"),
+                    editLinkTag = "tcsptypes-edit",
+                    editUrl = controllers.tcsp.routes.ProvidedServicesController.get(true).toString
+                ) {
+                    <ul class="list list-bullet">
+                        @model.providedServices.map { a =>
+                            @a.services.toSeq.filterNot(_.isInstanceOf[Other]).sortBy(_.getMessage).map { x =>
+                                <li>@x.getMessage</li>
+                            }
+                            @a.services.toSeq.filter(_.isInstanceOf[Other]).sortBy(_.getMessage).map { x =>
+                                <li>@x.getMessage</li>
+                            }
+                        }
+                    </ul>
+                }
+            }
+        }
+
+        @checkYourAnswersRow(
+            question = Messages("tcsp.servicesOfAnotherTcsp.title"),
+            editLinkTag = "servicesofanothertcsp-edit",
+            editUrl = controllers.tcsp.routes.ServicesOfAnotherTCSPController.get(true).toString
+        ) {
+            @model.doesServicesOfAnotherTCSP.map {
+                case true => { @Messages("lbl.yes") }
+                case false => { @Messages("lbl.no") }
+            }
+        }
+
+        @model.servicesOfAnotherTCSP.map { s =>
+
+            @checkYourAnswersRow(
+                question = Messages("tcsp.anothertcspsupervision.title"),
+                editLinkTag = "servicesofanothertcsp-edit",
+                editUrl = controllers.tcsp.routes.AnotherTCSPSupervisionController.get(true).toString
+            ) {
+                    @s match {
+                        case ServicesOfAnotherTCSPNo => { @Messages("lbl.no") }
+                        case ServicesOfAnotherTCSPYes(v) => { @Messages("tcsp.cya.mlrregno"): @v }
+                    }
+            }
+
+        }
+
+    </dl>
+
     @form(EmptyForm, controllers.tcsp.routes.SummaryController.post()) {
         @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), false)
     }

@@ -54,7 +54,7 @@ class TransactionTypeSpec extends PlaySpec with MustMatchers {
         )
 
         TransactionTypes.formRule.validate(model) must
-          be(Invalid(List((Path \ "name", Seq(ValidationError("error.invalid.maxlength.40"))))))
+          be(Invalid(List((Path \ "name", Seq(ValidationError("error.max.length.ba.software.package.name"))))))
       }
 
       "software name contains invalid characters" in {
@@ -64,7 +64,7 @@ class TransactionTypeSpec extends PlaySpec with MustMatchers {
         )
 
         TransactionTypes.formRule.validate(model) must
-          be(Invalid(List((Path \ "name", Seq(ValidationError("err.text.validation"))))))
+          be(Invalid(List((Path \ "name", Seq(ValidationError("error.invalid.characters.ba.software.package.name"))))))
       }
 
       "no check boxes are selected in transactions" in {

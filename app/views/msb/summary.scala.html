@@ -34,9 +34,11 @@
     heading = header
 ) {
 
+    <dl class="cya-summary-list">
+
     @bmMsbServices.map { services =>
         @model.throughput.map { throughput =>
-            @checkYourAnswers(
+            @checkYourAnswersRow(
                 question = Messages("msb.throughput.title"),
                 editLinkTag = "msbthroughput-edit",
                 editUrl = controllers.msb.routes.ExpectedThroughputController.get(true).toString
@@ -68,7 +70,7 @@
         }
 
         @model.branchesOrAgents.map { boa =>
-                @checkYourAnswers(
+                @checkYourAnswersRow(
                     question = Messages("msb.branchesoragents.title"),
                     editLinkTag = "msbbranchesoragents-edit",
                     editUrl = controllers.msb.routes.BranchesOrAgentsController.get(true).toString
@@ -85,13 +87,13 @@
 
                 @boa.hasCountries match {
                     case BranchesOrAgentsHasCountries(true) => {
-                        @checkYourAnswers(
+                        @checkYourAnswersRow(
                             question = Messages("msb.branchesoragents.countries.title"),
                             editLinkTag = "msbwhichcountries-edit",
                             editUrl = controllers.msb.routes.BranchesOrAgentsWhichCountriesController.get(true).toString
                         ) {
                             @boa.branches.map { branches =>
-                                <ul class="list list--comma">
+                                <ul class="list list-bullet">
                                     @branches.branches.map { country => <li>@country</li> }
                                 </ul>
                             }
@@ -103,7 +105,7 @@
         }
 
         @model.identifyLinkedTransactions.map { ilt =>
-            @checkYourAnswers(
+            @checkYourAnswersRow(
                 question = Messages("msb.linked.txn.title"),
                 editLinkTag = "msblinkedtransactions-edit",
                 editUrl = controllers.msb.routes.IdentifyLinkedTransactionsController.get(true).toString
@@ -121,7 +123,7 @@
 
         @if(services.msbServices.contains(TransmittingMoney)) {
             @model.businessUseAnIPSP.map { ipsp =>
-                @checkYourAnswers(
+                @checkYourAnswersRow(
                     question = Messages("msb.ipsp.title"),
                     editLinkTag = "msbipsp-edit",
                     editUrl = controllers.msb.routes.BusinessUseAnIPSPController.get(true).toString
@@ -141,7 +143,7 @@
             }
 
             @model.fundsTransfer.map { ft =>
-                @checkYourAnswers(
+                @checkYourAnswersRow(
                     question = Messages("msb.fundstransfer.title"),
                     editLinkTag = "msbfundstransfer-edit",
                     editUrl = controllers.msb.routes.FundsTransferController.get(true).toString
@@ -158,7 +160,7 @@
             }
 
             @model.transactionsInNext12Months.map { trans =>
-                @checkYourAnswers(
+                @checkYourAnswersRow(
                     question = Messages("msb.transactions.expected.title"),
                     editLinkTag = "msbtransactionsexpected-edit",
                     editUrl = controllers.msb.routes.TransactionsInNext12MonthsController.get(true).toString
@@ -168,7 +170,7 @@
             }
 
             @model.sendMoneyToOtherCountry.map { otherCountries =>
-                @checkYourAnswers(
+                @checkYourAnswersRow(
                     question = Messages("msb.send.money.title"),
                     editLinkTag = "msbsendmoneytoothercountries-edit",
                     editUrl = controllers.msb.routes.SendMoneyToOtherCountryController.get(true).toString
@@ -185,12 +187,12 @@
 
                 @if(otherCountries.money) {
                     @model.sendTheLargestAmountsOfMoney.map { lom =>
-                        @checkYourAnswers(
+                        @checkYourAnswersRow(
                             question = Messages("msb.send.the.largest.amounts.of.money.title"),
                             editLinkTag = "msbsendlargestamounts-edit",
                             editUrl = controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true).toString
                         ) {
-                            <ul class="list list--comma">
+                            <ul class="list list-bullet">
                             @lom.countries.map { country =>
                                 <li>@country.name</li>
                             }
@@ -199,12 +201,12 @@
                     }
 
                     @model.mostTransactions.map { mt =>
-                        @checkYourAnswers(
+                        @checkYourAnswersRow(
                             question = Messages("msb.most.transactions.title"),
                             editLinkTag = "msbmosttransactions-edit",
                             editUrl = controllers.msb.routes.MostTransactionsController.get(true).toString
                         ) {
-                            <ul class="list list--comma">
+                            <ul class="list list-bullet">
                             @mt.countries.map { country =>
                                 <li>@country.name</li>
                             }
@@ -217,7 +219,7 @@
 
         @if(services.msbServices.contains(CurrencyExchange)) {
             @model.ceTransactionsInNext12Months.map { trans =>
-                @checkYourAnswers(
+                @checkYourAnswersRow(
                     question = Messages("msb.ce.transactions.expected.in.12.months.title"),
                     editLinkTag = "msbcetransactionsexpected-edit",
                     editUrl = controllers.msb.routes.CETransactionsInNext12MonthsController.get(true).toString
@@ -227,7 +229,7 @@
             }
 
             @model.whichCurrencies.map { wc =>
-                @checkYourAnswers(
+                @checkYourAnswersRow(
                     question = Messages("msb.which_currencies.title"),
                     editLinkTag = "msbwhichcurrencies-edit",
                     editUrl = controllers.msb.routes.WhichCurrenciesController.get(true).toString
@@ -242,7 +244,7 @@
 
             @model.whichCurrencies.map { wc =>
                 @wc.usesForeignCurrencies.map { ufc =>
-                    @checkYourAnswers(
+                    @checkYourAnswersRow(
                         question = Messages("msb.deal_foreign_currencies.title"),
                         editLinkTag = "msbwhichcurrencies-edit",
                         editUrl = controllers.msb.routes.UsesForeignCurrenciesController.get(true).toString
@@ -262,7 +264,7 @@
             @model.whichCurrencies.map { wc =>
                 @wc.moneySources.map { ms =>
                     @if(ms.bankMoneySource.isDefined | ms.wholesalerMoneySource.isDefined | ms.customerMoneySource.isDefined){
-                        @checkYourAnswers(
+                        @checkYourAnswersRow(
                             question = Messages("msb.supply_foreign_currencies.title"),
                             editLinkTag = "msbwhichcurrencies-edit",
                             editUrl = controllers.msb.routes.MoneySourcesController.get(true).toString
@@ -286,7 +288,7 @@
 
         @if(services.msbServices.contains(ForeignExchange)) {
             @model.fxTransactionsInNext12Months.map { trans =>
-                @checkYourAnswers(
+                @checkYourAnswersRow(
                     question = Messages("msb.fx.transactions.expected.in.12.months.title"),
                     editLinkTag = "msbfxtransactionsexpected-edit",
                     editUrl = controllers.msb.routes.FXTransactionsInNext12MonthsController.get(true).toString
@@ -296,6 +298,9 @@
             }
         }
     }
+
+    </dl>
+
     @form(EmptyForm, controllers.msb.routes.SummaryController.post()) {
         @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), false)
     }

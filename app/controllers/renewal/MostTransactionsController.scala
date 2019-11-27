@@ -85,7 +85,7 @@ class MostTransactionsController @Inject()(val authAction: AuthAction,
         case (x, _) if x.contains(CurrencyExchange) => Redirect(routes.CETransactionsInLast12MonthsController.get())
         case (x, _) if x.contains(ForeignExchange) => Redirect(routes.FXTransactionsInLast12MonthsController.get())
         case (_, x) if x.contains(HighValueDealing) && x.contains(AccountancyServices) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
-        case (_, x) if x.contains(HighValueDealing) => Redirect(routes.CustomersOutsideIsUKController.get())
+        case (_, x) if x.contains(HighValueDealing) || x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideIsUKController.get())
         case _ => Redirect(routes.SummaryController.get())
       }
   }

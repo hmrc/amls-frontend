@@ -34,12 +34,11 @@ class LegalNameChangeDateController @Inject()(val dataCacheConnector: DataCacheC
                                               val ds: CommonPlayDependencies,
                                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
-
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>
         getData[ResponsiblePerson](request.credId, index) map {
           case Some(ResponsiblePerson(Some(personName),_,Some(changeDate),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-          => Ok(legal_name_change_date(Form2[LegalNameChangeDate](LegalNameChangeDate(changeDate)), edit, index, flow, personName.titleName ))
+          => Ok(legal_name_change_date(Form2[LegalNameChangeDate](LegalNameChangeDate(changeDate)), edit, index, flow, personName.titleName))
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(legal_name_change_date(EmptyForm, edit, index, flow, personName.titleName))
           case _
@@ -69,5 +68,4 @@ class LegalNameChangeDateController @Inject()(val dataCacheConnector: DataCacheC
         }
       }
   }
-
 }

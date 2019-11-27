@@ -185,7 +185,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
         }
 
         "go to PercentageOfCashPaymentOver15000Controller" when {
-          "activities include hvd and asp" in new RenewalModelFormSubmissionFixture {
+          "activities include both hvd AND asp" in new RenewalModelFormSubmissionFixture {
             setupBusinessMatching(Set(HighValueDealing, AccountancyServices))
 
             post() { result =>
@@ -195,8 +195,17 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
           }
         }
         "go to the CustomersOutsideIsUKController" when {
-          "activities include hvd and NOT asp" in new RenewalModelFormSubmissionFixture {
+          "activities dot not include ASP and HVD however includes hvd" in new RenewalModelFormSubmissionFixture {
             setupBusinessMatching(Set(HighValueDealing))
+
+            post() { result =>
+              result.header.status mustBe SEE_OTHER
+              result.header.headers.get("Location") mustEqual routes.CustomersOutsideIsUKController.get().url.some
+            }
+          }
+
+          "activities dot not include ASP and HVD however includes ASP" in new RenewalModelFormSubmissionFixture {
+            setupBusinessMatching(Set(AccountancyServices))
 
             post() { result =>
               result.header.status mustBe SEE_OTHER

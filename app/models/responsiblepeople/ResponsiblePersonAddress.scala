@@ -39,6 +39,12 @@ object ResponsiblePersonAddress {
     (__.read(validateCountry) ~ (__ \ "timeAtAddress").read[Option[TimeAtAddress]]) (ResponsiblePersonAddress.apply _)
 }
 
+  def addressFormRule(paFormRule: Rule[UrlFormEncoded, PersonAddress]): Rule[UrlFormEncoded, ResponsiblePersonAddress] = From[UrlFormEncoded] { __ =>
+
+    import jto.validation.forms.Rules._
+    (__.read(paFormRule andThen validateCountry) ~ (__ \ "timeAtAddress").read[Option[TimeAtAddress]]) (ResponsiblePersonAddress.apply _)
+  }
+
   implicit val formWrites: Write[ResponsiblePersonAddress, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
     import jto.validation.forms.Writes._
     import play.api.libs.functional.syntax.unlift

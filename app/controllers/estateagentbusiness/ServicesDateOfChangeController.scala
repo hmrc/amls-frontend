@@ -22,8 +22,8 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.DateOfChange
 import models.businessdetails.BusinessDetails
-import models.estateagentbusiness.EstateAgentBusiness
 import play.api.mvc.MessagesControllerComponents
+import models.estateagentbusiness.{EstateAgentBusiness, Residential}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -58,7 +58,10 @@ class ServicesDateOfChangeController  @Inject()( val dataCacheConnector: DataCac
                       case None => eab
                     })
                 } yield {
-                  Redirect(routes.SummaryController.get())
+                  eab.services.map(candidate => candidate.services.contains(Residential)) match {
+                    case Some(true) => Redirect(routes.ResidentialRedressSchemeController.get(true))
+                    case _          => Redirect(routes.SummaryController.get())
+                  }
                 }
               }
             }

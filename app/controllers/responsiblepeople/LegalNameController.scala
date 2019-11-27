@@ -16,10 +16,10 @@
 
 package controllers.responsiblepeople
 
-import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.{Inject, Singleton}
 import models.responsiblepeople.{PreviousName, ResponsiblePerson}
 import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
@@ -48,30 +48,35 @@ class LegalNameController @Inject()(val dataCacheConnector: DataCacheConnector,
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request => {
+
+        def processForm(data: PreviousName) = {
+          for {
+            _ <- {
+              data.hasPreviousName match {
+                case Some(true) => updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
+                  rp.legalName(data)
+                }
+                case Some(false) => updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
+                  rp.legalName(PreviousName(Some(false), None, None, None)).copy(legalNameChangeDate = None)
+                }
+              }
+            }
+          } yield edit match {
+            case true if data.hasPreviousName.contains(true) => Redirect(routes.LegalNameInputController.get(index, edit, flow))
+            case true => Redirect(routes.DetailedAnswersController.get(index, flow))
+            case false if data.hasPreviousName.contains(true) => Redirect(routes.LegalNameInputController.get(index, edit, flow))
+            case _ => Redirect(routes.KnownByController.get(index, edit, flow))
+          }
+        }
+
         Form2[PreviousName](request.body) match {
+          case f: InvalidForm if isHasPreviousNameTrue(f) => processForm(getModelFromForm(f))
           case f: InvalidForm =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
               BadRequest(views.html.responsiblepeople.legal_name(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
-            for {
-              _ <- {
-                data.hasPreviousName match {
-                  case Some(true) => updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
-                    rp.legalName(data)
-                  }
-                  case Some(false) => updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
-                    rp.legalName(PreviousName(Some(false), None, None, None)).copy(legalNameChangeDate = None)
-                  }
-                }
-              }
-            } yield edit match {
-              case true if data.hasPreviousName.contains(true) => Redirect(routes.LegalNameChangeDateController.get(index, edit, flow))
-              case true => Redirect(routes.DetailedAnswersController.get(index, flow))
-              case false if data.hasPreviousName.contains(true) =>
-                Redirect(routes.LegalNameChangeDateController.get(index, edit, flow))
-              case _ => Redirect(routes.KnownByController.get(index, edit, flow))
-            }
+            processForm(data)
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
@@ -79,4 +84,14 @@ class LegalNameController @Inject()(val dataCacheConnector: DataCacheConnector,
       }
   }
 
+  private def isHasPreviousNameTrue(form: InvalidForm) =
+    form.data.get("hasPreviousName").contains(Seq("true"))
+
+  private def getModelFromForm(form: InvalidForm) = {
+    val firstName = form.data.get("firstName").map(_.head)
+    val middleName = form.data.get("middleName").map(_.head)
+    val lastName = form.data.get("lastName").map(_.head)
+
+    PreviousName(Some(true), firstName, middleName, lastName)
+  }
 }

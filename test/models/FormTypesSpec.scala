@@ -19,6 +19,7 @@ package models
 import controllers.responsiblepeople.NinoUtil
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{Invalid, Path, Valid, ValidationError}
+import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.domain.Nino
 
@@ -55,7 +56,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
 
       postcodeType.validate("") must
         be(Invalid(Seq(
-          Path -> Seq(ValidationError("error.invalid.postcode"))
+          Path -> Seq(ValidationError("error.required.postcode"))
         )))
     }
 
@@ -88,7 +89,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
 
       vrnType.validate("1" * 10) must
         be(Invalid(Seq(
-          Path -> Seq(ValidationError("error.invalid.vat.number"))
+          Path -> Seq(ValidationError("error.invalid.vat.number.length"))
         )))
     }
   }
@@ -184,7 +185,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
 
       emailType.validate("1" * 101) must
         be(Invalid(Seq(
-          Path -> Seq(ValidationError("error.max.length.rp.email"))
+          Path -> Seq(ValidationError("error.invalid.email.max.length"))
         )))
     }
   }
@@ -627,6 +628,118 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
       FormTypes.accountNameType.validate(symbols5.mkString("")) must be (
         Invalid(Seq(Path -> Seq(ValidationError("err.text.validation"))))
       )
+    }
+  }
+
+  "newLocalDateRuleWithPattern" must {
+    "succesfully validate valid date" in {
+      val data = Map(
+        "day" -> Seq("24"),
+        "month" -> Seq("2"),
+        "year" -> Seq("1990")
+      )
+
+      newLocalDateRuleWithPattern.validate(data) mustBe Valid(LocalDate.parse("1990-02-24"))
+    }
+
+    "fail validation when date not supplied" in {
+      val data = Map(
+        "day" -> Seq(""),
+        "month" -> Seq(""),
+        "year" -> Seq("")
+      )
+
+      newLocalDateRuleWithPattern.validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.required.date.year.month.day"))))
+    }
+
+    "fail validation when day not supplied" in {
+      val data = Map(
+        "day" -> Seq(""),
+        "month" -> Seq("1"),
+        "year" -> Seq("1990")
+      )
+
+      newLocalDateRuleWithPattern.validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.required.date.day"))))
+    }
+
+    "fail validation when month not supplied" in {
+      val data = Map(
+        "day" -> Seq("1"),
+        "month" -> Seq(""),
+        "year" -> Seq("1990")
+      )
+
+      newLocalDateRuleWithPattern.validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.required.date.month"))))
+    }
+
+    "fail validation when year not supplied" in {
+      val data = Map(
+        "day" -> Seq("1"),
+        "month" -> Seq("1"),
+        "year" -> Seq("")
+      )
+
+      newLocalDateRuleWithPattern.validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.required.date.year"))))
+    }
+
+    "fail validation when day and month not supplied" in {
+      val data = Map(
+        "day" -> Seq(""),
+        "month" -> Seq(""),
+        "year" -> Seq("1990")
+      )
+
+      newLocalDateRuleWithPattern.validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.required.date.month.day"))))
+    }
+
+    "fail validation when day and year not supplied" in {
+      val data = Map(
+        "day" -> Seq(""),
+        "month" -> Seq("1"),
+        "year" -> Seq("")
+      )
+
+      newLocalDateRuleWithPattern.validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.required.date.year.day"))))
+    }
+
+    "fail validation when month and year not supplied" in {
+      val data = Map(
+        "day" -> Seq("1"),
+        "month" -> Seq(""),
+        "year" -> Seq("")
+      )
+
+      newLocalDateRuleWithPattern.validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.required.date.year.month"))))
+    }
+
+    "fail validation when not real date supplied" in {
+      val data = Map(
+        "day" -> Seq("30"),
+        "month" -> Seq("2"),
+        "year" -> Seq("1990")
+      )
+
+      newLocalDateRuleWithPattern.validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.invalid.date.not.real"))))
+    }
+
+    "fail validation when date before 1900" in {
+      val data = Map(
+        "day" -> Seq("31"),
+        "month" -> Seq("12"),
+        "year" -> Seq("1899")
+      )
+
+      newAllowedPastAndFutureDateRule.validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.invalid.date.after.1900"))))
+    }
+
+    "fail validation when date after 2099" in {
+      val data = Map(
+        "day" -> Seq("1"),
+        "month" -> Seq("1"),
+        "year" -> Seq("2100")
+      )
+
+      newAllowedPastAndFutureDateRule.validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.invalid.date.before.2100"))))
     }
   }
 

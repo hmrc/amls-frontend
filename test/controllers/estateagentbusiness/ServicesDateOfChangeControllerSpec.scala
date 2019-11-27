@@ -19,7 +19,7 @@ package controllers.estateagentbusiness
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.businessdetails.{ActivityStartDate, BusinessDetails}
-import models.estateagentbusiness.EstateAgentBusiness
+import models.estateagentbusiness._
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -51,7 +51,7 @@ class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar  {
       contentAsString(result) must include(Messages("summary.estateagentbusiness"))
     }
 
-    "submit with valid data" in new Fixture {
+    "submit with valid data and redirect to CYA for non residential" in new Fixture {
 
       val newRequest = requestWithUrlEncodedBody(
         "dateOfChange.day" -> "24",
@@ -59,12 +59,14 @@ class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar  {
         "dateOfChange.year" -> "1990"
       )
 
+      val eab = EstateAgentBusiness(Some(Services(Set(Commercial),None)),None,None)
+
       val mockCacheMap = mock[CacheMap]
       when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
-        .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
+        .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 22))))))
 
       when(mockCacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key))
-        .thenReturn(None)
+        .thenReturn(Some(eab))
 
       when(controller.dataCacheConnector.fetchAll(any())( any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -75,6 +77,34 @@ class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar  {
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.SummaryController.get().url))
+    }
+
+    "submit and redirect to redress scheme for residential" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "dateOfChange.day" -> "24",
+        "dateOfChange.month" -> "2",
+        "dateOfChange.year" -> "1990"
+      )
+
+      val eab = EstateAgentBusiness(Some(Services(Set(Residential),None)),None,None)
+
+      val mockCacheMap = mock[CacheMap]
+      when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
+        .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 22))))))
+
+      when(mockCacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key))
+        .thenReturn(Some(eab))
+
+      when(controller.dataCacheConnector.fetchAll(any())( any()))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any(), any())
+        ( any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.ResidentialRedressSchemeController.get(true).url))
     }
 
     "fail submission when invalid date is supplied" in new Fixture {

@@ -48,8 +48,10 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
                                    val parser: BodyParsers.Default)
                                   (implicit val executionContext: ExecutionContext) extends AuthAction with AuthorisedFunctions {
 
-  private val amlsKey              = "HMRC-MLR-ORG"
-  private val amlsNumberKey        = "MLRRefNumber"
+  private val amlsKey       = "HMRC-MLR-ORG"
+  private val amlsNumberKey = "MLRRefNumber"
+  private val saKey         = "IR-SA"
+  private val ctKey         = "IR-CT"
 
   private lazy val unauthorisedUrl = URLEncoder.encode(
     ReturnLocation(controllers.routes.AmlsController.unauthorised_role()).absoluteUrl, "utf-8"
@@ -62,13 +64,14 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
 
-    authorised(User).retrieve(
-      Retrievals.allEnrolments and
+    authorised(authPredicate)
+      .retrieve(
+        Retrievals.allEnrolments and
         Retrievals.credentials and
         Retrievals.affinityGroup and
         Retrievals.groupIdentifier and
         Retrievals.credentialRole
-    ) {
+      ) {
       case enrolments ~ Some(credentials) ~ Some(affinityGroup) ~ groupIdentifier ~ credentialRole =>
         Logger.debug("DefaultAuthAction:Refine - Enrolments:" + enrolments)
 
@@ -117,12 +120,24 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
     }
   }
 
+  private def authPredicate = {
+    User and (AffinityGroup.Organisation or (Enrolment(saKey) or Enrolment(ctKey)))
+  }
+
   private def amlsRefNo(enrolments: Enrolments): Option[String] = {
     val amlsRefNumber = for {
       enrolment      <- enrolments.getEnrolment(amlsKey)
       amlsIdentifier <- enrolment.getIdentifier(amlsNumberKey)
     } yield amlsIdentifier.value
     amlsRefNumber
+  }
+
+  private def getActiveEnrolment(enrolments: Enrolments, key: String) = {
+    /*
+    *  Look for activated enrolments only for SA and CT.
+    *  Enrolments can be 'Activated' or 'NotYetActivated'.
+    */
+    enrolments.getEnrolment(key).filter(e => e.isActivated)
   }
 
   private def accountTypeAndId(affinityGroup: AffinityGroup,
@@ -146,12 +161,12 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
       case _ =>
 
         val sa = for {
-          enrolment <- enrolments.getEnrolment("IR-SA")
+          enrolment <- getActiveEnrolment(enrolments, saKey)
           utr       <- enrolment.getIdentifier("UTR")
         } yield "sa" -> utr.value
 
         val ct = for {
-          enrolment <- enrolments.getEnrolment("IR-CT")
+          enrolment <- getActiveEnrolment(enrolments, ctKey)
           utr       <- enrolment.getIdentifier("UTR")
         } yield "ct" -> utr.value
 

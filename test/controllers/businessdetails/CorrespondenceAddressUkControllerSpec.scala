@@ -213,9 +213,12 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
         val errorCount = 4
         val elementsWithError : Elements = document.getElementsByClass("error-notification")
         elementsWithError.size() must be(errorCount)
-        for (ele: Element <- elementsWithError) {
-          ele.html() must include(Messages("err.text.validation"))
-        }
+
+        elementsWithError.map(_.text()) must contain allOf(
+          "Error: " + Messages("error.text.validation.address.line1"),
+          "Error: " + Messages("error.text.validation.address.line2"),
+          "Error: " + Messages("error.text.validation.address.line3"),
+          "Error: " + Messages("error.text.validation.address.line4"))
       }
 
       "an invalid form request is sent in the body" in new Fixture {

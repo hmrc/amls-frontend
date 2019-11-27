@@ -79,6 +79,17 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
         }
       }
 
+      "the user has inactive credentials for sa" must {
+        "redirect the user to amls frontend" in {
+          val authAction = new DefaultAuthAction(fakeAuthConnector(agentSaAuthRetrievalsInactive))
+          val controller = new Harness(authAction)
+
+          val result = controller.onPageLoad()(fakeRequest)
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(unauthorised)
+        }
+      }
+
       "the user has valid credentials for ct" must {
         "redirect the user to amls frontend" in {
           val authAction = new DefaultAuthAction(fakeAuthConnector(agentCtAuthRetrievals), mockApplicationConfig, mockParser)
@@ -86,6 +97,16 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
 
           val result = controller.onPageLoad()(fakeRequest)
           status(result) mustBe OK
+        }
+      }
+      "the user has inactive credentials for ct" must {
+        "redirect the user to amls frontend" in {
+          val authAction = new DefaultAuthAction(fakeAuthConnector(agentCtAuthRetrievalsInactive))
+          val controller = new Harness(authAction)
+
+          val result = controller.onPageLoad()(fakeRequest)
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(unauthorised)
         }
       }
     }
@@ -207,6 +228,15 @@ object AuthActionSpec extends AmlsReferenceNumberGenerator{
     new ~ (new ~(new ~(new~(enrolmentsSa, Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Agent)), Some("groupIdentifier")), Some(User))
   )
 
+  val enrolmentsSaInactive = Enrolments(Set(
+    Enrolment("HMCE-VATVAR-ORG", Seq(EnrolmentIdentifier("VATRegNo", "000000000")), "Active"),
+    Enrolment("HMRC-MLR-ORG", Seq(EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Active"),
+    Enrolment("IR-SA", Seq(EnrolmentIdentifier("UTR", "saRef")), "Inactive")
+  ))
+  private def agentSaAuthRetrievalsInactive = Future.successful(
+    new ~ (new ~(new ~(new~(enrolmentsSaInactive, Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Agent)), Some("groupIdentifier")), Some(User))
+  )
+
   val enrolmentsCt = Enrolments(Set(
     Enrolment("HMCE-VATVAR-ORG", Seq(EnrolmentIdentifier("VATRegNo", "000000000")), "Activated"),
     Enrolment("HMRC-MLR-ORG", Seq(EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Activated"),
@@ -214,6 +244,15 @@ object AuthActionSpec extends AmlsReferenceNumberGenerator{
   ))
   private def agentCtAuthRetrievals = Future.successful(
     new ~ (new ~(new ~(new ~(enrolmentsCt, Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Agent)), Some("groupIdentifier")), Some(User))
+  )
+
+  val enrolmentsCtInactive = Enrolments(Set(
+    Enrolment("HMCE-VATVAR-ORG", Seq(EnrolmentIdentifier("VATRegNo", "000000000")), "Active"),
+    Enrolment("HMRC-MLR-ORG", Seq(EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Active"),
+    Enrolment("IR-CT", Seq(EnrolmentIdentifier("UTR", "ctRef")), "Inactive")
+  ))
+  private def agentCtAuthRetrievalsInactive = Future.successful(
+    new ~ (new ~(new ~(new ~(enrolmentsCtInactive, Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Agent)), Some("groupIdentifier")), Some(User))
   )
 
   private def emptyAuthRetrievals = Future.successful(
