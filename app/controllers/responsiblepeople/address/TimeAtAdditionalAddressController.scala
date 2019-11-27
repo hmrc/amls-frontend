@@ -26,8 +26,8 @@ import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.address.time_at_additional_address
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class TimeAtAdditionalAddressController @Inject() (val dataCacheConnector: DataCacheConnector,
                                                    authAction: AuthAction,

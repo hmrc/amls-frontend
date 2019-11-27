@@ -29,8 +29,8 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.address.additional_extra_address_UK
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class AdditionalExtraAddressUKController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                    authAction: AuthAction,

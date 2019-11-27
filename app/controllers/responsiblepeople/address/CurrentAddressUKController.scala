@@ -33,8 +33,8 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, ControllerHelper, DateOfChangeHelper, RepeatingSection}
 import views.html.responsiblepeople.address.current_address_UK
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class CurrentAddressUKController @Inject ()(val dataCacheConnector: DataCacheConnector,
                                             auditConnector: AuditConnector,

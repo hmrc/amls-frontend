@@ -29,8 +29,8 @@ import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import services.StatusService
 import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class CurrentAddressDateOfChangeController @Inject ()(val dataCacheConnector: DataCacheConnector,
                                                       authAction: AuthAction,
