@@ -18,36 +18,40 @@ package views.businessactivities
 
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.businessactivities.{UkAccountantsAddress, WhoIsYourAccountant}
+import models.businessactivities.{AccountantsAddress, UkAccountantsAddress, WhoIsYourAccountantIsUk, WhoIsYourAccountantName}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.{AmlsSpec, AutoCompleteServiceMocks}
 import views.Fixture
 
 
-class who_is_your_accountantSpec extends AmlsSpec with MustMatchers {
+class who_is_your_accountant_uk_addressSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks {
     implicit val requestWithToken = addToken(request)
   }
 
+  val defaultName = WhoIsYourAccountantName("accountantName",Some("tradingName"))
+  val defaultIsUkTrue = WhoIsYourAccountantIsUk(true)
+  val defaultUkAddress = UkAccountantsAddress("line1","line2",None,None,"AB12CD")
+
   "who_is_your_accountant view" must {
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[WhoIsYourAccountant] = Form2(WhoIsYourAccountant("accountantName",Some("tradingName"),UkAccountantsAddress("line1","line2",None,None,"AB12CD")))
+      val form2: ValidForm[AccountantsAddress] = Form2(defaultUkAddress)
 
-      def view = views.html.businessactivities.who_is_your_accountant(form2, true, mockAutoComplete.getCountries)
+      def view = views.html.businessactivities.who_is_your_accountant_uk_address(form2, true, defaultName.accountantsName)
 
-      doc.title must startWith(Messages("businessactivities.whoisyouraccountant.title"))
+      doc.title must startWith(Messages("businessactivities.whoisyouraccountant.address.title"))
     }
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[WhoIsYourAccountant] = Form2(WhoIsYourAccountant("accountantName",Some("tradingName"),UkAccountantsAddress("line1","line2",None,None,"AB12CD")))
+      val form2: ValidForm[AccountantsAddress] = Form2(defaultUkAddress)
 
-      def view = views.html.businessactivities.who_is_your_accountant(form2, true, mockAutoComplete.getCountries)
+      def view = views.html.businessactivities.who_is_your_accountant_uk_address(form2, true, defaultName.accountantsName)
 
-      heading.html must be(Messages("businessactivities.whoisyouraccountant.title"))
+      heading.html must be(Messages("businessactivities.whoisyouraccountant.address.header", defaultName.accountantsName))
       subHeading.html must include(Messages("summary.businessactivities"))
 
     }
@@ -56,37 +60,20 @@ class who_is_your_accountantSpec extends AmlsSpec with MustMatchers {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "name") -> Seq(ValidationError("not a message Key")),
-          (Path \ "tradingName") -> Seq(ValidationError("second not a message Key")),
-          (Path \ "isUK") -> Seq(ValidationError("third not a message Key")),
           (Path \ "addressLine1") -> Seq(ValidationError("fourth not a message Key")),
           (Path \ "addressLine2") -> Seq(ValidationError("fifth not a message Key")),
           (Path \ "addressLine3") -> Seq(ValidationError("sixth not a message Key")),
           (Path \ "addressLine4") -> Seq(ValidationError("seventh not a message Key")),
-          (Path \ "postCode") -> Seq(ValidationError("eighth not a message Key")),
-          (Path \ "country") -> Seq(ValidationError("ninth not a message Key"))
+          (Path \ "postCode") -> Seq(ValidationError("eighth not a message Key"))
         ))
 
-      def view = views.html.businessactivities.who_is_your_accountant(form2, true, mockAutoComplete.getCountries)
+      def view = views.html.businessactivities.who_is_your_accountant_uk_address(form2, true, defaultName.accountantsName)
 
-      errorSummary.html() must include("not a message Key")
-      errorSummary.html() must include("second not a message Key")
-      errorSummary.html() must include("third not a message Key")
       errorSummary.html() must include("fourth not a message Key")
       errorSummary.html() must include("fifth not a message Key")
       errorSummary.html() must include("sixth not a message Key")
       errorSummary.html() must include("seventh not a message Key")
       errorSummary.html() must include("eighth not a message Key")
-      errorSummary.html() must include("ninth not a message Key")
-
-      doc.getElementById("name").parent
-        .getElementsByClass("error-notification").first().html() must include("not a message Key")
-
-      doc.getElementById("tradingName").parent
-        .getElementsByClass("error-notification").first().html() must include("second not a message Key")
-
-      doc.getElementById("isUK")
-        .getElementsByClass("error-notification").first().html() must include("third not a message Key")
 
       doc.getElementById("addressLine1").parent
         .getElementsByClass("error-notification").first().html() must include("fourth not a message Key")
@@ -103,13 +90,10 @@ class who_is_your_accountantSpec extends AmlsSpec with MustMatchers {
       doc.getElementById("postCode").parent
         .getElementsByClass("error-notification").first().html() must include("eighth not a message Key")
 
-      doc.getElementById("country").parent
-        .getElementsByClass("error-notification").first().html() must include("ninth not a message Key")
-
     }
 
     "have a back link" in new ViewFixture {
-      def view = views.html.businessactivities.who_is_your_accountant(EmptyForm, true, mockAutoComplete.getCountries)
+      def view = views.html.businessactivities.who_is_your_accountant_uk_address(EmptyForm, true, defaultName.accountantsName)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
