@@ -32,8 +32,12 @@ class HowToPayController @Inject()(authAction: AuthAction,
   def get = authAction.async {
     implicit request =>
       feeHelper.retrieveFeeResponse(request.amlsRefNumber, request.accountTypeId, request.groupIdentifier, prefix) map {
-        case Some(fees) => Ok(how_to_pay(fees.paymentReference))
+        case Some(fees) if !isEmpty(fees.paymentReference) => Ok(how_to_pay(fees.paymentReference))
         case _          => Ok(how_to_pay(None))
       }
+  }
+
+  def isEmpty(x: Option[String]) = {
+    x.isEmpty || x == null || (x.isDefined && x.get.trim.isEmpty)
   }
 }

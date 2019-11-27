@@ -47,23 +47,22 @@ class HowToPayControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
   "HowToPayController" must {
     "get" must {
       "redirect to HowToPay" when {
+        val amlsRegistrationNumber = "amlsRefNumber"
+
+        def feeResponse(responseType: ResponseType) = FeeResponse(
+          responseType = responseType,
+          amlsReferenceNumber = amlsRegistrationNumber,
+          registrationFee = 100,
+          fpFee = None,
+          approvalCheckFee = None,
+          premiseFee = 0,
+          totalFees = 200,
+          paymentReference = Some(paymentReferenceNumber),
+          difference = Some(115),
+          createdAt = DateTime.now
+        )
+
         "There is a payment reference number" in new Fixture {
-
-          val amlsRegistrationNumber = "amlsRefNumber"
-
-          def feeResponse(responseType: ResponseType) = FeeResponse(
-            responseType = responseType,
-            amlsReferenceNumber = amlsRegistrationNumber,
-            registrationFee = 100,
-            fpFee = None,
-            approvalCheckFee = None,
-            premiseFee = 0,
-            totalFees = 200,
-            paymentReference = Some(paymentReferenceNumber),
-            difference = Some(115),
-            createdAt = DateTime.now
-          )
-
           when {
             controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
           } thenReturn Future.successful(Some(feeResponse(SubscriptionResponseType)))
@@ -82,6 +81,21 @@ class HowToPayControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
           when {
             controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
           } thenReturn Future.successful(None)
+
+          val result = controller.get(request)
+          status(result) must be(OK)
+
+          val doc = Jsoup.parse(contentAsString(result))
+          doc.getElementById("find-email-no-reference").html must include(Messages("howtopay.para.3.link"))
+        }
+
+        "There is an empty payment reference number" in new Fixture {
+
+          val amlsRegistrationNumber = "amlsRefNumber"
+
+          when {
+            controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
+          } thenReturn Future.successful(Some(feeResponse(SubscriptionResponseType).copy(paymentReference = Some("    "))))
 
           val result = controller.get(request)
           status(result) must be(OK)

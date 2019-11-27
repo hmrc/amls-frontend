@@ -31,17 +31,17 @@
     <p>@Messages("howtopay.para.1")</p>
     <p>@Messages("howtopay.para.2")
         <a id="your-messages" href="your-registration/your-messages">
-            @if(!paymentReference.getOrElse("").isEmpty) {
+            @if(paymentReference.isDefined) {
                 @Messages("howtopay.para.2.link")
             } else {
                 @Messages("howtopay.para.2.link.stop")
             }
         </a>
-        @if(!paymentReference.getOrElse("").isEmpty) {
+        @if(paymentReference.isDefined) {
             @Messages("howtopay.para.2.b")
         }
     </p>
-    @if(!paymentReference.getOrElse("").isEmpty) {
+    @if(paymentReference.isDefined) {
         <p>@Messages("howtopay.para.3")
             <a id="find-email" href="https://www.gov.uk/guidance/money-laundering-regulations-registration-fees#how-to-pay">
                 @Messages("howtopay.para.3.link")
@@ -50,7 +50,7 @@
     }
 
     <h2 class="heading-small">@Messages("howtopay.title3")</h2>
-    @if(!paymentReference.getOrElse("").isEmpty) {
+    @if(paymentReference.isDefined) {
         <p id="payment-ref">@Messages("howtopay.para.4") @paymentReference @Messages("howtopay.para.4.a")</p>
     } else {
         <p>@Messages("howtopay.para.4.b")</p>
@@ -61,7 +61,7 @@
         </p>
     }
 
-    @if(paymentReference.getOrElse("").isEmpty) {
+    @if(!paymentReference.isDefined) {
         <h2 class="heading-small">@Messages("howtopay.title3.b")</h2>
         <p>@Messages("howtopay.para.3.b")
             <a id="find-email-no-reference" href="https://www.gov.uk/guidance/money-laundering-regulations-registration-fees#how-to-pay">
@@ -82,7 +82,7 @@
         </a>
     </p>
 
-    @if(!paymentReference.getOrElse("").isEmpty) {
+    @if(paymentReference.isDefined) {
         <p>@Messages("howtopay.para.7")</p>
     }
 }
