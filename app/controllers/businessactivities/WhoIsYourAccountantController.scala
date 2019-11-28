@@ -32,7 +32,6 @@ class WhoIsYourAccountantController @Inject() ( val dataCacheConnector: DataCach
                                                 val authAction: AuthAction
                                               )extends DefaultBaseController {
 
-  //Joe - cannot seem to provide a default for UK/Non UK without providing defaults for other co-products
   private val defaultValues = WhoIsYourAccountantName("", None)
 
   def get(edit: Boolean = false) = authAction.async {

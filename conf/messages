@@ -1635,20 +1635,16 @@ businessactivities.whoisyouraccountant.summary.tradingName = Adviser’s trading
 businessactivities.whoisyouraccountant.location.title = Is your adviser's address in the UK?
 businessactivities.whoisyouraccountant.location.header = Is {0}’s address in the UK?
 
-
-
 businessactivities.whoisyouraccountant.address.title = What is your adviser’s address?
 businessactivities.whoisyouraccountant.address.header = What is {0}’s address?
 businessactivities.whoisyouraccountant.address = Address
-
-
-
 
 businessactivities.whoisyouraccountant.ukAddress = This is a UK address
 businessactivities.whoisyouraccountant.nonUkAddress = This is an overseas address
 businessactivities.whoisyouraccountant.country = Country
 businessactivities.whoisyouraccountant.postCode = Postcode
 businessactivities.whoisyouraccountant.reference.details = Your accountant’s HMRC Agent Reference Number
+
 businessactivities.tax.matters.title = Does this professional adviser manage your tax affairs with HM Revenue and Customs (HMRC)?
 businessactivities.tax.matters.heading = Does {0} manage your tax affairs with HM Revenue and Customs (HMRC)?
 businessactivities.tax.matters.summary.title = Does {0} manage your tax affairs with HM Revenue and Customs (HMRC)?

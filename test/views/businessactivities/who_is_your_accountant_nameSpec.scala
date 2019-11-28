@@ -35,7 +35,7 @@ class who_is_your_accountant_nameSpec extends AmlsSpec with MustMatchers {
   val defaultIsUkTrue = WhoIsYourAccountantIsUk(true)
   val defaultUkAddress = UkAccountantsAddress("line1","line2",None,None,"AB12CD")
 
-  "who_is_your_accountant view" must {
+  "who_is_your_accountant_name view" must {
     "have correct title" in new ViewFixture {
 
       val form2: ValidForm[WhoIsYourAccountantName] = Form2(defaultName)

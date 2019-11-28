@@ -95,8 +95,6 @@ class WhoIsYourAccountantUkAddressControllerSpec extends AmlsSpec
 
     "post is called" when {
 
-
-
       "given invalid data" must {
         "respond with BAD_REQUEST" in new Fixture {
 

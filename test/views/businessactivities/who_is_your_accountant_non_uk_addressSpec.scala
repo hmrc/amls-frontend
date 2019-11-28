@@ -36,7 +36,7 @@ class who_is_your_accountant_non_uk_addressSpec extends AmlsSpec with MustMatche
   val defaultIsUkTrue = WhoIsYourAccountantIsUk(true)
   val defaultNonUkAddress = NonUkAccountantsAddress("line1","line2",None,None, Country("India", "IN"))
 
-  "who_is_your_accountant view" must {
+  "who_is_your_accountant_non_uk_address view" must {
     "have correct title" in new ViewFixture {
 
       val form2: ValidForm[AccountantsAddress] = Form2(defaultNonUkAddress)
