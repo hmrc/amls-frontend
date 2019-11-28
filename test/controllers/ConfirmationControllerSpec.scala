@@ -39,7 +39,7 @@ import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.{AmlsSpec, AuthorisedFixture, FeeHelper}
 
 import scala.concurrent.Future
 
@@ -60,15 +60,11 @@ class ConfirmationControllerSpec extends AmlsSpec
       statusService = mock[StatusService],
       dataCacheConnector = mock[DataCacheConnector],
       amlsConnector = mock[AmlsConnector],
-      enrolmentService = mock[AuthEnrolmentsService],
-      feeResponseService = mock[FeeResponseService],
       authenticator = mock[AuthenticatorConnector],
-      confirmationService = mock[ConfirmationService])
+      confirmationService = mock[ConfirmationService],
+      feeHelper = mock[FeeHelper])
 
     val amlsRegistrationNumber = "amlsRefNumber"
-
-    when(controller.enrolmentService.amlsRegistrationNumber(any(), any())(any(), any()))
-      .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
     val response = subscriptionResponseGen(hasFees = true).sample.get
 
@@ -120,7 +116,7 @@ class ConfirmationControllerSpec extends AmlsSpec
     )
 
     when {
-      controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any[(String, String)]())(any(), any())
+      controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
     } thenReturn Future.successful(Some(feeResponse(SubscriptionResponseType)))
 
     val breakdownRows = Seq.empty[BreakdownRow]
@@ -210,7 +206,7 @@ class ConfirmationControllerSpec extends AmlsSpec
           val rows = Gen.listOfN(5, breakdownRowGen).sample
 
           when {
-            controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any())(any(), any())
+            controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
           } thenReturn Future.successful(Some(fees))
 
           when {
@@ -233,7 +229,7 @@ class ConfirmationControllerSpec extends AmlsSpec
           val fees = feeResponse(SubscriptionResponseType)
 
           when {
-            controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any())(any(), any())
+            controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
           } thenReturn Future.successful(Some(fees))
 
           when {
@@ -260,7 +256,7 @@ class ConfirmationControllerSpec extends AmlsSpec
           val rows = Gen.listOfN(5, breakdownRowGen).sample
 
           when {
-            controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any())(any(), any())
+            controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
           } thenReturn Future.successful(Some(fees))
 
           when {
@@ -283,7 +279,7 @@ class ConfirmationControllerSpec extends AmlsSpec
           val fees = feeResponse(AmendOrVariationResponseType)
 
           when {
-            controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any())(any(), any())
+            controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
           } thenReturn Future.successful(Some(fees))
 
           when {
@@ -306,7 +302,7 @@ class ConfirmationControllerSpec extends AmlsSpec
           setupStatus(SubmissionDecisionApproved)
 
           when {
-            controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any())(any(), any())
+            controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
           } thenReturn Future.successful(Some(feeResponse(AmendOrVariationResponseType)))
 
           val result = controller.get()(request)
@@ -327,7 +323,7 @@ class ConfirmationControllerSpec extends AmlsSpec
         } thenReturn Future.successful(true)
 
         when {
-          controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any())(any(), any())
+          controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
         } thenReturn Future.successful(Some(feeResponse(AmendOrVariationResponseType)))
 
         val result = controller.get()(request)
@@ -348,7 +344,7 @@ class ConfirmationControllerSpec extends AmlsSpec
         setupStatus(SubmissionReadyForReview)
 
         when {
-          controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any())(any(), any())
+          controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
         } thenReturn Future.successful(None)
 
         when {
@@ -368,7 +364,7 @@ class ConfirmationControllerSpec extends AmlsSpec
         setupStatus(SubmissionDecisionApproved)
 
         when {
-          controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any())(any(), any())
+          controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
         } thenReturn Future.successful(Some(feeResponse(SubscriptionResponseType).copy(paymentReference = None)))
 
         when {
