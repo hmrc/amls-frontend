@@ -23,7 +23,6 @@
 @import utils._
 
 @(model: TradingPremises, isMsb: Boolean, index: Int, hasOneService: Boolean, hasOneMsbService: Boolean)(implicit request: Request[_], m: Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
-@(model: TradingPremises, isMsb: Boolean, index: Int, hasOneService: Boolean, hasOneMsbService: Boolean)(implicit request: Request[_], m: Messages, lang: Lang)
 
 @header = {
     @heading("summary.checkyouranswers.title", "summary.tradingpremises")
