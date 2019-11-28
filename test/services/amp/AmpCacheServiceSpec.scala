@@ -34,7 +34,7 @@ class AmpCacheServiceSpec extends AmlsSpec with MockitoSugar
 
   val completeData = Json.obj(
     "typeOfParticipant"             -> Seq("artGalleryOwner"),
-    "boughtOrSoldOverThreshold"     -> true,
+    "soldOverThreshold"     -> true,
     "dateTransactionOverThreshold"  -> LocalDate.now,
     "identifyLinkedTransactions"    -> true,
     "percentageExpectedTurnover"    -> "fortyOneToSixty"

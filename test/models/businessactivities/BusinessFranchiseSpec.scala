@@ -88,7 +88,7 @@ class BusinessFranchiseSpec extends PlaySpec with MockitoSugar {
 
       BusinessFranchise.formRule.validate(data) must
         be(Invalid(Seq(
-          (Path \ "franchiseName") -> Seq(ValidationError("err.text.validation"))
+          (Path \ "franchiseName") -> Seq(ValidationError("error.invalid.characters.ba.franchise.name"))
         )))
     }
 

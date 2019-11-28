@@ -30,7 +30,6 @@
 @feeResponse match {
     case Some(fee) => {
         <p>@Messages("status.submissionreadyforreview.description")
-        <a id="submission-ready-pay-the-fee" href="@controllers.routes.ConfirmationController.get()"> @Messages("status.submissionreadyforreview.description.link")</a>@Messages("full.stop")</p>
         <p id="submission-ready-for-review-description">@Messages("status.submissionreadyforreview.description.2")</p>
                 <ul class="list list-bullet">
                     <li>@Messages("status.submissionreadyforreview.description.2.listline1")</li>
@@ -40,18 +39,10 @@
                 <p>@Messages("status.submissionreadyforreview.description.3")</p>
                 <p>@Messages("status.submissionreadyforreview.description.4")</p>
         <p>@Messages("status.submissionreadyforreview.description.5")
-        <a href="https://www.gov.uk/government/collections/anti-money-laundering-businesses-supervised-by-hm-revenue-and-customs">@Messages("status.submissionreadyforreview.description.5.link")</a>@Messages("full.stop")</p>
+        <a href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/money-laundering">@Messages("status.submissionreadyforreview.description.5.link")</a>@Messages("full.stop")</p>
     }
     case None => {
         <p>@Messages("status.submissionreadyforreview.description.no.fee")</p>
-
-        @detailsSummary(summary = Messages("status.submissionreadyforreview.nofee.description.link")) {
-            <div class="partial-deskpro-form">
-                <div class="get-help-form">
-                    @getHelpForm
-                </div>
-            </div>
-        }
         <p id="submission-ready-for-review-description">@Messages("status.submissionreadyforreview.description.2")</p>
                 <ul class="list list-bullet">
             <li>@Messages("status.submissionreadyforreview.description.2.listline1")</li>

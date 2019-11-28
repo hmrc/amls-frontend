@@ -84,12 +84,12 @@ object WhoIsYourAccountant {
 
       val nameType = notEmptyStrip andThen
       notEmpty.withMessage("error.required.ba.advisor.name") andThen
-      maxLength(nameTypeLength).withMessage("error.invalid.maxlength.140") andThen
-      basicPunctuationPattern()
+      maxLength(nameTypeLength).withMessage("error.max.length.ba.advisor.name") andThen
+      regexWithMsg(basicPunctuationRegex, "error.invalid.character.ba.advisor.name")
 
       val tradingNameType = notEmptyStrip andThen
-        maxLength(tradingNameTypeLength).withMessage("error.invalid.maxlength.120") andThen
-        basicPunctuationPattern()
+        maxLength(tradingNameTypeLength).withMessage("error.required.ba.trading.name") andThen
+        regexWithMsg(basicPunctuationRegex, "error.invalid.character.ba.trading.name")
 
       ((__ \ "name").read(nameType) ~
         (__ \ "tradingName").read(optionR(tradingNameType)) ~

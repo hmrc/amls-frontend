@@ -83,6 +83,13 @@ class status_supervisedSpec extends AmlsSpec with MustMatchers {
 
     }
 
+    "contain fee information and link" in new ViewFixture {
+
+      def view = views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), false, None, activities)
+
+      doc.getElementsByClass("statusblock").first().html() must include(Messages("status.fees"))
+      doc.getElementsByClass("statusblock").first().html() must include(Messages("status.howtopay"))
+    }
 
     "contain the expected content elements when status is ready for renewal" in new ViewFixture {
       def view = views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), true, None, activities)

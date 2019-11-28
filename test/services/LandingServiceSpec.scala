@@ -92,7 +92,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
   val ampSection = Amp(
     data = Json.obj(
       "typeOfParticipant"     -> Seq("artGalleryOwner"),
-      "boughtOrSoldOverThreshold"     -> true,
+      "soldOverThreshold"     -> true,
       "dateTransactionOverThreshold"  -> LocalDate.now,
       "identifyLinkedTransactions"    -> true,
       "percentageExpectedTurnover"    -> "fortyOneToSixty"

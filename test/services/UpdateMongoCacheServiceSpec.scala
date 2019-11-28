@@ -186,7 +186,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
 
     val ampData = Json.obj(
       "typeOfParticipant"     -> Seq("artGalleryOwner"),
-      "boughtOrSoldOverThreshold"     -> true,
+      "soldOverThreshold"     -> true,
       "dateTransactionOverThreshold"  -> LocalDate.now,
       "identifyLinkedTransactions"    -> true,
       "percentageExpectedTurnover"    -> "fortyOneToSixty"

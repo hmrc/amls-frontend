@@ -182,9 +182,10 @@ class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar{
       val errorCount = 2
       val elementsWithError : Elements = document.getElementsByClass("error-notification")
       elementsWithError.size() must be(errorCount)
-      for (ele: Element <- elementsWithError) {
-        ele.html() must include(Messages("err.text.validation"))
-      }
+
+      elementsWithError.map(_.text()) must contain allOf(
+        "Error: " + Messages("error.text.validation.address.line1"),
+        "Error: " + Messages("error.text.validation.address.line2"))
     }
 
     "respond with BAD_REQUEST" when {
