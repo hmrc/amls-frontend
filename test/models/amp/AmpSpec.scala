@@ -31,7 +31,7 @@ trait AmpValues {
 
   val completeData = Json.obj(
     "typeOfParticipant"     -> Seq("artGalleryOwner"),
-    "boughtOrSoldOverThreshold"     -> true,
+    "soldOverThreshold"             -> true,
     "dateTransactionOverThreshold"  -> LocalDate.now,
     "identifyLinkedTransactions"    -> true,
     "percentageExpectedTurnover"    -> "fortyOneToSixty"
@@ -39,7 +39,7 @@ trait AmpValues {
 
   val newData = Json.obj(
     "typeOfParticipant"     -> Seq("artGalleryOwner"),
-    "boughtOrSoldOverThreshold"     -> true,
+    "soldOverThreshold"             -> true,
     "dateTransactionOverThreshold"  -> LocalDate.now,
     "identifyLinkedTransactions"    -> false,
     "percentageExpectedTurnover"    -> "fortyOneToSixty"
@@ -47,7 +47,7 @@ trait AmpValues {
 
   val missingTypeOfParticipantData = Json.obj(
     "typeOfParticipantDetail"       -> "some other type",
-    "boughtOrSoldOverThreshold"     -> true,
+    "soldOverThreshold"             -> true,
     "dateTransactionOverThreshold"  -> LocalDate.now,
     "identifyLinkedTransactions"    -> true,
     "percentageExpectedTurnover"    -> "fortyOneToSixty"
@@ -55,13 +55,13 @@ trait AmpValues {
 
   val missingTypeOfParticipantDetailData = Json.obj(
     "typeOfParticipant"     -> Seq("somethingElse"),
-    "boughtOrSoldOverThreshold"     -> true,
+    "soldOverThreshold"             -> true,
     "dateTransactionOverThreshold"  -> LocalDate.now,
     "identifyLinkedTransactions"    -> true,
     "percentageExpectedTurnover"    -> "fortyOneToSixty"
   )
 
-  val missingBoughtOrSoldOverThresholdData = Json.obj(
+  val missingSoldOverThresholdData = Json.obj(
     "typeOfParticipant"     -> Seq("artGalleryOwner"),
     "dateTransactionOverThreshold"  -> LocalDate.now,
     "identifyLinkedTransactions"    -> true,
@@ -70,21 +70,21 @@ trait AmpValues {
 
   val missingDateTransactionOverThresholdData = Json.obj(
     "typeOfParticipant"     -> Seq("artGalleryOwner"),
-    "boughtOrSoldOverThreshold"     -> true,
+    "soldOverThreshold"             -> true,
     "identifyLinkedTransactions"    -> true,
     "percentageExpectedTurnover"    -> "fortyOneToSixty"
   )
 
   val missingIdentifyLinkedTransactionsData = Json.obj(
     "typeOfParticipant"     -> Seq("artGalleryOwner"),
-    "boughtOrSoldOverThreshold"     -> true,
+    "soldOverThreshold"             -> true,
     "dateTransactionOverThreshold"  -> LocalDate.now,
     "percentageExpectedTurnover"    -> "fortyOneToSixty"
   )
 
   val MissingPercentageExpectedTurnoverData = Json.obj(
     "typeOfParticipant"     -> Seq("artGalleryOwner"),
-    "boughtOrSoldOverThreshold"     -> true,
+    "soldOverThreshold"             -> true,
     "dateTransactionOverThreshold"  -> LocalDate.now,
     "identifyLinkedTransactions"    -> true
   )
@@ -98,7 +98,7 @@ trait AmpValues {
   val completeModel                             = Amp(completeData, false, true)
   val missingTypeOfParticipantModel             = Amp(missingTypeOfParticipantData)
   val missingTypeOfParticipantDetailModel       = Amp(missingTypeOfParticipantDetailData)
-  val missingBoughtOrSoldOverTheThresholdModel  = Amp(missingBoughtOrSoldOverThresholdData)
+  val missingSoldOverTheThresholdModel          = Amp(missingSoldOverThresholdData)
   val missingDateTransactionOverThresholdModel  = Amp(missingDateTransactionOverThresholdData)
   val missingIdentifyLinkedTransactionsModel    = Amp(missingIdentifyLinkedTransactionsData)
   val MissingPercentageExpectedTurnoverModel    = Amp(MissingPercentageExpectedTurnoverData)
@@ -165,11 +165,11 @@ class AmpSpec extends AmlsSpec with AmpValues {
           missingTypeOfParticipantDetailModel.isComplete must be(false)
         }
 
-        "missing boughtOrSoldOverThreshold" in {
-          missingBoughtOrSoldOverTheThresholdModel.isComplete must be(false)
+        "missing soldOverThreshold" in {
+          missingSoldOverTheThresholdModel.isComplete must be(false)
         }
 
-        "boughtOrSoldOverThreshold true and missing dateTransactionOverThreshold" in {
+        "soldOverThreshold true and missing dateTransactionOverThreshold" in {
           missingDateTransactionOverThresholdModel.isComplete must be(false)
         }
 
