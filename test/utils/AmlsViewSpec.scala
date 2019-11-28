@@ -17,7 +17,7 @@
 package utils
 
 import akka.stream.Materializer
-import config.{ApplicationConfig, CachedStaticHtmlPartialProvider}
+import config.ApplicationConfig
 import connectors.KeystoreConnector
 import controllers.CommonPlayDependencies
 import org.mockito.Mockito.when
@@ -49,8 +49,6 @@ trait AmlsViewSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar w
   implicit lazy  val messages = messagesApi.preferred(FakeRequest())
 
   implicit val headerCarrier = HeaderCarrier()
-
-  implicit val partialsProvider = app.injector.instanceOf(classOf[CachedStaticHtmlPartialProvider])
 
   implicit val lang = mock[Lang]
   implicit val appConfig = mock[ApplicationConfig]

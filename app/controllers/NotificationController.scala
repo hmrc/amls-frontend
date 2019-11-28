@@ -18,7 +18,7 @@ package controllers
 
 import cats.data.OptionT
 import cats.implicits._
-import config.{ApplicationConfig, CachedStaticHtmlPartialProvider}
+import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector}
 import javax.inject.{Inject, Singleton}
 import models.notifications.ContactType._
@@ -26,7 +26,7 @@ import models.notifications._
 import models.status.{SubmissionDecisionRejected, SubmissionStatus}
 import play.api.i18n.{Lang, Messages}
 import play.api.mvc.{MessagesControllerComponents, Request, Result}
-import play.twirl.api.{Template4, Template6}
+import play.twirl.api.Template5
 import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, NotificationService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -112,8 +112,8 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
       Class.forName(name + "$").getField("MODULE$").get(man.runtimeClass).asInstanceOf[T]
 
     def render(templateName: String, notificationParams: NotificationParams, templateVersion: String) =
-      getTemplate[Template6[NotificationParams, Request[_], Messages, CachedStaticHtmlPartialProvider, Lang, ApplicationConfig, play.twirl.api.Html]](s"views.html.notifications.${ templateVersion }.${ templateName }")
-        .render(notificationParams, request, m, partialProvider, lang, appConfig)
+      getTemplate[Template5[NotificationParams, Request[_], Messages, Lang, ApplicationConfig, play.twirl.api.Html]](s"views.html.notifications.${ templateVersion }.${ templateName }")
+        .render(notificationParams, request, m, lang, appConfig)
 
     val notification = contactType match {
       case MindedToRevoke => render("minded_to_revoke", NotificationParams(

@@ -23,7 +23,7 @@ import play.api.mvc.Request
 import uk.gov.hmrc.play.bootstrap.http.FrontendErrorHandler
 
 class AmlsErrorHandler @Inject()(val messagesApi: MessagesApi, val configuration: Configuration)
-                                (implicit val partialProvider: CachedStaticHtmlPartialProvider, appConfig: ApplicationConfig) extends FrontendErrorHandler {
+                                (implicit val appConfig: ApplicationConfig) extends FrontendErrorHandler {
 
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit request: Request[_]) =
     views.html.error(pageTitle, heading, message)(implicitly, implicitly, Lang.defaultLang, implicitly)

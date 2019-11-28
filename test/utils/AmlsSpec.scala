@@ -17,7 +17,7 @@
 package utils
 
 import akka.stream.Materializer
-import config.{ApplicationConfig, CachedStaticHtmlPartialProvider}
+import config.ApplicationConfig
 import controllers.CommonPlayDependencies
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
@@ -39,11 +39,10 @@ trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with 
   implicit val requestWithToken = CSRFRequest(FakeRequest()).withCSRFToken
   val messagesApi = app.injector.instanceOf[MessagesApi]
   implicit val messages = messagesApi.preferred(requestWithToken)
-  implicit val partialProvider = mock[CachedStaticHtmlPartialProvider]
   implicit val lang = Lang.defaultLang
   implicit val appConfig = app.injector.instanceOf[ApplicationConfig]
 
-  val commonDependencies = new CommonPlayDependencies(appConfig, messagesApi, partialProvider)
+  val commonDependencies = new CommonPlayDependencies(appConfig, messagesApi)
 
   implicit val messagesProvider: MessagesProvider = MessagesImpl(lang, messagesApi)
   implicit val mat = mock[Materializer]

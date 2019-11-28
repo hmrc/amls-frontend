@@ -16,7 +16,7 @@
 
 @import include._
 @import forms2._
-@import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
+@import config.{ ApplicationConfig}
 @(index: Int, flow: Option[String] = None)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {

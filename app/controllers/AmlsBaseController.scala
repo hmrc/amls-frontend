@@ -17,7 +17,7 @@
 package controllers
 
 import com.google.inject.Inject
-import config.{ApplicationConfig, CachedStaticHtmlPartialProvider}
+import config.{ApplicationConfig}
 import play.api.i18n.{Lang, MessagesApi, MessagesImpl, MessagesProvider}
 import play.api.mvc.{AnyContent, BodyParsers, MessagesActionBuilderImpl, MessagesControllerComponents, Request}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
@@ -28,7 +28,6 @@ import scala.concurrent.ExecutionContext
 abstract class AmlsBaseController(val cpd: CommonPlayDependencies, override val controllerComponents: MessagesControllerComponents) extends FrontendController(controllerComponents) {
 
   override implicit val messagesApi: MessagesApi = cpd.messagesApi
-  implicit val partialProvider: CachedStaticHtmlPartialProvider = cpd.partialProvider
 
   implicit val appConfig = cpd.amlsConfig
 
@@ -42,12 +41,11 @@ abstract class AmlsBaseController(val cpd: CommonPlayDependencies, override val 
     MessagesImpl(lang, messagesApi)
   }
 
-  def notFoundView(implicit request: Request[_], partialProvider: CachedStaticHtmlPartialProvider, messages: play.api.i18n.Messages) = ControllerHelper.notFoundView
+  def notFoundView(implicit request: Request[_], messages: play.api.i18n.Messages) = ControllerHelper.notFoundView
 }
 
 class CommonPlayDependencies @Inject()(val amlsConfig: ApplicationConfig,
-                                       val messagesApi: MessagesApi,
-                                       val partialProvider: CachedStaticHtmlPartialProvider)
+                                       val messagesApi: MessagesApi)
 
 trait MessagesRequestHelper {
   def messagesAction(parsers: BodyParsers.Default)(implicit executionContext: ExecutionContext, messagesApi: MessagesApi) = new MessagesActionBuilderImpl[AnyContent](parsers, messagesApi)

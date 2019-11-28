@@ -16,7 +16,7 @@
 
 package utils
 
-import config.{ApplicationConfig, CachedStaticHtmlPartialProvider}
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import forms.InvalidForm
 import models.businessactivities.{BusinessActivities => BA}
@@ -155,7 +155,7 @@ object ControllerHelper {
 
   def rpTitleName(rp:Option[ResponsiblePerson]):String = rp.fold("")(_.personName.fold("")(_.titleName))
 
-  def notFoundView(implicit request: Request[_], partialProvider: CachedStaticHtmlPartialProvider, messages: Messages, lang: Lang, appConfig: ApplicationConfig) = {
+  def notFoundView(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig) = {
     views.html.error(Messages("error.not-found.title"),
       Messages("error.not-found.heading"),
       Messages("error.not-found.message"))

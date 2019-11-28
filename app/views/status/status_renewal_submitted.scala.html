@@ -21,7 +21,7 @@
 @import org.joda.time.LocalDateTime
 @import org.joda.time.LocalDate
 @import utils.DateHelper
-@import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
+@import config.{ ApplicationConfig}
 
 @(regNo: String, businessName: Option[String], endDate: Option[LocalDate], name: Option[String], showChangeOfficer: Boolean = true)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 

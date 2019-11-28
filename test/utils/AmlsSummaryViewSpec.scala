@@ -16,7 +16,7 @@
 
 package utils
 
-import config.{ApplicationConfig, CachedStaticHtmlPartialProvider}
+import config.ApplicationConfig
 import org.scalatest.MustMatchers
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -40,7 +40,6 @@ trait AmlsSummaryViewSpec extends PlaySpec with GuiceOneAppPerSuite with Mockito
   implicit val requestWithToken = addTokenForView(FakeRequest())
   val messagesApi = app.injector.instanceOf[MessagesApi]
   implicit val messages = messagesApi.preferred(requestWithToken)
-  implicit val partialProvider = mock[CachedStaticHtmlPartialProvider]
   implicit val lang = Lang.defaultLang
   implicit val appConfig = mock[ApplicationConfig]
 }

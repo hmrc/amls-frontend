@@ -19,7 +19,7 @@
 @import models.confirmation._
 @import include.forms2._
 @import forms.EmptyForm
-@import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
+@import config.{ ApplicationConfig}
 
 @(reasonMsg: String, amount: Currency, reference: String)(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
 

@@ -16,7 +16,7 @@
 
 @import include._
 @import forms2._
-@import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
+@import config.{ ApplicationConfig}
 @import forms.EmptyForm
 @import models.businessmatching._
 @(services: BusinessMatchingMsbServices = BusinessMatchingMsbServices(Set()))(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
