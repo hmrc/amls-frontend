@@ -23,7 +23,7 @@
 @import forms.EmptyForm
 @import models.businessmatching.updateservice.ServiceChangeRegister
 
-@(model: MoneyServiceBusiness, bmMsbServices: Option[BusinessMatchingMsbServices], register: ServiceChangeRegister)(implicit request: Request[_], m: Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+@(model: MoneyServiceBusiness, bmMsbServices: Option[BusinessMatchingMsbServices], register: ServiceChangeRegister)(implicit request: Request[_], m: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
 @heading("title.cya", "summary.msb")

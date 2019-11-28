@@ -20,7 +20,7 @@
 @import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 @import config.ApplicationConfig
 
-@(f: Form2[_], edit: Boolean, activityValues: Seq[String])(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+@(f: Form2[_], edit: Boolean, activityValues: Seq[String])(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()

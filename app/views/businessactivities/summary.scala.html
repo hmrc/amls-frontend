@@ -20,7 +20,7 @@
 @import models.businessactivities._
 @import config.ApplicationConfig
 
-@(f: forms.Form2[_], model: BusinessActivities, bmBusinessActivities:Option[List[String]], hideReceiveAdvice:Boolean = false)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+@(f: forms.Form2[_], model: BusinessActivities, bmBusinessActivities:Option[List[String]], hideReceiveAdvice:Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @heading("title.cya", "summary.businessactivities")

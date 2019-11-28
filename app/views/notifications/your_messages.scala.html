@@ -19,7 +19,7 @@
 @import utils.ContactTypeHelper
 @import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 
-@(businessName: String, currentApplicationNotifications: Seq[NotificationRow], previousApplicationNotifications: Seq[NotificationRow] = Seq())(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+@(businessName: String, currentApplicationNotifications: Seq[NotificationRow], previousApplicationNotifications: Seq[NotificationRow] = Seq())(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()

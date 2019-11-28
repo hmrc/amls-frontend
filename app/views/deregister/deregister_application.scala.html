@@ -22,7 +22,7 @@
 @import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 @import forms.EmptyForm
 
-@(businessName: String, activities: Set[String], regNumber: String)(implicit request: Request[_], messages: Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+@(businessName: String, activities: Set[String], regNumber: String)(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @heading("status.deregister.title", "summary.status")

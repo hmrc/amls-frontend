@@ -21,7 +21,7 @@
 @import utils.HtmlElementHelpers.AttrMinMax
 @import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 
-@(f: forms.Form2[_], edit: Boolean)(implicit   m: Messages, request: Request[_],partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+@(f: forms.Form2[_], edit: Boolean)(implicit   m: Messages, request: Request[_], lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()

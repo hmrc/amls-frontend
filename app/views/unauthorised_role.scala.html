@@ -20,7 +20,7 @@
 @import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 
 @import config.ApplicationConfig
-@()(implicit request: Request[_],partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+@()(implicit request: Request[_], lang: Lang, appConfig: ApplicationConfig)
 @import config.{ApplicationConfig => appConfig}
 @import uk.gov.hmrc.play.views.html._
 @import include.main

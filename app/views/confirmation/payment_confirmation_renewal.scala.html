@@ -17,7 +17,7 @@
 @import include._
 @import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 
-@(companyName: String, paymentReference: String)(implicit request: Request[_], messages: Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+@(companyName: String, paymentReference: String)(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @main(title = messages("confirmation.payment.renewal.title")){
 

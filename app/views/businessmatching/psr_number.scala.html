@@ -19,7 +19,7 @@
 @import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 @import utils.HtmlElementHelpers._
 
-@(f: forms.Form2[_], edit: Boolean, showReturnLink: Boolean = true, isPreSubmission: Boolean = true)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+@(f: forms.Form2[_], edit: Boolean, showReturnLink: Boolean = true, isPreSubmission: Boolean = true)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @target = @{
     s"""${f("regNumber").id}-panel"""

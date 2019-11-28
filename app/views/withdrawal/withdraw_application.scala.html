@@ -22,7 +22,7 @@
 @import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 
 @import forms.EmptyForm
-@(businessName: String, processingDate: LocalDateTime)(implicit messages: Messages, request: Request[_],partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+@(businessName: String, processingDate: LocalDateTime)(implicit messages: Messages, request: Request[_], lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
   @heading("status.withdraw.title", "summary.status")

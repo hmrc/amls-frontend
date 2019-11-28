@@ -25,7 +25,7 @@
 @(regNo: String,
         businessName: Option[String],
         feeResponse: Option[FeeResponse],
-        fromDuplicateSubmission: Boolean = false)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+        fromDuplicateSubmission: Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @main2(title = Messages("status.submissionreadyforreview.heading") + " - Your registration", showURRBanner = true) {
 

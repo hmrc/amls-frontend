@@ -20,7 +20,7 @@
 @import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 @import models.businessmatching._
 
-@(f: Form2[_], index: Int, edit: Boolean, changed: Boolean, model: BusinessMatching)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+@(f: Form2[_], index: Int, edit: Boolean, changed: Boolean, model: BusinessMatching)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()

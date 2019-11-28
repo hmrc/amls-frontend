@@ -22,7 +22,7 @@
 @import models.businessmatching.MoneyServiceBusiness
 @import utils._
 
-@(model: TradingPremises, isMsb: Boolean, index: Int, hasOneService: Boolean, hasOneMsbService: Boolean)(implicit request: Request[_], m: Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+@(model: TradingPremises, isMsb: Boolean, index: Int, hasOneService: Boolean, hasOneMsbService: Boolean)(implicit request: Request[_], m: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @heading("summary.checkyouranswers.title", "summary.tradingpremises")

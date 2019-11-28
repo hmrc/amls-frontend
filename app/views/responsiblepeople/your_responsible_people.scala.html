@@ -22,7 +22,7 @@
 @import forms.EmptyForm
 @import config.ApplicationConfig
 
-@(responsiblePeopleComplete: Seq[(ResponsiblePerson, Int)], responsiblePeopleIncomplete: Seq[(ResponsiblePerson, Int)])(implicit request: Request[_], m: Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+@(responsiblePeopleComplete: Seq[(ResponsiblePerson, Int)], responsiblePeopleIncomplete: Seq[(ResponsiblePerson, Int)])(implicit request: Request[_], m: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @rpDetail(rp: ResponsiblePerson) = {
 @rp.personName.map(pn => pn.fullName)

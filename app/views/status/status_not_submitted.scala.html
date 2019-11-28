@@ -21,7 +21,7 @@
 @import utils.DateHelper
 @import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 
-@(regNo: String, businessName: Option[String], call: Call)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+@(regNo: String, businessName: Option[String], call: Call)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @main2(title = Messages("status.submissionready.heading") + " - Your registration", showURRBanner = true) {
 

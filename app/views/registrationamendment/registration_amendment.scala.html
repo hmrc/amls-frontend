@@ -30,7 +30,7 @@
     serviceNames: Seq[String],
     canEditPreApplication: Boolean,
     newSections: Option[Seq[Section]] = None
-)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @main2(
     title = Messages("amendment.title"),

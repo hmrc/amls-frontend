@@ -19,7 +19,7 @@
 @import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 @import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 
-@(subtitle: String)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+@(subtitle: String)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()

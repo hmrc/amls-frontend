@@ -6,10 +6,6 @@ object FrontendBuild extends Build with MicroService {
   val appName = "amls-frontend"
 
   override lazy val appDependencies: Seq[ModuleID] = AppDependencies()
-  override lazy val playSettings : Seq[Setting[_]] = Seq(
-    dependencyOverrides += "com.typesafe.play" %% "play-json" % "2.6.13",
-    dependencyOverrides += "com.typesafe.play" %% "play-json-joda" % "2.6.13"
-  )
 }
 
 private object AppDependencies {

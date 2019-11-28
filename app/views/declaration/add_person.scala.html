@@ -20,7 +20,7 @@
 @import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 @import models.businessmatching.{BusinessType, BusinessMatching}
 
-@(title: String, subtitle: String, businessType: Option[BusinessType], f: Form2[_])(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+@(title: String, subtitle: String, businessType: Option[BusinessType], f: Form2[_])(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @target = @{
     s"""${f("other").id}-fieldset"""

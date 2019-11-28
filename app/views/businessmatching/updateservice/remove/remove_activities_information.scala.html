@@ -19,7 +19,7 @@
 @import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 @import utils.HtmlElementHelpers._
 
-@(placeholder: String)(implicit request: Request[_], m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+@(placeholder: String)(implicit request: Request[_], m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()

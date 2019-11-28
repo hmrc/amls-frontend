@@ -21,7 +21,7 @@
 @import utils.DateHelper
 @import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 
-@(businessName: Option[String])(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+@(businessName: Option[String])(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @main2(title = s"${Messages("status.submissiondecisionwithdrawn.title")} - Your registration", showURRBanner = true) {
 

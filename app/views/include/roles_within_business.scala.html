@@ -27,7 +27,7 @@
     heading: String = "",
     section: String = "",
     hint: String = ""
-)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang)
+)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @content = {
     @businessType match {

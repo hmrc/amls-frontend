@@ -30,7 +30,7 @@
     rpName: String = "",
     flow: Option[String] = None,
     showApprovalSection: Boolean = false,
-    businessMatching: BusinessMatching)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+    businessMatching: BusinessMatching)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @detailedAnswers[T](
     question: String = "",

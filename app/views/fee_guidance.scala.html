@@ -19,7 +19,7 @@
 @import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 @import models.confirmation.{ BreakdownRow, Currency }
 
-@(feeTotal: Currency, rows: Seq[BreakdownRow])(implicit request: Request[_], m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+@(feeTotal: Currency, rows: Seq[BreakdownRow])(implicit request: Request[_], m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @heading("fee.guidance", "submit.registration")

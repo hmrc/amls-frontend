@@ -19,7 +19,7 @@
 @import models.asp._
 @import include.forms2._
 
-@(f: forms.Form2[_],model: Asp)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+@(f: forms.Form2[_],model: Asp)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @heading("title.cya", "summary.asp")

@@ -17,7 +17,7 @@
 @import config.CachedStaticHtmlPartialProvider
 @import models.businessdetails._
 
-@(model: RegisteredOffice)(implicit m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang)
+@(model: RegisteredOffice)(implicit m:Messages, lang: Lang)
 
       <p>@model.toLines.map { line =>
           @line<br />

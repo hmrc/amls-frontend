@@ -19,7 +19,7 @@
 @import views.html.confirmation.{breakdown => breakdown_display}
 @import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 
-@(paymentReference: Option[String], total: Currency, breakdown: Seq[BreakdownRow], amountToPay: Currency, paymentsUrl: String)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+@(paymentReference: Option[String], total: Currency, breakdown: Seq[BreakdownRow], amountToPay: Currency, paymentsUrl: String)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @main(
     title = Messages("confirmation.renewal.title") + " - " + Messages("confirmation.renewal.header.secondary")

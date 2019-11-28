@@ -19,7 +19,7 @@
 @import models.bankdetails._
 @import include.forms2._
 
-@(f: forms.Form2[_], inCompleteModel: Seq[(BankDetails, Int)], completedModel: Seq[(BankDetails, Int)])(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+@(f: forms.Form2[_], inCompleteModel: Seq[(BankDetails, Int)], completedModel: Seq[(BankDetails, Int)])(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @heading("bankdetails.yourbankaccounts.title", "summary.bankdetails")

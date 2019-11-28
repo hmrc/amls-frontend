@@ -21,7 +21,7 @@
 @import play.api.i18n.Messages
 @import models.responsiblepeople.PersonAddress
 
-@(f: Form2[_], model: PersonAddress, index: Int, personName: String)(implicit request: Request[_],m:Messages,partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+@(f: Form2[_], model: PersonAddress, index: Int, personName: String)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()

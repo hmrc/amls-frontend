@@ -21,7 +21,7 @@
 @import models.tradingpremises._
 @import models.businessmatching._
 
-@(f:Form2[_], model : BusinessActivities, edit: Boolean, index: Int)(implicit   m: Messages, request: Request[_],partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+@(f:Form2[_], model : BusinessActivities, edit: Boolean, index: Int)(implicit   m: Messages, request: Request[_], lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()

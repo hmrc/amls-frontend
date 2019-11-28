@@ -18,7 +18,7 @@
 @import utils.Strings._
 @import config.{CachedStaticHtmlPartialProvider, ApplicationConfig}
 
-@()(implicit messages: Messages, request: Request[AnyContent],partialProvider: CachedStaticHtmlPartialProvider, lang: Lang, appConfig: ApplicationConfig)
+@()(implicit messages: Messages, request: Request[AnyContent], lang: Lang, appConfig: ApplicationConfig)
 
 @main(title = messages("error.submission.problem.title"), bodyClasses = Some("duplicate-submission-page")) {
 
