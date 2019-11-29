@@ -18,16 +18,16 @@ package controllers.businessactivities
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, WhoIsYourAccountant, WhoIsYourAccountantIsUk}
 import services.AutoCompleteService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AuthAction
+import utils.{AuthAction, ControllerHelper}
 
 class WhoIsYourAccountantIsUkController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                   val autoCompleteService: AutoCompleteService,
-                                                  val authAction: AuthAction
-                                              ) extends WhoIsYourAccountantController  {
+                                                  val authAction: AuthAction ) extends DefaultBaseController  {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
@@ -39,8 +39,7 @@ class WhoIsYourAccountantIsUkController @Inject()(val dataCacheConnector: DataCa
           } yield {
             Form2[WhoIsYourAccountantIsUk](isUk)
           }).getOrElse(EmptyForm)
-          val name = getName(response)
-          Ok(views.html.businessactivities.who_is_your_accountant_is_uk_address(form, edit, name))
+          Ok(views.html.businessactivities.who_is_your_accountant_is_uk_address(form, edit, ControllerHelper.accountantName(response)))
       }
   }
 
@@ -49,7 +48,7 @@ class WhoIsYourAccountantIsUkController @Inject()(val dataCacheConnector: DataCa
       Form2[WhoIsYourAccountantIsUk](request.body) match {
         case f: InvalidForm =>
           dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
-            response => BadRequest(views.html.businessactivities.who_is_your_accountant_is_uk_address(f, edit, getName(response)))
+            response => BadRequest(views.html.businessactivities.who_is_your_accountant_is_uk_address(f, edit, ControllerHelper.accountantName(response)))
           }
         case ValidForm(_, data) =>
           for {

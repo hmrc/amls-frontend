@@ -29,8 +29,7 @@ import scala.concurrent.Future
 
 class WhoIsYourAccountantNameController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                   val autoCompleteService: AutoCompleteService,
-                                                  val authAction: AuthAction
-                                              )extends DefaultBaseController {
+                                                  val authAction: AuthAction) extends DefaultBaseController {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

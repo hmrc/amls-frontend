@@ -231,16 +231,16 @@ error.max.length.ba.software.package.name = Names of the software packages must 
 error.invalid.characters.ba.software.package.name = Names of the software packages can include letters a to z, numbers, spaces, and most punctuation and special characters
 error.required.ba.select.nca = Select yes if your business is registered with the National Crime Agency
 error.required.ba.option.risk.assessment = Select yes if your business has a documented risk assessment policy and procedure
-error.required.ba.risk.assessment.format = Select one or more options to show what formats you use for your risk assessment policy and procedure
-error.required.ba.business.use.accountant = Select yes if your business receives advice on Money Laundering regulations and due diligence
-error.required.ba.suspicious.activity = Select yes if your business has written guidance for staff on how to report suspicious activity
-error.required.ba.tax.matters = Select yes if your professional adviser also manages your tax affairs with HMRC
+error.required.ba.risk.assessment.format = Select how you document your risk assessment policy and procedure
+error.required.ba.business.use.accountant = Select yes if your business receives professional advice on Money Laundering Regulations and due diligence
+error.required.ba.suspicious.activity = Select yes if you have written guidance on how to identify and report suspicious activity
+error.required.ba.tax.matters = Select yes if {0} manages your tax affairs with HMRC
 
 error.required.ba.advisor.name = Enter your adviser’s name
 error.length.ba.advisor.name = Adviser’s name must be 140 characters or less
 error.punctuation.ba.advisor.name = Adviser’s name can include letters a to z, numbers, spaces, and most punctuation and special characters
-error.length.ba.advisor.tradingname = Adviser's trading name must be 120 characters or less
-error.punctuation.ba.advisor.tradingname = Adviser’s trading name can include letters a to z, numbers, spaces, and most punctuation and special characters
+error.length.ba.advisor.tradingname = Adviser’s trading name must be 120 characters or less
+error.punctuation.ba.advisor.tradingname = Adviser’s trading name can include letters a to z, numbers, spaces and punctuation
 error.required.ba.advisor.isuk = Select yes if your adviser’s address is in the UK
 
 error.required.ba.select.yes = Select yes if you had customers who lived or worked outside of the UK in the last 12 months
@@ -1632,7 +1632,7 @@ businessactivities.whoisyouraccountant.name = Full name
 businessactivities.whoisyouraccountant.tradingName = Trading name (if different)
 businessactivities.whoisyouraccountant.summary.tradingName = Adviser’s trading name
 
-businessactivities.whoisyouraccountant.location.title = Is your adviser's address in the UK?
+businessactivities.whoisyouraccountant.location.title = Is your adviser’s address in the UK?
 businessactivities.whoisyouraccountant.location.header = Is {0}’s address in the UK?
 
 businessactivities.whoisyouraccountant.address.title = What is your adviser’s address?

@@ -18,16 +18,16 @@ package controllers.businessactivities
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{AccountantsAddress, BusinessActivities, NonUkAccountantsAddress}
 import services.AutoCompleteService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AuthAction
+import utils.{AuthAction, ControllerHelper}
 
 class WhoIsYourAccountantNonUkAddressController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                           val autoCompleteService: AutoCompleteService,
-                                                          val authAction: AuthAction
-                                              ) extends WhoIsYourAccountantController {
+                                                          val authAction: AuthAction) extends DefaultBaseController {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
@@ -39,7 +39,7 @@ class WhoIsYourAccountantNonUkAddressController @Inject()(val dataCacheConnector
           } yield {
             if(!whoIsYourAccountant.isUk) { Form2[AccountantsAddress](whoIsYourAccountant) } else { EmptyForm }
           }).getOrElse(EmptyForm)
-          Ok(views.html.businessactivities.who_is_your_accountant_non_uk_address(form, edit, getName(response), autoCompleteService.getCountries))
+          Ok(views.html.businessactivities.who_is_your_accountant_non_uk_address(form, edit, ControllerHelper.accountantName(response), autoCompleteService.getCountries))
       }
   }
 
@@ -49,7 +49,7 @@ class WhoIsYourAccountantNonUkAddressController @Inject()(val dataCacheConnector
         case f: InvalidForm =>
           dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
             response => BadRequest(views.html.businessactivities.who_is_your_accountant_non_uk_address(
-              f, edit, getName(response), autoCompleteService.getCountries))
+              f, edit, ControllerHelper.accountantName(response), autoCompleteService.getCountries))
           }
         case ValidForm(_, data) => {
           for {
