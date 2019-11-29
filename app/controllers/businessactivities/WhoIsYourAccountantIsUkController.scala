@@ -18,9 +18,8 @@ package controllers.businessactivities
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessactivities.{BusinessActivities, WhoIsYourAccountantIsUk}
+import models.businessactivities.{BusinessActivities, WhoIsYourAccountant, WhoIsYourAccountantIsUk}
 import services.AutoCompleteService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthAction
@@ -28,13 +27,18 @@ import utils.AuthAction
 class WhoIsYourAccountantIsUkController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                   val autoCompleteService: AutoCompleteService,
                                                   val authAction: AuthAction
-                                              )extends DefaultBaseController {
+                                              ) extends WhoIsYourAccountantController  {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
         response =>
-          val form = getForm(response)
+          val form = (for {
+            businessActivities <- response
+            isUk <- businessActivities.whoIsYourAccountant.flatMap(acc => acc.isUk)
+          } yield {
+            Form2[WhoIsYourAccountantIsUk](isUk)
+          }).getOrElse(EmptyForm)
           val name = getName(response)
           Ok(views.html.businessactivities.who_is_your_accountant_is_uk_address(form, edit, name))
       }
@@ -59,35 +63,16 @@ class WhoIsYourAccountantIsUkController @Inject()(val dataCacheConnector: DataCa
       }
   }
 
-  private def getForm(response: Option[BusinessActivities]): Form2[_] = {
-    val isUkForm = for {
-      businessActivities <- response
-      isUk <- businessActivities.whoIsYourAccountant.flatMap(acc => acc.isUk)
-    } yield {
-      Form2[WhoIsYourAccountantIsUk](isUk)
-    }
-
-    isUkForm.getOrElse {
-      val inferredIsUkForm = for {
-        businessActivities <- response
-        isUk <- businessActivities.whoIsYourAccountant.flatMap(acc => acc.address).map(address => address.isUk)
-      } yield {
-        Form2[WhoIsYourAccountantIsUk](WhoIsYourAccountantIsUk(isUk))
-      }
-      inferredIsUkForm.getOrElse(EmptyForm)
-    }
-  }
-
-  private def getName(response: Option[BusinessActivities]): String = response
-    .flatMap(ba => ba.whoIsYourAccountant).flatMap(acc => acc.names).map(acc => acc.accountantsName).getOrElse("")
-
   private def updateModel(ba: BusinessActivities, data: WhoIsYourAccountantIsUk): BusinessActivities = {
     ba.copy(whoIsYourAccountant = ba.whoIsYourAccountant.map(accountant =>
-      if(accountant.address.map(add => add.isUk).exists(isUk => isUk != data.isUk)) {
+      if(changedIsUk(accountant, data)) {
         accountant.isUk(data).address(None)
       } else {
         accountant.isUk(data)
       })
     )
   }
+
+  private def changedIsUk(accountant: WhoIsYourAccountant, newData: WhoIsYourAccountantIsUk): Boolean =
+    accountant.address.map(add => add.isUk).exists(isUk => isUk != newData.isUk)
 }

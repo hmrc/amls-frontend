@@ -18,16 +18,19 @@ package controllers.businessactivities
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
+import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessactivities.{AccountantsAddress, BusinessActivities, NonUkAccountantsAddress}
+import models.businessactivities.{BusinessActivities, WhoIsYourAccountantName}
 import services.AutoCompleteService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthAction
 
-class WhoIsYourAccountantNonUkAddressController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                          val autoCompleteService: AutoCompleteService,
-                                                          val authAction: AuthAction
-                                              ) extends WhoIsYourAccountantController {
+import scala.concurrent.Future
+
+class WhoIsYourAccountantNameController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                                  val autoCompleteService: AutoCompleteService,
+                                                  val authAction: AuthAction
+                                              )extends DefaultBaseController {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
@@ -35,32 +38,29 @@ class WhoIsYourAccountantNonUkAddressController @Inject()(val dataCacheConnector
         response =>
           val form = (for {
             businessActivities <- response
-            whoIsYourAccountant <- businessActivities.whoIsYourAccountant.flatMap(acc => acc.address)
+            whoIsYourAccountant <- businessActivities.whoIsYourAccountant.flatMap(acc => acc.names)
           } yield {
-            if(!whoIsYourAccountant.isUk) { Form2[AccountantsAddress](whoIsYourAccountant) } else { EmptyForm }
+            Form2[WhoIsYourAccountantName](whoIsYourAccountant)
           }).getOrElse(EmptyForm)
-          Ok(views.html.businessactivities.who_is_your_accountant_non_uk_address(form, edit, getName(response), autoCompleteService.getCountries))
+          Ok(views.html.businessactivities.who_is_your_accountant(form, edit))
       }
   }
 
   def post(edit : Boolean = false) = authAction.async {
     implicit request =>
-      Form2[NonUkAccountantsAddress](request.body) match {
+      Form2[WhoIsYourAccountantName](request.body) match {
         case f: InvalidForm =>
-          dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
-            response => BadRequest(views.html.businessactivities.who_is_your_accountant_non_uk_address(
-              f, edit, getName(response), autoCompleteService.getCountries))
-          }
+          Future.successful(BadRequest(views.html.businessactivities.who_is_your_accountant(f, edit)))
         case ValidForm(_, data) => {
           for {
             businessActivity <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
             _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
-              businessActivity.whoIsYourAccountant(businessActivity.flatMap(ba => ba.whoIsYourAccountant).map(acc => acc.copy(address = Option(data))))
+              businessActivity.whoIsYourAccountant(businessActivity.flatMap(ba => ba.whoIsYourAccountant).map(acc => acc.copy(names = Option(data))))
             )
           } yield if (edit) {
             Redirect(routes.SummaryController.get())
           } else {
-            Redirect(routes.TaxMattersController.get())
+            Redirect(routes.WhoIsYourAccountantIsUkController.get())
           }
         }
       }

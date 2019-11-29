@@ -39,8 +39,8 @@ POST        /employees                                            @controllers.b
 GET         /people-working-on-anti-money-laundering-activities   @controllers.businessactivities.EmployeeCountAMLSSupervisionController.get(edit: Boolean ?= false)
 POST        /people-working-on-anti-money-laundering-activities   @controllers.businessactivities.EmployeeCountAMLSSupervisionController.post(edit: Boolean ?= false)
 
-GET         /adviser-name                                         @controllers.businessactivities.WhoIsYourAccountantController.get(edit: Boolean ?= false)
-POST        /adviser-name                                         @controllers.businessactivities.WhoIsYourAccountantController.post(edit: Boolean ?= false)
+GET         /adviser-name                                         @controllers.businessactivities.WhoIsYourAccountantNameController.get(edit: Boolean ?= false)
+POST        /adviser-name                                         @controllers.businessactivities.WhoIsYourAccountantNameController.post(edit: Boolean ?= false)
 
 GET         /adviser-address-country                              @controllers.businessactivities.WhoIsYourAccountantIsUkController.get(edit: Boolean ?= false)
 POST        /adviser-address-country                              @controllers.businessactivities.WhoIsYourAccountantIsUkController.post(edit: Boolean ?= false)

@@ -229,7 +229,7 @@
 
                                     @checkYourAnswersRow(
                                         question = Messages("businessactivities.whoisyouraccountant.title"),
-                                        editUrl = controllers.businessactivities.routes.WhoIsYourAccountantController.get(true).toString
+                                        editUrl = controllers.businessactivities.routes.WhoIsYourAccountantNameController.get(true).toString
                                     ) {
                                         @accountant.names.map { names =>
                                             @if(!names.accountantsName.isEmpty) {

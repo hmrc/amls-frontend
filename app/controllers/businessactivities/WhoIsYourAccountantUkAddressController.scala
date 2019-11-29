@@ -18,7 +18,6 @@ package controllers.businessactivities
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{AccountantsAddress, BusinessActivities, UkAccountantsAddress}
 import services.AutoCompleteService
@@ -28,9 +27,7 @@ import utils.AuthAction
 class WhoIsYourAccountantUkAddressController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                        val autoCompleteService: AutoCompleteService,
                                                        val authAction: AuthAction
-                                              )extends DefaultBaseController {
-
-  private val defaultValues:AccountantsAddress = UkAccountantsAddress("", "", None, None, "")
+                                              ) extends WhoIsYourAccountantController {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
@@ -41,10 +38,8 @@ class WhoIsYourAccountantUkAddressController @Inject()(val dataCacheConnector: D
             whoIsYourAccountant <- businessActivities.whoIsYourAccountant.flatMap(acc => acc.address)
           } yield {
             if(whoIsYourAccountant.isUk) { Form2[AccountantsAddress](whoIsYourAccountant) } else { EmptyForm }
-          }).getOrElse(Form2(defaultValues))
-          Ok(views.html.businessactivities.who_is_your_accountant_uk_address(
-            form, edit,
-            response.flatMap(ba => ba.whoIsYourAccountant).flatMap(acc => acc.names).map(names => names.accountantsName).getOrElse("!!")))
+          }).getOrElse(EmptyForm)
+          Ok(views.html.businessactivities.who_is_your_accountant_uk_address(form, edit, getName(response)))
       }
   }
 
@@ -69,8 +64,4 @@ class WhoIsYourAccountantUkAddressController @Inject()(val dataCacheConnector: D
         }
       }
   }
-
-  private def getName(response: Option[BusinessActivities]): String = response
-    .flatMap(ba => ba.whoIsYourAccountant).flatMap(acc => acc.names).map(acc => acc.accountantsName).getOrElse("")
-
 }

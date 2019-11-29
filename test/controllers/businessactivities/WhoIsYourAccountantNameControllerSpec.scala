@@ -31,7 +31,7 @@ import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks}
 
 import scala.concurrent.Future
 
-class WhoIsYourAccountantControllerSpec extends AmlsSpec
+class WhoIsYourAccountantNameControllerSpec extends AmlsSpec
   with MockitoSugar
   with ScalaFutures
   with PrivateMethodTester {
@@ -40,7 +40,7 @@ class WhoIsYourAccountantControllerSpec extends AmlsSpec
     self =>
     val request = addToken(authRequest)
 
-    val controller = new WhoIsYourAccountantController (
+    val controller = new WhoIsYourAccountantNameController (
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
       autoCompleteService = mockAutoComplete

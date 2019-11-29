@@ -16,55 +16,17 @@
 
 package controllers.businessactivities
 
-import com.google.inject.Inject
-import connectors.DataCacheConnector
 import controllers.DefaultBaseController
-import forms.{Form2, InvalidForm, ValidForm}
-import models.businessactivities.{BusinessActivities, WhoIsYourAccountantName}
-import services.AutoCompleteService
+import models.businessactivities.BusinessActivities
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AuthAction
 
-import scala.concurrent.Future
+abstract class WhoIsYourAccountantController extends DefaultBaseController {
 
-class WhoIsYourAccountantController @Inject() ( val dataCacheConnector: DataCacheConnector,
-                                                val autoCompleteService: AutoCompleteService,
-                                                val authAction: AuthAction
-                                              )extends DefaultBaseController {
-
-  private val defaultValues = WhoIsYourAccountantName("", None)
-
-  def get(edit: Boolean = false) = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
-        response =>
-          val form = (for {
-            businessActivities <- response
-            whoIsYourAccountant <- businessActivities.whoIsYourAccountant.flatMap(acc => acc.names)
-          } yield {
-            Form2[WhoIsYourAccountantName](whoIsYourAccountant)
-          }).getOrElse(Form2(defaultValues))
-          Ok(views.html.businessactivities.who_is_your_accountant(form, edit))
-      }
-  }
-
-  def post(edit : Boolean = false) = authAction.async {
-    implicit request =>
-      Form2[WhoIsYourAccountantName](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.businessactivities.who_is_your_accountant(f, edit)))
-        case ValidForm(_, data) => {
-          for {
-            businessActivity <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
-              businessActivity.whoIsYourAccountant(businessActivity.flatMap(ba => ba.whoIsYourAccountant).map(acc => acc.copy(names = Option(data))))
-            )
-          } yield if (edit) {
-            Redirect(routes.SummaryController.get())
-          } else {
-            Redirect(routes.WhoIsYourAccountantIsUkController.get())
-          }
-        }
-      }
+  protected def getName(response: Option[BusinessActivities]): String = {
+    (for {
+      businessActivities <- response
+      whoIsYourAccountant <- businessActivities.whoIsYourAccountant
+      names <- whoIsYourAccountant.names
+    } yield (names.accountantsName)).getOrElse("")
   }
 }
