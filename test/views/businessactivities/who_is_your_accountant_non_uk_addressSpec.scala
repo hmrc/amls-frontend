@@ -61,10 +61,10 @@ class who_is_your_accountant_non_uk_addressSpec extends AmlsSpec with MustMatche
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "addressLine1") -> Seq(ValidationError("fourth not a message Key")),
-          (Path \ "addressLine2") -> Seq(ValidationError("fifth not a message Key")),
-          (Path \ "addressLine3") -> Seq(ValidationError("sixth not a message Key")),
-          (Path \ "addressLine4") -> Seq(ValidationError("seventh not a message Key")),
+          (Path \ "addressLineNonUK1") -> Seq(ValidationError("fourth not a message Key")),
+          (Path \ "addressLineNonUK2") -> Seq(ValidationError("fifth not a message Key")),
+          (Path \ "addressLineNonUK3") -> Seq(ValidationError("sixth not a message Key")),
+          (Path \ "addressLineNonUK4") -> Seq(ValidationError("seventh not a message Key")),
           (Path \ "country") -> Seq(ValidationError("ninth not a message Key"))
         ))
 
@@ -76,16 +76,16 @@ class who_is_your_accountant_non_uk_addressSpec extends AmlsSpec with MustMatche
       errorSummary.html() must include("seventh not a message Key")
       errorSummary.html() must include("ninth not a message Key")
 
-      doc.getElementById("addressLine1").parent
+      doc.getElementById("addressLineNonUK1").parent
         .getElementsByClass("error-notification").first().html() must include("fourth not a message Key")
 
-      doc.getElementById("addressLine2").parent
+      doc.getElementById("addressLineNonUK2").parent
         .getElementsByClass("error-notification").first().html() must include("fifth not a message Key")
 
-      doc.getElementById("addressLine3").parent
+      doc.getElementById("addressLineNonUK3").parent
         .getElementsByClass("error-notification").first().html() must include("sixth not a message Key")
 
-      doc.getElementById("addressLine4").parent
+      doc.getElementById("addressLineNonUK4").parent
         .getElementsByClass("error-notification").first().html() must include("seventh not a message Key")
 
       doc.getElementById("country").parent

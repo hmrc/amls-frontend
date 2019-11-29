@@ -103,10 +103,10 @@ object AccountantsAddress {
   implicit val nonUkFormRule: Rule[UrlFormEncoded, NonUkAccountantsAddress] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
       (
-        (__ \ "addressLine1").read(addressLine1Rule) ~
-        (__ \ "addressLine2").read(addressLine2Rule) ~
-        (__ \ "addressLine3").read(optionR(addressLine3Rule)) ~
-        (__ \ "addressLine4").read(optionR(addressLine4Rule)) ~
+        (__ \ "addressLineNonUK1").read(addressLine1Rule) ~
+        (__ \ "addressLineNonUK2").read(addressLine2Rule) ~
+        (__ \ "addressLineNonUK3").read(optionR(addressLine3Rule)) ~
+        (__ \ "addressLineNonUK4").read(optionR(addressLine4Rule)) ~
         (__ \ "country").read[Country]
       ) (NonUkAccountantsAddress.apply)
   }
@@ -120,10 +120,10 @@ object AccountantsAddress {
           "postCode" -> Seq(address.postCode)
         )
         case address: NonUkAccountantsAddress => Map(
-          "addressLine1" -> Seq(address.addressLine1),
-          "addressLine2" -> Seq(address.addressLine2),
-          "addressLine3" -> address.addressLine3.toSeq,
-          "addressLine4" -> address.addressLine4.toSeq,
+          "addressLineNonUK1" -> Seq(address.addressLine1),
+          "addressLineNonUK2" -> Seq(address.addressLine2),
+          "addressLineNonUK3" -> address.addressLine3.toSeq,
+          "addressLineNonUK4" -> address.addressLine4.toSeq,
           "country" -> Seq(address.country.code)
         )
   }

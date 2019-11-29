@@ -75,10 +75,10 @@ class AccountantsAddressSpec extends PlaySpec {
 
   val testNonUKModel = Map(
     "isUK" -> Seq("false"),
-    "addressLine1" -> Seq(testAddressLine1),
-    "addressLine2" -> Seq(testAddressLine2),
-    "addressLine3" -> Seq("Default Line 3"),
-    "addressLine4" -> Seq("Default Line 4"),
+    "addressLineNonUK1" -> Seq(testAddressLine1),
+    "addressLineNonUK2" -> Seq(testAddressLine2),
+    "addressLineNonUK3" -> Seq("Default Line 3"),
+    "addressLineNonUK4" -> Seq("Default Line 4"),
     "country" -> Seq(testCountry.code)
   )
 

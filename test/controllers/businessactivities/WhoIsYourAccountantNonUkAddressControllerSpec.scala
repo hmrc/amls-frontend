@@ -64,10 +64,10 @@ class WhoIsYourAccountantNonUkAddressControllerSpec extends AmlsSpec
         status(result) must be(OK)
 
         val page = Jsoup.parse(contentAsString(result))
-        page.getElementById("addressLine1").`val` must be("")
-        page.getElementById("addressLine2").`val` must be("")
-        page.getElementById("addressLine3").`val` must be("")
-        page.getElementById("addressLine4").`val` must be("")
+        page.getElementById("addressLineNonUK1").`val` must be("")
+        page.getElementById("addressLineNonUK2").`val` must be("")
+        page.getElementById("addressLineNonUK3").`val` must be("")
+        page.getElementById("addressLineNonUK4").`val` must be("")
         page.select("#country option[selected]").attr("value") must be("")
       }
 
@@ -86,10 +86,10 @@ class WhoIsYourAccountantNonUkAddressControllerSpec extends AmlsSpec
         status(result) must be(OK)
 
         val page = Jsoup.parse(contentAsString(result))
-        page.getElementById("addressLine1").`val` must be("line1")
-        page.getElementById("addressLine2").`val` must be("line2")
-        page.getElementById("addressLine3").`val` must be("line3")
-        page.getElementById("addressLine4").`val` must be("line4")
+        page.getElementById("addressLineNonUK1").`val` must be("line1")
+        page.getElementById("addressLineNonUK2").`val` must be("line2")
+        page.getElementById("addressLineNonUK3").`val` must be("line3")
+        page.getElementById("addressLineNonUK4").`val` must be("line4")
         page.select("#country option[selected]").attr("value") must be("AL")
       }
     }
@@ -121,10 +121,10 @@ class WhoIsYourAccountantNonUkAddressControllerSpec extends AmlsSpec
         "respond with SEE_OTHER and redirect to the SummaryController" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "addressLine1" -> "line1",
-            "addressLine2" -> "line2",
-            "addressLine3" -> "line3",
-            "addressLine4" -> "line4",
+            "addressLineNonUK1" -> "line1",
+            "addressLineNonUK2" -> "line2",
+            "addressLineNonUK3" -> "line3",
+            "addressLineNonUK4" -> "line4",
             "country" -> "AL"
           )
 
@@ -145,10 +145,10 @@ class WhoIsYourAccountantNonUkAddressControllerSpec extends AmlsSpec
         "respond with SEE_OTHER and redirect to the TaxMattersController" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "addressLine1" -> "line1",
-            "addressLine2" -> "line2",
-            "addressLine3" -> "line3",
-            "addressLine4" -> "line4",
+            "addressLineNonUK1" -> "line1",
+            "addressLineNonUK2" -> "line2",
+            "addressLineNonUK3" -> "line3",
+            "addressLineNonUK4" -> "line4",
             "country" -> "AL"
           )
 
