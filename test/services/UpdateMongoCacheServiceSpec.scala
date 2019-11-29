@@ -182,7 +182,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
 
     val ampData = Json.obj(
       "typeOfParticipant"     -> Seq("artGalleryOwner"),
-      "boughtOrSoldOverThreshold"     -> true,
+      "soldOverThreshold"     -> true,
       "dateTransactionOverThreshold"  -> LocalDate.now.toString,
       "identifyLinkedTransactions"    -> true,
       "percentageExpectedTurnover"    -> "fortyOneToSixty"

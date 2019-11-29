@@ -39,7 +39,7 @@ class AmpControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   val completeData = Json.obj(
     "typeOfParticipant"             -> Seq("artGalleryOwner"),
-    "boughtOrSoldOverThreshold"     -> true,
+    "soldOverThreshold"     -> true,
     "dateTransactionOverThreshold"  -> LocalDate.now,
     "identifyLinkedTransactions"    -> true,
     "percentageExpectedTurnover"    -> "fortyOneToSixty"

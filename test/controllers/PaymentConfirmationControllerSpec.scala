@@ -42,7 +42,7 @@ import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.{AmlsSpec, AuthorisedFixture, FeeHelper}
 
 import scala.concurrent.Future
 
@@ -66,12 +66,10 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
       feeResponseService = mock[FeeResponseService],
       auditConnector = mock[AuditConnector],
       ds = commonDependencies,
-      cc = mockMcc)
+      cc = mockMcc,
+      feeHelper = mock[FeeHelper])
 
     val amlsRegistrationNumber = "amlsRefNumber"
-
-    when(controller.enrolmentService.amlsRegistrationNumber(any(), any())(any(), any()))
-      .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
     val response = subscriptionResponseGen(hasFees = true).sample.get
 
@@ -119,7 +117,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
     )
 
     when {
-      controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any[(String, String)]())(any(), any())
+      controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
     } thenReturn Future.successful(Some(feeResponse(SubscriptionResponseType)))
 
     val breakdownRows = Seq.empty[BreakdownRow]

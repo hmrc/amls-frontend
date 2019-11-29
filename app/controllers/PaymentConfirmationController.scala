@@ -29,10 +29,11 @@ import models.status._
 import models.{FeeResponse, ReadStatusResponse}
 import play.api.Logger
 import play.api.mvc.MessagesControllerComponents
+import models.ReadStatusResponse
 import services.{AuthEnrolmentsService, FeeResponseService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import utils.{AuthAction, BusinessName}
+import utils.{AuthAction, BusinessName, FeeHelper}
 import views.html.confirmation._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -47,7 +48,8 @@ class PaymentConfirmationController @Inject()(authAction: AuthAction,
                                               private[controllers] val feeResponseService: FeeResponseService,
                                               private[controllers] val enrolmentService: AuthEnrolmentsService,
                                               private[controllers] val auditConnector: AuditConnector,
-                                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                              val cc: MessagesControllerComponents,
+                                              val feeHelper: FeeHelper) extends AmlsBaseController(ds, cc) {
 
   val prefix = "[PaymentConfirmationController]"
 
@@ -96,19 +98,9 @@ class PaymentConfirmationController @Inject()(authAction: AuthAction,
   private def doAudit(paymentStatus: PaymentStatus, amlsRegistrationNumber: Option[String], accountTypeId: (String, String), groupIdentifier: Option[String])
                      (implicit hc: HeaderCarrier) = {
     for {
-      fees <- OptionT(retrieveFeeResponse(amlsRegistrationNumber, accountTypeId, groupIdentifier))
+      fees <- OptionT(feeHelper.retrieveFeeResponse(amlsRegistrationNumber, accountTypeId, groupIdentifier, prefix))
       payRef <- OptionT.fromOption[Future](fees.paymentReference)
       result <- OptionT.liftF(auditConnector.sendEvent(PaymentConfirmationEvent(fees.amlsReferenceNumber, payRef, paymentStatus)))
     } yield result
-  }
-
-  private def retrieveFeeResponse(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), groupIdentifier: Option[String])
-                                 (implicit hc: HeaderCarrier): Future[Option[FeeResponse]] = {
-
-    Logger.debug(s"[$prefix][retrieveFeeResponse] - Begin...)")
-    (for {
-      amlsRegNo <- OptionT(enrolmentService.amlsRegistrationNumber(amlsRegistrationNumber, groupIdentifier))
-      fees <- OptionT(feeResponseService.getFeeResponse(amlsRegNo, accountTypeId))
-    } yield fees).value
   }
 }

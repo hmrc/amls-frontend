@@ -25,10 +25,10 @@ import models.confirmation.{BreakdownRow, Currency}
 import models.status._
 import models.{FeeResponse, SubmissionRequestStatus}
 import play.api.Logger
-import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
+import play.api.mvc.{AnyContent, Request, Result}
 import services.{AuthEnrolmentsService, FeeResponseService, StatusService, _}
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.{AuthAction, BusinessName}
+import utils.{AuthAction, BusinessName, FeeHelper}
 import views.html.confirmation._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -42,10 +42,10 @@ class ConfirmationController @Inject()(authAction: AuthAction,
                                        private[controllers] implicit val amlsConnector: AmlsConnector,
                                        private[controllers] implicit val statusService: StatusService,
                                        private[controllers] val authenticator: AuthenticatorConnector,
-                                       private[controllers] val feeResponseService: FeeResponseService,
                                        private[controllers] val enrolmentService: AuthEnrolmentsService,
                                        private[controllers] val confirmationService: ConfirmationService,
-                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                       val cc: MessagesControllerComponents,
+                                       val feeHelper: FeeHelper) extends AmlsBaseController(ds, cc) {
 
   val prefix = "[ConfirmationController]"
 
@@ -107,7 +107,7 @@ class ConfirmationController @Inject()(authAction: AuthAction,
 
     Logger.debug(s"[$prefix][resultFromStatus] - Begin get fee response...)")
 
-    OptionT.liftF(retrieveFeeResponse(amlsRegistrationNumber, accountTypeId, groupIdentifier)) flatMap {
+    OptionT.liftF(feeHelper.retrieveFeeResponse(amlsRegistrationNumber, accountTypeId, groupIdentifier, prefix)) flatMap {
       case Some(fees) if fees.paymentReference.isDefined && fees.toPay(status, submissionRequestStatus) > 0 =>
         Logger.debug(s"[$prefix][resultFromStatus] - Fee found)")
         lazy val breakdownRows = confirmationService.getBreakdownRows(credId, status, fees)
@@ -132,15 +132,5 @@ class ConfirmationController @Inject()(authAction: AuthAction,
       } yield {
         Ok(confirmation_no_fee(name))}
     } getOrElse InternalServerError("Could not determine a response")
-  }
-
-  private def retrieveFeeResponse(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), groupIdentifier: Option[String])
-                                 (implicit hc: HeaderCarrier): Future[Option[FeeResponse]] = {
-
-    Logger.debug(s"[$prefix][retrieveFeeResponse] - Begin...)")
-    (for {
-      amlsRegNo <- OptionT(enrolmentService.amlsRegistrationNumber(amlsRegistrationNumber, groupIdentifier))
-      fees <- OptionT(feeResponseService.getFeeResponse(amlsRegNo, accountTypeId))
-    } yield fees).value
   }
 }
