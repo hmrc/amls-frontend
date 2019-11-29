@@ -62,7 +62,6 @@ class ConfirmationControllerSpec extends AmlsSpec
       amlsConnector = mock[AmlsConnector],
       ds = commonDependencies,
       enrolmentService = mock[AuthEnrolmentsService],
-      feeResponseService = mock[FeeResponseService],
       authenticator = mock[AuthenticatorConnector],
       confirmationService = mock[ConfirmationService],
       cc = mockMcc,
