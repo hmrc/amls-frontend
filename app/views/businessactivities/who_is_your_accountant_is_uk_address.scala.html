@@ -17,10 +17,9 @@
 @import forms.Form2
 @import include._
 @import include.forms2._
-@import config.ApplicationConfig
 @import models.autocomplete._
 
-@(f: Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
+@(f: Form2[_], edit: Boolean, personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @components.back_link()
@@ -28,30 +27,32 @@
 }
 
 @main(
-    title = Messages("businessactivities.whoisyouraccountant.title") + " - " + Messages("summary.businessactivities"),
+    title = Messages("businessactivities.whoisyouraccountant.location.title") + " - " + Messages("summary.businessactivities"),
     heading = header
 ) {
 
-    @form(f, controllers.businessactivities.routes.WhoIsYourAccountantNameController.post(edit)) {
+    @form(f, controllers.businessactivities.routes.WhoIsYourAccountantIsUkController.post(edit)) {
 
         @fieldset(
-            heading = "businessactivities.whoisyouraccountant.title",
+            heading = Messages("businessactivities.whoisyouraccountant.location.header", personName),
             section = "summary.businessactivities",
+            f = f("isUK"),
             panel = false,
-            f = f("whoisyouraccountant-fieldset"),
-            classes = Seq("form-group")
+            classes = Seq("inline form-group")
         ) {
-            @input(
-                field = f("name"),
-                labelText = "businessactivities.whoisyouraccountant.name"
+            @radio(
+                f = f("isUK"),
+                labelText = "lbl.yes",
+                value = "true"
             )
-
-            @input(
-                field = f("tradingName"),
-                labelText = "businessactivities.whoisyouraccountant.tradingName"
+            @radio(
+                f = f("isUK"),
+                labelText = "lbl.no",
+                value = "false"
             )
         }
 
         @submit(edit)
+
     }
 }

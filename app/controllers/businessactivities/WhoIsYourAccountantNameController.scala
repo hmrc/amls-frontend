@@ -19,9 +19,10 @@ package controllers.businessactivities
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, UkAccountantsAddress, WhoIsYourAccountant}
 import play.api.mvc.MessagesControllerComponents
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessactivities.{BusinessActivities, WhoIsYourAccountantName}
 import services.AutoCompleteService
 import utils.AuthAction
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -34,38 +35,35 @@ class WhoIsYourAccountantController @Inject() ( val dataCacheConnector: DataCach
                                                 val ds: CommonPlayDependencies,
                                                 val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
-  //Joe - cannot seem to provide a default for UK/Non UK without providing defaults for other co-products
-  private val defaultValues = WhoIsYourAccountant("", None, UkAccountantsAddress("","", None, None, ""))
-
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
         response =>
           val form = (for {
             businessActivities <- response
-            whoIsYourAccountant <- businessActivities.whoIsYourAccountant
+            whoIsYourAccountant <- businessActivities.whoIsYourAccountant.flatMap(acc => acc.names)
           } yield {
-            Form2[WhoIsYourAccountant](whoIsYourAccountant)
-          }).getOrElse(Form2(defaultValues))
-          Ok(views.html.businessactivities.who_is_your_accountant(form, edit, autoCompleteService.getCountries))
+            Form2[WhoIsYourAccountantName](whoIsYourAccountant)
+          }).getOrElse(EmptyForm)
+          Ok(views.html.businessactivities.who_is_your_accountant(form, edit))
       }
   }
 
   def post(edit : Boolean = false) = authAction.async {
     implicit request =>
-      Form2[WhoIsYourAccountant](request.body) match {
+      Form2[WhoIsYourAccountantName](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.businessactivities.who_is_your_accountant(f, edit, autoCompleteService.getCountries)))
+          Future.successful(BadRequest(views.html.businessactivities.who_is_your_accountant(f, edit)))
         case ValidForm(_, data) => {
           for {
             businessActivity <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
             _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
-              businessActivity.whoIsYourAccountant(Some(data))
+              businessActivity.whoIsYourAccountant(businessActivity.flatMap(ba => ba.whoIsYourAccountant).map(acc => acc.copy(names = Option(data))))
             )
           } yield if (edit) {
             Redirect(routes.SummaryController.get())
           } else {
-            Redirect(routes.TaxMattersController.get())
+            Redirect(routes.WhoIsYourAccountantIsUkController.get())
           }
         }
       }

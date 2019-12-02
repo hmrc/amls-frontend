@@ -56,7 +56,7 @@ class AccountantForAMLSRegulationsController @Inject() (val dataCacheConnector: 
             businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId,BusinessActivities.key)
             _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key, updateModel(businessActivities, Some(data)))
           } yield (edit, data.accountantForAMLSRegulations) match {
-            case (false, true) | (true, true) => Redirect(routes.WhoIsYourAccountantController.get())
+            case (false, true) | (true, true) => Redirect(routes.WhoIsYourAccountantNameController.get())
             case _ => Redirect(routes.SummaryController.get())
           }
       }

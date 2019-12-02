@@ -96,7 +96,7 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
 
             val result = controller.post(true)(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.businessactivities.routes.WhoIsYourAccountantController.get().url))
+            redirectLocation(result) must be(Some(controllers.businessactivities.routes.WhoIsYourAccountantNameController.get().url))
           }
 
           "successfully redirect to the SummaryController on selection of Option 'No'" in new Fixture {
@@ -128,7 +128,7 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
 
             val result = controller.post(false)(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.businessactivities.routes.WhoIsYourAccountantController.get().url))
+            redirectLocation(result) must be(Some(controllers.businessactivities.routes.WhoIsYourAccountantNameController.get().url))
           }
 
           "successfully redirect to the SummaryController on selection of Option 'No'" in new Fixture {

@@ -120,8 +120,10 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
       riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(PaperBased)))),
       howManyEmployees = Some(HowManyEmployees(Some("5"), Some("4"))),
       identifySuspiciousActivity = Some(IdentifySuspiciousActivity(true)),
-      whoIsYourAccountant = Some(WhoIsYourAccountant("Accountant's name", Some("Accountant's trading name"),
-        UkAccountantsAddress("address1", "address2", Some("address3"), Some("address4"), "POSTCODE"))),
+      whoIsYourAccountant = Some(WhoIsYourAccountant(
+        Some(WhoIsYourAccountantName("Accountant's name", Some("Accountant's trading name"))),
+        Some(WhoIsYourAccountantIsUk(true)),
+        Some(UkAccountantsAddress("address1", "address2", Some("address3"), Some("address4"), "POSTCODE")))),
       taxMatters = Some(TaxMatters(false)),
       transactionRecordTypes = Some(TransactionTypes(Set(Paper))),
       hasChanged = false,
