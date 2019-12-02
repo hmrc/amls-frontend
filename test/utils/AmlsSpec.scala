@@ -62,12 +62,6 @@ trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with 
     CSRFRequest(fakeRequest.withHeaders((csrfConfig.headerName, token))).withCSRFToken
   }
 
-  def addTokenForView[T]() = {
-    import play.api.test.CSRFTokenHelper._
-
-    CSRFRequest(authRequest).withCSRFToken
-  }
-
   def addTokenWithUrlEncodedBody[T](fakeRequest: FakeRequest[T])(data: (String,String)*) = {
     import play.api.test.CSRFTokenHelper._
 
