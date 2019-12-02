@@ -16,12 +16,11 @@
 
 package models.businessactivities
 
-import config.ApplicationConfig
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
-import uk.gov.hmrc.http.cache.client.CacheMap
 import models.businessactivities.TransactionTypes._
 import models.businessmatching.{AccountancyServices, BusinessMatching, BusinessActivities => BusinessMatchingActivities}
+import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.api.Logger
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.ControllerHelper
 
 case class BusinessActivities(
@@ -125,30 +124,28 @@ case class BusinessActivities(
 
     this match {
       case ba@BusinessActivities(
-      Some(InvolvedInOtherNo), _, Some(_), Some(_), Some(_), _,
-      Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, true) if !containsASP =>
-        (ba.accountantForAMLSRegulations, ba.whoIsYourAccountant, ba.taxMatters) match {
-          case (Some(AccountantForAMLSRegulations(true)), Some(_), Some(_)) => true
-          case (Some(AccountantForAMLSRegulations(false)), _, _) => true
-          case _ => false
-        }
+        Some(InvolvedInOtherNo), _, Some(_), Some(_), Some(_), _, Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, true) if !containsASP =>
+          (ba.accountantForAMLSRegulations, ba.whoIsYourAccountant, ba.taxMatters) match {
+            case (Some(AccountantForAMLSRegulations(true)), Some(accountant), Some(_)) if accountant.isComplete => true
+            case (Some(AccountantForAMLSRegulations(false)), _, _) => true
+            case _ => false
+          }
 
       case ba@BusinessActivities(
-      Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), _,
-      Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, true) if !containsASP =>
-        (ba.accountantForAMLSRegulations, ba.whoIsYourAccountant, ba.taxMatters) match {
-          case (Some(AccountantForAMLSRegulations(true)), Some(_), Some(_)) => true
-          case (Some(AccountantForAMLSRegulations(false)), _, _) => true
-          case _ => false
-        }
+        Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), _, Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, true) if !containsASP =>
+          (ba.accountantForAMLSRegulations, ba.whoIsYourAccountant, ba.taxMatters) match {
+            case (Some(AccountantForAMLSRegulations(true)), Some(accountant), Some(_)) if accountant.isComplete => true
+            case (Some(AccountantForAMLSRegulations(false)), _, _) => true
+            case _ => false
+          }
 
       case BusinessActivities(
-      Some(InvolvedInOtherNo), _, Some(_), Some(_), Some(_), _,
-      Some(_), _, Some(_), Some(_), Some(_), _, _, _, _, true) if containsASP => true
+        Some(InvolvedInOtherNo), _, Some(_), Some(_), Some(_), _,
+        Some(_), _, Some(_), Some(_), Some(_), _, _, _, _, true) if containsASP => true
 
       case BusinessActivities(
-      Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), _,
-      Some(_), _, Some(_), Some(_), Some(_), _, _, _, _, true) if containsASP => true
+        Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), _,
+        Some(_), _, Some(_), Some(_), Some(_), _, _, _, _, true) if containsASP => true
 
       case _ => false
     }

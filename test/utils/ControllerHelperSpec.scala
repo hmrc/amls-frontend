@@ -17,7 +17,7 @@
 package utils
 
 import forms.InvalidForm
-import models.businessactivities.{BusinessActivities, UkAccountantsAddress, WhoIsYourAccountant}
+import models.businessactivities.{BusinessActivities, UkAccountantsAddress, WhoIsYourAccountant, WhoIsYourAccountantIsUk, WhoIsYourAccountantName}
 import models.responsiblepeople._
 import models.supervision._
 import org.joda.time.LocalDate
@@ -47,9 +47,10 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
   }
 
   val accountantNameCompleteModel = Some(BusinessActivities(
-    whoIsYourAccountant = Some(WhoIsYourAccountant(accountantsName = "Accountant name",
-      accountantsTradingName = None,
-      address = UkAccountantsAddress("", "", None, None, "")))))
+    whoIsYourAccountant = Some(WhoIsYourAccountant(
+      Some(WhoIsYourAccountantName("Accountant name", None)),
+      Some(WhoIsYourAccountantIsUk(true)),
+      Some(UkAccountantsAddress("", "", None, None, ""))))))
 
   val accountantNameInCompleteModel = Some(BusinessActivities(
     whoIsYourAccountant = None))

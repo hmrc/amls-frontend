@@ -52,9 +52,10 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(BusinessActivities(
-            whoIsYourAccountant = Some(WhoIsYourAccountant(accountantsName = "Accountant name",
-              accountantsTradingName = None,
-              address = UkAccountantsAddress("", "", None, None, "")))))))
+            whoIsYourAccountant = Some(WhoIsYourAccountant(
+              Some(WhoIsYourAccountantName("Accountant name", accountantsTradingName = None)),
+              Some(WhoIsYourAccountantIsUk(true)),
+              Some(UkAccountantsAddress("", "", None, None, ""))))))))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -69,8 +70,10 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(BusinessActivities(taxMatters = Some(TaxMatters(true)),
-            whoIsYourAccountant = Some(WhoIsYourAccountant(accountantsName = "Accountant name",
-              accountantsTradingName = None, address = UkAccountantsAddress("", "", None, None, "")))))))
+            whoIsYourAccountant = Some(WhoIsYourAccountant(
+              Some(WhoIsYourAccountantName("Accountant name", accountantsTradingName = None)),
+              Some(WhoIsYourAccountantIsUk(true)),
+              Some(UkAccountantsAddress("", "", None, None, ""))))))))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -103,9 +106,11 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
         val accountantsName = "Accountant name"
         when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(BusinessActivities(
-            whoIsYourAccountant = Some(WhoIsYourAccountant(accountantsName = accountantsName,
-              accountantsTradingName = None,
-              address = UkAccountantsAddress("", "", None, None, "")))))))
+            whoIsYourAccountant = Some(
+              WhoIsYourAccountant(
+                Some(WhoIsYourAccountantName(accountantsName, None)),
+                None,
+                None))))))
 
         val newRequest = request.withFormUrlEncodedBody(
           "manageYourTaxAffairs" -> "grrrrr"

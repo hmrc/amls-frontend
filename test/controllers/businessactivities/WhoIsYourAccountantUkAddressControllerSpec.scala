@@ -18,8 +18,7 @@ package controllers.businessactivities
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
-import models.Country
-import models.businessactivities.{BusinessActivities, NonUkAccountantsAddress, WhoIsYourAccountant}
+import models.businessactivities._
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -32,7 +31,7 @@ import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks}
 
 import scala.concurrent.Future
 
-class WhoIsYourAccountantControllerSpec extends AmlsSpec
+class WhoIsYourAccountantUkAddressControllerSpec extends AmlsSpec
   with MockitoSugar
   with ScalaFutures
   with PrivateMethodTester {
@@ -41,7 +40,7 @@ class WhoIsYourAccountantControllerSpec extends AmlsSpec
     self =>
     val request = addToken(authRequest)
 
-    val controller = new WhoIsYourAccountantController (
+    val controller = new WhoIsYourAccountantUkAddressController(
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
       autoCompleteService = mockAutoComplete
@@ -64,16 +63,11 @@ class WhoIsYourAccountantControllerSpec extends AmlsSpec
         status(result) must be(OK)
 
         val page = Jsoup.parse(contentAsString(result))
-        page.getElementById("name").`val` must be("")
-        page.getElementById("tradingName").`val` must be("")
-        page.getElementById("isUK-true").hasAttr("checked") must be(true)
-        page.getElementById("isUK-false").hasAttr("checked") must be(false)
         page.getElementById("addressLine1").`val` must be("")
         page.getElementById("addressLine2").`val` must be("")
         page.getElementById("addressLine3").`val` must be("")
         page.getElementById("addressLine4").`val` must be("")
         page.getElementById("postCode").`val` must be("")
-        page.select("#country option[selected]").attr("value") must be("")
       }
 
       "show the who is your accountant page when there is existing data" in new Fixture {
@@ -81,9 +75,9 @@ class WhoIsYourAccountantControllerSpec extends AmlsSpec
         when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(BusinessActivities(
             whoIsYourAccountant = Some(WhoIsYourAccountant(
-              "testname",
-              Some("testtradingName"),
-              NonUkAccountantsAddress("line1","line2",Some("line3"),Some("line4"), Country("Albania", "AL"))
+              Some(WhoIsYourAccountantName("testname", Some("testtradingName"))),
+              Some(WhoIsYourAccountantIsUk(true)),
+              Some(UkAccountantsAddress("line1","line2",Some("line3"),Some("line4"), "POSTCODE"))
             ))
           ))))
 
@@ -91,16 +85,11 @@ class WhoIsYourAccountantControllerSpec extends AmlsSpec
         status(result) must be(OK)
 
         val page = Jsoup.parse(contentAsString(result))
-        page.getElementById("name").`val` must be("testname")
-        page.getElementById("tradingName").`val` must be("testtradingName")
-        page.getElementById("isUK-true").hasAttr("checked") must be(false)
-        page.getElementById("isUK-false").hasAttr("checked") must be(true)
         page.getElementById("addressLine1").`val` must be("line1")
         page.getElementById("addressLine2").`val` must be("line2")
         page.getElementById("addressLine3").`val` must be("line3")
         page.getElementById("addressLine4").`val` must be("line4")
-        page.getElementById("postCode").`val` must be("")
-        page.select("#country option[selected]").attr("value") must be("AL")
+        page.getElementById("postCode").`val` must be("POSTCODE")
       }
     }
 
@@ -108,6 +97,15 @@ class WhoIsYourAccountantControllerSpec extends AmlsSpec
 
       "given invalid data" must {
         "respond with BAD_REQUEST" in new Fixture {
+
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+            .thenReturn(Future.successful(Some(BusinessActivities(
+              whoIsYourAccountant = Some(WhoIsYourAccountant(
+                Some(WhoIsYourAccountantName("testname", Some("testtradingName"))),
+                None,
+                None
+              ))
+            ))))
 
           val newRequest = request.withFormUrlEncodedBody(
             "name" -> ""
@@ -122,9 +120,6 @@ class WhoIsYourAccountantControllerSpec extends AmlsSpec
         "respond with SEE_OTHER and redirect to the SummaryController" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "name" -> "testName",
-            "tradingName" -> "tradingName",
-            "isUK" -> "true",
             "addressLine1" -> "line1",
             "addressLine2" -> "line2",
             "addressLine3" -> "line3",
@@ -149,9 +144,6 @@ class WhoIsYourAccountantControllerSpec extends AmlsSpec
         "respond with SEE_OTHER and redirect to the TaxMattersController" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "name" -> "testName",
-            "tradingName" -> "tradingName",
-            "isUK" -> "true",
             "addressLine1" -> "line1",
             "addressLine2" -> "line2",
             "addressLine3" -> "line3",

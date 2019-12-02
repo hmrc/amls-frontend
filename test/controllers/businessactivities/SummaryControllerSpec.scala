@@ -224,9 +224,9 @@ object BusinessActivitiesValues {
   val DefaultRiskAssessments = RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(PaperBased)))
   val DefaultHowManyEmployees = HowManyEmployees(Some("5"),Some("4"))
   val DefaultWhoIsYourAccountant = WhoIsYourAccountant(
-    "Accountant's name",
-    Some("Accountant's trading name"),
-    UkAccountantsAddress("address1", "address2", Some("address3"), Some("address4"), "POSTCODE")
+    Some(WhoIsYourAccountantName("Accountant's name", Some("Accountant's trading name"))),
+    Some(WhoIsYourAccountantIsUk(true)),
+    Some(UkAccountantsAddress("address1", "address2", Some("address3"), Some("address4"), "POSTCODE"))
   )
   val DefaultIdentifySuspiciousActivity = IdentifySuspiciousActivity(true)
   val DefaultTaxMatters = TaxMatters(false)

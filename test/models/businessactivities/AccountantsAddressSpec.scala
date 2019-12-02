@@ -16,10 +16,9 @@
 
 package models.businessactivities
 
-import models.{Country, FormTypes}
+import jto.validation.{Invalid, Path, Valid, ValidationError}
+import models.Country
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Valid, Invalid, Path}
-import jto.validation.ValidationError
 import play.api.libs.json.{JsSuccess, Json}
 
 class AccountantsAddressSpec extends PlaySpec {
@@ -76,10 +75,10 @@ class AccountantsAddressSpec extends PlaySpec {
 
   val testNonUKModel = Map(
     "isUK" -> Seq("false"),
-    "addressLine1" -> Seq(testAddressLine1),
-    "addressLine2" -> Seq(testAddressLine2),
-    "addressLine3" -> Seq("Default Line 3"),
-    "addressLine4" -> Seq("Default Line 4"),
+    "addressLineNonUK1" -> Seq(testAddressLine1),
+    "addressLineNonUK2" -> Seq(testAddressLine2),
+    "addressLineNonUK3" -> Seq("Default Line 3"),
+    "addressLineNonUK4" -> Seq("Default Line 4"),
     "country" -> Seq(testCountry.code)
   )
 
@@ -105,37 +104,19 @@ class AccountantsAddressSpec extends PlaySpec {
     "Form validation" must {
       "pass validation" when {
         "given valid Uk address data" in {
-          AccountantsAddress.formRule.validate(testUKModel) must be(Valid(testUKAddress))
+          AccountantsAddress.ukFormRule.validate(testUKModel) must be(Valid(testUKAddress))
         }
 
         "given valid Non-Uk address data" in {
-          AccountantsAddress.formRule.validate(testNonUKModel) must be (Valid(testNonUKAddress))
+          AccountantsAddress.nonUkFormRule.validate(testNonUKModel) must be (Valid(testNonUKAddress))
         }
       }
 
       "fail validation" when {
-        "mandatory fields are missing" in {
-          AccountantsAddress.formRule.validate(Map.empty) must be(
-            Invalid(Seq(
-              (Path \ "isUK") -> Seq(ValidationError("error.required.uk.or.overseas"))
-            )))
-        }
-
-        "isUK is given invalid data" in {
-          val model = testNonUKModel ++ Map(
-            "isUK" -> Seq("HGHHHH"))
-          AccountantsAddress.formRule.validate(model) must be(
-            Invalid(Seq(
-              (Path \ "isUK") -> Seq(
-                ValidationError("error.required.uk.or.overseas")
-              )
-            )))
-        }
 
         "country is given invalid data" in {
-          val model = testNonUKModel ++ Map(
-            "country" -> Seq("HGHHHH"))
-          AccountantsAddress.formRule.validate(model) must be(
+          val model = testNonUKModel ++ Map("country" -> Seq("HGHHHH"))
+          AccountantsAddress.nonUkFormRule.validate(model) must be(
             Invalid(Seq(
               (Path \ "country") -> Seq(
                 ValidationError("error.invalid.country")

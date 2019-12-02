@@ -33,9 +33,9 @@ class TaxMattersController @Inject() (val dataCacheConnector: DataCacheConnector
     implicit request =>
       dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
           case Some(BusinessActivities(_,_,_,_,_,_,_,_,_,_,_,Some(whoIsYourAccountant), Some(taxMatters),_,_,_))
-          => Ok(tax_matters(Form2[TaxMatters](taxMatters), edit, whoIsYourAccountant.accountantsName))
+          => Ok(tax_matters(Form2[TaxMatters](taxMatters), edit, whoIsYourAccountant.names.map(name => name.accountantsName)))
           case Some(BusinessActivities(_,_,_,_,_,_,_,_,_,_,_,Some(whoIsYourAccountant), _,_,_,_))
-          => Ok(tax_matters(EmptyForm, edit, whoIsYourAccountant.accountantsName))
+          => Ok(tax_matters(EmptyForm, edit, whoIsYourAccountant.names.map(name => name.accountantsName)))
           case _ => NotFound(notFoundView)
       }
   }
