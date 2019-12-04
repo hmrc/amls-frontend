@@ -58,6 +58,16 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       contentAsString(result) mustNot include("My IBAN Account")
     }
 
+    "redirect to RegistrationProgressController when BankDetails cannot be retrieved" in new Fixture {
+
+      mockCacheFetch[Seq[BankDetails]](None)
+      mockApplicationStatus(SubmissionReady)
+
+      val result = controller.get(1)(request)
+
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
+    }
 
     "load the summary page with correct text when IBAN" in new Fixture {
 
