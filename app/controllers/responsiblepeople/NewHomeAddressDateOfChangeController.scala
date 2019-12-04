@@ -60,7 +60,7 @@ class NewHomeAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
                 case ValidForm(_, data) => {
                   for {
                     _ <- dataCacheConnector.save[NewHomeDateOfChange](request.credId, NewHomeDateOfChange.key, data)
-                  } yield Redirect(routes.NewHomeAddressController.get(index))
+                  } yield Redirect(controllers.responsiblepeople.address.routes.NewHomeAddressController.get(index))
                 }
               }
             }

@@ -29,11 +29,9 @@ import views.html.responsiblepeople.address.additional_address
 import scala.concurrent.Future
 
 @Singleton
-class AdditionalAddressController @Inject()(
-                                              override val dataCacheConnector: DataCacheConnector,
-                                              authAction: AuthAction,
-                                              val autoCompleteService: AutoCompleteService
-                                            ) extends RepeatingSection with DefaultBaseController {
+class AdditionalAddressController @Inject()(override val dataCacheConnector: DataCacheConnector,
+                                            authAction: AuthAction,
+                                            val autoCompleteService: AutoCompleteService) extends RepeatingSection with DefaultBaseController {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>

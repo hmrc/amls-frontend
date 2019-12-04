@@ -24,7 +24,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @headingWithPlaceholder(("responsiblepeople.new.home.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
@@ -32,7 +31,7 @@
     heading = header
 ) {
 
-    @form(f, controllers.responsiblepeople.routes.NewHomeAddressController.post(index)) {
+    @form(f, controllers.responsiblepeople.address.routes.NewHomeAddressUKController.post(index)) {
 
         <input type ="hidden" name="isUK" value=true />
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.responsiblepeople
+package controllers.responsiblepeople.address
 
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
@@ -26,15 +26,14 @@ import models.responsiblepeople._
 import org.joda.time.{LocalDate, Months}
 import services.AutoCompleteService
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople
+import views.html.responsiblepeople.address.new_home_address_NonUK
 
 import scala.concurrent.Future
 
 @Singleton
-class NewHomeAddressController @Inject()(authAction: AuthAction,
-                                         val dataCacheConnector: DataCacheConnector,
-                                         val autoCompleteService: AutoCompleteService
-                                        ) extends RepeatingSection with DefaultBaseController {
+class NewHomeAddressNonUKController @Inject()(authAction: AuthAction,
+                                              val dataCacheConnector: DataCacheConnector,
+                                              val autoCompleteService: AutoCompleteService) extends RepeatingSection with DefaultBaseController {
 
   final val DefaultAddressHistory = NewHomeAddress(PersonAddressUK("", "", None, None, ""))
 
@@ -42,7 +41,7 @@ class NewHomeAddressController @Inject()(authAction: AuthAction,
         implicit request =>
           getData[ResponsiblePerson](request.credId, index) map {
             case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-            => Ok(responsiblepeople.new_home_address(Form2(DefaultAddressHistory), index, personName.titleName, autoCompleteService.getCountries))
+            => Ok(new_home_address_NonUK(Form2(DefaultAddressHistory), index, personName.titleName, autoCompleteService.getCountries))
             case _
             => NotFound(notFoundView)
           }
@@ -54,7 +53,7 @@ class NewHomeAddressController @Inject()(authAction: AuthAction,
           (Form2[NewHomeAddress](request.body) match {
             case f: InvalidForm =>
               getData[ResponsiblePerson](request.credId, index) map { rp =>
-                BadRequest(responsiblepeople.new_home_address(f, index, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
+                BadRequest(new_home_address_NonUK(f, index, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
               }
             case ValidForm(_, data) => {
               for {
@@ -64,7 +63,7 @@ class NewHomeAddressController @Inject()(authAction: AuthAction,
                 }
                 _ <- dataCacheConnector.save[NewHomeDateOfChange](request.credId, NewHomeDateOfChange.key, NewHomeDateOfChange(None))
               } yield {
-                Redirect(routes.DetailedAnswersController.get(index))
+                Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index))
               }
             }
           }).recoverWith {
