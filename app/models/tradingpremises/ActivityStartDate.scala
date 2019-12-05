@@ -30,7 +30,7 @@ object ActivityStartDate {
 
   implicit val formRule: Rule[UrlFormEncoded, ActivityStartDate] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-      (__ \ "startDate").read(allowedPastAndFutureDateRuleExtended) map ActivityStartDate.apply
+      (__ \ "startDate").read(newAllowedPastAndFutureDateRule("error.required.tp.address.date")) map ActivityStartDate.apply
   }
 
   implicit val formWrites: Write[ActivityStartDate, UrlFormEncoded] =

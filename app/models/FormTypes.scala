@@ -193,7 +193,7 @@ object FormTypes {
           jodaLocalDateR("yyyy-MM-dd")
       }.repath(_ => Path)
 
-  val dateRuleMapping = Rule.fromMapping[(String, String, String), String] { date =>
+  def dateRuleMapping(input: String) = Rule.fromMapping[(String, String, String), String] { date =>
     val (year, month, day) = date
     val dateMap = Map("year" -> year, "month" -> month, "day" -> day)
     val elements = (dateMap collect { case (id, value) if value.isEmpty => id}).toList
@@ -202,21 +202,13 @@ object FormTypes {
       Valid(s"$year-$month-$day")
     } else {
       val errors = elements match {
-        case el::Nil => ValidationError(List(s"error.required.date.$el"))
-        case el1::el2::Nil => ValidationError(List(s"error.required.date.$el1.$el2"))
-        case el1::el2::el3::Nil => ValidationError(List(s"error.required.date.$el1.$el2.$el3"))
+        case el::Nil => ValidationError(List(s"$input.$el"))
+        case el1::el2::Nil => ValidationError(List(s"$input.$el1.$el2"))
+        case el1::el2::el3::Nil => ValidationError(List(s"$input.$el1.$el2.$el3"))
       }
       Invalid(Seq(errors))
     }
   }
-
-  def newLocalDateRuleWithPattern: Rule[UrlFormEncoded, LocalDate] = From[UrlFormEncoded] { __ =>
-    (
-      (__ \ "year").read[String] ~
-        (__ \ "month").read[String] ~
-        (__ \ "day").read[String]
-      ).tupled andThen dateRuleMapping andThen jodaLocalDateR("yyyy-MM-dd").withMessage("error.invalid.date.not.real")
-  }.repath(_ => Path)
 
   val localDateWrite: Write[LocalDate, UrlFormEncoded] =
     To[UrlFormEncoded] { __ =>
@@ -227,6 +219,14 @@ object FormTypes {
           (__ \ "day").write[String]
         ) (d => (d.year.getAsString, d.monthOfYear.getAsString, d.dayOfMonth.getAsString))
     }
+
+  def newLocalDateRuleWithPattern(messagePrefix: String): Rule[UrlFormEncoded, LocalDate] = From[UrlFormEncoded] { __ =>
+    (
+      (__ \ "year").read[String] ~
+        (__ \ "month").read[String] ~
+        (__ \ "day").read[String]
+      ).tupled andThen dateRuleMapping(messagePrefix) andThen jodaLocalDateR("yyyy-MM-dd").withMessage("error.invalid.date.not.real")
+  }.repath(_ => Path)
 
   // Date rule logic that makes use of LocalDate.now should be retrieved via a def.
   // A `val` keyword represents a value. It’s an immutable reference, meaning that its value never changes.
@@ -277,7 +277,7 @@ object FormTypes {
   val pastStartDateRuleExtended: Rule[LocalDate, LocalDate] = minDateWithMsg(new LocalDate(1700, 1, 1), "error.allowed.start.date.extended")
   val allowedPastAndFutureDateRule: Rule[UrlFormEncoded, LocalDate] = localDateRuleWithPattern andThen pastStartDateRule andThen endOfCenturyDateRule
 
-  val newAllowedPastAndFutureDateRule: Rule[UrlFormEncoded, LocalDate] = newLocalDateRuleWithPattern andThen
+  def newAllowedPastAndFutureDateRule(messagePrefix: String): Rule[UrlFormEncoded, LocalDate] = newLocalDateRuleWithPattern(messagePrefix) andThen
     pastStartDateRuleWithMsg("error.invalid.date.after.1900") andThen
     endOfCenturyDateRuleWithMsg("error.invalid.date.before.2100")
 
