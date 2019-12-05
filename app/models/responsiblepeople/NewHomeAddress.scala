@@ -18,10 +18,15 @@ package models.responsiblepeople
 
 import jto.validation.{From, Rule, To, Write}
 import jto.validation.forms.UrlFormEncoded
+import play.api.libs.json.Json
 
 case class NewHomeAddress(personAddress: PersonAddress)
 
 object NewHomeAddress {
+
+  val key = "new-home-address"
+
+  implicit val format = Json.format[NewHomeAddress]
 
   import play.api.libs.json._
 
@@ -43,7 +48,4 @@ object NewHomeAddress {
     import jto.validation.forms.Writes._
     __.write[PersonAddress] contramap{x =>x.personAddress}
   }
-
-  implicit val format = Json.format[NewHomeAddress]
-
 }

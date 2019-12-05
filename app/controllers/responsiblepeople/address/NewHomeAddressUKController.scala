@@ -27,6 +27,7 @@ import org.joda.time.{LocalDate, Months}
 import services.AutoCompleteService
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.address.new_home_address_UK
+import models.responsiblepeople.NewHomeAddress._
 
 import scala.concurrent.Future
 
@@ -63,6 +64,7 @@ class NewHomeAddressUKController @Inject()(authAction: AuthAction,
                   rp.addressHistory(convertToCurrentAddress(data, moveDate, rp))
                 }
                 _ <- dataCacheConnector.save[NewHomeDateOfChange](request.credId, NewHomeDateOfChange.key, NewHomeDateOfChange(None))
+                _ <- dataCacheConnector.removeByKey(request.credId, NewHomeAddress.key)
               } yield {
                 Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index))
               }

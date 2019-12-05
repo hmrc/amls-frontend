@@ -38,12 +38,25 @@ class NewHomeAddressController @Inject()(authAction: AuthAction,
 
   def get(index: Int) = authAction.async {
         implicit request =>
-          getData[ResponsiblePerson](request.credId, index) map {
-            case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+          for {
+            rp <- getData[ResponsiblePerson](request.credId, index)
+            newAddress <- dataCacheConnector.fetch[NewHomeAddress](request.credId, NewHomeAddress.key)
+          } yield (rp, newAddress) match {
+            case (Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)), Some(newHomeAddress))
+            => Ok(new_home_address(Form2[NewHomeAddress](newHomeAddress), index, personName.titleName, autoCompleteService.getCountries))
+            case (Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)), None)
             => Ok(new_home_address(EmptyForm, index, personName.titleName, autoCompleteService.getCountries))
             case _
             => NotFound(notFoundView)
           }
+
+
+//          getData[ResponsiblePerson](request.credId, index) map {
+//            case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+//            => Ok(new_home_address(EmptyForm, index, personName.titleName, autoCompleteService.getCountries))
+//            case _
+//            => NotFound(notFoundView)
+//          }
     }
 
   def post(index: Int) =
@@ -51,11 +64,15 @@ class NewHomeAddressController @Inject()(authAction: AuthAction,
         implicit request =>
 
           def processForm(data: NewHomeAddress) = {
-              if (data.personAddress.isInstanceOf[PersonAddressUK]) {
-                Future.successful(Redirect(routes.NewHomeAddressUKController.get(index)))
-              } else {
-                Future.successful(Redirect(routes.NewHomeAddressNonUKController.get(index)))
+            for {
+              redirect <- dataCacheConnector.save[NewHomeAddress](request.credId, NewHomeAddress.key, data) map { _ =>
+                if (data.personAddress.isInstanceOf[PersonAddressUK]) {
+                  Redirect(routes.NewHomeAddressUKController.get(index))
+                } else {
+                  Redirect(routes.NewHomeAddressNonUKController.get(index))
+                }
               }
+            } yield redirect
           }
 
           (Form2[NewHomeAddress](request.body)(NewHomeAddress.addressFormRule(PersonAddress.formRule(AddressType.NewHome))) match {
