@@ -32,6 +32,13 @@ object NewHomeAddress {
 
   }
 
+  def addressFormRule(paFormRule: Rule[UrlFormEncoded, PersonAddress]): Rule[UrlFormEncoded, NewHomeAddress] = From[UrlFormEncoded] { __ =>
+
+    import jto.validation.forms.Rules._
+    __.read(paFormRule) map NewHomeAddress.apply _
+
+  }
+
   implicit val formWrites: Write[NewHomeAddress, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
     import jto.validation.forms.Writes._
     __.write[PersonAddress] contramap{x =>x.personAddress}

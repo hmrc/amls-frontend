@@ -58,7 +58,7 @@ class NewHomeAddressController @Inject()(authAction: AuthAction,
               }
           }
 
-          (Form2[NewHomeAddress](request.body) match {
+          (Form2[NewHomeAddress](request.body)(NewHomeAddress.addressFormRule(PersonAddress.formRule(AddressType.NewHome))) match {
             case f: InvalidForm if f.data.get("isUK").isDefined
             => processForm(NewHomeAddress(AddressHelper.modelFromForm(f)))
             case f: InvalidForm

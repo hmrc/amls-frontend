@@ -27,7 +27,7 @@
 }
 
 @main(
-    title = Messages("responsiblepeople.new.home.title", personName) + " - " + Messages("summary.responsiblepeople"),
+    title = Messages("responsiblepeople.new.home.is.uk.title", personName) + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 
@@ -36,7 +36,7 @@
         @fieldsetWithErrorGroup(
                 f = f("isUK"),
                 panel = false,
-                heading = Messages("responsiblepeople.new.home.heading", personName),
+                heading = Messages("responsiblepeople.new.home.is.uk.heading", personName),
                 section = "summary.responsiblepeople",
                 errorGroupPlaceholder = personName,
                 classes = Seq("inline")
