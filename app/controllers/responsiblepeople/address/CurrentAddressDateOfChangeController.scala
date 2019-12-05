@@ -31,11 +31,11 @@ import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
-class CurrentAddressDateOfChangeController @Inject ()(
+class CurrentAddressDateOfChangeController @Inject()(
                                                       val dataCacheConnector: DataCacheConnector,
                                                       authAction: AuthAction,
                                                       statusService: StatusService
-                                                      ) extends RepeatingSection with DefaultBaseController with DateOfChangeHelper with FormHelpers {
+                                                    ) extends RepeatingSection with DefaultBaseController with DateOfChangeHelper with FormHelpers {
 
   def get(index: Int, edit: Boolean) = authAction {
     implicit request =>

@@ -32,41 +32,41 @@ class NewHomeAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
                                                      authAction: AuthAction) extends RepeatingSection with DefaultBaseController {
 
   def get(index: Int) = authAction.async {
-      implicit request =>
-        dataCacheConnector.fetchAll(request.credId) flatMap {
-          cacheMap =>
-            (for {
-              cache <- cacheMap
-              rp <- getData[ResponsiblePerson](cache, index)
-            } yield cache.getEntry[NewHomeDateOfChange](NewHomeDateOfChange.key) match {
-              case Some(dateOfChange) => Future.successful(Ok(new_home_date_of_change(Form2(dateOfChange),
-                index, rp.personName.fold[String]("")(_.fullName))))
-              case None => Future.successful(Ok(new_home_date_of_change(EmptyForm,
-                index, rp.personName.fold[String]("")(_.fullName))))
-            }).getOrElse(Future.successful(NotFound(notFoundView)))
-        }
-    }
+    implicit request =>
+      dataCacheConnector.fetchAll(request.credId) flatMap {
+        cacheMap =>
+          (for {
+            cache <- cacheMap
+            rp <- getData[ResponsiblePerson](cache, index)
+          } yield cache.getEntry[NewHomeDateOfChange](NewHomeDateOfChange.key) match {
+            case Some(dateOfChange) => Future.successful(Ok(new_home_date_of_change(Form2(dateOfChange),
+              index, rp.personName.fold[String]("")(_.fullName))))
+            case None => Future.successful(Ok(new_home_date_of_change(EmptyForm,
+              index, rp.personName.fold[String]("")(_.fullName))))
+          }).getOrElse(Future.successful(NotFound(notFoundView)))
+      }
+  }
 
   def post(index: Int) = authAction.async {
-        implicit request =>
-          activityStartDateField(request.credId, index) flatMap {
-            case (Some(activityStartDate), personName) => {
+    implicit request =>
+      activityStartDateField(request.credId, index) flatMap {
+        case (Some(activityStartDate), personName) => {
 
-              val extraFields = Map("activityStartDate" -> Seq(activityStartDate.toString("yyyy-MM-dd")))
+          val extraFields = Map("activityStartDate" -> Seq(activityStartDate.toString("yyyy-MM-dd")))
 
-              Form2[NewHomeDateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
-                case f: InvalidForm =>
-                  Future.successful(BadRequest(new_home_date_of_change(f, index, personName)))
-                case ValidForm(_, data) => {
-                  for {
-                    _ <- dataCacheConnector.save[NewHomeDateOfChange](request.credId, NewHomeDateOfChange.key, data)
-                  } yield Redirect(controllers.responsiblepeople.address.routes.NewHomeAddressController.get(index))
-                }
-              }
+          Form2[NewHomeDateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
+            case f: InvalidForm =>
+              Future.successful(BadRequest(new_home_date_of_change(f, index, personName)))
+            case ValidForm(_, data) => {
+              for {
+                _ <- dataCacheConnector.save[NewHomeDateOfChange](request.credId, NewHomeDateOfChange.key, data)
+              } yield Redirect(controllers.responsiblepeople.address.routes.NewHomeAddressController.get(index))
             }
-            case _ => Future.successful(NotFound(notFoundView))
           }
-    }
+        }
+        case _ => Future.successful(NotFound(notFoundView))
+      }
+  }
 
   private def activityStartDateField(credId: String, index: Int)(implicit request: Request[AnyContent]) = {
     getData[ResponsiblePerson](credId, index) map { x =>

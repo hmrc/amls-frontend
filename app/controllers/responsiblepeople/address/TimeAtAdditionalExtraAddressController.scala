@@ -27,19 +27,19 @@ import views.html.responsiblepeople.address.time_at_additional_extra_address
 
 import scala.concurrent.Future
 
-class TimeAtAdditionalExtraAddressController @Inject () (
+class TimeAtAdditionalExtraAddressController @Inject()(
                                                         val dataCacheConnector: DataCacheConnector,
                                                         authAction: AuthAction
-                                                        ) extends RepeatingSection with DefaultBaseController {
+                                                      ) extends RepeatingSection with DefaultBaseController {
 
   final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None)
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request =>
       getData[ResponsiblePerson](request.credId, index) map {
-        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,Some(ResponsiblePersonAddressHistory(_,_,Some(ResponsiblePersonAddress(_, Some(additionalExtraAddress))))),_,_,_,_,_,_,_,_,_,_,_,_)) =>
+        case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, Some(ResponsiblePersonAddressHistory(_, _, Some(ResponsiblePersonAddress(_, Some(additionalExtraAddress))))), _, _, _, _, _, _, _, _, _, _, _, _)) =>
           Ok(time_at_additional_extra_address(Form2[TimeAtAddress](additionalExtraAddress), edit, index, flow, personName.titleName))
-        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
+        case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _)) =>
           Ok(time_at_additional_extra_address(Form2(DefaultAddressHistory), edit, index, flow, personName.titleName))
         case _ => NotFound(notFoundView)
       }
