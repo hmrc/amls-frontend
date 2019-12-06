@@ -35,8 +35,7 @@ class AdditionalExtraAddressUKController @Inject()(
                                                     val dataCacheConnector: DataCacheConnector,
                                                     authAction: AuthAction,
                                                     implicit val auditConnector: AuditConnector,
-                                                    autoCompleteService: AutoCompleteService,
-                                                    val helper: AddressHelper) extends RepeatingSection with DefaultBaseController {
+                                                    autoCompleteService: AutoCompleteService) extends AddressHelper with DefaultBaseController {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request =>
@@ -65,8 +64,8 @@ class AdditionalExtraAddressUKController @Inject()(
                 additionalExtraAddress <- addressHistory.additionalExtraAddress
               } yield {
                 val additionalExtraAddressWithTime = data.copy(timeAtAddress = additionalExtraAddress.timeAtAddress)
-                helper.updateAdditionalExtraAddressAndRedirect(request.credId, additionalExtraAddressWithTime, index, edit, flow)
-              }) getOrElse helper.updateAdditionalExtraAddressAndRedirect(request.credId, data, index, edit, flow)
+                updateAdditionalExtraAddressAndRedirect(request.credId, additionalExtraAddressWithTime, index, edit, flow)
+              }) getOrElse updateAdditionalExtraAddressAndRedirect(request.credId, data, index, edit, flow)
             }
           }
         }).recoverWith {

@@ -21,6 +21,7 @@ import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.responsiblepeople._
+import play.api.mvc.{AnyContent, Request}
 import services.AutoCompleteService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
@@ -30,8 +31,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class NewHomeAddressController @Inject()(authAction: AuthAction,
-                                         val dataCacheConnector: DataCacheConnector,
-                                         val autoCompleteService: AutoCompleteService) extends RepeatingSection with DefaultBaseController {
+                                         val dataCacheConnector: DataCacheConnector) extends AddressHelper with DefaultBaseController {
 
   def get(index: Int) = authAction.async {
     implicit request =>
@@ -40,9 +40,9 @@ class NewHomeAddressController @Inject()(authAction: AuthAction,
         newAddress <- dataCacheConnector.fetch[NewHomeAddress](request.credId, NewHomeAddress.key)
       } yield (rp, newAddress) match {
         case (Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _)), Some(newHomeAddress))
-        => Ok(new_home_address(Form2[NewHomeAddress](newHomeAddress), index, personName.titleName, autoCompleteService.getCountries))
+        => Ok(new_home_address(Form2[NewHomeAddress](newHomeAddress), index, personName.titleName))
         case (Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _)), None)
-        => Ok(new_home_address(EmptyForm, index, personName.titleName, autoCompleteService.getCountries))
+        => Ok(new_home_address(EmptyForm, index, personName.titleName))
         case _
         => NotFound(notFoundView)
       }
@@ -53,10 +53,10 @@ class NewHomeAddressController @Inject()(authAction: AuthAction,
       implicit request =>
         (Form2[NewHomeAddress](request.body)(NewHomeAddress.addressFormRule(PersonAddress.formRule(AddressType.NewHome))) match {
           case f: InvalidForm if f.data.get("isUK").isDefined
-          => processFormAndRedirect(NewHomeAddress(AddressHelper.modelFromForm(f)), index, request.credId)
+          => processFormAndRedirect(NewHomeAddress(modelFromForm(f)), index, request.credId)
           case f: InvalidForm
           => getData[ResponsiblePerson](request.credId, index) map { rp =>
-            BadRequest(new_home_address(f, index, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
+            BadRequest(new_home_address(f, index, ControllerHelper.rpTitleName(rp)))
           }
           case ValidForm(_, data)
           => processFormAndRedirect(data, index, request.credId)
@@ -66,13 +66,13 @@ class NewHomeAddressController @Inject()(authAction: AuthAction,
     }
 
   def processFormAndRedirect(data: NewHomeAddress, index: Int, credId: String)
-                            (implicit hc: HeaderCarrier) = {
+                            (implicit request: Request[AnyContent], hc: HeaderCarrier) = {
     for {
       redirect <- dataCacheConnector.save[NewHomeAddress](credId, NewHomeAddress.key, data) map { _ =>
-        if (data.personAddress.isInstanceOf[PersonAddressUK]) {
-          Redirect(routes.NewHomeAddressUKController.get(index))
-        } else {
-          Redirect(routes.NewHomeAddressNonUKController.get(index))
+        data.personAddress match {
+          case _:PersonAddressUK => Redirect(routes.NewHomeAddressUKController.get(index))
+          case _:PersonAddressNonUK => Redirect(routes.NewHomeAddressNonUKController.get(index))
+          case _ => NotFound(notFoundView)
         }
       }
     } yield redirect

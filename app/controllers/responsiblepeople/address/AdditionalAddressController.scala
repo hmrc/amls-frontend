@@ -31,7 +31,7 @@ import scala.concurrent.Future
 @Singleton
 class AdditionalAddressController @Inject()(override val dataCacheConnector: DataCacheConnector,
                                             authAction: AuthAction,
-                                            val autoCompleteService: AutoCompleteService) extends RepeatingSection with DefaultBaseController {
+                                            val autoCompleteService: AutoCompleteService) extends AddressHelper with DefaultBaseController {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request =>
@@ -49,7 +49,7 @@ class AdditionalAddressController @Inject()(override val dataCacheConnector: Dat
       implicit request =>
         (Form2[ResponsiblePersonAddress](request.body)(ResponsiblePersonAddress.addressFormRule(PersonAddress.formRule(AddressType.Previous))) match {
           case f: InvalidForm if f.data.get("isUK").isDefined
-          => processForm(ResponsiblePersonAddress(AddressHelper.modelFromForm(f), None), request.credId, index, edit, flow)
+          => processForm(ResponsiblePersonAddress(modelFromForm(f), None), request.credId, index, edit, flow)
           case f: InvalidForm =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
               BadRequest(additional_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))

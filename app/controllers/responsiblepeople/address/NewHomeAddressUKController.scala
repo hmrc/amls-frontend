@@ -18,7 +18,6 @@ package controllers.responsiblepeople.address
 
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
-import controllers.responsiblepeople.address.AddressHelper._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.responsiblepeople.NewHomeAddress._
@@ -31,14 +30,13 @@ import scala.concurrent.Future
 
 @Singleton
 class NewHomeAddressUKController @Inject()(authAction: AuthAction,
-                                           val dataCacheConnector: DataCacheConnector,
-                                           val autoCompleteService: AutoCompleteService) extends RepeatingSection with DefaultBaseController {
+                                           val dataCacheConnector: DataCacheConnector) extends AddressHelper with DefaultBaseController {
 
   def get(index: Int) = authAction.async {
     implicit request =>
       getData[ResponsiblePerson](request.credId, index) map {
         case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
-        => Ok(new_home_address_UK(EmptyForm, index, personName.titleName, autoCompleteService.getCountries))
+        => Ok(new_home_address_UK(EmptyForm, index, personName.titleName))
         case _
         => NotFound(notFoundView)
       }
@@ -50,7 +48,7 @@ class NewHomeAddressUKController @Inject()(authAction: AuthAction,
         (Form2[NewHomeAddress](request.body) match {
           case f: InvalidForm =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
-              BadRequest(new_home_address_UK(f, index, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
+              BadRequest(new_home_address_UK(f, index, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
             for {

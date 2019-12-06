@@ -23,6 +23,7 @@ import cats.implicits._
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import forms.InvalidForm
+import javax.inject.Singleton
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ThreeYearsPlus, ZeroToFiveMonths}
 import models.responsiblepeople._
 import models.status.SubmissionStatus
@@ -36,7 +37,7 @@ import utils.{ControllerHelper, DateOfChangeHelper, RepeatingSection}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AddressHelper @Inject()(val dataCacheConnector: DataCacheConnector) extends RepeatingSection with DateOfChangeHelper {
+trait AddressHelper extends RepeatingSection with DateOfChangeHelper {
 
   private[address] def updateAdditionalAddressAndRedirect(credId: String, data: ResponsiblePersonAddress, index: Int, edit: Boolean, flow: Option[String])
                                                          (implicit request: Request[AnyContent], hc: HeaderCarrier, ec: ExecutionContext, auditConnector: AuditConnector) = {
@@ -60,7 +61,7 @@ class AddressHelper @Inject()(val dataCacheConnector: DataCacheConnector) extend
 
     (for {
       rp <- OptionT(getData[ResponsiblePerson](credId, index))
-      _ <- OptionT.liftF(AddressHelper.auditPreviousAddressChange(data.personAddress, rp, edit)) orElse OptionT.some[Future, AuditResult](Success)
+      _ <- OptionT.liftF(auditPreviousAddressChange(data.personAddress, rp, edit)) orElse OptionT.some[Future, AuditResult](Success)
       result <- OptionT.liftF(doUpdate())
     } yield result) getOrElse NotFound(ControllerHelper.notFoundView(request))
   }
@@ -87,7 +88,7 @@ class AddressHelper @Inject()(val dataCacheConnector: DataCacheConnector) extend
     (for {
       rp <- OptionT(getData[ResponsiblePerson](credId, index))
       result <- OptionT.liftF(doUpdate())
-      _ <- OptionT.liftF(AddressHelper.auditPreviousExtraAddressChange(data.personAddress, rp, edit))
+      _ <- OptionT.liftF(auditPreviousExtraAddressChange(data.personAddress, rp, edit))
     } yield result).getOrElse(NotFound(ControllerHelper.notFoundView(request)))
   }
 
@@ -141,9 +142,7 @@ class AddressHelper @Inject()(val dataCacheConnector: DataCacheConnector) extend
       }
     }
   }
-}
 
-object AddressHelper {
   def modelFromForm(f: InvalidForm): PersonAddress = {
     if (f.data.get("isUK").contains(Seq("true"))) {
       PersonAddressUK("", "", None, None, "")

@@ -32,7 +32,7 @@ class AdditionalExtraAddressController @Inject()(
                                                   val dataCacheConnector: DataCacheConnector,
                                                   authAction: AuthAction,
                                                   autoCompleteService: AutoCompleteService
-                                                ) extends RepeatingSection with DefaultBaseController {
+                                                ) extends AddressHelper with DefaultBaseController {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request =>
@@ -50,7 +50,7 @@ class AdditionalExtraAddressController @Inject()(
       implicit request =>
         (Form2[ResponsiblePersonAddress](request.body)(ResponsiblePersonAddress.addressFormRule(PersonAddress.formRule(AddressType.OtherPrevious))) match {
           case f: InvalidForm if f.data.get("isUK").isDefined
-          => processForm(ResponsiblePersonAddress(AddressHelper.modelFromForm(f), None), request.credId, index, edit, flow)
+          => processForm(ResponsiblePersonAddress(modelFromForm(f), None), request.credId, index, edit, flow)
           case f: InvalidForm
           => getData[ResponsiblePerson](request.credId, index) map { rp =>
             BadRequest(additional_extra_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))

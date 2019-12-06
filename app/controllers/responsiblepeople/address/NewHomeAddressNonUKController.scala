@@ -18,7 +18,6 @@ package controllers.responsiblepeople.address
 
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
-import controllers.responsiblepeople.address.AddressHelper._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.responsiblepeople.NewHomeAddress._
@@ -32,7 +31,7 @@ import scala.concurrent.Future
 @Singleton
 class NewHomeAddressNonUKController @Inject()(authAction: AuthAction,
                                               val dataCacheConnector: DataCacheConnector,
-                                              val autoCompleteService: AutoCompleteService) extends RepeatingSection with DefaultBaseController {
+                                              val autoCompleteService: AutoCompleteService) extends AddressHelper with DefaultBaseController {
 
   def get(index: Int) = authAction.async {
     implicit request =>

@@ -32,8 +32,7 @@ import scala.concurrent.Future
 class AdditionalAddressNonUKController @Inject()(override val dataCacheConnector: DataCacheConnector,
                                                  authAction: AuthAction,
                                                  implicit val auditConnector: AuditConnector,
-                                                 val autoCompleteService: AutoCompleteService,
-                                                 val helper: AddressHelper) extends RepeatingSection with DefaultBaseController {
+                                                 val autoCompleteService: AutoCompleteService) extends AddressHelper with DefaultBaseController {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request =>
@@ -63,8 +62,8 @@ class AdditionalAddressNonUKController @Inject()(override val dataCacheConnector
                 additionalAddress <- addressHistory.additionalAddress
               } yield {
                 val additionalAddressWithTime = data.copy(timeAtAddress = additionalAddress.timeAtAddress)
-                helper.updateAdditionalAddressAndRedirect(request.credId, additionalAddressWithTime, index, edit, flow)
-              }) getOrElse helper.updateAdditionalAddressAndRedirect(request.credId, data, index, edit, flow)
+                updateAdditionalAddressAndRedirect(request.credId, additionalAddressWithTime, index, edit, flow)
+              }) getOrElse updateAdditionalAddressAndRedirect(request.credId, data, index, edit, flow)
             }
           }
         }).recoverWith {

@@ -31,8 +31,7 @@ import scala.concurrent.Future
 class CurrentAddressController @Inject()(
                                           val dataCacheConnector: DataCacheConnector,
                                           autoCompleteService: AutoCompleteService,
-                                          authAction: AuthAction
-                                        ) extends RepeatingSection with DefaultBaseController with DateOfChangeHelper {
+                                          authAction: AuthAction) extends AddressHelper with DefaultBaseController with DateOfChangeHelper {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request =>
@@ -53,7 +52,7 @@ class CurrentAddressController @Inject()(
         (Form2[ResponsiblePersonCurrentAddress]
           (request.body)(ResponsiblePersonCurrentAddress.addressFormRule(PersonAddress.formRule(AddressType.Current))) match {
           case f: InvalidForm if f.data.get("isUK").isDefined
-          => processForm(ResponsiblePersonCurrentAddress(AddressHelper.modelFromForm(f), None, None), request.credId, index, edit, flow)
+          => processForm(ResponsiblePersonCurrentAddress(modelFromForm(f), None, None), request.credId, index, edit, flow)
           case f: InvalidForm
           => getData[ResponsiblePerson](request.credId, index) map { rp =>
             BadRequest(current_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))

@@ -32,8 +32,7 @@ class CurrentAddressNonUKController @Inject()(val dataCacheConnector: DataCacheC
                                               implicit val auditConnector: AuditConnector,
                                               autoCompleteService: AutoCompleteService,
                                               statusService: StatusService,
-                                              authAction: AuthAction,
-                                              val helper: AddressHelper) extends RepeatingSection with DefaultBaseController with DateOfChangeHelper {
+                                              authAction: AuthAction) extends AddressHelper with DefaultBaseController with DateOfChangeHelper {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request =>
@@ -65,7 +64,7 @@ class CurrentAddressNonUKController @Inject()(val dataCacheConnector: DataCacheC
               } yield data.copy(timeAtAddress = currentAddress.timeAtAddress)).getOrElse(data)
 
               statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) flatMap {
-                status => helper.updateCurrentAddressAndRedirect(request.credId, currentAddressWithTime, index, edit, flow, responsiblePerson, status)
+                status => updateCurrentAddressAndRedirect(request.credId, currentAddressWithTime, index, edit, flow, responsiblePerson, status)
               }
             }
           }

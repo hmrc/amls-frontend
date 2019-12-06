@@ -19,7 +19,7 @@
 @import include.forms2._
 @import models.autocomplete._
 
-@(f: Form2[_], index: Int, personName: String, countryData: Option[Seq[NameValuePair]])(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], index: Int, personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @components.back_link()

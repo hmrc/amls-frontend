@@ -28,10 +28,8 @@ import views.html.responsiblepeople.address.time_at_additional_address
 
 import scala.concurrent.Future
 
-class TimeAtAdditionalAddressController @Inject()(
-                                                   val dataCacheConnector: DataCacheConnector,
-                                                   authAction: AuthAction
-                                                 ) extends RepeatingSection with DefaultBaseController {
+class TimeAtAdditionalAddressController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                                  authAction: AuthAction) extends RepeatingSection with DefaultBaseController {
 
   final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None)
 

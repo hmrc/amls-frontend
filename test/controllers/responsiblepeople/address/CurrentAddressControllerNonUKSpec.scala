@@ -34,6 +34,7 @@ import org.jsoup.select.Elements
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
@@ -48,14 +49,14 @@ import utils.{AmlsSpec, AuthorisedFixture}
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
 
-class CurrentAddressControllerNonUKSpec extends AmlsSpec with MockitoSugar {
-
-  implicit val hc = HeaderCarrier()
-  val mockDataCacheConnector = mock[DataCacheConnector]
-  val RecordId = 1
+class CurrentAddressControllerNonUKSpec extends AmlsSpec {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
+
+    implicit val hc = HeaderCarrier()
+    val mockDataCacheConnector = mock[DataCacheConnector]
+    val RecordId = 1
 
     val auditConnector = mock[AuditConnector]
     val autoCompleteService = mock[AutoCompleteService]
@@ -174,7 +175,6 @@ class CurrentAddressControllerNonUKSpec extends AmlsSpec with MockitoSugar {
 
     "post is called" must {
       "redirect to TimeAtAddressController" when {
-
         "all the mandatory non-UK parameters are supplied" in new Fixture {
 
           val requestWithParams = request.withFormUrlEncodedBody(
@@ -419,7 +419,6 @@ class CurrentAddressControllerNonUKSpec extends AmlsSpec with MockitoSugar {
       }
 
       "respond with BAD_REQUEST" when {
-
         "given an invalid address" in new Fixture {
 
           val requestWithParams = request.withFormUrlEncodedBody(
@@ -455,7 +454,10 @@ class CurrentAddressControllerNonUKSpec extends AmlsSpec with MockitoSugar {
         "isUK field is not supplied" in new Fixture {
 
           val line1MissingRequest = request.withFormUrlEncodedBody()
+          val responsiblePeople = ResponsiblePerson(personName = personName)
 
+          when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
           when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
@@ -476,6 +478,10 @@ class CurrentAddressControllerNonUKSpec extends AmlsSpec with MockitoSugar {
             "addressLineNonUK2" -> "",
             "country" -> ""
           )
+          val responsiblePeople = ResponsiblePerson(personName = personName)
+
+          when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
@@ -492,13 +498,17 @@ class CurrentAddressControllerNonUKSpec extends AmlsSpec with MockitoSugar {
         }
 
         "the country selected is United Kingdom" in new Fixture {
-
           val requestWithMissingParams = request.withFormUrlEncodedBody(
             "isUK" -> "false",
             "addressLineNonUK1" -> "",
             "addressLineNonUK2" -> "",
             "country" -> "GB"
           )
+
+          val responsiblePeople = ResponsiblePerson(personName = personName)
+
+          when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
