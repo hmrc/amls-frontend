@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.responsiblepeople
+package controllers.responsiblepeople.address
 
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
@@ -23,7 +23,7 @@ import javax.inject.{Inject, Singleton}
 import models.responsiblepeople.{NewHomeDateOfChange, ResponsiblePerson}
 import play.api.mvc.{AnyContent, Request}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.new_home_date_of_change
+import views.html.responsiblepeople.address.new_home_date_of_change
 
 import scala.concurrent.Future
 

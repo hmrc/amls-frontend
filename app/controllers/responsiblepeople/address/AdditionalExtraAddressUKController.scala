@@ -16,26 +16,22 @@
 
 package controllers.responsiblepeople.address
 
-import cats.data._
-import cats.implicits._
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople._
-import play.api.mvc.{AnyContent, Request}
 import services.AutoCompleteService
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import utils.{AuthAction, ControllerHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper}
 import views.html.responsiblepeople.address.additional_extra_address_UK
 
 import scala.concurrent.Future
 
-class AdditionalExtraAddressUKController @Inject()(
-                                                    val dataCacheConnector: DataCacheConnector,
-                                                    authAction: AuthAction,
-                                                    implicit val auditConnector: AuditConnector,
-                                                    autoCompleteService: AutoCompleteService) extends AddressHelper with DefaultBaseController {
+class AdditionalExtraAddressUKController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                                   authAction: AuthAction,
+                                                   implicit val auditConnector: AuditConnector,
+                                                   autoCompleteService: AutoCompleteService) extends AddressHelper with DefaultBaseController {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request =>

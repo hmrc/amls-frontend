@@ -22,8 +22,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.responsiblepeople.NewHomeAddress._
 import models.responsiblepeople._
-import services.AutoCompleteService
-import utils.{AuthAction, ControllerHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper}
 import views.html.responsiblepeople.address.new_home_address_UK
 
 import scala.concurrent.Future

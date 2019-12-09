@@ -23,7 +23,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople._
 import services.AutoCompleteService
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.{AuthAction, ControllerHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper}
 import views.html.responsiblepeople.address.additional_address
 
 import scala.concurrent.Future

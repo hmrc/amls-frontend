@@ -23,15 +23,14 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople._
 import services.AutoCompleteService
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.{AuthAction, ControllerHelper, DateOfChangeHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper, DateOfChangeHelper}
 import views.html.responsiblepeople.address.current_address
 
 import scala.concurrent.Future
 
-class CurrentAddressController @Inject()(
-                                          val dataCacheConnector: DataCacheConnector,
-                                          autoCompleteService: AutoCompleteService,
-                                          authAction: AuthAction) extends AddressHelper with DefaultBaseController with DateOfChangeHelper {
+class CurrentAddressController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                         autoCompleteService: AutoCompleteService,
+                                         authAction: AuthAction) extends AddressHelper with DefaultBaseController with DateOfChangeHelper {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request =>

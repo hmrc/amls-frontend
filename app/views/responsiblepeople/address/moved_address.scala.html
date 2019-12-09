@@ -31,7 +31,7 @@
     title = Messages("responsiblepeople.movedaddress.title") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
-    @form(f, controllers.responsiblepeople.routes.MovedAddressController.post(index)) {
+    @form(f, controllers.responsiblepeople.address.routes.MovedAddressController.post(index)) {
 
         @fieldsetWithErrorGroup(
             f = f("movedAddress"),

@@ -22,12 +22,11 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.responsiblepeople._
 import play.api.mvc.{AnyContent, Request}
-import services.AutoCompleteService
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.{AuthAction, ControllerHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper}
 import views.html.responsiblepeople.address.new_home_address
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 @Singleton
 class NewHomeAddressController @Inject()(authAction: AuthAction,
@@ -70,8 +69,8 @@ class NewHomeAddressController @Inject()(authAction: AuthAction,
     for {
       redirect <- dataCacheConnector.save[NewHomeAddress](credId, NewHomeAddress.key, data) map { _ =>
         data.personAddress match {
-          case _:PersonAddressUK => Redirect(routes.NewHomeAddressUKController.get(index))
-          case _:PersonAddressNonUK => Redirect(routes.NewHomeAddressNonUKController.get(index))
+          case _: PersonAddressUK => Redirect(routes.NewHomeAddressUKController.get(index))
+          case _: PersonAddressNonUK => Redirect(routes.NewHomeAddressNonUKController.get(index))
           case _ => NotFound(notFoundView)
         }
       }

@@ -20,10 +20,7 @@ import audit.AddressConversions._
 import audit.{AddressCreatedEvent, AddressModifiedEvent}
 import cats.data.OptionT
 import cats.implicits._
-import com.google.inject.Inject
-import connectors.DataCacheConnector
 import forms.InvalidForm
-import javax.inject.Singleton
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ThreeYearsPlus, ZeroToFiveMonths}
 import models.responsiblepeople._
 import models.status.SubmissionStatus
