@@ -364,7 +364,14 @@
 
                  @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.address.other.previous", personName),
-                    editUrl = controllers.responsiblepeople.address.routes.AdditionalExtraAddressController.get(idx, true, flow).toString,
+                     editUrl = a.personAddress match {
+                         case _:PersonAddressNonUK => {
+                             controllers.responsiblepeople.address.routes.AdditionalExtraAddressNonUKController.get(idx, true, flow).toString()
+                         }
+                         case _:PersonAddressUK => {
+                             controllers.responsiblepeople.address.routes.AdditionalExtraAddressUKController.get(idx, true, flow).toString()
+                         }
+                     },
                     editLinkTag = "rp-otherpreviousaddress-edit"
                 ) {
                     <ul class="list">

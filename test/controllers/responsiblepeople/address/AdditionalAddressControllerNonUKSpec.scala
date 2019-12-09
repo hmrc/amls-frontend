@@ -227,7 +227,7 @@ class AdditionalAddressControllerNonUKSpec extends AmlsSpec with MockitoSugar {
           val document: Document = Jsoup.parse(contentAsString(result))
           document.select("a[href=#addressLineNonUK1]").html() must include(Messages("error.required.address.line1"))
           document.select("a[href=#addressLineNonUK2]").html() must include(Messages("error.required.address.line2"))
-          document.select("a[href=#country]").html() must include(Messages("error.required.select.non.uk", s"$rpName's ${Messages("error.required.select.non.uk.previous.address")}"))
+          document.select("a[href=#country]").html() must include(Messages("error.required.select.non.uk", s"${Messages("error.required.select.non.uk.previous.address")}"))
         }
 
         "given an invalid non uk address" in new Fixture {
