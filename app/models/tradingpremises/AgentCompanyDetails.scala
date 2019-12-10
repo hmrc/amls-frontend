@@ -42,7 +42,8 @@ object AgentCompanyDetails {
   val agentsRegisteredCompanyCRNType: Rule[String, String] =
     notEmpty.withMessage("error.required.to.agent.company.reg.number") andThen
       maxLength(maxAgentRegisteredCompanyNumberLength).withMessage("error.size.to.agent.company.reg.number") andThen
-      regexWithMsg(basicPunctuationRegex, "error.char.to.agent.company.reg.number")
+      minLength(maxAgentRegisteredCompanyNumberLength).withMessage("error.size.to.agent.company.reg.number") andThen
+      regexWithMsg(crnNumberRegex, "error.char.to.agent.company.reg.number")
 
   implicit val mongoKey = new MongoKey[AgentCompanyDetails] {
     override def apply(): String = "agent-company-name"

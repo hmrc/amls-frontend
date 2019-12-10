@@ -25,7 +25,7 @@ error.required.date.month.day = Date your business started or will start activit
 error.required.date.year.month = Date your business started or will start activities must include a month and year
 error.required.date.year.month.day = Enter the date your business did or will start activities that need to be registered
 error.required.date.year.day = Date your business started or will start activities must include a day and year
-error.invalid.date.after.1900 = The date your business started or will start activities must be on or after 1900
+error.invalid.date.after.1700 = The date your business started or will start activities must be on or after 1700
 error.invalid.date.before.2100 = The date your business started or will start activities must be before 2100
 error.invalid.date.not.real = Enter a real date for when your business started or will start activities
 
@@ -271,7 +271,7 @@ error.invalid.char.tp.agent.company.details = Your agent’s company name can in
 error.required.to.agent.company.reg.number = Enter your agent’s company registration number
 error.size.to.agent.company.reg.number = Your agent’s company registration number must be 8 characters
 error.char.to.agent.company.reg.number = Your agent’s company registration number must only include capital letters and numbers
-error.required.tp.agent.registered.company.name = Enter your agent’s company registration number ===
+error.required.tp.agent.registered.company.name = Enter your agent’s company registration number
 error.invalid.tp.agent.registered.company.name = Your agent’s company registration number must be 8 characters
 error.invalid.char.tp.agent.registered.company.name = Your agent’s company name can include letters a to z, numbers, spaces and punctuation
 error.required.tp.agent.name = Enter your agent’s full name

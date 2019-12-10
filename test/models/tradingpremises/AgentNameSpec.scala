@@ -22,7 +22,7 @@ import org.joda.time.LocalDate
 import play.api.libs.json.JsSuccess
 import utils.AmlsSpec
 
-class AgentNaRoleWithinBusinessRelease7SpemeSpec extends AmlsSpec {
+class AgentNameSpec extends AmlsSpec {
 
   "AgentName" must {
 
@@ -48,7 +48,7 @@ class AgentNaRoleWithinBusinessRelease7SpemeSpec extends AmlsSpec {
         "agentDateOfBirth.year" -> Seq("")
       )
 
-      AgentName.formReads.validate(noContentModel) must be(Invalid(Seq((Path \ "agentDateOfBirth", Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))))))
+      AgentName.formReads.validate(noContentModel) must be(Invalid(Seq((Path \ "agentDateOfBirth", Seq(ValidationError("error.required.tp.agent.date.year.month.day"))))))
     }
   }
   "Json Validation" must {

@@ -639,7 +639,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
         "year" -> Seq("1990")
       )
 
-      newLocalDateRuleWithPattern.validate(data) mustBe Valid(LocalDate.parse("1990-02-24"))
+      newLocalDateRuleWithPattern("").validate(data) mustBe Valid(LocalDate.parse("1990-02-24"))
     }
 
     "fail validation when date not supplied" in {
@@ -649,7 +649,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
         "year" -> Seq("")
       )
 
-      newLocalDateRuleWithPattern.validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.required.date.year.month.day"))))
+      newLocalDateRuleWithPattern("error.required.date").validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.required.date.year.month.day"))))
     }
 
     "fail validation when day not supplied" in {
@@ -659,7 +659,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
         "year" -> Seq("1990")
       )
 
-      newLocalDateRuleWithPattern.validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.required.date.day"))))
+      newLocalDateRuleWithPattern("error.required.date").validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.required.date.day"))))
     }
 
     "fail validation when month not supplied" in {
@@ -669,7 +669,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
         "year" -> Seq("1990")
       )
 
-      newLocalDateRuleWithPattern.validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.required.date.month"))))
+      newLocalDateRuleWithPattern("error.required.date").validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.required.date.month"))))
     }
 
     "fail validation when year not supplied" in {
@@ -679,7 +679,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
         "year" -> Seq("")
       )
 
-      newLocalDateRuleWithPattern.validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.required.date.year"))))
+      newLocalDateRuleWithPattern("error.required.date").validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.required.date.year"))))
     }
 
     "fail validation when day and month not supplied" in {
@@ -689,7 +689,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
         "year" -> Seq("1990")
       )
 
-      newLocalDateRuleWithPattern.validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.required.date.month.day"))))
+      newLocalDateRuleWithPattern("error.required.date").validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.required.date.month.day"))))
     }
 
     "fail validation when day and year not supplied" in {
@@ -699,7 +699,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
         "year" -> Seq("")
       )
 
-      newLocalDateRuleWithPattern.validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.required.date.year.day"))))
+      newLocalDateRuleWithPattern("error.required.date").validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.required.date.year.day"))))
     }
 
     "fail validation when month and year not supplied" in {
@@ -709,7 +709,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
         "year" -> Seq("")
       )
 
-      newLocalDateRuleWithPattern.validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.required.date.year.month"))))
+      newLocalDateRuleWithPattern("error.required.date").validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.required.date.year.month"))))
     }
 
     "fail validation when not real date supplied" in {
@@ -719,17 +719,17 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
         "year" -> Seq("1990")
       )
 
-      newLocalDateRuleWithPattern.validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.invalid.date.not.real"))))
+      newLocalDateRuleWithPattern("error.required.date").validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.invalid.date.not.real"))))
     }
 
-    "fail validation when date before 1900" in {
+    "fail validation when date before 1700" in {
       val data = Map(
         "day" -> Seq("31"),
         "month" -> Seq("12"),
         "year" -> Seq("1899")
       )
 
-      newAllowedPastAndFutureDateRule.validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.invalid.date.after.1900"))))
+      newAllowedPastAndFutureDateRule("error.required.date").validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.invalid.date.after.1700"))))
     }
 
     "fail validation when date after 2099" in {
@@ -739,7 +739,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
         "year" -> Seq("2100")
       )
 
-      newAllowedPastAndFutureDateRule.validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.invalid.date.before.2100"))))
+      newAllowedPastAndFutureDateRule("error.required.date").validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.invalid.date.before.2100"))))
     }
   }
 

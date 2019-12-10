@@ -47,7 +47,7 @@ class TradingPremisesMsbServicesSpec extends AmlsSpec {
       )
 
       implicitly[Rule[UrlFormEncoded, TradingPremisesMsbServices]].validate(data)
-          .mustEqual(Invalid(Seq((Path \ "msbServices") -> Seq(ValidationError("error.required.msb.services")))))
+          .mustEqual(Invalid(Seq((Path \ "msbServices") -> Seq(ValidationError("error.required.tp.services")))))
     }
 
     "fail to validate when there is an invalid entry in the set" in {
