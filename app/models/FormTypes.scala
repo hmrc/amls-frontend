@@ -52,7 +52,7 @@ object FormTypes {
   private val addressTypeRegex = "^[A-Za-z0-9 !'‘’\"“”(),./\u2014\u2013\u2010\u002d]{1,35}$".r
   val emailRegex = "(?:[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-zA-Z0-9-]*[a-zA-Z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])".r
 
-  val capitalsAndNumbers = "^[A-Z0-9]$".r
+  val crnNumberRegex = "^[A-Z0-9]{8}$".r
   val dayRegex = "(0?[1-9]|[12][0-9]|3[01])".r
   val monthRegex = "(0?[1-9]|1[012])".r
   val yearRegexPost1900 = "((19|20)\\d\\d)".r
@@ -193,7 +193,7 @@ object FormTypes {
           jodaLocalDateR("yyyy-MM-dd")
       }.repath(_ => Path)
 
-  val dateRuleMapping = Rule.fromMapping[(String, String, String), String] { date =>
+  def dateRuleMapping(input: String) = Rule.fromMapping[(String, String, String), String] { date =>
     val (year, month, day) = date
     val dateMap = Map("year" -> year, "month" -> month, "day" -> day)
     val elements = (dateMap collect { case (id, value) if value.isEmpty => id}).toList
@@ -202,21 +202,13 @@ object FormTypes {
       Valid(s"$year-$month-$day")
     } else {
       val errors = elements match {
-        case el::Nil => ValidationError(List(s"error.required.date.$el"))
-        case el1::el2::Nil => ValidationError(List(s"error.required.date.$el1.$el2"))
-        case el1::el2::el3::Nil => ValidationError(List(s"error.required.date.$el1.$el2.$el3"))
+        case el::Nil => ValidationError(List(s"$input.$el"))
+        case el1::el2::Nil => ValidationError(List(s"$input.$el1.$el2"))
+        case el1::el2::el3::Nil => ValidationError(List(s"$input.$el1.$el2.$el3"))
       }
       Invalid(Seq(errors))
     }
   }
-
-  def newLocalDateRuleWithPattern: Rule[UrlFormEncoded, LocalDate] = From[UrlFormEncoded] { __ =>
-    (
-      (__ \ "year").read[String] ~
-        (__ \ "month").read[String] ~
-        (__ \ "day").read[String]
-      ).tupled andThen dateRuleMapping andThen jodaLocalDateR("yyyy-MM-dd").withMessage("error.invalid.date.not.real")
-  }.repath(_ => Path)
 
   val localDateWrite: Write[LocalDate, UrlFormEncoded] =
     To[UrlFormEncoded] { __ =>
@@ -228,12 +220,21 @@ object FormTypes {
         ) (d => (d.year.getAsString, d.monthOfYear.getAsString, d.dayOfMonth.getAsString))
     }
 
+  def newLocalDateRuleWithPattern(messagePrefix: String): Rule[UrlFormEncoded, LocalDate] = From[UrlFormEncoded] { __ =>
+    (
+      (__ \ "year").read[String] ~
+        (__ \ "month").read[String] ~
+        (__ \ "day").read[String]
+      ).tupled andThen dateRuleMapping(messagePrefix) andThen jodaLocalDateR("yyyy-MM-dd").withMessage("error.invalid.date.not.real")
+  }.repath(_ => Path)
+
   // Date rule logic that makes use of LocalDate.now should be retrieved via a def.
   // A `val` keyword represents a value. It’s an immutable reference, meaning that its value never changes.
   // Once assigned it will always keep the same value.
   // While the def is a function declaration. It is evaluated on call and not stored as an immutable object.
   def futureDateRule: Rule[LocalDate, LocalDate] = maxDateWithMsg(LocalDate.now, "error.future.date")
   def localDateFutureRule: Rule[UrlFormEncoded, LocalDate] = localDateRuleWithPattern andThen pastStartDateRule andThen futureDateRule
+  def localDateFutureRuleAgentsPremise: Rule[UrlFormEncoded, LocalDate] = localDateRuleWithPattern andThen pastStartDateRule andThen maxDateWithMsg(LocalDate.now, "error.required.tp.agent.date.past")
 
   def dateOfChangeActivityStartDateRule = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
@@ -274,14 +275,16 @@ object FormTypes {
   def endOfCenturyDateRuleWithMsg(message: String): Rule[LocalDate, LocalDate] = maxDateWithMsg(new LocalDate(2099, 12, 31), message)
   val pastStartDateRule: Rule[LocalDate, LocalDate] = minDateWithMsg(new LocalDate(1900, 1, 1), "error.allowed.start.date")
   def pastStartDateRuleWithMsg(message: String): Rule[LocalDate, LocalDate] = minDateWithMsg(new LocalDate(1900, 1, 1), message)
-  val pastStartDateRuleExtended: Rule[LocalDate, LocalDate] = minDateWithMsg(new LocalDate(1700, 1, 1), "error.allowed.start.date.extended")
+  def pastStartDateRuleWithMsg1700(message: String): Rule[LocalDate, LocalDate] = minDateWithMsg(new LocalDate(1700, 1, 1), message)
   val allowedPastAndFutureDateRule: Rule[UrlFormEncoded, LocalDate] = localDateRuleWithPattern andThen pastStartDateRule andThen endOfCenturyDateRule
 
-  val newAllowedPastAndFutureDateRule: Rule[UrlFormEncoded, LocalDate] = newLocalDateRuleWithPattern andThen
-    pastStartDateRuleWithMsg("error.invalid.date.after.1900") andThen
-    endOfCenturyDateRuleWithMsg("error.invalid.date.before.2100")
+  def newAllowedPastAndFutureDateRule(messagePrefix: String = "", messagePast: String = "", messageFuture: String = ""): Rule[UrlFormEncoded, LocalDate] = newLocalDateRuleWithPattern(messagePrefix) andThen
+    pastStartDateRuleWithMsg(messagePast) andThen
+    maxDateWithMsg(LocalDate.now, messageFuture)
 
-  val allowedPastAndFutureDateRuleExtended: Rule[UrlFormEncoded, LocalDate] = localDateRuleWithPattern andThen pastStartDateRuleExtended andThen endOfCenturyDateRule
+  def newAllowedPastAndFutureDateRule1700(messagePrefix: String = "", messagePast: String = "", messageFuture: String = ""): Rule[UrlFormEncoded, LocalDate] = newLocalDateRuleWithPattern(messagePrefix) andThen
+    pastStartDateRuleWithMsg1700(messagePast) andThen
+    maxDateWithMsg(LocalDate.now, messageFuture)
 
   val dateOfChangeActivityStartDateRuleMapping = Rule.fromMapping[(Option[LocalDate], LocalDate), LocalDate] {
     case (Some(d1), d2) if d2.isAfter(d1) => Valid(d2)

@@ -34,14 +34,15 @@ object AgentName {
 
   import utils.MappingUtils.Implicits._
 
+  val dateRule = newAllowedPastAndFutureDateRule("error.required.tp.agent.date", "error.char.tp.agent.dob", "error.required.tp.agent.date.past")
   def applyWithoutDateOfChange(agentName: String, agentDateOfBirth: Option[LocalDate]) =
     AgentName(agentName, None, agentDateOfBirth)
 
   val maxAgentNameLength = 140
 
   private val agentNameType = notEmptyStrip andThen notEmpty.withMessage("error.required.tp.agent.name") andThen
-    maxLength(maxAgentNameLength).withMessage("error.invalid.tp.agent.name") andThen
-    basicPunctuationPattern()
+    maxLength(maxAgentNameLength).withMessage("error.length.tp.agent.name") andThen
+    regexWithMsg(basicPunctuationRegex, "error.char.tp.agent.name")
 
   implicit val mongoKey = new MongoKey[AgentName] {
     override def apply(): String = "agent-name"
@@ -52,7 +53,7 @@ object AgentName {
     import jto.validation.forms.Rules._
     (
       (__ \ "agentName").read(agentNameType) ~
-      (__ \ "agentDateOfBirth").read(localDateFutureRule).map(x=>Some(x))
+      (__ \ "agentDateOfBirth").read(dateRule).map(x=>Some(x))
     ) (applyWithoutDateOfChange)
   }
 
