@@ -289,6 +289,7 @@ error.required.tp.agent.date.past = Your agent’s date of birth must be in the 
 error.required.tp.agent.partnership = Enter your agent’s partners
 error.invalid.tp.agent.partnership = Your agent’s partners must be 140 characters or less
 error.char.tp.agent.partnership = Your agent’s partners can include letters a to z, numbers, spaces and punctuation
+error.char.tp.agent.dob = Your agent’s date of birth must be after 1900
 error.required.tp.register.another.premises = Select yes if you want to register another trading premises
 error.expected.tp.date.after.start = The date must be after you started trading at these premises, which was {0}
 error.expected.tp.dateofchange.after.startdate = The date must be after you started trading at these premises, which was {0}
