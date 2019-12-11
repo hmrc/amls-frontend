@@ -34,7 +34,7 @@ object AgentName {
 
   import utils.MappingUtils.Implicits._
 
-  val dateRule = newAllowedPastAndFutureDateRule("error.required.tp.agent.date")
+  val dateRule = newAllowedPastAndFutureDateRule("error.required.tp.agent.date", "error.invalid.date.after.1700", "error.required.tp.agent.date.past")
   def applyWithoutDateOfChange(agentName: String, agentDateOfBirth: Option[LocalDate]) =
     AgentName(agentName, None, agentDateOfBirth)
 

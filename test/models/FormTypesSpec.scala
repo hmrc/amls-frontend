@@ -729,7 +729,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
         "year" -> Seq("1899")
       )
 
-      newAllowedPastAndFutureDateRule("error.required.date").validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.invalid.date.after.1700"))))
+      newAllowedPastAndFutureDateRule("error.required.date", "error.invalid.date.after.1700", "error.required.tp.agent.date.past").validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.invalid.date.after.1700"))))
     }
 
     "fail validation when date after 2099" in {
@@ -739,7 +739,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
         "year" -> Seq("2100")
       )
 
-      newAllowedPastAndFutureDateRule("error.required.date").validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.invalid.date.before.2100"))))
+      newAllowedPastAndFutureDateRule("error.required.date", "error.invalid.date.after.1700", "error.required.tp.agent.date.past").validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.required.tp.agent.date.past"))))
     }
   }
 

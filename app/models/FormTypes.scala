@@ -234,6 +234,7 @@ object FormTypes {
   // While the def is a function declaration. It is evaluated on call and not stored as an immutable object.
   def futureDateRule: Rule[LocalDate, LocalDate] = maxDateWithMsg(LocalDate.now, "error.future.date")
   def localDateFutureRule: Rule[UrlFormEncoded, LocalDate] = localDateRuleWithPattern andThen pastStartDateRule andThen futureDateRule
+  def localDateFutureRuleAgentsPremise: Rule[UrlFormEncoded, LocalDate] = localDateRuleWithPattern andThen pastStartDateRule andThen maxDateWithMsg(LocalDate.now, "error.required.tp.agent.date.past")
 
   def dateOfChangeActivityStartDateRule = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
@@ -277,9 +278,10 @@ object FormTypes {
   val pastStartDateRuleExtended: Rule[LocalDate, LocalDate] = minDateWithMsg(new LocalDate(1700, 1, 1), "error.allowed.start.date.extended")
   val allowedPastAndFutureDateRule: Rule[UrlFormEncoded, LocalDate] = localDateRuleWithPattern andThen pastStartDateRule andThen endOfCenturyDateRule
 
-  def newAllowedPastAndFutureDateRule(messagePrefix: String): Rule[UrlFormEncoded, LocalDate] = newLocalDateRuleWithPattern(messagePrefix) andThen
-    pastStartDateRuleWithMsg("error.invalid.date.after.1700") andThen
-    endOfCenturyDateRuleWithMsg("error.invalid.date.before.2100")
+  def newAllowedPastAndFutureDateRule(messagePrefix: String = "", messagePast: String = "", messageFuture: String = ""): Rule[UrlFormEncoded, LocalDate] = newLocalDateRuleWithPattern(messagePrefix) andThen
+    pastStartDateRuleWithMsg(messagePast) andThen
+    maxDateWithMsg(LocalDate.now, messageFuture)
+
 
   val allowedPastAndFutureDateRuleExtended: Rule[UrlFormEncoded, LocalDate] = localDateRuleWithPattern andThen pastStartDateRuleExtended andThen endOfCenturyDateRule
 
