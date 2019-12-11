@@ -160,7 +160,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("error.invalid.date.after.1700"))
+        contentAsString(result) must include(Messages("error.invalid.date.after.1900"))
       }
 
       "show error with year field too long" in new Fixture {

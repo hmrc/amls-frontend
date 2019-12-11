@@ -56,14 +56,14 @@ class ActivityStartDateSpec extends PlaySpec {
   }
 
   "fail validation" when {
-    "given a day in the past before start of 1700" in {
+    "given a day in the past before start of 1900" in {
       val model = Map(
         "startDate.day" -> Seq("31"),
         "startDate.month" -> Seq("12"),
         "startDate.year" -> Seq("1899")
       )
       ActivityStartDate.formRule.validate(model) must be(Invalid(Seq(
-        Path \ "startDate" -> Seq(ValidationError("error.invalid.date.after.1700"))
+        Path \ "startDate" -> Seq(ValidationError("error.invalid.date.after.1900"))
       )))
     }
   }
