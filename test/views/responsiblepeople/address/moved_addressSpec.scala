@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.responsiblepeople
+package views.responsiblepeople.address
 
 import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
@@ -37,7 +37,7 @@ class moved_addressSpec extends AmlsSpec with MustMatchers {
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.moved_address(form2, address, 1, name)
+      def view = views.html.responsiblepeople.address.moved_address(form2, address, 1, name)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
@@ -58,7 +58,7 @@ class moved_addressSpec extends AmlsSpec with MustMatchers {
           (Path \ "movedAddress") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.moved_address(form2, address, 1, name)
+      def view = views.html.responsiblepeople.address.moved_address(form2, address, 1, name)
 
       errorSummary.html() must include("not a message Key")
     }

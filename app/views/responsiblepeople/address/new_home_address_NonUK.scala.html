@@ -19,23 +19,24 @@
 @import include.forms2._
 @import models.autocomplete._
 
-@(f: Form2[_], edit: Boolean, index: Int, flow: Option[String] = None, personName: String, countryData: Option[Seq[NameValuePair]])(implicit request: Request[_],m:Messages)
+@(f: Form2[_], index: Int, personName: String, countryData: Option[Seq[NameValuePair]])(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @components.back_link()
-    @errorSummaryWithPlaceholder(f, s"${Messages("error.required.select.non.uk.previous.address")}")
+    @errorSummaryWithPlaceholder(f, s"${Messages("error.required.select.non.uk.home.address")}")
 }
 
 @main(
-    title = Messages("responsiblepeople.additional_address_country.title", personName) + " - " + Messages("summary.responsiblepeople"),
+    title = Messages("responsiblepeople.new.home.title", personName) + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 
-    @form(f, controllers.responsiblepeople.address.routes.AdditionalAddressNonUKController.post(index, edit, flow)) {
+    @form(f, controllers.responsiblepeople.address.routes.NewHomeAddressNonUKController.post(index)) {
 
         <input type ="hidden" name="isUK" value=false />
-            @fieldsetWithErrorGroup(
-                heading = Messages("responsiblepeople.additional_address_country.heading", personName),
+
+        @fieldsetWithErrorGroup(
+                heading = Messages("responsiblepeople.new.home.heading", personName),
                 section = "summary.responsiblepeople",
                 panel = false,
                 f = f(s"""${f("address-overseas").id}-fieldset""")
@@ -46,13 +47,13 @@
                 @input(f("addressLineNonUK4"), labelText = "lbl.address.line4")
                 @country_autocomplete(
                     field = f("country"),
-                    placeholder = s"${Messages("error.required.select.non.uk.previous.address")}",
+                    placeholder = s"${Messages("error.required.select.non.uk.home.address")}",
                     labelText = "responsiblepeople.additional_address.country",
                     data = countryData.getOrElse(Seq.empty)
                 )
             }
 
-        @submit(edit, Some("button.saveandcontinue"))
+        @submit(Some("button.saveandcontinue"))
     }
-
 }
+

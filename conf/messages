@@ -51,6 +51,7 @@ error.required.uk.or.overseas.address.previous = Select yes if {0}’s previous 
 error.required.uk.or.overseas.address.current = Select yes if {0}’s home address is in the UK
 error.required.uk.or.overseas.address.default = Select yes if this is a UK address
 error.required.uk.or.overseas = Select yes if this is a UK address
+error.required.uk.or.overseas.address.new.home = Select yes if this person’s new address is in the UK
 
 error.required.firstname = Enter a first name.
 error.required.lastname = Enter a last name.
@@ -337,8 +338,9 @@ error.required.select.uk.passport = Select yes if {0} has a UK passport
 error.required.select.non.uk.passport = Select yes if {0} has a passport from another country
 error.required.select.non.uk = Enter a country that is not the United Kingdom because {0} in the UK
 error.required.select.non.uk.address = does not live
-error.required.select.non.uk.previous.address = previous address was not
-error.required.select.non.uk.other.previous.address = other previous address was not
+error.required.select.non.uk.previous.address = this person’s previous address was not
+error.required.select.non.uk.home.address = this person’s home address is not
+error.required.select.non.uk.other.previous.address = this person’s other previous address was not
 error.required.enter.valid.non.uk = Enter a country that is not the United Kingdom because {0} was not born in the UK
 
 error.required.select.uk = Select yes if {0}’s home address is in the UK
@@ -346,10 +348,10 @@ error.required.enter.addressline.one = Enter address line 1
 error.required.enter.addressline.two = Enter address line 2
 error.required.enter.postcode = Enter a postcode, like AA1 1AA
 error.required.enter.country = Enter a country name, like France
-error.required.enter.addresslineone.regex = Address line 1 can include letters a to z, numbers, spaces, and most punctuation and special characters
-error.required.enter.addresslinetwo.regex = Address line 2 can include letters a to z, numbers, spaces, and most punctuation and special characters
-error.required.enter.addresslinethree.regex = Address line 3 can include letters a to z, numbers, spaces, and most punctuation and special characters
-error.required.enter.addresslinefour.regex = Address line 4 can include letters a to z, numbers, spaces, and most punctuation and special characters
+error.required.enter.addresslineone.regex = Address line 1 must only include letters a to z, numbers, apostrophes, commas, dashes, exclamation marks, full stops, hyphens, quotation marks, slashes, spaces, and round brackets
+error.required.enter.addresslinetwo.regex = Address line 2 must only include letters a to z, numbers, apostrophes, commas, dashes, exclamation marks, full stops, hyphens, quotation marks, slashes, spaces, and round brackets
+error.required.enter.addresslinethree.regex = Address line 3 must only include letters a to z, numbers, apostrophes, commas, dashes, exclamation marks, full stops, hyphens, quotation marks, slashes, spaces, and round brackets
+error.required.enter.addresslinefour.regex = Address line 4 must only include letters a to z, numbers, apostrophes, commas, dashes, exclamation marks, full stops, hyphens, quotation marks, slashes, spaces, and round brackets
 error.required.enter.addresslineone.charcount = Address line 1 must be 35 characters or less
 error.required.enter.addresslinetwo.charcount = Address line 2 must be 35 characters or less
 error.required.enter.addresslinethree.charcount = Address line 3 must be 35 characters or less
@@ -1989,12 +1991,17 @@ responsiblepeople.remove.responsible.person.title = Remove a responsible person
 responsiblepeople.remove.responsible.person = This will permanently remove {0} from your list of responsible people.
 responsiblepeople.remove.responsible.person.enddate.lbl = When did this person stop being a responsible person for your business?
 responsiblepeople.remove.responsible.person.btn = Remove responsible person
+
 responsiblepeople.confirmaddress.heading = Is this {0}’s home address?
 responsiblepeople.confirmaddress.title = Is this the person’s home address?
 responsiblepeople.new.home.date.of.change.heading = When did {0} move?
 responsiblepeople.new.home.date.of.change.title = When did this person move?
-responsiblepeople.new.home.heading = What’s {0}’s new home address?
-responsiblepeople.new.home.title = What’s this person’s new home address?
+responsiblepeople.new.home.is.uk.heading = Is {0}’s new home address in the UK?
+responsiblepeople.new.home.is.uk.title = Is this person’s new home address in the UK?
+
+responsiblepeople.new.home.heading = What is {0}’s new home address?
+responsiblepeople.new.home.title = What is this person’s new home address?
+
 responsiblepeople.detailed_answer.tell.us.moved = Tell us that {0} has moved
 responsiblepeople.movedaddress.heading = Has {0} moved from this home address?
 responsiblepeople.movedaddress.title = Has this person moved from this home address?

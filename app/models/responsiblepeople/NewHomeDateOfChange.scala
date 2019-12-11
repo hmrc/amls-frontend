@@ -22,7 +22,7 @@ import models.FormTypes._
 import org.joda.time.{DateTimeFieldType, LocalDate}
 import play.api.libs.json._
 
-case class NewHomeDateOfChange (dateOfChange: Option[LocalDate])
+case class NewHomeDateOfChange(dateOfChange: Option[LocalDate])
 
 object NewHomeDateOfChange {
 
@@ -34,12 +34,12 @@ object NewHomeDateOfChange {
 
   implicit val formRule: Rule[UrlFormEncoded, NewHomeDateOfChange] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    __.read(dateOfChangeActivityStartDateRule) map {date =>NewHomeDateOfChange(Some(date))}
+    __.read(dateOfChangeActivityStartDateRule) map { date => NewHomeDateOfChange(Some(date)) }
   }
 
   implicit val formWrites: Write[NewHomeDateOfChange, UrlFormEncoded] =
     Write {
-      case NewHomeDateOfChange(b) =>Map(
+      case NewHomeDateOfChange(b) => Map(
         "dateOfChange.day" -> Seq(b.fold("")(_.get(DateTimeFieldType.dayOfMonth()).toString)),
         "dateOfChange.month" -> Seq(b.fold("")(_.get(DateTimeFieldType.monthOfYear()).toString)),
         "dateOfChange.year" -> Seq(b.fold("")(_.get(DateTimeFieldType.year()).toString))

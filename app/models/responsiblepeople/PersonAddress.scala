@@ -84,6 +84,7 @@ object AddressType extends Enumeration {
   val Previous = Value("previous")
   val OtherPrevious = Value("previous.other")
   val Deafult = Value("default")
+  val NewHome = Value("new.home")
 }
 
 object PersonAddress {
