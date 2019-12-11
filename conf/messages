@@ -299,6 +299,7 @@ error.required.tp.address.date.year = Date your business started or will start t
 error.required.tp.address.date.month.day = Date your business started or will start trading from these premises must include a day and month
 error.required.tp.address.date.year.month = Date your business started or will start trading from these premises must include a month and year
 error.required.tp.address.date.year.month.day = Enter the date your business did or will start trading from these premises
+error.required.tp.address.date.year.day = Date your business started or will start trading from these premises must include a day and year
 error.required.tp.services = Select which money service business activities take place at these premises
 
 ###############################  Estate Agency Business ###############################
