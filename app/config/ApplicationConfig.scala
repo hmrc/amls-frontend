@@ -45,11 +45,10 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   lazy val analyticsToken = Some(getConfigString(s"analytics.token"))
   lazy val analyticsHost = getConfigString(s"analytics.host")
 
-  lazy val betaFeedbackUrl = (if (env == "Prod") "" else contactHost) + getConfigString("contact-frontend.beta-feedback-url.authenticated")
-  lazy val betaFeedbackUnauthenticatedUrl = (if (env == "Prod") "" else contactHost) + getConfigString("contact-frontend.beta-feedback-url.unauthenticated")
-
-  val reportAProblemPartialUrl = s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
-  val reportAProblemNonJSUrl = s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
+  val reportAProblemPartialUrl = getConfigString("contact-frontend.report-problem-url.with-js")
+  val reportAProblemNonJSUrl = getConfigString("contact-frontend.report-problem-url.non-js")
+  val betaFeedbackUrl = getConfigString("contact-frontend.beta-feedback-url.authenticated")
+  val betaFeedbackUnauthenticatedUrl = getConfigString("contact-frontend.beta-feedback-url.unauthenticated")
 
   lazy val loginUrl = getConfigString("login.url")
   lazy val logoutUrl = getConfigString("logout.url")
