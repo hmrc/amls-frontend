@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.responsiblepeople
+package controllers.responsiblepeople.address
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
@@ -105,7 +105,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
           (any(), any())).thenReturn(Future.successful(cacheMap))
         val result = controller.post(1)(postRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.NewHomeAddressController.get(1).url))
+        redirectLocation(result) must be(Some(controllers.responsiblepeople.address.routes.NewHomeAddressController.get(1).url))
       }
 
       "fail validation on invalid input" in new Fixture {

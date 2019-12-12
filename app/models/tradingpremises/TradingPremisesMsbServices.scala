@@ -93,7 +93,7 @@ sealed trait MsbServices0 {
       import utils.MappingUtils.Implicits.RichRule
 
       val required =
-        TraversableValidators.minLengthR[Set[TradingPremisesMsbService]](1) withMessage "error.required.msb.services"
+        TraversableValidators.minLengthR[Set[TradingPremisesMsbService]](1) withMessage "error.required.tp.services"
 
       (__ \ "msbServices").read(required) map TradingPremisesMsbService.applyWithoutDateOfChange
     }

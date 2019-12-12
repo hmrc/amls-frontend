@@ -33,14 +33,17 @@ object AgentCompanyDetails {
   import utils.MappingUtils.Implicits._
 
   val maxAgentRegisteredCompanyNameLength = 140
-  val agentsRegisteredCompanyNameType: Rule[String, String] =
-    notEmptyStrip andThen notEmpty.withMessage("error.required.tp.agent.registered.company.name") andThen
-      maxLength(maxAgentRegisteredCompanyNameLength).withMessage("error.invalid.tp.agent.registered.company.name") andThen
-      basicPunctuationPattern()
+  val maxAgentRegisteredCompanyNumberLength = 8
+  val agentsCompanyDetailsType: Rule[String, String] =
+    notEmptyStrip andThen notEmpty.withMessage("error.required.tp.agent.company.details") andThen
+      maxLength(maxAgentRegisteredCompanyNameLength).withMessage("error.invalid.tp.agent.company.details") andThen
+      regexWithMsg(basicPunctuationRegex, "error.invalid.char.tp.agent.company.details")
 
   val agentsRegisteredCompanyCRNType: Rule[String, String] =
-    notEmpty.withMessage("error.required.bm.registration.number") andThen
-      pattern("^[A-Z0-9]{8}$".r).withMessage("error.invalid.bm.registration.number")
+    notEmpty.withMessage("error.required.to.agent.company.reg.number") andThen
+      maxLength(maxAgentRegisteredCompanyNumberLength).withMessage("error.size.to.agent.company.reg.number") andThen
+      minLength(maxAgentRegisteredCompanyNumberLength).withMessage("error.size.to.agent.company.reg.number") andThen
+      regexWithMsg(crnNumberRegex, "error.char.to.agent.company.reg.number")
 
   implicit val mongoKey = new MongoKey[AgentCompanyDetails] {
     override def apply(): String = "agent-company-name"
@@ -49,7 +52,7 @@ object AgentCompanyDetails {
   implicit val formReads: Rule[UrlFormEncoded, AgentCompanyDetails] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
     (
-      (__ \ "agentCompanyName").read(agentsRegisteredCompanyNameType) ~
+      (__ \ "agentCompanyName").read(agentsCompanyDetailsType) ~
         (__ \ "companyRegistrationNumber").read(agentsRegisteredCompanyCRNType)
       ) (AgentCompanyDetails(_, _))
   }

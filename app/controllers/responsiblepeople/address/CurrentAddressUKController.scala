@@ -16,38 +16,31 @@
 
 package controllers.responsiblepeople.address
 
-import audit.AddressConversions._
-import audit.{AddressCreatedEvent, AddressModifiedEvent}
-import cats.data.OptionT
-import cats.implicits._
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.ViewResponse
 import models.responsiblepeople._
-import models.status.SubmissionStatus
-import play.api.mvc.{AnyContent, Request}
 import services.{AutoCompleteService, StatusService}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import utils.{AuthAction, ControllerHelper, DateOfChangeHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper, DateOfChangeHelper}
 import views.html.responsiblepeople.address.current_address_UK
 
 import scala.concurrent.Future
 
-class CurrentAddressUKController @Inject ()(val dataCacheConnector: DataCacheConnector,
-                                            auditConnector: AuditConnector,
-                                            autoCompleteService: AutoCompleteService,
-                                            statusService: StatusService,
-                                            authAction: AuthAction) extends RepeatingSection with DefaultBaseController with DateOfChangeHelper {
+class CurrentAddressUKController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                           implicit val auditConnector: AuditConnector,
+                                           autoCompleteService: AutoCompleteService,
+                                           statusService: StatusService,
+                                           authAction: AuthAction) extends AddressHelper with DefaultBaseController with DateOfChangeHelper {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request =>
       getData[ResponsiblePerson](request.credId, index) map {
-        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,
-        Some(ResponsiblePersonAddressHistory(Some(currentAddress),_,_)),_,_,_,_,_,_,_,_,_,_,_, _))
+        case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _,
+        Some(ResponsiblePersonAddressHistory(Some(currentAddress), _, _)), _, _, _, _, _, _, _, _, _, _, _, _))
         => Ok(current_address_UK(Form2[ResponsiblePersonCurrentAddress](currentAddress), edit, index, flow, personName.titleName))
-        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+        case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
         => Ok(current_address_UK(EmptyForm, edit, index, flow, personName.titleName))
         case _ => NotFound(notFoundView)
       }
@@ -70,61 +63,12 @@ class CurrentAddressUKController @Inject ()(val dataCacheConnector: DataCacheCon
               } yield data.copy(timeAtAddress = currentAddress.timeAtAddress)).getOrElse(data)
 
               statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) flatMap {
-                status => updateAndRedirect(request.credId, currentAddressWithTime, index, edit, flow, responsiblePerson, status)
+                status => updateCurrentAddressAndRedirect(request.credId, currentAddressWithTime, index, edit, flow, responsiblePerson, status)
               }
             }
-          }}).recoverWith {
+          }
+        }).recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
     }
-
-  private def updateAndRedirect(credId: String, data: ResponsiblePersonCurrentAddress, index: Int, edit: Boolean,
-                                flow: Option[String], originalResponsiblePerson: Option[ResponsiblePerson],
-                                status: SubmissionStatus)(implicit request: Request[AnyContent]) = {
-
-    updateDataStrict[ResponsiblePerson](credId, index) { res =>
-      res.addressHistory(
-        res.addressHistory match {
-          case Some(a) => a.currentAddress(data)
-          case _ => ResponsiblePersonAddressHistory(currentAddress = Some(data))
-        })
-    } flatMap { _ =>
-      val oldAddress = for {
-        viewResponse <- OptionT(dataCacheConnector.fetch[ViewResponse](credId, ViewResponse.key))
-        rp <- OptionT.fromOption[Future](ResponsiblePerson.getResponsiblePersonFromData(viewResponse.responsiblePeopleSection, index))
-        address <- OptionT.fromOption[Future](rp.addressHistory)
-        personAddress <- OptionT.fromOption[Future](address.currentAddress)
-      } yield personAddress.personAddress
-
-      oldAddress.value flatMap { originalAddress =>
-        (edit, originalAddress) match {
-          case (true, _)  => {
-            auditConnector.sendEvent(AddressModifiedEvent(data.personAddress, originalAddress)) map { _ =>
-              if (redirectToDateOfChange[PersonAddress](status, originalAddress, data.personAddress)
-                && originalResponsiblePerson.flatMap {
-                orp => orp.lineId
-              }.isDefined) {
-                Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))
-              } else {
-                Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index, flow))
-              }
-            }
-          }
-          case (false, Some(a)) if !data.personAddress.equals(a) & (a.isEmpty | a.isComplete)
-            & isEligibleForDateOfChange(status) & originalResponsiblePerson.flatMap {
-            orp => orp.lineId
-          }.isDefined => {
-            auditConnector.sendEvent(AddressModifiedEvent(data.personAddress, originalAddress)) map { _ =>
-              Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))
-            }
-          }
-          case (_, _) => {
-            auditConnector.sendEvent(AddressCreatedEvent(data.personAddress)) map { _ =>
-              Redirect(routes.TimeAtCurrentAddressController.get(index, edit, flow))
-            }
-          }
-        }
-      }
-    }
-  }
 }
