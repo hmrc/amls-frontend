@@ -183,10 +183,11 @@ object ControllerHelper {
     }
   }
 
-  def accountantName(ba: Option[BA]): String = ba match {
-    case Some(activities) if activities.whoIsYourAccountant.isDefined => activities.whoIsYourAccountant.get.accountantsName
-    case _ => ""
-  }
+  def accountantName(ba: Option[BA]): String = (for {
+    businessActivities <- ba
+    whoIsYourAccountant <- businessActivities.whoIsYourAccountant
+    names <- whoIsYourAccountant.names
+  } yield names.accountantsName).getOrElse("")
 
   def supervisionComplete(cache: CacheMap) = cache.getEntry[Supervision](Supervision.key) match {
     case Some(supervision) => supervision.isComplete

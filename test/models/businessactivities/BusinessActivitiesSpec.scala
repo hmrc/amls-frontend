@@ -38,9 +38,9 @@ class BusinessActivitiesSpec extends AmlsSpec {
   val DefaultRiskAssessments = RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(PaperBased)))
   val DefaultHowManyEmployees = HowManyEmployees(Some("5"),Some("4"))
   val DefaultWhoIsYourAccountant = WhoIsYourAccountant(
-    "Accountant's name",
-    Some("Accountant's trading name"),
-    UkAccountantsAddress("address1", "address2", Some("address3"), Some("address4"), "POSTCODE")
+    Some(WhoIsYourAccountantName("Accountant's name", Some("Accountant's trading name"))),
+    Some(WhoIsYourAccountantIsUk(true)),
+    Some(UkAccountantsAddress("address1", "address2", Some("address3"), Some("address4"), "POSTCODE"))
   )
   val DefaultIdentifySuspiciousActivity = IdentifySuspiciousActivity(true)
   val DefaultTaxMatters = TaxMatters(false)
@@ -59,9 +59,9 @@ class BusinessActivitiesSpec extends AmlsSpec {
   val NewHowManyEmployees = HowManyEmployees(Some("2"),Some("3"))
   val NewIdentifySuspiciousActivity = IdentifySuspiciousActivity(true)
   val NewWhoIsYourAccountant = WhoIsYourAccountant(
-    "newName",
-    Some("newTradingName"),
-    UkAccountantsAddress("98E", "Building1", Some("street1"), Some("road1"), "AA11 1AA")
+    Some(WhoIsYourAccountantName("newName", Some("newTradingName"))),
+    Some(WhoIsYourAccountantIsUk(true)),
+    Some(UkAccountantsAddress("98E", "Building1", Some("street1"), Some("road1"), "AA11 1AA"))
   )
   val NewTaxMatters = TaxMatters(true)
 
@@ -151,6 +151,7 @@ class BusinessActivitiesSpec extends AmlsSpec {
     "riskassessments" -> Seq("01"),
     "employeeCount" -> "5",
     "employeeCountAMLSSupervision" -> "4",
+    "isUK" -> true,
     "accountantsName" -> "Accountant's name",
     "accountantsTradingName" -> "Accountant's trading name",
     "accountantsAddressLine1" -> "address1",

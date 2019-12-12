@@ -71,7 +71,9 @@ class summarySpec extends AmlsSpec
         checkElementTextIncludes(_, "businessactivities.RiskAssessmentType.lbl.01", "businessactivities.RiskAssessmentType.lbl.02")),
       ("businessactivities.accountantForAMLSRegulations.title",checkElementTextIncludes(_, "lbl.yes")),
       ("businessactivities.whoisyouraccountant.title",
-        checkElementTextIncludes(_, "AccountantName","tradingName","line1","line2","line3","line4","AB12CD")),
+        checkElementTextIncludes(_, "AccountantName","tradingName")),
+      ("businessactivities.whoisyouraccountant.address.header",
+        checkElementTextIncludes(_, "line1","line2","line3","line4","AB12CD")),
       ("businessactivities.tax.matters.summary.title",checkElementTextIncludes(_, "AccountantName", "lbl.yes"))
     )
 
@@ -91,7 +93,10 @@ class summarySpec extends AmlsSpec
           identifySuspiciousActivity = Some(IdentifySuspiciousActivity(true)),
           riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(Digital, PaperBased)))),
           howManyEmployees = Some(HowManyEmployees(Some("123"), Some("456"))),
-          whoIsYourAccountant = Some(WhoIsYourAccountant("AccountantName", Some("tradingName"), UkAccountantsAddress("line1", "line2", Some("line3"), Some("line4"), "AB12CD"))),
+          whoIsYourAccountant = Some(WhoIsYourAccountant(
+            Some(WhoIsYourAccountantName("AccountantName", Some("tradingName"))),
+            Some(WhoIsYourAccountantIsUk(true)),
+            Some(UkAccountantsAddress("line1", "line2", Some("line3"), Some("line4"), "AB12CD")))),
           taxMatters = Some(TaxMatters(true)),
           transactionRecordTypes = Some(TransactionTypes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("SoftwareName"))))
         ),

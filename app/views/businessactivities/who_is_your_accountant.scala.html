@@ -19,7 +19,7 @@
 @import include.forms2._
 @import models.autocomplete._
 
-@(f: Form2[_], edit: Boolean, countryData: Option[Seq[NameValuePair]])(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @components.back_link()
@@ -31,7 +31,7 @@
     heading = header
 ) {
 
-    @form(f, controllers.businessactivities.routes.WhoIsYourAccountantController.post(edit)) {
+    @form(f, controllers.businessactivities.routes.WhoIsYourAccountantNameController.post(edit)) {
 
         @fieldset(
             heading = "businessactivities.whoisyouraccountant.title",
@@ -49,72 +49,6 @@
                     field = f("tradingName"),
                     labelText = "businessactivities.whoisyouraccountant.tradingName"
                 )
-        }
-
-        @fieldset(
-            f = f("isUK"),
-            legend = "businessactivities.whoisyouraccountant.address.location",
-            panel = false,
-            classes = Seq("inline form-group")
-        ) {
-            @radio(
-                f = f("isUK"),
-                labelText = "lbl.yes",
-                value = "true",
-                inline = true,
-                target = s"#${f("postCode").id}-field"
-            )
-            @radio(
-                f = f("isUK"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true,
-                target = s"#${f("country").id}-field"
-            )
-        }
-
-        @fieldset(
-            legend = "businessactivities.whoisyouraccountant.address",
-            legendHidden = true,
-            panel = false,
-            f = f("whoisyouraccountant-address-fieldset")
-        ) {
-            @input(
-                field = f("addressLine1"),
-                labelText = "lbl.address.line1"
-            )
-            @input(
-                field = f("addressLine2"),
-                labelText = "lbl.address.line2"
-            )
-            @input(
-                field = f("addressLine3"),
-                labelText = "lbl.address.line3"
-            )
-            @input(
-                field = f("addressLine4"),
-                labelText = "lbl.address.line4"
-            )
-            @panel(
-                field = Some(f(s"${f("postCode").id}-field")),
-                panel = false
-            ) {
-                @input(
-                    field = f("postCode"),
-                    labelText = "businessactivities.whoisyouraccountant.postCode",
-                    classes = Seq("postcode")
-                )
-            }
-            @panel(
-                field = Some(f(s"${f("country").id}-field")),
-                panel = false
-            ) {
-                @country_autocomplete(
-                    field = f("country"),
-                    labelText = "businessactivities.whoisyouraccountant.country",
-                    data = countryData.getOrElse(Seq.empty)
-                )
-            }
         }
 
         @submit(edit)

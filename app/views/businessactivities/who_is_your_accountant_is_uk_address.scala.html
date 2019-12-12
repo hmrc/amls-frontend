@@ -17,43 +17,42 @@
 @import forms.Form2
 @import include._
 @import include.forms2._
-@import play.api.i18n.Messages
-@import models.responsiblepeople.PersonAddress
+@import models.autocomplete._
 
-@(f: Form2[_], model: PersonAddress, index: Int, personName: String)(implicit request: Request[_],m:Messages)
+@(f: Form2[_], edit: Boolean, personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @components.back_link()
-    @errorSummaryWithPlaceholder(f, personName)
+    @errorSummary(f)
 }
 
 @main(
-    title = Messages("responsiblepeople.movedaddress.title") + " - " + Messages("summary.responsiblepeople"),
+    title = Messages("businessactivities.whoisyouraccountant.location.title") + " - " + Messages("summary.businessactivities"),
     heading = header
 ) {
-    @form(f, controllers.responsiblepeople.routes.MovedAddressController.post(index)) {
 
-        @fieldsetWithErrorGroup(
-            f = f("movedAddress"),
-            heading = Messages("responsiblepeople.movedaddress.heading", personName),
-            section = "summary.responsiblepeople",
+    @form(f, controllers.businessactivities.routes.WhoIsYourAccountantIsUkController.post(edit)) {
+
+        @fieldset(
+            heading = Messages("businessactivities.whoisyouraccountant.location.header", personName),
+            section = "summary.businessactivities",
+            f = f("isUK"),
             panel = false,
-            supportingContent = person_address_helper(model),
-            classes = Seq("inline"),
-            errorGroupPlaceholder = personName
+            classes = Seq("inline form-group")
         ) {
             @radio(
-                f = f("movedAddress"),
+                f = f("isUK"),
                 labelText = "lbl.yes",
                 value = "true"
             )
             @radio(
-                f = f("movedAddress"),
+                f = f("isUK"),
                 labelText = "lbl.no",
                 value = "false"
             )
         }
 
-        @submit(false)
+        @submit(edit)
+
     }
 }

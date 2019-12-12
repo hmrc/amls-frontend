@@ -35,7 +35,7 @@ class AgentCompanyDetailsSpec extends AmlsSpec {
         val formInput = Map("agentCompanyName" -> Seq(""), "companyRegistrationNumber" -> Seq("12345678"))
         AgentCompanyDetails.formReads.validate(formInput) must be(Invalid(Seq((
           Path \ "agentCompanyName",
-          Seq(ValidationError("error.required.tp.agent.registered.company.name"))
+          Seq(ValidationError("error.required.tp.agent.company.details"))
         ))))
       }
 
@@ -43,36 +43,36 @@ class AgentCompanyDetailsSpec extends AmlsSpec {
         val formInput = Map("agentCompanyName" -> Seq("sometext"), "companyRegistrationNumber" -> Seq(""))
         AgentCompanyDetails.formReads.validate(formInput) must be(Invalid(Seq((
           Path \ "companyRegistrationNumber",
-          Seq(ValidationError("error.required.bm.registration.number"))
+          Seq(ValidationError("error.required.to.agent.company.reg.number"))
         ))))
       }
 
       "given a value with length greater than 8" in {
         val data = Map("agentCompanyName" -> Seq("sometext"), "companyRegistrationNumber" -> Seq("1" * 9))
         val result = AgentCompanyDetails.formReads.validate(data)
-        result mustBe Invalid(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number"))))
+        result mustBe Invalid(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.size.to.agent.company.reg.number"))))
       }
 
       "given a value with length less than 8" in {
         val data = Map("agentCompanyName" -> Seq("sometext"), "companyRegistrationNumber" -> Seq("1" * 7))
         val result = AgentCompanyDetails.formReads.validate(data)
-        result mustBe Invalid(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number"))))
+        result mustBe Invalid(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.size.to.agent.company.reg.number"))))
       }
 
       "given a value containing non-alphanumeric characters" in {
         val data = Map("agentCompanyName" -> Seq("sometext"), "companyRegistrationNumber" -> Seq("1234567!"))
         val result = AgentCompanyDetails.formReads.validate(data)
-        result mustBe Invalid(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number"))))
+        result mustBe Invalid(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.char.to.agent.company.reg.number"))))
       }
 
       "both fields missing" in {
-        val formInput = Map("agentCompanyName" -> Seq(""))
+        val formInput = Map("agentCompanyName" -> Seq(""), "companyRegistrationNumber" -> Seq(""))
         AgentCompanyDetails.formReads.validate(formInput) must be(Invalid(Seq((
           Path \ "agentCompanyName",
-          Seq(ValidationError("error.required.tp.agent.registered.company.name"))
+          Seq(ValidationError("error.required.tp.agent.company.details"))
         ), (
           Path \ "companyRegistrationNumber",
-          Seq(ValidationError("error.required"))
+          Seq(ValidationError("error.required.to.agent.company.reg.number"))
         )
         )))
       }
@@ -80,14 +80,14 @@ class AgentCompanyDetailsSpec extends AmlsSpec {
       "input exceeds max length" in {
         val formInput = Map("agentCompanyName" -> Seq("sometesttexttest" * 11), "companyRegistrationNumber" -> Seq("12345678"))
         AgentCompanyDetails.formReads.validate(formInput) must be(Invalid(Seq((
-          Path \ "agentCompanyName") -> Seq(ValidationError("error.invalid.tp.agent.registered.company.name")
+          Path \ "agentCompanyName") -> Seq(ValidationError("error.invalid.tp.agent.company.details")
         ))))
       }
 
       "input has invalid data" in {
         val formInput = Map("agentCompanyName" -> Seq("<sometest>"), "companyRegistrationNumber" -> Seq("12345678"))
         AgentCompanyDetails.formReads.validate(formInput) must be(Invalid(Seq((
-          Path \ "agentCompanyName") -> Seq(ValidationError("err.text.validation")
+          Path \ "agentCompanyName") -> Seq(ValidationError("error.invalid.char.tp.agent.company.details")
         ))))
       }
 

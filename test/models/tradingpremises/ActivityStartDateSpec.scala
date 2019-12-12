@@ -51,7 +51,7 @@ class ActivityStartDateSpec extends PlaySpec {
         )
 
         ActivityStartDate.formRule.validate(model) must be(Invalid(Seq(Path \ "startDate" -> Seq(
-          ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+          ValidationError("error.invalid.date.not.real")))))
       }
 
       "fail validation" when {
@@ -62,7 +62,7 @@ class ActivityStartDateSpec extends PlaySpec {
             "startDate.year" -> Seq("2100")
           )
           ActivityStartDate.formRule.validate(model) must be(Invalid(Seq(
-            Path \ "startDate" -> Seq(ValidationError("error.future.date"))
+            Path \ "startDate" -> Seq(ValidationError("error.required.tp.agent.date.past"))
           )))
         }
       }
@@ -75,7 +75,7 @@ class ActivityStartDateSpec extends PlaySpec {
             "startDate.year" -> Seq("1699")
           )
           ActivityStartDate.formRule.validate(model) must be(Invalid(Seq(
-            Path \ "startDate" -> Seq(ValidationError("error.allowed.start.date.extended"))
+            Path \ "startDate" -> Seq(ValidationError("error.invalid.date.after.1700"))
           )))
         }
       }
@@ -83,8 +83,14 @@ class ActivityStartDateSpec extends PlaySpec {
       "fail validation" when {
         "given a future date" in {
 
-          val data = ActivityStartDate.formWrites.writes(ActivityStartDate(LocalDate.now().plusDays(1)))
-          ActivityStartDate.formRule.validate(data) must be(Valid(ActivityStartDate(LocalDate.now().plusDays(1))))
+          val model = Map(
+            "startDate.day" -> Seq("1"),
+            "startDate.month" -> Seq("1"),
+            "startDate.year" -> Seq("2050")
+          )
+          ActivityStartDate.formRule.validate(model) must be(Invalid(Seq(
+            Path \ "startDate" -> Seq(ValidationError("error.required.tp.agent.date.past"))
+          )))
         }
       }
 
@@ -96,14 +102,7 @@ class ActivityStartDateSpec extends PlaySpec {
           "startDate.year" -> Seq("")
         )
         ActivityStartDate.formRule.validate(model) must be(Invalid(Seq(
-          Path \ "startDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
-        )))
-      }
-
-      "given missing data represented by an empty Map" in {
-
-        ActivityStartDate.formRule.validate(Map.empty) must be(Invalid(Seq(
-          Path \ "startDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
+          Path \ "startDate" -> Seq(ValidationError("error.required.tp.address.date.year.month.day"))
         )))
       }
     }

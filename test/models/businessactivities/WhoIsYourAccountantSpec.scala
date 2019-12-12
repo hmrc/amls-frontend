@@ -45,17 +45,20 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
     testAddressLine4,
     testCountry)
 
-  val testWhoIsYourAccountantUk = WhoIsYourAccountant(testName,
-    testTradingName,
-    testUKAddress)
+  val testWhoIsYourAccountantUk = WhoIsYourAccountant(
+    Some(WhoIsYourAccountantName(testName, testTradingName)),
+    Some(WhoIsYourAccountantIsUk(true)),
+    Some(testUKAddress))
 
-  val testWhoIsYourAccountantNonUk = WhoIsYourAccountant(testName,
-    testTradingName,
-    testNonUkAddress)
+  val testWhoIsYourAccountantNonUk = WhoIsYourAccountant(
+    Some(WhoIsYourAccountantName(testName, testTradingName)),
+    Some(WhoIsYourAccountantIsUk(false)),
+    Some(testNonUkAddress))
 
   val testUKAccountantJson = Json.obj(
     "accountantsName" -> testName,
     "accountantsTradingName" -> testTradingName,
+    "isUK" -> true,
     "accountantsAddressLine1" -> testAddressLine1,
     "accountantsAddressLine2" -> testAddressLine2,
     "accountantsAddressLine3" -> testAddressLine3,
@@ -66,6 +69,7 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
   val testNonUKAccountantJson = Json.obj(
     "accountantsName" -> testName,
     "accountantsTradingName" -> testTradingName,
+    "isUK" -> false,
     "accountantsAddressLine1" -> testAddressLine1,
     "accountantsAddressLine2" -> testAddressLine2,
     "accountantsAddressLine3" -> testAddressLine3,
@@ -99,72 +103,77 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
 
     "pass validation" when {
       "given valid data with a UK address" in {
-        WhoIsYourAccountant.formRule.validate(
-          WhoIsYourAccountant.formWrites.writes(testWhoIsYourAccountantUk)
-        ) should be(Valid(testWhoIsYourAccountantUk))
+        WhoIsYourAccountantName.formRule.validate(
+          WhoIsYourAccountantName.formWrites.writes(testWhoIsYourAccountantUk.names.get)
+        ) should be(Valid(testWhoIsYourAccountantUk.names.get))
+
+        WhoIsYourAccountantIsUk.formRule.validate(
+          WhoIsYourAccountantIsUk.formWrites.writes(testWhoIsYourAccountantUk.isUk.get)
+        ) should be(Valid(testWhoIsYourAccountantUk.isUk.get))
+
+        AccountantsAddress.ukFormRule.validate(
+          AccountantsAddress.formWrites.writes(testWhoIsYourAccountantUk.address.get)
+        ) should be(Valid(testWhoIsYourAccountantUk.address.get))
       }
 
       "given valid data with a Non UK address" in {
-        WhoIsYourAccountant.formRule.validate(
-          WhoIsYourAccountant.formWrites.writes(testWhoIsYourAccountantNonUk)
-        ) should be(Valid(testWhoIsYourAccountantNonUk))
+        WhoIsYourAccountantName.formRule.validate(
+          WhoIsYourAccountantName.formWrites.writes(testWhoIsYourAccountantNonUk.names.get)
+        ) should be(Valid(testWhoIsYourAccountantNonUk.names.get))
+
+        WhoIsYourAccountantIsUk.formRule.validate(
+          WhoIsYourAccountantIsUk.formWrites.writes(testWhoIsYourAccountantNonUk.isUk.get)
+        ) should be(Valid(testWhoIsYourAccountantNonUk.isUk.get))
+
+        AccountantsAddress.nonUkFormRule.validate(
+          AccountantsAddress.formWrites.writes(testWhoIsYourAccountantNonUk.address.get)
+        ) should be(Valid(testWhoIsYourAccountantNonUk.address.get))
       }
     }
 
     "fail validation" when {
       "given an empty name" in {
-        val DefaultWhoIsYourAccountant = WhoIsYourAccountant("",
-          testTradingName,
-          testUKAddress)
+        val DefaultWhoIsYourAccountant = WhoIsYourAccountantName("", None)
 
-        WhoIsYourAccountant.formRule.validate(WhoIsYourAccountant.formWrites.writes(DefaultWhoIsYourAccountant)
+        WhoIsYourAccountantName.formRule.validate(WhoIsYourAccountantName.formWrites.writes(DefaultWhoIsYourAccountant)
         ) should be(Invalid(Seq(
           (Path \ "name") -> Seq(ValidationError("error.required.ba.advisor.name"))
         )))
       }
 
       "given a name with too many characters" in {
-        val DefaultWhoIsYourAccountant = WhoIsYourAccountant("a" * 141,
-          testTradingName,
-          testUKAddress)
+        val DefaultWhoIsYourAccountant = WhoIsYourAccountantName("a" * 141, None)
 
-        WhoIsYourAccountant.formRule.validate(WhoIsYourAccountant.formWrites.writes(DefaultWhoIsYourAccountant)
+        WhoIsYourAccountantName.formRule.validate(WhoIsYourAccountantName.formWrites.writes(DefaultWhoIsYourAccountant)
         ) should be(Invalid(Seq(
-          (Path \ "name") -> Seq(ValidationError("error.max.length.ba.advisor.name"))
+          (Path \ "name") -> Seq(ValidationError("error.length.ba.advisor.name"))
         )))
       }
 
       "given a name with invalid characters" in {
-        val DefaultWhoIsYourAccountant = WhoIsYourAccountant("sasdasd{}sdfsdf",
-          testTradingName,
-          testUKAddress)
+        val DefaultWhoIsYourAccountant = WhoIsYourAccountantName("a{}", None)
 
-        WhoIsYourAccountant.formRule.validate(WhoIsYourAccountant.formWrites.writes(DefaultWhoIsYourAccountant)
+        WhoIsYourAccountantName.formRule.validate(WhoIsYourAccountantName.formWrites.writes(DefaultWhoIsYourAccountant)
         ) should be(Invalid(Seq(
-          (Path \ "name") -> Seq(ValidationError("error.invalid.character.ba.advisor.name"))
+          (Path \ "name") -> Seq(ValidationError("error.punctuation.ba.advisor.name"))
         )))
       }
 
       "given a trading name with too many characters" in {
-        val DefaultWhoIsYourAccountant = WhoIsYourAccountant(testName,
-          Some("a" * 121),
-          testUKAddress
-        )
+        val DefaultWhoIsYourAccountant = WhoIsYourAccountantName(testName, Some("a" * 121))
 
-        WhoIsYourAccountant.formRule.validate(WhoIsYourAccountant.formWrites.writes(DefaultWhoIsYourAccountant)
+        WhoIsYourAccountantName.formRule.validate(WhoIsYourAccountantName.formWrites.writes(DefaultWhoIsYourAccountant)
         ) should be(Invalid(Seq(
-          (Path \ "tradingName") -> Seq(ValidationError("error.required.ba.trading.name"))
+          (Path \ "tradingName") -> Seq(ValidationError("error.length.ba.advisor.tradingname"))
         )))
       }
 
       "given a trading name with invalid characters" in {
-        val DefaultWhoIsYourAccountant = WhoIsYourAccountant(testName,
-          Some("sasdasd{}sdfsdf"),
-          testUKAddress)
+        val DefaultWhoIsYourAccountant = WhoIsYourAccountantName(testName, Some("a{}"))
 
-        WhoIsYourAccountant.formRule.validate(WhoIsYourAccountant.formWrites.writes(DefaultWhoIsYourAccountant)
+        WhoIsYourAccountantName.formRule.validate(WhoIsYourAccountantName.formWrites.writes(DefaultWhoIsYourAccountant)
         ) should be(Invalid(Seq(
-          (Path \ "tradingName") -> Seq(ValidationError("error.invalid.character.ba.trading.name"))
+          (Path \ "tradingName") -> Seq(ValidationError("error.punctuation.ba.advisor.tradingname"))
         )))
       }
     }

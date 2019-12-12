@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package controllers.responsiblepeople
+package controllers.responsiblepeople.address
 
-import javax.inject.Inject
 import connectors.DataCacheConnector
 import controllers.DefaultBaseController
+import controllers.responsiblepeople.address
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.responsiblepeople._
 import play.api.i18n.MessagesApi
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.moved_address
+import views.html.responsiblepeople.address.moved_address
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -35,20 +36,20 @@ class MovedAddressController @Inject()(override val messagesApi: MessagesApi,
 
 
   def get(index: Int) = authAction.async {
-      implicit request =>
-        dataCacheConnector.fetchAll(request.credId) map {
-          optionalCache =>
-            (for {
-              cache <- optionalCache
-              rp <- getData[ResponsiblePerson](cache, index)
-              addr <- rp.addressHistory
-            } yield {
-              addr.currentAddress match {
-                case Some(addr) => Ok(moved_address(EmptyForm, addr.personAddress, index, ControllerHelper.rpTitleName(Some(rp))))
-                case _ => Redirect(address.routes.CurrentAddressController.get(index,true))
-              }
-            }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
-        }
+    implicit request =>
+      dataCacheConnector.fetchAll(request.credId) map {
+        optionalCache =>
+          (for {
+            cache <- optionalCache
+            rp <- getData[ResponsiblePerson](cache, index)
+            addr <- rp.addressHistory
+          } yield {
+            addr.currentAddress match {
+              case Some(addr) => Ok(moved_address(EmptyForm, addr.personAddress, index, ControllerHelper.rpTitleName(Some(rp))))
+              case _ => Redirect(address.routes.CurrentAddressController.get(index, true))
+            }
+          }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
+      }
   }
 
   def post(index: Int) = authAction.async {
@@ -63,16 +64,15 @@ class MovedAddressController @Inject()(override val messagesApi: MessagesApi,
                 addr <- rp.addressHistory
               } yield {
                 addr.currentAddress match {
-                  case Some(addr) => BadRequest(views.html.responsiblepeople.moved_address(f, addr.personAddress,
-                    index, ControllerHelper.rpTitleName(Some(rp))))
+                  case Some(addr) => BadRequest(moved_address(f, addr.personAddress, index, ControllerHelper.rpTitleName(Some(rp))))
                   case _ => Redirect(address.routes.CurrentAddressController.get(index, true))
                 }
               }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
           }
         case ValidForm(_, data) =>
           data.movedAddress match {
-            case true => Future.successful(Redirect(routes.NewHomeAddressDateOfChangeController.get(index)))
-            case false => Future.successful(Redirect(address.routes.CurrentAddressController.get(index,true)))
+            case true => Future.successful(Redirect(address.routes.NewHomeAddressDateOfChangeController.get(index)))
+            case false => Future.successful(Redirect(address.routes.CurrentAddressController.get(index, true)))
           }
       }
   }
