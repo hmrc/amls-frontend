@@ -8,8 +8,20 @@ GET         /informal-account-name/:index                                @contro
 POST        /informal-account-name                                       @controllers.bankdetails.BankAccountNameController.postNoIndex
 POST        /informal-account-name/:index                                @controllers.bankdetails.BankAccountNameController.postIndex(index:Int, edit: Boolean ?= false)
 
-GET         /uk-account/:index/                                          @controllers.bankdetails.BankAccountIsUKController.get(index:Int, edit: Boolean ?= false)
-POST        /uk-account/:index/                                          @controllers.bankdetails.BankAccountIsUKController.post(index:Int, edit: Boolean ?= false)
+GET         /account-country/:index/                                     @controllers.bankdetails.BankAccountIsUKController.get(index:Int, edit: Boolean ?= false)
+POST        /account-country/:index/                                     @controllers.bankdetails.BankAccountIsUKController.post(index:Int, edit: Boolean ?= false)
+
+GET         /account-uk/:index/                                          @controllers.bankdetails.BankAccountUKController.get(index:Int, edit: Boolean ?= false)
+POST        /account-uk/:index/                                          @controllers.bankdetails.BankAccountUKController.post(index:Int, edit: Boolean ?= false)
+
+GET         /does-account-have-iban/:index/                              @controllers.bankdetails.BankAccountHasIbanController.get(index:Int, edit: Boolean ?= false)
+POST        /does-account-have-iban/:index/                              @controllers.bankdetails.BankAccountHasIbanController.post(index:Int, edit: Boolean ?= false)
+
+GET         /iban/:index/                                                @controllers.bankdetails.BankAccountIbanController.get(index:Int, edit: Boolean ?= false)
+POST        /iban/:index/                                                @controllers.bankdetails.BankAccountIbanController.post(index:Int, edit: Boolean ?= false)
+
+GET         /account-number-non-uk/:index/                               @controllers.bankdetails.BankAccountNonUKController.get(index:Int, edit: Boolean ?= false)
+POST        /account-number-non-uk/:index/                               @controllers.bankdetails.BankAccountNonUKController.post(index:Int, edit: Boolean ?= false)
 
 GET         /your-bank-accounts                                          @controllers.bankdetails.YourBankAccountsController.get()
 

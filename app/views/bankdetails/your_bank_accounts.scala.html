@@ -49,12 +49,12 @@
 @bankAccount(bankDetail: BankDetails) = {
     @bankDetail.accountName.getOrElse(Messages("bankdetails.yourbankaccounts.noaccountname"))<br/>
 
-    @(bankDetail.bankAccount match {
+    @(bankDetail.bankAccount.map(acc => acc.account match {
         case Some(account: UKAccount) => ukAccount(bankDetail, account)
         case Some(account: NonUKAccountNumber) => nonUkAccountNumber(bankDetail, account)
         case Some(account: NonUKIBANNumber) => nonUKIBANNumber(bankDetail, account)
         case _ => <div>{bankDetail.bankAccountType.map(x => Messages(s"bankdetails.summary.accounttype.lbl.${x.getBankAccountTypeID}")).getOrElse("")}</div>
-    })
+    }))
 }
 
 @main(

@@ -41,7 +41,6 @@ object WhoIsYourAccountant {
       __.read(Reads.optionNoError[AccountantsAddress])
     )(WhoIsYourAccountant.apply _)
 
-
   implicit val jsonWrites: Writes[WhoIsYourAccountant] = Writes[WhoIsYourAccountant] {
     model =>
       Seq(

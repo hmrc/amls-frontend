@@ -17,9 +17,7 @@
 package models.bankdetails
 
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
-import play.api.Logger
 import play.api.i18n.Messages
-import play.api.i18n.Messages.Implicits._
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
@@ -27,7 +25,7 @@ import utils.StatusConstants
 case class BankDetails(
                         bankAccountType: Option[BankAccountType] = None,
                         accountName: Option[String] = None,
-                        bankAccount: Option[Account] = None,
+                        bankAccount: Option[BankAccount] = None,
                         hasChanged: Boolean = false,
                         refreshedFromServer: Boolean = false,
                         status: Option[String] = None,
@@ -44,7 +42,7 @@ case class BankDetails(
     }
   }
 
-  def bankAccount(value: Option[Account]): BankDetails = {
+  def bankAccount(value: Option[BankAccount]): BankDetails = {
     this.copy(bankAccount = value, hasChanged = hasChanged || (this.bankAccount != value),
       hasAccepted = hasAccepted && this.bankAccount == value)
   }
@@ -71,11 +69,11 @@ object BankDetails {
 
   def getBankAccountDescription(bankDetails:BankDetails)(implicit messages: Messages):String  = {
     (bankDetails.bankAccountType, bankDetails.bankAccount) match {
-      case (Some(baType), Some(UKAccount(_,_))) =>
+      case (Some(baType), Some(BankAccount(Some(BankAccountIsUk(true)), _, _))) =>
           messages("bankdetails.accounttype.uk.lbl." + baType.getBankAccountTypeID)
-      case (Some(baType), Some(_)) =>
+      case (Some(baType), Some(BankAccount(Some(BankAccountIsUk(false)), _, _))) =>
           messages("bankdetails.accounttype.nonuk.lbl." + baType.getBankAccountTypeID)
-      case (Some(baType), None) =>
+      case (Some(baType), _) =>
           messages("bankdetails.accounttype.lbl." + baType.getBankAccountTypeID)
       case _ => ""
     }
@@ -113,7 +111,10 @@ object BankDetails {
     (
       ((__ \ "bankAccountType").readNullable[BankAccountType] orElse __.read(Reads.optionNoError[BankAccountType])) ~
         accountNameReader ~
-        ((__ \ "bankAccount").read[Account].map[Option[Account]](Some(_)) orElse __.read(Reads.optionNoError[Account])) ~
+        ((__ \ "bankAccount").read[BankAccount].map[Option[BankAccount]](Some(_)) orElse __.read(Reads.optionNoError[BankAccount]).map{
+          case Some(BankAccount(None, None, None)) => None
+          case x => x
+        }) ~
         (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) ~
         (__ \ "refreshedFromServer").readNullable[Boolean].map(_.getOrElse(false)) ~
         (__ \ "status").readNullable[String] ~

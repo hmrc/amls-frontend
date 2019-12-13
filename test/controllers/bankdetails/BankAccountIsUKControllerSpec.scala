@@ -39,6 +39,9 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
 
     val request = addToken(authRequest)
 
+
+    val ukBankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456", "11-11-11")))
+
     val controller = new BankAccountIsUKController(
       mockCacheConnector,
       SuccessfulAuthAction,
@@ -68,8 +71,6 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
         }
 
         "there is already bank account detail information" in new Fixture {
-
-          val ukBankAccount = UKAccount("12345678", "000000")
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None, Some(ukBankAccount)))), Some(BankDetails.key))
 
@@ -110,7 +111,6 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
 
         "editing an amendment" in new Fixture {
 
-          val ukBankAccount = UKAccount("12345678", "000000")
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(
             BankDetails(None, None, Some(ukBankAccount), hasAccepted = true))), Some(BankDetails.key))
@@ -124,8 +124,6 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
         }
 
         "editing a variation" in new Fixture {
-
-          val ukBankAccount = UKAccount("12345678", "000000")
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(
             BankDetails(None, None, Some(ukBankAccount), hasAccepted = true))), Some(BankDetails.key))
@@ -143,6 +141,7 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
     "post is called" must {
       "respond with SEE_OTHER" when {
         "given valid data in edit mode" in new Fixture {
+
 
           val newRequest = request.withFormUrlEncodedBody(
             "isUK" -> "false",
@@ -177,7 +176,7 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
           val result = controller.post(1)(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.SummaryController.get(1).url))
+          redirectLocation(result) must be(Some(routes.BankAccountHasIbanController.get(1).url))
         }
 
       }
@@ -232,7 +231,7 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
         mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(
           Some(PersonalAccount),
           Some("Test account"),
-          Some(UKAccount("8934798324", "934947"))))),
+          Some(ukBankAccount)))),
           Some(BankDetails.key))
 
         mockCacheSave[Seq[BankDetails]]
@@ -240,7 +239,7 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
         val result = controller.post(1)(newRequest)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.SummaryController.get(1).url))
+        redirectLocation(result) must be(Some(routes.BankAccountHasIbanController.get(1).url))
 
         val captor = ArgumentCaptor.forClass(classOf[DataEvent])
         verify(controller.auditConnector).sendEvent(captor.capture())(any(), any())
