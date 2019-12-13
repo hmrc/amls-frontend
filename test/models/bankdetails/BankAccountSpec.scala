@@ -19,7 +19,6 @@ package models.bankdetails
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
-import models.bankdetails.Account._
 
 class BankAccountSpec extends PlaySpec with MockitoSugar {
 
@@ -28,54 +27,16 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
   val nonUkIban = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(true)), Some( NonUKIBANNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")))
   val nonUkAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some( NonUKAccountNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")))
 
-  val ukAccountJson:String = """{
-    "isUK" : true,
-    "accountNumber" : "12341234",
-    "sortCode" : "000000"
-  }"""
-
-  val nonUkIbanJson:String = """{
-    "isUK" : false,
-    "isIBAN" : true,
-    "IBANNumber" : "ABCDEFGHIJKLMNOPQRSTUVWXYZABCD"
-  }"""
-
-  val nonUkAccountJson:String = """{
-    "isUK" : false,
-    "isIBAN" : false,
-    "nonUKAccountNumber" : "ABCDEFGHIJKLMNOPQRSTUVWXYZABCD"
-  }"""
-
   "BankAccount" must {
-    "Serialise correctly" in {
-      println(Json.prettyPrint(Json.toJson(ukAccount)))
-      println(Json.prettyPrint(Json.toJson(nonUkAccount)))
-      println(Json.prettyPrint(Json.toJson(nonUkIban)))
+    "serialise and deserialise correctly" in {
+      Json.toJson(ukAccount).as[BankAccount] mustBe ukAccount
+      Json.toJson(nonUkAccount).as[BankAccount] mustBe nonUkAccount
+      Json.toJson(nonUkIban).as[BankAccount] mustBe nonUkIban
     }
 
-    "Deserialise account correctly" in {
-      import play.api.libs.json.Json
-      println(Json.parse(ukAccountJson).as[Account])
-      println(Json.parse(nonUkAccountJson).as[Account])
-      println(Json.parse(nonUkIbanJson).as[Account])
-    }
-
-    "Deserialise Bank Account correctly" in {
-      import play.api.libs.json.Json
-//      println(Json.parse(ukAccountJson).as[BankAccount])
-      println(Json.parse(nonUkAccountJson).as[BankAccount])
-      println(Json.parse(nonUkIbanJson).as[BankAccount])
-    }
-
-    "Deserialise hasIBAN correctly" in {
-      println(Json.parse(nonUkAccountJson).as[BankAccountHasIban])
-      println(Json.parse(nonUkIbanJson).as[BankAccountHasIban])
-    }
-
-    "Deserialise isUk correctly" in {
-      println(Json.parse(ukAccountJson).as[BankAccountIsUk])
-      println(Json.parse(nonUkAccountJson).as[BankAccountIsUk])
-      println(Json.parse(nonUkIbanJson).as[BankAccountIsUk])
+    "update correctly" in {
+      ukAccount.isUk(BankAccountIsUk(false)) mustBe BankAccount(Some(BankAccountIsUk(false)), None, None)
+      ukAccount.isUk(BankAccountIsUk(true)) mustBe ukAccount
     }
   }
 }

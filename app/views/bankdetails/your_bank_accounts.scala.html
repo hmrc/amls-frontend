@@ -54,8 +54,7 @@
         case Some(account: NonUKAccountNumber) => nonUkAccountNumber(bankDetail, account)
         case Some(account: NonUKIBANNumber) => nonUKIBANNumber(bankDetail, account)
         case _ => <div>{bankDetail.bankAccountType.map(x => Messages(s"bankdetails.summary.accounttype.lbl.${x.getBankAccountTypeID}")).getOrElse("")}</div>
-    }))
-}
+    }).getOrElse(<div>{bankDetail.bankAccountType.map(x => Messages(s"bankdetails.summary.accounttype.lbl.${x.getBankAccountTypeID}")).getOrElse("")}</div>))}
 
 @main(
     title = Messages("bankdetails.yourbankaccounts.title") + " - " + Messages("summary.bankdetails"),

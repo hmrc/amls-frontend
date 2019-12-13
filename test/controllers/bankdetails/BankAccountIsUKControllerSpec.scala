@@ -21,12 +21,12 @@ import models.bankdetails._
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.mockito.ArgumentCaptor
+import org.mockito.{ArgumentCaptor, Matchers}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
@@ -149,15 +149,16 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
             "isIBAN" -> "false"
           )
 
+          when(controller.auditConnector.sendEvent(Matchers.any())(Matchers.any(), Matchers.any()))
+            .thenReturn(Future.successful(AuditResult.Success))
+
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount), None))), Some(BankDetails.key))
           mockCacheSave[Seq[BankDetails]]
 
           val result = controller.post(1, true)(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.SummaryController.get(1).url))
-
-          verify(controller.auditConnector, never()).sendEvent(any())(any(), any())
+          redirectLocation(result) must be(Some(routes.BankAccountHasIbanController.get(1).url))
         }
         "given valid data when NOT in edit mode" in new Fixture {
 
@@ -204,7 +205,7 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
         "given invalid data" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "isUK" -> "true"
+            "isUK" -> ""
           )
 
           mockCacheFetch[Seq[BankDetails]](None, Some(BankDetails.key))

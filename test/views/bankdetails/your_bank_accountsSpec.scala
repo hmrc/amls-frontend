@@ -88,7 +88,7 @@ class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChe
     val inCompleteModel4 = BankDetails(
       Some(PersonalAccount),
       None,
-      bankAccount = Some(nonUkAccount)
+      bankAccount = Some(nonUkIban)
     )
   }
 

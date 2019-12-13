@@ -96,11 +96,5 @@ class bank_account_is_ukSpec extends AmlsSpec with MustMatchers {
     errorSummary.html() must include(messageKey6)
 
     doc.getElementById(isUKField).html() must include(messageKey2)
-    doc.getElementById(sortCodeField + "-fieldset").html() must include(messageKey3)
-    doc.getElementById(sortCodeField + "-fieldset").getElementsByClass("form-group").last().html() must include(messageKey4)
-    doc.getElementById(IBANNumberField + "-fieldset").html() must include(messageKey5)
-    doc.getElementById(IBANNumberField + "-fieldset").getElementsByClass("form-group").last().html() must include(messageKey6)
-
   }
-
 }
