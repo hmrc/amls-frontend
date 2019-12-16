@@ -20,14 +20,16 @@ import jto.validation._
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
-
-sealed trait Account
-
-sealed trait NonUKAccount extends Account
+import models.FormTypes._
+import utils.MappingUtils.Implicits._
 
 case class BankAccountIsUk(isUk: Boolean)
 
 case class BankAccountHasIban(hasIban: Boolean)
+
+sealed trait Account
+
+sealed trait NonUKAccount extends Account
 
 case class UKAccount(accountNumber: String, sortCode: String) extends Account {
 
@@ -45,10 +47,40 @@ case class NonUKAccountNumber(accountNumber: String) extends NonUKAccount
 
 case class NonUKIBANNumber(IBANNumber: String) extends NonUKAccount
 
-object Account {
+object BankAccountIsUk {
 
-  import models.FormTypes._
-  import utils.MappingUtils.Implicits._
+  implicit val isUkFormRead: Rule[UrlFormEncoded, BankAccountIsUk] =
+    From[UrlFormEncoded] { __ =>
+      import jto.validation.forms.Rules._
+      (__ \ "isUK").read[Boolean].withMessage("error.bankdetails.ukbankaccount") map BankAccountIsUk.apply
+    }
+
+  implicit val isUkFormWrites: Write[BankAccountIsUk, forms.UrlFormEncoded] = Write {
+    data => Map("isUK" -> Seq(data.isUk.toString))
+  }
+
+  implicit val isUkJsonReads: Reads[BankAccountIsUk] = ( __ \ "isUK").read[Boolean] map BankAccountIsUk.apply
+
+  implicit val isUkJsonWrites = Writes[BankAccountIsUk] { data => Json.obj( "isUK" -> data.isUk) }
+}
+
+object BankAccountHasIban {
+
+  implicit val hasIbanFormRead: Rule[UrlFormEncoded, BankAccountHasIban] =
+    From[UrlFormEncoded] { __ =>
+      import jto.validation.forms.Rules._
+      (__ \ "hasIBAN").read[Boolean]
+        .withMessage("error.required.bankdetails.isiban") map BankAccountHasIban.apply
+    }
+
+  implicit val hasIbanFormWrites: Write[BankAccountHasIban, UrlFormEncoded] = Write {  data => Map("hasIBAN" -> Seq(data.hasIban.toString))  }
+
+  implicit val hasIbanJsonReads: Reads[BankAccountHasIban] = ( __ \ "isIBAN").read[Boolean] map BankAccountHasIban.apply
+
+  implicit val hasIbanJsonWrites = Writes[BankAccountHasIban] { data => Json.obj("isIBAN" -> data.hasIban ) }
+}
+
+object Account {
 
   val sortCodeRegex = "^[0-9]{6}".r
   val ukBankAccountNumberRegex = "^[0-9]{8}$".r
@@ -77,16 +109,6 @@ object Account {
     .andThen(maxLength(maxIBANLength).withMessage("error.invalid.bankdetails.iban"))
     .andThen(pattern(ibanRegex).withMessage("error.invalid.bankdetails.iban"))
 
-  implicit val isUkFormRead: Rule[UrlFormEncoded, BankAccountIsUk] =
-    From[UrlFormEncoded] { __ =>
-      import jto.validation.forms.Rules._
-      (__ \ "isUK").read[Boolean].withMessage("error.bankdetails.ukbankaccount") map BankAccountIsUk.apply
-  }
-
-  implicit val isUkFormWrites: Write[BankAccountIsUk, forms.UrlFormEncoded] = Write {
-    data => Map("isUK" -> Seq(data.isUk.toString))
-  }
-
   implicit val ukFormRead: Rule[UrlFormEncoded, UKAccount] =
     From[UrlFormEncoded] { __ =>
       import jto.validation.forms.Rules._
@@ -103,53 +125,14 @@ object Account {
     )
   }
 
-  implicit val hasIbanFormRead: Rule[UrlFormEncoded, BankAccountHasIban] =
-    From[UrlFormEncoded] { __ =>
-      import jto.validation.forms.Rules._
-      (__ \ "hasIBAN").read[Boolean]
-        .withMessage("error.required.bankdetails.isiban") map BankAccountHasIban.apply
-    }
-
-  implicit val hasIbanFormWrites: Write[BankAccountHasIban, UrlFormEncoded] = Write {  data => Map("hasIBAN" -> Seq(data.hasIban.toString))  }
-
-  implicit val nonUkIbanRead: Rule[UrlFormEncoded, NonUKIBANNumber] =
-    From[UrlFormEncoded] { __ =>
-      import jto.validation.forms.Rules._
-      (__ \ "IBANNumber").read(ibanType) map NonUKIBANNumber.apply
-  }
-
-  implicit val nonUkIbanWrites: Write[NonUKIBANNumber, UrlFormEncoded] = Write { data => Map("IBANNumber" -> data.IBANNumber) }
-
-  implicit val nonUkAccountNumberFormRead: Rule[UrlFormEncoded, NonUKAccountNumber] =
-    From[UrlFormEncoded] { __ =>
-      import jto.validation.forms.Rules._
-      (__ \ "nonUKAccountNumber").read(nonUKBankAccountNumberType) map NonUKAccountNumber.apply
-  }
-
-  implicit val nonUkAccountNumberFormWrites: Write[NonUKAccountNumber, UrlFormEncoded] = Write {
-    data => Map("nonUKAccountNumber" -> data.accountNumber)
-  }
-
-  implicit val isUkJsonReads: Reads[BankAccountIsUk] = ( __ \ "isUK").read[Boolean] map BankAccountIsUk.apply
-
-  implicit val hasIbanJsonReads: Reads[BankAccountHasIban] = ( __ \ "isIBAN").read[Boolean] map BankAccountHasIban.apply
-
-  implicit val hasIbanJsonWrites = Writes[BankAccountHasIban] { data => Json.obj("isIBAN" -> data.hasIban ) }
-
   val ukJsonReads: Reads[Account] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
     (
       (__ \ "accountNumber").read[String] ~
-      (__ \ "sortCode").read[String]
-    ) (UKAccount.apply _)
+        (__ \ "sortCode").read[String]
+      ) (UKAccount.apply _)
   }
-
-  val nonUkIbanJsonReads: Reads[Account] = (__ \ "IBANNumber").read[String] map NonUKIBANNumber.apply
-
-  val nonUkAccountNoJsonReads: Reads[Account] = (__ \ "nonUKAccountNumber").read[String] map NonUKAccountNumber.apply
-
-  implicit val isUkJsonWrites = Writes[BankAccountIsUk] { data => Json.obj( "isUK" -> data.isUk) }
 
   val ukJsonWrites = Writes[UKAccount] {
     data => Json.obj(
@@ -157,11 +140,33 @@ object Account {
       "sortCode" -> data.sortCode)
   }
 
-  val nonUkIbanJsonWrites = Writes[NonUKIBANNumber] { data => Json.obj("IBANNumber" -> data.IBANNumber)  }
+  implicit val nonUkAccountFormRead: Rule[UrlFormEncoded, NonUKAccountNumber] =
+    From[UrlFormEncoded] { __ =>
+      import jto.validation.forms.Rules._
+      (__ \ "nonUKAccountNumber").read(nonUKBankAccountNumberType) map NonUKAccountNumber.apply
+  }
+
+  implicit val nonUkAccountFormWrites: Write[NonUKAccountNumber, UrlFormEncoded] = Write {
+    data => Map("nonUKAccountNumber" -> data.accountNumber)
+  }
 
   val nonUkAccountJsonWrites = Writes[NonUKAccountNumber] { data => Json.obj("nonUKAccountNumber" -> data.accountNumber) }
 
-  implicit val accountReads: Reads[Account] = ukJsonReads orElse nonUkIbanJsonReads orElse nonUkAccountNoJsonReads
+  val nonUkAccountJsonReads: Reads[Account] = (__ \ "nonUKAccountNumber").read[String] map NonUKAccountNumber.apply
+
+  implicit val nonUkIbanRead: Rule[UrlFormEncoded, NonUKIBANNumber] =
+    From[UrlFormEncoded] { __ =>
+      import jto.validation.forms.Rules._
+      (__ \ "IBANNumber").read(ibanType) map NonUKIBANNumber.apply
+    }
+
+  implicit val nonUkIbanWrites: Write[NonUKIBANNumber, UrlFormEncoded] = Write { data => Map("IBANNumber" -> data.IBANNumber) }
+
+  val nonUkIbanJsonReads: Reads[Account] = (__ \ "IBANNumber").read[String] map NonUKIBANNumber.apply
+
+  val nonUkIbanJsonWrites = Writes[NonUKIBANNumber] { data => Json.obj("IBANNumber" -> data.IBANNumber)  }
+
+  implicit val accountReads: Reads[Account] = ukJsonReads orElse nonUkIbanJsonReads orElse nonUkAccountJsonReads
 
   implicit val accountWrites = Writes[Account] {
     case account@UKAccount(_, _) => ukJsonWrites.writes(account)
