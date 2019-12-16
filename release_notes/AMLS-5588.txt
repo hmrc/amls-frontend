@@ -1,1 +1,0 @@
- + [AMLS-5588] - 'Configure feedback and get help urls to work correctly in all environments'

@@ -1,1 +1,0 @@
- + [AMLS-5343] - 'Add approval content for amp on approval screens in rp section'
