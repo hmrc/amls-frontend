@@ -36,7 +36,7 @@ class bank_account_is_ukSpec extends AmlsSpec with MustMatchers {
 
       val form2: ValidForm[NonUKAccountNumber] = Form2(NonUKAccountNumber(""))
 
-      override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_is_uk(form2, false, 0)
+      override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_is_uk(form2, false, 0)
 
       doc.title() must startWith(Messages("bankdetails.bankaccount.accounttype.title") + " - " + Messages("summary.bankdetails"))
     }
@@ -46,7 +46,7 @@ class bank_account_is_ukSpec extends AmlsSpec with MustMatchers {
 
     val form2: ValidForm[NonUKAccountNumber] = Form2(NonUKAccountNumber(""))
 
-    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_is_uk(form2, false, 0)
+    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_is_uk(form2, false, 0)
 
     heading.html() must be(Messages("bankdetails.bankaccount.accounttype.title"))
   }
@@ -55,7 +55,7 @@ class bank_account_is_ukSpec extends AmlsSpec with MustMatchers {
 
     val form2: ValidForm[NonUKAccountNumber] = Form2(NonUKAccountNumber(""))
 
-    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_is_uk(form2, false, 0)
+    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_is_uk(form2, false, 0)
 
     doc.getElementsByAttributeValue("class", "link-back") must not be empty
   }
@@ -87,7 +87,7 @@ class bank_account_is_ukSpec extends AmlsSpec with MustMatchers {
         (Path \ nonUKAccountNumberField, Seq(ValidationError(messageKey6)))
       ))
 
-    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_is_uk(form2, false, 0)
+    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_is_uk(form2, false, 0)
 
     errorSummary.html() must include(messageKey2)
     errorSummary.html() must include(messageKey3)
