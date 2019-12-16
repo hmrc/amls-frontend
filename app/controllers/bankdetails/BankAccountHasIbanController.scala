@@ -21,8 +21,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
-import models.bankdetails.Account._
-import models.bankdetails.{BankAccount,  BankAccountHasIban, BankDetails}
+import models.bankdetails.{BankAccount, BankAccountHasIban, BankDetails}
 import services.StatusService
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, StatusConstants}
@@ -30,12 +29,10 @@ import utils.{AuthAction, StatusConstants}
 import scala.concurrent.Future
 
 @Singleton
-class BankAccountHasIbanController @Inject()(
-                                           val dataCacheConnector: DataCacheConnector,
-                                           val authAction: AuthAction,
-                                           val auditConnector: AuditConnector,
-                                           val statusService: StatusService
-                                         ) extends BankDetailsController {
+class BankAccountHasIbanController @Inject()( val dataCacheConnector: DataCacheConnector,
+                                              val authAction: AuthAction,
+                                              val auditConnector: AuditConnector,
+                                              val statusService: StatusService ) extends BankDetailsController {
 
   def get(index: Int, edit: Boolean = false) = authAction.async{
       implicit request =>
@@ -72,20 +69,16 @@ class BankAccountHasIbanController @Inject()(
                   StatusConstants.Added
                 })
               )
-            }.flatMap { _ =>
-                lazy val redirect = if(data.hasIban) {
+            }.map { _ =>
+                if(data.hasIban) {
                   Redirect(routes.BankAccountIbanController.get(index))
                 } else {
                   Redirect(routes.BankAccountNonUKController.get(index))
                 }
-                (sendAudit map { _ =>
-                  redirect
-                }) getOrElse redirect
             }
         }
       }.recoverWith {
         case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
       }
   }
-
 }

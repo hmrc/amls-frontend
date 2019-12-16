@@ -30,12 +30,10 @@ import utils.{AuthAction, StatusConstants}
 import scala.concurrent.Future
 
 @Singleton
-class BankAccountIbanController @Inject()(
-                                           val dataCacheConnector: DataCacheConnector,
+class BankAccountIbanController @Inject()( val dataCacheConnector: DataCacheConnector,
                                            val authAction: AuthAction,
                                            val auditConnector: AuditConnector,
-                                           val statusService: StatusService
-                                         ) extends BankDetailsController {
+                                           val statusService: StatusService ) extends BankDetailsController {
 
   def get(index: Int, edit: Boolean = false) = authAction.async{
       implicit request =>

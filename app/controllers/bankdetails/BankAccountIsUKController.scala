@@ -21,7 +21,6 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
-import models.bankdetails.Account._
 import models.bankdetails.{BankAccount, BankAccountIsUk, BankDetails}
 import services.StatusService
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -30,12 +29,10 @@ import utils.{AuthAction, StatusConstants}
 import scala.concurrent.Future
 
 @Singleton
-class BankAccountIsUKController @Inject()(
-                                           val dataCacheConnector: DataCacheConnector,
+class BankAccountIsUKController @Inject()( val dataCacheConnector: DataCacheConnector,
                                            val authAction: AuthAction,
                                            val auditConnector: AuditConnector,
-                                           val statusService: StatusService
-                                         ) extends BankDetailsController {
+                                           val statusService: StatusService ) extends BankDetailsController {
 
   def get(index: Int, edit: Boolean = false) = authAction.async{
       implicit request =>
@@ -72,15 +69,12 @@ class BankAccountIsUKController @Inject()(
                   StatusConstants.Added
                 })
               )
-            }.flatMap { _ =>
-                lazy val redirect = if (data.isUk) {
+            }.map { _ =>
+                if (data.isUk) {
                   Redirect(routes.BankAccountUKController.get(index))
                 } else {
                   Redirect(routes.BankAccountHasIbanController.get(index))
                 }
-                (sendAudit map { _ =>
-                  redirect
-                }) getOrElse redirect
             }
         }
       }.recoverWith {
