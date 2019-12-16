@@ -58,7 +58,7 @@ editUrl = controllers.bankdetails.routes.BankAccountNameController.getIndex(inde
     @bankDetails.bankAccount.map { bankAccount =>
 
             @checkYourAnswers(  question = Messages("bankdetails.bankaccount.accounttype.title"),
-                                editUrl = controllers.bankdetails.routes.BankAccountIsUKController.get(index).toString
+                                editUrl = controllers.bankdetails.routes.BankAccountIsUKController.get(index, true).toString
             ) {
                 @bankAccount.isUk match {
                     case Some(BankAccountIsUk(true)) =>  { @Messages("lbl.yes") }
@@ -70,13 +70,13 @@ editUrl = controllers.bankdetails.routes.BankAccountNameController.getIndex(inde
             @bankAccount.hasIban match {
                 case Some(BankAccountHasIban(true)) => {
                     @checkYourAnswers(  question = Messages("bankdetails.bankaccount.hasiban"),
-                                        editUrl = controllers.bankdetails.routes.BankAccountHasIbanController.get(index).toString
+                                        editUrl = controllers.bankdetails.routes.BankAccountHasIbanController.get(index, true).toString
                     ) {
                         @Messages("lbl.yes")
                     }}
                 case Some(BankAccountHasIban(false)) => {
                     @checkYourAnswers(  question = Messages("bankdetails.bankaccount.hasiban"),
-                                        editUrl = controllers.bankdetails.routes.BankAccountHasIbanController.get(index).toString
+                                        editUrl = controllers.bankdetails.routes.BankAccountHasIbanController.get(index, true).toString
                     ) {
                         @Messages("lbl.no")
                     }}
