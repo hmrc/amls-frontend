@@ -1,1 +1,0 @@
- + [AMLS-5468] - 'Add paragraph text to How do you want to pay your fees?'
