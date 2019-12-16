@@ -63,8 +63,6 @@ object BankDetails {
   import play.api.libs.json._
   import utils.MappingUtils._
 
-  implicit def maybeBankAccount(account: Account): Option[Account] = Some(account)
-
   def anyChanged(newModel: Seq[BankDetails]): Boolean = newModel exists { x => x.hasChanged }
 
   def getBankAccountDescription(bankDetails:BankDetails)(implicit messages: Messages):String  = {

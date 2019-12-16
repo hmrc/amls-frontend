@@ -34,9 +34,42 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
       Json.toJson(nonUkIban).as[BankAccount] mustBe nonUkIban
     }
 
-    "update correctly" in {
-      ukAccount.isUk(BankAccountIsUk(false)) mustBe BankAccount(Some(BankAccountIsUk(false)), None, None)
-      ukAccount.isUk(BankAccountIsUk(true)) mustBe ukAccount
+    "update correctly" when {
+      "filling in UK account" in {
+        BankAccount(None, None, None)
+          .isUk(BankAccountIsUk(true))
+          .account(UKAccount("12341234", "000000")) mustBe ukAccount
+      }
+      "filling in non-UK IBAN account" in {
+        BankAccount(None, None, None)
+          .isUk(BankAccountIsUk(false))
+          .hasIban(BankAccountHasIban(true))
+          .account(NonUKIBANNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")) mustBe nonUkIban
+      }
+      "filling in non-UK account number" in {
+        BankAccount(None, None, None)
+          .isUk(BankAccountIsUk(false))
+          .hasIban(BankAccountHasIban(false))
+          .account(NonUKAccountNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")) mustBe nonUkAccount
+      }
+
+      "is UK account and" when {
+        "switching to non UK account" in {
+          ukAccount.isUk(BankAccountIsUk(false)) mustBe BankAccount(Some(BankAccountIsUk(false)), None, None)
+        }
+        "is UK is identical" in {
+          ukAccount.isUk(BankAccountIsUk(true)) mustBe ukAccount
+        }
+      }
+
+      "is non UK IBAN account and" when {
+        "has IBAN is changed" in {
+          nonUkIban.hasIban(BankAccountHasIban(false)) mustBe BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), None)
+        }
+        "has IBAN is identical" in {
+          nonUkIban.hasIban(BankAccountHasIban(true)) mustBe nonUkIban
+        }
+      }
     }
   }
 }
