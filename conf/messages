@@ -189,9 +189,10 @@ error.businessmatching.updateservice.fitandproper = Select yes if any of your re
 error.businessmatching.updateservice.changeservices = Select what you want to do
 
 ###############################  Bank Details ###############################
-error.bankdetails.accounttype = Select one option to show what kind of account your business uses
-error.bankdetails.accountname = Enter a name for this account
-error.invalid.bankdetails.accountname = You can’t enter more than 40 characters
+error.bankdetails.accounttype = Select the type of bank account this is
+error.bankdetails.accountname = Enter an informal name for this bank account
+error.invalid.bankdetails.accountname = Name of bank account must be 40 characters or less
+error.invalid.bankdetails.char = Name of bank account can include letters a to z, numbers, spaces and punctuation
 error.bankdetails.ukbankaccount = Select yes if this is a UK bank account
 error.invalid.bankdetails.sortcode = Enter a valid sort code
 error.bankdetails.accountnumber = Enter a valid account number

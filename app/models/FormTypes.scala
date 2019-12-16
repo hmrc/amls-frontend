@@ -360,7 +360,7 @@ object FormTypes {
   val accountNameType = notEmptyStrip
     .andThen(notEmpty.withMessage("error.bankdetails.accountname"))
     .andThen(maxLength(maxAccountName).withMessage("error.invalid.bankdetails.accountname"))
-    .andThen(basicPunctuationPattern())
+    .andThen(basicPunctuationPattern("error.invalid.bankdetails.char"))
 
 
   /** Personal Identification Rules **/
