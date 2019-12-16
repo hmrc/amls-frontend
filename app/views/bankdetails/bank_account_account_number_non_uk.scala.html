@@ -31,23 +31,13 @@
 ) {
 
     @form(f, controllers.bankdetails.routes.BankAccountNonUKController.post(index, edit)) {
-
-        @fieldsetWithErrorGroup(
-            f = f("accountDetails"),
+        @input(
+            field = f("nonUKAccountNumber"),
             heading = "bankdetails.bankaccount.accountnumber.nonuk.title",
             section = "summary.bankdetails",
-            panel = false
-        ) {
-            @input(
-                field = f("nonUKAccountNumber"),
-                hintText = "bankdetails.bankaccount.accountnumber.nonuk.hint",
-                attrMaxlength = "40",
-                attrPattern = "[0-9a-zA-Z_]{1,40}",
-                attrTitle = "bankdetails.bankaccount.accountnumber.nonuk.hint"
-            )
-        }
-
-        @submit(edit)
+            hintText = "bankdetails.bankaccount.accountnumber.nonuk.hint",
+            attrTitle = "bankdetails.bankaccount.accountnumber.nonuk.hint"
+        )
+        @submit()
     }
-
 }
