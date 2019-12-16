@@ -106,7 +106,7 @@ object Account {
     .andThen(pattern(nonUKBankAccountNumberRegex).withMessage("error.invalid.bankdetails.account"))
 
   val ibanType = notEmpty.withMessage("error.required.bankdetails.iban")
-    .andThen(maxLength(maxIBANLength).withMessage("error.invalid.bankdetails.iban"))
+    .andThen(maxLength(maxIBANLength).withMessage("error.max.length.bankdetails.iban"))
     .andThen(pattern(ibanRegex).withMessage("error.invalid.bankdetails.iban"))
 
   implicit val ukFormRead: Rule[UrlFormEncoded, UKAccount] =
