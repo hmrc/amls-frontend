@@ -90,10 +90,34 @@ class ApprovalFlagsSpec extends PlaySpec {
         )
       }
 
+      "Read successfully using designated reader" in {
+        val expected = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true))
+
+        val json = Json.parse(
+          """{
+            | "hasAlreadyPassedFitAndProper": true
+            |}""".stripMargin
+        )
+
+        ApprovalFlags.reads.reads(json) must be(
+          JsSuccess(expected)
+        )
+      }
+
       "write successfully" in {
         val expected = ApprovalFlags(hasAlreadyPaidApprovalCheck = Some(true))
 
         ApprovalFlags.format.writes(expected) must be (
+          Json.obj(
+            "hasAlreadyPaidApprovalCheck" -> true
+          )
+        )
+      }
+
+      "write successfully using designated writer" in {
+        val expected = ApprovalFlags(hasAlreadyPaidApprovalCheck = Some(true))
+
+        ApprovalFlags.writes.writes(expected) must be (
           Json.obj(
             "hasAlreadyPaidApprovalCheck" -> true
           )
