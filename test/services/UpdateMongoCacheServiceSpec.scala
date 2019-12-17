@@ -24,7 +24,7 @@ import generators.tradingpremises.TradingPremisesGenerator
 import models.amp.Amp
 import models.businessdetails._
 import models.asp.{Accountancy, Asp, OtherBusinessTaxMattersNo, ServicesOfBusiness}
-import models.bankdetails.{BankDetails, PersonalAccount, UKAccount}
+import models.bankdetails.{BankAccount, BankAccountIsUk, BankDetails, PersonalAccount, UKAccount}
 import models.businessactivities._
 import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
@@ -91,6 +91,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
 
     val tradingPremises = Seq(tradingPremisesGen.sample.get, tradingPremisesGen.sample.get)
 
+
     val businessDetails = BusinessDetails(
       previouslyRegistered = Some(PreviouslyRegisteredYes(Some("12345678"))),
       activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))),
@@ -109,7 +110,9 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
       hasAccepted = true
     )
 
-    val bankDetails = BankDetails(Some(PersonalAccount), None, Some(UKAccount("123456", "00-00-00")), false)
+    val ukBankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456", "00-00-00")))
+
+    val bankDetails = BankDetails(Some(PersonalAccount), None, Some(ukBankAccount), false)
     val addPerson = AddPerson("FirstName", Some("Middle"), "Last name", RoleWithinBusinessRelease7(Set(BeneficialShareholder)))
 
     val businessActivitiesCompleteModel = BusinessActivities(

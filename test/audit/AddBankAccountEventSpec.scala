@@ -25,10 +25,14 @@ class AddBankAccountEventSpec extends AmlsSpec {
 
   implicit val request = FakeRequest("GET", "/test-path")
 
+  val ukBankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("ASD123", "1234567")))
+  val nonUkBankAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some(NonUKAccountNumber("98374389hjk")))
+  val nonUkIban = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(true)), Some( NonUKIBANNumber("9ds8ofidf")))
+
   "The bank account audit event" must {
     "serialize to the correct json" when {
       "bank account is a UK bank account" in {
-        val account = BankDetails(Some(PersonalAccount), Some("Test account"), Some(UKAccount("ASD123", "1234567")))
+        val account = BankDetails(Some(PersonalAccount), Some("Test account"), Some(ukBankAccount))
         val result = AddBankAccountEvent(account)
 
         val expected = headerCarrier.toAuditDetails() ++ Map(
@@ -43,7 +47,7 @@ class AddBankAccountEventSpec extends AmlsSpec {
       }
 
       "bank account is a non-UK bank account" in {
-        val account = BankDetails(Some(PersonalAccount), Some("Test account"), Some(NonUKIBANNumber("9ds8ofidf")))
+        val account = BankDetails(Some(PersonalAccount), Some("Test account"), Some(nonUkIban))
         val result = AddBankAccountEvent(account)
 
         val expected = headerCarrier.toAuditDetails() ++ Map(
@@ -58,21 +62,21 @@ class AddBankAccountEventSpec extends AmlsSpec {
       }
 
       "bank account is a business account" in {
-        val account = BankDetails(Some(BelongsToBusiness), Some("Test account"), Some(UKAccount("7364823", "8377343")))
+        val account = BankDetails(Some(BelongsToBusiness), Some("Test account"), Some(ukBankAccount))
         val result = AddBankAccountEvent(account)
 
         result.detail("accountType") mustBe "business"
       }
 
       "bank account belongs to some other business" in {
-        val account = BankDetails(Some(BelongsToOtherBusiness), Some("Test account"), Some(UKAccount("7364823", "8377343")))
+        val account = BankDetails(Some(BelongsToOtherBusiness), Some("Test account"), Some(ukBankAccount))
         val result = AddBankAccountEvent(account)
 
         result.detail("accountType") mustBe "other business"
       }
 
       "bank account uses a non-UK account number" in {
-        val account = BankDetails(Some(PersonalAccount), Some("Test account"), Some(NonUKAccountNumber("98374389hjk")))
+        val account = BankDetails(Some(PersonalAccount), Some("Test account"), Some(nonUkBankAccount))
         val result = AddBankAccountEvent(account)
 
         result.detail("accountNumber") mustBe "98374389hjk"

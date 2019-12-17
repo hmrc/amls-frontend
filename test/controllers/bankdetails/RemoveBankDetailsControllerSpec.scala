@@ -50,7 +50,9 @@ class RemoveBankDetailsControllerSpec extends AmlsSpec with MockitoSugar {
 
     "show bank account details on the remove bank account page" in new Fixture {
 
-      mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, Some("Account Name"), Some(NonUKAccountNumber("12345678"))))))
+      val bankAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some(NonUKAccountNumber("12345678")))
+
+      mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, Some("Account Name"), Some(bankAccount)))))
 
       val result = controller.get(1) (request)
 
@@ -69,16 +71,16 @@ class RemoveBankDetailsControllerSpec extends AmlsSpec with MockitoSugar {
       val emptyCache = CacheMap("", Map.empty)
 
       val accountType1 = PersonalAccount
-      val bankAccount1 = UKAccount("111111", "11-11-11")
+      val bankAccount1 = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("111111", "11-11-11")))
 
       val accountType2 = PersonalAccount
-      val bankAccount2 = UKAccount("222222", "22-22-22")
+      val bankAccount2 = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("222222", "22-22-22")))
 
       val accountType3 = PersonalAccount
-      val bankAccount3 = UKAccount("333333", "33-33-33")
+      val bankAccount3 = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("333333", "33-33-33")))
 
       val accountType4 = PersonalAccount
-      val bankAccount4 = UKAccount("444444", "44-44-44")
+      val bankAccount4 = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("444444", "44-44-44")))
 
       val completeModel1 = BankDetails(Some(accountType1), None, Some(bankAccount1), true, false, Some(StatusConstants.Deleted))
       val completeModel2 = BankDetails(Some(accountType2), None, Some(bankAccount2))

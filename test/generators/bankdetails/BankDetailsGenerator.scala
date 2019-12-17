@@ -22,14 +22,15 @@ import org.scalacheck.Gen
 
 // scalastyle:off magic.number
 trait BankDetailsGenerator extends BaseGenerator {
-  val accountGen: Gen[Account] = for {
+
+  val accountGen: Gen[BankAccount] = for {
     accountNumber <- numSequence(10)
     sortCode <- numSequence(6)
     iban <- numSequence(15)
     account <- Gen.oneOf(Seq(
-      UKAccount(accountNumber, sortCode),
-      NonUKAccountNumber(accountNumber),
-      NonUKIBANNumber(iban)
+      BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount(accountNumber, sortCode))),
+      BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some(NonUKAccountNumber(accountNumber))),
+      BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(true)), Some( NonUKIBANNumber(iban)))
     ))
   } yield account
 

@@ -16,18 +16,12 @@
 
 package views.bankdetails
 
-import forms.EmptyForm
 import models.bankdetails._
-import models.status._
-import org.jsoup.nodes.Element
-import org.scalacheck.Gen
 import org.scalatest.MustMatchers
 import org.scalatest.prop.PropertyChecks
 import play.api.i18n.Messages
-import utils.{AmlsSpec, StatusConstants}
+import utils.AmlsSpec
 import views.{Fixture, HtmlAssertions}
-
-import scala.collection.JavaConversions._
 
 class summarySpec extends AmlsSpec with MustMatchers with PropertyChecks with HtmlAssertions {
 
@@ -38,11 +32,16 @@ class summarySpec extends AmlsSpec with MustMatchers with PropertyChecks with Ht
 
     val accountName = "Account Name"
 
+    val ukBankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("12345678", "111111")))
+    val nonUkBankAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some(NonUKAccountNumber("123456789")))
+    val nonUkIban = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(true)), Some(NonUKIBANNumber("NL26RABO0163975856")))
+
+
   }
 
   "summary view" must {
     "have correct title" in new ViewFixture {
-      val model = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(UKAccount("123456789", "111111")))
+      val model = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukBankAccount))
 
       def view = views.html.bankdetails.summary(model, 1)
 
@@ -50,7 +49,7 @@ class summarySpec extends AmlsSpec with MustMatchers with PropertyChecks with Ht
     }
 
     "have correct headings" in new ViewFixture {
-      val model = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(UKAccount("123456789", "111111")))
+      val model = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukBankAccount))
 
       def view = views.html.bankdetails.summary(model, 1)
 
@@ -59,7 +58,7 @@ class summarySpec extends AmlsSpec with MustMatchers with PropertyChecks with Ht
     }
 
     "have correct button text" in new ViewFixture {
-      val model = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(UKAccount("123456789", "111111")))
+      val model = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukBankAccount))
 
       def view = views.html.bankdetails.summary(model, 1)
 
@@ -69,17 +68,17 @@ class summarySpec extends AmlsSpec with MustMatchers with PropertyChecks with Ht
 
     "include the provided data for a UKAccount" in new ViewFixture {
 
-      val model = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(UKAccount("123456789", "111111")))
+      val model = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukBankAccount))
 
       def view = views.html.bankdetails.summary(model, 1)
 
       view.body must include("My Personal Account")
-      view.body must include("123456789")
+      view.body must include("12345678")
       view.body must include("11-11-11")
     }
 
     "include the provided data for a NonUKAccountNumber" in new ViewFixture {
-      val model = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(NonUKAccountNumber("123456789")))
+      val model = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(nonUkBankAccount))
 
       def view = views.html.bankdetails.summary(model, 1)
 
@@ -89,7 +88,7 @@ class summarySpec extends AmlsSpec with MustMatchers with PropertyChecks with Ht
     }
 
     "include the provided data for a NonUKIBANNumber" in new ViewFixture {
-      val model = BankDetails(Some(BelongsToOtherBusiness), Some("Other Business Account"), Some(NonUKIBANNumber("NL26RABO0163975856")))
+      val model = BankDetails(Some(BelongsToOtherBusiness), Some("Other Business Account"), Some(nonUkIban))
 
       def view = views.html.bankdetails.summary(model, 1)
 
