@@ -26,7 +26,7 @@ import uk.gov.hmrc.http.controllers.RestFormats
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
 
 import scala.concurrent.{ExecutionContext, Future}
-
+// $COVERAGE-OFF$ Below implementation is obsolete and will be removed with migration to Play 2.6
 case class Ids(internalId: String)
 
 object Ids {
@@ -43,7 +43,7 @@ case class Authority(uri: String,
   def normalisedIds: String = if (ids.startsWith("/")) ids.drop(1) else ids
 }
 
-// $COVERAGE-OFF$
+
 object Authority {
   implicit val format = {
     implicit val dateFormat = RestFormats.dateTimeFormats
@@ -51,7 +51,7 @@ object Authority {
     Json.format[Authority]
   }
 }
-// $COVERAGE-ON$
+
 
 class AuthConnector @Inject()(val http: WSHttp, config: AppConfig) {
 
@@ -80,4 +80,4 @@ class AuthConnector @Inject()(val http: WSHttp, config: AppConfig) {
     case _ => Future.failed(new NotFoundException("No credId available"))
   }
 }
-
+// $COVERAGE-ON$

@@ -19,9 +19,7 @@ package models.bankdetails
 import models.CharacterSets
 import models.bankdetails.BankDetails._
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
-import org.mockito.Matchers.{eq => meq}
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import org.scalatestplus.play.OneAppPerSuite
 import play.api.libs.json.Json
 import utils.{AmlsSpec, DependencyMocks, StatusConstants}
 
@@ -34,7 +32,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with OneAppPerSuite wi
 
   val bankAccountPartialModel = BankDetails(None, None, Some(bankAccount))
 
-  val bankAccountNew = UKAccount("123456", "00-00-00")
+  val bankAccountNew = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456", "11-11-11")))
 
   val incompleteModel = BankDetails(Some(accountType), None)
 
@@ -86,8 +84,8 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with OneAppPerSuite wi
   "isComplete" must {
     "return true" when {
       "given complete model" in {
-        val bankAccount = UKAccount("123456", "00-00-00")
-        val bankDetails = BankDetails(Some(accountType), Some("name"), Some(bankAccount), hasAccepted = true)
+        val bankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456", "00-00-00")))
+        val bankDetails = BankDetails(Some(accountType), Some("name"), Some( bankAccount), hasAccepted = true)
         bankDetails.isComplete must be(true)
       }
 
@@ -113,7 +111,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with OneAppPerSuite wi
   "getBankAccountDescription" must {
     "return the correct uk account descriptions" when {
 
-      val bankDetailsPersonal = BankDetails(Some(PersonalAccount), None, Some(UKAccount("05108289", "523011")))
+      val bankDetailsPersonal = BankDetails(Some(PersonalAccount), None, Some(bankAccount))
       val bankDetailsBelongstoBusiness = bankDetailsPersonal.copy(bankAccountType = Some(BelongsToBusiness))
       val bankDetailsBelongstoOtherBusiness = bankDetailsPersonal.copy(bankAccountType = Some(BelongsToOtherBusiness))
       val bankDetailsNoBankAccountUsed = bankDetailsPersonal.copy(bankAccountType = Some(NoBankAccountUsed))
@@ -125,7 +123,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with OneAppPerSuite wi
    }
   "return the correct non-uk account descriptions" when {
 
-    val bankDetailsPersonal = BankDetails(Some(PersonalAccount), None, Some(NonUKAccountNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")))
+    val bankDetailsPersonal = BankDetails(Some(PersonalAccount), None, Some(BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some(NonUKAccountNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")))))
     val bankDetailsBelongstoBusiness = bankDetailsPersonal.copy(bankAccountType = Some(BelongsToBusiness))
     val bankDetailsBelongstoOtherBusiness = bankDetailsPersonal.copy(bankAccountType = Some(BelongsToOtherBusiness))
     val bankDetailsNoBankAccountUsed = bankDetailsPersonal.copy(bankAccountType = Some(NoBankAccountUsed))
@@ -334,7 +332,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with OneAppPerSuite wi
     "bankAccount value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val res = completeModel.bankAccount(bankAccount)
+          val res = completeModel.bankAccount(Some(bankAccount))
           res must be(completeModel)
           res.hasChanged must be(false)
         }
@@ -342,7 +340,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with OneAppPerSuite wi
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val res = completeModel.bankAccount(bankAccountNew)
+          val res = completeModel.bankAccount(Some(bankAccountNew))
           res.hasChanged must be(true)
           res.bankAccount must be(Some(bankAccountNew))
         }
@@ -364,7 +362,7 @@ trait BankDetailsModels {
     "hasAccepted" -> false
   )
 
-  val bankAccount = UKAccount("111111", "00-00-00")
+  val bankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("111111", "00-00-00")))
   val bankAccountJson = Json.obj(
     "bankAccount" -> Json.obj(
       "isUK" -> true,

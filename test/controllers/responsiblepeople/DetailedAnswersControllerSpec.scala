@@ -19,13 +19,18 @@ package controllers.responsiblepeople
 import config.AppConfig
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import controllers.declaration
+import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching.BusinessMatching
+import models.businessmatching.BusinessType.{LimitedCompany, Partnership}
 import models.responsiblepeople._
 import models.status._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
+import models.responsiblepeople.ResponsiblePerson.{flowChangeOfficer, flowFromDeclaration}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import org.scalatest.OptionValues
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
@@ -35,7 +40,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
-class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePeopleValues{
+class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePeopleValues with BusinessMatchingGenerator with OptionValues{
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
@@ -254,6 +259,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
               controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any())
             } thenReturn Future.successful(CacheMap("", Map.empty))
 
+
             val result = controller.post(1, flow)(request)
 
             redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
@@ -261,6 +267,126 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
             verify(controller.dataCacheConnector).save(any(), any(),eqTo(Seq(ResponsiblePerson(hasAccepted = true))))(any(),any())
 
           }
+        }
+      }
+
+      "redirect to RegisterPartnersController" when {
+        "business type is partnership and flow is from declaration" in new Fixture {
+          val flow = Some(`flowFromDeclaration`)
+
+          val bm: BusinessMatching = businessMatchingGen.sample.get
+          val rd = reviewDetailsGen.sample.get
+
+          setupMocksFor(completeResponsiblePerson, SubmissionDecisionApproved)
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any(), any()))
+            .thenReturn(Future.successful(Some(Seq(completeResponsiblePerson))))
+
+          when {
+            controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any())
+          } thenReturn Future.successful(CacheMap("", Map.empty))
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any(), any()))
+            .thenReturn(Future.successful(Some(Seq(completeResponsiblePerson))))
+
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
+            .thenReturn(Future.successful(Some(bm.copy(reviewDetails = Some(rd.copy(businessType = Some(Partnership)))))))
+
+          when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          val result = controller.post(1, flow)(request)
+          redirectLocation(result) must be(Some(controllers.declaration.routes.RegisterPartnersController.get().url))
+        }
+      }
+
+      "redirect to WhoIsRegisteringController" when {
+        "business type is other than partnership, flow is from declaration and nominated officer is defined" in new Fixture  {
+          val flow = Some(`flowFromDeclaration`)
+
+          val bm: BusinessMatching = businessMatchingGen.sample.get
+          val rd = reviewDetailsGen.sample.get
+
+          setupMocksFor(completeResponsiblePerson, SubmissionDecisionApproved)
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any(), any()))
+            .thenReturn(Future.successful(Some(Seq(completeResponsiblePerson))))
+
+          when {
+            controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any())
+          } thenReturn Future.successful(CacheMap("", Map.empty))
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any(), any()))
+            .thenReturn(Future.successful(Some(Seq(completeResponsiblePerson))))
+
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
+            .thenReturn(Future.successful(Some(bm.copy(reviewDetails = Some(rd.copy(businessType = Some(LimitedCompany)))))))
+
+          when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          val result = controller.post(1, flow)(request)
+          redirectLocation(result) must be(Some(declaration.routes.WhoIsRegisteringController.get().url))
+        }
+      }
+
+      "redirect to WhoIsTheBusinessNominatedOfficerController in update service" when {
+        "business type is other than partnership, flow is from declaration and nominated officer is not defined in pre submission" in new Fixture  {
+          val flow = Some(`flowFromDeclaration`)
+
+          val bm: BusinessMatching = businessMatchingGen.sample.get
+          val rd = reviewDetailsGen.sample.get
+
+          setupMocksFor(completeResponsiblePerson, SubmissionReady)
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any(), any()))
+            .thenReturn(Future.successful(Some(Seq(completeResponsiblePerson))))
+
+          when {
+            controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any())
+          } thenReturn Future.successful(CacheMap("", Map.empty))
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any(), any()))
+            .thenReturn(Future.successful(Some(Seq(completeResponsiblePerson.copy(positions = Some(Positions(Set(SoleProprietor), Some(PositionStartDate(LocalDate.now().minusMonths(5))))))))))
+
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
+            .thenReturn(Future.successful(Some(bm.copy(reviewDetails = Some(rd.copy(businessType = Some(LimitedCompany)))))))
+
+          when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any()))
+            .thenReturn(Future.successful(SubmissionReady))
+
+          val result = controller.post(1, flow)(request)
+          redirectLocation(result) must be(Some(declaration.routes.WhoIsTheBusinessNominatedOfficerController.get().url))
+        }
+      }
+
+      "redirect to WhoIsTheBusinessNominatedOfficerController in submit application" when {
+        "business type is other than partnership, flow is from declaration and nominated officer is not defined in post submission" in new Fixture  {
+          val flow = Some(`flowFromDeclaration`)
+
+          val bm: BusinessMatching = businessMatchingGen.sample.get
+          val rd = reviewDetailsGen.sample.get
+
+          setupMocksFor(completeResponsiblePerson, SubmissionDecisionApproved)
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any(), any()))
+            .thenReturn(Future.successful(Some(Seq(completeResponsiblePerson))))
+
+          when {
+            controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any())
+          } thenReturn Future.successful(CacheMap("", Map.empty))
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any(), any()))
+            .thenReturn(Future.successful(Some(Seq(completeResponsiblePerson.copy(positions = Some(Positions(Set(SoleProprietor), Some(PositionStartDate(LocalDate.now().minusMonths(5))))))))))
+
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
+            .thenReturn(Future.successful(Some(bm.copy(reviewDetails = Some(rd.copy(businessType = Some(LimitedCompany)))))))
+
+          when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any()))
+            .thenReturn(Future.successful(SubmissionReady))
+
+          val result = controller.post(1, flow)(request)
+          redirectLocation(result) must be(Some(declaration.routes.WhoIsTheBusinessNominatedOfficerController.get().url))
         }
       }
     }

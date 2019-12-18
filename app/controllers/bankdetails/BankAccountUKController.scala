@@ -21,7 +21,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
-import models.bankdetails.{BankAccount, BankAccountIsUk, BankDetails}
+import models.bankdetails.{ BankAccount, BankDetails, UKAccount}
 import services.StatusService
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, StatusConstants}
@@ -29,10 +29,10 @@ import utils.{AuthAction, StatusConstants}
 import scala.concurrent.Future
 
 @Singleton
-class BankAccountIsUKController @Inject()( val dataCacheConnector: DataCacheConnector,
-                                           val authAction: AuthAction,
-                                           val auditConnector: AuditConnector,
-                                           val statusService: StatusService ) extends BankDetailsController {
+class BankAccountUKController @Inject()( val dataCacheConnector: DataCacheConnector,
+                                         val authAction: AuthAction,
+                                         val auditConnector: AuditConnector,
+                                         val statusService: StatusService ) extends BankDetailsController {
 
   def get(index: Int, edit: Boolean = false) = authAction.async{
       implicit request =>
@@ -40,10 +40,10 @@ class BankAccountIsUKController @Inject()( val dataCacheConnector: DataCacheConn
           bankDetails <- getData[BankDetails](request.credId, index)
           status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
         } yield bankDetails match {
-          case Some(x@BankDetails(_, _, Some(data), _, _, _, _)) if x.canEdit(status) =>
-            Ok(views.html.bankdetails.bank_account_account_is_uk(data.isUk.map(isUk => Form2[BankAccountIsUk](isUk)).getOrElse(EmptyForm), edit, index))
+          case Some(x@BankDetails(_, _, Some(BankAccount(_, _, Some(data@UKAccount(_, _)))), _, _, _, _))if x.canEdit(status) =>
+            Ok(views.html.bankdetails.bank_account_account_uk(Form2[UKAccount](data), edit, index))
           case Some(x) if x.canEdit(status) =>
-            Ok(views.html.bankdetails.bank_account_account_is_uk(EmptyForm, edit, index))
+            Ok(views.html.bankdetails.bank_account_account_uk(EmptyForm, edit, index))
           case _ => NotFound(notFoundView)
         }
   }
@@ -56,25 +56,28 @@ class BankAccountIsUKController @Inject()( val dataCacheConnector: DataCacheConn
           result <- OptionT.liftF(auditConnector.sendEvent(audit.AddBankAccountEvent(details)))
         } yield result
 
-        Form2[BankAccountIsUk](request.body) match {
+        Form2[UKAccount](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.bankdetails.bank_account_account_is_uk(f, edit, index)))
+            Future.successful(BadRequest(views.html.bankdetails.bank_account_account_uk(f, edit, index)))
           case ValidForm(_, data) =>
             updateDataStrict[BankDetails](request.credId, index) { bd =>
               bd.copy(
-                bankAccount = Option(bd.bankAccount.getOrElse(BankAccount(None, None, None)).isUk(data)),
+                bankAccount = Option(bd.bankAccount.getOrElse(BankAccount(None, None, None)).account(data)),
                 status = Some(if (edit) {
                   StatusConstants.Updated
                 } else {
                   StatusConstants.Added
                 })
               )
-            }.map { _ =>
-                if (data.isUk) {
-                  Redirect(routes.BankAccountUKController.get(index))
-                } else {
-                  Redirect(routes.BankAccountHasIbanController.get(index))
-                }
+            }.flatMap { _ =>
+              if (edit) {
+                Future.successful(Redirect(routes.SummaryController.get(index)))
+              } else {
+                lazy val redirect = Redirect(routes.SummaryController.get(index))
+                (sendAudit map { _ =>
+                  redirect
+                }) getOrElse redirect
+              }
             }
         }
       }.recoverWith {

@@ -32,6 +32,11 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
     self =>
     val request = addToken(authRequest)
 
+    val ukAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456789", "111111")))
+    val nonUkIban = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(true)), Some( NonUKIBANNumber("DE89370400440532013000")))
+    val nonUkAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some( NonUKAccountNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")))
+
+
     val controller = new SummaryController(
       dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction
@@ -42,8 +47,8 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
     "load the summary page with the correct text when UK" in new Fixture {
 
-      val model1 = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(UKAccount("123456789", "111111")))
-      val model2 = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(NonUKIBANNumber("DE89370400440532013000")))
+      val model1 = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukAccount))
+      val model2 = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(nonUkIban))
 
       mockCacheFetch[Seq[BankDetails]](Some(Seq(model1, model2)))
       mockApplicationStatus(SubmissionReady)
@@ -71,8 +76,8 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
     "load the summary page with correct text when IBAN" in new Fixture {
 
-      val model1 = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(UKAccount("123456789", "111111")))
-      val model2 = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(NonUKIBANNumber("DE89370400440532013000")))
+      val model1 = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukAccount))
+      val model2 = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(nonUkIban))
 
       mockCacheFetch[Seq[BankDetails]](Some(Seq(model1, model2)))
       mockApplicationStatus(SubmissionReady)
@@ -90,8 +95,8 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
   "post is called" must {
     "respond with OK and redirect to the bank account details page" in new Fixture {
 
-      val model1 = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(UKAccount("123456789", "111111")))
-      val model2 = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(NonUKIBANNumber("DE89370400440532013000")))
+      val model1 = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukAccount))
+      val model2 = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(nonUkIban))
 
       mockCacheFetch[Seq[BankDetails]](Some(Seq(model1, model2)))
 
@@ -104,11 +109,11 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
     }
 
     "update the accepted flag" in new Fixture {
-      val model1 = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(UKAccount("123456789", "111111")), hasAccepted = true)
-      val model2 = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(NonUKIBANNumber("DE89370400440532013000")))
+      val model1 = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukAccount), hasAccepted = true)
+      val model2 = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(nonUkIban))
 
-      val completeModel1 = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(UKAccount("123456789", "111111")), hasAccepted = true)
-      val completeModel2 = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(NonUKIBANNumber("DE89370400440532013000")), hasAccepted = true)
+      val completeModel1 = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukAccount), hasAccepted = true)
+      val completeModel2 = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(nonUkIban), hasAccepted = true)
 
       val bankAccounts = Seq(model1, model2)
 

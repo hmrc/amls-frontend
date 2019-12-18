@@ -18,14 +18,14 @@ package views.bankdetails
 
 import forms.{Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.bankdetails.BankAccountIsUk
+import models.bankdetails.NonUKIBANNumber
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import utils.AmlsSpec
 import views.Fixture
 
-class bank_account_is_ukSpec extends AmlsSpec with MustMatchers {
+class bank_account_has_ibanSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
@@ -34,28 +34,28 @@ class bank_account_is_ukSpec extends AmlsSpec with MustMatchers {
   "bank_account view " must{
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[BankAccountIsUk] = Form2(BankAccountIsUk(true))
+      val form2: ValidForm[NonUKIBANNumber] = Form2(NonUKIBANNumber(""))
 
-      override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_is_uk(form2, false, 0)
+      override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_has_iban(form2, false, 0)
 
-      doc.title() must startWith(Messages("bankdetails.bankaccount.accounttype") + " - " + Messages("summary.bankdetails"))
+      doc.title() must startWith(Messages("bankdetails.bankaccount.hasiban") + " - " + Messages("summary.bankdetails"))
     }
   }
 
   "have correct heading" in new ViewFixture {
 
-    val form2: ValidForm[BankAccountIsUk] = Form2(BankAccountIsUk(true))
+    val form2: ValidForm[NonUKIBANNumber] = Form2(NonUKIBANNumber(""))
 
-    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_is_uk(form2, false, 0)
+    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_has_iban(form2, false, 0)
 
-    heading.html() must be(Messages("bankdetails.bankaccount.accounttype"))
+    heading.html() must be(Messages("bankdetails.bankaccount.hasiban"))
   }
 
   "have a back link" in new ViewFixture {
 
-    val form2: ValidForm[BankAccountIsUk] = Form2(BankAccountIsUk(true))
+    val form2: ValidForm[NonUKIBANNumber] = Form2(NonUKIBANNumber(""))
 
-    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_is_uk(form2, false, 0)
+    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_has_iban(form2, false, 0)
 
     doc.getElementsByAttributeValue("class", "link-back") must not be empty
   }
@@ -68,17 +68,17 @@ class bank_account_is_ukSpec extends AmlsSpec with MustMatchers {
 
     val messageKey = alphaNumeric
 
-    val isUKField = "isUK"
+    val hasIBANField = "hasIBAN"
 
     val form2: InvalidForm = InvalidForm(Map("thing" -> Seq("thing")),
       Seq(
-        (Path \ isUKField, Seq(ValidationError(messageKey)))
+        (Path \ hasIBANField, Seq(ValidationError(messageKey)))
       ))
 
-    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_is_uk(form2, false, 0)
+    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_has_iban(form2, false, 0)
 
     errorSummary.html() must include(messageKey)
 
-    doc.getElementById(isUKField + "-error-notification").html() must include(messageKey)
+    doc.getElementById(hasIBANField).html() must include(messageKey)
   }
 }

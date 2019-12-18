@@ -1,1 +1,0 @@
- + [AMLS-5484] - 'Fixed TradingPremises isComplete logic'
