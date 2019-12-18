@@ -17,55 +17,54 @@
 package controllers.amp
 
 import java.time.{LocalDate, LocalDateTime, ZoneOffset}
+
+import akka.stream.Materializer
+import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import models.amp.Amp
+import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
+import org.scalatest.OptionValues
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.amp.AmpCacheService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
-import org.mockito.Matchers._
-import play.api.test.FakeRequest
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
-class AmpControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class AmpControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with OptionValues {
 
   val dateVal = LocalDateTime.now
 
   val completeData = Json.obj(
-    "typeOfParticipant"             -> Seq("artGalleryOwner"),
-    "soldOverThreshold"     -> true,
-    "dateTransactionOverThreshold"  -> LocalDate.now,
-    "identifyLinkedTransactions"    -> true,
-    "percentageExpectedTurnover"    -> "fortyOneToSixty"
+    "typeOfParticipant" -> Seq("artGalleryOwner"),
+    "soldOverThreshold" -> true,
+    "dateTransactionOverThreshold" -> LocalDate.now,
+    "identifyLinkedTransactions" -> true,
+    "percentageExpectedTurnover" -> "fortyOneToSixty"
   )
 
   val completeJson = Json.obj(
-    "_id"            -> "someid",
-    "data"           -> completeData,
-    "lastUpdated"    -> Json.obj("$date" -> dateVal.atZone(ZoneOffset.UTC).toInstant.toEpochMilli),
-    "hasChanged"     -> false,
-    "hasAccepted"    -> false
+    "_id" -> "someid",
+    "data" -> completeData,
+    "lastUpdated" -> Json.obj("$date" -> dateVal.atZone(ZoneOffset.UTC).toInstant.toEpochMilli),
+    "hasChanged" -> false,
+    "hasAccepted" -> false
   )
 
   trait Fixture extends AuthorisedFixture {
     self =>
-    val request         = addToken(authRequest)
+    val request = addToken(authRequest)
     val ampCacheService = mock[AmpCacheService]
-    val controller      = app.injector.instanceOf[AmpController]
-    val mockCacheMap    = mock[CacheMap]
-    val credId          = "someId"
+    val mockCacheMap = mock[CacheMap]
+    val credId = "someId"
+    val mockCacheConnector = mock[DataCacheConnector]
 
-    lazy val app = new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .overrides(bind[AmpCacheService].to(ampCacheService))
-      .build()
+    val controller = new AmpController(ampCacheService, SuccessfulAuthAction, mockCacheConnector)
   }
 
   "get returns 200" when {
@@ -76,7 +75,7 @@ class AmpControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
       status(result) must be(OK)
 
       val document = Json.parse(contentAsString(result))
-      document mustBe(Json.obj())
+      document mustBe (Json.obj())
     }
 
     "amp section in cache" in new Fixture {
@@ -86,7 +85,7 @@ class AmpControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
       status(result) must be(OK)
 
       val document = Json.parse(contentAsString(result))
-      document mustBe(completeJson)
+      document mustBe (completeJson)
     }
   }
 
@@ -101,7 +100,27 @@ class AmpControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
       val result = controller.set(credId)(postRequest)
       status(result) must be(OK)
       val document = Json.parse(contentAsString(result))
-      document mustBe(Json.obj("_id" -> credId))
+      document mustBe (Json.obj("_id" -> credId))
+    }
+  }
+
+  "accept" must {
+    "set accept flag to true and redirect to RegistrationProgressController" in new Fixture {
+      implicit lazy val materializer: Materializer = app.materializer
+
+      when(controller.cacheConnector.fetch[Amp](any(), any())(any(), any()))
+        .thenReturn(Future.successful(Some(completeJson.as[Amp])))
+
+      when(controller.cacheConnector.save[Amp](any(), any(), any())(any(), any()))
+        .thenReturn(Future.successful(mockCacheMap))
+
+      val result = call(controller.accept, FakeRequest())
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result).value mustBe controllers.routes.RegistrationProgressController.get().toString
+
+      verify(controller.cacheConnector).save[Amp](any(), eqTo(Amp.key),
+        eqTo(completeJson.as[Amp].copy(hasAccepted = true)))(any(), any())
     }
   }
 }

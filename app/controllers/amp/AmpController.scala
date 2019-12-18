@@ -30,7 +30,7 @@ import utils.AuthAction
 
 class AmpController @Inject()(ampCacheService: AmpCacheService,
                               authAction     : AuthAction,
-                              cacheConnector : DataCacheConnector) extends DefaultBaseController {
+                              val cacheConnector : DataCacheConnector) extends DefaultBaseController {
 
   def get(credId: String) = Action.async {
     implicit request => {
