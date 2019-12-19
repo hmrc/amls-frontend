@@ -54,8 +54,8 @@ class what_you_needSpec extends AmlsSpec with MustMatchers {
 
       doc.getElementsMatchingOwnText(Messages("button.continue")).hasAttr("href") must be(true)
       doc.getElementsMatchingOwnText(Messages("button.continue")).attr("href") must be("/anti-money-laundering/trading-premises/premises/1")
-      doc.getElementsMatchingOwnText(Messages("main.sidebar.title")).hasText must be(true)
-      doc.getElementsMatchingOwnText(Messages("main.sidebar.information")).hasText must be(true)
+      doc.getElementsMatchingOwnText(Messages("whatYouNeed.attention.title")).hasText must be(true)
+      doc.getElementsMatchingOwnText(Messages("whatYouNeed.attention.information")).hasText must be(true)
     }
 
     "contain the expected content elements when msb is selected as one of the option in business activities" in new ViewFixture {
@@ -67,8 +67,8 @@ class what_you_needSpec extends AmlsSpec with MustMatchers {
       html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.4"))
 
       doc.getElementsMatchingOwnText(Messages("button.continue")).hasAttr("href") must be(true)
-      doc.getElementsMatchingOwnText(Messages("main.sidebar.title")).hasText must be(true)
-      doc.getElementsMatchingOwnText(Messages("main.sidebar.information")).hasText must be(true)
+      doc.getElementsMatchingOwnText(Messages("whatYouNeed.attention.title")).hasText must be(true)
+      doc.getElementsMatchingOwnText(Messages("whatYouNeed.attention.information")).hasText must be(true)
 
       doc.getElementsMatchingOwnText(Messages("tradingpremises.whatyouneed.agents.sub.heading")).hasText must be(true)
       doc.getElementsMatchingOwnText(Messages("tradingpremises.whatyouneed.agents.desc.1")).hasText must be(true)

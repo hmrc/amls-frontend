@@ -1761,6 +1761,19 @@ legend .page-header {
   margin-left: 0.6em;
 }
 
+.auto-save {
+  padding: 30px 20px 10px;
+  background-color: #1d70b8;
+  color: #ffffff;
+  margin-bottom: 30px;
+}
+
+.heading-small {
+  margin-top: 0;
+}
+
+
+
 /*=========================
 updated 15 Oct 2019 14:14 BST
 Palette change
