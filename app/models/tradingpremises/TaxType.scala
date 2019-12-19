@@ -70,6 +70,5 @@ object TaxType {
       Map("taxType" -> Seq("01"))
     case TaxTypeCorporationTax =>
       Map("taxType" -> Seq("02"))
-    case _ => Map("" -> Seq(""))
   }
 }

@@ -21,12 +21,12 @@ import models.bankdetails._
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.mockito.ArgumentCaptor
+import org.mockito.{ArgumentCaptor, Matchers}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
@@ -39,6 +39,9 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
 
     val request = addToken(authRequest)
 
+
+    val ukBankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456", "11-11-11")))
+
     val controller = new BankAccountIsUKController(
       mockCacheConnector,
       SuccessfulAuthAction, ds = commonDependencies,
@@ -49,28 +52,12 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
 
   }
 
-  val fieldElements = Array("accountNumber", "sortCode", "IBANNumber")
 
   "BankAccountIsUKController" when {
     "get is called" must {
       "respond with OK" when {
-        "there is no bank account detail information yet" in new Fixture {
-
-          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None))), Some(BankDetails.key))
-
-          mockApplicationStatus(SubmissionReady)
-
-          val result = controller.get(1, false)(request)
-          val document: Document = Jsoup.parse(contentAsString(result))
-
-          status(result) must be(OK)
-          for (field <- fieldElements)
-            document.select(s"input[name=$field]").`val` must be(empty)
-        }
 
         "there is already bank account detail information" in new Fixture {
-
-          val ukBankAccount = UKAccount("12345678", "000000")
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None, Some(ukBankAccount)))), Some(BankDetails.key))
 
@@ -78,22 +65,6 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
 
           val result = controller.get(1, true)(request)
           status(result) must be(OK)
-        }
-
-        "when editing a bank account" which {
-          "hasn't been accepted and completed yet" in new Fixture {
-            mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None))), Some(BankDetails.key))
-
-            mockApplicationStatus(SubmissionDecisionApproved)
-
-            val result = controller.get(1, edit = true)(request)
-            val document: Document = Jsoup.parse(contentAsString(result))
-
-            status(result) must be(OK)
-
-            for (field <- fieldElements)
-              document.select(s"input[name=$field]").`val` must be(empty)
-          }
         }
       }
 
@@ -111,7 +82,6 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
 
         "editing an amendment" in new Fixture {
 
-          val ukBankAccount = UKAccount("12345678", "000000")
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(
             BankDetails(None, None, Some(ukBankAccount), hasAccepted = true))), Some(BankDetails.key))
@@ -125,8 +95,6 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
         }
 
         "editing a variation" in new Fixture {
-
-          val ukBankAccount = UKAccount("12345678", "000000")
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(
             BankDetails(None, None, Some(ukBankAccount), hasAccepted = true))), Some(BankDetails.key))
@@ -145,11 +113,12 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with SEE_OTHER" when {
         "given valid data in edit mode" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
-            "isUK" -> "false",
-            "nonUKAccountNumber" -> "1234567890123456789012345678901234567890",
-            "isIBAN" -> "false"
+          val newRequest = request.withFormUrlEncodedBody(
+            "isUK" -> "false"
           )
+
+          when(controller.auditConnector.sendEvent(Matchers.any())(Matchers.any(), Matchers.any()))
+            .thenReturn(Future.successful(AuditResult.Success))
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount), None))), Some(BankDetails.key))
           mockCacheSave[Seq[BankDetails]]
@@ -157,16 +126,13 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
           val result = controller.post(1, true)(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.SummaryController.get(1).url))
-
-          verify(controller.auditConnector, never()).sendEvent(any())(any(), any())
+          redirectLocation(result) must be(Some(routes.BankAccountHasIbanController.get(1).url))
         }
+
         "given valid data when NOT in edit mode" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
-            "isUK" -> "false",
-            "nonUKAccountNumber" -> "1234567890123456789012345678901234567890",
-            "isIBAN" -> "false"
+          val newRequest = request.withFormUrlEncodedBody(
+            "isUK" -> "false"
           )
 
           when(controller.auditConnector.sendEvent(any())(any(), any()))
@@ -178,7 +144,7 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
           val result = controller.post(1)(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.SummaryController.get(1).url))
+          redirectLocation(result) must be(Some(routes.BankAccountHasIbanController.get(1).url))
         }
 
       }
@@ -186,10 +152,8 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with NOT_FOUND" when {
         "given an index out of bounds in edit mode" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
-            "isUK" -> "false",
-            "nonUKAccountNumber" -> "1234567890123456789012345678901234567890",
-            "isIBAN" -> "false"
+          val newRequest = request.withFormUrlEncodedBody(
+            "isUK" -> "false"
           )
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None))), Some(BankDetails.key))
@@ -201,12 +165,11 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
         }
       }
 
-
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
-            "isUK" -> "true"
+          val newRequest = request.withFormUrlEncodedBody(
+            "isUK" -> ""
           )
 
           mockCacheFetch[Seq[BankDetails]](None, Some(BankDetails.key))

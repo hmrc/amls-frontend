@@ -21,6 +21,7 @@ import org.joda.time.LocalDate
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation._
+import models.FormTypes.{basicPunctuationRegex, regexWithMsg}
 import play.api.libs.json.{Reads, Writes}
 import utils.MappingUtils.Implicits._
 
@@ -41,7 +42,7 @@ object YourTradingPremises {
   val premisesTradingNameType = FormTypes.notEmptyStrip andThen
     notEmpty.withMessage("error.required.tp.trading.name") andThen
     maxLength(maxLengthPremisesTradingName).withMessage("error.invalid.tp.trading.name") andThen
-    FormTypes.basicPunctuationPattern()
+    regexWithMsg(basicPunctuationRegex, "error.invalid.char.tp.agent.company.details")
 
   implicit val reads: Reads[YourTradingPremises] = {
     import play.api.libs.functional.syntax._

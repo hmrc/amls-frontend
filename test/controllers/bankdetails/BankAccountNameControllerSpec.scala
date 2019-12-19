@@ -60,7 +60,7 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
 
         "with a name" in new Fixture {
 
-          val ukBankAccount = UKAccount("12345678", "000000")
+          val ukBankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("12345678", "000000")))
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, Some("my bank account"), Some(ukBankAccount)))), Some(BankDetails.key))
 

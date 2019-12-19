@@ -25,7 +25,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @headingWithPlaceholder(("changeofficer.roleinbusiness.heading", personName), "summary.updateinformation")
 }
 
 @main(
@@ -33,15 +32,16 @@
     heading = header
 ) {
 
-    <p>@Messages("lbl.select.all")</p>
-
     @form(f, controllers.changeofficer.routes.RoleInBusinessController.post()) {
 
         @roles_within_business(
             f,
             businessType,
             displayNominatedOfficer = false,
-            isDeclaration = false
+            isDeclaration = false,
+            heading = Messages("changeofficer.roleinbusiness.heading", personName),
+            section = "summary.updateinformation",
+            hint = "lbl.select.all"
         )
 
         @submit(returnLink = false)

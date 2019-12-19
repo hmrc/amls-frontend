@@ -36,7 +36,7 @@ class bank_account_typeSpec extends AmlsViewSpec with MustMatchers  {
   "bank_account_type view " must{
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[Account] = Form2(NonUKAccountNumber(""))
+      val form2: ValidForm[NonUKAccountNumber] = Form2(NonUKAccountNumber(""))
 
       override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_types(form2, false, 0)
 
@@ -45,7 +45,7 @@ class bank_account_typeSpec extends AmlsViewSpec with MustMatchers  {
 
     "have correct heading" in new ViewFixture {
 
-      val form2: ValidForm[Account] = Form2(NonUKAccountNumber(""))
+      val form2: ValidForm[NonUKAccountNumber] = Form2(NonUKAccountNumber(""))
 
       override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_types(form2, false, 0)
 
@@ -54,7 +54,7 @@ class bank_account_typeSpec extends AmlsViewSpec with MustMatchers  {
 
     "have a back link" in new ViewFixture {
 
-      val form2: ValidForm[Account] = Form2(NonUKAccountNumber(""))
+      val form2: ValidForm[NonUKAccountNumber] = Form2(NonUKAccountNumber(""))
 
       override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_types(form2, false, 0)
 

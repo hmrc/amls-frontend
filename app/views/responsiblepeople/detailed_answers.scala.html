@@ -90,7 +90,7 @@
         @if(showHide){
         <div class="panel-indent panel-indent--gutter panel-border-wide info">
             <p>
-                <a href="@controllers.responsiblepeople.routes.NewHomeAddressDateOfChangeController.get(idx)">
+                <a href="@controllers.responsiblepeople.address.routes.NewHomeAddressDateOfChangeController.get(idx)">
                     @Messages("responsiblepeople.detailed_answer.tell.us.moved", personName)
                 </a>
             </p>
@@ -277,7 +277,7 @@
                     question = Messages("responsiblepeople.detailed_answers.address.UK", personName),
                     editUrl = showHide match {
                         case true => {
-                            controllers.responsiblepeople.routes.MovedAddressController.get(idx).toString()
+                            controllers.responsiblepeople.address.routes.MovedAddressController.get(idx).toString()
                         }
                         case _ => {
                             controllers.responsiblepeople.address.routes.CurrentAddressController.get(idx, true, flow).toString()
@@ -293,7 +293,7 @@
                     question = Messages("responsiblepeople.detailed_answers.address", personName),
                     editUrl =  (a.personAddress, showHide)match {
                             case (_, true) => {
-                                controllers.responsiblepeople.routes.MovedAddressController.get(idx).toString
+                                controllers.responsiblepeople.address.routes.MovedAddressController.get(idx).toString
                             }
                             case (_:PersonAddressNonUK, false) => {
                                 controllers.responsiblepeople.address.routes.CurrentAddressNonUKController.get(idx, true, flow).toString()
@@ -365,7 +365,14 @@
 
                  @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.address.other.previous", personName),
-                    editUrl = controllers.responsiblepeople.address.routes.AdditionalExtraAddressController.get(idx, true, flow).toString,
+                     editUrl = a.personAddress match {
+                         case _:PersonAddressNonUK => {
+                             controllers.responsiblepeople.address.routes.AdditionalExtraAddressNonUKController.get(idx, true, flow).toString()
+                         }
+                         case _:PersonAddressUK => {
+                             controllers.responsiblepeople.address.routes.AdditionalExtraAddressUKController.get(idx, true, flow).toString()
+                         }
+                     },
                     editLinkTag = "rp-otherpreviousaddress-edit"
                 ) {
                     <ul class="list">

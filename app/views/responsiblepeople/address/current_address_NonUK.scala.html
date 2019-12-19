@@ -24,7 +24,7 @@
 
 @header = {
     @components.back_link()
-    @errorSummaryWithPlaceholder(f, s"$personName ${Messages("error.required.select.non.uk.address")}")
+    @errorSummaryWithPlaceholder(f, s"${Messages("error.required.select.non.uk.address")}")
 }
 
 @main(
@@ -61,7 +61,7 @@
             )
             @country_autocomplete(
                 field = f("country"),
-                placeholder = s"$personName ${Messages("error.required.select.non.uk.address")}",
+                placeholder = s"${Messages("error.required.select.non.uk.address")}",
                 labelText = "responsiblepeople.wherepersonlives.country",
                 data = countries.getOrElse(Seq.empty)
             )

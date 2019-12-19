@@ -30,10 +30,13 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
     self =>
     val request = addToken(authRequest)
 
+
+    val ukAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("12341234", "000000")))
+
     val completeModel1 = BankDetails(
       Some(PersonalAccount),
       Some("Completed First Account Name"),
-      Some(UKAccount("12341234", "000000")),
+      Some(ukAccount),
         false,
         false,
         None,
@@ -42,7 +45,7 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
     val completeModel2 = BankDetails(
       Some(BelongsToBusiness),
       Some("Completed Second Account Name"),
-      Some(UKAccount("12341234", "000000")),
+      Some(ukAccount),
         false,
         false,
         None,
@@ -51,7 +54,7 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
     val completeModel3 = BankDetails(
       Some(BelongsToOtherBusiness),
       Some("Completed Third Account Name"),
-      Some(UKAccount("12341234", "000000")),
+      Some(ukAccount),
       false,
       false,
       None,
@@ -67,7 +70,7 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
     val inCompleteModel1 = BankDetails(
       Some(PersonalAccount),
       None,
-      Some(UKAccount("12341234", "000000"))
+      Some(ukAccount)
     )
     val inCompleteModel2 = BankDetails(
       Some(BelongsToBusiness),

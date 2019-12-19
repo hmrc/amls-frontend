@@ -18,9 +18,10 @@ package models.businessdetails
 
 import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Path}
+import jto.validation.Path
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.ValidationError
+import models.tradingpremises.ActivityStartDate
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 
@@ -49,7 +50,7 @@ class ActivityStartDateSpec extends PlaySpec {
         "startDate.year" -> Seq("2100")
       )
       ActivityStartDate.formRule.validate(model) must be(Invalid(Seq(
-        Path \ "startDate" -> Seq(ValidationError("error.invalid.date.before.2100"))
+        Path \ "startDate" -> Seq(ValidationError("error.invalid.date.past"))
       )))
     }
   }
@@ -70,8 +71,14 @@ class ActivityStartDateSpec extends PlaySpec {
   "fail validation" when {
     "given a future date" in {
 
-     val data = ActivityStartDate.formWrites.writes(ActivityStartDate(LocalDate.now().plusDays(1)))
-      ActivityStartDate.formRule.validate(data) must be(Valid(ActivityStartDate(LocalDate.now().plusDays(1))))
+      val model = Map(
+        "startDate.day" -> Seq("1"),
+        "startDate.month" -> Seq("1"),
+        "startDate.year" -> Seq("2050")
+      )
+      ActivityStartDate.formRule.validate(model) must be(Invalid(Seq(
+        Path \ "startDate" -> Seq(ValidationError("error.invalid.date.past"))
+      )))
     }
   }
 

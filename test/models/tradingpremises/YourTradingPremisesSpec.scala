@@ -115,7 +115,19 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers with JodaWrites
         "isResidential" -> Seq("true"),
         "startDate.day" -> Seq("24"),
         "startDate.month" -> Seq("02"),
-        "startDate.year" -> Seq("1990"))) must be (Invalid(Seq(Path \ "tradingName"  -> Seq(ValidationError("err.text.validation"))
+        "startDate.year" -> Seq("1990"))) must be (Invalid(Seq(Path \ "tradingName"  -> Seq(ValidationError("error.invalid.char.tp.agent.company.details"))
+      )))
+    }
+
+    "fail validation when trading name is to long" in {
+      YourTradingPremises.formR.validate(Map("tradingName" -> Seq("11111111111111" * 40),
+        "addressLine1" -> Seq("1"),
+        "addressLine2" -> Seq("2"),
+        "postcode" -> Seq("AA11 1AA"),
+        "isResidential" -> Seq("true"),
+        "startDate.day" -> Seq("24"),
+        "startDate.month" -> Seq("02"),
+        "startDate.year" -> Seq("1990"))) must be (Invalid(Seq(Path \ "tradingName"  -> Seq(ValidationError("error.invalid.tp.trading.name"))
       )))
     }
 

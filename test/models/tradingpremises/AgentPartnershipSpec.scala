@@ -42,7 +42,7 @@ class AgentPartnershipSpec extends PlaySpec {
 
     "throw error when input has invalid data" in {
       val formInput = Map("agentPartnership" -> Seq("sometesttexttest{}"))
-      AgentPartnership.formReads.validate(formInput) must be(Invalid(Seq((Path \ "agentPartnership") -> Seq(ValidationError("err.text.validation")))))
+      AgentPartnership.formReads.validate(formInput) must be(Invalid(Seq((Path \ "agentPartnership") -> Seq(ValidationError("error.char.tp.agent.partnership")))))
     }
 
     "validate form write" in {

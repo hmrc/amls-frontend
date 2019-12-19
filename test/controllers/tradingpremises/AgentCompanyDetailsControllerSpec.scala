@@ -154,7 +154,7 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGen
 
           val result = controller.post(1)(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.invalid.tp.agent.registered.company.name"))
+          contentAsString(result) must include(Messages("error.invalid.tp.agent.company.details"))
 
         }
 
@@ -165,7 +165,7 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGen
 
           val result = controller.post(1)(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.required.tp.agent.registered.company.name"))
+          contentAsString(result) must include(Messages("error.required.tp.agent.company.details"))
         }
       }
 

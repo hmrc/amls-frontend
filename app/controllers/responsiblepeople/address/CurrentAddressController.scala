@@ -38,33 +38,33 @@ class CurrentAddressController @Inject ()(val dataCacheConnector: DataCacheConne
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request =>
-        getData[ResponsiblePerson](request.credId, index) map {
-          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,
-          Some(ResponsiblePersonAddressHistory(Some(currentAddress),_,_)),_,_,_,_,_,_,_,_,_,_,_, _))
-          => Ok(current_address(Form2[ResponsiblePersonCurrentAddress](currentAddress), edit, index, flow, personName.titleName))
-          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-          => Ok(current_address(EmptyForm, edit, index, flow, personName.titleName))
-          case _
-          => NotFound(notFoundView)
-        }
-    }
+      getData[ResponsiblePerson](request.credId, index) map {
+        case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _,
+        Some(ResponsiblePersonAddressHistory(Some(currentAddress), _, _)), _, _, _, _, _, _, _, _, _, _, _, _))
+        => Ok(current_address(Form2[ResponsiblePersonCurrentAddress](currentAddress), edit, index, flow, personName.titleName))
+        case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
+        => Ok(current_address(EmptyForm, edit, index, flow, personName.titleName))
+        case _
+        => NotFound(notFoundView)
+      }
+  }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
     authAction.async {
-        implicit request =>
-          (Form2[ResponsiblePersonCurrentAddress]
-            (request.body)(ResponsiblePersonCurrentAddress.addressFormRule(PersonAddress.formRule(AddressType.Current)))  match {
-            case f: InvalidForm if f.data.get("isUK").isDefined
-            => processForm(ResponsiblePersonCurrentAddress(AddressHelper.modelFromForm(f), None, None), request.credId, index, edit, flow)
-            case f: InvalidForm
-            => getData[ResponsiblePerson](request.credId, index) map { rp =>
-                BadRequest(current_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
-              }
-            case ValidForm(_, data)
-            => processForm(data, request.credId, index, edit, flow)
-          }).recoverWith {
-            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+      implicit request =>
+        (Form2[ResponsiblePersonCurrentAddress]
+          (request.body)(ResponsiblePersonCurrentAddress.addressFormRule(PersonAddress.formRule(AddressType.Current))) match {
+          case f: InvalidForm if f.data.get("isUK").isDefined
+          => processForm(ResponsiblePersonCurrentAddress(modelFromForm(f), None, None), request.credId, index, edit, flow)
+          case f: InvalidForm
+          => getData[ResponsiblePerson](request.credId, index) map { rp =>
+            BadRequest(current_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
           }
+          case ValidForm(_, data)
+          => processForm(data, request.credId, index, edit, flow)
+        }).recoverWith {
+          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+        }
     }
 
   private def processForm(data: ResponsiblePersonCurrentAddress, credId: String, index: Int, edit: Boolean, flow: Option[String])
@@ -74,9 +74,9 @@ class CurrentAddressController @Inject ()(val dataCacheConnector: DataCacheConne
       (res.addressHistory, data.personAddress) match {
         case (None, _)
         => res.addressHistory(ResponsiblePersonAddressHistory(Some(data)))
-        case (Some(rph), addrUk:PersonAddressUK) if !ResponsiblePersonAddressHistory.isRPCurrentAddressInUK(rph.currentAddress)
+        case (Some(rph), addrUk: PersonAddressUK) if !ResponsiblePersonAddressHistory.isRPCurrentAddressInUK(rph.currentAddress)
         => res.addressHistory(rph.copy(currentAddress = Some(ResponsiblePersonCurrentAddress(addrUk, rph.currentAddress.flatMap(_.timeAtAddress)))))
-        case (Some(rph), addrNonUK:PersonAddressNonUK) if ResponsiblePersonAddressHistory.isRPCurrentAddressInUK(rph.currentAddress)
+        case (Some(rph), addrNonUK: PersonAddressNonUK) if ResponsiblePersonAddressHistory.isRPCurrentAddressInUK(rph.currentAddress)
         => res.addressHistory(rph.copy(currentAddress = Some(ResponsiblePersonCurrentAddress(addrNonUK, rph.currentAddress.flatMap(_.timeAtAddress)))))
         case (_, _) => res
       }

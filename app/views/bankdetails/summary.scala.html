@@ -54,48 +54,62 @@ editUrl = controllers.bankdetails.routes.BankAccountNameController.getIndex(inde
 
 
     @bankDetails.bankAccount.map { bankAccount =>
-        @bankAccount match {
-            case ba: UKAccount => {
-                @checkYourAnswers(question = Messages("bankdetails.bankaccount.accounttype.title"),
-                    editUrl = controllers.bankdetails.routes.BankAccountIsUKController.get(index).toString
-                ) {
-                    @Messages("lbl.yes")
-                }
-                @checkYourAnswers(question = Messages("bankdetails.bankaccount.accountnumber"),
-                    editUrl = controllers.bankdetails.routes.BankAccountIsUKController.get(index, true).toString
-                ) {
-                    @ba.accountNumber
-                }
-                @checkYourAnswers(question = Messages("bankdetails.bankaccount.sortcode"),
-                    editUrl = controllers.bankdetails.routes.BankAccountIsUKController.get(index, true).toString
-                ) {
-                    @ba.displaySortCode
+
+            @checkYourAnswers(  question = Messages("bankdetails.bankaccount.accounttype.title"),
+                                editUrl = controllers.bankdetails.routes.BankAccountIsUKController.get(index, true).toString
+            ) {
+                @bankAccount.isUk match {
+                    case Some(BankAccountIsUk(true)) =>  { @Messages("lbl.yes") }
+                    case Some(BankAccountIsUk(false)) => { @Messages("lbl.no") }
+                    case _ => {}
                 }
             }
-            case ba: NonUKAccountNumber => {
-                @checkYourAnswers(question = Messages("bankdetails.bankaccount.accounttype.title"),
-                    editUrl = controllers.bankdetails.routes.BankAccountIsUKController.get(index, true).toString
-                ) {
-                    @Messages("lbl.no")
-                }
-                @checkYourAnswers(question = Messages("bankdetails.bankaccount.accountnumber"),
-                    editUrl = controllers.bankdetails.routes.BankAccountIsUKController.get(index, true).toString
-                ) {
-                    @ba.accountNumber
-                }
+
+            @bankAccount.hasIban match {
+                case Some(BankAccountHasIban(true)) => {
+                    @checkYourAnswers(  question = Messages("bankdetails.bankaccount.hasiban"),
+                                        editUrl = controllers.bankdetails.routes.BankAccountHasIbanController.get(index, true).toString
+                    ) {
+                        @Messages("lbl.yes")
+                    }}
+                case Some(BankAccountHasIban(false)) => {
+                    @checkYourAnswers(  question = Messages("bankdetails.bankaccount.hasiban"),
+                                        editUrl = controllers.bankdetails.routes.BankAccountHasIbanController.get(index, true).toString
+                    ) {
+                        @Messages("lbl.no")
+                    }}
+                case _ => {}
             }
-            case ba: NonUKIBANNumber => {
-                @checkYourAnswers(question = Messages("bankdetails.bankaccount.accounttype.title"),
-                    editUrl = controllers.bankdetails.routes.BankAccountIsUKController.get(index, true).toString
-                ) {
-                    @Messages("lbl.no")
+
+            @bankAccount.account match {
+                case Some(ba:UKAccount) => {
+                    @checkYourAnswers(  question = Messages("bankdetails.bankaccount.accountnumber"),
+                                        editUrl = controllers.bankdetails.routes.BankAccountUKController.get(index, true).toString
+                    ) {
+                        @ba.accountNumber
+                    }
+                    @checkYourAnswers(  question = Messages("bankdetails.bankaccount.sortcode"),
+                                        editUrl = controllers.bankdetails.routes.BankAccountUKController.get(index, true).toString
+                    ) {
+                        @ba.displaySortCode
+                    }
                 }
-                @checkYourAnswers(question = Messages("bankdetails.bankaccount.iban"),
-                    editUrl = controllers.bankdetails.routes.BankAccountIsUKController.get(index, true).toString
-                ) {
-                    @ba.IBANNumber
+                case Some(ba: NonUKAccountNumber) => {
+                    @checkYourAnswers(  question = Messages("bankdetails.bankaccount.accountnumber"),
+                                        editUrl = controllers.bankdetails.routes.BankAccountNonUKController.get(index, true).toString
+                    ) {
+                        @ba.accountNumber
+                    }
                 }
-            }
+                case Some(ba: NonUKIBANNumber) => {
+                    @checkYourAnswers(  question = Messages("bankdetails.bankaccount.iban"),
+                                        editUrl = controllers.bankdetails.routes.BankAccountIbanController.get(index, true).toString
+                    ) {
+                        @ba.IBANNumber
+                    }
+                }
+                case _ => {}
+
         }
     }
 

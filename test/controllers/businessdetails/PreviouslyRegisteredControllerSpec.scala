@@ -97,7 +97,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
     "on post with valid data and load confirm address page when businessType is SoleProprietor" in new Fixture {
 
       val newRequest = requestWithUrlEncodedBody(
-        "previouslyRegistered" -> "true",
+        "previouslyRegistered" -> "false",
         "prevMLRRegNo" -> "12345678"
       )
       val reviewDtls = ReviewDetails("BusinessName", None,

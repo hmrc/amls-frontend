@@ -177,10 +177,12 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
             "bankAccountType" -> "01"
           )
 
+          val ukBankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("12345678", "000000")))
+
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(
             Some(PersonalAccount),
             Some("AccountName"),
-            Some(UKAccount("12341234", "000000"))
+            Some(ukBankAccount)
           ))))
 
           mockCacheSave[Seq[BankDetails]]

@@ -38,22 +38,22 @@ class TimeAtAdditionalAddressController @Inject() (val dataCacheConnector: DataC
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request =>
-        getData[ResponsiblePerson](request.credId, index) map {
-          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,Some(ResponsiblePersonAddressHistory(_,Some(ResponsiblePersonAddress(_,Some(additionalAddress))),_)),_,_,_,_,_,_,_,_,_,_,_, _)) =>
-            Ok(time_at_additional_address(Form2[TimeAtAddress](additionalAddress), edit, index, flow, personName.titleName))
-          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
-            Ok(time_at_additional_address(Form2(DefaultAddressHistory), edit, index, flow, personName.titleName))
-          case _ => NotFound(notFoundView)
-        }
+      getData[ResponsiblePerson](request.credId, index) map {
+        case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, Some(ResponsiblePersonAddressHistory(_, Some(ResponsiblePersonAddress(_, Some(additionalAddress))), _)), _, _, _, _, _, _, _, _, _, _, _, _)) =>
+          Ok(time_at_additional_address(Form2[TimeAtAddress](additionalAddress), edit, index, flow, personName.titleName))
+        case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _)) =>
+          Ok(time_at_additional_address(Form2(DefaultAddressHistory), edit, index, flow, personName.titleName))
+        case _ => NotFound(notFoundView)
+      }
   }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request =>
       (Form2[TimeAtAddress](request.body) match {
         case f: InvalidForm =>
-             getData[ResponsiblePerson](request.credId, index) map { rp =>
-                BadRequest(time_at_additional_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
-              }
+          getData[ResponsiblePerson](request.credId, index) map { rp =>
+            BadRequest(time_at_additional_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+          }
         case ValidForm(_, data) => {
           getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>
             (for {

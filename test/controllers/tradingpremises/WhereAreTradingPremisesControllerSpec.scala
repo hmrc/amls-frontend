@@ -172,9 +172,9 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
           val newRequest = requestWithUrlEncodedBody(
             "tradingName" -> "Trading Name",
             "addressLine1" -> "Address **1",
-            "addressLine2" -> "Address **2",
-            "addressLine3" -> "Address **3",
-            "addressLine4" -> "Address **4",
+            "addressLine2" -> "Address 2",
+            "addressLine3" -> "Address 3",
+            "addressLine4" -> "Address 4",
             "postcode" -> "AA1 1AA"
           )
 
@@ -187,11 +187,11 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
           val result = controller.post(RecordId1, false)(newRequest)
 
           val document: Document  = Jsoup.parse(contentAsString(result))
-          val errorCount = 4
+          val errorCount = 1
           val elementsWithError : Elements = document.getElementsByClass("error-notification")
           elementsWithError.size() must be(errorCount)
           for (ele: Element <- elementsWithError) {
-            ele.html() must include(Messages("err.text.validation"))
+            ele.html() must include(Messages("error.required.enter.addresslineone.regex"))
           }
         }
 
@@ -292,7 +292,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
           val result = controller.post(RecordId1, false)(newRequest)
 
           hstatus(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.max.length.address.line"))
+          contentAsString(result) must include(Messages("error.required.enter.addresslineone.charcount"))
 
         }
       }
