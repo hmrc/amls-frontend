@@ -250,6 +250,9 @@ class NewHomeAddressUKControllerSpec extends AmlsSpec {
           when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
+          when(controller.dataCacheConnector.removeByKey[NewHomeAddress](any(), meq(NewHomeAddress.key))
+            (any(), any())).thenReturn(Future.successful(emptyCache))
+
           val result = controller.post(RecordId)(requestWithParams)
 
           status(result) must be(SEE_OTHER)

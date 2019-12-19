@@ -48,5 +48,6 @@ class CommonPlayDependencies @Inject()(val amlsConfig: ApplicationConfig,
                                        val messagesApi: MessagesApi)
 
 trait MessagesRequestHelper {
-  def messagesAction(parsers: BodyParsers.Default)(implicit executionContext: ExecutionContext, messagesApi: MessagesApi) = new MessagesActionBuilderImpl[AnyContent](parsers, messagesApi)
+  def messagesAction(parsers: BodyParsers.Default)(implicit executionContext: ExecutionContext, messagesApi: MessagesApi) =
+    new MessagesActionBuilderImpl[AnyContent](parsers, messagesApi)
 }
