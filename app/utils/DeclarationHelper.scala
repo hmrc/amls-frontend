@@ -16,13 +16,15 @@
 
 package utils
 
+import cats.data.OptionT
 import controllers.declaration
 import models.responsiblepeople.{Partner, ResponsiblePerson}
 import models.status._
-import services.StatusService
+import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 
 object DeclarationHelper {
@@ -73,6 +75,39 @@ object DeclarationHelper {
       case SubmissionReadyForReview | SubmissionDecisionApproved => "submit.amendment.application"
       case ReadyForRenewal(_) | RenewalSubmitted(_) => "submit.renewal.application"
       case _ => throw new Exception("Incorrect status - Page not permitted for this status")
+    }
+  }
+
+  def promptRenewal(amlsRegistrationNo: Option[String],
+                    accountTypeId: (String, String),
+                    cacheId: String)(implicit statusService: StatusService,
+                                     renewalService: RenewalService,
+                                     hc: HeaderCarrier,
+                                     ec: ExecutionContext): Future[Boolean] = {
+    for{
+      status <- statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId)
+      inWindow <- inRenewalWindow(status)
+      complete <- renewalComplete(renewalService, cacheId)
+    } yield (inWindow, complete) match {
+      case (true, false) => true
+      case _ => false
+    }
+  }
+
+  private def inRenewalWindow(status: SubmissionStatus)(implicit hc: HeaderCarrier,
+                                                        ec: ExecutionContext): Future[Boolean] = {
+    status match {
+      case ReadyForRenewal(_) => Future.successful(true)
+      case _ => Future.successful(false)
+    }
+  }
+
+  private def renewalComplete(renewalService: RenewalService, credId: String)(implicit hc: HeaderCarrier,
+                                                                              ec: ExecutionContext): Future[Boolean] = {
+    renewalService.getRenewal(credId) flatMap {
+      case Some(renewal) =>
+        renewalService.isRenewalComplete(renewal, credId)
+      case _ => Future.successful(false)
     }
   }
 }

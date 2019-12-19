@@ -16,29 +16,57 @@
 
 package utils
 
+import models.{Country}
+import models.renewal._
 import models.responsiblepeople._
 import models.status._
+import org.joda.time.LocalDate
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import services.StatusService
+import services.{RenewalService, StatusService}
 import org.mockito.Mockito.when
 import org.mockito.Matchers.any
 import utils.DeclarationHelper._
 import play.api.test.Helpers._
+import org.mockito.Matchers.{eq => eqTo, _}
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 
 class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar {
 
   implicit val statusService = mock[StatusService]
+  implicit val renewalService = mock[RenewalService]
   implicit val headerCarrier = mock[HeaderCarrier]
 
   val amlsRegNo = Some("regNo")
   val accountTypeId = ("accountType", "accountId")
   val credId = "12341234"
+
+  private val completeRenewal = Renewal(
+    Some(InvolvedInOtherYes("test")),
+    Some(BusinessTurnover.First),
+    Some(AMLSTurnover.First),
+    Some(CustomersOutsideIsUK(true)),
+    Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+    Some(PercentageOfCashPaymentOver15000.First),
+    Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other")))))),
+    Some(TotalThroughput("01")),
+    Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
+    Some(TransactionsInLast12Months("1500")),
+    Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))),
+    Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+    Some(CETransactionsInLast12Months("123")),
+    hasChanged = true
+  )
+
+  private val inCompleteRenewal = completeRenewal.copy(
+    businessTurnover = None
+  )
 
   "currentPartnersNames" must {
     "return a sequence of full names of only undeleted partners" in {
@@ -161,6 +189,87 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
       } thenReturn Future.successful(SubmissionWithdrawn)
 
       a[Exception] mustBe thrownBy(await(statusSubtitle(amlsRegNo, accountTypeId, credId)))
+    }
+  }
+
+  "promptRenewal" must {
+    "where in renewal window" must {
+      "where renewal incomplete" must {
+        "return true" in {
+          when {
+            statusService.getStatus(any(),any(), any())(any(),any())
+          } thenReturn Future.successful(ReadyForRenewal(Some(new LocalDate())))
+
+          when(renewalService.isRenewalComplete(any(), any())(any(), any()))
+            .thenReturn(Future.successful(false))
+
+          when(renewalService.getRenewal(any())(any(), any()))
+            .thenReturn(Future.successful(Some(inCompleteRenewal)))
+
+          await(promptRenewal(amlsRegNo, accountTypeId, credId)) mustBe(true)
+        }
+      }
+
+      "where no renewal" must {
+        "return true" in {
+          when {
+            statusService.getStatus(any(),any(), any())(any(),any())
+          } thenReturn Future.successful(ReadyForRenewal(Some(new LocalDate())))
+
+          when(renewalService.isRenewalComplete(any(), any())(any(), any()))
+            .thenReturn(Future.successful(false))
+
+          when(renewalService.getRenewal(any())(any(), any()))
+            .thenReturn(Future.successful(None))
+
+          await(promptRenewal(amlsRegNo, accountTypeId, credId)) mustBe(true)
+        }
+      }
+
+      "where renewal complete" must {
+        "return false" in {
+          when {
+            statusService.getStatus(any(),any(), any())(any(),any())
+          } thenReturn Future.successful(ReadyForRenewal(Some(new LocalDate())))
+
+          when(renewalService.isRenewalComplete(any(), any())(any(), any()))
+            .thenReturn(Future.successful(true))
+
+          when(renewalService.getRenewal(any())(any(), any()))
+            .thenReturn(Future.successful(Some(completeRenewal)))
+
+          await(promptRenewal(amlsRegNo, accountTypeId, credId)) mustBe(false)
+        }
+      }
+    }
+
+    "where not in renewal window post renewal" must {
+      "return false" in {
+        when{
+          statusService.getStatus(any(),any(), any())(any(),any())
+        } thenReturn Future.successful(RenewalSubmitted(None))
+
+        when(renewalService.isRenewalComplete(any(), any())(any(), any()))
+          .thenReturn(Future.successful(true))
+
+        when(renewalService.getRenewal(any())(any(), any()))
+          .thenReturn(Future.successful(Some(completeRenewal)))
+
+        await(promptRenewal(amlsRegNo, accountTypeId, credId)) mustBe(false)
+      }
+    }
+
+    "where not in renewal window pre renewal" must {
+      "return false" in {
+        when{
+          statusService.getStatus(any(),any(),any())(any(),any())
+        } thenReturn Future.successful(SubmissionReady)
+
+        when(renewalService.getRenewal(any())(any(), any()))
+          .thenReturn(Future.successful(None))
+
+        await(promptRenewal(amlsRegNo, accountTypeId, credId)) mustBe(false)
+      }
     }
   }
 
