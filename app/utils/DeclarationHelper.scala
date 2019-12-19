@@ -69,7 +69,8 @@ object DeclarationHelper {
     }
   }
 
-  def statusSubtitle(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)(implicit statusService: StatusService, hc: HeaderCarrier): Future[String] = {
+  def statusSubtitle(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)
+                    (implicit statusService: StatusService, hc: HeaderCarrier): Future[String] = {
     statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) map {
       case SubmissionReady => "submit.registration"
       case SubmissionReadyForReview | SubmissionDecisionApproved => "submit.amendment.application"
@@ -78,12 +79,11 @@ object DeclarationHelper {
     }
   }
 
-  def promptRenewal(amlsRegistrationNo: Option[String],
-                    accountTypeId: (String, String),
-                    cacheId: String)(implicit statusService: StatusService,
-                                     renewalService: RenewalService,
-                                     hc: HeaderCarrier,
-                                     ec: ExecutionContext): Future[Boolean] = {
+  def promptRenewal(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)
+                   (implicit statusService: StatusService,
+                    renewalService: RenewalService,
+                    hc: HeaderCarrier,
+                    ec: ExecutionContext): Future[Boolean] = {
     for{
       status <- statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId)
       inWindow <- inRenewalWindow(status)
@@ -102,8 +102,8 @@ object DeclarationHelper {
     }
   }
 
-  private def renewalComplete(renewalService: RenewalService, credId: String)(implicit hc: HeaderCarrier,
-                                                                              ec: ExecutionContext): Future[Boolean] = {
+  private def renewalComplete(renewalService: RenewalService, credId: String)
+                             (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] = {
     renewalService.getRenewal(credId) flatMap {
       case Some(renewal) =>
         renewalService.isRenewalComplete(renewal, credId)
