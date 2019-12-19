@@ -34,7 +34,7 @@ class CurrentAddressController @Inject ()(val dataCacheConnector: DataCacheConne
                                           autoCompleteService: AutoCompleteService,
                                           authAction: AuthAction,
                                           val ds: CommonPlayDependencies,
-                                          val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper {
+                                          val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with AddressHelper {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request =>

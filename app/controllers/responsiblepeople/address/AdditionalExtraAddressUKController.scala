@@ -21,10 +21,10 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople._
-import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
+import play.api.mvc.MessagesControllerComponents
 import services.AutoCompleteService
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import utils.{AuthAction, ControllerHelper}
+import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.address.additional_extra_address_UK
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -35,7 +35,7 @@ class AdditionalExtraAddressUKController @Inject()(val dataCacheConnector: DataC
                                                    implicit val auditConnector: AuditConnector,
                                                    autoCompleteService: AutoCompleteService,
                                                    val ds: CommonPlayDependencies,
-                                                   val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                                   val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection with AddressHelper {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request =>

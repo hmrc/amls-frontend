@@ -17,9 +17,8 @@
 package controllers.responsiblepeople.address
 
 import connectors.DataCacheConnector
-import controllers.{AmlsBaseController, CommonPlayDependencies}
-import controllers.DefaultBaseController
 import controllers.responsiblepeople.address
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.responsiblepeople._

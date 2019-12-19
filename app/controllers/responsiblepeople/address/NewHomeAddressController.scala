@@ -17,11 +17,11 @@
 package controllers.responsiblepeople.address
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.responsiblepeople._
-import play.api.mvc.{AnyContent, Request}
+import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, ControllerHelper}
 import views.html.responsiblepeople.address.new_home_address
@@ -30,7 +30,9 @@ import scala.concurrent.Future
 
 @Singleton
 class NewHomeAddressController @Inject()(authAction: AuthAction,
-                                         val dataCacheConnector: DataCacheConnector) extends AddressHelper with DefaultBaseController {
+                                         val dataCacheConnector: DataCacheConnector,
+                                         val ds: CommonPlayDependencies,
+                                         val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with AddressHelper {
 
   def get(index: Int) = authAction.async {
     implicit request =>
