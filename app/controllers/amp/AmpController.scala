@@ -30,7 +30,7 @@ import utils.AuthAction
 
 class AmpController @Inject()(ampCacheService: AmpCacheService,
                               authAction     : AuthAction,
-                              cacheConnector : DataCacheConnector,
+                              val cacheConnector : DataCacheConnector,
                               val ds: CommonPlayDependencies,
                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 

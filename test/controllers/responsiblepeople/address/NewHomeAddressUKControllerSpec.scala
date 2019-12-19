@@ -18,7 +18,7 @@ package controllers.responsiblepeople.address
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
-import models.DateOfChange
+import models.{Country, DateOfChange}
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ThreeYearsPlus, ZeroToFiveMonths}
 import models.responsiblepeople._
 import org.joda.time.LocalDate
@@ -45,7 +45,9 @@ class NewHomeAddressUKControllerSpec extends AmlsSpec {
 
     val controller = new NewHomeAddressUKController(
       SuccessfulAuthAction,
-      dataCacheConnector
+      dataCacheConnector,
+      commonDependencies,
+      mockMcc
     )
   }
 
@@ -239,21 +241,21 @@ class NewHomeAddressUKControllerSpec extends AmlsSpec {
             additionalExtraAddress = Some(pushCurrentToExtraAdditional))
           val nResponsiblePeople = ResponsiblePerson(addressHistory = Some(upDatedHistory), hasChanged = true)
 
-          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-          when(controllers.dataCacheConnector.fetch[NewHomeDateOfChange](any(), meq(NewHomeDateOfChange.key))(any(), any()))
+          when(controller.dataCacheConnector.fetch[NewHomeDateOfChange](any(), meq(NewHomeDateOfChange.key))(any(), any()))
             .thenReturn(Future.successful(Some(NewHomeDateOfChange(Some(LocalDate.now())))))
 
-          when(controllers.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          val result = controllers.post(RecordId)(requestWithParams)
+          val result = controller.post(RecordId)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(RecordId).url))
 
-          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(),
+          verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(),
             meq(Seq(nResponsiblePeople)))(any(),any())
         }
 
@@ -314,9 +316,9 @@ class NewHomeAddressUKControllerSpec extends AmlsSpec {
             "addressLineNonUK2" -> "",
             "country" -> ""
           )
-          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
-            val result = controllers.post(RecordId)(requestWithMissingParams)
+            val result = controller.post(RecordId)(requestWithMissingParams)
           status(result) must be(BAD_REQUEST)
 
         }

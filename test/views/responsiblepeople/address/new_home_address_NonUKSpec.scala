@@ -23,7 +23,7 @@ import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
 
-class new_home_address_NonUKSpec extends AmlsViewSpec with MustMatchers {
+class new_home_address_NonUKSpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addTokenForView()

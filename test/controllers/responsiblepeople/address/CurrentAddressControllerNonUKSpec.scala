@@ -455,7 +455,6 @@ class CurrentAddressControllerNonUKSpec extends AmlsSpec {
         "isUK field is not supplied" in new Fixture {
 
           val line1MissingRequest = requestWithUrlEncodedBody()
-          val line1MissingRequest = request.withFormUrlEncodedBody()
           val responsiblePeople = ResponsiblePerson(personName = personName)
 
           when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))

@@ -33,7 +33,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
-class BankAccountNonUKControllerSpec extends AmlsSpec with MockitoSugar {
+class BankAccountNonUKControllerSpec extends AmlsSpec {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
@@ -46,7 +46,9 @@ class BankAccountNonUKControllerSpec extends AmlsSpec with MockitoSugar {
       mockCacheConnector,
       SuccessfulAuthAction,
       mock[AuditConnector],
-      mockStatusService
+      mockStatusService,
+      commonDependencies,
+      mockMcc
     )
 
   }
@@ -143,7 +145,7 @@ class BankAccountNonUKControllerSpec extends AmlsSpec with MockitoSugar {
         "given valid data in edit mode" in new Fixture {
 
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "nonUKAccountNumber" -> "1234567890123456789012345678901234567890"
           )
 
@@ -160,7 +162,7 @@ class BankAccountNonUKControllerSpec extends AmlsSpec with MockitoSugar {
         }
         "given valid data when NOT in edit mode" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "nonUKAccountNumber" -> "1234567890123456789012345678901234567890"
           )
 
@@ -181,7 +183,7 @@ class BankAccountNonUKControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with NOT_FOUND" when {
         "given an index out of bounds in edit mode" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "nonUKAccountNumber" -> "1234567890123456789012345678901234567890"
           )
 
@@ -198,7 +200,7 @@ class BankAccountNonUKControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "nonUKAccountNumber" -> "!@£$"
           )
 
@@ -214,7 +216,7 @@ class BankAccountNonUKControllerSpec extends AmlsSpec with MockitoSugar {
 
     "an account is created" must {
       "send an audit event" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "nonUKAccountNumber" -> "1234567890123456789012345678901234567890"
         )
 

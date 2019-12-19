@@ -33,9 +33,9 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
-class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
+class BankAccountIsUKControllerSpec extends AmlsSpec {
 
-  trait Fixture extends DependencyMocks { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
@@ -44,14 +44,14 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
 
     val controller = new BankAccountIsUKController(
       mockCacheConnector,
-      SuccessfulAuthAction, ds = commonDependencies,
+      SuccessfulAuthAction,
+      commonDependencies,
       mock[AuditConnector],
       mockStatusService,
       mockMcc
     )
 
   }
-
 
   "BankAccountIsUKController" when {
     "get is called" must {
@@ -113,7 +113,8 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with SEE_OTHER" when {
         "given valid data in edit mode" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+
+          val newRequest = requestWithUrlEncodedBody(
             "isUK" -> "false"
           )
 
@@ -128,10 +129,9 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.BankAccountHasIbanController.get(1).url))
         }
-
         "given valid data when NOT in edit mode" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "isUK" -> "false"
           )
 
@@ -152,7 +152,7 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with NOT_FOUND" when {
         "given an index out of bounds in edit mode" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "isUK" -> "false"
           )
 
@@ -165,10 +165,11 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
         }
       }
 
+
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "isUK" -> ""
           )
 
@@ -179,41 +180,6 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
 
           status(result) must be(BAD_REQUEST)
         }
-      }
-    }
-
-    "an account is created" must {
-      "send an audit event" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
-          "isUK" -> "false",
-          "nonUKAccountNumber" -> "1234567890123456789012345678901234567890",
-          "isIBAN" -> "false"
-        )
-
-        when(controller.auditConnector.sendEvent(any())(any(), any())).
-          thenReturn(Future.successful(Success))
-
-        mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(
-          Some(PersonalAccount),
-          Some("Test account"),
-          Some(UKAccount("8934798324", "934947"))))),
-          Some(BankDetails.key))
-
-        mockCacheSave[Seq[BankDetails]]
-
-        val result = controller.post(1)(newRequest)
-
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.SummaryController.get(1).url))
-
-        val captor = ArgumentCaptor.forClass(classOf[DataEvent])
-        verify(controller.auditConnector).sendEvent(captor.capture())(any(), any())
-
-        captor.getValue match {
-          case DataEvent(_, _, _, _, detail, _) =>
-            detail("accountName") mustBe "Test account"
-        }
-
       }
     }
   }

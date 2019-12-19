@@ -25,8 +25,6 @@ import models.amp.Amp
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.OptionValues
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
 import play.api.libs.json.{JsValue, Json}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -36,7 +34,7 @@ import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
-class AmpControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with OptionValues {
+class AmpControllerSpec extends AmlsSpec with OptionValues {
 
   val dateVal = LocalDateTime.now
 
@@ -64,7 +62,7 @@ class AmpControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures wit
     val credId = "someId"
     val mockCacheConnector = mock[DataCacheConnector]
 
-    val controller = new AmpController(ampCacheService, SuccessfulAuthAction, mockCacheConnector)
+    val controller = new AmpController(ampCacheService, SuccessfulAuthAction, mockCacheConnector, commonDependencies, mockMcc)
   }
 
   "get returns 200" when {
@@ -106,8 +104,6 @@ class AmpControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures wit
 
   "accept" must {
     "set accept flag to true and redirect to RegistrationProgressController" in new Fixture {
-      implicit lazy val materializer: Materializer = app.materializer
-
       when(controller.cacheConnector.fetch[Amp](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(completeJson.as[Amp])))
 
