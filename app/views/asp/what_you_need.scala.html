@@ -25,9 +25,10 @@
 
 @whatyouneed(
     title = Messages("title.wyn") + " - " + Messages("summary.asp"),
-    heading = header,
-    sidebar = sidebar
+    heading = header
 ) {
+
+    @components.user_attention_saving()
 
     <p>@Messages("asp.whatyouneed.subheading")</p>
 
@@ -43,12 +44,4 @@
         returnLink = true,
         id=Some("aspwhatyouneed-button")
     )
-
-}
-
-@sidebar = {
-    <div class="user-attention">
-        <h2 class="heading-small">@Messages("main.sidebar.title")</h2>
-        <p>@Messages("main.sidebar.information")</p>
-    </div>
 }
