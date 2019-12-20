@@ -21,11 +21,16 @@ import connectors.DataCacheConnector
 import controllers.DefaultBaseController
 import forms._
 import models.declaration.{RenewRegistration, RenewRegistrationNo, RenewRegistrationYes}
+import play.api.mvc.Result
+import services.ProgressService
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
-import scala.concurrent.Future
+
+import scala.concurrent.{ExecutionContext, Future}
 
 class RenewRegistrationController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                            val authAction: AuthAction) extends DefaultBaseController {
+                                            val authAction: AuthAction,
+                                            val progressService: ProgressService) extends DefaultBaseController {
 
   def get() = authAction.async {
     implicit request =>
@@ -44,15 +49,28 @@ class RenewRegistrationController @Inject()(val dataCacheConnector: DataCacheCon
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.declaration.renew_registration(f)))
         case ValidForm(_, data) =>
-          for {
-            _ <- dataCacheConnector.save[RenewRegistration](request.credId, RenewRegistration.key, data)
-          } yield redirectDependingOnResponse(data)
+          dataCacheConnector.save[RenewRegistration](request.credId, RenewRegistration.key, data)
+          redirectDependingOnResponse(data, request.amlsRefNumber, request.accountTypeId, request.credId)
       }
     }
   }
 
-  private def redirectDependingOnResponse(data: RenewRegistration) = data match {
-    case RenewRegistrationYes => Redirect(controllers.renewal.routes.WhatYouNeedController.get())
-    case RenewRegistrationNo  => Redirect(controllers.declaration.routes.WhoIsRegisteringController.get())
+  private def redirectDependingOnResponse(data: RenewRegistration,
+                                          amlsRefNo: Option[String],
+                                          accountTypeId: (String, String),
+                                          credId: String)
+                                         (implicit hc: HeaderCarrier, ec: ExecutionContext) = data match {
+    case RenewRegistrationYes => Future.successful(Redirect(controllers.renewal.routes.WhatYouNeedController.get()))
+    case RenewRegistrationNo  => resolveDeclarationDest(amlsRefNo, accountTypeId, credId)
+  }
+
+  private def resolveDeclarationDest(amlsRefNo: Option[String],
+                                     accountTypeId: (String, String),
+                                     credId: String)
+                                    (implicit hc: HeaderCarrier, ec: ExecutionContext) = {
+    progressService.getSubmitRedirect(amlsRefNo, accountTypeId, credId) map {
+      case Some(url) => Redirect(url)
+      case _ => InternalServerError("Could not get data for redirect")
+    }
   }
 }
