@@ -159,7 +159,8 @@ class LandingController @Inject()(val landingService: LandingService,
         case (true, Some(abt)) =>
           landingService.setAltCorrespondenceAddress(abt, cacheId) flatMap { _ =>
             Logger.debug(s"[AMLSLandingController][preApplicationComplete]: landingService.setAltCorrespondenceAddress returned")
-            val result: Future[Boolean] = hasIncompleteResponsiblePeople(amlsRegistrationNumber, accountTypeId, cacheId)
+            //below to be called logic to decide if the Login Events Page should be displayed or not (second place below)
+            val result: Future[Boolean] = Future.successful(false)
             result.map {
               case true =>
                 Logger.debug(s"[AMLSLandingController][preApplicationComplete]: has Incomplete RPs - redirecting to LoginEvent")
@@ -189,7 +190,8 @@ class LandingController @Inject()(val landingService: LandingService,
         case Some(x) => x.previouslySubmitted.contains(true)
         case _ => false
       }
-      incomplete <- hasIncompleteResponsiblePeople(amlsRegistrationNumber, accountTypeId, cacheId)
+      //below to be called logic to decide if the Login Events Page should be displayed or not
+      incomplete <- Future.successful(false)
     } yield (incomplete, dupe)
 
     loginEvent.map {
