@@ -25,9 +25,9 @@
 
 @whatyouneed(
     title = Messages("responsiblepeople.whomustregister.ymr") + " - " + Messages("summary.responsiblepeople"),
-    heading = header,
-    sidebar = sidebar
+    heading = header
 ) {
+    @components.user_attention_saving()
 
     <p>@Messages("responsiblepeople.whomustregister.must_register")</p>
 
@@ -47,11 +47,4 @@
         id=Some("tpwhomustregister-button")
     )
 
-}
-
-@sidebar = {
-    <div class="user-attention">
-        <h2 class="heading-small">@Messages("main.sidebar.title")</h2>
-        <p>@Messages("main.sidebar.information")</p>
-    </div>
 }
