@@ -163,7 +163,7 @@ class LandingController @Inject()(val landingService: LandingService,
             val result: Future[Boolean] = Future.successful(false)
             result.map {
               case true =>
-                Logger.debug(s"[AMLSLandingController][preApplicationComplete]: has Incomplete RPs - redirecting to LoginEvent")
+                Logger.debug(s"[AMLSLandingController][preApplicationComplete]: redirecting to LoginEvent")
                 Redirect(controllers.routes.LoginEventController.get())
               case _ =>
                 Logger.debug(s"[AMLSLandingController][preApplicationComplete]: has complete RPs - redirecting to status")
@@ -191,8 +191,8 @@ class LandingController @Inject()(val landingService: LandingService,
         case _ => false
       }
       //below to be called logic to decide if the Login Events Page should be displayed or not
-      incomplete <- Future.successful(false)
-    } yield (incomplete, dupe)
+      redirectToEventPage <- Future.successful(false)
+    } yield (redirectToEventPage, dupe)
 
     loginEvent.map {
       case (true, false) => Redirect(controllers.routes.LoginEventController.get())
