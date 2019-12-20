@@ -21,12 +21,11 @@ import connectors.DataCacheConnector
 import controllers.DefaultBaseController
 import forms._
 import models.declaration.{RenewRegistration, RenewRegistrationNo, RenewRegistrationYes}
-import play.api.mvc.Result
 import services.ProgressService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
-
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{Future}
 
 class RenewRegistrationController @Inject()(val dataCacheConnector: DataCacheConnector,
                                             val authAction: AuthAction,
@@ -58,16 +57,14 @@ class RenewRegistrationController @Inject()(val dataCacheConnector: DataCacheCon
   private def redirectDependingOnResponse(data: RenewRegistration,
                                           amlsRefNo: Option[String],
                                           accountTypeId: (String, String),
-                                          credId: String)
-                                         (implicit hc: HeaderCarrier, ec: ExecutionContext) = data match {
+                                          credId: String)(implicit hc: HeaderCarrier)= data match {
     case RenewRegistrationYes => Future.successful(Redirect(controllers.renewal.routes.WhatYouNeedController.get()))
     case RenewRegistrationNo  => resolveDeclarationDest(amlsRefNo, accountTypeId, credId)
   }
 
   private def resolveDeclarationDest(amlsRefNo: Option[String],
                                      accountTypeId: (String, String),
-                                     credId: String)
-                                    (implicit hc: HeaderCarrier, ec: ExecutionContext) = {
+                                     credId: String)(implicit hc: HeaderCarrier) = {
     progressService.getSubmitRedirect(amlsRefNo, accountTypeId, credId) map {
       case Some(url) => Redirect(url)
       case _ => InternalServerError("Could not get data for redirect")
