@@ -63,7 +63,7 @@ class ServicesOfAnotherTCSPSpec extends PlaySpec with MockitoSugar {
       "fail when no option selected" in {
         ServicesOfAnotherTCSP.formRule.validate(Map.empty) must
           be(Invalid(Seq(
-            (Path \ "servicesOfAnotherTCSP") -> Seq(ValidationError("error.required.tcsp.services.another.tcsp"))
+            (Path \ "servicesOfAnotherTCSP") -> Seq(ValidationError("error.required.tcsp.services.another.tcsp.registered"))
           )))
 
       }
@@ -77,7 +77,7 @@ class ServicesOfAnotherTCSPSpec extends PlaySpec with MockitoSugar {
 
         ServicesOfAnotherTCSP.formRule.validate(data) must
           be(Invalid(Seq(
-            (Path \ "mlrRefNumber") -> Seq(ValidationError("error.invalid.mlr.number"))
+            (Path \ "mlrRefNumber") -> Seq(ValidationError("error.required.tcsp.services.another.tcsp.number"))
           )))
       }
 
@@ -90,7 +90,7 @@ class ServicesOfAnotherTCSPSpec extends PlaySpec with MockitoSugar {
         )
 
         ServicesOfAnotherTCSP.formRule.validate(data) must be(
-          Invalid(Seq((Path \ "mlrRefNumber") -> Seq(ValidationError("error.invalid.mlr.number"))
+          Invalid(Seq((Path \ "mlrRefNumber") -> Seq(ValidationError("error.tcsp.services.another.tcsp.number.length"))
           )))
       }
     }

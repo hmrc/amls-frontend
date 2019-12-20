@@ -92,7 +92,7 @@ class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
 
       "show an error with an invalid details value" in {
         val form = Map("services[]" -> Seq("08"), "details" -> Seq("$3<>7485/45"))
-        val expectedResult = Invalid(Seq(Path \ "details" -> Seq(ValidationError("err.text.validation"))))
+        val expectedResult = Invalid(Seq(Path \ "details" -> Seq(ValidationError("error.required.tcsp.provided_services.details.punctuation"))))
 
         ProvidedServices.formReads.validate(form) must be(expectedResult)
       }
