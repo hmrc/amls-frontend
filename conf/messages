@@ -31,6 +31,7 @@ error.invalid.date.before.2100 = The date your business started or will start ac
 error.invalid.date.tp.before.2100 = The date your business started or will start trading must be before 2100
 error.invalid.date.not.real = Enter a real date for when your business started or will start activities
 error.invalid.date.tp.not.real = Enter a real date for when your business started or will start trading from these premises
+error.invalid.date.agent.not.real = Enter a real date of birth
 
 error.required.address.line1 = Enter address line 1
 error.required.address.line2 = Enter address line 2
