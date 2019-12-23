@@ -43,10 +43,9 @@ class LoginEventSpec extends AmlsSpec with MustMatchers {
       def view = views.html.login_event()
 
       html must include(Messages("login-event.event-messages-header"))
-      html must include(Messages("login-event.date-of-birth-message"))
-      html must include(Messages("login-event.fit-and-proper-message"))
-      html must include(Messages("login-event.approval-check-charge-message"))
-      html must include(Messages("login-event.update-responsible-people"))
+      html must include(Messages("login-event.property-redress"))
+      html must include(Messages("login-event.property-ombudsman"))
+      html must include(Messages("login-event.update-now"))
       html must include(Messages("login-event.skip-for-now"))
     }
   }

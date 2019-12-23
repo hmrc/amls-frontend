@@ -636,7 +636,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
           when(businessMatching.isComplete) thenReturn true
           when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(businessMatching))
           when(cacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(completeATB))
-          when(cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(None)
+          when(cacheMap.getEntry[EstateAgentBusiness](meq(EstateAgentBusiness.key))(any())).thenReturn(None)
           when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
             .thenReturn(Future.successful(NotCompleted, None))
 

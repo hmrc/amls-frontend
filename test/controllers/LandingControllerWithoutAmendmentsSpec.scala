@@ -25,6 +25,7 @@ import generators.StatusGenerator
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessdetails.BusinessDetails
 import models.businessmatching._
+import models.estateagentbusiness.EstateAgentBusiness
 import models.responsiblepeople.TimeAtAddress.OneToThreeYears
 import models.responsiblepeople._
 import models.status._
@@ -139,7 +140,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
           when(complete.isComplete) thenReturn true
           when(emptyCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
           when(emptyCacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(completeATB))
-          when(emptyCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(None)
+          when(emptyCacheMap.getEntry[EstateAgentBusiness](meq(EstateAgentBusiness.key))(any())).thenReturn(None)
 
           val result = controllerNoAmlsNumber.get()(request)
           status(result) must be(SEE_OTHER)
@@ -154,7 +155,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
           when(complete.isComplete) thenReturn true
           when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
           when(cacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(completeATB))
-          when(cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(None)
+          when(cacheMap.getEntry[EstateAgentBusiness](meq(EstateAgentBusiness.key))(any())).thenReturn(None)
           when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
             .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0)))))
           when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(Some(cacheMap))

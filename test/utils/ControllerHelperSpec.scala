@@ -17,7 +17,8 @@
 package utils
 
 import forms.InvalidForm
-import models.businessactivities.{BusinessActivities, UkAccountantsAddress, WhoIsYourAccountant, WhoIsYourAccountantIsUk, WhoIsYourAccountantName}
+import models.businessactivities._
+import models.estateagentbusiness.{EstateAgentBusiness, OmbudsmanServices, PropertyRedressScheme, ThePropertyOmbudsman}
 import models.responsiblepeople._
 import models.supervision._
 import org.joda.time.LocalDate
@@ -46,6 +47,11 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
     )
   }
 
+  val eabPropertyOmbudsman =  EstateAgentBusiness(redressScheme = Some(ThePropertyOmbudsman))
+  val eabPropertyRedress =  EstateAgentBusiness(redressScheme = Some(PropertyRedressScheme))
+  val eabOmbudsmanServices = EstateAgentBusiness(redressScheme = Some(OmbudsmanServices))
+  val eabOther = EstateAgentBusiness(redressScheme = Some(models.estateagentbusiness.Other("Other")))
+
   val accountantNameCompleteModel = Some(BusinessActivities(
     whoIsYourAccountant = Some(WhoIsYourAccountant(
       Some(WhoIsYourAccountantName("Accountant name", None)),
@@ -56,6 +62,35 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
     whoIsYourAccountant = None))
 
   "ControllerHelper" must {
+
+    "hasInvalidRedressScheme" must {
+
+      "return false" when {
+        "eab seq is None" in {
+          ControllerHelper.hasInvalidRedressScheme(None) mustEqual false
+        }
+
+        "when 'PropertyOmbudsman' is selected" in {
+          ControllerHelper.hasInvalidRedressScheme(Some(eabPropertyOmbudsman)) mustEqual false
+        }
+
+        "when 'PropertyRedressScheme' is selected" in {
+          ControllerHelper.hasInvalidRedressScheme(Some(eabPropertyRedress)) mustEqual false
+        }
+
+      }
+
+      "return true" when {
+        "when 'ObudsmanServices' is selected" in {
+          ControllerHelper.hasInvalidRedressScheme(Some(eabOmbudsmanServices)) mustEqual true
+        }
+
+        "when 'Other' is selected" in {
+          ControllerHelper.hasInvalidRedressScheme(Some(eabOther)) mustEqual true
+        }
+      }
+    }
+
     "hasIncompleteResponsiblePerson" must {
 
       "return false" when {

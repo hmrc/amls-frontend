@@ -2480,14 +2480,15 @@ urr.bannertext = Get involved in making government services better (opens in a n
 urr.nothanks = No thanks
 
 ############################### LoginEvents ###############################
-login-event.title = New information needed for each responsible person
-login-event.heading = New information needed for each responsible person
-login-event.update-responsible-people = Update your responsible people now
+login-event.title = Tell us which redress scheme you're registered with
+login-event.heading = Tell us which redress scheme you're registered with
+login-event.event-messages-header = There are now only 2 government-approved redress schemes:
+
+login-event.property-redress = Property Redress Scheme
+login-event.property-ombudsman = The Property Ombudsman
+
+login-event.update-now = Update your information now
 login-event.skip-for-now = Skip for now and continue to the service
-login-event.date-of-birth-message = their date of birth
-login-event.fit-and-proper-message = if they have passed the fit and proper test
-login-event.approval-check-charge-message = if they have been charged for the approval check
-login-event.event-messages-header = For each responsible person, you must tell us:
 
 ############################### SiteBack ###############################
 site.back = Back
