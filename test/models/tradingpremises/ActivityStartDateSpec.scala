@@ -51,7 +51,7 @@ class ActivityStartDateSpec extends PlaySpec {
         )
 
         ActivityStartDate.formRule.validate(model) must be(Invalid(Seq(Path \ "startDate" -> Seq(
-          ValidationError("error.invalid.date.not.real")))))
+          ValidationError("error.invalid.date.tp.not.real")))))
       }
 
       "fail validation" when {
@@ -62,7 +62,7 @@ class ActivityStartDateSpec extends PlaySpec {
             "startDate.year" -> Seq("2100")
           )
           ActivityStartDate.formRule.validate(model) must be(Invalid(Seq(
-            Path \ "startDate" -> Seq(ValidationError("error.invalid.date.before.2100"))
+            Path \ "startDate" -> Seq(ValidationError("error.invalid.date.tp.before.2100"))
           )))
         }
       }
@@ -89,7 +89,7 @@ class ActivityStartDateSpec extends PlaySpec {
             "startDate.year" -> Seq("2150")
           )
           ActivityStartDate.formRule.validate(model) must be(Invalid(Seq(
-            Path \ "startDate" -> Seq(ValidationError("error.invalid.date.before.2100"))
+            Path \ "startDate" -> Seq(ValidationError("error.invalid.date.tp.before.2100"))
           )))
         }
       }

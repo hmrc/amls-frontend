@@ -228,6 +228,14 @@ object FormTypes {
       ).tupled andThen dateRuleMapping(messagePrefix) andThen jodaLocalDateR("yyyy-MM-dd").withMessage("error.invalid.date.not.real")
   }.repath(_ => Path)
 
+  def newLocalDateRuleWithPatternTP(messagePrefix: String): Rule[UrlFormEncoded, LocalDate] = From[UrlFormEncoded] { __ =>
+    (
+      (__ \ "year").read[String] ~
+        (__ \ "month").read[String] ~
+        (__ \ "day").read[String]
+      ).tupled andThen dateRuleMapping(messagePrefix) andThen jodaLocalDateR("yyyy-MM-dd").withMessage("error.invalid.date.tp.not.real")
+  }.repath(_ => Path)
+
   // Date rule logic that makes use of LocalDate.now should be retrieved via a def.
   // A `val` keyword represents a value. It’s an immutable reference, meaning that its value never changes.
   // Once assigned it will always keep the same value.
@@ -286,7 +294,7 @@ object FormTypes {
     pastStartDateRuleWithMsg(messagePast) andThen
     maxDateWithMsg(new LocalDate(2099, 12, 31), messageFuture)
 
-  def newAllowedPastAndFutureDateRule1700(messagePrefix: String = "", messagePast: String = "", messageFuture: String = ""): Rule[UrlFormEncoded, LocalDate] = newLocalDateRuleWithPattern(messagePrefix) andThen
+  def newAllowedPastAndFutureDateRule1700(messagePrefix: String = "", messagePast: String = "", messageFuture: String = ""): Rule[UrlFormEncoded, LocalDate] = newLocalDateRuleWithPatternTP(messagePrefix) andThen
     pastStartDateRuleWithMsg1700(messagePast) andThen
     maxDateWithMsg(new LocalDate(2099, 12, 31), messageFuture)
 
