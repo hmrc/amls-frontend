@@ -249,11 +249,11 @@ class LandingController @Inject()(val landingService: LandingService,
         landingService.cacheMap(cacheId).map {
           cache =>
             Logger.debug("[AMLSLandingController][hasIncompleteRedressScheme]: checking cacheMap for incomplete redress scheme")
-            val hasIncompleteRps: Option[Boolean] = for {
+            val hasInvalidRedressScheme: Option[Boolean] = for {
               eab <- cache.map(_.getEntry[EstateAgentBusiness](EstateAgentBusiness.key))
             } yield ControllerHelper.hasInvalidRedressScheme(eab)
-            Logger.debug(s"[AMLSLandingController][hasIncompleteRedressScheme]: Rps.isComplete = ${hasIncompleteRps.contains(true)}")
-            hasIncompleteRps.contains(true)
+            Logger.debug(s"[AMLSLandingController][hasIncompleteRedressScheme]: eab.isRedressInvalid = ${hasInvalidRedressScheme.contains(true)}")
+            hasInvalidRedressScheme.contains(true)
         }
     }
   }

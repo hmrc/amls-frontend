@@ -66,7 +66,7 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
     "hasInvalidRedressScheme" must {
 
       "return false" when {
-        "eab seq is None" in {
+        "eab is None" in {
           ControllerHelper.hasInvalidRedressScheme(None) mustEqual false
         }
 
@@ -81,7 +81,7 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
       }
 
       "return true" when {
-        "when 'ObudsmanServices' is selected" in {
+        "when 'OmbudsmanServices' is selected" in {
           ControllerHelper.hasInvalidRedressScheme(Some(eabOmbudsmanServices)) mustEqual true
         }
 
