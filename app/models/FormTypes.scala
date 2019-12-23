@@ -282,9 +282,13 @@ object FormTypes {
     pastStartDateRuleWithMsg(messagePast) andThen
     maxDateWithMsg(LocalDate.now, messageFuture)
 
+  def newAllowedPastAndEndOfCenturyDateRule(messagePrefix: String = "", messagePast: String = "", messageFuture: String = ""): Rule[UrlFormEncoded, LocalDate] = newLocalDateRuleWithPattern(messagePrefix) andThen
+    pastStartDateRuleWithMsg(messagePast) andThen
+    maxDateWithMsg(new LocalDate(2099, 12, 31), messageFuture)
+
   def newAllowedPastAndFutureDateRule1700(messagePrefix: String = "", messagePast: String = "", messageFuture: String = ""): Rule[UrlFormEncoded, LocalDate] = newLocalDateRuleWithPattern(messagePrefix) andThen
     pastStartDateRuleWithMsg1700(messagePast) andThen
-    maxDateWithMsg(LocalDate.now, messageFuture)
+    maxDateWithMsg(new LocalDate(2099, 12, 31), messageFuture)
 
   val dateOfChangeActivityStartDateRuleMapping = Rule.fromMapping[(Option[LocalDate], LocalDate), LocalDate] {
     case (Some(d1), d2) if d2.isAfter(d1) => Valid(d2)
