@@ -75,7 +75,7 @@ class ActivityStartDateSpec extends PlaySpec {
             "startDate.year" -> Seq("1699")
           )
           ActivityStartDate.formRule.validate(model) must be(Invalid(Seq(
-            Path \ "startDate" -> Seq(ValidationError("error.invalid.date.after.1700"))
+            Path \ "startDate" -> Seq(ValidationError("error.invalid.date.tp.after.1700"))
           )))
         }
       }

@@ -26,6 +26,7 @@ error.required.date.year.month = Date your business started or will start activi
 error.required.date.year.month.day = Enter the date your business did or will start activities that need to be registered
 error.required.date.year.day = Date your business started or will start activities must include a day and year
 error.invalid.date.after.1700 = The date your business started or will start activities must be on or after 1700
+error.invalid.date.tp.after.1700 = The date your business started or will start trading must be on or after 1700
 error.invalid.date.after.1900 = The date your business started or will start activities must be on or after 1900
 error.invalid.date.before.2100 = The date your business started or will start activities must be before 2100
 error.invalid.date.tp.before.2100 = The date your business started or will start trading must be before 2100
