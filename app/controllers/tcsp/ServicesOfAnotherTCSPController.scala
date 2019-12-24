@@ -36,7 +36,7 @@ class ServicesOfAnotherTCSPController @Inject()(
 
   val NAME = "servicesOfAnotherTCSP"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(NAME)
-  implicit val boolRead = utils.BooleanFormReadWrite.formRule(NAME, "error.required.hvd.receive.cash.payments")
+  implicit val boolRead = utils.BooleanFormReadWrite.formRule(NAME, "error.required.tcsp.services.another.tcsp")
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

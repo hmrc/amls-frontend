@@ -26,9 +26,13 @@ error.required.date.year.month = Date your business started or will start activi
 error.required.date.year.month.day = Enter the date your business did or will start activities that need to be registered
 error.required.date.year.day = Date your business started or will start activities must include a day and year
 error.invalid.date.after.1700 = The date your business started or will start activities must be on or after 1700
+error.invalid.date.tp.after.1700 = The date your business started or will start trading must be on or after 1700
 error.invalid.date.after.1900 = The date your business started or will start activities must be on or after 1900
 error.invalid.date.before.2100 = The date your business started or will start activities must be before 2100
+error.invalid.date.tp.before.2100 = The date your business started or will start trading must be before 2100
 error.invalid.date.not.real = Enter a real date for when your business started or will start activities
+error.invalid.date.tp.not.real = Enter a real date for when your business started or will start trading from these premises
+error.invalid.date.agent.not.real = Enter a real date of birth
 
 error.required.address.line1 = Enter address line 1
 error.required.address.line2 = Enter address line 2
@@ -394,12 +398,19 @@ error.required.enter.addresslinefour.charcount = Address line 4 must be 35 chara
 
 ############################### Trust and company service providers ###############################
 
-error.required.tcsp.provided_services.services = Select one or more options to show the services your business provides
-error.required.tcsp.provided_services.details = Describe the services that your business provides
-error.required.tcsp.service.providers = Select one or more options to show the kind of Trust or Company Service Provider you are
+error.required.tcsp.provided_services.services = Select which services your business provides
+error.required.tcsp.provided_services.details = Enter the services your business provides
+error.required.tcsp.provided_services.details.length = Services must be 255 characters or less
+error.required.tcsp.provided_services.details.punctuation = Services can include letters a to z, numbers, spaces and punctuation
+
+error.required.tcsp.service.providers = Select the type of trust or company service provider you are
 error.required.tcsp.off.the.shelf.companies = Select yes if you only sell off-the-shelf companies
-error.required.tcsp.complex.corporate.structures = Select yes if you create complex corporate structures for clients, or plan to
-error.required.tcsp.services.another.tcsp = Select yes if you use the services of another Trust or Company Service Provider
+error.required.tcsp.complex.corporate.structures = Select yes if you create or will create complex corporate structures for clients
+error.required.tcsp.services.another.tcsp = Select yes if your business uses the services of another trust or company service provider
+error.required.tcsp.services.another.tcsp.registered = Select yes if your trust or company service provider is registered with HMRC under the Money Laundering Regulations
+error.required.tcsp.services.another.tcsp.number = Enter your trust or company service provider’s Money Laundering Regulations number
+error.tcsp.services.another.tcsp.number.length = Money Laundering Regulations number must be between 8 and 15 characters
+error.tcsp.services.another.tcsp.number.punctuation = Money Laundering Regulations number must only include numbers and letters a to z
 
 ############################### Accountancy service provide ###############################
 error.required.asp.other.business.tax.matters = Select yes if you’re registered with HMRC to handle other businesses’ tax matters
@@ -1123,8 +1134,8 @@ withdrawal.reason.lbl.03 = I‘m supervised by another body
 withdrawal.reason.lbl.04 = Other
 withdrawal.reason.lbl.specify.other.reason = Please specify
 
-main.sidebar.title = Automatic saving
-main.sidebar.information = Information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
+whatYouNeed.attention.title = Automatic saving
+whatYouNeed.attention.information = Information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
 
 aboutyou.yourdetails.title = What’s your name?
 aboutyou.rolewithinbusiness.title = What’s your role in the business?

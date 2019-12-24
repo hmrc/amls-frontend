@@ -48,7 +48,7 @@ class bank_account_non_uk_ibanSpec extends AmlsViewSpec {
 
     override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_iban(form2, false, 0)
 
-    heading.html() must be(Messages("bankdetails.bankaccount.iban.title"))
+    heading.text must be(Messages("bankdetails.bankaccount.iban.title"))
   }
 
   "have a back link" in new ViewFixture {

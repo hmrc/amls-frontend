@@ -32,23 +32,13 @@
 ) {
 
     @form(f, controllers.bankdetails.routes.BankAccountIbanController.post(index, edit)) {
-
-        @fieldsetWithErrorGroup(
-            f = f("accountDetails"),
+        @input(
+            field = f("IBANNumber"),
             heading = "bankdetails.bankaccount.iban.title",
             section = "summary.bankdetails",
-            panel = false,
-            classes = Seq("inline")
-        ) {
-            @input(
-                field = f("IBANNumber"),
-                labelText = "bankdetails.bankaccount.iban",
-                hintText = "bankdetails.bankaccount.iban.hint",
-                attrTitle = "bankdetails.bankaccount.iban.hint"
-            )
-        }
-
-        @submit(edit)
+            hintText = "bankdetails.bankaccount.iban.hint",
+            attrTitle = "bankdetails.bankaccount.iban.hint"
+        )
+        @submit()
     }
-
 }

@@ -173,7 +173,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("error.invalid.date.past"))
+        contentAsString(result) must include(Messages("error.invalid.date.before.2100"))
       }
     }
   }

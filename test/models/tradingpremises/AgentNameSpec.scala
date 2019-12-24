@@ -39,8 +39,6 @@ class AgentNameSpec extends AmlsSpec {
 
     }
 
-
-
     "throw error when required date of birth field is missing" in {
       val noContentModel = Map("agentName" -> Seq("sometext")) ++ Map(
         "agentDateOfBirth.day" -> Seq(""),

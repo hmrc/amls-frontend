@@ -28,9 +28,10 @@
 
 @whatyouneed(
     title = Messages("title.wyn") + " - " + Messages("summary.tradingpremises"),
-    heading = header,
-    sidebar = sidebar
+    heading = header
 ) {
+
+    @components.user_attention_saving()
 
     <p>@Messages("tradingpremises.whatyouneed.requiredinfo.heading")</p>
 
@@ -75,11 +76,4 @@
     }
 
 
-}
-
-@sidebar = {
-    <div class="user-attention">
-        <h2 class="heading-small">@Messages("main.sidebar.title")</h2>
-        <p>@Messages("main.sidebar.information")</p>
-    </div>
 }
