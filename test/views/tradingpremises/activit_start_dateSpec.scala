@@ -18,7 +18,7 @@ package views.tradingpremises
 
 import forms.{EmptyForm, InvalidForm}
 import org.scalatest.MustMatchers
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import models.tradingpremises.Address
@@ -26,10 +26,10 @@ import play.api.i18n.Messages
 import views.Fixture
 
 
-class activit_start_dateSpec extends AmlsSpec with MustMatchers {
+class activit_start_dateSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "activit_start_date view" must {

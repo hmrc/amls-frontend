@@ -19,13 +19,13 @@ package views.confirmation
 import generators.PaymentGenerator
 import models.confirmation.Currency
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class RenewalConfirmationViewSpec extends AmlsSpec with PaymentGenerator {
+class RenewalConfirmationViewSpec extends AmlsViewSpec with PaymentGenerator {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     val continueHref = "http://google.co.uk"
 

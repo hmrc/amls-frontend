@@ -16,35 +16,22 @@
 
 package utils
 
-import org.mockito.Matchers._
-import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.test.FakeRequest
-import uk.gov.hmrc.domain.Org
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.SessionKeys
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.frontend.auth.connectors.domain._
-
-import scala.concurrent.Future
 
 trait AuthorisedFixture extends MockitoSugar {
 
-    var authConnector = mock[AuthConnector]
+  var authConnector = mock[AuthConnector]
 
-  val authority = Authority(
-    "Test User",
-    Accounts(org = Some(OrgAccount("org/1234", Org("1234")))), None, None, CredentialStrength.Strong ,ConfidenceLevel.L50, None, None,None, ""
-  )
-
-  implicit val authRequest = FakeRequest().withSession(
+  val authRequest = FakeRequest().withSession(
     SessionKeys.sessionId -> "SessionId",
     SessionKeys.token -> "Token",
     SessionKeys.userId -> "Test User",
     SessionKeys.authToken -> ""
   )
-  when(authConnector.currentAuthority(any(), any())) thenReturn Future.successful(Some(authority))
 }
-
 
 
 

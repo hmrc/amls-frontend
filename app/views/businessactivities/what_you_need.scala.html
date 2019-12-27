@@ -16,7 +16,8 @@
 
 @import include._
 @import forms2._
-@(nextPageUrl: String)(implicit request: Request[_],m:Messages)
+@import config.{ ApplicationConfig}
+@(nextPageUrl: String)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()

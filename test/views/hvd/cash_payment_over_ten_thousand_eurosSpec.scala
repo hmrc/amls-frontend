@@ -22,14 +22,14 @@ import models.hvd
 import models.hvd.CashPaymentOverTenThousandEuros
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
 
-class cash_payment_over_ten_thousand_eurosSpec extends AmlsSpec with MustMatchers  {
+class cash_payment_over_ten_thousand_eurosSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "cash_payment view" must {

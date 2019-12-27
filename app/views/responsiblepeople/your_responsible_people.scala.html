@@ -16,12 +16,13 @@
 
 @import include._
 @import include.forms2._
+@import config.{ ApplicationConfig}
 @import models.responsiblepeople.ResponsiblePerson
 @import utils.StatusConstants
 @import forms.EmptyForm
 @import config.ApplicationConfig
 
-@(responsiblePeopleComplete: Seq[(ResponsiblePerson, Int)], responsiblePeopleIncomplete: Seq[(ResponsiblePerson, Int)])(implicit request: Request[_], m: Messages)
+@(responsiblePeopleComplete: Seq[(ResponsiblePerson, Int)], responsiblePeopleIncomplete: Seq[(ResponsiblePerson, Int)])(implicit request: Request[_], m: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @rpDetail(rp: ResponsiblePerson) = {
 @rp.personName.map(pn => pn.fullName)

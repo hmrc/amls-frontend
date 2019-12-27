@@ -25,7 +25,7 @@ import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
@@ -34,14 +34,13 @@ import scala.concurrent.Future
 
 class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val request = addToken(authRequest)
 
     val controller = new VATRegisteredController (
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction
-      )
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -96,7 +95,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
         "go to RegisteredForSelfAssessmentController" when {
           "edit = false" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "registeredForVAT" -> "true",
               "vrnNumber" -> "123456789",
               "personName" -> "Person Name"
@@ -117,7 +116,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
         "go to DetailedAnswersController" when {
           "edit = true" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "registeredForVAT" -> "true",
               "vrnNumber" -> "123456789",
               "personName" -> "Person Name"
@@ -139,7 +138,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
       "given invalid data" must {
         "respond with BAD_REQUEST" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "registeredForVATYes" -> "1234567890",
             "personName" -> "Person Name"
           )
@@ -153,7 +152,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
       "Responsible Person cannot be found with given index" must {
         "respond with NOT_FOUND" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "registeredForVAT" -> "true",
             "vrnNumber" -> "123456789",
             "personName" -> "Person Name"

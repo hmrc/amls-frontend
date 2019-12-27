@@ -23,7 +23,7 @@ import models.businessmatching.{AccountancyServices, BusinessMatching, MoneyServ
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
@@ -34,13 +34,12 @@ import scala.concurrent.Future
 
 class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new DocumentRiskAssessmentController (
       dataCacheConnector = mock[DataCacheConnector],
-      SuccessfulAuthAction
-    )
+      SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -81,7 +80,7 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
       "when edit is false" must {
         "on post with valid data redirect to check your answers page when businessActivity is ASP" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "riskassessments[0]" -> "01",
             "riskassessments[1]" -> "02"
           )
@@ -107,7 +106,7 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
 
         "on post with valid data redirect to advice on MLR due to diligence page when businessActivity is not ASP" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "riskassessments[0]" -> "01",
             "riskassessments[1]" -> "02"
           )
@@ -134,7 +133,7 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
         "respond with BAD_REQUEST" when {
           "riskassessments fields are missing" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
             )
 
             when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
@@ -152,7 +151,7 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
 
           "riskassessments fields are missing, represented by an empty string" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "riskassessments[0]" -> "",
               "riskassessments[1]" -> ""
             )
@@ -176,7 +175,7 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
       "when edit is true" must {
         "redirect to the SummaryController" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "riskassessments[0]" -> "01",
             "riskassessments[1]" -> "02"
           )

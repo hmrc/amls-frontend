@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package controllers
+package config
 
-import play.api.i18n.{I18nSupport, Messages}
+import com.google.inject.Inject
+import play.api.Configuration
+import play.api.i18n.{Lang, MessagesApi}
 import play.api.mvc.Request
-import uk.gov.hmrc.play.frontend.controller.FrontendController
-import utils.ControllerHelper
+import uk.gov.hmrc.play.bootstrap.http.FrontendErrorHandler
 
-trait DefaultBaseController extends FrontendController with I18nSupport {
-  def notFoundView(implicit request: Request[_]) = ControllerHelper.notFoundView(request)
+class AmlsErrorHandler @Inject()(val messagesApi: MessagesApi, val configuration: Configuration)
+                                (implicit val appConfig: ApplicationConfig) extends FrontendErrorHandler {
 
-  import play.api.Play.current
-  implicit def messagesApi = Messages.Implicits.applicationMessages.messages
+  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit request: Request[_]) =
+    views.html.error(pageTitle, heading, message)(implicitly, implicitly, Lang.defaultLang, implicitly)
 }

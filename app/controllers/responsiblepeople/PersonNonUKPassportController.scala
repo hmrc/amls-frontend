@@ -16,25 +16,26 @@
 
 package controllers.responsiblepeople
 
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.responsiblepeople.{NonUKPassport, ResponsiblePerson}
 import play.api.i18n.MessagesApi
-import play.api.mvc.{AnyContent, Request}
+import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.person_non_uk_passport
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class PersonNonUKPassportController @Inject()(override val messagesApi: MessagesApi,
                                               val dataCacheConnector: DataCacheConnector,
                                               authAction: AuthAction,
-                                              val appConfig:AppConfig
-                                             ) extends RepeatingSection with DefaultBaseController {
+                                              val ds: CommonPlayDependencies,
+                                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
 
   def get(index:Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {

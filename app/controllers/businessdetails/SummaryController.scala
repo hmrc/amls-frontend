@@ -18,20 +18,23 @@ package controllers.businessdetails
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import models.businessdetails.BusinessDetails
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.businessdetails._
 
 
 class SummaryController @Inject () (
-                                   val dataCache: DataCacheConnector,
-                                   val statusService: StatusService,
-                                   val authAction: AuthAction
-                                   ) extends DefaultBaseController {
+                                     val dataCache: DataCacheConnector,
+                                     val statusService: StatusService,
+                                     val authAction: AuthAction,
+                                     val ds: CommonPlayDependencies,
+                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
     implicit request =>

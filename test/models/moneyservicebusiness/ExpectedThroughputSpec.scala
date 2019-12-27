@@ -20,11 +20,11 @@ import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import models.renewal.TotalThroughput
+import org.scalatest.MustMatchers
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
-class ExpectedThroughputSpec extends PlaySpec {
+class ExpectedThroughputSpec extends PlaySpec with MustMatchers{
 
-  "ExpectedThroughput" should {
     "Form Validation" must {
 
       "successfully validate given an enum value" in {
@@ -138,11 +138,11 @@ class ExpectedThroughputSpec extends PlaySpec {
 
       "throw error for invalid data" in {
         Json.fromJson[ExpectedThroughput](Json.obj("throughput" -> "20")) must
-          be(JsError(JsPath, play.api.data.validation.ValidationError("error.invalid")))
+          be(JsError(JsPath, play.api.libs.json.JsonValidationError("error.invalid")))
       }
     }
 
-    "convert to renewal throughput model" must {
+    "convert to renewal throughput model" in {
       ExpectedThroughput.convert(ExpectedThroughput.First) must be(TotalThroughput("01"))
       ExpectedThroughput.convert(ExpectedThroughput.Second) must be(TotalThroughput("02"))
       ExpectedThroughput.convert(ExpectedThroughput.Third) must be(TotalThroughput("03"))
@@ -151,6 +151,5 @@ class ExpectedThroughputSpec extends PlaySpec {
       ExpectedThroughput.convert(ExpectedThroughput.Sixth) must be(TotalThroughput("06"))
       ExpectedThroughput.convert(ExpectedThroughput.Seventh) must be(TotalThroughput("07"))
     }
-   
-  }
+
 }

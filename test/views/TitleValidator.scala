@@ -17,7 +17,7 @@
 package views
 
 import org.jsoup.nodes.Document
-import org.scalatest.matchers.MustMatchers
+import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 
 trait TitleValidator extends MustMatchers {

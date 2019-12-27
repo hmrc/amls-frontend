@@ -19,16 +19,16 @@ package views.responsiblepeople
 import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.ContactDetails
 import org.scalatest.MustMatchers
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
 
-class contact_detailsSpec extends AmlsSpec with MustMatchers {
+class contact_detailsSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "contact_details view" must {

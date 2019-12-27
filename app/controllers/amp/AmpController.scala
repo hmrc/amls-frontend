@@ -19,18 +19,20 @@ package controllers.amp
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import models.amp.Amp
 import play.api.libs.json._
-import play.api.mvc.Action
+import play.api.mvc.{Action, MessagesControllerComponents}
 import services.amp.AmpCacheService
 import utils.AuthAction
 
 
 class AmpController @Inject()(ampCacheService: AmpCacheService,
                               authAction     : AuthAction,
-                              val cacheConnector : DataCacheConnector) extends DefaultBaseController {
+                              val cacheConnector : DataCacheConnector,
+                              val ds: CommonPlayDependencies,
+                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(credId: String) = Action.async {
     implicit request => {

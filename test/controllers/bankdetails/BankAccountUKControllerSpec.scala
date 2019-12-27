@@ -45,7 +45,9 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar {
       mockCacheConnector,
       SuccessfulAuthAction,
       mock[AuditConnector],
-      mockStatusService
+      mockStatusService,
+      commonDependencies,
+      mockMcc
     )
 
   }
@@ -142,7 +144,7 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar {
         "given valid data in edit mode" in new Fixture {
 
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "accountNumber" -> "12345678",
             "sortCode" -> "123456"
           )
@@ -160,7 +162,7 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar {
         }
         "given valid data when NOT in edit mode" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "accountNumber" -> "12345678",
             "sortCode" -> "123456"
           )
@@ -182,7 +184,7 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with NOT_FOUND" when {
         "given an index out of bounds in edit mode" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "accountNumber" -> "12345678",
             "sortCode" -> "123456"
           )
@@ -200,7 +202,7 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "accountNumber" -> "%!@£%",
             "sortCode" -> "&^%$"
           )
@@ -217,7 +219,7 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar {
 
     "an account is created" must {
       "send an audit event" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "accountNumber" -> "12345678",
           "sortCode" -> "123456"
         )

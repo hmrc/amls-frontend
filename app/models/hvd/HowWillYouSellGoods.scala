@@ -18,7 +18,7 @@ package models.hvd
 
 import jto.validation.forms.UrlFormEncoded
 import jto.validation._
-import play.api.libs.json.{Writes, Reads}
+import play.api.libs.json._
 import utils.TraversableValidators
 import utils.MappingUtils.Implicits._
 
@@ -66,11 +66,44 @@ trait HowWillYouSellGoods0 {
     implicitly
   }
 
-  val jsonR: Reads[HowWillYouSellGoods] = {
-    import jto.validation.playjson.Rules.{JsValue => _, pickInJson => _, _}
-    import utils.JsonMapping._
-    implicitly[Reads[HowWillYouSellGoods]]
-  }
+//  val jsonR: Reads[HowWillYouSellGoods] =
+//    import jto.validation.forms.Rules._
+//    import utils.MappingUtils.Implicits._
+//
+//    (__ \ "salesChannels").read(Seq[String]).flatMap {s: Set[String] =>
+//      s.map {
+//          case "Retail" => Reads(_ => JsSuccess(Retail)) map identity[SalesChannel]
+//          case "Wholesale" =>  Reads(_ => JsSuccess(Wholesale)) map identity[SalesChannel]
+//          case "Auction" =>  Reads(_ => JsSuccess(Auction)) map identity[SalesChannel]
+//      }.foldLeft[Reads[Set[SalesChannel]]](
+//        Reads[Set[SalesChannel]](_ => JsSuccess(Set.empty))
+//      ) {
+//        (result, data) =>
+//          data flatMap { m =>
+//            result.map { n =>
+//              n + m
+//            }
+//          }
+//      }
+//    } map HowWillYouSellGoods.apply
+
+  implicit val jsonReads: Reads[HowWillYouSellGoods] =
+    (__ \ "salesChannels").read[Set[String]].flatMap { x: Set[String] =>
+      x.map {
+        case "Retail" => Reads(_ => JsSuccess(Retail)) map identity[SalesChannel]
+        case "Wholesale" => Reads(_ => JsSuccess(Wholesale)) map identity[SalesChannel]
+        case "Auction" => Reads(_ => JsSuccess(Auction)) map identity[SalesChannel]
+      }.foldLeft[Reads[Set[SalesChannel]]](
+        Reads[Set[SalesChannel]](_ => JsSuccess(Set.empty))
+      ) {
+        (result, data) =>
+          data flatMap { m =>
+            result.map { n =>
+              n + m
+            }
+          }
+      }
+    } map HowWillYouSellGoods.apply
 
 
   val jsonW: Writes[HowWillYouSellGoods] = {
@@ -86,6 +119,6 @@ object HowWillYouSellGoods {
 
   implicit val formW: Write[HowWillYouSellGoods, UrlFormEncoded] = Cache.formW
   implicit val formR: Rule[UrlFormEncoded, HowWillYouSellGoods] = Cache.formR
-  implicit val jsonR: Reads[HowWillYouSellGoods] = Cache.jsonR
+  implicit val jsonR: Reads[HowWillYouSellGoods] = Cache.jsonReads
   implicit val jsonW: Writes[HowWillYouSellGoods] = Cache.jsonW
 }

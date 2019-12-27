@@ -22,13 +22,13 @@ import models.bankdetails.NonUKIBANNumber
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import utils.AmlsSpec
+import utils.{AmlsSpec, AmlsViewSpec}
 import views.Fixture
 
-class bank_account_non_uk_ibanSpec extends AmlsSpec with MustMatchers {
+class bank_account_non_uk_ibanSpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "bank_account view " must{

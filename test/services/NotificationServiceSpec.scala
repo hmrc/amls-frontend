@@ -22,7 +22,7 @@ import models.notifications.{ContactType, IDType, NotificationDetails, Notificat
 import org.joda.time.{DateTime, DateTimeZone}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import play.api.i18n.MessagesApi
 import play.api.inject.bind
@@ -37,7 +37,7 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar with GeneratorD
 
   implicit val hc = HeaderCarrier()
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
 
     val amlsNotificationConnector = mock[AmlsNotificationConnector]
 

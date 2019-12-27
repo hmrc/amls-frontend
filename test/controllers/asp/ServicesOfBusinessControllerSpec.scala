@@ -22,7 +22,7 @@ import models.businessmatching.AccountancyServices
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -32,7 +32,7 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
 
   val emptyCache = CacheMap("", Map.empty)
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
@@ -40,7 +40,9 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
       mockCacheConnector,
       mockStatusService,
       authAction = SuccessfulAuthAction,
-      mockServiceFlow
+      ds = commonDependencies,
+      mockServiceFlow,
+      mockMcc
     )
 
     mockCacheFetch[Asp](None)
@@ -59,7 +61,7 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
 
     "submit with valid data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "services" -> "02",
         "services" -> "04"
       )
@@ -85,7 +87,7 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
 
     "fail submission on error" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "services" -> "0299999"
       )
 
@@ -96,7 +98,7 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
 
     "fail submission when no check boxes were selected" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
 
       )
 
@@ -108,7 +110,7 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
 
     "submit with valid data in edit mode" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "services[1]" -> "02",
         "services[0]" -> "01",
         "services[2]" -> "03"
@@ -126,7 +128,7 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
 
         mockApplicationStatus(SubmissionDecisionApproved)
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "services[0]" -> "02",
           "services[1]" -> "01",
           "services[2]" -> "03")
@@ -142,7 +144,7 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
 
         mockApplicationStatus(ReadyForRenewal(None))
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "services[0]" -> "02",
           "services[1]" -> "01",
           "services[2]" -> "03")
@@ -157,7 +159,7 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
       "the status is approved" when {
         "the service has just been added" must {
           "redirect to the next page in the flow" in new Fixture {
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "services[0]" -> "02",
               "services[1]" -> "01",
               "services[2]" -> "03")

@@ -21,6 +21,8 @@ import jto.validation.{To, Write, From, Rule}
 import jto.validation.forms._
 import play.api.libs.json.Json
 import models.FormTypes._
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 
 case class ActivityStartDate (startDate: LocalDate)
 

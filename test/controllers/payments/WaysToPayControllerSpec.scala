@@ -36,7 +36,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator with PaymentGenerator {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
 
     val request = addToken(authRequest)
@@ -46,11 +46,12 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
     implicit val ec: ExecutionContext = mock[ExecutionContext]
 
     val controller = new WaysToPayController(
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
       paymentsService = mock[PaymentsService],
       authEnrolmentsService = mock[AuthEnrolmentsService],
-      feeResponseService = mock[FeeResponseService]
+      feeResponseService = mock[FeeResponseService],
+      cc = mockMcc
     )
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))
@@ -111,7 +112,7 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
 
       "bacs" must {
         "redirect to TypeOfBankController" in new Fixture {
-          val postRequest = request.withFormUrlEncodedBody(
+          val postRequest = requestWithUrlEncodedBody(
             "waysToPay" -> WaysToPay.Bacs.entryName
           )
 
@@ -128,7 +129,7 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
 
       "card" must {
         "go to the payments url" in new Fixture {
-          val postRequest = request.withFormUrlEncodedBody(
+          val postRequest = requestWithUrlEncodedBody(
             "waysToPay" -> WaysToPay.Card.entryName
           )
 
@@ -153,7 +154,7 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
         "return 500" when {
           "payment info cannot be retrieved" in new Fixture {
 
-            val postRequest = request.withFormUrlEncodedBody(
+            val postRequest = requestWithUrlEncodedBody(
               "waysToPay" -> WaysToPay.Card.entryName
             )
 
@@ -176,7 +177,7 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
       "request is invalid" must {
         "return BAD_REQUEST" in new Fixture {
 
-          val postRequest = request.withFormUrlEncodedBody(
+          val postRequest = requestWithUrlEncodedBody(
             "waysToPay" -> "01"
           )
 

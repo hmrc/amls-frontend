@@ -31,7 +31,7 @@
     heading: String = "",
     section: String = "",
     data: String = ""
-)(implicit lang:Lang,  m: Messages)
+)(implicit m: Messages, lang: Lang)
 
 @labelSpan = {
     @if(labelText.nonEmpty) {

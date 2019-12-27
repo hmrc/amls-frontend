@@ -17,12 +17,13 @@
 package controllers.responsiblepeople.address
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
 import controllers.responsiblepeople.address
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.responsiblepeople._
 import play.api.i18n.MessagesApi
+import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.address.moved_address
 
@@ -32,7 +33,9 @@ import scala.concurrent.Future
 
 class MovedAddressController @Inject()(override val messagesApi: MessagesApi,
                                        val dataCacheConnector: DataCacheConnector,
-                                       authAction: AuthAction) extends RepeatingSection with DefaultBaseController {
+                                       authAction: AuthAction,
+                                       val ds: CommonPlayDependencies,
+                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
 
   def get(index: Int) = authAction.async {

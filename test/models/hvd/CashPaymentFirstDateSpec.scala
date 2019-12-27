@@ -18,7 +18,7 @@ package models.hvd
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.joda.time.LocalDate
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 
 class CashPaymentFirstDateSpec extends PlaySpec with MockitoSugar {

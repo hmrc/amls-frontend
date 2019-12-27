@@ -23,7 +23,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.RenewalService
@@ -34,7 +34,7 @@ import scala.concurrent.Future
 
 class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val request = addToken(authRequest)
 
@@ -47,8 +47,8 @@ class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
     val controller = new BusinessTurnoverController(
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction,
-      renewalService = mockRenewalService
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      renewalService = mockRenewalService, cc = mockMcc
     )
 
     when(mockRenewalService.getRenewal(any())(any(), any()))
@@ -84,7 +84,7 @@ class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
       "on post with valid data" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "businessTurnover" -> "01"
         )
 
@@ -101,7 +101,7 @@ class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
       "on post with valid data in edit mode" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "businessTurnover" -> "01"
         )
 

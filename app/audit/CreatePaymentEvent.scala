@@ -20,7 +20,6 @@ import models.payments.{CreatePaymentRequest, CreatePaymentResponse}
 import play.api.libs.json.{JsObject, Json, Writes}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
-import uk.gov.hmrc.play.config.AppName
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import utils.AuditHelper
 

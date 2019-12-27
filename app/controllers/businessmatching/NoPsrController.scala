@@ -16,13 +16,18 @@
 
 package controllers.businessmatching
 
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import models.status.{NotCompleted, SubmissionReady}
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 
-class NoPsrController @Inject()(val authAction: AuthAction, statusService: StatusService) extends DefaultBaseController {
+class NoPsrController @Inject()(val authAction: AuthAction,
+                                val ds: CommonPlayDependencies,
+                                statusService: StatusService,
+                                val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
     implicit request =>

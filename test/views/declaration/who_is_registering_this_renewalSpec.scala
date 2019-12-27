@@ -22,14 +22,14 @@ import models.declaration.WhoIsRegistering
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
 
-class who_is_registering_this_renewalSpec extends AmlsSpec with MustMatchers  {
+class who_is_registering_this_renewalSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "who_is_registering_this_renewal view" must {

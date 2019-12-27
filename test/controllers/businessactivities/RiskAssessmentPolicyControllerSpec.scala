@@ -23,7 +23,7 @@ import models.businessmatching.{AccountancyServices, BusinessMatching, MoneyServ
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
@@ -35,13 +35,12 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new RiskAssessmentController (
       dataCacheConnector = mock[DataCacheConnector],
-      SuccessfulAuthAction
-    )
+      SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -81,7 +80,7 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
       "when edit is false" must {
         "on post with valid data redirect to check your answers page when businessActivity is ASP and hasPolicy is false" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "hasPolicy" -> "false"
           )
 
@@ -105,7 +104,7 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
         }
         "on post with valid data redirect to DocumentRiskAssessment page when businessActivity is ASP and hasPolicy is true" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "hasPolicy" -> "true"
           )
 
@@ -130,7 +129,7 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
 
         "on post with valid data redirect to DocumentRiskAssessment page when businessActivity is not ASP and hasPolicy is true" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "hasPolicy" -> "true"
           )
 
@@ -154,7 +153,7 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
         }
         "on post with valid data redirect to advice on MLR due to diligence page when businessActivity is not ASP and hasPolicy is false" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "hasPolicy" -> "false"
           )
 
@@ -180,7 +179,7 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
         "respond with BAD_REQUEST" when {
           "hasPolicy field is missing" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
             )
 
             when(controller.dataCacheConnector.fetch[BusinessActivities](any(),any())(any(), any()))
@@ -198,7 +197,7 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
 
           "hasPolicy field is missing, represented by an empty string" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "hasPolicy" -> ""
             )
 
@@ -220,7 +219,7 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
       "clicking continue" must {
         "redirect to the SummaryController when hasPolicy is false and is AccountancyService" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "hasPolicy" -> "false"
           )
 
@@ -244,7 +243,7 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
         }
         "redirect to the DocumentRiskAssessmentController when hasPolicy is true" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "hasPolicy" -> "true"
           )
 
@@ -268,7 +267,7 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
         }
         "redirect to the AccountantForAMLSRegulationsController when hasPolicy is false and not accountancy service" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "hasPolicy" -> "false"
           )
 

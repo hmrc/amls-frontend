@@ -23,13 +23,13 @@ import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class your_trading_premisesSpec extends AmlsSpec with MustMatchers with TradingPremisesGenerator {
+class your_trading_premisesSpec extends AmlsViewSpec with MustMatchers with TradingPremisesGenerator {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   val tpAddress = Address("CPLT 1", "SecondLine", Some("ThirdLine"), Some("FourthLine"), "AQ11QA")

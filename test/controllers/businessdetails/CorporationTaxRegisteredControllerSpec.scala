@@ -26,7 +26,7 @@ import models.businessmatching.BusinessType.{LimitedCompany, UnincorporatedBody}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.{verify}
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import utils.DependencyMocks
 import utils.{AmlsSpec, AuthorisedFixture}
@@ -34,7 +34,7 @@ import org.mockito.Matchers.{eq => eqTo}
 
 class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with DependencyMocks {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
 
     val request = addToken(authRequest)
@@ -55,8 +55,7 @@ class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar 
     val controller = new CorporationTaxRegisteredController(
       dataCacheConnector = mockCacheConnector,
       businessMatchingConnector = mock[BusinessMatchingConnector],
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   "CorporationTaxRegisteredController" when {

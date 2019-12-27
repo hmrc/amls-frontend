@@ -16,14 +16,17 @@
 
 package connectors
 
-import config.WSHttp
+import config.AmlsHeaderCarrierForPartialsConverter
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
+import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.test.Helpers._
-import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.http.NotFoundException
+import uk.gov.hmrc.play.bootstrap.config.RunMode
+import uk.gov.hmrc.play.bootstrap.filters.frontend.crypto.SessionCookieCrypto
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
@@ -56,14 +59,11 @@ class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
       |}
     """.stripMargin
 
-  trait Fixture extends AuthorisedFixture { self =>
+  trait Fixture { self =>
 
-    val applicationCrypto:ApplicationCrypto = app.injector.instanceOf(classOf[ApplicationCrypto])
+    lazy val hc: AmlsHeaderCarrierForPartialsConverter = app.injector.instanceOf[AmlsHeaderCarrierForPartialsConverter]
 
-    object TestBusinessMatchingConnector extends BusinessMatchingConnector (
-      http = mock[WSHttp],
-      applicationCrypto = applicationCrypto
-    )
+    val testBusinessMatchingConnector = new BusinessMatchingConnector(mock[HttpClient], hc, appConfig)
 
     val address = BusinessMatchingAddress("1 Test Street", "Test Town", None, None, None, "UK")
 
@@ -89,20 +89,20 @@ class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
 
     "get the review details" in new Fixture {
 
-      when(TestBusinessMatchingConnector.http.GET[BusinessMatchingReviewDetails](any())(any(), any(), any()))
+      when(testBusinessMatchingConnector.http.GET[BusinessMatchingReviewDetails](any())(any(), any(), any()))
         .thenReturn(Future.successful(validResponseDetail))
 
-      whenReady(TestBusinessMatchingConnector.getReviewDetails) { result =>
+      whenReady(testBusinessMatchingConnector.getReviewDetails) { result =>
         result mustBe Some(validResponseDetail)
       }
 
     }
 
     "return None when business matching returns 404" in new Fixture {
-      when(TestBusinessMatchingConnector.http.GET[BusinessMatchingReviewDetails](any())(any(), any(), any()))
+      when(testBusinessMatchingConnector.http.GET[BusinessMatchingReviewDetails](any())(any(), any(), any()))
         .thenReturn(Future.failed(new NotFoundException("The review details were not found")))
 
-      whenReady(TestBusinessMatchingConnector.getReviewDetails) { result =>
+      whenReady(testBusinessMatchingConnector.getReviewDetails) { result =>
         result mustBe None
       }
     }
@@ -111,11 +111,11 @@ class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
       val ex = new Exception("Some other exception")
 
       when {
-        TestBusinessMatchingConnector.http.GET[BusinessMatchingReviewDetails](any())(any(), any(), any())
+        testBusinessMatchingConnector.http.GET[BusinessMatchingReviewDetails](any())(any(), any(), any())
       } thenReturn Future.failed(ex)
 
       intercept[Exception] {
-        await(TestBusinessMatchingConnector.getReviewDetails)
+        await(testBusinessMatchingConnector.getReviewDetails)
       } mustBe ex
     }
 

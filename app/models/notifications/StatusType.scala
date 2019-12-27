@@ -35,7 +35,7 @@ object StatusType {
       case JsString("08") => JsSuccess(Revoked)
       case JsString("10") => JsSuccess(DeRegistered)
       case JsString("11") => JsSuccess(Expired)
-      case _ => JsError(JsPath -> play.api.data.validation.ValidationError("error.invalid"))
+      case _ => JsError(JsPath -> play.api.libs.json.JsonValidationError("error.invalid"))
     }
 
   implicit val jsonWrites =

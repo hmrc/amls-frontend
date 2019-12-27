@@ -18,14 +18,14 @@ package views.supervision
 
 import forms.EmptyForm
 import org.scalatest.MustMatchers
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
 
-class penalised_by_professionalSpec extends AmlsSpec with MustMatchers  {
+class penalised_by_professionalSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "what_you_need view" must {

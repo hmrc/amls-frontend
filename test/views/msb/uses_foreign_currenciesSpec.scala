@@ -21,14 +21,14 @@ import jto.validation.{Path, ValidationError}
 import models.moneyservicebusiness.{UsesForeignCurrencies, UsesForeignCurrenciesYes}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
 
-class uses_foreign_currenciesSpec extends AmlsSpec with MustMatchers {
+class uses_foreign_currenciesSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "uses_foreign_currencies view" must {

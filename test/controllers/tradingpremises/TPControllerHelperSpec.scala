@@ -16,14 +16,16 @@
 
 package controllers.tradingpremises
 
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.http.cache.client.CacheMap
 import org.mockito.Mockito._
 import org.mockito.Matchers._
 import cats.implicits._
 import cats._
+import config.{ApplicationConfig}
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
+import play.api.i18n.{Lang, Messages}
 import play.api.mvc.Results._
 import play.api.test.FakeRequest
 import utils.StatusConstants
@@ -33,6 +35,9 @@ class TPControllerHelperSpec extends PlaySpec with MockitoSugar {
   trait TestFixture {
     implicit val request = FakeRequest()
     val cache = mock[CacheMap]
+    implicit val lang = mock[Lang]
+    implicit val messages = mock[Messages]
+    implicit val appConfig = mock[ApplicationConfig]
 
     def setUpTradingPremise(model: Option[TradingPremises]) = when {
       cache.getEntry[Seq[TradingPremises]](any())(any())

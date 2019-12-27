@@ -17,8 +17,9 @@
 @import forms.Form2
 @import include.{main, heading}
 @import include.forms2._
+@import config.{ ApplicationConfig}
 
-@(f: forms.Form2[_],index: Int, complete: Boolean, tradingAddress: String, showDateField:Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: forms.Form2[_],index: Int, complete: Boolean, tradingAddress: String, showDateField:Boolean)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()

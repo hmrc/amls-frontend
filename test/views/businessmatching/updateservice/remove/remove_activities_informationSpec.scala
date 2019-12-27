@@ -17,15 +17,15 @@
 package views.businessmatching.updateservice.remove
 
 import org.scalatest.MustMatchers
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class remove_activities_informationSpec extends AmlsSpec with MockitoSugar with MustMatchers {
+class remove_activities_informationSpec extends AmlsViewSpec with MockitoSugar with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
     def view = views.html.businessmatching.updateservice.remove.remove_activities_information("placeholder")
   }
 

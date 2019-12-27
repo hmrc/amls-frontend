@@ -20,16 +20,19 @@ import javax.inject.Inject
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import controllers.changeofficer.Helpers._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.changeofficer._
 import models.responsiblepeople.{ResponsiblePerson, ResponsiblePersonEndDate}
+import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, RepeatingSection, StatusConstants}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class RemoveResponsiblePersonController @Inject()(authAction: AuthAction,
-                                                   implicit val dataCacheConnector: DataCacheConnector
-                                                 ) extends DefaultBaseController with RepeatingSection {
+                                                  val ds: CommonPlayDependencies,
+                                                  implicit val dataCacheConnector: DataCacheConnector,
+                                                  val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get() = authAction.async {
      implicit request => {

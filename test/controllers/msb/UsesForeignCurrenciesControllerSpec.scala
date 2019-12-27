@@ -27,7 +27,7 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration, ScalaFutures}
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
@@ -41,7 +41,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
                                     with IntegrationPatience
                                     with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
     implicit val ec = app.injector.instanceOf[ExecutionContext]
@@ -53,9 +53,9 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
       .thenReturn(Future.successful(CacheMap("TESTID", Map())))
 
     val controller = new UsesForeignCurrenciesController(dataCacheConnector = mockCacheConnector,
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mockStatusService,
-      serviceFlow = mockServiceFlow)
+      serviceFlow = mockServiceFlow, cc = mockMcc)
 
     mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, Some(ServiceChangeRegister.key))
@@ -74,7 +74,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
   trait Fixture2 extends AuthorisedFixture with DependencyMocks with MoneyServiceBusinessTestData {
     self =>
     val request = addToken(authRequest)
-    val controller = new UsesForeignCurrenciesController(SuccessfulAuthAction, mockCacheConnector, mockStatusService, mockServiceFlow)
+    val controller = new UsesForeignCurrenciesController(SuccessfulAuthAction, ds = commonDependencies, mockCacheConnector, mockStatusService, mockServiceFlow, mockMcc)
     implicit val ec = app.injector.instanceOf[ExecutionContext]
 
     when {
@@ -165,7 +165,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
       "data is valid" should {
           "clear the foreign currency data when not using foreign currencies" in new Fixture2 {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "usesForeignCurrencies" -> "false"
             )
 
@@ -181,7 +181,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
 
         "keep the foreign currency data when using foreign currencies" in new Fixture2 {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "usesForeignCurrencies" -> "true"
             )
 

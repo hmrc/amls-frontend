@@ -30,7 +30,7 @@
     hint: String = "",
     heading: String = "",
     section: String = "",
-    supportingContent: Html = HtmlFormat.empty,
+    supportingContent: Html = play.twirl.api.HtmlFormat.empty,
     errorGroupPlaceholder: String = ""
 )(content: Html)(implicit request: Request[_],m:Messages, lang: Lang)
 

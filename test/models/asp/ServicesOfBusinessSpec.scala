@@ -18,7 +18,7 @@ package models.asp
 
 import models.DateOfChange
 import org.joda.time.LocalDate
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
@@ -90,12 +90,12 @@ class ServicesOfBusinessSpec extends PlaySpec with MockitoSugar {
       "fail when on invalid data" in {
 
         Json.fromJson[ServicesOfBusiness](Json.obj("services" -> Seq("40"))) must
-          be(JsError(((JsPath \ "services")(0) \ "services") -> play.api.data.validation.ValidationError("error.invalid")))
+          be(JsError(((JsPath \ "services")(0) \ "services") -> play.api.libs.json.JsonValidationError("error.invalid")))
       }
 
       "successfully validate json write" in {
 
-        val json = Json.obj("services" -> Set("01","02","03","04","05"))
+        val json = Json.obj("services" -> Seq("04","05","03","02","01"))
         Json.toJson(ServicesOfBusiness(businessServices)) must be(json)
       }
     }

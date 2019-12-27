@@ -19,19 +19,19 @@ package views.registrationprogress
 import forms.EmptyForm
 import generators.businesscustomer.AddressGenerator
 import models.registrationprogress.{Completed, Section}
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.mvc.Call
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class registration_progressSpec extends AmlsSpec with MockitoSugar with AddressGenerator {
+class registration_progressSpec extends AmlsViewSpec with MockitoSugar with AddressGenerator {
 
   val businessName = "BusinessName"
   val serviceNames = Seq("Service 1", "Service 2", "Service 3")
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     val sections = Seq(
         Section("section1", Completed, true, mock[Call])

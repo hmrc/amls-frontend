@@ -27,7 +27,7 @@ class TaxMattersSpec extends PlaySpec {
     "successfully complete a round trip json conversion" in {
       TaxMatters.formats.reads(
         TaxMatters.formats.writes(TaxMatters(false))
-      ) must be(JsSuccess(TaxMatters(false), JsPath \ "manageYourTaxAffairs"))
+      ) must be(JsSuccess(TaxMatters(false), JsPath))
     }
 
     "Serialise TaxMatters as expected" in {
