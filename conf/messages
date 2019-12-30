@@ -1096,6 +1096,14 @@ button.summary.acceptandcomplete = Accept and complete section
 summary.linetext = Please check all the information you have provided.
 button.checkyouranswers.tradingpremises = Accept and add this trading premises
 
+summary.declaration = Declaration
+declaration.renew.registration.title = Would you like to renew your registration?
+declaration.renew.registration.section1 = You have made an update but your renewal is also due.
+declaration.renew.registration.section2 = Your supervision with HMRC will expire on {0} unless you renew your supervision.
+declaration.renew.now = Renew now
+declaration.continue.update = Continue with your update and renew another time
+
+
 changeservices.title = What do you want to do?
 changeservices.choice.add = Register another service
 changeservices.choice.remove = Remove a service

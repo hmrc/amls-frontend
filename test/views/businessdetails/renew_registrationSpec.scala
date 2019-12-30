@@ -19,6 +19,7 @@ package views.businessdetails
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.declaration.{RenewRegistration, RenewRegistrationYes}
+import org.joda.time.LocalDate
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -36,7 +37,7 @@ class renew_registrationSpec extends AmlsSpec with MustMatchers  {
 
       val form2: ValidForm[RenewRegistration] = Form2(RenewRegistrationYes)
 
-      def view = views.html.declaration.renew_registration(form2)
+      def view = views.html.declaration.renew_registration(form2, Some(LocalDate.parse("2019-3-20")))
 
       doc.title must startWith(Messages("declaration.renew.registration.title") + " - " + Messages("summary.declaration"))
     }
@@ -45,7 +46,7 @@ class renew_registrationSpec extends AmlsSpec with MustMatchers  {
 
       val form2: ValidForm[RenewRegistration] = Form2(RenewRegistrationYes)
 
-      def view = views.html.declaration.renew_registration(form2)
+      def view = views.html.declaration.renew_registration(form2, Some(LocalDate.parse("2019-3-20")))
 
       heading.html must be(Messages("declaration.renew.registration.title"))
       subHeading.html must include(Messages("summary.declaration"))
@@ -59,7 +60,7 @@ class renew_registrationSpec extends AmlsSpec with MustMatchers  {
           (Path \ "renewRegistration") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.declaration.renew_registration(form2)
+      def view = views.html.declaration.renew_registration(form2, Some(LocalDate.parse("2019-3-20")))
 
       errorSummary.html() must include("not a message Key")
 
@@ -71,7 +72,7 @@ class renew_registrationSpec extends AmlsSpec with MustMatchers  {
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.declaration.renew_registration(form2)
+      def view = views.html.declaration.renew_registration(form2, Some(LocalDate.parse("2019-3-20")))
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

@@ -20,6 +20,7 @@ import cats.data.OptionT
 import controllers.declaration
 import models.responsiblepeople.{Partner, ResponsiblePerson}
 import models.status._
+import org.joda.time.LocalDate
 import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -76,6 +77,14 @@ object DeclarationHelper {
       case SubmissionReadyForReview | SubmissionDecisionApproved => "submit.amendment.application"
       case ReadyForRenewal(_) | RenewalSubmitted(_) => "submit.renewal.application"
       case _ => throw new Exception("Incorrect status - Page not permitted for this status")
+    }
+  }
+
+  def statusEndDate(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)
+                    (implicit statusService: StatusService, hc: HeaderCarrier): Future[Option[LocalDate]] = {
+    statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) map {
+      case ReadyForRenewal(endDate) => endDate
+      case _ => None
     }
   }
 

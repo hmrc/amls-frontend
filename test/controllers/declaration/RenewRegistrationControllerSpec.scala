@@ -25,6 +25,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import services.{ProgressService, RenewalService, StatusService}
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
@@ -36,7 +37,10 @@ class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with Sc
 
     val controller = new RenewRegistrationController(
       dataCacheConnector = mockCacheConnector,
-      authAction = SuccessfulAuthAction
+      authAction = SuccessfulAuthAction,
+      progressService = mock[ProgressService],
+      statusService = mock[StatusService],
+      renewalService = mock[RenewalService]
     )
   }
 
@@ -80,16 +84,20 @@ class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with Sc
           }
         }
 
-        "redirect to WhoIsRegistering" when {
-          "No is selected" in new Fixture {
-            mockCacheSave[RenewRegistration](RenewRegistrationNo, Some(RenewRegistration.key))
+        "redirect to the url provided by progressService" in new Fixture {
+          val call = controllers.routes.RegistrationProgressController.get()
+          val newRequest = request.withFormUrlEncodedBody("renewRegistration" -> "false")
 
-            val newRequest = request.withFormUrlEncodedBody("renewRegistration" -> "false")
+          mockCacheSave[RenewRegistration](RenewRegistrationNo, Some(RenewRegistration.key))
 
-            val result = controller.post()(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.declaration.routes.WhoIsRegisteringController.get().url))
-          }
+          when {
+            controller.progressService.getSubmitRedirect(any[Option[String]](), any(), any())(any(), any())
+          } thenReturn Future.successful(Some(call))
+
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+
+          redirectLocation(result) must be(Some(call.url))
         }
       }
 

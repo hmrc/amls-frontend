@@ -21,24 +21,30 @@ import connectors.DataCacheConnector
 import controllers.DefaultBaseController
 import forms._
 import models.declaration.{RenewRegistration, RenewRegistrationNo, RenewRegistrationYes}
-import services.ProgressService
+import services.{ProgressService, RenewalService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.AuthAction
+import utils.{AuthAction, DeclarationHelper}
+
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Future}
+import scala.concurrent.Future
 
 class RenewRegistrationController @Inject()(val dataCacheConnector: DataCacheConnector,
                                             val authAction: AuthAction,
-                                            val progressService: ProgressService) extends DefaultBaseController {
+                                            val progressService: ProgressService,
+                                            implicit val statusService: StatusService,
+                                            implicit val renewalService: RenewalService) extends DefaultBaseController {
 
   def get() = authAction.async {
     implicit request =>
-      dataCacheConnector.fetch[RenewRegistration](request.credId, RenewRegistration.key) map {
-        renewRegistration =>
-          val form = (for {
-            renew <- renewRegistration
-          } yield Form2[RenewRegistration](renew)).getOrElse(EmptyForm)
-          Ok(views.html.declaration.renew_registration(form))
+      DeclarationHelper.statusEndDate(request.amlsRefNumber, request.accountTypeId, request.credId) flatMap { maybeEndDate =>
+        dataCacheConnector.fetch[RenewRegistration](request.credId, RenewRegistration.key) map {
+          renewRegistration =>
+            val form = (for {
+              renew <- renewRegistration
+            } yield Form2[RenewRegistration](renew)).getOrElse(EmptyForm)
+            Ok(views.html.declaration.renew_registration(form, maybeEndDate))
+        }
+
       }
   }
 
@@ -46,7 +52,9 @@ class RenewRegistrationController @Inject()(val dataCacheConnector: DataCacheCon
     implicit request => {
       Form2[RenewRegistration](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.declaration.renew_registration(f)))
+          DeclarationHelper.statusEndDate(request.amlsRefNumber, request.accountTypeId, request.credId) flatMap { maybeEndDate =>
+            Future.successful(BadRequest(views.html.declaration.renew_registration(f, maybeEndDate)))
+          }
         case ValidForm(_, data) =>
           dataCacheConnector.save[RenewRegistration](request.credId, RenewRegistration.key, data)
           redirectDependingOnResponse(data, request.amlsRefNumber, request.accountTypeId, request.credId)

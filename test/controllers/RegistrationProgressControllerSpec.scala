@@ -21,10 +21,12 @@ import cats.implicits._
 import controllers.actions.{SuccessfulAuthAction, SuccessfulAuthActionNoAmlsRefNo}
 import generators.AmlsReferenceNumberGenerator
 import generators.businesscustomer.ReviewDetailsGenerator
+import models.Country
 import models.businessmatching._
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
-import models.renewal.{InvolvedInOtherNo, Renewal}
+import models.renewal.{AMLSTurnover, BusinessTurnover, CETransactionsInLast12Months, CashPayments, CashPaymentsCustomerNotMet, CustomersOutsideIsUK, CustomersOutsideUK, HowCashPaymentsReceived, InvolvedInOtherNo, InvolvedInOtherYes, MoneySources, MostTransactions, PaymentMethods, PercentageOfCashPaymentOver15000, Renewal, SendTheLargestAmountsOfMoney, TotalThroughput, TransactionsInLast12Months, WhichCurrencies}
 import models.status._
+import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.any
 import org.mockito.Mockito._
@@ -33,9 +35,9 @@ import play.api.i18n.Messages
 import play.api.mvc.Call
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import services.{AuthEnrolmentsService, ProgressService, SectionsProvider}
+import services.{AuthEnrolmentsService, ProgressService, RenewalService, SectionsProvider}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DeclarationHelper, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -58,7 +60,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
       statusService = mockStatusService,
       sectionsProvider = mock[SectionsProvider],
       businessMatchingService = mockBusinessMatchingService,
-      serviceFlow = mockServiceFlow)
+      serviceFlow = mockServiceFlow,
+      renewalService = mock[RenewalService])
 
     mockApplicationStatus(SubmissionReady)
     mockCacheFetch[Renewal](None)
@@ -447,19 +450,82 @@ class RegistrationProgressControllerSpec extends AmlsSpec
     }
 
     "post is called" must {
-      "redirect to the url provided by progressService" in new Fixture {
-        val call = controllers.routes.RegistrationProgressController.get()
+      val completeRenewal = Renewal(
+        Some(InvolvedInOtherYes("test")),
+        Some(BusinessTurnover.First),
+        Some(AMLSTurnover.First),
+        Some(CustomersOutsideIsUK(true)),
+        Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+        Some(PercentageOfCashPaymentOver15000.First),
+        Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other")))))),
+        Some(TotalThroughput("01")),
+        Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
+        Some(TransactionsInLast12Months("1500")),
+        Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))),
+        Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+        Some(CETransactionsInLast12Months("123")),
+        hasChanged = true
+      )
 
-        when {
-          controller.progressService.getSubmitRedirect(any[Option[String]](), any(), any())(any(), any())
-        } thenReturn Future.successful(Some(call))
+      "when not in a position to renew" must {
+        "redirect to the url provided by progressService" in new Fixture {
+          val call = controllers.routes.RegistrationProgressController.get()
 
-        val result = controller.post()(request)
+          when{
+            controller.statusService.getStatus(any(),any(), any())(any(),any())
+          } thenReturn Future.successful(RenewalSubmitted(None))
 
-        redirectLocation(result) must be(Some(call.url))
+          when(controller.renewalService.isRenewalComplete(any(), any())(any(), any()))
+            .thenReturn(Future.successful(true))
+
+          when(controller.renewalService.getRenewal(any())(any(), any()))
+            .thenReturn(Future.successful(Some(completeRenewal)))
+
+          when {
+            controller.progressService.getSubmitRedirect(any[Option[String]](), any(), any())(any(), any())
+          } thenReturn Future.successful(Some(call))
+
+          val result = controller.post()(request)
+
+          redirectLocation(result) must be(Some(call.url))
+        }
+      }
+
+      "when in a position to renew" must {
+        val inCompleteRenewal = completeRenewal.copy(
+          businessTurnover = None
+        )
+
+        "redirect to the renew registration controller" in new Fixture {
+          when {
+            controller.statusService.getStatus(any(),any(), any())(any(),any())
+          } thenReturn Future.successful(ReadyForRenewal(Some(new LocalDate())))
+
+          when(controller.renewalService.isRenewalComplete(any(), any())(any(), any()))
+            .thenReturn(Future.successful(false))
+
+          when(controller.renewalService.getRenewal(any())(any(), any()))
+            .thenReturn(Future.successful(Some(inCompleteRenewal)))
+
+          when(controller.renewalService.getRenewal(any())(any(), any()))
+            .thenReturn(Future.successful(Some(inCompleteRenewal)))
+
+          val result = controller.post()(request)
+
+          redirectLocation(result) must be(Some(controllers.declaration.routes.RenewRegistrationController.get().url))
+        }
       }
 
       "return INTERNAL_SERVER_ERROR if no call is returned" in new Fixture {
+        when{
+          controller.statusService.getStatus(any(),any(), any())(any(),any())
+        } thenReturn Future.successful(RenewalSubmitted(None))
+
+        when(controller.renewalService.isRenewalComplete(any(), any())(any(), any()))
+          .thenReturn(Future.successful(true))
+
+        when(controller.renewalService.getRenewal(any())(any(), any()))
+          .thenReturn(Future.successful(Some(completeRenewal)))
 
         when {
           controller.progressService.getSubmitRedirect(any[Option[String]](), any(), any())(any(), any())

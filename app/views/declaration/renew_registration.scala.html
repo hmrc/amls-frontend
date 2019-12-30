@@ -19,12 +19,21 @@
 @import include.forms2._
 @import play.api.i18n.Messages
 @import models.declaration._
+@import org.joda.time.LocalDate
+@import utils.DateHelper
 
-@(f: Form2[_])(implicit request: Request[_],m:Messages)
+@(f: Form2[_], endDate: Option[LocalDate])(implicit request: Request[_],m:Messages)
 
 @header = {
     @components.back_link()
     @errorSummaryWithPlaceholder(f)
+}
+
+@supportingContent = {
+  <p>@Messages("declaration.renew.registration.section1")</p>
+  @endDate.map {date =>
+    <p>@Messages("declaration.renew.registration.section2", DateHelper.formatDate(date))</p>
+  }
 }
 
 @main(
@@ -38,17 +47,17 @@
             f = f("renewRegistration"),
             heading = "declaration.renew.registration.title",
             section = "summary.declaration",
-            panel = false,
-            classes = Seq("inline")
+            supportingContent = supportingContent,
+            panel = false
         ) {
             @radio(
                 f = f("renewRegistration"),
-                labelText = "lbl.yes",
+                labelText = "declaration.renew.now",
                 value = "true"
             )
             @radio(
                 f = f("renewRegistration"),
-                labelText = "lbl.no",
+                labelText = "declaration.continue.update",
                 value = "false"
             )
         }
