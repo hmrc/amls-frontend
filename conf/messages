@@ -779,7 +779,6 @@ status.renewalincomplete.description3 = Your supervision will expire on {0} unle
 status.renewalincomplete.description4 = When you submit your renewal you’ll need to pay a fee for each of your trading premises. You may also need to pay a fee for new responsible people you add.
 status.renewal.incomplete.buttontext = Return to your renewal application
 status.renewalnotsubmitted.buttontext = Continue
-error.required.declaration.renew.registration = Select if you would like to renew now or continue with your update and renew another time
 
 status.renewalnotsubmitted.description = Renewal not submitted
 status.renewalnotsubmitted.description2 = You have completed the renewal application but you have not submitted it.
@@ -1114,6 +1113,7 @@ declaration.renew.registration.section1 = You have made an update but your renew
 declaration.renew.registration.section2 = Your supervision with HMRC will expire on {0} unless you renew your registration.
 declaration.renew.now = Renew now
 declaration.continue.update = Continue with your update and renew another time
+error.required.declaration.renew.registration = Select if you would like to renew now or continue with your update and renew another time
 
 changeservices.title = What do you want to do?
 changeservices.choice.add = Register another service
