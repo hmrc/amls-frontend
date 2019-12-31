@@ -111,16 +111,14 @@ object Eab {
     Call(redirectCallType, destinationUrl)
   }
 
-  // TODO: Update the URLs once config work is complete
-
   def section(implicit cache: CacheMap): Section = {
-    val notStarted = Section(key, NotStarted, false, generateRedirect(appConfig.ampWhatYouNeedUrl))
+    val notStarted = Section(key, NotStarted, false, generateRedirect(appConfig.eabWhatYouNeedUrl))
     cache.getEntry[Amp](key).fold(notStarted) {
       model =>
         if (model.isComplete && model.hasAccepted) {
-          Section(key, Completed, model.hasChanged, generateRedirect(appConfig.ampSummaryUrl))
+          Section(key, Completed, model.hasChanged, generateRedirect(appConfig.eabSummaryUrl))
         } else {
-          Section(key, Started, model.hasChanged, generateRedirect(appConfig.ampWhatYouNeedUrl))
+          Section(key, Started, model.hasChanged, generateRedirect(appConfig.eabWhatYouNeedUrl))
         }
     }
   }
