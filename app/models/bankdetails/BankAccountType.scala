@@ -71,7 +71,7 @@ object BankAccountType {
       case "03" => BelongsToOtherBusiness
       case "04" => NoBankAccountUsed
       case _ =>
-        play.api.data.validation.ValidationError("error.invalid")
+        play.api.libs.json.JsonValidationError("error.invalid")
     }
   }
 

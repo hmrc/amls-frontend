@@ -19,15 +19,15 @@ package views.businessmatching.updateservice.add
 import models.businessmatching.{AccountancyServices, TrustAndCompanyServices}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.add._
 
 
-class new_service_informationSpec extends AmlsSpec with MustMatchers {
+class new_service_informationSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     def view = new_service_information(Set(AccountancyServices.getMessage()), false)
   }

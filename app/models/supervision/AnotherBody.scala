@@ -56,6 +56,8 @@ case object AnotherBodyNo extends AnotherBody
 object AnotherBody {
 
   import utils.MappingUtils.Implicits._
+  import play.api.libs.json.JodaWrites._
+  import play.api.libs.json.JodaReads._
 
   private val supervisorMaxLength = 140
 

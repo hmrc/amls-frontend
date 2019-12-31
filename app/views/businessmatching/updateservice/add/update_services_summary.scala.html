@@ -16,14 +16,15 @@
 
 @import include._
 @import forms2._
+@import config.{ ApplicationConfig}
 @import models.businessmatching._
 @import config.{ApplicationConfig => appConfig}
 @import controllers.businessmatching.updateservice.add.routes
 @import models.flowmanagement.AddBusinessTypeFlowModel
-
 @import models.tradingpremises.TradingPremises
 @import models.responsiblepeople.ResponsiblePerson
-@(f: forms.Form2[_], flowModel: AddBusinessTypeFlowModel, tradingPremises: Seq[(TradingPremises, Int)], responsiblePeople: Seq[(ResponsiblePerson, Int)])(implicit request: Request[_],messages:Messages)
+
+@(f: forms.Form2[_], flowModel: AddBusinessTypeFlowModel, tradingPremises: Seq[(TradingPremises, Int)], responsiblePeople: Seq[(ResponsiblePerson, Int)])(implicit request: Request[_],messages:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @heading("title.cya", "summary.updateservice")

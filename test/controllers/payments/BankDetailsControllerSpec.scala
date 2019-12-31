@@ -35,7 +35,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
@@ -44,10 +44,11 @@ class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
 
     val controller = new BankDetailsController(
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       authEnrolmentsService = mock[AuthEnrolmentsService],
       feeResponseService = mock[FeeResponseService],
-      statusService = mockStatusService
+      statusService = mockStatusService,
+      cc = mockMcc
     )
 
     val submissionStatus = SubmissionReadyForReview

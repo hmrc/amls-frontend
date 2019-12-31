@@ -22,7 +22,7 @@ import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
@@ -32,13 +32,12 @@ import scala.concurrent.Future
 
 class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar {
 
-    trait Fixture extends AuthorisedFixture {
+    trait Fixture {
       self => val request = addToken(authRequest)
 
       val controller = new YourResponsiblePeopleController (
         dataCacheConnector = mock[DataCacheConnector],
-        authAction = SuccessfulAuthAction
-        )
+        authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
     }
 
     "Get" must {

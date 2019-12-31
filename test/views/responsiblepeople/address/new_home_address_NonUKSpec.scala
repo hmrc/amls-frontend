@@ -20,13 +20,13 @@ import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
 import models.autocomplete.NameValuePair
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class new_home_address_NonUKSpec extends AmlsSpec {
+class new_home_address_NonUKSpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     val name = "firstName lastName"
 

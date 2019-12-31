@@ -18,14 +18,14 @@ package views.submission
 
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
 
-class bad_requestSpec extends AmlsSpec with MustMatchers {
+class bad_requestSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
     def view = views.html.submission.bad_request()
     val errorMessage = "Non-recoverable Error - The request could not be understood by the server due to malformed syntax"
   }

@@ -21,14 +21,14 @@ import jto.validation.{Path, ValidationError}
 import models.businessactivities.{PaperBased, RiskAssessmentTypes}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
 
-class document_risk_assessment_policySpec extends AmlsSpec with MustMatchers {
+class document_risk_assessment_policySpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "risk_assessment_policy view" must {

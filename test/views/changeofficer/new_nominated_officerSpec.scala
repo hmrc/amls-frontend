@@ -21,15 +21,15 @@ import generators.ResponsiblePersonGenerator
 import jto.validation.{Path, ValidationError}
 import org.scalacheck.Gen
 import org.scalatest.MustMatchers
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import play.api.i18n.Messages
 import views.Fixture
 
 
-class new_nominated_officerSpec extends AmlsSpec with MustMatchers with ResponsiblePersonGenerator {
+class new_nominated_officerSpec extends AmlsViewSpec with MustMatchers with ResponsiblePersonGenerator {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "new_nominated_officer view" must {

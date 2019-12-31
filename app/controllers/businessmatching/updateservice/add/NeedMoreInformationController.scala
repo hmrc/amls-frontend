@@ -19,22 +19,25 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BillPaymentServices, TelephonePaymentService}
 import models.flowmanagement.{AddBusinessTypeFlowModel, NeedMoreInformationPageId}
+import play.api.mvc.MessagesControllerComponents
 import services.flowmanagement.Router
 import utils.{AuthAction, ControllerHelper}
 import views.html.businessmatching.updateservice.add.new_service_information
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
+import ExecutionContext.Implicits.global
 
 @Singleton
 class NeedMoreInformationController @Inject()(authAction: AuthAction,
+                                              val ds: CommonPlayDependencies,
                                               implicit val dataCacheConnector: DataCacheConnector,
-                                              val router: Router[AddBusinessTypeFlowModel]
-                                             ) extends DefaultBaseController {
+                                              val router: Router[AddBusinessTypeFlowModel],
+                                              val cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
       implicit request =>

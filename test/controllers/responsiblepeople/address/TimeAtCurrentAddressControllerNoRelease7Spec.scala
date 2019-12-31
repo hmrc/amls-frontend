@@ -23,26 +23,26 @@ import models.responsiblepeople._
 import models.status.SubmissionDecisionApproved
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.AmlsSpec
 
 import scala.concurrent.Future
 
-class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with MockitoSugar {
+class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
   val recordId = 1
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val timeAtAddressController = new TimeAtCurrentAddressController (
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction,
-      statusService = mock[StatusService]
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      statusService = mock[StatusService],
+      cc = mockMcc
     )
   }
 
@@ -53,7 +53,7 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with Mockito
       "time at address is less than 1 year" must {
         "redirect to the AdditionalAddressController" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "timeAtAddress" -> "01"
           )
           val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA11AA")
@@ -78,7 +78,7 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with Mockito
       "time at address is more than 1 year" must {
         "redirect to the correct location" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "timeAtAddress" -> "03"
           )
           val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA11AA")

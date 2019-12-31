@@ -22,14 +22,14 @@ import models.autocomplete.NameValuePair
 import models.responsiblepeople.{PersonAddressUK, ResponsiblePersonAddress}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.{AmlsSpec, AmlsViewSpec}
 import views.Fixture
 
 
-class additional_extra_addressSpec extends AmlsSpec with MustMatchers {
+class additional_extra_addressSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "additional_extra_address view" must {

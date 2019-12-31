@@ -18,18 +18,21 @@ package controllers.businessdetails
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import models.businessdetails._
+import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, DateOfChangeHelper}
 import views.html.businessdetails._
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class RegisteredOfficeIsUKController @Inject ()(
-                                            val dataCacheConnector: DataCacheConnector,
-                                            val authAction: AuthAction
-                                            ) extends DefaultBaseController with DateOfChangeHelper {
+                                                val dataCacheConnector: DataCacheConnector,
+                                                val authAction: AuthAction,
+                                                val ds: CommonPlayDependencies,
+                                                val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

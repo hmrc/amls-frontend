@@ -49,10 +49,10 @@ class ConfirmationControllerSpec extends AmlsSpec
   with PaymentGenerator
   with SubscriptionResponseGenerator {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val baseUrl = "http://localhost"
-    val request = addToken(authRequest).copyFakeRequest(uri = baseUrl)
+    val request = addToken(authRequest.copyFakeRequest(uri = baseUrl))
 
     val controller = new ConfirmationController(
       keystoreConnector = mock[KeystoreConnector],
@@ -60,8 +60,11 @@ class ConfirmationControllerSpec extends AmlsSpec
       statusService = mock[StatusService],
       dataCacheConnector = mock[DataCacheConnector],
       amlsConnector = mock[AmlsConnector],
+      ds = commonDependencies,
+      enrolmentService = mock[AuthEnrolmentsService],
       authenticator = mock[AuthenticatorConnector],
       confirmationService = mock[ConfirmationService],
+      cc = mockMcc,
       feeHelper = mock[FeeHelper])
 
     val amlsRegistrationNumber = "amlsRefNumber"

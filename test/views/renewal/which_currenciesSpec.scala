@@ -21,15 +21,15 @@ import jto.validation.{Path, ValidationError}
 import models.renewal.WhichCurrencies
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.which_currencies
 
 
-class which_currenciesSpec extends AmlsSpec with MustMatchers {
+class which_currenciesSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "which_currencies view" must {

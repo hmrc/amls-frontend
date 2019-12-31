@@ -19,16 +19,18 @@ package controllers.businessmatching.updateservice.remove
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import jto.validation.Write
 import jto.validation.forms.UrlFormEncoded
 import models.DateOfChange
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, _}
+import play.api.mvc.MessagesControllerComponents
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.date_of_change
 
 import scala.concurrent.Future
@@ -36,9 +38,10 @@ import scala.concurrent.Future
 @Singleton
 class WhatDateRemovedController @Inject()(
                                            authAction: AuthAction,
+                                           val ds: CommonPlayDependencies,
                                            val dataCacheConnector: DataCacheConnector,
-                                           val router: Router[RemoveBusinessTypeFlowModel]
-                                           ) extends DefaultBaseController {
+                                           val router: Router[RemoveBusinessTypeFlowModel],
+                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   implicit val dateWrites: Write[DateOfChange, UrlFormEncoded] =
     Write {

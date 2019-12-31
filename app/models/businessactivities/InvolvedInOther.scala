@@ -66,9 +66,9 @@ object InvolvedInOther {
 
   implicit val jsonWrites = Writes[InvolvedInOther] {
     case InvolvedInOtherYes(details) => Json.obj(
-                                          "involvedInOther" -> true,
-                                          "details" -> details
-                                        )
+      "involvedInOther" -> true,
+      "details" -> details
+    )
     case involvedInOtherNo => Json.obj("involvedInOther" -> false)
   }
 

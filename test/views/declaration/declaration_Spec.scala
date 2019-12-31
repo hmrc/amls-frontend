@@ -17,15 +17,15 @@
 package views.declaration
 
 import org.scalatest.{MustMatchers}
-import  utils.AmlsSpec
+import  utils.AmlsViewSpec
 import play.api.i18n.Messages
 import views.Fixture
 
 
-class declaration_Spec extends AmlsSpec with MustMatchers  {
+class declaration_Spec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "declaration view" must {

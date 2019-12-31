@@ -32,7 +32,7 @@ import models.{status => _, _}
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import play.api.mvc.Result
+import play.api.mvc.{BodyParsers, MessagesActionBuilder, Result}
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, LandingService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -45,8 +45,10 @@ import scala.concurrent.Future
 
 class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerator {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
+
+    val mockApplicationConfig = mock[ApplicationConfig]
 
     val request = addToken(authRequest)
 
@@ -56,7 +58,11 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       authAction = SuccessfulAuthActionNoAmlsRefNo,
       auditConnector = mock[AuditConnector],
       cacheConnector = mock[DataCacheConnector],
-      statusService = mock[StatusService])
+      statusService = mock[StatusService],
+      ds = commonDependencies,
+      mcc = mockMcc,
+      messagesApi = messagesApi,
+      parser = mock[BodyParsers.Default])
 
     val controllerNoUserRole = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],
@@ -64,7 +70,11 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       authAction = SuccessfulAuthActionNoUserRole,
       auditConnector = mock[AuditConnector],
       cacheConnector = mock[DataCacheConnector],
-      statusService = mock[StatusService])
+      statusService = mock[StatusService],
+      ds = commonDependencies,
+      mcc = mockMcc,
+      messagesApi = messagesApi,
+      parser = mock[BodyParsers.Default])
 
     when {
       controllerNoAmlsNumber.landingService.setAltCorrespondenceAddress(any(), any[String])(any(), any())
@@ -195,7 +205,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       }
 
       "redirect to the sign-out page when the user role is not USER" in new Fixture {
-        val expectedLocation = s"${ApplicationConfig.logoutUrl}?continue=${
+        val expectedLocation = s"${appConfig.logoutUrl}?continue=${
           URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role).absoluteUrl, "utf-8")}"
 
         val result = controllerNoUserRole.get()(request)
@@ -246,7 +256,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
 
           val result = controllerNoAmlsNumber.get()(request)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(ApplicationConfig.businessCustomerUrl)
+          redirectLocation(result) mustBe Some(appConfig.businessCustomerUrl)
         }
       }
 

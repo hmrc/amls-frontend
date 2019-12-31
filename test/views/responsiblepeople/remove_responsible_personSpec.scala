@@ -19,16 +19,16 @@ package views.responsiblepeople
 import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{ExperienceTraining, ExperienceTrainingYes}
 import org.scalatest.MustMatchers
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
 
-class remove_responsible_personSpec extends AmlsSpec with MustMatchers  {
+class remove_responsible_personSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "remove_responsible_person view" must {

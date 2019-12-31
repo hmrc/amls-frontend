@@ -17,19 +17,21 @@
 package controllers.tcsp
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.tcsp.{CompanyFormationAgent, RegisteredOfficeEtc, Tcsp, TcspTypes}
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.tcsp.service_provider_types
 
 import scala.concurrent.Future
 
 class TcspTypesController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                     val authAction: AuthAction
-                                    ) extends DefaultBaseController {
+                                     val authAction: AuthAction,
+                                     val ds: CommonPlayDependencies,
+                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

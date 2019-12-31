@@ -20,12 +20,14 @@ import audit.AddressConversions._
 import audit.{AddressCreatedEvent, AddressModifiedEvent}
 import cats.data.OptionT
 import cats.implicits._
+import config.ApplicationConfig
 import forms.InvalidForm
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ThreeYearsPlus, ZeroToFiveMonths}
 import models.responsiblepeople._
 import models.status.SubmissionStatus
 import models.{Country, DateOfChange, ViewResponse}
 import org.joda.time.{LocalDate, Months}
+import play.api.i18n.{Lang, Messages}
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
@@ -37,7 +39,8 @@ import scala.concurrent.{ExecutionContext, Future}
 trait AddressHelper extends RepeatingSection with DateOfChangeHelper {
 
   private[address] def updateAdditionalAddressAndRedirect(credId: String, data: ResponsiblePersonAddress, index: Int, edit: Boolean, flow: Option[String])
-                                                         (implicit request: Request[AnyContent], hc: HeaderCarrier, ec: ExecutionContext, auditConnector: AuditConnector) = {
+                                                         (implicit request: Request[AnyContent], hc: HeaderCarrier, ec: ExecutionContext,
+                                                          auditConnector: AuditConnector, messages: Messages, lang: Lang, appConfig: ApplicationConfig) = {
 
     import play.api.mvc.Results._
 
@@ -60,11 +63,12 @@ trait AddressHelper extends RepeatingSection with DateOfChangeHelper {
       rp <- OptionT(getData[ResponsiblePerson](credId, index))
       _ <- OptionT.liftF(auditPreviousAddressChange(data.personAddress, rp, edit)) orElse OptionT.some[Future, AuditResult](Success)
       result <- OptionT.liftF(doUpdate())
-    } yield result) getOrElse NotFound(ControllerHelper.notFoundView(request))
+    } yield result) getOrElse NotFound(ControllerHelper.notFoundView(request, messages, lang, appConfig))
   }
 
   private[address] def updateAdditionalExtraAddressAndRedirect(credId: String, data: ResponsiblePersonAddress, index: Int, edit: Boolean, flow: Option[String])
-                                                              (implicit request: Request[AnyContent], hc: HeaderCarrier, ec: ExecutionContext, auditConnector: AuditConnector) = {
+                                                              (implicit request: Request[AnyContent], hc: HeaderCarrier, ec: ExecutionContext,
+                                                               auditConnector: AuditConnector, messages: Messages, lang: Lang, appConfig: ApplicationConfig) = {
 
     import play.api.mvc.Results._
 
@@ -86,7 +90,7 @@ trait AddressHelper extends RepeatingSection with DateOfChangeHelper {
       rp <- OptionT(getData[ResponsiblePerson](credId, index))
       result <- OptionT.liftF(doUpdate())
       _ <- OptionT.liftF(auditPreviousExtraAddressChange(data.personAddress, rp, edit))
-    } yield result).getOrElse(NotFound(ControllerHelper.notFoundView(request)))
+    } yield result).getOrElse(NotFound(ControllerHelper.notFoundView(request, messages, lang, appConfig)))
   }
 
   private[address] def updateCurrentAddressAndRedirect(credId: String, data: ResponsiblePersonCurrentAddress, index: Int, edit: Boolean,

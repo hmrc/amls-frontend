@@ -17,18 +17,21 @@
 package controllers.bankdetails
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.bankdetails.BankDetails
-import play.api.mvc.{Call, Request}
+import play.api.mvc.{Call, MessagesControllerComponents, Request}
 import utils.{AuthAction, BooleanFormReadWrite}
 import views.html.bankdetails._
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class HasBankAccountController @Inject()(val authAction: AuthAction,
-                                         cacheConnector: DataCacheConnector) extends DefaultBaseController {
+                                         val ds: CommonPlayDependencies,
+                                         cacheConnector: DataCacheConnector,
+                                         val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   val router: Boolean => Call = {
     case true => routes.BankAccountNameController.getNoIndex()

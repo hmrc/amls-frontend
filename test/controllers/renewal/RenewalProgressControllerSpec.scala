@@ -38,7 +38,7 @@ import services.businessmatching.BusinessMatchingService
 import services.{ProgressService, RenewalService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.auth.core.AuthConnector
 import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -46,7 +46,7 @@ import scala.concurrent.Future
 
 class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val request = addToken(authRequest)
 
@@ -215,7 +215,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
   "POST" must {
     "redirect to correct page" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody()
+      val newRequest = requestWithUrlEncodedBody("" -> "")
 
       when(controller.progressService.getSubmitRedirect(any[Option[String]](), any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(controllers.declaration.routes.WhoIsRegisteringController.get())))

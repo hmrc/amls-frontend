@@ -16,7 +16,7 @@
 
 package models.estateagentbusiness
 
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
@@ -25,8 +25,6 @@ import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 class ProfessionalBodySpec extends PlaySpec with MockitoSugar {
 
   "Form Validation" must {
-
-
     "pass validation" when {
       "given a valid enum value" in {
 
@@ -144,7 +142,7 @@ class ProfessionalBodySpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("penalised" -> true)
 
       Json.fromJson[ProfessionalBody](json) must
-        be(JsError((JsPath \ "professionalBody") -> play.api.data.validation.ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "professionalBody") -> play.api.libs.json.JsonValidationError("error.path.missing")))
     }
 
     "write the correct value" in {

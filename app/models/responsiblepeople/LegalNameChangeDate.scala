@@ -22,6 +22,8 @@ import jto.validation.{From, Rule, Write}
 import models.FormTypes._
 import org.joda.time.{DateTimeFieldType, LocalDate}
 import play.api.libs.json.{Json, Writes => _}
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 
 case class LegalNameChangeDate(date: LocalDate)
 

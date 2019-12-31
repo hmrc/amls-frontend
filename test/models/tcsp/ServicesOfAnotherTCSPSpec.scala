@@ -16,7 +16,7 @@
 
 package models.tcsp
 
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
@@ -113,7 +113,7 @@ class ServicesOfAnotherTCSPSpec extends PlaySpec with MockitoSugar {
     }
 
     "JSON validation" when {
-      import play.api.data.validation.ValidationError
+      import play.api.libs.json.JsonValidationError
 
       "successfully validate given an enum value" in {
 
@@ -132,7 +132,7 @@ class ServicesOfAnotherTCSPSpec extends PlaySpec with MockitoSugar {
         val json = Json.obj("servicesOfAnotherTCSP" -> true)
 
         Json.fromJson[ServicesOfAnotherTCSP](json) must
-          be(JsError((JsPath \ "mlrRefNumber") -> ValidationError("error.path.missing")))
+          be(JsError((JsPath \ "mlrRefNumber") -> JsonValidationError("error.path.missing")))
       }
 
       "write the correct value" in {

@@ -76,7 +76,7 @@ object PercentageOfCashPaymentOver15000 {
       case "04" => Fourth
       case "05" => Fifth
       case _ =>
-        play.api.data.validation.ValidationError("error.invalid")
+        play.api.libs.json.JsonValidationError("error.invalid")
     }
   }
 

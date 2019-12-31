@@ -28,7 +28,7 @@
     section: String = "",
     showErrorStyling: Boolean = true,
     f: forms.Field
-)(content: Html)(implicit lang:Lang,  m: Messages)
+)(content: Html)(implicit m: Messages)
 
 @if(section.nonEmpty) {
     <div class="page-header"><p class="heading-secondary"><span class="visuallyhidden">This section is: </span>@Messages(section)</p></div>

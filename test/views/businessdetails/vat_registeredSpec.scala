@@ -19,17 +19,17 @@ package views.businessdetails
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessdetails.{VATRegistered, VATRegisteredYes}
 import org.scalatest.MustMatchers
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
 
 
-class vat_registeredSpec extends AmlsSpec with MustMatchers  {
+class vat_registeredSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "vat_registered view" must {

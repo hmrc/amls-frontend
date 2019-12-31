@@ -24,7 +24,7 @@ import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.libs.json.Json
@@ -36,13 +36,12 @@ import scala.concurrent.Future
 
 class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures{
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new TaxMattersController (
       dataCacheConnector = mock[DataCacheConnector],
-      SuccessfulAuthAction
-    )
+      SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   "TaxMattersController" when {
@@ -87,7 +86,7 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
     "post is called" must {
       "redirect to Check Your Answers on post with valid data" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "manageYourTaxAffairs" -> "true"
         )
 
@@ -112,7 +111,7 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
                 None,
                 None))))))
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "manageYourTaxAffairs" -> "grrrrr"
         )
 
@@ -124,7 +123,7 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
       "redirect to Check Your Answers on post with valid data in edit mode" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "manageYourTaxAffairs" -> "true"
         )
 

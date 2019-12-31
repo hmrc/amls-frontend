@@ -92,6 +92,6 @@ object BusinessType {
     case JsString("LLP") => JsSuccess(LPrLLP)
     case JsString("Unincorporated Body") => JsSuccess(UnincorporatedBody)
     case _ =>
-      JsError(JsPath -> play.api.data.validation.ValidationError("error.invalid"))
+      JsError(JsPath -> play.api.libs.json.JsonValidationError("error.invalid"))
   }
 }

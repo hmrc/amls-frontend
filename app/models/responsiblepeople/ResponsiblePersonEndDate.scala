@@ -21,6 +21,8 @@ import org.joda.time.{DateTimeFieldType, LocalDate}
 import jto.validation._
 import jto.validation.forms._
 import play.api.libs.json.Json
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 
 case class ResponsiblePersonEndDate(endDate: LocalDate)
 

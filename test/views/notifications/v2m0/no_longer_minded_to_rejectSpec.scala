@@ -19,14 +19,14 @@ package views.notifications.v2m0
 import models.notifications.NotificationParams
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class no_longer_minded_to_rejectSpec extends AmlsSpec with MustMatchers {
+class no_longer_minded_to_rejectSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
 
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     val notificationParams = NotificationParams(safeId = Some("reference"))
 

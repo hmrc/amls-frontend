@@ -44,7 +44,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
   with ReviewDetailsGenerator
   with AmlsReferenceNumberGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
 
     val mockBusinessMatching = mock[BusinessMatching]
@@ -58,7 +58,9 @@ class RegistrationProgressControllerSpec extends AmlsSpec
       statusService = mockStatusService,
       sectionsProvider = mock[SectionsProvider],
       businessMatchingService = mockBusinessMatchingService,
-      serviceFlow = mockServiceFlow)
+      serviceFlow = mockServiceFlow,
+      ds = commonDependencies,
+      cc = mockMcc)
 
     mockApplicationStatus(SubmissionReady)
     mockCacheFetch[Renewal](None)

@@ -19,7 +19,8 @@
 @import include.forms2._
 @import models.autocomplete.NameValuePair
 
-@(f: Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
+@import config.ApplicationConfig
+@(f: Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()

@@ -20,17 +20,17 @@ import forms.{InvalidForm, ValidForm, Form2}
 import models.businessmatching.BusinessType
 import models.businessmatching.BusinessType.LimitedCompany
 import org.scalatest.{MustMatchers}
-import  utils.AmlsSpec
+import  utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
 
 
-class business_typeSpec extends AmlsSpec with MustMatchers  {
+class business_typeSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "business_type view" must {

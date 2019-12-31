@@ -36,7 +36,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenerator {
 
-  trait Fixture extends AuthorisedFixture { self =>
+  trait Fixture { self =>
 
     val request = addToken(authRequest)
 
@@ -44,11 +44,12 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
     implicit val ec: ExecutionContext = mock[ExecutionContext]
 
     val controller = new TypeOfBankController(
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       auditConnector = mock[AuditConnector],
       authEnrolmentsService = mock[AuthEnrolmentsService],
       feeResponseService = mock[FeeResponseService],
-      paymentsService = mock[PaymentsService]
+      paymentsService = mock[PaymentsService],
+      cc = mockMcc
     )
 
     val paymentRef = paymentRefGen.sample.get
@@ -100,7 +101,7 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
       "form value is true" must {
         "redirect to BankDetails" in new Fixture {
 
-          val postRequest = request.withFormUrlEncodedBody(
+          val postRequest = requestWithUrlEncodedBody(
             "typeOfBank" -> "true"
           )
 
@@ -115,7 +116,7 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
       "form value is false" must {
         "redirect to BankDetails" in new Fixture {
 
-          val postRequest = request.withFormUrlEncodedBody(
+          val postRequest = requestWithUrlEncodedBody(
             "typeOfBank" -> "false"
           )
 
@@ -131,7 +132,7 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
       "request is invalid" must {
         "return BAD_REQUEST" in new Fixture {
 
-          val postRequest = request.withFormUrlEncodedBody(
+          val postRequest = requestWithUrlEncodedBody(
             "typeOfBank" -> "01"
           )
 

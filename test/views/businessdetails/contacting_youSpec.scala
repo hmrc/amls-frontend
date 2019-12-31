@@ -21,14 +21,14 @@ import jto.validation.{Path, ValidationError}
 import models.businessdetails.ContactingYouEmail
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
 
-class contacting_youSpec extends AmlsSpec with MustMatchers  {
+class contacting_youSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "contacting_you view" must {

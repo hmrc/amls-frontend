@@ -16,14 +16,14 @@
 
 package views
 
-import org.scalatest.{MustMatchers}
-import  utils.AmlsSpec
+import org.scalatest.MustMatchers
+import utils.AmlsViewSpec
 import play.api.i18n.Messages
 
-class LoginEventSpec extends AmlsSpec with MustMatchers {
+class LoginEventSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "Login Event Page View" must {

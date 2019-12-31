@@ -23,7 +23,7 @@ import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.renewal._
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.mvc.Call
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
@@ -38,7 +38,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
   implicit val hc = HeaderCarrier()
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
 
     val dataCache = mock[DataCacheConnector]
 

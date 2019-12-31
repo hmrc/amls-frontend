@@ -22,6 +22,8 @@ import org.joda.time.LocalDate
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Path, Rule, Write}
 import play.api.libs.json._
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 
 case class DateOfChange (dateOfChange: LocalDate)
 

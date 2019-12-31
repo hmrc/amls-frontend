@@ -16,16 +16,18 @@
 
 package controllers.tcsp
 
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.tcsp.what_you_need
 
 import scala.concurrent.Future
 
-class WhatYouNeedController @Inject() (val authAction: AuthAction
-                                      ) extends DefaultBaseController {
+class WhatYouNeedController @Inject() (val authAction: AuthAction,
+                                       val ds: CommonPlayDependencies,
+                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get() =
     authAction.async {

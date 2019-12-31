@@ -20,22 +20,19 @@ import forms.EmptyForm
 import models.Country
 import models.businessmatching._
 import models.renewal._
-import org.scalatest.MustMatchers
+import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
-import utils.AmlsSpec
-import views.{Fixture, HtmlAssertions}
-import org.jsoup.nodes.Element
+import play.api.test.FakeRequest
+import utils.AmlsSummaryViewSpec
+import views.Fixture
 
 import scala.collection.JavaConversions._
 
-class summarySpec extends AmlsSpec
-  with MustMatchers
-  with TableDrivenPropertyChecks
-  with HtmlAssertions {
+class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView(FakeRequest())
   }
 
   "summary view" must {
@@ -68,27 +65,28 @@ class summarySpec extends AmlsSpec
       "businessmatching.registerservices.servicename.lbl.08"
     )
 
-    val sectionChecks = Table[String, Element=>Boolean, String](
-      ("title key", "check", "edit link"),
-      ("renewal.involvedinother.title",checkElementTextIncludes(_, "test text"), controllers.renewal.routes.InvolvedInOtherController.get(true).toString),
-      ("renewal.business-turnover.title", checkElementTextIncludes(_, "£0 to £14,999"), controllers.renewal.routes.BusinessTurnoverController.get(true).toString),
-      ("renewal.turnover.title", checkElementTextIncludes(_, "£0 to £14,999"), controllers.renewal.routes.AMLSTurnoverController.get(true).toString),
-      ("renewal.turnover.title", checkListContainsItems(_, fullActivitiesSet), controllers.renewal.routes.AMLSTurnoverController.get(true).toString),
-      ("renewal.customer.outside.uk.title", checkElementTextIncludes(_, "Yes"), controllers.renewal.routes.CustomersOutsideIsUKController.get(true).toString),
-      ("renewal.customer.outside.uk.countries.title", checkElementTextIncludes(_, "United Kingdom"), controllers.renewal.routes.CustomersOutsideUKController.get(true).toString),
-      ("renewal.hvd.percentage.title", checkElementTextIncludes(_, "hvd.percentage.lbl.01"), controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.get(true).toString),
-      ("renewal.receiving.title", checkElementTextIncludes(_, "Yes"), controllers.renewal.routes.CashPaymentsCustomersNotMetController.get(true).toString),
-      ("renewal.cash.payments.received.title", checkElementTextIncludes(_, "Directly into a bank account"), controllers.renewal.routes.HowCashPaymentsReceivedController.get(true).toString),
-      ("renewal.msb.throughput.header", checkElementTextIncludes(_, "renewal.msb.throughput.selection.1"), controllers.renewal.routes.TotalThroughputController.get(true).toString),
-      ("renewal.msb.transfers.header", checkElementTextIncludes(_, "1500"), controllers.renewal.routes.TransactionsInLast12MonthsController.get(true).toString),
-      ("renewal.msb.largest.amounts.title", checkElementTextIncludes(_, "France"), controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get(true).toString),
-      ("renewal.msb.most.transactions.title", checkElementTextIncludes(_, "United Kingdom"), controllers.renewal.routes.MostTransactionsController.get(true).toString),
-      ("renewal.msb.whichcurrencies.header", checkElementTextIncludes(_, "EUR"), controllers.renewal.routes.WhichCurrenciesController.get(true).toString),
-      ("renewal.msb.ce.transactions.expected.title", checkElementTextIncludes(_, "123"), controllers.renewal.routes.CETransactionsInLast12MonthsController.get(true).toString),
-      ("renewal.msb.fx.transactions.expected.title", checkElementTextIncludes(_, "12"), controllers.renewal.routes.FXTransactionsInLast12MonthsController.get(true).toString)
-    )
-
     "include the provided data" in new ViewFixture {
+
+      val sectionChecks = Table[String, Element=>Boolean, String](
+        ("title key", "check", "edit link"),
+        ("renewal.involvedinother.title",checkElementTextIncludes(_, "test text"), controllers.renewal.routes.InvolvedInOtherController.get(true).toString),
+        ("renewal.business-turnover.title", checkElementTextIncludes(_, "£0 to £14,999"), controllers.renewal.routes.BusinessTurnoverController.get(true).toString),
+        ("renewal.turnover.title", checkElementTextIncludes(_, "£0 to £14,999"), controllers.renewal.routes.AMLSTurnoverController.get(true).toString),
+        ("renewal.turnover.title", checkListContainsItems(_, fullActivitiesSet), controllers.renewal.routes.AMLSTurnoverController.get(true).toString),
+        ("renewal.customer.outside.uk.title", checkElementTextIncludes(_, "Yes"), controllers.renewal.routes.CustomersOutsideIsUKController.get(true).toString),
+        ("renewal.customer.outside.uk.countries.title", checkElementTextIncludes(_, "United Kingdom"), controllers.renewal.routes.CustomersOutsideUKController.get(true).toString),
+        ("renewal.hvd.percentage.title", checkElementTextIncludes(_, "hvd.percentage.lbl.01"), controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.get(true).toString),
+        ("renewal.receiving.title", checkElementTextIncludes(_, "Yes"), controllers.renewal.routes.CashPaymentsCustomersNotMetController.get(true).toString),
+        ("renewal.cash.payments.received.title", checkElementTextIncludes(_, "Directly into a bank account"), controllers.renewal.routes.HowCashPaymentsReceivedController.get(true).toString),
+        ("renewal.msb.throughput.header", checkElementTextIncludes(_, "renewal.msb.throughput.selection.1"), controllers.renewal.routes.TotalThroughputController.get(true).toString),
+        ("renewal.msb.transfers.header", checkElementTextIncludes(_, "1500"), controllers.renewal.routes.TransactionsInLast12MonthsController.get(true).toString),
+        ("renewal.msb.largest.amounts.title", checkElementTextIncludes(_, "France"), controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get(true).toString),
+        ("renewal.msb.most.transactions.title", checkElementTextIncludes(_, "United Kingdom"), controllers.renewal.routes.MostTransactionsController.get(true).toString),
+        ("renewal.msb.whichcurrencies.header", checkElementTextIncludes(_, "EUR"), controllers.renewal.routes.WhichCurrenciesController.get(true).toString),
+        ("renewal.msb.ce.transactions.expected.title", checkElementTextIncludes(_, "123"), controllers.renewal.routes.CETransactionsInLast12MonthsController.get(true).toString),
+        ("renewal.msb.fx.transactions.expected.title", checkElementTextIncludes(_, "12"), controllers.renewal.routes.FXTransactionsInLast12MonthsController.get(true).toString)
+      )
+
       def view = {
         val renewalModel = Renewal(
           Some(InvolvedInOtherYes("test text")),

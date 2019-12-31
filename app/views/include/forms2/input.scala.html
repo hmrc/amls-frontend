@@ -38,7 +38,7 @@
     dataAttrs: Map[String, String] = Map.empty[String, String],
     heading: String = "",
     section: String = ""
-)(implicit lang:Lang,  m: Messages)
+)(implicit m: Messages, lang: Lang)
 
 @labelSpan = {
     @if(labelText.nonEmpty) {

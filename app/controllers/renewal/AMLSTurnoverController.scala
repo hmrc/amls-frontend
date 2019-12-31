@@ -17,21 +17,23 @@
 package controllers.renewal
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import javax.inject.{Inject, Singleton}
 import models.businessmatching._
 import models.renewal.{AMLSTurnover, Renewal}
+import play.api.mvc.MessagesControllerComponents
 import services.RenewalService
 import utils.{AuthAction, ControllerHelper}
 import views.html.renewal.amls_turnover
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
-class AMLSTurnoverController @Inject()(
-                                        val dataCacheConnector: DataCacheConnector,
-                                        val authAction: AuthAction,
-                                        val renewalService: RenewalService
-                                      ) extends DefaultBaseController {
+class AMLSTurnoverController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                       val authAction: AuthAction,
+                                       val ds: CommonPlayDependencies,
+                                       val renewalService: RenewalService,
+                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

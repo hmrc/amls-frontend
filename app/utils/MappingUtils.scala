@@ -167,7 +167,7 @@ trait MappingUtils {
     implicit def toReadsSuccess[A, B <: A](b: B): Reads[A] =
       Reads { _ => JsSuccess(b) }
 
-    implicit def toReadsFailure[A](f: play.api.data.validation.ValidationError): Reads[A] =
+    implicit def toReadsFailure[A](f: play.api.libs.json.JsonValidationError): Reads[A] =
       Reads { _ => JsError(f) }
 
     implicit class RichRule[I, O](rule: Rule[I, O]) {
@@ -234,7 +234,7 @@ trait MappingUtils {
     import play.api.libs.json.Reads._
 
     def nonEmpty[M](implicit reads: Reads[M], p: M => TraversableLike[_, M]) =
-      filter[M](play.api.data.validation.ValidationError("error.required"))(_.isEmpty)
+      filter[M](play.api.libs.json.JsonValidationError("error.required"))(_.isEmpty)
   }
 
 

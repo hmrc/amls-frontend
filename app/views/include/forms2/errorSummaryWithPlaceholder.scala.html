@@ -16,7 +16,7 @@
 
 @import forms._
 
-@(form: Form2[_], placeholder:String = "")(implicit lang:Lang,  m: Messages)
+@(form: Form2[_], placeholder:String = "")(implicit m: Messages, lang: Lang)
 
 @if(form.errors.nonEmpty) {
     <div class="flash amls-error-summary" role="alert" tabindex="-1">
