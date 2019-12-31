@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-package controllers.auth
+package config
 
-import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
-import uk.gov.hmrc.play.frontend.auth.{AuthenticationProvider, TaxRegime}
+import com.google.inject.Inject
+import uk.gov.hmrc.crypto.PlainText
+import uk.gov.hmrc.play.bootstrap.filters.frontend.crypto.SessionCookieCrypto
+import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 
-object AmlsRegime extends TaxRegime {
-
-  override def isAuthorised(accounts: Accounts): Boolean = {
-    accounts.ct.isDefined || accounts.org.isDefined || accounts.sa.isDefined
-  }
-
-  override def authenticationType: AuthenticationProvider = AmlsGovernmentGateway
-
-  override def unauthorisedLandingPage: Option[String] = Some(controllers.routes.AmlsController.unauthorised().url)
+class AmlsHeaderCarrierForPartialsConverter @Inject()(val sessionCookieCrypto: SessionCookieCrypto) extends HeaderCarrierForPartialsConverter {
+  override def crypto: String => String = identity
 }

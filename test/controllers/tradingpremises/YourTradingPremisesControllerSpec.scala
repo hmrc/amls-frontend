@@ -26,7 +26,7 @@ import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -46,14 +46,13 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
   //val mockCacheMap = mock[CacheMap]
   val mockYtp = mock[TradingPremises]
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
 
     val ytpController = new YourTradingPremisesController(
       mockDataCacheConnector,
       mockStatusService,
-      SuccessfulAuthAction
-    )
+      SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
 
     when(ytpController.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
 
@@ -169,7 +168,7 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
 
         val emptyCache = CacheMap("", Map.empty)
 
-        val newRequest = request.withFormUrlEncodedBody( "hasAccepted" -> "true")
+        val newRequest = requestWithUrlEncodedBody( "hasAccepted" -> "true")
 
         when(ytpController.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises =  Some(ytpModel), hasAccepted = true)))))

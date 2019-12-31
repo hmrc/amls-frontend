@@ -123,7 +123,7 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
 
       ResponsiblePersonEndDate.format.reads(
         ResponsiblePersonEndDate.format.writes(ResponsiblePersonEndDate(new LocalDate(1990, 2, 24)))) must be(
-        JsSuccess(ResponsiblePersonEndDate(new LocalDate(1990, 2, 24)), JsPath \ "endDate"))
+        JsSuccess(ResponsiblePersonEndDate(new LocalDate(1990, 2, 24)), JsPath))
 
     }
 

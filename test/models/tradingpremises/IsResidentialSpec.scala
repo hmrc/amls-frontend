@@ -69,7 +69,7 @@ class IsResidentialSpec extends PlaySpec {
     "Read and write successfully" in {
 
       IsResidential.format.reads(IsResidential.format.writes(IsResidential(true))) must be(
-        JsSuccess(IsResidential(true), JsPath \ "isResidential"))
+        JsSuccess(IsResidential(true), JsPath))
     }
 
     "write successfully" in {

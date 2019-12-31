@@ -34,15 +34,9 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures {
     val request = addToken(self.authRequest)
     val RecordId = 1
 
-    val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
-      .build()
+    lazy val controller = new LegalNameChangeDateController(mockCacheConnector, SuccessfulAuthAction, commonDependencies, cc = mockMcc)
 
-    lazy val controller = injector.instanceOf[LegalNameChangeDateController]
     val personName = PersonName("firstname", None, "lastname")
-
-
   }
 
   "The LegalNameChangeDateController" when {
@@ -94,7 +88,7 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures {
         "go to KnownByController" when {
           "edit is false" in new TestFixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "date.day" -> "1",
               "date.month" -> "12",
               "date.year" -> "1990"
@@ -112,7 +106,7 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures {
         "go to DetailedAnswersController" when {
           "edit is true" in new TestFixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "date.day" -> "1",
               "date.month" -> "12",
               "date.year" -> "1990"
@@ -131,7 +125,7 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures {
       "form is invalid" must {
         "return BAD_REQUEST" in new TestFixture {
 
-          val NameMissingInRequest = request.withFormUrlEncodedBody(
+          val NameMissingInRequest = requestWithUrlEncodedBody(
             "date.day" -> "1"
           )
 
@@ -148,7 +142,7 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures {
       "model cannot be found with given index" must {
         "return NOT_FOUND" in new TestFixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "date.day" -> "1",
             "date.month" -> "12",
             "date.year" -> "1990"

@@ -18,27 +18,29 @@ package controllers.payments
 
 import cats.data.OptionT
 import cats.implicits._
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.FeeResponse
 import models.payments.WaysToPay._
 import models.payments.{CreateBacsPaymentRequest, WaysToPay}
-import play.api.mvc.Result
+import play.api.mvc.{MessagesControllerComponents, Result}
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, AuthorisedRequest}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class WaysToPayController @Inject()(
                                      val authAction: AuthAction,
+                                     val ds: CommonPlayDependencies,
                                      val statusService: StatusService,
                                      val paymentsService: PaymentsService,
                                      val authEnrolmentsService: AuthEnrolmentsService,
-                                     val feeResponseService: FeeResponseService
-                                   ) extends DefaultBaseController {
+                                     val feeResponseService: FeeResponseService,
+                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
       implicit request =>

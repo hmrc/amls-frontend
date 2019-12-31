@@ -18,16 +18,16 @@ package views.responsiblepeople
 
 import forms.{EmptyForm, InvalidForm}
 import org.scalatest.MustMatchers
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
 
-class date_of_birthSpec extends AmlsSpec with MustMatchers  {
+class date_of_birthSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "date_of_birth view" must {

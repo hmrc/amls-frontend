@@ -17,7 +17,7 @@
 package models.supervision
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
@@ -99,7 +99,7 @@ class SupervisionEndReasonsSpec extends PlaySpec with MockitoSugar {
 
     "fail when data is missing" in {
       Json.fromJson[SupervisionEndReasons](Json.obj()) must
-        be(JsError((JsPath \ "supervisionEndingReason") -> play.api.data.validation.ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "supervisionEndingReason") -> play.api.libs.json.JsonValidationError("error.path.missing")))
     }
   }
 }

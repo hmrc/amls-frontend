@@ -25,7 +25,7 @@ import org.jsoup.nodes.{Document, Element}
 import org.jsoup.select.Elements
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -36,7 +36,7 @@ import scala.concurrent.Future
 
 class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
 
-  trait Fixture extends AuthorisedFixture with AutoCompleteServiceMocks {
+  trait Fixture extends AutoCompleteServiceMocks {
     self => val request = addToken(authRequest)
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
@@ -44,8 +44,7 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
 
     val controller = new RegisteredOfficeIsUKController(
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
 
     when(controller.dataCacheConnector.fetch[BusinessDetails](any(), any())(any(), any()))
       .thenReturn(Future.successful(None))
@@ -63,7 +62,7 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
     "successfully submit form and navigate to RegisteredOfficeUK when true and edit false" in new Fixture {
       when(mockDataCacheConnector.save[BusinessDetails](any(), any(), any())(any(), any())).thenReturn(Future.successful(mockCacheMap))
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "isUK"-> "true"
       )
 
@@ -75,7 +74,7 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
 
     "successfully submit form and navigate to RegisteredOfficeNonUK when false and edit false" in new Fixture {
       when(mockDataCacheConnector.save[BusinessDetails](any(), any(), any())(any(), any())).thenReturn(Future.successful(mockCacheMap))
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "isUK"-> "false"
       )
 
@@ -90,7 +89,7 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
       when(controller.dataCacheConnector.fetch[BusinessDetails](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(RegisteredOfficeIsUK(true)), Some(ukAddress), None))))
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "isUK"-> "true"
       )
 
@@ -105,7 +104,7 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
       when(controller.dataCacheConnector.fetch[BusinessDetails](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(RegisteredOfficeIsUK(false)), Some(ukAddress), None))))
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "isUK"-> "false"
       )
 
@@ -120,7 +119,7 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
       when(controller.dataCacheConnector.fetch[BusinessDetails](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(RegisteredOfficeIsUK(true)), Some(nonUKAddress), None))))
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "isUK"-> "true"
       )
 
@@ -135,7 +134,7 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
       when(controller.dataCacheConnector.fetch[BusinessDetails](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(RegisteredOfficeIsUK(false)), Some(nonUKAddress), None))))
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "isUK"-> "false"
       )
 
@@ -146,7 +145,7 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
     }
 
     "fail submission on invalid isUK" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "isUK"-> ""
       )
 
@@ -165,7 +164,7 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
 
         when(controller.dataCacheConnector.fetch(any(), any())(any(), any())).thenReturn(Future.successful(None))
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "isUK" -> "*"
         )
         val result = controller.post()(newRequest)

@@ -34,14 +34,14 @@ import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
-                                         implicit val dataCacheConnector: DataCacheConnector
-                                   ) {
+                                         implicit val dataCacheConnector: DataCacheConnector) {
 
   def removeSectionData(credId: String, model: RemoveBusinessTypeFlowModel)
                        (implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Seq[CacheMap]] = {

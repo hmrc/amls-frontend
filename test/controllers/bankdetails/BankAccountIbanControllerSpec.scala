@@ -33,12 +33,11 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
-class BankAccountIbanControllerSpec extends AmlsSpec with MockitoSugar {
+class BankAccountIbanControllerSpec extends AmlsSpec {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
     val request = addToken(authRequest)
-
 
     val ukBankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456", "11-11-11")))
 
@@ -46,7 +45,9 @@ class BankAccountIbanControllerSpec extends AmlsSpec with MockitoSugar {
       mockCacheConnector,
       SuccessfulAuthAction,
       mock[AuditConnector],
-      mockStatusService
+      mockStatusService,
+      commonDependencies,
+      mockMcc
     )
 
   }
@@ -143,7 +144,7 @@ class BankAccountIbanControllerSpec extends AmlsSpec with MockitoSugar {
         "given valid data in edit mode" in new Fixture {
 
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "IBANNumber" -> "12345"
           )
 
@@ -160,7 +161,7 @@ class BankAccountIbanControllerSpec extends AmlsSpec with MockitoSugar {
         }
         "given valid data when NOT in edit mode" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "IBANNumber" -> "12345"
           )
 
@@ -181,7 +182,7 @@ class BankAccountIbanControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with NOT_FOUND" when {
         "given an index out of bounds in edit mode" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "IBANNumber" -> "12345"
           )
 
@@ -198,7 +199,7 @@ class BankAccountIbanControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "IBANNumber" -> "!@£$"
           )
 
@@ -214,7 +215,7 @@ class BankAccountIbanControllerSpec extends AmlsSpec with MockitoSugar {
 
     "an account is created" must {
       "send an audit event" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "IBANNumber" -> "12345"
         )
 

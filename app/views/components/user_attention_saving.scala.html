@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,14 +12,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package controllers.auth
+@()(implicit messages: Messages)
 
-import config.ApplicationConfig
-import uk.gov.hmrc.play.frontend.auth.GovernmentGateway
+    <div class="auto-save">
+        <h2 class="heading-small">@Messages("whatYouNeed.attention.title")</h2>
+        <p>@Messages("whatYouNeed.attention.information")</p>
+    </div>
 
-object AmlsGovernmentGateway extends GovernmentGateway {
-  override def loginURL: String = ApplicationConfig.loginUrl
-  override def continueURL: String = ApplicationConfig.loginContinue
-}

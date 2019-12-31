@@ -22,7 +22,7 @@ import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
@@ -39,12 +39,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar {
 
     val dataCacheConnector = mock[DataCacheConnector]
 
-    val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .overrides(bind[DataCacheConnector].to(dataCacheConnector))
-      .build()
-
-    lazy val controller = injector.instanceOf[RemoveResponsiblePersonController]
+    lazy val controller = new RemoveResponsiblePersonController(SuccessfulAuthAction, commonDependencies, dataCacheConnector, mockMcc)
 
     val nominatedOfficer = ResponsiblePerson(
       personName = Some(PersonName("firstName", None, "lastName")),
@@ -93,7 +88,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar {
     "post is called" must {
       "Redirect to NewOfficerController" in new TestFixture {
 
-        val result = controller.post()(request.withFormUrlEncodedBody(
+        val result = controller.post()(requestWithUrlEncodedBody(
           "date.day" -> "10",
           "date.month" -> "11",
           "date.year" -> "2001"
@@ -104,7 +99,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar {
 
       }
       "return BAD_REQUEST for invalid form" in new TestFixture {
-        val result = controller.post()(request.withFormUrlEncodedBody(
+        val result = controller.post()(requestWithUrlEncodedBody(
           "date.day" -> "a",
           "date.month" -> "b",
           "date.year" -> "c"
@@ -131,7 +126,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar {
               dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(),any())( any(), any())
             } thenReturn Future.successful(None)
 
-            val result = controller.post()(request.withFormUrlEncodedBody(
+            val result = controller.post()(requestWithUrlEncodedBody(
               "date.day" -> "a",
               "date.month" -> "b",
               "date.year" -> "c"
@@ -147,7 +142,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar {
 
   it must {
     "save the responsible person as deleted given an end date" in new TestFixture {
-      val result = controller.post()(request.withFormUrlEncodedBody(
+      val result = controller.post()(requestWithUrlEncodedBody(
         "date.day" -> "10",
         "date.month" -> "11",
         "date.year" -> "2001"

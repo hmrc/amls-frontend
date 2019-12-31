@@ -27,15 +27,16 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class WhatDateRemovedControllerSpec extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
 
     val controller = new WhatDateRemovedController(
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
-      router = createRouter[RemoveBusinessTypeFlowModel]
+      router = createRouter[RemoveBusinessTypeFlowModel],
+      cc = mockMcc
     )
   }
 
@@ -80,7 +81,7 @@ class WhatDateRemovedControllerSpec extends AmlsSpec {
         val today = LocalDate.now
         mockCacheUpdate(Some(RemoveBusinessTypeFlowModel.key), RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(today))))
 
-        val result = controller.post()(request.withFormUrlEncodedBody(
+        val result = controller.post()(requestWithUrlEncodedBody(
           "dateOfChange.day" -> today.getDayOfMonth.toString,
           "dateOfChange.month" -> today.getMonthOfYear.toString,
           "dateOfChange.year" -> today.getYear.toString
@@ -95,7 +96,7 @@ class WhatDateRemovedControllerSpec extends AmlsSpec {
 
 
         val result = await {
-          controller.post()(request.withFormUrlEncodedBody(
+          controller.post()(requestWithUrlEncodedBody(
             "dateOfChange.day" -> today.getDayOfMonth.toString,
             "dateOfChange.month" -> today.getMonthOfYear.toString,
             "dateOfChange.year" -> today.getYear.toString

@@ -21,14 +21,14 @@ import jto.validation.{Path, ValidationError}
 import models.moneyservicebusiness.FundsTransfer
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
 
-class funds_transferSpec extends AmlsSpec with MustMatchers {
+class funds_transferSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "funds_transfer view" must {

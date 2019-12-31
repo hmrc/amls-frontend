@@ -25,7 +25,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -39,13 +39,12 @@ class ContactingYouControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
   val contactingYou = Some(ContactingYou(Some("+44 (0)123 456-7890"), Some("test@test.com")))
   val businessDetailsWithData = BusinessDetails(contactingYou = contactingYou)
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new ContactingYouController (
       dataCache = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -88,7 +87,7 @@ class ContactingYouControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
       "on post of valid data" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "confirmEmail" -> "test@test.com",
           "email" -> "test@test.com"
         )
@@ -107,7 +106,7 @@ class ContactingYouControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
       "on post of incomplete data" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "email" -> "test@test.com"
         )
 
@@ -123,7 +122,7 @@ class ContactingYouControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
       "on post of different email addresses" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "confirmEmail" -> "test@test.com",
           "email" -> "test1@test.com"
         )

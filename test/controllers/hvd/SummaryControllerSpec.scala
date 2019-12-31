@@ -28,7 +28,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
@@ -39,16 +39,20 @@ import scala.concurrent.Future
 
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
     implicit val headerCarrier = HeaderCarrier()
 
-    lazy val controller = new SummaryController(authAction = SuccessfulAuthAction,
-                                                mockCacheConnector,
-                                                mockStatusService,
-                                                mockServiceFlow)
+    lazy val controller =
+      new SummaryController(
+        authAction = SuccessfulAuthAction,
+        ds = commonDependencies,
+        mockCacheConnector,
+        mockStatusService,
+        mockServiceFlow,
+        cc = mockMcc)
 
     val day = 15
     val month = 2

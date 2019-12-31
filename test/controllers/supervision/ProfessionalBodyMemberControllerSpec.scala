@@ -19,7 +19,7 @@ package controllers.supervision
 import controllers.actions.SuccessfulAuthAction
 import models.supervision._
 import org.jsoup.Jsoup
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.mockito.Mockito._
 import org.mockito.Matchers.{eq => eqTo, _}
 import play.api.i18n.Messages
@@ -33,13 +33,12 @@ import scala.concurrent.duration._
 
 class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {self =>
+  trait Fixture extends DependencyMocks {self =>
     val request = addToken(authRequest)
 
     val controller = new ProfessionalBodyMemberController (
       dataCacheConnector = mockCacheConnector,
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
 
     mockCacheSave[Supervision]
 
@@ -128,7 +127,7 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
         "isAMember field is true" when {
           "edit is false" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "isAMember" -> "true"
             )
 
@@ -141,7 +140,7 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
           "edit is true" when {
             "professionalBodies is not defined" in new Fixture {
 
-              val newRequest = request.withFormUrlEncodedBody(
+              val newRequest = requestWithUrlEncodedBody(
                 "isAMember" -> "true"
               )
 
@@ -172,7 +171,7 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
 
         "isMember is false" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "isAMember" -> "false"
           )
 
@@ -209,7 +208,7 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
           "isMember is true" when {
             "ProfessionalBodyMemberYes is already defined and professional bodies provided" in new Fixture {
 
-              val newRequest = request.withFormUrlEncodedBody(
+              val newRequest = requestWithUrlEncodedBody(
                 "isAMember" -> "true"
               )
 
@@ -238,7 +237,7 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
 
     "on post with invalid data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody()
+      val newRequest = requestWithUrlEncodedBody("" -> "")
 
       mockCacheFetch[Supervision](None)
 
@@ -256,7 +255,7 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
     "remove professionalBodies data" when {
       "updated from ProfessionalBodyMemberYes to No" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "isAMember" -> "false"
         )
 
@@ -278,7 +277,7 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
       }
       "ProfessionalBodyMemberNo and professionalBodies is defined" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "isAMember" -> "false"
         )
 

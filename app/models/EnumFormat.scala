@@ -19,7 +19,7 @@ package models
 import cats.data.Validated.{Invalid, Valid}
 import enumeratum.{Enum, EnumEntry}
 import jto.validation.{Rule, ValidationError => FormValidationError}
-import play.api.data.validation.ValidationError
+import play.api.libs.json.JsonValidationError
 import play.api.libs.json._
 
 object EnumFormat {
@@ -27,7 +27,7 @@ object EnumFormat {
   def apply[T <: EnumEntry](e: Enum[T]): Format[T] = Format(
     Reads {
       case JsString(value) => e.withNameOption(value).map(JsSuccess(_))
-        .getOrElse(JsError(ValidationError(
+        .getOrElse(JsError(JsonValidationError(
           s"Unknown ${e.getClass.getSimpleName} value: $value", s"error.invalid.${e.getClass.getSimpleName.toLowerCase.replaceAllLiterally("$", "")}"
         )))
       case _ => JsError("Can only parse String")

@@ -17,25 +17,25 @@
 package controllers.businessdetails
 
 import cats.data.OptionT
+import cats.implicits._
+import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.{BaseController, DefaultBaseController}
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessdetails.{BusinessDetails, ConfirmRegisteredOffice, RegisteredOffice, RegisteredOfficeUK}
 import models.businesscustomer.Address
+import models.businessdetails.{BusinessDetails, ConfirmRegisteredOffice, RegisteredOffice, RegisteredOfficeUK}
 import models.businessmatching.BusinessMatching
+import play.api.mvc.MessagesControllerComponents
+import utils.AuthAction
 import views.html.businessdetails._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import cats.implicits._
-import com.google.inject.Inject
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AuthAction
 
-class ConfirmRegisteredOfficeController @Inject () (
-                                                   val dataCache: DataCacheConnector,
-                                                   val authAction: AuthAction
-                                                   ) extends DefaultBaseController {
+class ConfirmRegisteredOfficeController @Inject () (val dataCache: DataCacheConnector,
+                                                    val authAction: AuthAction,
+                                                    val ds: CommonPlayDependencies,
+                                                    val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
 
   def updateBMAddress(bm: BusinessMatching): Option[RegisteredOffice] = {

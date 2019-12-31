@@ -25,7 +25,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.RenewalService
@@ -36,7 +36,7 @@ import scala.concurrent.Future
 
 class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
@@ -45,7 +45,8 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
     val controller = new AMLSTurnoverController(
       dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction,
-      renewalService = mockRenewalService
+      ds = commonDependencies,
+      renewalService = mockRenewalService, cc = mockMcc
     )
 
     val businessMatching = BusinessMatching(
@@ -245,7 +246,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
           "in edit mode" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "turnover" -> "01"
             )
 
@@ -267,7 +268,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
           }
 
           "it does not have business type of ASP, HVD or MSB" in new Fixture {
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "turnover" -> "01"
             )
 
@@ -290,7 +291,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
         "go to renewal CustomerOutsideIsUKController" when {
           "it has business type of HVD and not (ASP or MSB)" in new Fixture {
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "turnover" -> "01"
             )
 
@@ -314,7 +315,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         "go to the renewal TotalThroughput page" when {
 
           "it has a business type of MSB but not ASP" in new Fixture {
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "turnover" -> "01"
             )
 

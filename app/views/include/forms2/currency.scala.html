@@ -22,7 +22,7 @@
     hintText: String = "",
     bold: Boolean = false,
     classes: Seq[String] = Seq.empty
-)(implicit lang:Lang,  m: Messages)
+)(implicit m: Messages, lang: Lang)
 
 <div class="form-group @if(field.hasErrors) {form-field--error}">
     <label>

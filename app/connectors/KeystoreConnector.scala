@@ -16,10 +16,10 @@
 
 package connectors
 
-import config.AmlsSessionCache
 import javax.inject.Inject
 import models.status.ConfirmationStatus
 import uk.gov.hmrc.http.HeaderCarrier
+import config.AmlsSessionCache
 
 import scala.concurrent.{ExecutionContext, Future}
 

@@ -34,10 +34,13 @@ class WhatYouNeedControllerSpec
     with TitleValidator
     with BankDetailsGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
-    val controller = new WhatYouNeedController(SuccessfulAuthAction, mockCacheConnector)
+    val controller = new WhatYouNeedController(SuccessfulAuthAction,
+      commonDependencies,
+      mockCacheConnector,
+      mockMcc)
 
     def assertHref(url: String)(implicit doc: Document) = {
       doc.getElementById("bankwhatyouneed-button").attr("href") mustBe url

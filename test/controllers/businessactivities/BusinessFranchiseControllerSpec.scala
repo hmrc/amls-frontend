@@ -16,7 +16,6 @@
 
 package controllers.businessactivities
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.businessactivities.{BusinessActivities, BusinessFranchiseYes}
@@ -25,24 +24,24 @@ import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
-import utils.AmlsSpec
-import play.api.test.Helpers._
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
+import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
 class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures{
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new BusinessFranchiseController (
       dataCacheConnector = mock[DataCacheConnector],
-      SuccessfulAuthAction
-    )
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -83,7 +82,7 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
       "respond with SEE_OTHER" when {
         "edit is false and given valid data" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "businessFranchise" -> "true",
             "franchiseName" -> "test test"
           )
@@ -100,7 +99,7 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
         }
 
         "edit is true and given valid data" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "businessFranchise" -> "true",
             "franchiseName" -> "test"
           )
@@ -119,7 +118,7 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
 
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "businessFranchise" -> "test"
           )
 

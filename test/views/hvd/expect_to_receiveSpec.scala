@@ -21,13 +21,13 @@ import jto.validation.{Path, ValidationError}
 import models.hvd.{PaymentMethods, ReceiveCashPayments}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class expect_to_receiveSpec extends AmlsSpec with MustMatchers  {
+class expect_to_receiveSpec extends AmlsViewSpec with MustMatchers  {
 
     trait ViewFixture extends Fixture {
-      implicit val requestWithToken = addToken(request)
+      implicit val requestWithToken = addTokenForView()
     }
 
     "expect_to_receive view" must {

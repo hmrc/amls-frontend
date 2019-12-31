@@ -22,14 +22,14 @@ import models.renewal.TotalThroughput
 import org.jsoup.nodes.Document
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.total_throughput
 
-class total_throughputSpec extends AmlsSpec with MustMatchers {
+class total_throughputSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     override def view = total_throughput(EmptyForm, edit = false)
   }

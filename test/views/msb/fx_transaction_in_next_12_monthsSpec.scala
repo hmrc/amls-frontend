@@ -21,14 +21,14 @@ import jto.validation.{Path, ValidationError}
 import models.moneyservicebusiness.{FXTransactionsInNext12Months}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
 
-class fx_transaction_in_next_12_monthsSpec extends AmlsSpec with MustMatchers {
+class fx_transaction_in_next_12_monthsSpec extends AmlsViewSpec with MustMatchers {
 
     trait ViewFixture extends Fixture {
-        implicit val requestWithToken = addToken(request)
+        implicit val requestWithToken = addTokenForView()
     }
 
     "fx_transaction_in_next_12_months view" must {

@@ -16,15 +16,19 @@
 
 package controllers.asp
 
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
+import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.asp._
 
 import scala.concurrent.Future
 
-class WhatYouNeedController @Inject()(authAction: AuthAction
-                                     ) extends DefaultBaseController {
+class WhatYouNeedController @Inject()(authAction: AuthAction,
+                                      val ds: CommonPlayDependencies,
+                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+
   def get = authAction.async {
       implicit request =>
         Future.successful(Ok(what_you_need()))

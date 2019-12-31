@@ -28,7 +28,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.AutoCompleteService
@@ -43,15 +43,14 @@ import scala.concurrent.Future
 
 class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new CorrespondenceAddressNonUkController (
       dataConnector = mock[DataCacheConnector],
       auditConnector = mock[AuditConnector],
       autoCompleteService = mock[AutoCompleteService],
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
 
     when {
       controller.autoCompleteService.getCountries
@@ -114,7 +113,7 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
 
         val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, None, Some(CorrespondenceAddress(None, Some(address))))))
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "yourName" -> "Name",
           "businessName" -> "Business Name",
           "addressLineNonUK1" -> "Add Line 1",
@@ -148,7 +147,7 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
 
         val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, None, Some(CorrespondenceAddress(None, Some(address))))))
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "yourName" -> "Name",
           "businessName" -> "Business Name",
           "addressLineNonUK1" -> "Add Line 1",
@@ -186,7 +185,7 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
 
         val fetchResult = Future.successful(None)
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "yourName" -> "Name",
           "businessName" -> "Business Name",
           "addressLineNonUK1" -> "Add Line 1 & 3",
@@ -219,7 +218,7 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
 
       "an invalid form request is sent in the body" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "yourName" -> "Name",
           "businessName" -> "Business Name",
           "invalid" -> "AL"

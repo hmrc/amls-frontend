@@ -18,17 +18,19 @@ package controllers.declaration
 
 import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReadyForReview}
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
-class RegisterResponsiblePersonController @Inject()(
-                                                     val dataCacheConnector: DataCacheConnector,
-                                                     authAction: AuthAction,
-                                                     val statusService: StatusService
-                                                   ) extends DefaultBaseController {
+class RegisterResponsiblePersonController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                                    authAction: AuthAction,
+                                                    val ds: CommonPlayDependencies,
+                                                    val statusService: StatusService,
+                                                    val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
     implicit request => {

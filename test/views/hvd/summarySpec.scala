@@ -21,22 +21,19 @@ import models.hvd.PercentageOfCashPaymentOver15000.Third
 import models.hvd._
 import org.joda.time.LocalDate
 import org.jsoup.nodes.Element
-import org.scalatest.MustMatchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
-import utils.AmlsSpec
-import views.{Fixture, HtmlAssertions}
+import play.api.test.FakeRequest
+import utils.AmlsSummaryViewSpec
+import views.Fixture
 
 import scala.collection.JavaConversions._
 
 
-class summarySpec extends AmlsSpec
-  with MustMatchers
-  with TableDrivenPropertyChecks
-  with HtmlAssertions{
+class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView(FakeRequest())
   }
 
   "summary view" must {
@@ -65,6 +62,8 @@ class summarySpec extends AmlsSpec
       "Other Product"
     )
 
+    "include the provided data" in new ViewFixture {
+
     val sectionChecks = Table[String, Element=>Boolean](
       ("title key", "check"),
       ("hvd.cash.payment.title",checkElementTextOnlyIncludes(_, "lbl.yes")),
@@ -78,7 +77,6 @@ class summarySpec extends AmlsSpec
       ("hvd.identify.linked.cash.payment.title", checkElementTextOnlyIncludes(_, "lbl.yes"))
     )
 
-    "include the provided data" in new ViewFixture {
       def view = {
         val testdata = Hvd(
           cashPayment = Some(CashPayment(

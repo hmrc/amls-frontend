@@ -20,9 +20,9 @@ import models.DateOfChange
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import org.joda.time.LocalDate
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.{JsUndefined, Json}
+import play.api.libs.json.{JodaReads, JodaWrites, JsUndefined, Json}
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 sealed trait HvdTestFixture {
@@ -43,7 +43,7 @@ sealed trait HvdTestFixture {
     Some(DateOfChange(new LocalDate("2016-02-24"))))
 }
 
-class HvdSpec extends PlaySpec with MockitoSugar {
+class HvdSpec extends PlaySpec with MockitoSugar with JodaReads with JodaWrites {
 
   "hvd" must {
 

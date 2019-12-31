@@ -27,20 +27,19 @@ import org.mockito.Mockito._
 import play.api.i18n.Messages
 import play.api.inject._
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.mvc.{AnyContentAsFormUrlEncoded, Result}
+import play.api.mvc.{AnyContentAsFormUrlEncoded, Request, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
 
 import scala.concurrent.Future
 
 class CustomersOutsideUKControllerSpec extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val request = addToken(authRequest)
 
@@ -66,12 +65,12 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
 
   trait FormSubmissionFixture extends Fixture {
 
-    def formData(data: Option[FakeRequest[AnyContentAsFormUrlEncoded]]) = data match {
+    def formData(data: Option[Request[AnyContentAsFormUrlEncoded]]) = data match {
       case Some(d) => d
-      case None => request.withFormUrlEncodedBody("countries" -> "GB")
+      case None => requestWithUrlEncodedBody("countries" -> "GB")
     }
 
-    def formRequest(data: Option[FakeRequest[AnyContentAsFormUrlEncoded]]) = formData(data)
+    def formRequest(data: Option[Request[AnyContentAsFormUrlEncoded]]) = formData(data)
 
     val cache = mock[CacheMap]
 
@@ -99,7 +98,7 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
 
     def post(
               edit: Boolean = false,
-              data: Option[FakeRequest[AnyContentAsFormUrlEncoded]] = None,
+              data: Option[Request[AnyContentAsFormUrlEncoded]] = None,
               businessMatching: BusinessMatching = BusinessMatching(activities = Some(BusinessActivities(Set.empty))),
               renewal: Option[Renewal] = None
             )(block: Result => Unit) = block({
@@ -201,7 +200,7 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
 
       "given invalid data" must {
         "respond with BAD_REQUEST" in new FormSubmissionFixture {
-          post(data = Some(request.withFormUrlEncodedBody("countries" -> "abc"))) { result =>
+          post(data = Some(addToken(authRequest.withFormUrlEncodedBody("countries" -> "abc")))) { result: Result =>
             result.header.status mustBe BAD_REQUEST
           }
         }

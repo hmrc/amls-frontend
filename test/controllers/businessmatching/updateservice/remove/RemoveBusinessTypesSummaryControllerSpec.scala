@@ -40,7 +40,7 @@ import scala.concurrent.Future
 
 class RemoveBusinessTypesSummaryControllerSpec extends AmlsSpec with TitleValidator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
@@ -49,10 +49,11 @@ class RemoveBusinessTypesSummaryControllerSpec extends AmlsSpec with TitleValida
     val router = createRouter[RemoveBusinessTypeFlowModel]
 
     val controller = new RemoveBusinessTypesSummaryController(
-      SuccessfulAuthAction,
+      SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
       removeServiceHelper,
-      router
+      router,
+      cc = mockMcc
     )
   }
 
@@ -98,7 +99,7 @@ class RemoveBusinessTypesSummaryControllerSpec extends AmlsSpec with TitleValida
         when(removeServiceHelper.removeFlowData(any())(any(), any()))
           .thenReturn(OptionT.some[Future, RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel()))
 
-        val result = controller.post()(request.withFormUrlEncodedBody())
+        val result = controller.post()(requestWithUrlEncodedBody("" -> ""))
 
         status(result) mustBe SEE_OTHER
 

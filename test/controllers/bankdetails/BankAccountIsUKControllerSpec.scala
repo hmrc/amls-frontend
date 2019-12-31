@@ -24,7 +24,7 @@ import org.jsoup.nodes.Document
 import org.mockito.{ArgumentCaptor, Matchers}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
@@ -33,7 +33,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
-class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
+class BankAccountIsUKControllerSpec extends AmlsSpec {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
@@ -45,12 +45,13 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
     val controller = new BankAccountIsUKController(
       mockCacheConnector,
       SuccessfulAuthAction,
+      commonDependencies,
       mock[AuditConnector],
-      mockStatusService
+      mockStatusService,
+      mockMcc
     )
 
   }
-
 
   "BankAccountIsUKController" when {
     "get is called" must {
@@ -113,7 +114,7 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
         "given valid data in edit mode" in new Fixture {
 
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "isUK" -> "false"
           )
 
@@ -130,7 +131,7 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
         }
         "given valid data when NOT in edit mode" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "isUK" -> "false"
           )
 
@@ -151,7 +152,7 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with NOT_FOUND" when {
         "given an index out of bounds in edit mode" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "isUK" -> "false"
           )
 
@@ -168,7 +169,7 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "isUK" -> ""
           )
 

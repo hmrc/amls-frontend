@@ -21,6 +21,8 @@ import jto.validation.{From, Rule, Write}
 import models.FormTypes._
 import org.joda.time.LocalDate
 import play.api.libs.json.{Json, Reads, Writes}
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 
 case class SupervisionStart(startDate: LocalDate)
 
@@ -46,7 +48,7 @@ object SupervisionStart {
 
   implicit val jsonReads: Reads[SupervisionStart] = {
 
-    import play.api.libs.json.Reads._
+    import play.api.libs.json.JodaReads._
     import play.api.libs.json._
 
     (__ \ "supervisionStartDate").read[LocalDate].map(SupervisionStart.apply)

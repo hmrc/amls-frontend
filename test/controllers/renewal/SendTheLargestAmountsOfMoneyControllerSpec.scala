@@ -25,7 +25,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration}
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.mvc.Result
 import play.api.test.Helpers._
@@ -37,7 +37,7 @@ import scala.concurrent.Future
 
 class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSugar with PatienceConfiguration with IntegrationPatience {
 
-  trait Fixture extends AuthorisedFixture with AutoCompleteServiceMocks {
+  trait Fixture extends AutoCompleteServiceMocks {
     self =>
     val request = addToken(authRequest)
 
@@ -51,15 +51,15 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
 
     val controller = new SendTheLargestAmountsOfMoneyController(
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction,
-      renewalService = mockRenewalService,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      renewalService = mockRenewalService, cc = mockMcc,
       autoCompleteService = mockAutoComplete
     )
   }
 
   trait FormSubmissionFixture extends Fixture {
     def formData(valid: Boolean) = if (valid) "largestAmountsOfMoney[0]" -> "GB" else "largestAmountsOfMoney[0]" -> ""
-    def formRequest(valid: Boolean) = request.withFormUrlEncodedBody(formData(valid))
+    def formRequest(valid: Boolean) = requestWithUrlEncodedBody(formData(valid))
 
     when(mockRenewalService.getRenewal(any())(any(), any()))
       .thenReturn(Future.successful(None))
@@ -141,7 +141,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
 
       "given invalid data, must respond with BAD_REQUEST" in new FormSubmissionFixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "largestAmountsOfMoney[0]" -> ""
         )
 

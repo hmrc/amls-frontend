@@ -18,18 +18,21 @@ package controllers.businessactivities
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
+import play.api.mvc.MessagesControllerComponents
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, WhoIsYourAccountantName}
 import services.AutoCompleteService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 
 class WhoIsYourAccountantNameController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                  val autoCompleteService: AutoCompleteService,
-                                                  val authAction: AuthAction) extends DefaultBaseController {
+                                              val autoCompleteService: AutoCompleteService,
+                                              val authAction: AuthAction,
+                                              val ds: CommonPlayDependencies,
+                                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

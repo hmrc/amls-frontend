@@ -46,7 +46,7 @@ object TaxType {
     (__ \ "taxType").read[String].flatMap[TaxType] {
       case "01" => TaxTypeSelfAssesment
       case "02" => TaxTypeCorporationTax
-      case _ => play.api.data.validation.ValidationError("error.invalid")
+      case _ => play.api.libs.json.JsonValidationError("error.invalid")
     }
   }
 

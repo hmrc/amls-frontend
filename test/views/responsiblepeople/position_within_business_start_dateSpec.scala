@@ -22,13 +22,13 @@ import models.businessmatching.BusinessType
 import models.responsiblepeople._
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class position_within_business_start_dateSpec extends AmlsSpec with MustMatchers {
+class position_within_business_start_dateSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
     val name = "firstName lastName"
   }
 

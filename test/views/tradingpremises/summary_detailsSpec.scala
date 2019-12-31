@@ -23,13 +23,12 @@ import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
-import play.twirl.api.HtmlFormat
-import utils.{DateHelper, AmlsSpec}
-import views.{Fixture, HtmlAssertions}
+import utils.{AmlsSummaryViewSpec, DateHelper}
+import views.Fixture
 
 import scala.collection.JavaConversions._
 
-sealed trait TestHelper extends AmlsSpec {
+sealed trait TestHelper extends AmlsSummaryViewSpec {
 
   val ytp = YourTradingPremises(
     "foo",
@@ -70,11 +69,11 @@ sealed trait TestHelper extends AmlsSpec {
   )
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(FakeRequest())
+    implicit val requestWithToken = addTokenForView(FakeRequest())
   }
 }
 
-class summary_detailsSpec extends TestHelper with HtmlAssertions with TableDrivenPropertyChecks {
+class summary_detailsSpec extends TestHelper with TableDrivenPropertyChecks {
 
   "The summary details page" must {
     val sectionChecks = Table[String, Element => Boolean](

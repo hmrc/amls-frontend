@@ -21,14 +21,14 @@ import jto.validation.{Path, ValidationError}
 import models.businessactivities.ExpectedBusinessTurnover
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
 
-class business_turnoverSpec extends AmlsSpec with MustMatchers  {
+class business_turnoverSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "expected_business_turnover view" must {

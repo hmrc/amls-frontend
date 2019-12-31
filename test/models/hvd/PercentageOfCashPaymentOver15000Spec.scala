@@ -118,7 +118,7 @@ class PercentageOfCashPaymentOver15000Spec extends PlaySpec {
 
       "throw error for invalid data" in {
         Json.fromJson[PercentageOfCashPaymentOver15000](Json.obj("percentage" -> "20")) must
-          be(JsError(JsPath , play.api.data.validation.ValidationError("error.invalid")))
+          be(JsError(JsPath , play.api.libs.json.JsonValidationError("error.invalid")))
       }
     }
 

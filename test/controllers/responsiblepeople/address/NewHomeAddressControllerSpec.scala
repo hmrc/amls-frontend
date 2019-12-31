@@ -40,7 +40,9 @@ class NewHomeAddressControllerSpec extends AmlsSpec {
 
     val controller = new NewHomeAddressController(
       SuccessfulAuthAction,
-      dataCacheConnector
+      dataCacheConnector,
+      commonDependencies,
+      mockMcc
     )
   }
 
@@ -116,7 +118,7 @@ class NewHomeAddressControllerSpec extends AmlsSpec {
       "save data and redirect to NewHomeAddressUKController" when {
         "yes selected" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "true"
           )
 
@@ -136,7 +138,7 @@ class NewHomeAddressControllerSpec extends AmlsSpec {
       "save data and redirect to NewHomeAddressNonUKController" when {
         "no selected" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "false"
           )
 
@@ -156,7 +158,7 @@ class NewHomeAddressControllerSpec extends AmlsSpec {
       "respond with BAD_REQUEST" when {
         "isUK field is not supplied" in new Fixture {
 
-          val line1MissingRequest = request.withFormUrlEncodedBody()
+          val line1MissingRequest = requestWithUrlEncodedBody()
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))

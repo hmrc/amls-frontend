@@ -20,17 +20,17 @@ import forms.{Form2, InvalidForm, ValidForm}
 import models.declaration.WhoIsRegistering
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import org.scalatest.{MustMatchers}
-import  utils.AmlsSpec
+import  utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
 
 
-class who_is_registeringSpec extends AmlsSpec with MustMatchers  {
+class who_is_registeringSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "who_is_registering_this_registration view" must {

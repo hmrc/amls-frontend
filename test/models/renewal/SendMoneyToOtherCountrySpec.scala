@@ -57,7 +57,7 @@ class SendMoneyToOtherCountrySpec extends PlaySpec {
       "Successfully read/write Json data" in {
 
         SendMoneyToOtherCountry.format.reads(SendMoneyToOtherCountry.format.writes(
-          SendMoneyToOtherCountry(false))) must be(JsSuccess(SendMoneyToOtherCountry(false), JsPath \ "money"))
+          SendMoneyToOtherCountry(false))) must be(JsSuccess(SendMoneyToOtherCountry(false), JsPath))
 
       }
     }

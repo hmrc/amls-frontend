@@ -21,15 +21,15 @@ import jto.validation.{Path, ValidationError}
 import models.renewal.{UsesForeignCurrencies, UsesForeignCurrenciesYes, WhichCurrencies}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.uses_foreign_currencies
 
 
-class uses_foreign_currenciesSpec extends AmlsSpec with MustMatchers {
+class uses_foreign_currenciesSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "uses foreign currencies view" must {

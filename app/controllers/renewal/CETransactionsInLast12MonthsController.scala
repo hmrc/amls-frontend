@@ -17,22 +17,24 @@
 package controllers.renewal
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.renewal.{CETransactionsInLast12Months, Renewal}
+import play.api.mvc.MessagesControllerComponents
 import services.RenewalService
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.renewal.ce_transactions_in_last_12_months
 
 import scala.concurrent.Future
 
 @Singleton
-class CETransactionsInLast12MonthsController @Inject()(
-                                                           val dataCacheConnector: DataCacheConnector,
-                                                           val authAction: AuthAction,
-                                                           val renewalService: RenewalService
-                                                         ) extends DefaultBaseController {
+class CETransactionsInLast12MonthsController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                                       val authAction: AuthAction,
+                                                       val ds: CommonPlayDependencies,
+                                                       val renewalService: RenewalService,
+                                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[Renewal](request.credId, Renewal.key) map {
