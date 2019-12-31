@@ -19,6 +19,7 @@ package models.estateagentbusiness
 import config.ApplicationConfig
 import models.amp.Amp
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import play.api.Play
 import play.api.libs.json._
 import play.api.mvc.Call
 import typeclasses.MongoKey
@@ -91,6 +92,8 @@ final case class Eab(data: JsObject = Json.obj(),
 
 object Eab {
 
+  lazy val appConfig = Play.current.injector.instanceOf[ApplicationConfig]
+
   val eabServicesProvided             = JsPath \ "eabServicesProvided"
   val redressScheme                   = JsPath \ "redressScheme"
   val redressSchemeDetail             = JsPath \ "redressSchemeDetail"
@@ -111,13 +114,13 @@ object Eab {
   // TODO: Update the URLs once config work is complete
 
   def section(implicit cache: CacheMap): Section = {
-    val notStarted = Section(key, NotStarted, false, generateRedirect(ApplicationConfig.ampWhatYouNeedUrl))
+    val notStarted = Section(key, NotStarted, false, generateRedirect(appConfig.ampWhatYouNeedUrl))
     cache.getEntry[Amp](key).fold(notStarted) {
       model =>
         if (model.isComplete && model.hasAccepted) {
-          Section(key, Completed, model.hasChanged, generateRedirect(ApplicationConfig.ampSummeryUrl))
+          Section(key, Completed, model.hasChanged, generateRedirect(appConfig.ampSummaryUrl))
         } else {
-          Section(key, Started, model.hasChanged, generateRedirect(ApplicationConfig.ampWhatYouNeedUrl))
+          Section(key, Started, model.hasChanged, generateRedirect(appConfig.ampWhatYouNeedUrl))
         }
     }
   }
@@ -158,8 +161,8 @@ object Eab {
     def readPathOrReturn(path: JsPath, returnValue: JsValue) =
       path.readNullable[JsValue].map(_.getOrElse(returnValue))
 
-    import play.api.libs.json.Reads._
     import play.api.libs.functional.syntax._
+    import play.api.libs.json.Reads._
 
     val oldModelTransformer:Reads[JsObject] = (servicesTransform and redressTransform and
       (__ \ 'data ++ penalisedEstateAgentsAct).json.copyFrom(readPathOrReturn(__ \ 'penalisedUnderEstateAgentsAct, JsNull)) and
