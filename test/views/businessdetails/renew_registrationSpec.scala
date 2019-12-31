@@ -22,14 +22,14 @@ import models.declaration.{RenewRegistration, RenewRegistrationYes}
 import org.joda.time.LocalDate
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
 import views.Fixture
+import utils.{AmlsViewSpec}
 
 
-class renew_registrationSpec extends AmlsSpec with MustMatchers  {
+class renew_registrationSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "renew_registration view" must {

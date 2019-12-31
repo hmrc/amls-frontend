@@ -33,7 +33,7 @@ import scala.concurrent.Future
 
 class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val helper = new ChangeSubSectorHelper(
       SuccessfulAuthAction,

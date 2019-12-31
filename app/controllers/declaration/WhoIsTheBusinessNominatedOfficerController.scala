@@ -16,16 +16,16 @@
 
 package controllers.declaration
 
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector}
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.declaration.BusinessNominatedOfficer
 import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import models.responsiblepeople.{NominatedOfficer, Positions, ResponsiblePerson}
 import models.status._
-import play.api.mvc.{AnyContent, Request, Result}
+import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
@@ -38,8 +38,10 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
                                                              val amlsConnector: AmlsConnector,
                                                              val dataCacheConnector: DataCacheConnector,
                                                              authAction: AuthAction,
+                                                             val ds: CommonPlayDependencies,
                                                              val statusService: StatusService,
-                                                             config: AppConfig) extends DefaultBaseController {
+                                                             config: ApplicationConfig,
+                                                             val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def businessNominatedOfficerView(amlsRegistrationNo: Option[String],
                                    accountTypeId: (String, String),

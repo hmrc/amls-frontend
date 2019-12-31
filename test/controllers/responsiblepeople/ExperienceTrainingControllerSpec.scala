@@ -27,12 +27,12 @@ import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.AmlsSpec
 
 import scala.concurrent.Future
 
@@ -42,16 +42,16 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
 
   def getMessage(service: BusinessActivity): String = Messages("businessactivities.registerservices.servicename.lbl." + BusinessMatchingActivities.getValue(service))
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val dataCacheConnector = mock[DataCacheConnector]
 
-
     val controller = new ExperienceTrainingController (
       dataCacheConnector = dataCacheConnector,
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -64,9 +64,7 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
 
     val personName = Some(PersonName("firstname", None, "lastname"))
 
-    "get" must {
-
-      "load the page with the business activities" in new Fixture {
+    "on get load the page with the business activities" in new Fixture {
 
         val mockCacheMap = mock[CacheMap]
 
@@ -83,7 +81,7 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
         val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
-        val newRequest = request.withFormUrlEncodedBody("activities[0]" -> "01")
+        val newRequest = requestWithUrlEncodedBody("activities[0]" -> "01")
 
         val RecordId = 1
         val result = controller.get(RecordId)(request)
@@ -95,7 +93,6 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
 
         contentAsString(result) must include(Messages("responsiblepeople.experiencetraining.title"))
       }
-    }
 
     "on get display the page with pre populated data for the Yes Option" in new Fixture {
 
@@ -141,7 +138,7 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
 
 
     "on post with valid data and training selected yes" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "experienceTraining" -> "true",
         "experienceInformation" -> "I do not remember when I did the training"
       )
@@ -166,7 +163,7 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
     }
 
     "on post with valid data and training selected no" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "experienceTraining" -> "false"
       )
 
@@ -190,7 +187,7 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
     }
 
     "on post with invalid data" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "experienceTraining" -> "not a boolean value"
       )
       val mockCacheMap = mock[CacheMap]
@@ -222,7 +219,7 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "experienceTraining" -> "true",
         "experienceInformation" -> "I do not remember when I did the training"
       )

@@ -20,7 +20,7 @@ import controllers.actions.SuccessfulAuthAction
 import models.asp.Asp
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
@@ -28,12 +28,12 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
     implicit val ec = app.injector.instanceOf[ExecutionContext]
-    val controller = new SummaryController(mockCacheConnector, mockServiceFlow, mockStatusService, authAction = SuccessfulAuthAction)
+    val controller = new SummaryController(mockCacheConnector, mockServiceFlow, mockStatusService, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
 
     mockCacheSave[Asp]
 
@@ -65,7 +65,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
   "Post" must {
     "load the Asp model and set hasAccepted to true" in new Fixture {
-      val postRequest = request.withFormUrlEncodedBody()
+      val postRequest = requestWithUrlEncodedBody("" -> "")
 
       val model = Asp(None, None)
       mockCacheFetch(Some(model))

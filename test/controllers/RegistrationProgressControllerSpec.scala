@@ -18,7 +18,7 @@ package controllers
 
 import cats.data.OptionT
 import cats.implicits._
-import controllers.actions.{SuccessfulAuthAction, SuccessfulAuthActionNoAmlsRefNo}
+import controllers.actions.{SuccessfulAuthAction}
 import generators.AmlsReferenceNumberGenerator
 import generators.businesscustomer.ReviewDetailsGenerator
 import models.Country
@@ -37,7 +37,7 @@ import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, ProgressService, RenewalService, SectionsProvider}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DeclarationHelper, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -46,7 +46,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
   with ReviewDetailsGenerator
   with AmlsReferenceNumberGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
 
     val mockBusinessMatching = mock[BusinessMatching]
@@ -61,7 +61,9 @@ class RegistrationProgressControllerSpec extends AmlsSpec
       sectionsProvider = mock[SectionsProvider],
       businessMatchingService = mockBusinessMatchingService,
       serviceFlow = mockServiceFlow,
-      renewalService = mock[RenewalService])
+      renewalService = mock[RenewalService],
+      ds = commonDependencies,
+      cc = mockMcc)
 
     mockApplicationStatus(SubmissionReady)
     mockCacheFetch[Renewal](None)

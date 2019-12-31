@@ -75,8 +75,8 @@ object ProvidedServices {
 
   val serviceDetailsType = notEmptyStrip andThen
     notEmpty.withMessage("error.required.tcsp.provided_services.details") andThen
-    maxWithMsg(serviceDetailsMaxLength, "error.invalid.maxlength.255") andThen
-    basicPunctuationPattern()
+    maxWithMsg(serviceDetailsMaxLength, "error.required.tcsp.provided_services.details.length") andThen
+    basicPunctuationPattern("error.required.tcsp.provided_services.details.punctuation")
 
   val serviceType = minLengthR[Set[String]](1).withMessage("error.required.tcsp.provided_services.services")
 
@@ -134,7 +134,7 @@ object ProvidedServices {
             case "08" =>
               (JsPath \ "details").read[String].map (Other.apply  _) map identity[TcspService]
             case _ =>
-              Reads(_ => JsError((JsPath \ "services") -> play.api.data.validation.ValidationError("error.invalid")))
+              Reads(_ => JsError((JsPath \ "services") -> play.api.libs.json.JsonValidationError("error.invalid")))
           }.foldLeft[Reads[Set[TcspService]]](
             Reads[Set[TcspService]](_ => JsSuccess(Set.empty))
          ){

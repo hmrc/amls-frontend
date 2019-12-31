@@ -19,11 +19,12 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement.{AddBusinessTypeFlowModel, AddBusinessTypeSummaryPageId}
+import play.api.mvc.MessagesControllerComponents
 import models.responsiblepeople.ResponsiblePerson
 import models.tradingpremises.TradingPremises
 import services.businessmatching.BusinessMatchingService
@@ -34,17 +35,19 @@ import utils.{AuthAction, RepeatingSection, StatusConstants}
 import views.html.businessmatching.updateservice.add.update_services_summary
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class AddBusinessTypeSummaryController @Inject()(
                                                   authAction: AuthAction,
+                                                  val ds: CommonPlayDependencies,
                                                   implicit val dataCacheConnector: DataCacheConnector,
                                                   val statusService: StatusService,
                                                   val businessMatchingService: BusinessMatchingService,
                                                   val helper: AddBusinessTypeHelper,
                                                   val router: Router[AddBusinessTypeFlowModel],
-                                                  val tradingPremisesService: TradingPremisesService
-                                               ) extends DefaultBaseController with RepeatingSection {
+                                                  val tradingPremisesService: TradingPremisesService,
+                                                  val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get() = authAction.async {
     implicit request =>

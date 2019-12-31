@@ -68,7 +68,7 @@ object ContactType {
       case JsString("RPV1") => JsSuccess(ReminderToPayForVariation)
       case JsString("RPM1") => JsSuccess(ReminderToPayForManualCharges)
 
-      case _ => JsError((JsPath \ "contact_type") -> play.api.data.validation.ValidationError("error.invalid"))
+      case _ => JsError((JsPath \ "contact_type") -> play.api.libs.json.JsonValidationError("error.invalid"))
     }
 
   implicit val jsonWrites =

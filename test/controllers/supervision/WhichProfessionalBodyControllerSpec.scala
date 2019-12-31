@@ -19,7 +19,7 @@ package controllers.supervision
 import controllers.actions.SuccessfulAuthAction
 import models.supervision._
 import org.jsoup.Jsoup
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.mockito.Mockito._
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.scalatestplus.play.PlaySpec
@@ -34,8 +34,7 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
     val request = addToken(authRequest)
 
     val controller = new WhichProfessionalBodyController(mockCacheConnector,
-                                                         authAction = SuccessfulAuthAction
-    )
+                                                         authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
     mockCacheFetch[Supervision](Some(Supervision()))
     mockCacheSave[Supervision]
   }
@@ -89,7 +88,7 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
         "redirect to PenalisedByProfessionalController" when {
           "not in edit mode" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "businessType[0]" -> "01",
               "businessType[1]" -> "02"
             )
@@ -103,7 +102,7 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
         "redirect to SummaryController" when {
           "in edit mode" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "businessType[0]" -> "01",
               "businessType[1]" -> "02"
             )
@@ -118,7 +117,7 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
       "invalid data" must {
         "respond with BAD_REQUEST" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody()
+          val newRequest = requestWithUrlEncodedBody("" -> "")
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -130,7 +129,7 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
   it must {
     "save the valid data to the supervision model" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "businessType[0]" -> "01",
         "businessType[1]" -> "02"
       )

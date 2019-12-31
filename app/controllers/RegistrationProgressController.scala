@@ -24,7 +24,7 @@ import models.businessmatching.{BusinessActivity, BusinessMatching}
 import models.registrationprogress.{Completed, Section}
 import models.renewal.Renewal
 import models.status._
-import play.api.mvc.{AnyContent, Request}
+import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import services.businessmatching.{BusinessMatchingService, ServiceFlow}
 import services.{AuthEnrolmentsService, ProgressService, RenewalService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -38,6 +38,7 @@ import scala.concurrent.Future
 
 @Singleton
 class RegistrationProgressController @Inject()(protected[controllers] val authAction: AuthAction,
+                                               val ds: CommonPlayDependencies,
                                                protected[controllers] val dataCache: DataCacheConnector,
                                                protected[controllers] val enrolmentsService: AuthEnrolmentsService,
                                                implicit               val statusService: StatusService,
@@ -45,7 +46,8 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
                                                protected[controllers] val sectionsProvider: SectionsProvider,
                                                protected[controllers] val businessMatchingService: BusinessMatchingService,
                                                protected[controllers] val serviceFlow: ServiceFlow,
-                                               implicit               val renewalService: RenewalService) extends DefaultBaseController {
+                                               implicit               val renewalService: RenewalService,
+                                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
       implicit request =>

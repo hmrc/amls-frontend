@@ -18,12 +18,14 @@ package audit
 
 import models.bankdetails._
 import play.api.test.FakeRequest
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import utils.AmlsSpec
 
 class AddBankAccountEventSpec extends AmlsSpec {
 
   implicit val request = FakeRequest("GET", "/test-path")
+  implicit override val headerCarrier: HeaderCarrier = HeaderCarrier()
 
   val ukBankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("ASD123", "1234567")))
   val nonUkBankAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some(NonUKAccountNumber("98374389hjk")))

@@ -43,12 +43,7 @@ class RoleInBusinessControllerSpec extends AmlsSpec{
 
     val cache = mock[DataCacheConnector]
 
-    val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .overrides(bind[DataCacheConnector].to(cache))
-      .build()
-
-    lazy val controller = injector.instanceOf[RoleInBusinessController]
+    lazy val controller = new RoleInBusinessController(SuccessfulAuthAction, commonDependencies, cache, mockMcc)
 
     val nominatedOfficer = ResponsiblePerson(
       personName = Some(PersonName("firstName", None, "lastName")),
@@ -107,7 +102,7 @@ class RoleInBusinessControllerSpec extends AmlsSpec{
           when(cache.save(any(), any(), any())(any(),any()))
             .thenReturn(Future.successful(mock[CacheMap]))
 
-          val result = controller.post()(request.withFormUrlEncodedBody("positions[]" -> "06"))
+          val result = controller.post()(requestWithUrlEncodedBody("positions[]" -> "06"))
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(routes.NewOfficerController.get().url)
@@ -121,7 +116,7 @@ class RoleInBusinessControllerSpec extends AmlsSpec{
           when(cache.save(any(), any(), any())(any(),any()))
             .thenReturn(Future.successful(mock[CacheMap]))
 
-          val result = controller.post()(request.withFormUrlEncodedBody("positions[]" -> ""))
+          val result = controller.post()(requestWithUrlEncodedBody("positions[]" -> ""))
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(routes.RemoveResponsiblePersonController.get().url)

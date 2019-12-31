@@ -16,8 +16,8 @@
 
 package models.businessdetails
 
+import org.scalatest.mockito.MockitoSugar
 import jto.validation.{Invalid, Path, Valid, ValidationError}
-import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 

@@ -45,7 +45,7 @@ class NewHomeAddressSpec extends PlaySpec {
     }
 
     "read/ write json successfully" in {
-      NewHomeAddress.format.reads(NewHomeAddress.format.writes(model)) must be(JsSuccess(model, JsPath \ "personAddress" ))
+      NewHomeAddress.format.reads(NewHomeAddress.format.writes(model)) must be(JsSuccess(model, JsPath ))
     }
 
   }

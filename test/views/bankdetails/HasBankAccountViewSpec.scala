@@ -19,14 +19,14 @@ package views.bankdetails
 import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 import views.html.bankdetails._
 
-class HasBankAccountViewSpec extends AmlsSpec {
+class HasBankAccountViewSpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture {
-    implicit val csrfRequest = addToken(request)
+    implicit val csrfRequest = addTokenForView()
   }
 
   "The view" should {

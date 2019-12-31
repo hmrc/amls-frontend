@@ -25,7 +25,7 @@ import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import utils.AmlsSpec
 import play.api.test.Helpers._
@@ -37,14 +37,16 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
     implicit val ec = app.injector.instanceOf[ExecutionContext]
 
     val controller = new SummaryController (
       dataCache = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
-      statusService = mock[StatusService]
+      ds = commonDependencies,
+      statusService = mock[StatusService],
+      cc = mockMcc
     )
 
     val mockCacheMap = mock[CacheMap]
@@ -190,7 +192,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
         val emptyCache = CacheMap("", Map.empty)
 
-        val newRequest = request.withFormUrlEncodedBody( "hasAccepted" -> "true")
+        val newRequest = requestWithUrlEncodedBody( "hasAccepted" -> "true")
 
         when(controller.dataCache.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(completeModel.copy(hasAccepted = false))))

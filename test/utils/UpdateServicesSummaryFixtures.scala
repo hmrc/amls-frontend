@@ -31,7 +31,7 @@ import views.html.businessmatching.updateservice.add._
   *
   * Holds traits required to test the check your answers page given FX.
   */
-trait UpdateServicesSummaryFixtures  extends AmlsSpec {
+trait UpdateServicesSummaryFixtures  extends AmlsViewSpec {
 
   /**
     * ViewFixture.
@@ -40,7 +40,7 @@ trait UpdateServicesSummaryFixtures  extends AmlsSpec {
     * All other traits will extend to inherit oAuth
     */
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   /**

@@ -19,17 +19,17 @@ package views.businessactivities
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.HowManyEmployees
 import org.scalatest.MustMatchers
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
 
 
-class business_employeesSpec extends AmlsSpec with MustMatchers  {
+class business_employeesSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "business_employees view" must {

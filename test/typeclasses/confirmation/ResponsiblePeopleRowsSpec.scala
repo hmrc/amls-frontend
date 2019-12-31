@@ -23,7 +23,8 @@ import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import models.{AmendVariationRenewalResponse, SubscriptionFees, SubscriptionResponse}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -35,7 +36,7 @@ class ResponsiblePeopleRowsSpec extends PlaySpec
   with MockitoSugar
   with ScalaFutures
   with IntegrationPatience
-  with OneAppPerSuite
+  with GuiceOneAppPerSuite
   with ResponsiblePersonGenerator
   with generators.tradingpremises.TradingPremisesGenerator
   with AmlsReferenceNumberGenerator {

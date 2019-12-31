@@ -19,13 +19,13 @@ package views.confirmation
 import models.confirmation.Currency
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class PaymentFailureViewSpec extends AmlsSpec with MustMatchers {
+class PaymentFailureViewSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     //noinspection ScalaStyle
     override def view = views.html.confirmation.payment_failure("confirmation.payment.failed.reason.failure", 100, "X123456789")

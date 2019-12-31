@@ -43,7 +43,9 @@ class WhoIsYourAccountantNameControllerSpec extends AmlsSpec
     val controller = new WhoIsYourAccountantNameController (
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
-      autoCompleteService = mockAutoComplete
+      autoCompleteService = mockAutoComplete,
+      ds = commonDependencies,
+      cc = mockMcc
     )
   }
 
@@ -92,7 +94,7 @@ class WhoIsYourAccountantNameControllerSpec extends AmlsSpec
       "given invalid data" must {
         "respond with BAD_REQUEST" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "name" -> ""
           )
 
@@ -104,7 +106,7 @@ class WhoIsYourAccountantNameControllerSpec extends AmlsSpec
       "edit is true" must {
         "respond with SEE_OTHER and redirect to the SummaryController" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "name" -> "testName",
             "tradingName" -> "tradingName"
           )
@@ -125,7 +127,7 @@ class WhoIsYourAccountantNameControllerSpec extends AmlsSpec
       "edit is false" must {
         "respond with SEE_OTHER and redirect to the TaxMattersController" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "name" -> "testName",
             "tradingName" -> "tradingName"
           )

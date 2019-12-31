@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@()(implicit request: Request[_],m:Messages)
+@()(implicit request: Request[_],m:Messages, lang: Lang)
 <p>@Messages("status.incomplete.description")</p>
 <p>@Messages("status.incomplete.description1")</p>
 <a id="return-to-saved-application" href="@controllers.routes.RegistrationProgressController.get()" class="button">@Messages("status.incomplete.buttontext")</a>

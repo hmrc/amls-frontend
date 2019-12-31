@@ -19,7 +19,7 @@ package utils
 import jto.validation.Path
 import org.scalatest.PrivateMethodTester
 import play.api.libs.json
-import play.api.libs.json.JsPath
+import play.api.libs.json.{JsPath, JsonValidationError}
 
 class JsonMappingSpec extends AmlsSpec with PrivateMethodTester {
 
@@ -41,7 +41,7 @@ class JsonMappingSpec extends AmlsSpec with PrivateMethodTester {
 
       val result = JsonMapping.convertValidationErros(errors)
 
-      result.head mustBe a[play.api.data.validation.ValidationError]
+      result.head mustBe a[JsonValidationError]
       result.head.message must be("some error")
     }
   }
@@ -53,7 +53,7 @@ class JsonMappingSpec extends AmlsSpec with PrivateMethodTester {
       val result = JsonMapping.errorConversion(errors)
 
       result.head._1 mustBe a[JsPath]
-      result.head._2.head mustBe a[play.api.data.validation.ValidationError]
+      result.head._2.head mustBe a[JsonValidationError]
     }
   }
 }

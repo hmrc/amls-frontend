@@ -21,13 +21,13 @@ import jto.validation.{Path, ValidationError}
 import models.responsiblepeople.PersonAddressUK
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class moved_addressSpec extends AmlsSpec with MustMatchers {
+class moved_addressSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     val name = "firstName lastName"
     val address = PersonAddressUK("#11", "some building", Some("Some street"), Some("city"), "AA111AA")

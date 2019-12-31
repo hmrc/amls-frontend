@@ -18,7 +18,6 @@ package models.responsiblepeople
 
 import cats.data.Validated.Valid
 import models.FormTypes._
-import org.joda.time.{DateTimeFieldType, LocalDate}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, To, Write}
 import play.api.libs.json.{Reads, Writes}

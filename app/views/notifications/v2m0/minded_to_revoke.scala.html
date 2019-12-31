@@ -16,8 +16,9 @@
 
 @import include._
 @import models.notifications.NotificationParams
+@import config.{ ApplicationConfig}
 
-@(notificationParams: NotificationParams)(implicit request: Request[_],m:Messages)
+@(notificationParams: NotificationParams)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()

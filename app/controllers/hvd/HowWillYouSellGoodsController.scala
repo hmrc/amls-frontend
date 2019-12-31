@@ -17,15 +17,16 @@
 package controllers.hvd
 
 import connectors.DataCacheConnector
-import controllers.{DefaultBaseController}
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching.HighValueDealing
 import models.hvd.{HowWillYouSellGoods, Hvd}
-import play.api.mvc.Call
+import play.api.mvc.{Call, MessagesControllerComponents}
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import utils.DateOfChangeHelper
 import views.html.hvd.how_will_you_sell_goods
 
@@ -34,7 +35,9 @@ import scala.concurrent.Future
 class HowWillYouSellGoodsController @Inject()( val dataCacheConnector: DataCacheConnector,
                                                val statusService: StatusService,
                                                val authAction: AuthAction,
-                                               val serviceFlow: ServiceFlow) extends DefaultBaseController with DateOfChangeHelper {
+                                               val ds: CommonPlayDependencies,
+                                               val serviceFlow: ServiceFlow,
+                                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

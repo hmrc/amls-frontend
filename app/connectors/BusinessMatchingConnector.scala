@@ -16,20 +16,22 @@
 
 package connectors
 
-import config.WSHttp
+import config.{AmlsHeaderCarrierForPartialsConverter, ApplicationConfig}
 import javax.inject.Inject
 import play.api.Mode.Mode
 import play.api.{Configuration, Logger, Play}
 import play.api.libs.json.Json
 import play.api.mvc.Request
-import uk.gov.hmrc.crypto.ApplicationCrypto
-import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.frontend.filters.SessionCookieCryptoFilter
+import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import uk.gov.hmrc.http.NotFoundException
+import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
+import uk.gov.hmrc.play.bootstrap.filters.frontend.crypto.SessionCookieCrypto
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.play.http.ws.WSHttp
 
 case class BusinessMatchingAddress(line_1: String,
                                    line_2: String,
@@ -67,19 +69,17 @@ object BusinessMatchingReviewDetails {
   implicit val formats = Json.format[BusinessMatchingReviewDetails]
 }
 
-class BusinessMatchingConnector @Inject()(val http: WSHttp,
-                                          val applicationCrypto: ApplicationCrypto
-                                          ) extends ServicesConfig with HeaderCarrierForPartialsConverter {
+class BusinessMatchingConnector @Inject()(val http: HttpClient,
+                                          hc: AmlsHeaderCarrierForPartialsConverter,
+                                          val applicationConfig: ApplicationConfig) {
 
-  val sessionCookieCryptoFilter: SessionCookieCryptoFilter = new SessionCookieCryptoFilter(applicationCrypto)
-  override val crypto: String => String = sessionCookieCryptoFilter.encrypt _
+  import hc._
 
-  val businessMatchingUrl = s"${baseUrl("business-customer")}/business-customer"
   val serviceName = "amls"
 
   def getReviewDetails(implicit request: Request[_]): Future[Option[BusinessMatchingReviewDetails]] = {
 
-    val url = s"$businessMatchingUrl/fetch-review-details/$serviceName"
+    val url = s"${applicationConfig.businessMatchingUrl}/fetch-review-details/$serviceName"
     val logPrefix = "[BusinessMatchingConnector][getReviewDetails]"
 
     Logger.debug(s"$logPrefix Fetching $url..")
@@ -94,7 +94,4 @@ class BusinessMatchingConnector @Inject()(val http: WSHttp,
         Future.failed(ex)
     }
   }
-
-  override protected def mode: Mode = Play.current.mode
-  override protected def runModeConfiguration: Configuration = Play.current.configuration
 }

@@ -17,8 +17,9 @@
 @import include._
 @import models.responsiblepeople._
 @import forms2._
+@import config.{ ApplicationConfig}
 
-@(f: forms.Form2[_], model : Seq[ResponsiblePerson])(implicit lang:Lang,  m: Messages, request: Request[_])
+@(f: forms.Form2[_], model : Seq[ResponsiblePerson])(implicit m: Messages, request: Request[_], lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()
@@ -41,7 +42,7 @@
             f,
             model,
             "submit.registration",
-            supportingContent)(m, request)
+            supportingContent)
 
         @submit(buttonId=Some("confirm-continue"))
     }

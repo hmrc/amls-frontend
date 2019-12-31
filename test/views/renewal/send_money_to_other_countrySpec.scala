@@ -21,14 +21,14 @@ import jto.validation.{Path, ValidationError}
 import models.renewal.SendMoneyToOtherCountry
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
 
-class send_money_to_other_countrySpec extends AmlsSpec with MustMatchers {
+class send_money_to_other_countrySpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "send_money_to_other_country view" must {

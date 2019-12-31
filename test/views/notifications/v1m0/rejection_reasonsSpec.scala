@@ -20,14 +20,14 @@ import models.notifications.NotificationParams
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class rejection_reasonsSpec extends AmlsSpec with MustMatchers {
+class rejection_reasonsSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
 
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     val notificationParams = NotificationParams(businessName = Some("Fake Name Ltd."), msgContent = "msgContent", safeId = Some("reference"), endDate = Some("endDate"))
 

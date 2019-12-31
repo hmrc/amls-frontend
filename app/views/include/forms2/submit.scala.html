@@ -23,7 +23,7 @@
  returnLocation : Option[String] = None,
  buttonId : Option[String] = None,
  gaTag : Option[String] = None
- )(implicit lang:Lang,  m: Messages)
+ )(implicit m: Messages)
 <div class="form-group-footer">
     <button type="submit" name="submit" class="button" @if(gaTag.isDefined) {data-journey-click = "@gaTag"} id="@buttonId.getOrElse("")">
         @Messages(buttonMessageKey.getOrElse("button.saveandcontinue"))

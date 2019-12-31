@@ -18,17 +18,17 @@ package views.tradingpremises
 
 import forms.{Form2, InvalidForm, ValidForm}
 import org.scalatest.MustMatchers
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import models.tradingpremises.AgentCompanyDetails
 import play.api.i18n.Messages
 import views.Fixture
 
-class agent_company_detailsSpec extends AmlsSpec with MustMatchers {
+class agent_company_detailsSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "add_person view" must {

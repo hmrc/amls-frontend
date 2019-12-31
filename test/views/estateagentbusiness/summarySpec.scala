@@ -19,14 +19,14 @@ package views.estateagentbusiness
 import forms.EmptyForm
 import models.estateagentbusiness._
 import org.scalatest.MustMatchers
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import play.api.i18n.Messages
 import views.Fixture
 
-class summarySpec extends AmlsSpec with MustMatchers  {
+class summarySpec extends AmlsViewSpec with MustMatchers  {
 
   trait TestFixture extends Fixture {
-      implicit val requestWithToken = addToken(request)
+      implicit val requestWithToken = addTokenForView()
     val validBusiness = EstateAgentBusiness(
       Some(Services(Set(Commercial, AssetManagement, Residential))),
       Some(ThePropertyOmbudsman),

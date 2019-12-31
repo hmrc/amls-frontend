@@ -24,18 +24,13 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.PrivateMethodTester
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks}
 
 import scala.concurrent.Future
 
-class WhoIsYourAccountantIsUkControllerSpec extends AmlsSpec
-  with MockitoSugar
-  with ScalaFutures
-  with PrivateMethodTester {
+class WhoIsYourAccountantIsUkControllerSpec extends AmlsSpec with PrivateMethodTester {
 
   trait Fixture extends AuthorisedFixture with AutoCompleteServiceMocks{
     self =>
@@ -44,7 +39,9 @@ class WhoIsYourAccountantIsUkControllerSpec extends AmlsSpec
     val controller = new WhoIsYourAccountantIsUkController (
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
-      autoCompleteService = mockAutoComplete
+      autoCompleteService = mockAutoComplete,
+      ds = commonDependencies,
+      cc = mockMcc
     )
   }
 
@@ -102,7 +99,7 @@ class WhoIsYourAccountantIsUkControllerSpec extends AmlsSpec
               ))
             ))))
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "isUK" -> ""
           )
 
@@ -114,7 +111,7 @@ class WhoIsYourAccountantIsUkControllerSpec extends AmlsSpec
       "edit is true" must {
         "respond with SEE_OTHER and redirect to the SummaryController" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "isUK" -> "true"
           )
 
@@ -134,7 +131,7 @@ class WhoIsYourAccountantIsUkControllerSpec extends AmlsSpec
       "edit is false" must {
         "respond with SEE_OTHER and redirect to the WhoIsYourAccountantUkAddressController" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "isUK" -> "true"
           )
 
@@ -152,7 +149,7 @@ class WhoIsYourAccountantIsUkControllerSpec extends AmlsSpec
 
         "respond with SEE_OTHER and redirect to the WhoIsYourAccountantNonUkAddressController" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "isUK" -> "false"
           )
 

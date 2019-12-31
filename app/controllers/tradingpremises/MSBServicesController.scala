@@ -18,22 +18,25 @@ package controllers.tradingpremises
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, _}
 import models.businessmatching.BusinessMatching
 import models.status.SubmissionStatus
 import models.tradingpremises.TradingPremisesMsbServices._
 import models.tradingpremises.{TradingPremises, TradingPremisesMsbServices}
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class MSBServicesController @Inject () (
                                        val dataCacheConnector: DataCacheConnector,
                                        val authAction: AuthAction,
-                                       val statusService: StatusService
-                                       ) extends RepeatingSection with DefaultBaseController with DateOfChangeHelper with FormHelpers {
+                                       val ds: CommonPlayDependencies,
+                                       val statusService: StatusService,
+                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
 
   def get(index: Int, edit: Boolean = false, changed: Boolean = false) = authAction.async {
     implicit request =>

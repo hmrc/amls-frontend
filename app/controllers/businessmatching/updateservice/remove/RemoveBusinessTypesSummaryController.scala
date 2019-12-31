@@ -19,23 +19,26 @@ package controllers.businessmatching.updateservice.remove
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
 import forms.EmptyForm
 import javax.inject.Inject
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, RemoveBusinessTypesSummaryPageId}
+import play.api.mvc.MessagesControllerComponents
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.businessmatching.updateservice.remove.remove_activities_summary
 
 import scala.concurrent.Future
 
 class RemoveBusinessTypesSummaryController @Inject()(authAction: AuthAction,
+                                                     val ds: CommonPlayDependencies,
                                                      val dataCacheConnector: DataCacheConnector,
                                                      val helper: RemoveBusinessTypeHelper,
-                                                     val router: Router[RemoveBusinessTypeFlowModel]
-                                                    ) extends DefaultBaseController {
+                                                     val router: Router[RemoveBusinessTypeFlowModel],
+                                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
       implicit request => {

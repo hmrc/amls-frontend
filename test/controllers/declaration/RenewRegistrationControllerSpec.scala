@@ -42,7 +42,9 @@ class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with Sc
       authAction = SuccessfulAuthAction,
       progressService = mock[ProgressService],
       statusService = mock[StatusService],
-      renewalService = mock[RenewalService]
+      renewalService = mock[RenewalService],
+      ds = commonDependencies,
+      cc = mockMcc
     )
   }
 
@@ -96,7 +98,7 @@ class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with Sc
 
             mockCacheSave[RenewRegistration](RenewRegistrationYes, Some(RenewRegistration.key))
 
-            val newRequest = request.withFormUrlEncodedBody("renewRegistration" -> "true")
+            val newRequest = requestWithUrlEncodedBody("renewRegistration" -> "true")
 
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
@@ -106,7 +108,7 @@ class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with Sc
 
         "redirect to the url provided by progressService" in new Fixture {
           val call = controllers.routes.RegistrationProgressController.get()
-          val newRequest = request.withFormUrlEncodedBody("renewRegistration" -> "false")
+          val newRequest = requestWithUrlEncodedBody("renewRegistration" -> "false")
           val date = new LocalDate()
 
           when {
@@ -128,7 +130,7 @@ class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with Sc
 
       "with invalid data" must {
         "respond with BAD_REQUEST" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "renewRegistration" -> "1234567890"
           )
           val date = new LocalDate()

@@ -16,7 +16,9 @@
 
 @import include._
 @import forms2._
-@(nextUrl: Call)(implicit request: Request[_], m:Messages)
+@import config.{ ApplicationConfig}
+
+@(nextUrl: Call)(implicit request: Request[_], m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()
@@ -25,9 +27,10 @@
 
 @whatyouneed(
     title = Messages("title.wyn") + " - " + Messages("summary.bankdetails"),
-    heading = header,
-    sidebar = sidebar
+    heading = header
 ) {
+
+    @components.user_attention_saving()
 
     <p>@Messages("bankdetails.whatyouneed.requiredinfo.heading")</p>
 
@@ -46,11 +49,4 @@
         returnLink = true,
         id = Some("bankwhatyouneed-button")
     )
-}
-
-@sidebar = {
-    <div class="user-attention">
-        <h2 class="heading-small">@Messages("main.sidebar.title")</h2>
-        <p>@Messages("main.sidebar.information")</p>
-    </div>
 }

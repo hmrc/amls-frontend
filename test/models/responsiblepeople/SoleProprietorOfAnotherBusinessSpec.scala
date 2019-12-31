@@ -72,7 +72,7 @@ class SoleProprietorOfAnotherBusinessSpec extends PlaySpec {
     "Read and write successfully" in {
 
       SoleProprietorOfAnotherBusiness.format.reads(SoleProprietorOfAnotherBusiness.format.writes(SoleProprietorOfAnotherBusiness(true))) must be(
-        JsSuccess(SoleProprietorOfAnotherBusiness(true), JsPath \ "soleProprietorOfAnotherBusiness"))
+        JsSuccess(SoleProprietorOfAnotherBusiness(true), JsPath))
     }
 
     "write successfully" in {

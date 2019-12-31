@@ -19,20 +19,25 @@ package controllers.bankdetails
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
+import controllers.CommonPlayDependencies
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.bankdetails.{BankAccount, BankAccountHasIban, BankDetails}
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, StatusConstants}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
 class BankAccountHasIbanController @Inject()( val dataCacheConnector: DataCacheConnector,
                                               val authAction: AuthAction,
                                               val auditConnector: AuditConnector,
-                                              val statusService: StatusService ) extends BankDetailsController {
+                                              val statusService: StatusService,
+                                              val ds: CommonPlayDependencies,
+                                              val mcc: MessagesControllerComponents) extends BankDetailsController(ds, mcc) {
 
   def get(index: Int, edit: Boolean = false) = authAction.async{
       implicit request =>

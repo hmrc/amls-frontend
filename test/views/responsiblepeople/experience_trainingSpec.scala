@@ -20,16 +20,16 @@ import forms.{Form2, InvalidForm, ValidForm}
 import models.businessmatching.{AccountancyServices, BusinessActivities, BusinessMatching, MoneyServiceBusiness}
 import models.responsiblepeople.{ExperienceTraining, ExperienceTrainingYes}
 import org.scalatest.MustMatchers
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
 
-class experience_trainingSpec extends AmlsSpec with MustMatchers  {
+class experience_trainingSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
     val businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(AccountancyServices))))
   }
 

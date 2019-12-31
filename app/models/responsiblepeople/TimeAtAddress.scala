@@ -64,7 +64,7 @@ object TimeAtAddress {
         case "03" => OneToThreeYears
         case "04" => ThreeYearsPlus
         case _ =>
-          play.api.data.validation.ValidationError("error.invalid")
+          play.api.libs.json.JsonValidationError("error.invalid")
       }
     }
 

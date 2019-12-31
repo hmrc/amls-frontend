@@ -56,7 +56,7 @@ object Nationality {
     (__ \ "nationality").read[String].flatMap[Nationality] {
       case "01" => British
       case "02" => (JsPath \ "otherCountry").read[Country] map OtherCountry.apply
-      case _ => play.api.data.validation.ValidationError("error.invalid")
+      case _ => play.api.libs.json.JsonValidationError("error.invalid")
     }
   }
 

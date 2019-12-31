@@ -19,13 +19,15 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement.{AddBusinessTypeFlowModel, NoPSRPageId}
+import play.api.mvc.MessagesControllerComponents
 import services.flowmanagement.Router
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.businessmatching.updateservice.add.cannot_add_services
 
 import scala.concurrent.Future
@@ -33,10 +35,11 @@ import scala.concurrent.Future
 @Singleton
 class NoPsrController @Inject()(
                                  authAction: AuthAction,
+                                 val ds: CommonPlayDependencies,
                                  implicit val dataCacheConnector: DataCacheConnector,
                                  val helper: AddBusinessTypeHelper,
-                                 val router: Router[AddBusinessTypeFlowModel]
-                               ) extends DefaultBaseController {
+                                 val router: Router[AddBusinessTypeFlowModel],
+                                 val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
       implicit request =>

@@ -73,7 +73,7 @@ class TcspTypesSpec extends PlaySpec {
     }
 
     "Json Validation" must {
-      import play.api.data.validation.ValidationError
+      import play.api.libs.json.JsonValidationError
 
       "successfully validate given values with option Trust or company formation agent etc" in {
         val json = Json.obj(
@@ -92,7 +92,7 @@ class TcspTypesSpec extends PlaySpec {
       "throw error message on reading invalid data" in {
 
         Json.fromJson[TcspTypes](Json.obj("serviceProviders" -> Seq("40"))) must
-          be(JsError((JsPath) \ "serviceProviders" -> ValidationError("error.invalid")))
+          be(JsError((JsPath) \ "serviceProviders" -> JsonValidationError("error.invalid")))
 
       }
     }

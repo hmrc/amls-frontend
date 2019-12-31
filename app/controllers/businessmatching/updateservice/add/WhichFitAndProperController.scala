@@ -19,12 +19,13 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
 import models.flowmanagement._
+import play.api.mvc.MessagesControllerComponents
 import services.ResponsiblePeopleService._
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
@@ -38,13 +39,14 @@ import scala.concurrent.Future
 @Singleton
 class WhichFitAndProperController @Inject()(
                                              authAction: AuthAction,
+                                             val ds: CommonPlayDependencies,
                                              implicit val dataCacheConnector: DataCacheConnector,
                                              val statusService: StatusService,
                                              val businessMatchingService: BusinessMatchingService,
                                              val responsiblePeopleService: ResponsiblePeopleService,
                                              val helper: AddBusinessTypeHelper,
-                                             val router: Router[AddBusinessTypeFlowModel]
-                                           ) extends DefaultBaseController with RepeatingSection {
+                                             val router: Router[AddBusinessTypeFlowModel],
+                                             val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

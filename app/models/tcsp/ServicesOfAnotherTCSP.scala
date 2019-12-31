@@ -33,12 +33,17 @@ object ServicesOfAnotherTCSP {
 
   import utils.MappingUtils.Implicits._
 
-  val service = notEmpty.withMessage("error.invalid.mlr.number")
-    .andThen(referenceNumberRule())
+  val minMlrNumberLength:Int = 8
+  val maxMlrNumberLength:Int = 15
+
+  val service = notEmpty.withMessage("error.required.tcsp.services.another.tcsp.number")
+    .andThen(minLength(minMlrNumberLength).withMessage("error.tcsp.services.another.tcsp.number.length"))
+    .andThen(maxLength(maxMlrNumberLength).withMessage("error.tcsp.services.another.tcsp.number.length"))
+    .andThen(referenceNumberRule("error.tcsp.services.another.tcsp.number.punctuation"))
 
   implicit val formRule: Rule[UrlFormEncoded, ServicesOfAnotherTCSP] = From[UrlFormEncoded] { __ =>
   import jto.validation.forms.Rules._
-    (__ \ "servicesOfAnotherTCSP").read[Boolean].withMessage("error.required.tcsp.services.another.tcsp") flatMap {
+    (__ \ "servicesOfAnotherTCSP").read[Boolean].withMessage("error.required.tcsp.services.another.tcsp.registered") flatMap {
       case true =>
        (__ \ "mlrRefNumber").read(service) map ServicesOfAnotherTCSPYes.apply
       case false => Rule.fromMapping { _ => Valid(ServicesOfAnotherTCSPNo) }

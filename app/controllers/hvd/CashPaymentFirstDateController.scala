@@ -17,17 +17,21 @@
 package controllers.hvd
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.hvd.{CashPayment, CashPaymentFirstDate, CashPaymentOverTenThousandEuros, Hvd}
+import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.hvd.cash_payment_first_date
 
 import scala.concurrent.Future
 
 class CashPaymentFirstDateController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                               val authAction: AuthAction) extends DefaultBaseController {
+                                               val authAction: AuthAction,
+                                               val ds: CommonPlayDependencies,
+                                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) =
     authAction.async {

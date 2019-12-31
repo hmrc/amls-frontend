@@ -21,14 +21,14 @@ import jto.validation.{Path, ValidationError}
 import models.changeofficer.StillEmployed
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
 
-class still_employedSpec extends AmlsSpec with MustMatchers  {
+class still_employedSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "vat_registered view" must {

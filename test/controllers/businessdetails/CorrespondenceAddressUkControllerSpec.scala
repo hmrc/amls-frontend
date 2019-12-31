@@ -27,7 +27,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.AutoCompleteService
@@ -42,15 +42,14 @@ import scala.concurrent.Future
 
 class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new CorrespondenceAddressUkController (
       dataConnector = mock[DataCacheConnector],
       auditConnector = mock[AuditConnector],
       autoCompleteService = mock[AutoCompleteService],
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
 
     when {
       controller.autoCompleteService.getCountries
@@ -112,7 +111,7 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
 
         val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, Some(CorrespondenceAddressIsUk(true)), Some(CorrespondenceAddress(Some(address), None)))))
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "yourName" -> "Name",
           "businessName" -> "Business Name",
           "isUK"         -> "true",
@@ -150,7 +149,7 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
 
         val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, Some(CorrespondenceAddressIsUk(true)), Some(CorrespondenceAddress(Some(address), None)))))
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "yourName" -> "Name",
           "businessName" -> "Business Name",
           "isUK"         -> "true",
@@ -190,7 +189,7 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
 
         val fetchResult = Future.successful(None)
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "yourName" -> "Name",
           "businessName" -> "Business Name",
           "isUK"         -> "true",
@@ -224,7 +223,7 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
 
       "an invalid form request is sent in the body" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "yourName" -> "Name",
           "businessName" -> "Business Name",
           "invalid" -> "AA1 1AA"

@@ -31,9 +31,9 @@ class TransactionTypesControllerSpec extends AmlsSpec
   with MustMatchers
   with BusinessActivitiesGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
-    val controller = new TransactionTypesController(SuccessfulAuthAction, mockCacheConnector)
+    val controller = new TransactionTypesController(SuccessfulAuthAction, ds = commonDependencies, mockCacheConnector, mockMcc)
 
     mockCacheSave[BusinessActivities]
     mockCacheFetch(Some(BusinessActivities()))
@@ -72,7 +72,7 @@ class TransactionTypesControllerSpec extends AmlsSpec
           "name" -> "example software"
         )
 
-        val result = controller.post()(request.withFormUrlEncodedBody(form:_*))
+        val result = controller.post()(requestWithUrlEncodedBody(form:_*))
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.businessactivities.routes.IdentifySuspiciousActivityController.get().url)
@@ -90,7 +90,7 @@ class TransactionTypesControllerSpec extends AmlsSpec
       "return to the summary page when in edit mode" in new Fixture {
         val form = "types[]" -> "01"
 
-        val result = controller.post(edit = true)(request.withFormUrlEncodedBody(form))
+        val result = controller.post(edit = true)(requestWithUrlEncodedBody(form))
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.businessactivities.routes.SummaryController.get().url)
@@ -101,7 +101,7 @@ class TransactionTypesControllerSpec extends AmlsSpec
       "return BAD_REQUEST and show the page again" in new Fixture {
         val form = "types[]" -> "03"
 
-        val result = controller.post()(request.withFormUrlEncodedBody(form))
+        val result = controller.post()(requestWithUrlEncodedBody(form))
 
         status(result) mustBe BAD_REQUEST
         contentAsString(result) must include(messages("businessactivities.do.keep.records"))

@@ -17,7 +17,7 @@
 package models.responsiblepeople
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 
@@ -137,7 +137,7 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
       "fail to validate" when {
         "given an empty value" in {
           Json.fromJson[PositionWithinBusiness](JsString("")) must
-            be(JsError((JsPath \ "positions") -> play.api.data.validation.ValidationError("error.invalid")))
+            be(JsError((JsPath \ "positions") -> play.api.libs.json.JsonValidationError("error.invalid")))
         }
       }
 

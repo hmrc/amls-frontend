@@ -22,7 +22,7 @@ import models.moneyservicebusiness.{BranchesOrAgents, BranchesOrAgentsHasCountri
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
@@ -31,10 +31,10 @@ import scala.concurrent.Future
 
 class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
 
-    val controller = new BranchesOrAgentsController(mockCacheConnector, authAction = SuccessfulAuthAction, mockAutoComplete)
+    val controller = new BranchesOrAgentsController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, mockAutoComplete, mockMcc)
   }
 
   "BranchesOrAgentsHasCountriesController" must {
@@ -81,7 +81,7 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
         hasChanged = true
       )
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "hasCountries" -> "false"
       )
 
@@ -104,7 +104,7 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
         hasChanged = true
       )
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "hasCountries" -> "true"
       )
 
@@ -127,7 +127,7 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
         hasChanged = true
       )
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "hasCountries" -> "false"
       )
 
@@ -150,7 +150,7 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
         hasChanged = true
       )
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "hasCountries" -> "true"
       )
 

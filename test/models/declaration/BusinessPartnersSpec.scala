@@ -50,7 +50,7 @@ class BusinessPartnersSpec extends PlaySpec {
     "successfully validate given an model value" in {
       val json = Json.obj("value" -> "PersonName")
       Json.fromJson[BusinessPartners](json) must
-        be(JsSuccess(BusinessPartners("PersonName"), JsPath \ "value"))
+        be(JsSuccess(BusinessPartners("PersonName"), JsPath))
     }
 
     "successfully validate json read write" in {

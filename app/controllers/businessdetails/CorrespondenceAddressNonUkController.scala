@@ -22,26 +22,26 @@ import cats.data.OptionT
 import cats.implicits._
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.{BaseController, DefaultBaseController}
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessdetails.{BusinessDetails, CorrespondenceAddress, CorrespondenceAddressNonUk}
-import play.api.mvc.Request
+import play.api.mvc.{MessagesControllerComponents, Request}
 import services.AutoCompleteService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.businessdetails._
 
 import scala.concurrent.Future
 
-class CorrespondenceAddressNonUkController @Inject ()(
-                                                 val dataConnector: DataCacheConnector,
-                                                 val auditConnector: AuditConnector,
-                                                 val autoCompleteService: AutoCompleteService,
-                                                 val authAction: AuthAction
-                                                 ) extends DefaultBaseController {
+class CorrespondenceAddressNonUkController @Inject ()(val dataConnector: DataCacheConnector,
+                                                      val auditConnector: AuditConnector,
+                                                      val autoCompleteService: AutoCompleteService,
+                                                      val authAction: AuthAction,
+                                                      val ds: CommonPlayDependencies,
+                                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

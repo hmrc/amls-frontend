@@ -48,7 +48,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class PaymentsService @Inject()(val amlsConnector: AmlsConnector,
                                 val paymentsConnector: PayApiConnector,
-                                val statusService: StatusService) {
+                                val statusService: StatusService,
+                                val applicationConfig: ApplicationConfig) {
 
   def requestPaymentsUrl(fees: FeeResponse, returnUrl: String, amlsRefNo: String, safeId: String, accountTypeId: (String, String))
                         (implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[NextUrl] =
@@ -57,7 +58,7 @@ class PaymentsService @Inject()(val amlsConnector: AmlsConnector,
         paymentsUrlOrDefault(f.paymentReference.get, f.difference.get.toDouble, returnUrl, amlsRefNo, safeId, accountTypeId)
       case f: FeeResponse if f.paymentReference.isDefined =>
         paymentsUrlOrDefault(f.paymentReference.get, f.totalFees.toDouble, returnUrl, amlsRefNo, safeId, accountTypeId)
-      case _ => Future.successful(NextUrl(ApplicationConfig.paymentsUrl))
+      case _ => Future.successful(NextUrl(applicationConfig.paymentsUrl))
     }
 
   def paymentsUrlOrDefault(paymentReference: String, amount: Double, returnUrl: String, amlsRefNo: String, safeId: String, accountTypeId: (String, String))
@@ -72,7 +73,7 @@ class PaymentsService @Inject()(val amlsConnector: AmlsConnector,
         // $COVERAGE-OFF$
         Logger.warn("[ConfirmationController.requestPaymentUrl] Did not get a redirect url from the payments service; using configured default")
         // $COVERAGE-ON$
-        Future.successful(NextUrl(ApplicationConfig.paymentsUrl))
+        Future.successful(NextUrl(applicationConfig.paymentsUrl))
     }
   }
 

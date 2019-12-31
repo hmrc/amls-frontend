@@ -16,14 +16,15 @@
 
 package controllers.declaration
 
-import com.google.inject.Inject
+import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import models.declaration.{RenewRegistration, RenewRegistrationNo, RenewRegistrationYes}
 import services.{ProgressService, RenewalService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, DeclarationHelper}
+import play.api.mvc.MessagesControllerComponents
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -32,7 +33,9 @@ class RenewRegistrationController @Inject()(val dataCacheConnector: DataCacheCon
                                             val authAction: AuthAction,
                                             val progressService: ProgressService,
                                             implicit val statusService: StatusService,
-                                            implicit val renewalService: RenewalService) extends DefaultBaseController {
+                                            implicit val renewalService: RenewalService,
+                                            val ds: CommonPlayDependencies,
+                                            val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
     implicit request =>

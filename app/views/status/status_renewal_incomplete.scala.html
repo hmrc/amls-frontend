@@ -19,8 +19,9 @@
 @import config.ApplicationConfig
 @import org.joda.time.LocalDate
 @import utils.DateHelper
+@import config.{ ApplicationConfig}
 
-@(regNo: String, businessName: Option[String], endDate: Option[LocalDate], name: Option[String], showChangeOfficer: Boolean = true)(implicit request: Request[_],m:Messages)
+@(regNo: String, businessName: Option[String], endDate: Option[LocalDate], name: Option[String], showChangeOfficer: Boolean = true)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @main2(title = Messages("status.submissiondecisionsupervised.heading") + " - Your registration", showURRBanner = true) {
 

@@ -19,14 +19,14 @@ package views.supervision
 import forms.EmptyForm
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
 
-class supervision_end_reasonsSpec extends AmlsSpec with MustMatchers  {
+class supervision_end_reasonsSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "supervision_end_reasons view" must {

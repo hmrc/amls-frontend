@@ -159,7 +159,7 @@ object Products{
         case "12" =>
           (JsPath \ "otherDetails").read[String].map(Other.apply _) map identity[ItemType]
         case _ =>
-          Reads(_ => JsError((JsPath \ "products") -> play.api.data.validation.ValidationError("error.invalid")))
+          Reads(_ => JsError((JsPath \ "products") -> play.api.libs.json.JsonValidationError("error.invalid")))
       }.foldLeft[Reads[Set[ItemType]]](
         Reads[Set[ItemType]](_ => JsSuccess(Set.empty))
       ) {

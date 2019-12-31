@@ -21,14 +21,14 @@ import jto.validation.{Path, ValidationError}
 import models.responsiblepeople.{SoleProprietorOfAnotherBusiness}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
 
-class sole_proprietorSpec extends AmlsSpec with MustMatchers {
+class sole_proprietorSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "sole_proprietor view" must {
