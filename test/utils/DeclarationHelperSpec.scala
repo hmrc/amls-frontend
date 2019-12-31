@@ -273,6 +273,25 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
     }
   }
 
+  "statusEndDate" must {
+    "return the end date where there is a date" in {
+      val date = new LocalDate()
+      when {
+        statusService.getStatus(any(),any(), any())(any(),any())
+      } thenReturn Future.successful(ReadyForRenewal(Some(date)))
+
+      await(statusEndDate(amlsRegNo, accountTypeId, credId)) mustBe(Some(date))
+    }
+
+    "return none where there is no date" in {
+      when{
+        statusService.getStatus(any(),any(),any())(any(),any())
+      } thenReturn Future.successful(SubmissionReady)
+
+      await(statusEndDate(amlsRegNo, accountTypeId, credId)) mustBe(None)
+    }
+  }
+
   val partnerWithName = ResponsiblePerson(
     personName = Some(PersonName("FirstName1", None, "LastName1")),
     positions = Some(Positions(Set(Partner), None)),
