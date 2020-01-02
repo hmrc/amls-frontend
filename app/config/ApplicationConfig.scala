@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@ import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 @Singleton
 class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode, servicesConfig: ServicesConfig) {
 
-  def baseUrl(serviceName: String) = {
-    val protocol = servicesConfig.getConfString(s"microservice.services.$serviceName.protocol", "http")
-    val host = servicesConfig.getString(s"microservice.services.$serviceName.host")
-    val port = servicesConfig.getString(s"microservice.services.$serviceName.port")
+  private def baseUrl(serviceName: String) = {
+    val protocol = configuration.getOptional[String](s"microservice.services.protocol").getOrElse("https")
+    val host = configuration.get[String](s"microservice.services.$serviceName.host")
+    val port = configuration.get[String](s"microservice.services.$serviceName.port")
     s"$protocol://$host:$port"
   }
 
