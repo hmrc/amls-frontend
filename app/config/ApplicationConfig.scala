@@ -24,7 +24,7 @@ import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode, servicesConfig: ServicesConfig) {
 
   private def baseUrl(serviceName: String) = {
-    val protocol = configuration.getOptional[String](s"microservice.services.protocol").getOrElse("https")
+    val protocol = configuration.getOptional[String](s"microservice.services.$serviceName.protocol").getOrElse("http")
     val host = configuration.get[String](s"microservice.services.$serviceName.host")
     val port = configuration.get[String](s"microservice.services.$serviceName.port")
     s"$protocol://$host:$port"
