@@ -26,7 +26,10 @@ import play.api.libs.json._
 sealed trait RedressScheme
 
 case object ThePropertyOmbudsman extends RedressScheme
+case object OmbudsmanServices extends RedressScheme
 case object PropertyRedressScheme extends RedressScheme
+case class Other(v: String) extends RedressScheme
+
 case object RedressSchemedNo extends RedressScheme
 
 object RedressScheme {
@@ -62,8 +65,14 @@ object RedressScheme {
       {
         (__ \ "propertyRedressScheme").read[String].flatMap[RedressScheme] {
           case "01" => ThePropertyOmbudsman
+          case "02" => OmbudsmanServices
           case "03" => PropertyRedressScheme
-          case _    => play.api.libs.json.JsonValidationError("error.invalid")
+          case "04" =>
+            (JsPath \ "propertyRedressSchemeOther").read[String] map {
+              Other(_)
+            }
+          case _ =>
+            play.api.libs.json.JsonValidationError("error.invalid")
         }
       }
       case false => Reads(_ => JsSuccess(RedressSchemedNo))
