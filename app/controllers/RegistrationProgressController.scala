@@ -26,10 +26,10 @@ import models.renewal.Renewal
 import models.status._
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import services.businessmatching.{BusinessMatchingService, ServiceFlow}
-import services.{AuthEnrolmentsService, ProgressService, SectionsProvider, StatusService}
+import services.{AuthEnrolmentsService, ProgressService, RenewalService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthAction
+import utils.{AuthAction, DeclarationHelper}
 import views.html.registrationamendment.registration_amendment
 import views.html.registrationprogress.registration_progress
 
@@ -41,11 +41,12 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
                                                val ds: CommonPlayDependencies,
                                                protected[controllers] val dataCache: DataCacheConnector,
                                                protected[controllers] val enrolmentsService: AuthEnrolmentsService,
-                                               protected[controllers] val statusService: StatusService,
+                                               implicit val statusService: StatusService,
                                                protected[controllers] val progressService: ProgressService,
                                                protected[controllers] val sectionsProvider: SectionsProvider,
                                                protected[controllers] val businessMatchingService: BusinessMatchingService,
                                                protected[controllers] val serviceFlow: ServiceFlow,
+                                               implicit val renewalService: RenewalService,
                                                val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
@@ -145,10 +146,13 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
     businessMatchingService.getAdditionalBusinessActivities(cacheId)
 
   def post() = authAction.async {
-      implicit request =>
-        progressService.getSubmitRedirect(request.amlsRefNumber, request.accountTypeId, request.credId) map {
+    implicit request =>
+      DeclarationHelper.promptRenewal(request.amlsRefNumber, request.accountTypeId, request.credId).flatMap {
+        case true => Future.successful(Redirect(controllers.declaration.routes.RenewRegistrationController.get()))
+        case false => progressService.getSubmitRedirect(request.amlsRefNumber, request.accountTypeId, request.credId) map {
           case Some(url) => Redirect(url)
           case _ => InternalServerError("Could not get data for redirect")
         }
+      }
   }
 }
