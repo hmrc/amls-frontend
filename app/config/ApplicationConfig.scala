@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@ import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 @Singleton
 class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode, servicesConfig: ServicesConfig) {
 
-  def baseUrl(serviceName: String) = {
-    val protocol = servicesConfig.getConfString(s"microservice.services.protocol", "http")
-    val host = servicesConfig.getString(s"microservice.services.$serviceName.host")
-    val port = servicesConfig.getString(s"microservice.services.$serviceName.port")
+  private def baseUrl(serviceName: String) = {
+    val protocol = configuration.getOptional[String](s"microservice.services.$serviceName.protocol").getOrElse("http")
+    val host = configuration.get[String](s"microservice.services.$serviceName.host")
+    val port = configuration.get[String](s"microservice.services.$serviceName.port")
     s"$protocol://$host:$port"
   }
 
@@ -58,6 +58,11 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
 
   lazy val ampWhatYouNeedUrl = s"${servicesConfig.getConfString("amls-art-market-participant-frontend.url", "")}/what-you-need"
   lazy val ampSummaryUrl     = s"${servicesConfig.getConfString("amls-art-market-participant-frontend.url", "")}/check-your-answers"
+
+  // TODO: EAB TO BE ADDED TO CONFIG
+  lazy val eabWhatYouNeedUrl = s"${servicesConfig.getConfString("amls-estate-agency-business-frontend.url", "")}/what-you-need"
+  lazy val eabSummaryUrl     = s"${servicesConfig.getConfString("amls-estate-agency-business-frontend.url", "")}/check-your-answers"
+
 
   def businessCustomerUrl = getConfigString("business-customer.url")
   
