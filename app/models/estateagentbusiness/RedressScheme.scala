@@ -26,10 +26,7 @@ import play.api.libs.json._
 sealed trait RedressScheme
 
 case object ThePropertyOmbudsman extends RedressScheme
-case object OmbudsmanServices extends RedressScheme
 case object PropertyRedressScheme extends RedressScheme
-case class Other(v: String) extends RedressScheme
-
 case object RedressSchemedNo extends RedressScheme
 
 object RedressScheme {
@@ -45,10 +42,7 @@ object RedressScheme {
         ( __ \ "propertyRedressScheme").read[String].withMessage("error.required.eab.which.redress.scheme") flatMap {
           case "05" => Rule.fromMapping { _ => Valid(RedressSchemedNo) }
           case "01" => ThePropertyOmbudsman
-          case "02" => OmbudsmanServices
           case "03" => PropertyRedressScheme
-          case "04" =>
-            (__ \ "other").read(redressOtherType) map Other.apply
           case _ =>
             (Path \ "propertyRedressScheme") -> Seq(ValidationError("error.invalid"))
         }
@@ -57,13 +51,7 @@ object RedressScheme {
 
   implicit val formRedressWrites: Write[RedressScheme, UrlFormEncoded] = Write {
     case ThePropertyOmbudsman => Map("propertyRedressScheme" -> "01")
-    case OmbudsmanServices => Map("propertyRedressScheme" -> "02")
     case PropertyRedressScheme => Map("propertyRedressScheme" -> "03")
-    case Other(value) =>
-      Map(
-        "propertyRedressScheme" -> "04",
-        "other" -> value
-      )
     case RedressSchemedNo => Map("propertyRedressScheme" -> "05")
   }
 
@@ -74,14 +62,8 @@ object RedressScheme {
       {
         (__ \ "propertyRedressScheme").read[String].flatMap[RedressScheme] {
           case "01" => ThePropertyOmbudsman
-          case "02" => OmbudsmanServices
           case "03" => PropertyRedressScheme
-          case "04" =>
-            (JsPath \ "propertyRedressSchemeOther").read[String] map {
-              Other(_)
-            }
-          case _ =>
-            play.api.libs.json.JsonValidationError("error.invalid")
+          case _    => play.api.libs.json.JsonValidationError("error.invalid")
         }
       }
       case false => Reads(_ => JsSuccess(RedressSchemedNo))
@@ -90,15 +72,8 @@ object RedressScheme {
 
   implicit val jsonRedressWrites = Writes[RedressScheme] {
       case ThePropertyOmbudsman => Json.obj("isRedress" -> true,"propertyRedressScheme" -> "01")
-      case OmbudsmanServices => Json.obj("isRedress" -> true,"propertyRedressScheme" -> "02")
       case PropertyRedressScheme => Json.obj("isRedress" -> true,"propertyRedressScheme" -> "03")
-      case Other(value) =>
-        Json.obj(
-          "isRedress" -> true,
-          "propertyRedressScheme" -> "04",
-          "propertyRedressSchemeOther" -> value
-        )
-    case RedressSchemedNo => Json.obj("isRedress" -> false)
+      case RedressSchemedNo => Json.obj("isRedress" -> false)
   }
 }
 

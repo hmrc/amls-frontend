@@ -17,9 +17,9 @@
 package views.estateagentbusiness
 
 import forms.{Form2, InvalidForm, ValidForm}
-import models.estateagentbusiness.{Other, RedressScheme}
-import org.scalatest.{MustMatchers}
-import  utils.AmlsViewSpec
+import models.estateagentbusiness.{RedressScheme, ThePropertyOmbudsman}
+import org.scalatest.MustMatchers
+import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
@@ -30,7 +30,7 @@ class redress_schemeSpec extends AmlsViewSpec with MustMatchers  {
 
   trait TestFixture extends Fixture {
     implicit val requestWithToken = addTokenForView()
-    val testScheme = Other("test scheme")
+    val testScheme = ThePropertyOmbudsman
   }
 
   "redress_scheme view" must {
