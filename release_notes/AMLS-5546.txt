@@ -1,1 +1,1 @@
- + [AMLS-5546] - 'Would you like to renew your refgistration page and logic'
+ + [AMLS-5546] - 'Would you like to renew your registration page and logic'
