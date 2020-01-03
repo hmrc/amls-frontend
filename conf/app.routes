@@ -96,8 +96,8 @@ GET         /update-information/declaration                                     
 
 GET         /update-information/add-person                                            @controllers.declaration.AddPersonController.getWithAmendment()
 
-GET         /decleration/renew-registration                                           @controllers.declaration.RenewRegistrationController.get()
-POST        /decleration/renew-registration                                           @controllers.declaration.RenewRegistrationController.post()
+GET         /declaration/renew-registration                                           @controllers.declaration.RenewRegistrationController.get()
+POST        /declaration/renew-registration                                           @controllers.declaration.RenewRegistrationController.post()
 
 GET         /update-information/add-or-remove-services                                @controllers.businessmatching.updateservice.ChangeBusinessTypesController.get()
 POST        /update-information/add-or-remove-services                                @controllers.businessmatching.updateservice.ChangeBusinessTypesController.post()
