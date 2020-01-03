@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,13 @@ package views.renewal
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.renewal.{CashPaymentsCustomerNotMet, HowCashPaymentsReceived, PaymentMethods}
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class cash_payments_customers_not_metSpec extends AmlsSpec{
+class cash_payments_customers_not_metSpec extends AmlsViewSpec{
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     val cashPaymentsCustomersNotMet = CashPaymentsCustomerNotMet(true)
   }

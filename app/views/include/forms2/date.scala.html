@@ -1,5 +1,5 @@
 @*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@
     legendHidden: Boolean = false,
     heading: String = "",
     section: String = "",
-    supportingContent: Html = HtmlFormat.empty
-)(implicit lang:Lang,  m: Messages)
+    supportingContent: Html = play.twirl.api.HtmlFormat.empty
+)(implicit m: Messages, lang: Lang)
 
 @field = @{ f(p) }
 

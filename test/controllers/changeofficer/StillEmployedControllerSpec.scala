@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,8 @@ import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import play.api.inject.bind
-import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -35,12 +33,7 @@ class StillEmployedControllerSpec extends AmlsSpec {
 
     val cache = mock[DataCacheConnector]
 
-    val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .overrides(bind[DataCacheConnector].to(self.cache))
-      .build()
-
-    lazy val controller = injector.instanceOf[StillEmployedController]
+    val controller = new StillEmployedController(SuccessfulAuthAction, commonDependencies, cache, mockMcc)
 
     val nominatedOfficer = ResponsiblePerson(
       personName = Some(PersonName("firstName", None, "lastName")),
@@ -90,14 +83,14 @@ class StillEmployedControllerSpec extends AmlsSpec {
       "respond with SEE_OTHER" when {
         "request is 'yes'" which {
           "redirects to RoleInBusinessController" in new TestFixture {
-            val result = controller.post()(request.withFormUrlEncodedBody("stillEmployed" -> "true"))
+            val result = controller.post()(requestWithUrlEncodedBody("stillEmployed" -> "true"))
             status(result) mustBe SEE_OTHER
             redirectLocation(result) mustBe Some(controllers.changeofficer.routes.RoleInBusinessController.get().url)
           }
         }
         "request is 'no'" which {
           "redirects to RemoveResponsiblePerson" in new TestFixture {
-            val result = controller.post()(request.withFormUrlEncodedBody("stillEmployed" -> "false"))
+            val result = controller.post()(requestWithUrlEncodedBody("stillEmployed" -> "false"))
             status(result) mustBe SEE_OTHER
             redirectLocation(result) mustBe Some(controllers.changeofficer.routes.RemoveResponsiblePersonController.get().url)
           }

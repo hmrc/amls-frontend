@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,18 +21,18 @@ import models.supervision._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
-    val controller = new SupervisionEndController(mockCacheConnector, authAction = SuccessfulAuthAction)
+    val controller = new SupervisionEndController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   "SupervisionEndController" must {
@@ -96,7 +96,7 @@ class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with Scala
       val start = Some(SupervisionStart(new LocalDate(1990, 2, 24))) //scalastyle:off magic.number
       val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24))) //scalastyle:off magic.number
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "anotherBody" -> "true",
         "endDate.day" -> "24",
         "endDate.month" -> "2",
@@ -118,7 +118,7 @@ class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with Scala
       val start = Some(SupervisionStart(new LocalDate(1990, 2, 24))) //scalastyle:off magic.number
       val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24))) //scalastyle:off magic.number
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "anotherBody" -> "true",
         "endDate.day" -> "24",
         "endDate.month" -> "2",
@@ -145,7 +145,7 @@ class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with Scala
         Some(ProfessionalBodyYes("details"))
       )))
 
-      val newRequest = request.withFormUrlEncodedBody()
+      val newRequest = requestWithUrlEncodedBody("invalid" -> "data")
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package services
 
 import com.fasterxml.jackson.core.JsonParseException
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector}
 import exceptions.{DuplicateSubscriptionException, NoEnrolmentException}
 import javax.inject.Inject
@@ -52,7 +52,7 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
                                   val ggService: GovernmentGatewayService,
                                   val authEnrolmentsService: AuthEnrolmentsService,
                                   val amlsConnector: AmlsConnector,
-                                  config: AppConfig) extends DataCacheService {
+                                  config: ApplicationConfig) extends DataCacheService {
 
   private def enrol(safeId: String, amlsRegistrationNumber: String, postcode: String, groupId: Option[String], credId: String)
                    (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[_] =

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package audit
 import audit.AddressConversions._
 import cats.implicits._
 import play.api.test.FakeRequest
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.AmlsSpec
@@ -26,6 +27,7 @@ import utils.AmlsSpec
 class AddressModifiedEventSpec extends AmlsSpec {
 
   implicit val request = FakeRequest("GET", "/test-path")
+  implicit override val headerCarrier: HeaderCarrier = HeaderCarrier()
 
   "The AddressModifiedAuditEvent" must {
     "create the proper detail" when {

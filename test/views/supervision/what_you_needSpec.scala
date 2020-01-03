@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,16 @@
 package views.supervision
 
 import org.scalatest.MustMatchers
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
 
-class what_you_needSpec extends AmlsSpec with MustMatchers  {
+class what_you_needSpec extends AmlsViewSpec with MustMatchers  {
 
   "what_you_need view" must {
 
     "have a back link" in new Fixture {
+      implicit val requestWithToken = addTokenForView()
 
       def view = views.html.supervision.what_you_need()
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,22 +18,25 @@ package controllers.renewal
 
 import com.google.inject.Singleton
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.renewal.{CashPayments, CashPaymentsCustomerNotMet, HowCashPaymentsReceived}
+import play.api.mvc.MessagesControllerComponents
 import services.RenewalService
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.renewal.how_cash_payments_received
 
 import scala.concurrent.Future
 
 @Singleton
 class HowCashPaymentsReceivedController @Inject()(
-                                         val dataCacheConnector: DataCacheConnector,
-                                         val authAction: AuthAction,
-                                         val renewalService: RenewalService
-                                       ) extends DefaultBaseController {
+                                                 val dataCacheConnector: DataCacheConnector,
+                                                 val authAction: AuthAction,
+                                                 val ds: CommonPlayDependencies,
+                                                 val renewalService: RenewalService,
+                                                 val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

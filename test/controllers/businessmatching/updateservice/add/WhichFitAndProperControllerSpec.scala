@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.ResponsiblePeopleService
@@ -43,7 +43,7 @@ import scala.concurrent.Future
 
 class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePersonGenerator with BusinessMatchingGenerator {
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
+  sealed trait Fixture extends DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
@@ -52,13 +52,14 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
     val mockRPService = mock[ResponsiblePeopleService]
 
     val controller = new WhichFitAndProperController(
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,
       responsiblePeopleService = mockRPService,
       helper = mockUpdateServiceHelper,
-      router = createRouter[AddBusinessTypeFlowModel]
+      router = createRouter[AddBusinessTypeFlowModel],
+      cc = mockMcc
     )
 
     val responsiblePeople: List[ResponsiblePerson] = (responsiblePeopleGen(2).sample.get :+
@@ -122,7 +123,7 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
 
       "a valid call is made and not editing" in new Fixture {
 
-        val result = controller.post()(request.withFormUrlEncodedBody("responsiblePeople[]" -> "1"))
+        val result = controller.post()(requestWithUrlEncodedBody("responsiblePeople[]" -> "1"))
 
         status(result) must be(SEE_OTHER)
         controller.router.verify("internalId", WhichFitAndProperPageId,
@@ -140,7 +141,7 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
 
     "a valid call is made and editing" in new Fixture {
 
-      val result = controller.post(true)(request.withFormUrlEncodedBody("responsiblePeople[]" -> "1"))
+      val result = controller.post(true)(requestWithUrlEncodedBody("responsiblePeople[]" -> "1"))
       status(result) must be(SEE_OTHER)
       controller.router.verify("internalId", WhichFitAndProperPageId,
         AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices),

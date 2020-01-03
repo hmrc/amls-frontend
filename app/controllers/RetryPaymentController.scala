@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
 import javax.inject.{Inject, Singleton}
+import play.api.mvc.MessagesControllerComponents
 import services.{PaymentsService, StatusService}
 import utils.AuthAction
 
@@ -28,10 +29,12 @@ import scala.concurrent.Future
 
 @Singleton
 class RetryPaymentController @Inject()(authAction: AuthAction,
+                                       val ds: CommonPlayDependencies,
                                        private[controllers] implicit val dataCacheConnector: DataCacheConnector,
                                        private[controllers] implicit val amlsConnector: AmlsConnector,
                                        private[controllers] implicit val statusService: StatusService,
-                                       private[controllers] val paymentsService: PaymentsService) extends DefaultBaseController {
+                                       private[controllers] val paymentsService: PaymentsService,
+                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def retryPayment = authAction.async {
       implicit request =>

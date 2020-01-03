@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package services.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import javax.inject.Inject
 import models.ViewResponse
@@ -37,7 +37,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class BusinessMatchingService @Inject()(
                                          statusService: StatusService,
                                          dataCacheConnector: DataCacheConnector,
-                                         appConfig: AppConfig
+                                         appConfig: ApplicationConfig
                                        ) {
 
   def preApplicationComplete(credId: String)(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Boolean] = {

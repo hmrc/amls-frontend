@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package controllers.businessmatching.updateservice
 
 import cats.data.OptionT
 import cats.implicits._
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models.businessactivities.BusinessActivities
@@ -42,8 +42,7 @@ class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
                                       implicit val dataCacheConnector: DataCacheConnector,
                                       val tradingPremisesService: TradingPremisesService,
                                       val responsiblePeopleService: ResponsiblePeopleService,
-                                      val appConfig:AppConfig
-                                   ) extends RepeatingSection {
+                                      val appConfig:ApplicationConfig) extends RepeatingSection {
 
   def updateBusinessActivities(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier): OptionT[Future, BusinessActivities] = {
     OptionT(dataCacheConnector.update[BusinessActivities](credId, BusinessActivities.key) {

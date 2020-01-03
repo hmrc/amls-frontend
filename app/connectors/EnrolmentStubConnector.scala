@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,15 @@
 
 package connectors
 
-import config.AppConfig
+import config.ApplicationConfig
 import javax.inject.Inject
 import models.enrolment.GovernmentGatewayEnrolment
-import uk.gov.hmrc.http.{HeaderCarrier, HttpGet}
+import uk.gov.hmrc.http.{HeaderCarrier}
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
+
 import scala.concurrent.ExecutionContext
 
-class EnrolmentStubConnector @Inject()(http: HttpGet, config: AppConfig) {
+class EnrolmentStubConnector @Inject()(http: HttpClient, config: ApplicationConfig) {
 
   lazy val baseUrl = config.enrolmentStubsUrl
 

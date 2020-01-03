@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,20 +19,24 @@ package controllers.changeofficer
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import controllers.changeofficer.Helpers.getOfficer
 import forms.{Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.changeofficer.{ChangeOfficer, NewOfficer, RoleInBusiness}
 import models.responsiblepeople.ResponsiblePerson.flowChangeOfficer
 import models.responsiblepeople.{NominatedOfficer, Positions, ResponsiblePerson}
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, RepeatingSection, StatusConstants}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class NewOfficerController @Inject()(authAction: AuthAction,
-                                     val cacheConnector: DataCacheConnector) extends DefaultBaseController with RepeatingSection {
+                                     val ds: CommonPlayDependencies,
+                                     val cacheConnector: DataCacheConnector,
+                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   override def dataCacheConnector: DataCacheConnector = cacheConnector
 

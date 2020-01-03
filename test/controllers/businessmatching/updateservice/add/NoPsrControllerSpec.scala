@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import scala.concurrent.Future
 
 class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
@@ -39,10 +39,11 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
     val controller = new NoPsrController(
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       helper = mockUpdateServiceHelper,
-      router = createRouter[AddBusinessTypeFlowModel]
+      router = createRouter[AddBusinessTypeFlowModel],
+      cc = mockMcc
     )
   }
 
@@ -67,7 +68,7 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
         mockUpdateServiceHelper.clearFlowModel(any())(any())
       } thenReturn OptionT[Future, AddBusinessTypeFlowModel](Future.successful(Some(AddBusinessTypeFlowModel())))
 
-      val result = controller.post()(request.withFormUrlEncodedBody())
+      val result = controller.post()(requestWithUrlEncodedBody("" -> ""))
 
       status(result) mustBe SEE_OTHER
       controller.router.verify("internalId", NoPSRPageId, AddBusinessTypeFlowModel())

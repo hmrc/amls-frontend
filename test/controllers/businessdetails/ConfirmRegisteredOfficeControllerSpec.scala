@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import models.businessdetails._
 import models.businessmatching.{BusinessMatching, BusinessType}
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
@@ -35,13 +35,12 @@ import scala.concurrent.Future
 
 class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new ConfirmRegisteredOfficeController (
       dataCache = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction
-      )
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   private val ukAddress = RegisteredOfficeUK("line1", "line2", Some("line3"), Some("line4"), "AA1 1AA")
@@ -100,7 +99,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
       "successfully redirect to the page on selection of 'Yes' [this is registered address]" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "isRegOfficeOrMainPlaceOfBusiness" -> "true"
         )
 
@@ -124,7 +123,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
       "successfully redirect to the page on selection of Option 'No' [this is not registered address]" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "isRegOfficeOrMainPlaceOfBusiness" -> "false"
         )
 
@@ -150,7 +149,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
       "on post invalid data" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
         )
         when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(),any()))
           .thenReturn(Future.successful(Some(bm)))
@@ -161,7 +160,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
       }
 
       "on post with invalid data show error" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "isRegOfficeOrMainPlaceOfBusiness" -> ""
         )
         when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(),any()))

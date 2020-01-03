@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -33,9 +33,9 @@ import scala.concurrent.Future
 
 class CashPaymentOverTenThousandEurosControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture  with DependencyMocks{
+  trait Fixture extends DependencyMocks{
     self => val request = addToken(authRequest)
-    val controller = new CashPaymentController(mockCacheConnector, authAction = SuccessfulAuthAction)
+    val controller = new CashPaymentController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -94,7 +94,7 @@ class CashPaymentOverTenThousandEurosControllerSpec extends AmlsSpec with Mockit
 
       "successfully redirect to the Date of First Cash Payment page on selection of 'Yes' when edit mode is on" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody("acceptedAnyPayment" -> "true",
+        val newRequest = requestWithUrlEncodedBody("acceptedAnyPayment" -> "true",
           "paymentDate.day" -> "12",
           "paymentDate.month" -> "5",
           "paymentDate.year" -> "1999"
@@ -113,7 +113,7 @@ class CashPaymentOverTenThousandEurosControllerSpec extends AmlsSpec with Mockit
 
       "successfully redirect to the Date of First Cash Payment page on selection of 'Yes' when edit mode is off" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody("acceptedAnyPayment" -> "true",
+        val newRequest = requestWithUrlEncodedBody("acceptedAnyPayment" -> "true",
           "paymentDate.day" -> "12",
           "paymentDate.month" -> "5",
           "paymentDate.year" -> "1999"
@@ -131,7 +131,7 @@ class CashPaymentOverTenThousandEurosControllerSpec extends AmlsSpec with Mockit
       }
 
       "successfully redirect to the Linked Cash Payments page on selection of 'No' when edit mode is off" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody("acceptedAnyPayment" -> "false")
+        val newRequest = requestWithUrlEncodedBody("acceptedAnyPayment" -> "false")
 
         when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
@@ -145,7 +145,7 @@ class CashPaymentOverTenThousandEurosControllerSpec extends AmlsSpec with Mockit
       }
 
       "successfully redirect to the Summary page on selection of Option 'No' when edit mode is on" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "acceptedAnyPayment" -> "false"
         )
         when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
@@ -161,7 +161,7 @@ class CashPaymentOverTenThousandEurosControllerSpec extends AmlsSpec with Mockit
 
       "show invalid data error" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody()
+        val newRequest = requestWithUrlEncodedBody("" -> "")
         when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 

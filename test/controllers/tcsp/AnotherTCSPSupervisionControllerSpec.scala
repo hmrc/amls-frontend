@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,19 @@ package controllers.tcsp
 import controllers.actions.SuccessfulAuthAction
 import models.tcsp.{ServicesOfAnotherTCSPYes, Tcsp}
 import org.jsoup.Jsoup
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class AnotherTCSPSupervisionControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
 
     val controller = new AnotherTCSPSupervisionController(
-      SuccessfulAuthAction,
-      dataCacheConnector = mockCacheConnector
+      SuccessfulAuthAction, ds = commonDependencies,
+      dataCacheConnector = mockCacheConnector,
+      cc = mockMcc
     )
   }
 
@@ -72,7 +73,7 @@ class AnotherTCSPSupervisionControllerSpec extends AmlsSpec with MockitoSugar {
             mockCacheFetch[Tcsp](None)
             mockCacheSave[Tcsp]
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "servicesOfAnotherTCSP" -> "true",
               "mlrRefNumber" -> "12345678"
             )
@@ -88,7 +89,7 @@ class AnotherTCSPSupervisionControllerSpec extends AmlsSpec with MockitoSugar {
             mockCacheFetch[Tcsp](None)
             mockCacheSave[Tcsp]
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "servicesOfAnotherTCSP" -> "true",
               "mlrRefNumber" -> "12345678"
             )
@@ -106,7 +107,7 @@ class AnotherTCSPSupervisionControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with BAD_REQUEST" when {
         "invalid data" in new Fixture {
 
-          val newRequestInvalid = request.withFormUrlEncodedBody(
+          val newRequestInvalid = requestWithUrlEncodedBody(
             "servicesOfAnotherTCSP" -> "true",
             "mlrRefNumber" -> "adbg1233"
           )

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,8 +43,10 @@ final case class AuthorisedRequest[A](request: Request[A],
 
 final case class enrolmentNotFound(msg: String = "enrolmentNotFound") extends AuthorisationException(msg)
 
-class DefaultAuthAction @Inject() (val authConnector: AuthConnector)
-                                  (implicit ec: ExecutionContext) extends AuthAction with AuthorisedFunctions {
+class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
+                                   applicationConfig: ApplicationConfig,
+                                   val parser: BodyParsers.Default)
+                                  (implicit val executionContext: ExecutionContext) extends AuthAction with AuthorisedFunctions {
 
   private val amlsKey       = "HMRC-MLR-ORG"
   private val amlsNumberKey = "MLRRefNumber"
@@ -54,8 +56,9 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector)
   private lazy val unauthorisedUrl = URLEncoder.encode(
     ReturnLocation(controllers.routes.AmlsController.unauthorised_role()).absoluteUrl, "utf-8"
   )
-  def unauthorised = s"${ApplicationConfig.logoutUrl}?continue=$unauthorisedUrl"
-  def signout      = s"${ApplicationConfig.logoutUrl}"
+
+  def unauthorised = s"${applicationConfig.logoutUrl}?continue=$unauthorisedUrl"
+  def signout      = s"${applicationConfig.logoutUrl}"
 
   override final protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] = {
 
@@ -173,4 +176,4 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector)
 }
 
 @com.google.inject.ImplementedBy(classOf[DefaultAuthAction])
-trait AuthAction extends ActionRefiner[Request, AuthorisedRequest] with ActionBuilder[AuthorisedRequest]
+trait AuthAction extends ActionRefiner[Request, AuthorisedRequest] with ActionBuilder[AuthorisedRequest, AnyContent]

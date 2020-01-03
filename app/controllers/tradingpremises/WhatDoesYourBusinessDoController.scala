@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package controllers.tradingpremises
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.businessmatching._
@@ -26,7 +26,7 @@ import models.status.SubmissionStatus
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import org.joda.time.LocalDate
 import play.api.Logger
-import play.api.mvc.Result
+import play.api.mvc.{MessagesControllerComponents, Result}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -34,14 +34,14 @@ import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 import views.html.tradingpremises._
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class WhatDoesYourBusinessDoController @Inject () (
                                                     val dataCacheConnector: DataCacheConnector,
                                                     val authAction: AuthAction,
-                                                    val statusService: StatusService
-                                                  ) extends RepeatingSection with DefaultBaseController with FormHelpers with DateOfChangeHelper {
-
-
+                                                    val ds: CommonPlayDependencies,
+                                                    val statusService: StatusService,
+                                                    val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection with FormHelpers with DateOfChangeHelper {
 
   private def data(credId: String, index: Int, edit: Boolean)(implicit hc: HeaderCarrier)
   : Future[Either[Result, (CacheMap, Set[BusinessActivity])]] = {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,16 @@
 
 package models.amp
 
+import java.time.LocalDateTime
+
 import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import play.api.{Configuration, Play}
 import play.api.libs.json._
 import play.api.mvc.Call
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 
 final case class Amp(data: JsObject = Json.obj(),
                      hasChanged: Boolean = false,
@@ -77,18 +81,20 @@ object Amp  {
   val redirectCallType       = "GET"
   val key                    = "amp"
 
+  lazy val appConfig = Play.current.injector.instanceOf[ApplicationConfig]
+
   private def generateRedirect(destinationUrl: String) = {
     Call(redirectCallType, destinationUrl)
   }
 
   def section(implicit cache: CacheMap): Section = {
-    val notStarted = Section(key, NotStarted, false, generateRedirect(ApplicationConfig.ampWhatYouNeedUrl))
+    val notStarted = Section(key, NotStarted, false, generateRedirect(appConfig.ampWhatYouNeedUrl))
     cache.getEntry[Amp](key).fold(notStarted) {
       model =>
         if (model.isComplete && model.hasAccepted) {
-          Section(key, Completed, model.hasChanged, generateRedirect(ApplicationConfig.ampSummeryUrl))
+          Section(key, Completed, model.hasChanged, generateRedirect(appConfig.ampSummaryUrl))
         } else {
-          Section(key, Started, model.hasChanged, generateRedirect(ApplicationConfig.ampWhatYouNeedUrl))
+          Section(key, Started, model.hasChanged, generateRedirect(appConfig.ampWhatYouNeedUrl))
         }
     }
   }

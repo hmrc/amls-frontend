@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import models.businessactivities.{BusinessActivities, NCARegistered}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
@@ -34,12 +34,11 @@ import scala.concurrent.Future
 
 class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
     val controller = new NCARegisteredController (
       dataCacheConnector = mock[DataCacheConnector],
-      SuccessfulAuthAction
-    )
+      SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -80,7 +79,7 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar {
 
       "successfully redirect to the page on selection of 'Yes' when edit mode is on" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody("ncaRegistered" -> "true")
+        val newRequest = requestWithUrlEncodedBody("ncaRegistered" -> "true")
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
@@ -94,7 +93,7 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar {
       }
 
       "successfully redirect to the page on selection of 'Yes' when edit mode is off" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody("ncaRegistered" -> "true")
+        val newRequest = requestWithUrlEncodedBody("ncaRegistered" -> "true")
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
@@ -111,7 +110,7 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar {
 
     "successfully redirect to the page on selection of Option 'No' when edit mode is on" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "ncaRegistered" -> "false"
       )
       when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
@@ -126,7 +125,7 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar {
     }
 
     "successfully redirect to the page on selection of Option 'No' when edit mode is off" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "ncaRegistered" -> "false"
       )
       when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
@@ -143,7 +142,7 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar {
 
     "on post invalid data show error" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody()
+      val newRequest = requestWithUrlEncodedBody("" -> "")
       when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
         .thenReturn(Future.successful(None))
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,9 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar wi
     val additionalExtraAddressController = new AdditionalExtraAddressController (
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction,
-      autoCompleteService = autoCompleteService
+      autoCompleteService = autoCompleteService,
+      ds = commonDependencies,
+      cc = mockMcc
     )
 
     when {
@@ -169,7 +171,7 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar wi
       "go to AdditionalExtraAddressUKController" when {
         "user selected Yes" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "true"
           )
 
@@ -190,7 +192,7 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar wi
       "go to AdditionalExtraAddressNonUKController" when {
         "user selected No" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "false"
           )
 
@@ -211,7 +213,7 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar wi
 
     "respond with BAD_REQUEST" when {
       "form is invalid" in new Fixture {
-        val requestWithParams = request.withFormUrlEncodedBody()
+        val requestWithParams = requestWithUrlEncodedBody()
 
         val responsiblePeople = ResponsiblePerson(personName)
 
@@ -228,7 +230,7 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar wi
 
     "process form as valid" when {
       "isUK is defined and false" in new Fixture {
-        val requestWithParams = request.withFormUrlEncodedBody(
+        val requestWithParams = requestWithUrlEncodedBody(
           "isUK" -> "false"
         )
 
@@ -246,7 +248,7 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar wi
       }
 
       "isUK is defined and true" in new Fixture {
-        val requestWithParams = request.withFormUrlEncodedBody(
+        val requestWithParams = requestWithUrlEncodedBody(
           "isUK" -> "true"
         )
 
@@ -267,7 +269,7 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar wi
     "redirect to AdditionalExtraAddressNonUK and wipe old address" when {
       "changed the answer from yes to no" in new Fixture {
 
-        val requestWithParams = request.withFormUrlEncodedBody(
+        val requestWithParams = requestWithUrlEncodedBody(
           "isUK" -> "false")
 
         val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
@@ -298,7 +300,7 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar wi
     "redirect to AdditionalExtraAddressUkController and wipe old address" when {
       "changed the answer from no to yes" in new Fixture {
 
-        val requestWithParams = request.withFormUrlEncodedBody(
+        val requestWithParams = requestWithUrlEncodedBody(
           "isUK" -> "true")
 
         val ukAddress = PersonAddressNonUK("Line 1", "Line 2", Some("Line 3"), None, Country("", ""))

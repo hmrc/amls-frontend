@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,21 +18,25 @@ package controllers.responsiblepeople.address
 
 import com.google.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople._
+import play.api.mvc.MessagesControllerComponents
 import services.AutoCompleteService
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import utils.{AuthAction, ControllerHelper}
+import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.address.additional_address_NonUK
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
 class AdditionalAddressNonUKController @Inject()(override val dataCacheConnector: DataCacheConnector,
                                                  authAction: AuthAction,
                                                  implicit val auditConnector: AuditConnector,
-                                                 val autoCompleteService: AutoCompleteService) extends AddressHelper with DefaultBaseController {
+                                                 val autoCompleteService: AutoCompleteService,
+                                                 val ds: CommonPlayDependencies,
+                                                 val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection with AddressHelper {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request =>

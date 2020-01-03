@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,20 @@
 
 package connectors
 
-import config.{AppConfig, WSHttp}
+import config.ApplicationConfig
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
 import generators.auth.UserDetailsGenerator
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
 import models.enrolment.{AmlsEnrolmentKey, ErrorResponse, TaxEnrolment}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
-import org.scalatest.concurrent.{AbstractPatienceConfiguration, ScalaFutures}
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
 import play.api.libs.json.Json
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HttpResponse, Upstream4xxResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, Upstream4xxResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import utils.AmlsSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -44,10 +45,11 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
 
   trait Fixture {
 
-    val http = mock[WSHttp]
-    val appConfig = mock[AppConfig]
+    val http = mock[HttpClient]
+    val appConfig = mock[ApplicationConfig]
     val auditConnector = mock[AuditConnector]
     val groupIdentfier = stringOfLengthGen(10).sample.get
+    implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
 
     val connector = new TaxEnrolmentsConnector(http, appConfig, auditConnector)
     val baseUrl = "http://localhost:3001"
@@ -132,15 +134,14 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
   "deEnrol" when {
     "called" must {
       "call the ES9 API endpoint" in new Fixture {
-        val authority = mock[Authority]
         val endpointUrl = s"$baseUrl/${serviceStub}/groups/$groupIdentfier/enrolments/${enrolKey.key}"
 
         when {
-          http.DELETE[HttpResponse](any())(any(), any(), any())
+          http.DELETE[HttpResponse](any(), any())(any(), any(), any())
         } thenReturn Future.successful(HttpResponse(NO_CONTENT))
 
         whenReady(connector.deEnrol(amlsRegistrationNumber, Some(groupIdentfier))) { _ =>
-          verify(http).DELETE[HttpResponse](eqTo(endpointUrl))(any(), any(), any())
+          verify(http).DELETE[HttpResponse](eqTo(endpointUrl), any())(any(), any(), any())
           verify(auditConnector).sendEvent(any())(any(), any())
         }
       }
@@ -162,11 +163,11 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
         val endpointUrl = s"$baseUrl/${serviceStub}/enrolments/${enrolKey.key}"
 
         when {
-          http.DELETE[HttpResponse](any())(any(), any(), any())
+          http.DELETE[HttpResponse](any(), any())(any(), any(), any())
         } thenReturn Future.successful(HttpResponse(NO_CONTENT))
 
         whenReady(connector.removeKnownFacts(amlsRegistrationNumber)) { _ =>
-          verify(http).DELETE[HttpResponse](eqTo(endpointUrl))(any(), any(), any())
+          verify(http).DELETE[HttpResponse](eqTo(endpointUrl), any())(any(), any(), any())
           verify(auditConnector).sendEvent(any())(any(), any())
         }
       }

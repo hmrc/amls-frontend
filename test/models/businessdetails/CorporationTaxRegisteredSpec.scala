@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
 package models.businessdetails
 
 import cats.data.Validated.{Invalid, Valid}
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.Path
-import play.api.data.validation.ValidationError
+import play.api.libs.json.JsonValidationError
 import play.api.libs.json._
 
 class CorporationTaxRegisteredSpec extends PlaySpec with MockitoSugar {
@@ -176,7 +176,7 @@ class CorporationTaxRegisteredSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("registeredForCorporationTax" -> true)
 
       Json.fromJson[CorporationTaxRegistered](json) must
-        be(JsError((JsPath \ "corporationTaxReference") -> ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "corporationTaxReference") -> JsonValidationError("error.path.missing")))
     }
 
     "write the correct value" in {

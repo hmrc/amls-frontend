@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,14 @@ package views.estateagentbusiness
 import forms.EmptyForm
 import models.estateagentbusiness._
 import org.scalatest.MustMatchers
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import play.api.i18n.Messages
 import views.Fixture
 
-class summarySpec extends AmlsSpec with MustMatchers  {
+class summarySpec extends AmlsViewSpec with MustMatchers  {
 
   trait TestFixture extends Fixture {
-      implicit val requestWithToken = addToken(request)
+      implicit val requestWithToken = addTokenForView()
     val validBusiness = EstateAgentBusiness(
       Some(Services(Set(Commercial, AssetManagement, Residential))),
       Some(ThePropertyOmbudsman),

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ class BusinessPartnersSpec extends PlaySpec {
     "successfully validate given an model value" in {
       val json = Json.obj("value" -> "PersonName")
       Json.fromJson[BusinessPartners](json) must
-        be(JsSuccess(BusinessPartners("PersonName"), JsPath \ "value"))
+        be(JsSuccess(BusinessPartners("PersonName"), JsPath))
     }
 
     "successfully validate json read write" in {

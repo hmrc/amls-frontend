@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package models.businessactivities
 
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
@@ -139,7 +139,7 @@ class ExpectedAMLSTurnoverSpec extends PlaySpec with MockitoSugar {
 
     "throw error for invalid data" in {
       Json.fromJson[ExpectedAMLSTurnover](Json.obj("expectedAMLSTurnover" -> "20")) must
-        be(JsError(JsPath, play.api.data.validation.ValidationError("error.invalid")))
+        be(JsError(JsPath, play.api.libs.json.JsonValidationError("error.invalid")))
     }
 
     "convert ExpectedAMLSTurnover to renewal AMLSTurnover model" in {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,6 +104,9 @@ object BusinessDetails {
   }
 
   val key = "about-the-business"
+
+  import play.api.libs.json.JodaWrites._
+  import play.api.libs.json.JodaReads._
 
   implicit val format = Json.writes[BusinessDetails]
 

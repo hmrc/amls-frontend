@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,15 @@
 package views.withdrawal
 
 import org.joda.time.LocalDateTime
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
-import utils.{DateHelper, AmlsSpec}
+import utils.{DateHelper, AmlsViewSpec}
 import views.Fixture
 
-class withdraw_applicationSpec extends AmlsSpec with MockitoSugar {
+class withdraw_applicationSpec extends AmlsViewSpec with MockitoSugar {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     //noinspection ScalaStyle
     val date = new LocalDateTime(2001, 1, 1, 12, 0, 0)

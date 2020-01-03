@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,10 @@ import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview}
 import models.tradingpremises.{Address, RegisteringAgentPremises, TradingPremises, YourTradingPremises}
 import org.joda.time.LocalDate
 import play.api.test.FakeRequest
-import utils.{AmlsSpec, StatusConstants}
+import utils.{AmlsViewSpec, StatusConstants}
 import views.Fixture
 
-sealed trait ViewTestHelper extends AmlsSpec {
+sealed trait ViewTestHelper extends AmlsViewSpec {
   val tradingPremises = Seq(TradingPremises(
     registeringAgentPremises = Some(RegisteringAgentPremises(true)),
     status = Some(StatusConstants.Added),
@@ -33,7 +33,7 @@ sealed trait ViewTestHelper extends AmlsSpec {
   ))
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(FakeRequest())
+    implicit val requestWithToken = addTokenForView()
   }
 }
 

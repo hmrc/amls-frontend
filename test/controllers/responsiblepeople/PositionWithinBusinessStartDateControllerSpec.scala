@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
@@ -40,14 +40,13 @@ import scala.concurrent.Future
 
 class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePersonGenerator {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
       val request = addToken(authRequest)
 
       val controller = new PositionWithinBusinessStartDateController (
         dataCacheConnector = mock[DataCacheConnector],
-        authAction = SuccessfulAuthAction
-      )
+        authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
 
       object DefaultValues {
         val noNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant), startDate)
@@ -71,15 +70,15 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
   private val startDate: Option[PositionStartDate] = Some(PositionStartDate(new LocalDate()))
 
+  val pageTitle = "When did this person start their role in the business? - " +
+    Messages("summary.responsiblepeople") + " - " +
+    Messages("title.amls") + " - " + Messages("title.gov")
+
+  val pageHeader = "When did firstname lastname start their role in the business?"
+
+  val personName = Some(PersonName("firstname", None, "lastname"))
+
   "PositionWithinBusinessStartDateController" when {
-
-    val pageTitle = "When did this person start their role in the business? - " +
-      Messages("summary.responsiblepeople") + " - " +
-      Messages("title.amls") + " - " + Messages("title.gov")
-
-    val pageHeader = "When did firstname lastname start their role in the business?"
-
-    val personName = Some(PersonName("firstname", None, "lastname"))
 
     "get is called" must {
 
@@ -134,7 +133,7 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
     "post is called" must {
       "respond with BAD_REQUEST" when {
         "the year field has too few digits" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody (
+          val newRequest = requestWithUrlEncodedBody(
             "startDate.day" -> "24",
             "startDate.month" -> "2",
             "startDate.year" -> "90")
@@ -161,7 +160,7 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
 
           "the year field has too many digits" in new Fixture {
-            val newRequest = request.withFormUrlEncodedBody (
+            val newRequest = requestWithUrlEncodedBody(
             "startDate.day" -> "24",
             "startDate.month" -> "2",
             "startDate.year" -> "19905")
@@ -184,7 +183,7 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
           "the date fields are empty" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody ("positions" -> "01", "startDate.day" -> "", "startDate.month" -> "", "startDate.year" -> "")
+            val newRequest = requestWithUrlEncodedBody("positions" -> "01", "startDate.day" -> "", "startDate.month" -> "", "startDate.year" -> "")
 
             val mockBusinessMatching: BusinessMatching = mock[BusinessMatching]
 
@@ -204,7 +203,7 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
       "when edit is false" must {
         "redirect to the 'Sole proprietor of another business?' page" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "positions" -> "04",
             "startDate.day" -> "24",
             "startDate.month" -> "2",
@@ -225,7 +224,7 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
       "when edit is true" must {
         "redirect to the 'Check your answers' page" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "positions" -> "04",
             "startDate.day" -> "24",
             "startDate.month" -> "2",

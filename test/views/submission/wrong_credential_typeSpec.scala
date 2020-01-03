@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@ package views.submission
 
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class wrong_credential_typeSpec extends AmlsSpec with MustMatchers {
+class wrong_credential_typeSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     override def view = views.html.submission.wrong_credential_type()
   }

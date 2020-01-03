@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ class MostTransactionsSpec extends PlaySpec {
       val model: MostTransactions =
         MostTransactions(Seq(Country("United Kingdom", "GB")))
 
-      Json.fromJson[MostTransactions](Json.toJson(model)) mustEqual JsSuccess(model)
+      Json.fromJson[MostTransactions](Json.toJson(model)) mustEqual JsSuccess(model, JsPath \ "mostTransactionsCountries")
     }
 
     "roundtrip through forms" in {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,22 @@
 
 package controllers.renewal
 
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
 import models.registrationprogress.{NotStarted, Section, Started}
+import play.api.mvc.MessagesControllerComponents
 import services.RenewalService
 import utils.AuthAction
 import views.html.renewal._
 
+import scala.concurrent.ExecutionContext
+import scala.concurrent.ExecutionContext.Implicits.global
+
 @Singleton
-class WhatYouNeedController @Inject()(val authAction: AuthAction, renewalService: RenewalService) extends DefaultBaseController {
+class WhatYouNeedController @Inject()(val authAction: AuthAction,
+                                      val ds: CommonPlayDependencies,
+                                      renewalService: RenewalService,
+                                      val cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
     implicit request =>

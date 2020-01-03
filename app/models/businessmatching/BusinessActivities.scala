@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,7 +98,7 @@ object BusinessActivity {
     case JsString("05") => JsSuccess(MoneyServiceBusiness)
     case JsString("06") => JsSuccess(TrustAndCompanyServices)
     case JsString("07") => JsSuccess(TelephonePaymentService)
-    case _ => JsError((JsPath \ "businessActivities") -> play.api.data.validation.ValidationError("error.invalid"))
+    case _ => JsError((JsPath \ "businessActivities") -> play.api.libs.json.JsonValidationError("error.invalid"))
   }
 
   implicit val jsonActivityWrite = Writes[BusinessActivity] {
@@ -206,7 +206,7 @@ object BusinessActivities {
       case "06" => Reads(_ => JsSuccess(TrustAndCompanyServices)) map identity[BusinessActivity]
       case "07" => Reads(_ => JsSuccess(TelephonePaymentService)) map identity[BusinessActivity]
       case _ =>
-        Reads(_ => JsError((JsPath \ path) -> play.api.data.validation.ValidationError("error.invalid")))
+        Reads(_ => JsError((JsPath \ path) -> play.api.libs.json.JsonValidationError("error.invalid")))
     }
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -226,7 +226,7 @@ class RoleWithinBusinessSpec extends AmlsSpec with CharacterSets {
       val json = Json.obj(
         "roleWithinBusiness" -> "10"
       )
-      RoleWithinBusiness.jsonReads.reads(json) must be(JsError((JsPath) -> play.api.data.validation.ValidationError("error.invalid")))
+      RoleWithinBusiness.jsonReads.reads(json) must be(JsError((JsPath) -> play.api.libs.json.JsonValidationError("error.invalid")))
     }
 
 

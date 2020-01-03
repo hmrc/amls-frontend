@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,32 +19,31 @@ package controllers.renewal
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
 import models.registrationprogress.Completed
 import models.status.{ReadyForRenewal, RenewalSubmitted}
 import play.api.i18n.MessagesApi
+import play.api.mvc.MessagesControllerComponents
 import services.businessmatching.BusinessMatchingService
 import services.{ProgressService, RenewalService, SectionsProvider, StatusService}
 import utils.{AuthAction, ControllerHelper}
 import views.html.renewal.renewal_progress
 
 import scala.concurrent.Future
-
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
-class RenewalProgressController @Inject()
-(
-  val authAction: AuthAction,
-  val dataCacheConnector: DataCacheConnector,
-  val progressService: ProgressService,
-  val sectionsProvider: SectionsProvider,
-  val messages: MessagesApi,
-  val renewals: RenewalService,
-  val businessMatchingService: BusinessMatchingService,
-  val statusService: StatusService
-) extends DefaultBaseController {
+class RenewalProgressController @Inject()(val authAction: AuthAction,
+                                          val ds: CommonPlayDependencies,
+                                          val dataCacheConnector: DataCacheConnector,
+                                          val progressService: ProgressService,
+                                          val sectionsProvider: SectionsProvider,
+                                          val renewals: RenewalService,
+                                          val businessMatchingService: BusinessMatchingService,
+                                          val statusService: StatusService,
+                                          val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
       implicit request =>

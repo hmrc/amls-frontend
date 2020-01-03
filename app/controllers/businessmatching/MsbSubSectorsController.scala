@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,28 +18,32 @@ package controllers.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching._
 import models.flowmanagement.{ChangeSubSectorFlowModel, SubSectorsPageId}
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 
 class MsbSubSectorsController @Inject()(authAction: AuthAction,
+                                        val ds: CommonPlayDependencies,
                                         val dataCacheConnector: DataCacheConnector,
                                         val router: Router[ChangeSubSectorFlowModel],
                                         val businessMatchingService: BusinessMatchingService,
                                         val statusService:StatusService,
                                         val helper: ChangeSubSectorHelper,
-                                        val config: AppConfig) extends DefaultBaseController {
+                                        val config: ApplicationConfig,
+                                        val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

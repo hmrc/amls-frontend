@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,21 +20,22 @@ import controllers.actions.SuccessfulAuthAction
 import models.bankdetails._
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.jsoup.Jsoup
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
 
 class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
     val controller = new BankAccountTypeController(
-      SuccessfulAuthAction,
+      SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
-      mockStatusService
+      mockStatusService,
+      mockMcc
     )
   }
 
@@ -129,7 +130,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with OK and redirect to the bank account details page" when {
 
         "not editing and there is valid account type" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "bankAccountType" -> "01"
           )
 
@@ -144,7 +145,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
 
           "not editing and there is no bank account" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "bankAccountType" -> "04"
             )
 
@@ -158,7 +159,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
         }
 
         "editing and there is valid account type but no account details" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "bankAccountType" -> "01"
           )
 
@@ -172,7 +173,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
         }
 
         "editing and there is both a valid account type and valid account details" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "bankAccountType" -> "01"
           )
 
@@ -195,7 +196,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
 
       "respond with BAD_REQUEST" when {
         "there is invalid data" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "bankAccountType" -> "10"
           )
 
@@ -212,7 +213,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
 
       "respond with NOT_FOUND" when {
         "the given index is out of bounds" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "bankAccountType" -> "04"
           )
 

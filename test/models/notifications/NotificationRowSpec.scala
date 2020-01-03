@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ class NotificationRowSpec extends PlaySpec with AmlsSpec {
     }
 
     "fail with error when status value is passed incorrectly" in {
-      ContactType.jsonReads.reads(JsString("RPM1RPM1")) must be(JsError(List((JsPath \ "contact_type", List(play.api.data.validation.ValidationError("error.invalid"))))))
+      ContactType.jsonReads.reads(JsString("RPM1RPM1")) must be(JsError(List((JsPath \ "contact_type", List(play.api.libs.json.JsonValidationError("error.invalid"))))))
     }
 
     "format the date for the table of messages" in {

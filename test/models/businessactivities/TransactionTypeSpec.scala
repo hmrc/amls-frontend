@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -140,7 +140,7 @@ class TransactionTypeSpec extends PlaySpec with MustMatchers {
         "types" -> Seq("01", "02", "03")
       )
 
-      Json.fromJson[TransactionTypes](json) mustBe JsError(JsPath \ "software" -> play.api.data.validation.ValidationError("error.missing"))
+      Json.fromJson[TransactionTypes](json) mustBe JsError(JsPath \ "software" -> play.api.libs.json.JsonValidationError("error.missing"))
     }
 
     "fail when an invalid value was given" in {
@@ -148,13 +148,13 @@ class TransactionTypeSpec extends PlaySpec with MustMatchers {
         "types" -> Seq("01", "10")
       )
 
-      Json.fromJson[TransactionTypes](json) mustBe JsError(JsPath \ "types" -> play.api.data.validation.ValidationError("error.invalid"))
+      Json.fromJson[TransactionTypes](json) mustBe JsError(JsPath \ "types" -> play.api.libs.json.JsonValidationError("error.invalid"))
     }
 
     "fail when no values are given" in {
       val json = Json.obj()
 
-      Json.fromJson[TransactionTypes](json) mustBe JsError(JsPath \ "types" -> play.api.data.validation.ValidationError("error.missing"))
+      Json.fromJson[TransactionTypes](json) mustBe JsError(JsPath \ "types" -> play.api.libs.json.JsonValidationError("error.missing"))
     }
   }
 }

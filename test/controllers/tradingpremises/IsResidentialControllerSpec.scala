@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,14 +25,14 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
 
 class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar with PrivateMethodTester {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
@@ -45,7 +45,7 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
     mockCacheGetEntry[Seq[TradingPremises]](Some(Seq(TradingPremises())), TradingPremises.key)
     mockCacheGetEntry[BusinessMatching](Some(BusinessMatching()), BusinessMatching.key)
 
-    val controller = new IsResidentialController(messagesApi, SuccessfulAuthAction, mockCacheConnector)
+    val controller = new IsResidentialController(messagesApi, SuccessfulAuthAction, ds = commonDependencies, mockCacheConnector, cc = mockMcc)
 
     mockCacheSave[Seq[TradingPremises]]
   }
@@ -109,7 +109,7 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
       "on valid request" must {
 
         "redirect to WhatDoesYourBusinessDoController" in new Fixture {
-          val postRequest = request.withFormUrlEncodedBody(
+          val postRequest = requestWithUrlEncodedBody(
             "isResidential" -> "true"
           )
 
@@ -125,7 +125,7 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
         }
 
         "redirect to DetailedAnswersController in edit mode" in new Fixture {
-          val postRequest = request.withFormUrlEncodedBody(
+          val postRequest = requestWithUrlEncodedBody(
             "isResidential" -> "false"
           )
 
@@ -150,7 +150,7 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
 
       "on invalid request" must {
         "respond with BAD_REQUEST" in new Fixture {
-          val postRequest = request.withFormUrlEncodedBody(
+          val postRequest = requestWithUrlEncodedBody(
             "isResidential" -> ""
           )
 
@@ -235,7 +235,7 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
   it must {
 
     "save an updated Trading Premises model" in new Fixture {
-      val postRequest = request.withFormUrlEncodedBody(
+      val postRequest = requestWithUrlEncodedBody(
         "isResidential" -> "true"
       )
 

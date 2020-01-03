@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package controllers.tcsp
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import models.tcsp._
 import play.api.i18n.Messages
@@ -28,13 +28,17 @@ import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.HeaderCarrier
 import views.html.tcsp.summary
 import play.api.Logger
+import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class SummaryController @Inject()(
                                   val dataCache: DataCacheConnector,
                                   val authAction: AuthAction,
+                                  val ds: CommonPlayDependencies,
                                   val serviceFlow: ServiceFlow,
-                                  val statusService: StatusService) extends DefaultBaseController {
+                                  val statusService: StatusService,
+                                  val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def sortProviders(data: Tcsp): List[String] = {
 

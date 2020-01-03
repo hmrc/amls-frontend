@@ -1,5 +1,5 @@
 @*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
     hintText: String = "",
     bold: Boolean = false,
     classes: Seq[String] = Seq.empty
-)(implicit lang:Lang,  m: Messages)
+)(implicit m: Messages, lang: Lang)
 
 <div class="form-group @if(field.hasErrors) {form-field--error}">
     <label>

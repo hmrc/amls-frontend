@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ object TimeAtAddress {
         case "03" => OneToThreeYears
         case "04" => ThreeYearsPlus
         case _ =>
-          play.api.data.validation.ValidationError("error.invalid")
+          play.api.libs.json.JsonValidationError("error.invalid")
       }
     }
 

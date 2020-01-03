@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ class StatusSpec extends PlaySpec {
     }
 
     "fail with error when status value is passed incorrectly" in {
-      StatusType.jsonReads.reads(JsString("12")) must be(JsError(List((JsPath ,List(play.api.data.validation.ValidationError("error.invalid"))))))
+      StatusType.jsonReads.reads(JsString("12")) must be(JsError(List((JsPath ,List(play.api.libs.json.JsonValidationError("error.invalid"))))))
 
     }
   }

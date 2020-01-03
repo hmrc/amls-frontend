@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, _}
 import javax.inject.{Inject, Singleton}
 import models.DateOfChange
@@ -25,6 +25,7 @@ import models.status.SubmissionDecisionApproved
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import play.api.libs.json.Format
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.HeaderCarrier
@@ -32,13 +33,15 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class AgentNameController @Inject()(
                                      val dataCacheConnector: DataCacheConnector,
                                      val authAction: AuthAction,
-                                     val statusService: StatusService
-                                   ) extends RepeatingSection with DefaultBaseController with DateOfChangeHelper with FormHelpers {
+                                     val ds: CommonPlayDependencies,
+                                     val statusService: StatusService,
+                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
 
   def get(index: Int, edit: Boolean = false) = authAction.async {
       implicit request =>

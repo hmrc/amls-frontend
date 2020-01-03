@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package models.renewal
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
@@ -121,7 +121,7 @@ class InvolvedInOtherSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("involvedInOther" -> true)
 
       Json.fromJson[InvolvedInOther](json) must
-        be(JsError((JsPath \ "details") -> play.api.data.validation.ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "details") -> play.api.libs.json.JsonValidationError("error.path.missing")))
     }
 
     "write the correct value" in {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,24 +19,27 @@ package controllers.payments
 import audit.BacsPaymentEvent
 import cats.data.OptionT
 import cats.implicits._
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.payments.TypeOfBank
+import play.api.mvc.MessagesControllerComponents
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 
 class TypeOfBankController @Inject()(
                                       val authAction: AuthAction,
+                                      val ds: CommonPlayDependencies,
                                       val auditConnector: AuditConnector,
                                       val authEnrolmentsService: AuthEnrolmentsService,
                                       val feeResponseService: FeeResponseService,
-                                      val paymentsService: PaymentsService
-                                    ) extends DefaultBaseController {
+                                      val paymentsService: PaymentsService,
+                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
       implicit request =>

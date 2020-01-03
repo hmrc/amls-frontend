@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package models.tradingpremises
 
 import cats.data.Validated.Valid
 import jto.validation.{Invalid, Path, ValidationError}
-import play.api.libs.json.{JsError, JsSuccess, Json}
+import play.api.libs.json.{JsError, JsSuccess, Json, JsonValidationError}
 import utils.AmlsSpec
 
 class TaxTypeSpec extends AmlsSpec {
@@ -40,7 +40,7 @@ class TaxTypeSpec extends AmlsSpec {
       TaxType.jsonReadsTaxType.reads(Json.obj(("taxType", Json.toJson("02")))) mustEqual JsSuccess(TaxTypeCorporationTax)
     }
     "return error for invalid JSON" in {
-      TaxType.jsonReadsTaxType.reads(Json.obj(("taxType", Json.toJson("03")))) mustEqual JsError(play.api.data.validation.ValidationError("error.invalid"))
+      TaxType.jsonReadsTaxType.reads(Json.obj(("taxType", Json.toJson("03")))) mustEqual JsError(JsonValidationError("error.invalid"))
     }
   }
 

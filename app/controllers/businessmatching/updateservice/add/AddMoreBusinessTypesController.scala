@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@ package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
-
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
 import models.flowmanagement.{AddBusinessTypeFlowModel, AddMoreBusinessTypesPageId}
+import play.api.mvc.MessagesControllerComponents
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, BooleanFormReadWrite}
@@ -32,13 +32,15 @@ import views.html.businessmatching.updateservice.add.add_more_activities
 
 import scala.collection.immutable.SortedSet
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class AddMoreBusinessTypesController @Inject()(
                                                 authAction: AuthAction,
+                                                val ds: CommonPlayDependencies,
                                                 implicit val dataCacheConnector: DataCacheConnector,
-                                                val router: Router[AddBusinessTypeFlowModel]
-                                           ) extends DefaultBaseController {
+                                                val router: Router[AddBusinessTypeFlowModel],
+                                                val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   val fieldName = "addmoreactivities"
 

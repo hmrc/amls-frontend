@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.mvc.Result
 import play.api.test.Helpers._
@@ -37,7 +37,7 @@ import scala.concurrent.Future
 
 class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     implicit val request = addToken(authRequest)
     val renewalService = mock[RenewalService]
@@ -46,9 +46,10 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
     val cacheMap = mock[CacheMap]
 
     lazy val controller = new TotalThroughputController(
-      SuccessfulAuthAction,
+      SuccessfulAuthAction, ds = commonDependencies,
       renewalService,
-      dataCacheConnector
+      dataCacheConnector,
+      cc = mockMcc
     )
   }
 
@@ -56,7 +57,7 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
     self =>
 
     val formData = "throughput" -> "01"
-    val formRequest = request.withFormUrlEncodedBody(formData)
+    val formRequest = requestWithUrlEncodedBody(formData)
     val cache = mock[CacheMap]
 
     when {
@@ -128,7 +129,7 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
               )
           ), hasChanged = true
       )
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
           "throughput" -> "01"
       )
 

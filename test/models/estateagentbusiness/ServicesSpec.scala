@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package models.estateagentbusiness
 
 import models.DateOfChange
 import org.joda.time.LocalDate
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
@@ -30,7 +30,7 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
 
   "ServicesSpec" must {
 
-    val businessServices:Set[Service] = Set(Residential, Commercial, Auction, Relocation,
+    val businessServices: Set[Service] = Set(Residential, Commercial, Auction, Relocation,
                                             BusinessTransfer, AssetManagement, LandManagement, Development, SocialHousing)
     import jto.validation.forms.Rules._
 
@@ -86,12 +86,12 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
 
       "fail when on invalid data" in {
         Json.fromJson[Services](Json.obj("services" -> Seq("40"))) must
-          be(JsError(((JsPath \ "services")(0) \ "services") -> play.api.data.validation.ValidationError("error.invalid")))
+          be(JsError(((JsPath \ "services")(0) \ "services") -> play.api.libs.json.JsonValidationError("error.invalid")))
       }
     }
 
     "successfully validate json write" in {
-      val json = Json.obj("services" -> Set("01","02","03","04","05","06","07","08","09"))
+      val json = Json.obj("services" -> Seq("01","02","09","05","08","06","07","03","04"))
       Json.toJson(Services(businessServices)) must be(json)
 
     }

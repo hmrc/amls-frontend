@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,14 +22,14 @@ import models.notifications._
 import org.joda.time.DateTime
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class your_messagesSpec extends AmlsSpec with MustMatchers  {
+class your_messagesSpec extends AmlsViewSpec with MustMatchers  {
 
     trait ViewFixture extends Fixture {
 
-        implicit val requestWithToken = addToken(request)
+        implicit val requestWithToken = addTokenForView()
 
         val emptyNotifications: Seq[NotificationRow] = Seq()
         val notifications:Seq[NotificationRow] = Seq(

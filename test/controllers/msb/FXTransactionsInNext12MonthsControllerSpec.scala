@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import models.moneyservicebusiness._
 import models.status.NotCompleted
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -33,15 +33,15 @@ import scala.concurrent.Future
 
 class FXTransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSugar {
 
-    trait Fixture extends AuthorisedFixture with DependencyMocks {
+    trait Fixture extends DependencyMocks {
         self =>
         val request = addToken(authRequest)
 
         val controller = new FXTransactionsInNext12MonthsController(
-            authAction = SuccessfulAuthAction,
+            authAction = SuccessfulAuthAction, ds = commonDependencies,
             dataCacheConnector = mockCacheConnector,
             statusService = mockStatusService,
-            serviceFlow = mockServiceFlow)
+            serviceFlow = mockServiceFlow, cc = mockMcc)
 
         mockIsNewActivityNewAuth(false)
         mockCacheFetch[ServiceChangeRegister](None, None)
@@ -100,7 +100,7 @@ class FXTransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
         "Show error message when user has not filled the mandatory fields" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
                 "fxTransaction" -> ""
             )
 
@@ -117,7 +117,7 @@ class FXTransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
         }
 
         "Successfully save data in mongoCache and navigate to Summary page" in new Fixture {
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
                 "fxTransaction" -> "12345678963"
             )
 
@@ -144,7 +144,7 @@ class FXTransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
                 ), hasChanged = true
             )
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
                 "fxTransaction" -> "12345678963"
             )
 

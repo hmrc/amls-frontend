@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package controllers.auth
+package config
 
-import config.ApplicationConfig
-import uk.gov.hmrc.play.frontend.auth.GovernmentGateway
+import com.google.inject.Inject
+import uk.gov.hmrc.crypto.PlainText
+import uk.gov.hmrc.play.bootstrap.filters.frontend.crypto.SessionCookieCrypto
+import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 
-object AmlsGovernmentGateway extends GovernmentGateway {
-  override def loginURL: String = ApplicationConfig.loginUrl
-  override def continueURL: String = ApplicationConfig.loginContinue
+class AmlsHeaderCarrierForPartialsConverter @Inject()(val sessionCookieCrypto: SessionCookieCrypto) extends HeaderCarrierForPartialsConverter {
+  override def crypto: String => String = identity
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,20 +19,24 @@ package controllers.deregister
 import cats.data.OptionT
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import models.businessmatching.BusinessMatching
+import play.api.mvc.MessagesControllerComponents
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AuthAction, BusinessName}
 import views.html.deregister.deregister_application
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class DeRegisterApplicationController @Inject() (authAction: AuthAction,
+                                                 val ds: CommonPlayDependencies,
                                                  implicit val cache: DataCacheConnector,
                                                  implicit val statusService: StatusService,
                                                  enrolments: AuthEnrolmentsService,
-                                                 implicit val amls: AmlsConnector) extends DefaultBaseController {
+                                                 implicit val amls: AmlsConnector,
+                                                 val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
         implicit request =>

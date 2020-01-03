@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import models.tradingpremises.TradingPremises
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.libs.json.JsValue
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -34,14 +34,13 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
 
   import models.tradingpremises.RemovalReasonConstants._
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     implicit val request = addToken(authRequest)
 
     val controller = new RemoveAgentPremisesReasonsController (
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
 
     val tradingPremises = TradingPremises()
     val cache = CacheMap("", Map.empty[String, JsValue])
@@ -81,7 +80,7 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
 
       "return a bad request if there is a validation problem" in new Fixture {
 
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = requestWithUrlEncodedBody(
           "removalReason" -> Form.OTHER
         )
 
@@ -93,7 +92,7 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
 
       "save the reason data to mongoCache" in new Fixture {
 
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = requestWithUrlEncodedBody(
           "removalReason" -> Form.OTHER,
           "removalReasonOther" -> "Some reason"
         )
@@ -113,7 +112,7 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
 
       "redirect to the 'Remove trading premises' page" in new Fixture {
 
-        val formRequest = request.withFormUrlEncodedBody(
+        val formRequest = requestWithUrlEncodedBody(
           "removalReason" -> Form.OTHER,
           "removalReasonOther" -> "Some reason"
         )

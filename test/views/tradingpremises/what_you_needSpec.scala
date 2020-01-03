@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,14 @@ package views.tradingpremises
 
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
 
-class what_you_needSpec extends AmlsSpec with MustMatchers {
+class what_you_needSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "what_you_need view" must {
@@ -54,8 +54,8 @@ class what_you_needSpec extends AmlsSpec with MustMatchers {
 
       doc.getElementsMatchingOwnText(Messages("button.continue")).hasAttr("href") must be(true)
       doc.getElementsMatchingOwnText(Messages("button.continue")).attr("href") must be("/anti-money-laundering/trading-premises/premises/1")
-      doc.getElementsMatchingOwnText(Messages("main.sidebar.title")).hasText must be(true)
-      doc.getElementsMatchingOwnText(Messages("main.sidebar.information")).hasText must be(true)
+      doc.getElementsMatchingOwnText(Messages("whatYouNeed.attention.title")).hasText must be(true)
+      doc.getElementsMatchingOwnText(Messages("whatYouNeed.attention.information")).hasText must be(true)
     }
 
     "contain the expected content elements when msb is selected as one of the option in business activities" in new ViewFixture {
@@ -67,8 +67,8 @@ class what_you_needSpec extends AmlsSpec with MustMatchers {
       html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.4"))
 
       doc.getElementsMatchingOwnText(Messages("button.continue")).hasAttr("href") must be(true)
-      doc.getElementsMatchingOwnText(Messages("main.sidebar.title")).hasText must be(true)
-      doc.getElementsMatchingOwnText(Messages("main.sidebar.information")).hasText must be(true)
+      doc.getElementsMatchingOwnText(Messages("whatYouNeed.attention.title")).hasText must be(true)
+      doc.getElementsMatchingOwnText(Messages("whatYouNeed.attention.information")).hasText must be(true)
 
       doc.getElementsMatchingOwnText(Messages("tradingpremises.whatyouneed.agents.sub.heading")).hasText must be(true)
       doc.getElementsMatchingOwnText(Messages("tradingpremises.whatyouneed.agents.desc.1")).hasText must be(true)

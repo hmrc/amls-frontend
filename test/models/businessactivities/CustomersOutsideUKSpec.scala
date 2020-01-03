@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,12 +32,12 @@ class CustomersOutsideUKSpec extends PlaySpec {
     "round trip through Json correctly" in {
 
       val model: CustomersOutsideUK = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))
-      Json.fromJson[CustomersOutsideUK](Json.toJson(model)) mustBe JsSuccess(model, JsPath)
+      Json.fromJson[CustomersOutsideUK](Json.toJson(model)) mustBe JsSuccess(model, JsPath \ "countries")
     }
 
     "round trip through forms correctly" in {
-
       val model: CustomersOutsideUK = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"), Country("India", "IN"))))
+
       rule.validate(write.writes(model)) mustBe Valid(model)
     }
 

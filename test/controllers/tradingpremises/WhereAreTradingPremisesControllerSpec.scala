@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers.{status => hstatus, _}
 import services.StatusService
@@ -46,14 +46,15 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
 
   private val mockDataCacheConnector = mock[DataCacheConnector]
 
-  trait Fixture extends AuthorisedFixture  {
+  trait Fixture  {
     self => val request = addToken(authRequest)
 
     val controller = new WhereAreTradingPremisesController (
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
-      auditConnector = mock[AuditConnector]
+      auditConnector = mock[AuditConnector],
+      cc = mockMcc
       )
 
     when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())).thenReturn(Future.successful(SubmissionDecisionRejected))
@@ -134,7 +135,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       "respond with SEE_OTHER" when {
         "edit mode is false, and redirect to the 'Activity Start Date' page" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "tradingName" -> "Trading Name",
             "addressLine1" -> "Address 1",
             "addressLine2" -> "Address 2",
@@ -168,7 +169,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
         
         "fail submission on invalid uk address" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "tradingName" -> "Trading Name",
             "addressLine1" -> "Address **1",
             "addressLine2" -> "Address 2",
@@ -196,7 +197,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
 
         "redirect to the 'Activity Start Date' page when no data in mongoCache" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "tradingName" -> "Trading Name",
             "addressLine1" -> "Address 1",
             "addressLine2" -> "Address 2",
@@ -221,7 +222,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
 
         "edit mode is true, and redirect to check your answer page" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "tradingName" -> "Trading Name",
             "addressLine1" -> "Address 1",
             "addressLine2" -> "Address 2",
@@ -258,7 +259,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
 
       "respond with BAD_REQUEST" when {
         "given an invalid request" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "tradingName" -> "Trading Name"
           )
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
@@ -275,7 +276,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
 
         "date contains an invalid year too great in length" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "tradingName" -> "Trading Name",
             "addressLine1" -> "Address 1"*120,
             "addressLine2" -> "Address 2",
@@ -299,7 +300,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       "respond with NOT_FOUND" when {
         "the given index is out of bounds" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "tradingName" -> "Trading Name",
             "addressLine1" -> "Address 1",
             "addressLine2" -> "Address 2",
@@ -321,7 +322,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
 
       "set the hasChanged flag to true" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "tradingName" -> "Trading Name",
           "addressLine1" -> "Address 1",
           "addressLine2" -> "Address 2",
@@ -353,7 +354,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
   "go to the date of change page" when {
     "the submission has been approved and trading name has changed" in new Fixture {
 
-      val initRequest = request.withFormUrlEncodedBody(
+      val initRequest = requestWithUrlEncodedBody(
         "tradingName" -> "Trading Name",
         "addressLine1" -> "Address 1",
         "addressLine2" -> "Address 2",
@@ -382,7 +383,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
   "go to the date of change page" when {
     "the status id ready for renewal and trading name has changed" in new Fixture {
 
-      val initRequest = request.withFormUrlEncodedBody(
+      val initRequest = requestWithUrlEncodedBody(
         "tradingName" -> "Trading Name",
         "addressLine1" -> "Address 1",
         "addressLine2" -> "Address 2",
@@ -411,7 +412,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
   "go to the check your answers page" when {
     "data has not changed" in new Fixture {
 
-      val initRequest = request.withFormUrlEncodedBody(
+      val initRequest = requestWithUrlEncodedBody(
         "tradingName" -> "Trading Name",
         "addressLine1" -> "Address 1",
         "addressLine2" -> "Address 2",
@@ -441,7 +442,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
 
     "the trading premises instance is brand new" in new Fixture {
 
-      val initRequest = request.withFormUrlEncodedBody(
+      val initRequest = requestWithUrlEncodedBody(
         "tradingName" -> "Trading Name",
         "addressLine1" -> "Address 1",
         "addressLine2" -> "Address 2",
@@ -476,7 +477,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
   "handle the date of change form post" when {
     "given valid data for a trading premises name" in new Fixture {
 
-      val postRequest = request.withFormUrlEncodedBody(
+      val postRequest = requestWithUrlEncodedBody(
         "dateOfChange.year" -> "2010",
         "dateOfChange.month" -> "10",
         "dateOfChange.day" -> "01"
@@ -520,7 +521,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       when(tp.yourTradingPremises) thenReturn Some(ytp)
       when(ytp.startDate) thenReturn Some(new LocalDate(2011,1,1))
 
-      val postRequest = request.withFormUrlEncodedBody()
+      val postRequest = requestWithUrlEncodedBody("invalid" -> "data")
 
       when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), meq(TradingPremises.key))(any(), any())) thenReturn Future.successful(Some(Seq(tp)))
 
@@ -538,7 +539,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       when(tp.yourTradingPremises) thenReturn Some(ytp)
       when(ytp.startDate) thenReturn Some(new LocalDate(2011,1,1))
 
-      val postRequest = request.withFormUrlEncodedBody(
+      val postRequest = requestWithUrlEncodedBody(
         "dateOfChange.day" -> "1",
         "dateOfChange.month" -> "1",
         "dateOfChange.year" -> LocalDate.now.plusYears(1).getYear.toString
@@ -555,7 +556,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
   }
 
   "given a date of change which is before the activity start date" in new Fixture {
-    val postRequest = request.withFormUrlEncodedBody(
+    val postRequest = requestWithUrlEncodedBody(
       "dateOfChange.year" -> "2007",
       "dateOfChange.month" -> "10",
       "dateOfChange.day" -> "01"

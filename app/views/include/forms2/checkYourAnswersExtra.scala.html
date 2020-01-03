@@ -1,5 +1,5 @@
 @*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 @(
     question: String = ""
-)(content: Html)(implicit lang:Lang,  m: Messages)
+)(content: Html)(implicit m: Messages, lang: Lang)
 
 <h3 class="heading-small">@question</h3>
 <span class="visuallyhidden">@Messages("summary.visuallyhidden.answer"): </span>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.auth.core.AffinityGroup.Individual
@@ -53,13 +53,14 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
     reset(mockDataCacheConnector)
   }
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val whatDoesYourBusinessDoController = new WhatDoesYourBusinessDoController (
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction,
-      statusService = mock[StatusService]
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      statusService = mock[StatusService],
+      cc = mockMcc
     )
 
     val businessMatchingActivitiesAll = BusinessMatchingActivities(
@@ -232,7 +233,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
 
-          val invalidRequest = request.withFormUrlEncodedBody(
+          val invalidRequest = requestWithUrlEncodedBody(
             "activities" -> ""
           )
           val result = whatDoesYourBusinessDoController.post(recordId1)(invalidRequest)
@@ -255,7 +256,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesSingle))))
 
-          val newRequest = request.withFormUrlEncodedBody("activities[0]" -> "01")
+          val newRequest = requestWithUrlEncodedBody("activities[0]" -> "01")
 
           val result = whatDoesYourBusinessDoController.post(recordId1, edit = true)(newRequest)
           status(result) must be(SEE_OTHER)
@@ -275,7 +276,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "activities[0]" -> "01",
             "activities[1]" -> "02",
             "activities[2]" -> "03"
@@ -301,7 +302,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
             when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
               .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesSingle))))
 
-            val newRequest = request.withFormUrlEncodedBody("activities[0]" -> "01", "activities[1]" -> "06")
+            val newRequest = requestWithUrlEncodedBody("activities[0]" -> "01", "activities[1]" -> "06")
 
             val result = whatDoesYourBusinessDoController.post(recordId1, edit = true)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -328,7 +329,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
             when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
               .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesSingle))))
 
-            val newRequest = request.withFormUrlEncodedBody("activities[0]" -> "02", "activities[1]" -> "01")
+            val newRequest = requestWithUrlEncodedBody("activities[0]" -> "02", "activities[1]" -> "01")
 
             val result = whatDoesYourBusinessDoController.post(recordId1, edit = true)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -356,7 +357,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
             when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
               .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesSingle))))
 
-            val newRequest = request.withFormUrlEncodedBody("activities[0]" -> "02", "activities[1]" -> "01")
+            val newRequest = requestWithUrlEncodedBody("activities[0]" -> "02", "activities[1]" -> "01")
 
             val result = whatDoesYourBusinessDoController.post(recordId1, edit = true)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -377,7 +378,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "activities[0]" -> "01",
             "activities[1]" -> "02",
             "activities[2]" -> "03"
@@ -392,7 +393,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
 
       "set the hasChanged flag to true" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "activities[0]" -> "01",
           "activities[1]" -> "03",
           "activities[2]" -> "04"
@@ -440,7 +441,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
 
 
 
-        val postRequest = request.withFormUrlEncodedBody(
+        val postRequest = requestWithUrlEncodedBody(
           "dateOfChange.year" -> "2010",
           "dateOfChange.month" -> "10",
           "dateOfChange.day" -> "01"

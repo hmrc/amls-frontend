@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,21 +17,25 @@
 package controllers.hvd
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.hvd.Hvd
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.hvd.receiving
 
 import scala.concurrent.Future
 
 class ReceiveCashPaymentsController @Inject()(val authAction: AuthAction,
+                                              val ds: CommonPlayDependencies,
                                               implicit val cacheConnector: DataCacheConnector,
                                               implicit val serviceFlow: ServiceFlow,
-                                              implicit val statusService: StatusService) extends DefaultBaseController {
+                                              implicit val statusService: StatusService,
+                                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   val NAME = "receivePayments"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(NAME)

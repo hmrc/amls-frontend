@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@ package audit
 import models.payments.CreatePaymentRequest
 import play.api.libs.json.{JsObject, Json, Writes}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.audit.model.{ExtendedDataEvent}
+import uk.gov.hmrc.play.audit.AuditExtensions
+import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import utils.AuditHelper
 
@@ -29,8 +30,8 @@ object CreatePaymentFailureEvent {
     ExtendedDataEvent(
       auditSource = AuditHelper.appName,
       auditType = "createPaymentFailureEvent",
-      tags = hc.toAuditTags("Create Payment", "n/a"),
-      detail = Json.toJson(hc.toAuditDetails()).as[JsObject] ++ Json.obj(
+      tags =  AuditExtensions.auditHeaderCarrier(hc).toAuditTags("Create Payment", "n/a"),
+      detail = Json.toJson(AuditExtensions.auditHeaderCarrier(hc).toAuditDetails()).as[JsObject] ++ Json.obj(
         "paymentRef" -> paymentRef,
         "status" -> status,
         "message" -> message,

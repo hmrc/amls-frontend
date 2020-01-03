@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,14 +23,14 @@ import models.renewal.SendTheLargestAmountsOfMoney
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import services.AutoCompleteService
-import utils.{AmlsSpec, AutoCompleteServiceMocks}
+import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
 
 
-class send_largest_amounts_of_moneySpec extends AmlsSpec with MustMatchers  {
+class send_largest_amounts_of_moneySpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "expected_business_turnover view" must {

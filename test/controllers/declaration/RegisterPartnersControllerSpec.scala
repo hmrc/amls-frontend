@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,14 +23,14 @@ import models.status._
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.{ProgressService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.auth.core.AuthConnector
 import utils._
 
 import scala.concurrent.Future
@@ -38,7 +38,7 @@ import scala.concurrent.Future
 
 class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
@@ -100,7 +100,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
       "pass validation" when {
         "selected option is a valid responsible person" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
+          val newRequest = requestWithUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
@@ -124,7 +124,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
 
       "fail validation" when {
         "no option is selected on the UI and status is submissionready" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody()
+          val newRequest = requestWithUrlEncodedBody("" -> "")
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
@@ -137,7 +137,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
         }
 
         "no option is selected on the UI and status is SubmissionReadyForReview" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody()
+          val newRequest = requestWithUrlEncodedBody("" -> "")
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
@@ -150,7 +150,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
         }
 
         "no option is selected on the UI and status is ReadyForRenewal" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody()
+          val newRequest = requestWithUrlEncodedBody("" -> "")
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
@@ -163,7 +163,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
         }
 
         "no option is selected on the UI and no responsible people returned" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody()
+          val newRequest = requestWithUrlEncodedBody("" -> "")
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(None))
 

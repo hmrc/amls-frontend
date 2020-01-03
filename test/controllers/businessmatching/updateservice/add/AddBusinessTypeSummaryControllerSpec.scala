@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import org.scalacheck.Gen
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.TradingPremisesService
@@ -49,7 +49,7 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
   with TradingPremisesGenerator
   with BusinessMatchingGenerator with ResponsiblePersonGenerator {
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
+  sealed trait Fixture extends DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
@@ -59,13 +59,14 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
     val controller = new AddBusinessTypeSummaryController(
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,
       helper = mockUpdateServiceHelper,
       router = createRouter[AddBusinessTypeFlowModel],
-      tradingPremisesService = mockTradingPremisesService
+      tradingPremisesService = mockTradingPremisesService,
+      cc = mockMcc
     )
 
     val flowModel = AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices),

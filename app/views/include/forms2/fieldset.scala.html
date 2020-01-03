@@ -1,5 +1,5 @@
 @*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@
     section: String = "",
     showErrorStyling: Boolean = true,
     f: forms.Field
-)(content: Html)(implicit lang:Lang,  m: Messages)
+)(content: Html)(implicit m: Messages)
 
 @if(section.nonEmpty) {
     <div class="page-header"><p class="heading-secondary"><span class="visuallyhidden">This section is: </span>@Messages(section)</p></div>

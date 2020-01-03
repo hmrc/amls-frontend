@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@ import models.FormTypes._
 import org.joda.time.LocalDate
 import play.api.libs.json._
 import typeclasses.MongoKey
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 
 case class AgentName(agentName: String,
                      dateOfChange: Option[DateOfChange] = None,
@@ -34,7 +36,7 @@ object AgentName {
 
   import utils.MappingUtils.Implicits._
 
-  val dateRule = newAllowedPastAndFutureDateRule("error.required.tp.agent.date", "error.char.tp.agent.dob", "error.required.tp.agent.date.past")
+  val dateRule = newAllowedPastAndFutureDateRuleAgent("error.required.tp.agent.date", "error.char.tp.agent.dob", "error.required.tp.agent.date.past")
   def applyWithoutDateOfChange(agentName: String, agentDateOfBirth: Option[LocalDate]) =
     AgentName(agentName, None, agentDateOfBirth)
 

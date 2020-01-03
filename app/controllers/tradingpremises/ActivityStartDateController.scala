@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,20 +17,22 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import javax.inject.{Inject, Singleton}
 import models.tradingpremises._
 import play.api.i18n.MessagesApi
-import play.api.mvc.Request
+import play.api.mvc.{MessagesControllerComponents, Request}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, RepeatingSection}
-
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class ActivityStartDateController @Inject()(override val messagesApi: MessagesApi,
                                             val authAction: AuthAction,
-                                            val dataCacheConnector: DataCacheConnector) extends RepeatingSection with DefaultBaseController {
+                                            val ds: CommonPlayDependencies,
+                                            val dataCacheConnector: DataCacheConnector,
+                                            val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false) = authAction.async {
     implicit request =>

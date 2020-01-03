@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,22 @@
 
 package controllers.responsiblepeople
 
-import config.AppConfig
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, _}
 import javax.inject.Inject
 import models.responsiblepeople.ResponsiblePerson
+import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class ApprovalCheckController @Inject()(
                                          val dataCacheConnector: DataCacheConnector,
                                          authAction: AuthAction,
-                                         appConfig: AppConfig
-                                       ) extends RepeatingSection with DefaultBaseController {
+                                         val ds: CommonPlayDependencies,
+                                         val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   val FIELD_NAME = "hasAlreadyPaidApprovalCheck"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(FIELD_NAME)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,20 +20,17 @@ import forms.EmptyForm
 import models.businessactivities._
 import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.MustMatchers
-import utils.AmlsSpec
 import play.api.i18n.Messages
-import views.{Fixture, HtmlAssertions}
+import play.api.test.FakeRequest
+import utils.AmlsSummaryViewSpec
+import views.Fixture
 
 import scala.collection.JavaConversions._
 
-class summarySpec extends AmlsSpec
-  with MustMatchers
-  with HtmlAssertions
-  with TableDrivenPropertyChecks {
+class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView(FakeRequest())
   }
 
   "summary view" must {
@@ -52,6 +49,8 @@ class summarySpec extends AmlsSpec
       subHeading.html must include(Messages("summary.businessactivities"))
 
     }
+
+    "include the provided data" in new ViewFixture {
 
     val sectionChecks = Table[String, Element => Boolean](
       ("title key", "check"),
@@ -76,8 +75,6 @@ class summarySpec extends AmlsSpec
         checkElementTextIncludes(_, "line1","line2","line3","line4","AB12CD")),
       ("businessactivities.tax.matters.summary.title",checkElementTextIncludes(_, "AccountantName", "lbl.yes"))
     )
-
-    "include the provided data" in new ViewFixture {
 
       def view = views.html.businessactivities.summary(
         f = EmptyForm,

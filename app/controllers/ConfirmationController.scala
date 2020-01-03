@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import models.confirmation.{BreakdownRow, Currency}
 import models.status._
 import models.{FeeResponse, SubmissionRequestStatus}
 import play.api.Logger
-import play.api.mvc.{AnyContent, Request, Result}
+import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
 import services.{AuthEnrolmentsService, FeeResponseService, StatusService, _}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, BusinessName, FeeHelper}
@@ -36,13 +36,16 @@ import scala.concurrent.Future
 
 @Singleton
 class ConfirmationController @Inject()(authAction: AuthAction,
+                                       val ds: CommonPlayDependencies,
                                        private[controllers] val keystoreConnector: KeystoreConnector,
                                        private[controllers] implicit val dataCacheConnector: DataCacheConnector,
                                        private[controllers] implicit val amlsConnector: AmlsConnector,
                                        private[controllers] implicit val statusService: StatusService,
                                        private[controllers] val authenticator: AuthenticatorConnector,
+                                       private[controllers] val enrolmentService: AuthEnrolmentsService,
                                        private[controllers] val confirmationService: ConfirmationService,
-                                       val feeHelper: FeeHelper) extends DefaultBaseController {
+                                       val cc: MessagesControllerComponents,
+                                       val feeHelper: FeeHelper) extends AmlsBaseController(ds, cc) {
 
   val prefix = "[ConfirmationController]"
 

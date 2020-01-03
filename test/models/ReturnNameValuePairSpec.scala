@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,32 +16,20 @@
 
 package models
 
-import connectors.KeystoreConnector
-import org.scalatestplus.play.OneAppPerSuite
-import play.api.inject.guice.GuiceApplicationBuilder
-import utils.AmlsSpec
-import play.api.inject.bind
+import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
-class ReturnNameValuePairSpec extends AmlsSpec with OneAppPerSuite {
-
-  implicit override lazy val app = new GuiceApplicationBuilder()
-    .configure("microservice.services.amls-frontend.public.host" -> "somehost:9000")
-    .configure("microservice.services.amls-frontend.public.secure" -> true)
-    .build()
+class ReturnNameValuePairSpec extends PlaySpec with GuiceOneAppPerSuite {
 
   "The ReturnLocation model" must {
-
     "correctly determine the absolute url based on the current request" when {
       "request is running on localhost" in {
 
         val call = controllers.routes.PaymentConfirmationController.paymentConfirmation("reference")
         val model = ReturnLocation(call)
 
-        model.absoluteUrl mustBe s"https://somehost:9000${call.url}"
-
+        model.absoluteUrl mustBe s"http://localhost:9222${call.url}"
       }
-
     }
   }
-
 }

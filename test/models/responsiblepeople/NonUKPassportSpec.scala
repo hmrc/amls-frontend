@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,7 +122,7 @@ class NonUKPassportSpec extends PlaySpec {
       "Read the json and return error if passport number is missing" in {
         val json = Json.obj("nonUKPassport" -> true)
         NonUKPassport.jsonReads.reads(json) must be(
-          JsError((JsPath  \ "nonUKPassportNumber") -> play.api.data.validation.ValidationError("error.path.missing"))
+          JsError((JsPath  \ "nonUKPassportNumber") -> play.api.libs.json.JsonValidationError("error.path.missing"))
         )
       }
     }

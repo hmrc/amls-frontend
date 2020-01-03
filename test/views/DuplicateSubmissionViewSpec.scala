@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,12 @@ package views
 
 import play.api.i18n.Messages
 import play.twirl.api.Html
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 
-class DuplicateSubmissionViewSpec extends AmlsSpec {
+class DuplicateSubmissionViewSpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     val getHelpView = Html("<p>Get help here</p>")
 

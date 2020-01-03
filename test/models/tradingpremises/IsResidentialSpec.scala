@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ class IsResidentialSpec extends PlaySpec {
     "Read and write successfully" in {
 
       IsResidential.format.reads(IsResidential.format.writes(IsResidential(true))) must be(
-        JsSuccess(IsResidential(true), JsPath \ "isResidential"))
+        JsSuccess(IsResidential(true), JsPath))
     }
 
     "write successfully" in {

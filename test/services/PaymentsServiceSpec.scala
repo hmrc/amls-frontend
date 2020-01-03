@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,14 +39,15 @@ import scala.concurrent.Future
 class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerator {
 
   //noinspection ScalaStyle
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
 
     val mockAmlsConnector = mock[AmlsConnector]
     val testPaymentService = new PaymentsService(
       mockAmlsConnector,
       mock[PayApiConnector],
-      mock[StatusService]
+      mock[StatusService],
+      appConfig
     )
 
     val paymentRefNo = "XA000000000000"
@@ -132,7 +133,7 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
 
           //noinspection ScalaStyle
           whenReady(testPaymentService.paymentsUrlOrDefault("ref", 100, "http://return.com", "ref-no", "safeid", accountTypeId)) { result =>
-            result mustBe NextUrl(ApplicationConfig.paymentsUrl)
+            result mustBe NextUrl(appConfig.paymentsUrl)
           }
 
         }
@@ -176,7 +177,7 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
 
         whenReady(testPaymentService.requestPaymentsUrl(
           testFeeResponseAmendVariation.copy(difference = None, paymentReference = None), "http://return.com", "XAML0000000001", safeId, accountTypeId)) { result =>
-          result mustBe NextUrl(ApplicationConfig.paymentsUrl)
+          result mustBe NextUrl(appConfig.paymentsUrl)
         }
       }
     }

@@ -1,5 +1,5 @@
 @*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 @import include.forms2._
 @import forms.EmptyForm
 
-@(showReregisterButton: Boolean = true)(implicit request: Request[_],m:Messages)
+@(showReregisterButton: Boolean = true)(implicit request: Request[_],m:Messages, lang: Lang)
 <p>@Messages("status.submissiondecisionrevoked.description")</p>
 <p id="revoked.p2">@Messages("status.submissiondecisionrevoked.description2")</p>
 

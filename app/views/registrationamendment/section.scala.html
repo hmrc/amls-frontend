@@ -1,5 +1,5 @@
 @*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
     status: Status,
     hasChanged: Boolean,
     call: Call
-)(implicit request: Request[_],m:Messages, lang: Lang)
+)(implicit request: Request[_],m:Messages)
 @getStatusId(name:String) = {@Messages(s"progress.${name}.name").replaceAll(" ", "-").concat("-status").toLowerCase}
 
 @progressText = {

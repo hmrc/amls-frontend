@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,22 +19,23 @@ package controllers.estateagentbusiness
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.EmptyForm
 import javax.inject.Inject
 import models.estateagentbusiness.EstateAgentBusiness
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.estateagentbusiness._
 
-class SummaryController @Inject()
-(
-  val dataCache: DataCacheConnector,
-  authAction: AuthAction,
-  implicit val statusService: StatusService,
-  implicit val serviceFlow: ServiceFlow
-) extends DefaultBaseController {
+class SummaryController @Inject()(val dataCache: DataCacheConnector,
+                                  authAction: AuthAction,
+                                  val ds: CommonPlayDependencies,
+                                  implicit val statusService: StatusService,
+                                  implicit val serviceFlow: ServiceFlow,
+                                  val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
     implicit request =>

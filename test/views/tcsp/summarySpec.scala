@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,17 +20,17 @@ import generators.AmlsReferenceNumberGenerator
 import models.tcsp._
 import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.MustMatchers
-import utils.AmlsSpec
 import play.api.i18n.Messages
-import views.{Fixture, HtmlAssertions}
+import play.api.test.FakeRequest
+import utils.AmlsSummaryViewSpec
+import views.Fixture
 
 import scala.collection.JavaConversions._
 
-class summarySpec extends AmlsSpec with MustMatchers with HtmlAssertions with TableDrivenPropertyChecks with AmlsReferenceNumberGenerator {
+class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks with AmlsReferenceNumberGenerator {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView(FakeRequest())
   }
 
   "summary view" must {
@@ -46,30 +46,31 @@ class summarySpec extends AmlsSpec with MustMatchers with HtmlAssertions with Ta
       subHeading.html must include(Messages("summary.tcsp"))
     }
 
-    val sectionChecks = Table[String, Element => Boolean](
-      ("title key", "check"),
-      ("tcsp.kind.of.service.provider.title", checkListContainsItems(_, Set("tcsp.service.provider.lbl.01",
-                                                                            "tcsp.service.provider.lbl.02",
-                                                                            "tcsp.service.provider.lbl.03",
-                                                                            "tcsp.service.provider.lbl.04",
-                                                                            "tcsp.service.provider.lbl.05"))),
-
-      ("tcsp.off-the-shelf.companies.lbl", checkElementTextIncludes(_, "lbl.yes")),
-      ("tcsp.create.complex.corporate.structures.lbl", checkElementTextIncludes(_, "lbl.no")),
-
-      ("tcsp.provided_services.title", checkListContainsItems(_, Set("tcsp.provided_services.service.lbl.01",
-                                                                     "tcsp.provided_services.service.lbl.02",
-                                                                     "tcsp.provided_services.service.lbl.03",
-                                                                     "tcsp.provided_services.service.lbl.04",
-                                                                     "tcsp.provided_services.service.lbl.05",
-                                                                     "tcsp.provided_services.service.lbl.06",
-                                                                     "tcsp.provided_services.service.lbl.07",
-                                                                     "Other: sfasfasef"))),
-      ("tcsp.servicesOfAnotherTcsp.title", checkElementTextIncludes(_, "lbl.yes")),
-      ("tcsp.anothertcspsupervision.title", checkElementTextIncludes(_, s"Money Laundering Regulation reference number: $amlsRegistrationNumber"))
-    )
-
     "include the provided data" in new ViewFixture {
+
+      val sectionChecks = Table[String, Element => Boolean](
+        ("title key", "check"),
+        ("tcsp.kind.of.service.provider.title", checkListContainsItems(_, Set("tcsp.service.provider.lbl.01",
+          "tcsp.service.provider.lbl.02",
+          "tcsp.service.provider.lbl.03",
+          "tcsp.service.provider.lbl.04",
+          "tcsp.service.provider.lbl.05"))),
+
+        ("tcsp.off-the-shelf.companies.lbl", checkElementTextIncludes(_, "lbl.yes")),
+        ("tcsp.create.complex.corporate.structures.lbl", checkElementTextIncludes(_, "lbl.no")),
+
+        ("tcsp.provided_services.title", checkListContainsItems(_, Set("tcsp.provided_services.service.lbl.01",
+          "tcsp.provided_services.service.lbl.02",
+          "tcsp.provided_services.service.lbl.03",
+          "tcsp.provided_services.service.lbl.04",
+          "tcsp.provided_services.service.lbl.05",
+          "tcsp.provided_services.service.lbl.06",
+          "tcsp.provided_services.service.lbl.07",
+          "Other: sfasfasef"))),
+        ("tcsp.servicesOfAnotherTcsp.title", checkElementTextIncludes(_, "lbl.yes")),
+        ("tcsp.anothertcspsupervision.title", checkElementTextIncludes(_, s"Money Laundering Regulation reference number: $amlsRegistrationNumber"))
+      )
+
       def view = {
         val testdata = Tcsp(
           Some(TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, RegisteredOfficeEtc, CompanyDirectorEtc, CompanyFormationAgent))),

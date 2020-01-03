@@ -1,5 +1,5 @@
 @*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,13 @@
  * limitations under the License.
  *@
 
-@import include._
-@import forms2._
-@import models.bankdetails._
-@import utils.StatusConstants
-@import models.status._
-@import config.ApplicationConfig
+@import config.{ApplicationConfig}
 @import forms.EmptyForm
+@import include._
+@import models.bankdetails._
+@import include.forms2._
 
-@(bankDetails: BankDetails, index: Integer)(implicit request: Request[_],m:Messages, lang: Lang)
+@(bankDetails: BankDetails, index: Integer)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @heading("title.cya", "summary.bankdetails")

@@ -1,5 +1,5 @@
 @*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,9 @@
 @import include._
 @import include.forms2._
 @import models.autocomplete._
+@import config.ApplicationConfig
 
-@(f: Form2[_], index: Int, personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], index: Int, personName: String)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()

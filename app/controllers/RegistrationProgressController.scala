@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import models.businessmatching.{BusinessActivity, BusinessMatching}
 import models.registrationprogress.{Completed, Section}
 import models.renewal.Renewal
 import models.status._
-import play.api.mvc.{AnyContent, Request}
+import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import services.businessmatching.{BusinessMatchingService, ServiceFlow}
 import services.{AuthEnrolmentsService, ProgressService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -38,13 +38,15 @@ import scala.concurrent.Future
 
 @Singleton
 class RegistrationProgressController @Inject()(protected[controllers] val authAction: AuthAction,
+                                               val ds: CommonPlayDependencies,
                                                protected[controllers] val dataCache: DataCacheConnector,
                                                protected[controllers] val enrolmentsService: AuthEnrolmentsService,
                                                protected[controllers] val statusService: StatusService,
                                                protected[controllers] val progressService: ProgressService,
                                                protected[controllers] val sectionsProvider: SectionsProvider,
                                                protected[controllers] val businessMatchingService: BusinessMatchingService,
-                                               protected[controllers] val serviceFlow: ServiceFlow) extends DefaultBaseController {
+                                               protected[controllers] val serviceFlow: ServiceFlow,
+                                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
       implicit request =>

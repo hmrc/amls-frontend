@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ import scala.concurrent.Future
 
 class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsReferenceNumberGenerator {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new SubmissionController (
@@ -47,7 +47,9 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       mock[StatusService],
       mock[RenewalService],
       mock[AuthenticatorConnector],
-      SuccessfulAuthAction
+      SuccessfulAuthAction,
+      commonDependencies,
+      mockMcc
     )
   }
 

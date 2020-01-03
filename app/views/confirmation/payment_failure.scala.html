@@ -1,5 +1,5 @@
 @*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,9 @@
 @import models.confirmation._
 @import include.forms2._
 @import forms.EmptyForm
+@import config.{ ApplicationConfig}
 
-@(reasonMsg: String, amount: Currency, reference: String)(implicit request: Request[_], messages: Messages)
+@(reasonMsg: String, amount: Currency, reference: String)(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @main(title = messages("confirmation.payment.failed.title")) {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,18 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import forms.{Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessMatchingMsbService, BusinessMatchingMsbServices}
 import models.flowmanagement._
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.businessmatching.updateservice.add.what_do_you_do_here
 
 import scala.concurrent.Future
@@ -36,12 +38,13 @@ import scala.concurrent.Future
 @Singleton
 class WhatDoYouDoHereController @Inject()(
                                            authAction: AuthAction,
+                                           val ds: CommonPlayDependencies,
                                            implicit val dataCacheConnector: DataCacheConnector,
                                            val statusService: StatusService,
                                            val businessMatchingService: BusinessMatchingService,
                                            val helper: AddBusinessTypeHelper,
-                                           val router: Router[AddBusinessTypeFlowModel]
-                                         ) extends DefaultBaseController {
+                                           val router: Router[AddBusinessTypeFlowModel],
+                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   var msbServiceValues: Set[String] = Set()
 

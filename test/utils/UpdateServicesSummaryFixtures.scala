@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import views.html.businessmatching.updateservice.add._
   *
   * Holds traits required to test the check your answers page given FX.
   */
-trait UpdateServicesSummaryFixtures  extends AmlsSpec {
+trait UpdateServicesSummaryFixtures  extends AmlsViewSpec {
 
   /**
     * ViewFixture.
@@ -40,7 +40,7 @@ trait UpdateServicesSummaryFixtures  extends AmlsSpec {
     * All other traits will extend to inherit oAuth
     */
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,10 +62,10 @@ class IdentifySuspiciousActivitySpec extends PlaySpec {
       Json.toJson(IdentifySuspiciousActivity(false)) must be(Json.obj("hasWrittenGuidance" -> false))
     }
     "read Json correctly when given true value" in {
-      Json.fromJson[IdentifySuspiciousActivity](Json.obj("hasWrittenGuidance" -> true)) must be(JsSuccess(IdentifySuspiciousActivity(true), JsPath \ "hasWrittenGuidance"))
+      Json.fromJson[IdentifySuspiciousActivity](Json.obj("hasWrittenGuidance" -> true)) must be(JsSuccess(IdentifySuspiciousActivity(true), JsPath))
     }
     "read Json correctly when given false value" in {
-      Json.fromJson[IdentifySuspiciousActivity](Json.obj("hasWrittenGuidance" -> false)) must be(JsSuccess(IdentifySuspiciousActivity(false), JsPath \ "hasWrittenGuidance"))
+      Json.fromJson[IdentifySuspiciousActivity](Json.obj("hasWrittenGuidance" -> false)) must be(JsSuccess(IdentifySuspiciousActivity(false), JsPath))
     }
   }
 }

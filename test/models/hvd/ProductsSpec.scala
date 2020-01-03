@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package models.hvd
 
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
@@ -184,12 +184,12 @@ class ProductsSpec extends PlaySpec with MockitoSugar {
       "fail when on path is missing" in {
         Json.fromJson[Products](Json.obj(
           "product" -> Seq("01"))) must
-          be(JsError((JsPath \ "products") -> play.api.data.validation.ValidationError("error.path.missing")))
+          be(JsError((JsPath \ "products") -> play.api.libs.json.JsonValidationError("error.path.missing")))
       }
 
       "fail when on invalid data" in {
         Json.fromJson[Products](Json.obj("products" -> Seq("40"))) must
-          be(JsError(((JsPath) \ "products") -> play.api.data.validation.ValidationError("error.invalid")))
+          be(JsError(((JsPath) \ "products") -> play.api.libs.json.JsonValidationError("error.invalid")))
       }
 
       "write valid data in using json write" in {

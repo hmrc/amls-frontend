@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ object Nationality {
     (__ \ "nationality").read[String].flatMap[Nationality] {
       case "01" => British
       case "02" => (JsPath \ "otherCountry").read[Country] map OtherCountry.apply
-      case _ => play.api.data.validation.ValidationError("error.invalid")
+      case _ => play.api.libs.json.JsonValidationError("error.invalid")
     }
   }
 

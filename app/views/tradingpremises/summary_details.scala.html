@@ -1,5 +1,5 @@
 @*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,13 @@
 
 @import include._
 @import forms2._
+@import config.{ ApplicationConfig}
 @import forms.EmptyForm
 @import models.tradingpremises._
 @import models.businessmatching.MoneyServiceBusiness
 @import utils._
 
-@(model: TradingPremises, isMsb: Boolean, index: Int, hasOneService: Boolean, hasOneMsbService: Boolean)(implicit request: Request[_], m: Messages, lang: Lang)
+@(model: TradingPremises, isMsb: Boolean, index: Int, hasOneService: Boolean, hasOneMsbService: Boolean)(implicit request: Request[_], m: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @heading("summary.checkyouranswers.title", "summary.tradingpremises")

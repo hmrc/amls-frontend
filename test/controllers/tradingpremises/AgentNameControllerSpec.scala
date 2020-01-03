@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
@@ -37,14 +37,16 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with TradingPremisesGenerator{
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
     val controller = new AgentNameController(
       mockCacheConnector,
       SuccessfulAuthAction,
-      mockStatusService
+      ds = commonDependencies,
+      mockStatusService,
+      cc = mockMcc
     )
 
     mockCacheFetchAll
@@ -105,7 +107,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
     "post is called" must {
       "respond with NOT_FOUND" when {
         "there is no data at all at that index" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "agentName" -> "text",
             "agentDateOfBirth.day" -> "15",
             "agentDateOfBirth.month" -> "2",
@@ -122,7 +124,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
 
           when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "agentName" -> "text",
             "agentDateOfBirth.day" -> "15",
             "agentDateOfBirth.month" -> "2",
@@ -139,7 +141,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
           when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
 
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "agentName" -> "text",
             "agentDateOfBirth.day" -> "15",
             "agentDateOfBirth.month" -> "2",
@@ -156,7 +158,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "agentName" -> ""
           )
 
@@ -169,7 +171,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
 
       "set the hasChanged flag to true" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody("agentName" -> "text",
+        val newRequest = requestWithUrlEncodedBody("agentName" -> "text",
           "agentDateOfBirth.day" -> "15",
           "agentDateOfBirth.month" -> "2",
           "agentDateOfBirth.year" -> "1956")
@@ -203,7 +205,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
 
           when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "agentName" -> "someName",
             "agentDateOfBirth.day" -> "15",
             "agentDateOfBirth.month" -> "2",
@@ -224,7 +226,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
 
           when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "agentName" -> "someName",
             "agentDateOfBirth.day" -> "15",
             "agentDateOfBirth.month" -> "2",
@@ -249,7 +251,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
 
         "given valid data for a agent name" in new Fixture {
 
-          val postRequest = request.withFormUrlEncodedBody(
+          val postRequest = requestWithUrlEncodedBody(
             "dateOfChange.year" -> "2010",
             "dateOfChange.month" -> "10",
             "dateOfChange.day" -> "01"
@@ -281,7 +283,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
         }
 
         "given a date of change which is before the activity start date" in new Fixture {
-          val postRequest = request.withFormUrlEncodedBody(
+          val postRequest = requestWithUrlEncodedBody(
             "dateOfChange.year" -> "2003",
             "dateOfChange.month" -> "10",
             "dateOfChange.day" -> "01"

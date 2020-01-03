@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -178,7 +178,7 @@ object ProfessionalBodies {
       case "14" =>
         (JsPath \ "specifyOtherBusiness").read[String].map(Other.apply) map identity[BusinessType]
       case _ =>
-        Reads(_ => JsError((JsPath \ "businessType") -> play.api.data.validation.ValidationError("error.invalid")))
+        Reads(_ => JsError((JsPath \ "businessType") -> play.api.libs.json.JsonValidationError("error.invalid")))
     }).foldLeft[Reads[Set[BusinessType]]](
       Reads[Set[BusinessType]](_ => JsSuccess(Set.empty))
     ) {

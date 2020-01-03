@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package models.estateagentbusiness
 
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
@@ -117,7 +117,7 @@ class PenalisedUnderEstateAgentsActSpec extends PlaySpec with MockitoSugar {
     "fail to validate when given an empty `Yes` value" in {
       val json = Json.obj("penalisedUnderEstateAgentsAct" -> true)
       Json.fromJson[PenalisedUnderEstateAgentsAct](json) must
-        be(JsError((JsPath \ "penalisedUnderEstateAgentsActDetails") -> play.api.data.validation.ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "penalisedUnderEstateAgentsActDetails") -> play.api.libs.json.JsonValidationError("error.path.missing")))
     }
 
     "write the correct value" in {

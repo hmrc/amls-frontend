@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,11 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class HasBankAccountControllerSpec extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
-    val controller = new HasBankAccountController(SuccessfulAuthAction, mockCacheConnector)
+    val controller = new HasBankAccountController(SuccessfulAuthAction, ds = commonDependencies, mockCacheConnector, mockMcc)
 
   }
 
@@ -41,7 +41,7 @@ class HasBankAccountControllerSpec extends AmlsSpec {
     "redirect to the 'bank name' page" when {
       "'yes' is selected" in new Fixture {
         val formData = "hasBankAccount" -> "true"
-        val result = controller.post()(request.withFormUrlEncodedBody(formData))
+        val result = controller.post()(requestWithUrlEncodedBody(formData))
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.bankdetails.routes.BankAccountNameController.getNoIndex.url)
@@ -52,7 +52,7 @@ class HasBankAccountControllerSpec extends AmlsSpec {
           mockCacheSave(Seq.empty[BankDetails], Some(BankDetails.key))
 
           val formData = "hasBankAccount" -> "false"
-          val result = controller.post()(request.withFormUrlEncodedBody(formData))
+          val result = controller.post()(requestWithUrlEncodedBody(formData))
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(controllers.bankdetails.routes.YourBankAccountsController.get().url)

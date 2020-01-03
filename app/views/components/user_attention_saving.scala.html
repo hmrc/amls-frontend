@@ -1,5 +1,5 @@
-/*
- * Copyright 2019 HM Revenue & Customs
+@*
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,18 +12,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package controllers
+@()(implicit messages: Messages)
 
-import play.api.i18n.{I18nSupport, Messages}
-import play.api.mvc.Request
-import uk.gov.hmrc.play.frontend.controller.FrontendController
-import utils.ControllerHelper
+    <div class="auto-save">
+        <h2 class="heading-small">@Messages("whatYouNeed.attention.title")</h2>
+        <p>@Messages("whatYouNeed.attention.information")</p>
+    </div>
 
-trait DefaultBaseController extends FrontendController with I18nSupport {
-  def notFoundView(implicit request: Request[_]) = ControllerHelper.notFoundView(request)
-
-  import play.api.Play.current
-  implicit def messagesApi = Messages.Implicits.applicationMessages.messages
-}

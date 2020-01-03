@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,20 +20,23 @@ import cats.data.OptionT
 import cats.implicits._
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.EmptyForm
 import models.businessactivities.BusinessActivities
 import models.businessmatching.{AccountancyServices, BusinessMatching}
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import utils.{AuthAction, ControllerHelper}
 import views.html.businessactivities.summary
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class SummaryController @Inject() (val dataCache: DataCacheConnector,
                                    implicit val statusService: StatusService,
-                                   val authAction: AuthAction
-                                  )extends DefaultBaseController {
+                                   val authAction: AuthAction,
+                                   val ds: CommonPlayDependencies,
+                                   val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
     implicit request =>

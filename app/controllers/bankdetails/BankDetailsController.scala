@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,14 @@
 
 package controllers.bankdetails
 
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.bankdetails.BankDetails
 import models.status.{NotCompleted, SubmissionReady, SubmissionStatus}
+import play.api.mvc.MessagesControllerComponents
 import utils.RepeatingSection
 
-trait BankDetailsController extends DefaultBaseController with RepeatingSection {
+abstract class BankDetailsController(ds: CommonPlayDependencies,
+                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   implicit class BankDetailsSyntax(model: BankDetails) {
     def canEdit(status: SubmissionStatus): Boolean = status match {

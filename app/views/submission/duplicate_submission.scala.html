@@ -1,5 +1,5 @@
 @*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,15 @@
  * limitations under the License.
  *@
 
+@import config.ApplicationConfig
 @import include._
-@import utils.Strings._
-@import config.{ApplicationConfig => appConfig}
 @import uk.gov.hmrc.play.views.html.{helpers => uiHelpers}
+@import utils.Strings._
 
-@(errorMessage: String)(implicit request: Request[_], m: Messages)
+@(errorMessage: String)(implicit request: Request[_], m: Messages, appConfig: ApplicationConfig, lang: Lang)
 
 @getHelpForm = {
-    @{uiHelpers.reportAProblemLink(config.ApplicationConfig.reportAProblemPartialUrl, config.ApplicationConfig.reportAProblemNonJSUrl)}
+    @{uiHelpers.reportAProblemLink(appConfig.reportAProblemPartialUrl, appConfig.reportAProblemNonJSUrl)}
 }
 
 @header = {

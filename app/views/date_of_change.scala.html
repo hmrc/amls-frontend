@@ -1,5 +1,5 @@
 @*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,9 @@
 
 @import include._
 @import forms2._
+@import config.{ ApplicationConfig}
 
-@(f: forms.Form2[_], subheadingMessage: String, controllerAction: Call, returnLink: Boolean = true, buttonMsgKey: String = "button.saveandcontinue")(implicit request: Request[_],m:Messages)
+@(f: forms.Form2[_], subheadingMessage: String, controllerAction: Call, returnLink: Boolean = true, buttonMsgKey: String = "button.saveandcontinue")(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
   @components.back_link()

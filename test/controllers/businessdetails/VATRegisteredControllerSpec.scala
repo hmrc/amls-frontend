@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
@@ -36,13 +36,12 @@ import scala.concurrent.Future
 
 class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
 
     val controller = new VATRegisteredController (
       dataCacheConnector = mockCacheConnector,
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   "BusinessRegisteredForVATController" when {
@@ -89,7 +88,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
             mockCacheGetEntry(Some(BusinessMatching(Some(partnership))), BusinessMatching.key)
             mockCacheUpdate(Some(BusinessDetails.key), BusinessDetails())
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "registeredForVAT" -> "true",
               "vrnNumber" -> "123456789"
             )
@@ -109,7 +108,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
             mockCacheGetEntry(Some(BusinessMatching(Some(llp))), BusinessMatching.key)
             mockCacheUpdate(Some(BusinessDetails.key), BusinessDetails())
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "registeredForVAT" -> "true",
               "vrnNumber" -> "123456789"
             )
@@ -127,7 +126,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
             mockCacheGetEntry(Some(BusinessMatching(Some(details))), BusinessMatching.key)
             mockCacheUpdate(Some(BusinessDetails.key), BusinessDetails())
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "registeredForVAT" -> "true",
               "vrnNumber" -> "123456789"
             )
@@ -141,7 +140,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
         "redirect to SummaryController" when {
           "in edit" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "registeredForVAT" -> "true",
               "vrnNumber" -> "123456789"
             )
@@ -163,7 +162,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
       "with invalid data" must {
         "respond with BAD_REQUEST" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "registeredForVATYes" -> "1234567890"
           )
 

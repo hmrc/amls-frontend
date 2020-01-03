@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ class FXTransactionInNext12MonthsSpec extends PlaySpec {
             "Successfully read/write Json data" in {
 
                 FXTransactionsInNext12Months.format.reads(FXTransactionsInNext12Months.format.writes(
-                    FXTransactionsInNext12Months("12345678963"))) must be(JsSuccess(FXTransactionsInNext12Months("12345678963"), JsPath \ "fxTransaction"))
+                    FXTransactionsInNext12Months("12345678963"))) must be(JsSuccess(FXTransactionsInNext12Months("12345678963"), JsPath))
 
             }
         }

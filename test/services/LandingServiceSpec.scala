@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,6 @@ import play.api.libs.json.{Json, Writes}
 import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.LoggedInUser
 import utils.AmlsSpec
 
 import scala.concurrent.ExecutionContext.Implicits._
@@ -243,8 +242,6 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         service.desConnector.view(any[String], any())(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]])
       } thenReturn Future.successful(viewResponse)
 
-      val user = mock[LoggedInUser]
-
       when(service.cacheConnector.remove(any[String])(any())).thenReturn(Future.successful(true))
 
       when {
@@ -334,9 +331,6 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         service.desConnector.view(any[String], any())(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]])
       } thenReturn Future.successful(viewResponse)
 
-      val user = mock[LoggedInUser]
-
-      when(user.oid).thenReturn("")
       when(service.cacheConnector.remove(any())(any())).thenReturn(Future.successful(true))
 
       when {
@@ -477,9 +471,6 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         service.cacheConnector.fetch[AmendVariationRenewalResponse](any(), eqTo(AmendVariationRenewalResponse.key))(any(), any())
       } thenReturn Future.successful(None)
 
-      val user = mock[LoggedInUser]
-
-      when(user.oid).thenReturn("")
       when(service.cacheConnector.remove(any())(any())).thenReturn(Future.successful(true))
 
       when {
@@ -535,8 +526,6 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         "safe id",
         agentReferenceNumber = Some("test")
       )
-
-      implicit val r = FakeRequest()
 
       when {
         service.businessMatchingConnector.getReviewDetails(any())

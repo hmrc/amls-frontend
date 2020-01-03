@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,23 @@
 
 package controllers.businessactivities
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.BusinessActivities
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessactivities._
 import javax.inject.Inject
+import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import utils.BooleanFormReadWrite._
 
 import scala.concurrent.Future
 
 class TransactionRecordController @Inject()(val authAction: AuthAction,
-                                            val dataCacheConnector: DataCacheConnector) extends DefaultBaseController {
+                                            val ds: CommonPlayDependencies,
+                                            val dataCacheConnector: DataCacheConnector,
+                                            val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   val fieldName = "isRecorded"
   implicit val reader = formRule(fieldName, "error.required.ba.select.transaction.record")

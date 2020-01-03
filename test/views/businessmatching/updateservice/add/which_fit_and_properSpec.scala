@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,16 +22,16 @@ import generators.ResponsiblePersonGenerator
 import jto.validation.{Path, ValidationError}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.add._
 
-class which_fit_and_properSpec extends AmlsSpec with MustMatchers with ResponsiblePersonGenerator{
+class which_fit_and_properSpec extends AmlsViewSpec with MustMatchers with ResponsiblePersonGenerator{
 
   val rp = responsiblePersonGen.sample.get
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     def view = which_fit_and_proper(EmptyForm, false, Seq((rp, 0)))
   }

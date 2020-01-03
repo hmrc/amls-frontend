@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
@@ -46,17 +46,19 @@ class PSRNumberControllerSpec extends AmlsSpec
   with ScalaFutures
   with BusinessMatchingGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
     val controller = new PSRNumberController(
       SuccessfulAuthAction,
+      ds = commonDependencies,
       mockCacheConnector,
       mockStatusService,
       mock[BusinessMatchingService],
       createRouter[ChangeSubSectorFlowModel],
-      mock[ChangeSubSectorHelper]
+      mock[ChangeSubSectorHelper],
+      cc = mockMcc
     )
 
     when {
@@ -124,7 +126,7 @@ class PSRNumberControllerSpec extends AmlsSpec
           controller.helper.updateSubSectors(any(), any())(any(), any())
         } thenReturn Future.successful((mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty))
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "appliedFor" -> "true",
           "regNumber" -> "123789"
         )
@@ -149,7 +151,7 @@ class PSRNumberControllerSpec extends AmlsSpec
 
         mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel.empty)
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "appliedFor" -> "false"
         )
 
@@ -160,7 +162,7 @@ class PSRNumberControllerSpec extends AmlsSpec
       }
 
       "respond with BAD_REQUEST when given invalid data" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "appliedFor" -> "true",
           "regNumber" -> ""
         )

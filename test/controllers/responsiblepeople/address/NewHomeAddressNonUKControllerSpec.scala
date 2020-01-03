@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,9 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
     val controller = new NewHomeAddressNonUKController(
       SuccessfulAuthAction,
       dataCacheConnector,
-      mockAutoComplete
+      mockAutoComplete,
+      commonDependencies,
+      mockMcc
     )
   }
 
@@ -78,7 +80,7 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
     "post is called" must {
       "redirect to DetailedAnswersController" when {
         "all the mandatory non-UK parameters are supplied" in new Fixture {
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "false",
             "addressLineNonUK1" -> "new address line1",
             "addressLineNonUK2" -> "new address line2",
@@ -113,7 +115,7 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
         }
 
         "all the mandatory non-UK parameters are supplied and date of move is more then 6 months" in new Fixture {
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "false",
             "addressLineNonUK1" -> "new address line1",
             "addressLineNonUK2" -> "new address line2",
@@ -165,7 +167,7 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
         }
 
         "all the mandatory non-UK parameters are supplied and date of move is more then 3 years" in new Fixture {
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "false",
             "addressLineNonUK1" -> "new address line1",
             "addressLineNonUK2" -> "new address line2",
@@ -213,7 +215,7 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
 
         "given an invalid address" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "false",
             "addressLineNonUK1" -> "Line &1",
             "addressLineNonUK2" -> "Line *2",
@@ -228,7 +230,7 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
 
         "isUK field is not supplied" in new Fixture {
 
-          val line1MissingRequest = request.withFormUrlEncodedBody()
+          val line1MissingRequest = requestWithUrlEncodedBody()
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
@@ -241,7 +243,7 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
 
         "the default fields for overseas are not supplied" in new Fixture {
 
-          val requestWithMissingParams = request.withFormUrlEncodedBody(
+          val requestWithMissingParams = requestWithUrlEncodedBody(
             "isUK" -> "false",
             "addressLineNonUK1" -> "",
             "addressLineNonUK2" -> "",
@@ -256,7 +258,7 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
 
         "respond with NOT_FOUND" when {
           "given an out of bounds index" in new Fixture {
-            val requestWithParams = request.withFormUrlEncodedBody(
+            val requestWithParams = requestWithUrlEncodedBody(
               "isUK" -> "false",
               "addressLineNonUK1" -> "Line 1",
               "addressLineNonUK2" -> "Line 2",

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package models.bankdetails
 
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play. PlaySpec
 import jto.validation.{Path, Invalid, Valid}
 import jto.validation.ValidationError
@@ -94,7 +94,7 @@ class BankAccountTypeSpec extends PlaySpec with MockitoSugar {
 
     "fail Json read on invalid data" in  {
       Json.fromJson[BankAccountType](Json.obj("bankAccountType" ->"10")) must
-        be (JsError(JsPath, play.api.data.validation.ValidationError("error.invalid")))
+        be (JsError(JsPath, play.api.libs.json.JsonValidationError("error.invalid")))
     }
 
     "write correct Json value" in  {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,15 +39,15 @@ trait JsonMapping {
   private def pathToJsPath(p: Path): JsPath =
     JsPath(p.path.map(nodeToJsNode _))
 
-  def convertError(error: ValidationError): play.api.data.validation.ValidationError = {
-    play.api.data.validation.ValidationError(error.message, error.args)
+  def convertError(error: ValidationError): play.api.libs.json.JsonValidationError = {
+    play.api.libs.json.JsonValidationError(error.message, error.args)
   }
 
-  implicit def convertValidationErros(errors: Seq[ValidationError]): Seq[play.api.data.validation.ValidationError] = {
+  implicit def convertValidationErros(errors: Seq[ValidationError]): Seq[play.api.libs.json.JsonValidationError] = {
    errors.map(convertError(_))
   }
 
-  implicit def errorConversion(errs: Seq[(Path, Seq[ValidationError])]): Seq[(JsPath, Seq[play.api.data.validation.ValidationError])] =
+  implicit def errorConversion(errs: Seq[(Path, Seq[ValidationError])]): Seq[(JsPath, Seq[play.api.libs.json.JsonValidationError])] =
     errs map {
       case (path, errors) =>
         (pathToJsPath(path), convertValidationErros(errors))

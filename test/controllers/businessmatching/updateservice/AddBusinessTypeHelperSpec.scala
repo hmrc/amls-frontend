@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package controllers.businessmatching.updateservice
 
 import cats.implicits._
-import config.AppConfig
+import config.ApplicationConfig
 import controllers.actions.SuccessfulAuthAction
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessActivitiesGenerator
@@ -43,20 +43,19 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
   with ResponsiblePersonGenerator
   with FutureAssertions {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
 
     val tradingPremisesService = mock[TradingPremisesService]
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
     val responsiblePeopleService = mock[ResponsiblePeopleService]
-    val mockAppConfig = mock[AppConfig]
+    val mockApplicationConfig = mock[ApplicationConfig]
 
     val SUT = new AddBusinessTypeHelper(
       SuccessfulAuthAction,
       mockCacheConnector,
       tradingPremisesService,
       responsiblePeopleService,
-      mockAppConfig
-    )
+      mockApplicationConfig)
 
     val businessActivitiesSection = BABusinessActivities(
       involvedInOther = Some(InvolvedInOtherNo),

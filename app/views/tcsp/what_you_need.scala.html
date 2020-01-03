@@ -1,5 +1,5 @@
 @*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,9 @@
 @import forms.Form2
 @import include._
 @import forms2._
+@import config.{ ApplicationConfig}
 
-@()(implicit request: Request[_],m:Messages)
+@()(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()
@@ -27,9 +28,10 @@
 
 @whatyouneed(
     title = Messages("title.wyn") + " - " + Messages("summary.tcsp"),
-    heading = header,
-    sidebar = sidebar
+    heading = header
 ) {
+
+    @components.user_attention_saving()
 
     <p>@Messages("tcsp.whatyouneed.requiredinfo.heading")</p>
 
@@ -48,11 +50,4 @@
         id=Some("tcspwhatyouneed-button")
     )
 
-}
-
-@sidebar = {
-    <div class="user-attention">
-        <h2 class="heading-small">@Messages("main.sidebar.title")</h2>
-        <p>@Messages("main.sidebar.information")</p>
-    </div>
 }

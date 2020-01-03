@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,24 +17,27 @@
 package controllers.estateagentbusiness
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{EstateAgentBusinessService => EAB}
 import models.estateagentbusiness.{EstateAgentBusiness, Residential, Services}
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import utils.{AuthAction, DateOfChangeHelper}
 import views.html.estateagentbusiness.business_servicess
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class BusinessServicesController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                            val statusService: StatusService,
-                                            val serviceFlow: ServiceFlow,
-                                            authAction: AuthAction
-                                          ) extends DefaultBaseController with DateOfChangeHelper {
+                                           val statusService: StatusService,
+                                           val serviceFlow: ServiceFlow,
+                                           authAction: AuthAction,
+                                           val ds: CommonPlayDependencies,
+                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

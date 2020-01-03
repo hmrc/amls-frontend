@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,14 @@
 package models.amp
 import java.time.{LocalDate, LocalDateTime, ZoneOffset}
 
-import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 import org.mockito.Mockito._
+import org.scalatest.MustMatchers
+import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.play.PlaySpec
 import play.api.mvc.Call
 
 trait AmpValues {
@@ -128,23 +130,25 @@ class AmpSpec extends AmlsSpec with AmpValues {
 
     "have a section function that" must {
       implicit val cache         = mock[CacheMap]
+      val ampWhatYouNeedUrl = "http://localhost:9223/anti-money-laundering/art-market-participant/what-you-need"
+      val ampSummaryUrl     = "http://localhost:9223/anti-money-laundering/art-market-participant/check-your-answers"
 
       "return a NotStarted Section when model is empty" in {
-        val notStartedSection = Section("amp", NotStarted, false, Call("GET", ApplicationConfig.ampWhatYouNeedUrl))
+        val notStartedSection = Section("amp", NotStarted, false, Call("GET", ampWhatYouNeedUrl))
 
         when(cache.getEntry[Amp]("amp")) thenReturn None
         Amp.section must be(notStartedSection)
       }
 
       "return a Completed Section when model is complete" in {
-        val completedSection = Section("amp", Completed, false, Call("GET", ApplicationConfig.ampSummeryUrl))
+        val completedSection = Section("amp", Completed, false, Call("GET", ampSummaryUrl))
 
         when(cache.getEntry[Amp]("amp")) thenReturn Some(completeModel)
         Amp.section must be(completedSection)
       }
 
       "return a Started Section when model is incomplete" in {
-        val startedSection = Section("amp", Started, false, Call("GET", ApplicationConfig.ampWhatYouNeedUrl))
+        val startedSection = Section("amp", Started, false, Call("GET", ampWhatYouNeedUrl))
 
         when(cache.getEntry[Amp]("amp")) thenReturn Some(missingTypeOfParticipantDetailModel)
         Amp.section must be(startedSection)

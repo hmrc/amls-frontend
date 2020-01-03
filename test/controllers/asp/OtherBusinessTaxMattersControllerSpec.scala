@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -36,7 +36,7 @@ class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar w
 
   val emptyCache = CacheMap("", Map.empty)
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
@@ -44,9 +44,9 @@ class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar w
 
     mockCacheSave[Asp]
 
-    val controller = new OtherBusinessTaxMattersController(mockCacheConnector, authAction = SuccessfulAuthAction)
+    val controller = new OtherBusinessTaxMattersController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
 
-    val newRequest = request.withFormUrlEncodedBody(
+    val newRequest = requestWithUrlEncodedBody(
       "otherBusinessTaxMatters" -> "true"
     )
   }
@@ -81,7 +81,7 @@ class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar w
       }
 
       "on post with invalid boolean data" in new Fixture {
-        val newRequestInvalid = request.withFormUrlEncodedBody("otherBusinessTaxMatters" -> "invalidBoolean")
+        val newRequestInvalid = requestWithUrlEncodedBody("otherBusinessTaxMatters" -> "invalidBoolean")
         val result = controller.post()(newRequestInvalid)
 
         status(result) must be(BAD_REQUEST)
@@ -90,7 +90,7 @@ class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar w
       }
 
       "On post with missing boolean data" in new Fixture {
-        val newRequestInvalid = request.withFormUrlEncodedBody("otherBusinessTaxMatters" -> "")
+        val newRequestInvalid = requestWithUrlEncodedBody("otherBusinessTaxMatters" -> "")
         val result = controller.post()(newRequestInvalid)
 
         status(result) must be(BAD_REQUEST)

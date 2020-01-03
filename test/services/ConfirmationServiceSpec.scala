@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,14 +46,12 @@ import org.joda.time.{DateTime, LocalDate}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.test.Helpers._
-import uk.gov.hmrc.domain.Org
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, OrgAccount}
-import uk.gov.hmrc.play.frontend.auth.{Principal}
 import utils.StatusConstants
 
 import scala.concurrent.ExecutionContext.Implicits._
@@ -63,7 +61,7 @@ class ConfirmationServiceSpec extends PlaySpec
   with MockitoSugar
   with ScalaFutures
   with IntegrationPatience
-  with OneAppPerSuite
+  with GuiceOneAppPerSuite
   with ResponsiblePersonGenerator
   with generators.tradingpremises.TradingPremisesGenerator
   with AmlsReferenceNumberGenerator {
@@ -149,7 +147,6 @@ class ConfirmationServiceSpec extends PlaySpec
     val activities = mock[BusinessActivities]
     val businessMatching = mock[BusinessMatching]
     val cache = mock[CacheMap]
-    val principle = Principal(None, Accounts(org = Some(OrgAccount("", Org("TestOrgRef")))))
 
     when {
       businessMatching.activities

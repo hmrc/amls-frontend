@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,7 @@ class CETransactionsInLast12MonthsSpec extends PlaySpec {
       "Successfully read/write Json data" in {
 
         CETransactionsInLast12Months.format.reads(CETransactionsInLast12Months.format.writes(
-          CETransactionsInLast12Months("12345678963"))) must be(JsSuccess(CETransactionsInLast12Months("12345678963"), JsPath \ "ceTransaction"))
+          CETransactionsInLast12Months("12345678963"))) must be(JsSuccess(CETransactionsInLast12Months("12345678963"), JsPath))
 
       }
     }

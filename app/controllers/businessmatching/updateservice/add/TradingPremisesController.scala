@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,13 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.flowmanagement.{AddBusinessTypeFlowModel, TradingPremisesPageId}
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
@@ -33,16 +34,18 @@ import utils.{AuthAction, BooleanFormReadWrite}
 import views.html.businessmatching.updateservice.add.trading_premises
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class TradingPremisesController @Inject()(
                                            authAction: AuthAction,
+                                           val ds: CommonPlayDependencies,
                                            implicit val dataCacheConnector: DataCacheConnector,
                                            val statusService: StatusService,
                                            val businessMatchingService: BusinessMatchingService,
                                            val helper: AddBusinessTypeHelper,
-                                           val router: Router[AddBusinessTypeFlowModel]
-                                         ) extends DefaultBaseController {
+                                           val router: Router[AddBusinessTypeFlowModel],
+                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   val fieldName = "tradingPremisesNewActivities"
   implicit val boolWrite = BooleanFormReadWrite.formWrites(fieldName)

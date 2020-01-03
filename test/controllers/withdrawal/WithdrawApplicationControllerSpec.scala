@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,14 +27,13 @@ import models.status.SubmissionReadyForReview
 import org.joda.time.LocalDateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatestplus.play.OneAppPerSuite
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AmlsSpec, AuthorisedFixture, DateHelper}
 
 import scala.concurrent.Future
 
-class WithdrawApplicationControllerSpec extends AmlsSpec with OneAppPerSuite {
+class WithdrawApplicationControllerSpec extends AmlsSpec {
 
   trait TestFixture extends AuthorisedFixture {
     self =>
@@ -45,7 +44,7 @@ class WithdrawApplicationControllerSpec extends AmlsSpec with OneAppPerSuite {
     val statusService = mock[StatusService]
     val enrolments = mock[AuthEnrolmentsService]
 
-    val controller = new WithdrawApplicationController(SuccessfulAuthAction, amlsConnector, cacheConnector, enrolments, statusService)
+    val controller = new WithdrawApplicationController(SuccessfulAuthAction, ds = commonDependencies, amlsConnector, cacheConnector, enrolments, statusService, cc = mockMcc)
 
     val applicationReference = "SUIYD3274890384"
     val safeId = "X87FUDIKJJKJH87364"

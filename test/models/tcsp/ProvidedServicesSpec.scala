@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package models.tcsp
 
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Path, Invalid, Valid}
 import jto.validation.ValidationError
@@ -101,7 +101,7 @@ class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
   }
 
   "Json read and writes" must {
-    import play.api.data.validation.ValidationError
+    import play.api.libs.json.JsonValidationError
     "Serialise single service as expected" in {
       Json.toJson(ProvidedServices(Set(EmailServer))) must be(Json.obj("services" -> Seq("03")))
     }
@@ -140,22 +140,22 @@ class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
 
     "fail when invalid data given" in {
       Json.fromJson[ProvidedServices](Json.obj("services" -> Set("99"))) must
-        be(JsError((JsPath \ "services") -> ValidationError("error.invalid")))
+        be(JsError((JsPath \ "services") -> JsonValidationError("error.invalid")))
     }
 
     "fail when on invalid data" in {
       Json.fromJson[ProvidedServices](Json.obj("transactions" -> Set("40"))) must
-        be(JsError((JsPath \ "services") -> ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "services") -> JsonValidationError("error.path.missing")))
     }
 
     "fail when on missing details data" in {
       Json.fromJson[ProvidedServices](Json.obj("transactions" -> Set("08"))) must
-        be(JsError((JsPath \ "services") -> ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "services") -> JsonValidationError("error.path.missing")))
     }
 
     "fail when on missing all data" in {
       Json.fromJson[ProvidedServices](Json.obj()) must
-        be(JsError((JsPath \ "services") -> ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "services") -> JsonValidationError("error.path.missing")))
     }
   }
 }

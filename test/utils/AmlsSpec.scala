@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,40 +16,75 @@
 
 package utils
 
-import connectors.KeystoreConnector
+import akka.stream.Materializer
+import config.ApplicationConfig
+import controllers.CommonPlayDependencies
 import org.scalatest.MustMatchers
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.i18n.MessagesApi
-import play.api.inject.bind
-import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.i18n.{Lang, MessagesApi, MessagesImpl, MessagesProvider}
+import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
-import play.api.{Application, Mode}
-import play.filters.csrf.CSRF.Token
 import play.filters.csrf.{CSRFConfigProvider, CSRFFilter}
-import uk.gov.hmrc.http.HeaderCarrier
-trait AmlsSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with MustMatchers {
+import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 
-  protected val bindModules: Seq[GuiceableModule] = Seq(bind[KeystoreConnector].to(mock[KeystoreConnector]))
+import scala.concurrent.ExecutionContext
 
-  implicit override lazy val app: Application = new GuiceApplicationBuilder()
-    .disable[com.kenshoo.play.metrics.PlayModule]
-    .bindings(bindModules:_*).in(Mode.Test)
-    .build()
+trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with ScalaFutures with MustMatchers with AuthorisedFixture {
 
-  implicit lazy val messagesApi = app.injector.instanceOf[MessagesApi]
-  implicit lazy val messages = messagesApi.preferred(FakeRequest())
+  import play.api.test.CSRFTokenHelper._
 
-  implicit val headerCarrier = HeaderCarrier()
+  implicit val requestWithToken = CSRFRequest(FakeRequest()).withCSRFToken
+  val messagesApi = app.injector.instanceOf[MessagesApi]
+  implicit val messages = messagesApi.preferred(requestWithToken)
+  implicit val lang = Lang.defaultLang
+  implicit val appConfig = app.injector.instanceOf[ApplicationConfig]
+
+  val commonDependencies = new CommonPlayDependencies(appConfig, messagesApi)
+
+  implicit val messagesProvider: MessagesProvider = MessagesImpl(lang, messagesApi)
+  implicit val mat = mock[Materializer]
+
+  val mockMcc = mock[MessagesControllerComponents]
+
+  implicit val ec: ExecutionContext = mock[ExecutionContext]
+  implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
 
   def addToken[T](fakeRequest: FakeRequest[T]) = {
+    import play.api.test.CSRFTokenHelper._
+
     val csrfConfig     = app.injector.instanceOf[CSRFConfigProvider].get
     val csrfFilter     = app.injector.instanceOf[CSRFFilter]
     val token          = csrfFilter.tokenProvider.generateToken
 
-    fakeRequest.copyFakeRequest(tags = fakeRequest.tags ++ Map(
-      Token.NameRequestTag  -> csrfConfig.tokenName,
-      Token.RequestTag      -> token
-    )).withHeaders((csrfConfig.headerName, token))
+    CSRFRequest(fakeRequest.withHeaders((csrfConfig.headerName, token))).withCSRFToken
   }
+
+  def addTokenWithUrlEncodedBody[T](fakeRequest: FakeRequest[T])(data: (String,String)*) = {
+    import play.api.test.CSRFTokenHelper._
+
+    val csrfConfig     = app.injector.instanceOf[CSRFConfigProvider].get
+    val csrfFilter     = app.injector.instanceOf[CSRFFilter]
+    val token          = csrfFilter.tokenProvider.generateToken
+
+    fakeRequest.withSession(SessionKeys.sessionId -> "fakesessionid")
+      .withHeaders((csrfConfig.headerName, token)).withFormUrlEncodedBody(data:_*).withCSRFToken
+  }
+
+  def requestWithUrlEncodedBody(data: (String, String)*) = addTokenWithUrlEncodedBody(authRequest)(data:_*)
+
+  def addTokenWithHeaders[T](fakeRequest: FakeRequest[T])(data: (String,String)*) = {
+    import play.api.test.CSRFTokenHelper._
+
+    val csrfConfig     = app.injector.instanceOf[CSRFConfigProvider].get
+    val csrfFilter     = app.injector.instanceOf[CSRFFilter]
+    val token          = csrfFilter.tokenProvider.generateToken
+
+    fakeRequest.withSession(SessionKeys.sessionId -> "fakesessionid")
+      .withHeaders((csrfConfig.headerName, token)).withHeaders(data:_*).withCSRFToken
+  }
+
+  def requestWithHeaders(data: (String, String)*) = addTokenWithHeaders(authRequest)(data:_*)
 }

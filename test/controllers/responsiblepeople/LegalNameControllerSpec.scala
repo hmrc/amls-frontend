@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,12 +33,7 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
     val request = addToken(self.authRequest)
     val RecordId = 1
 
-    val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
-      .build()
-
-    lazy val controller = injector.instanceOf[LegalNameController]
+    lazy val controller = new LegalNameController(mockCacheConnector, SuccessfulAuthAction, commonDependencies, cc = mockMcc)
 
   }
 
@@ -95,7 +90,6 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
 
         document.select("input[name=hasPreviousName]").`val` must be("true")
       }
-
     }
 
     "post is called" must {
@@ -103,7 +97,7 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
         "go to LegalNameChangeDateController" when {
           "edit is false" in new TestFixture {
 
-            val requestWithParams = request.withFormUrlEncodedBody(
+            val requestWithParams = requestWithUrlEncodedBody(
               "hasPreviousName" -> "true",
               "firstName" -> "first",
               "middleName" -> "middle",
@@ -122,7 +116,7 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
         "go to DetailedAnswersController" when {
           "edit is true" in new TestFixture {
 
-            val requestWithParams = request.withFormUrlEncodedBody(
+            val requestWithParams = requestWithUrlEncodedBody(
               "hasPreviousName" -> "true",
               "firstName" -> "first",
               "middleName" -> "middle",
@@ -138,7 +132,7 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
 
           "edit is true and does not have previous names" in new TestFixture {
 
-            val requestWithParams = request.withFormUrlEncodedBody(
+            val requestWithParams = requestWithUrlEncodedBody(
               "hasPreviousName" -> "false"
             )
 
@@ -154,14 +148,14 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
       "form is invalid" must {
         "return BAD_REQUEST" in new TestFixture {
 
-          val NameMissingInRequest = request.withFormUrlEncodedBody(
+          val notValidData = requestWithUrlEncodedBody(
             "hasPreviousName" -> "fail"
           )
 
           mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
           mockCacheSave[PreviousName]
 
-          val result = controller.post(RecordId)(NameMissingInRequest)
+          val result = controller.post(RecordId)(notValidData)
           status(result) must be(BAD_REQUEST)
 
         }
@@ -171,7 +165,7 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
         "hasPreviousName is true" must {
           "redirect to LegalNameInputController" in new TestFixture {
 
-            val requestWithHasPreviousNameTrue = request.withFormUrlEncodedBody(
+            val requestWithHasPreviousNameTrue = requestWithUrlEncodedBody(
               "hasPreviousName" -> "true"
             )
 
@@ -188,7 +182,7 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
       "model cannot be found with given index" must {
         "return NOT_FOUND" in new TestFixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "hasPreviousName" -> "true",
             "firstName" -> "first",
             "lastName" -> "last"

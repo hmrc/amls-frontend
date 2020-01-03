@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,7 +116,7 @@ class DateOfBirthSpec extends PlaySpec {
       DateOfBirth.format.reads(
         DateOfBirth.format.writes(DateOfBirth(new LocalDate(1990, 2, 24)))
       ) must be(
-        JsSuccess(DateOfBirth(new LocalDate(1990, 2, 24)), JsPath \ "dateOfBirth")
+        JsSuccess(DateOfBirth(new LocalDate(1990, 2, 24)), JsPath)
       )
 
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,19 @@ package controllers.tradingpremises
 
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
+import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper}
 import views.html.tradingpremises._
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class WhatYouNeedController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                      val authAction: AuthAction) extends DefaultBaseController {
+                                      val authAction: AuthAction,
+                                      val ds: CommonPlayDependencies,
+                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(index: Int) = authAction.async {
     implicit request =>

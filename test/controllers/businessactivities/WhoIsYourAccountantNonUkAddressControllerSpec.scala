@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,9 @@ class WhoIsYourAccountantNonUkAddressControllerSpec extends AmlsSpec
     val controller = new WhoIsYourAccountantNonUkAddressController (
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
-      autoCompleteService = mockAutoComplete
+      autoCompleteService = mockAutoComplete,
+      ds = commonDependencies,
+      cc = mockMcc
     )
   }
 
@@ -108,7 +110,7 @@ class WhoIsYourAccountantNonUkAddressControllerSpec extends AmlsSpec
               ))
             ))))
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "name" -> ""
           )
 
@@ -120,7 +122,7 @@ class WhoIsYourAccountantNonUkAddressControllerSpec extends AmlsSpec
       "edit is true" must {
         "respond with SEE_OTHER and redirect to the SummaryController" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "addressLineNonUK1" -> "line1",
             "addressLineNonUK2" -> "line2",
             "addressLineNonUK3" -> "line3",
@@ -144,7 +146,7 @@ class WhoIsYourAccountantNonUkAddressControllerSpec extends AmlsSpec
       "edit is false" must {
         "respond with SEE_OTHER and redirect to the TaxMattersController" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "addressLineNonUK1" -> "line1",
             "addressLineNonUK2" -> "line2",
             "addressLineNonUK3" -> "line3",

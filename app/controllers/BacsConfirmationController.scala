@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector, _}
 import javax.inject.{Inject, Singleton}
 import models.businessdetails.{BusinessDetails, PreviouslyRegisteredYes}
+import play.api.mvc.MessagesControllerComponents
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AuthAction, BusinessName}
 
@@ -28,11 +29,13 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class BacsConfirmationController @Inject()(authAction: AuthAction,
+                                           val ds: CommonPlayDependencies,
                                            private[controllers] implicit val dataCacheConnector: DataCacheConnector,
                                            private[controllers] implicit val amlsConnector: AmlsConnector,
                                            private[controllers] implicit val statusService: StatusService,
                                            private[controllers] val authenticator: AuthenticatorConnector,
-                                           private[controllers] val enrolmentService: AuthEnrolmentsService) extends DefaultBaseController {
+                                           private[controllers] val enrolmentService: AuthEnrolmentsService,
+                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def bacsConfirmation() = authAction.async {
       implicit request =>

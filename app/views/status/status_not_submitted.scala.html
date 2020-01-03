@@ -1,5 +1,5 @@
 @*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,9 @@
 @import config.ApplicationConfig
 @import org.joda.time.LocalDate
 @import utils.DateHelper
+@import config.{ ApplicationConfig}
 
-@(regNo: String, businessName: Option[String], call: Call)(implicit request: Request[_],m:Messages)
+@(regNo: String, businessName: Option[String], call: Call)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @main2(title = Messages("status.submissionready.heading") + " - Your registration", showURRBanner = true) {
 

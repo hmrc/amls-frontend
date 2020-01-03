@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,10 +34,13 @@ class WhatYouNeedControllerSpec
     with TitleValidator
     with BankDetailsGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
-    val controller = new WhatYouNeedController(SuccessfulAuthAction, mockCacheConnector)
+    val controller = new WhatYouNeedController(SuccessfulAuthAction,
+      commonDependencies,
+      mockCacheConnector,
+      mockMcc)
 
     def assertHref(url: String)(implicit doc: Document) = {
       doc.getElementById("bankwhatyouneed-button").attr("href") mustBe url

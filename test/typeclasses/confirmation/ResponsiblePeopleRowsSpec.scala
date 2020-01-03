@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,8 @@ import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import models.{AmendVariationRenewalResponse, SubscriptionFees, SubscriptionResponse}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -35,7 +36,7 @@ class ResponsiblePeopleRowsSpec extends PlaySpec
   with MockitoSugar
   with ScalaFutures
   with IntegrationPatience
-  with OneAppPerSuite
+  with GuiceOneAppPerSuite
   with ResponsiblePersonGenerator
   with generators.tradingpremises.TradingPremisesGenerator
   with AmlsReferenceNumberGenerator {

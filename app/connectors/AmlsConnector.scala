@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package connectors
 
-import config.{AppConfig, WSHttp}
+import config.ApplicationConfig
 import javax.inject.Inject
 import models.deregister.{DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse}
 import models.payments._
@@ -26,13 +26,13 @@ import models.{AmendVariationRenewalResponse, _}
 import play.api.Logger
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.http._
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.play.http.ws.WSHttp
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AmlsConnector @Inject()(val httpPost: WSHttp,
-                              val httpGet: WSHttp,
-                              val httpPut: WSHttp,
-                              val appConfig: AppConfig) {
+class AmlsConnector @Inject()(val http: HttpClient,
+                              val appConfig: ApplicationConfig) {
 
   private[connectors] val url: String = appConfig.subscriptionUrl
 
@@ -48,7 +48,7 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     val postUrl = s"$url/$accountType/$accountId/$safeId"
     val prefix = "[AmlsConnector][subscribe]"
     Logger.debug(s"$prefix - Request Body: ${Json.toJson(subscriptionRequest)}")
-    httpPost.POST[SubscriptionRequest, SubscriptionResponse](postUrl, subscriptionRequest) map {
+    http.POST[SubscriptionRequest, SubscriptionResponse](postUrl, subscriptionRequest) map {
       response =>
         Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
         response
@@ -64,7 +64,7 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     val prefix = "[AmlsConnector][status]"
     Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
 
-    httpGet.GET[ReadStatusResponse](getUrl) map {
+    http.GET[ReadStatusResponse](getUrl) map {
       response =>
         Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
         response
@@ -80,7 +80,7 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     val prefix = "[AmlsConnector][view]"
     Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
 
-    httpGet.GET[ViewResponse](getUrl) map {
+    http.GET[ViewResponse](getUrl) map {
       response =>
         Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
         response
@@ -96,7 +96,7 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/update"
     val prefix = "[AmlsConnector][update]"
     Logger.debug(s"$prefix - Request Body: ${Json.toJson(updateRequest)}")
-    httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, updateRequest) map {
+    http.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, updateRequest) map {
       response =>
         Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
         response
@@ -111,7 +111,7 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/variation"
     val prefix = "[AmlsConnector][variation]"
     Logger.debug(s"$prefix - Request Body: ${Json.toJson(updateRequest)}")
-    httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, updateRequest) map {
+    http.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, updateRequest) map {
       response =>
         Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
         response
@@ -128,7 +128,7 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
 
     log(s"Request body: ${Json.toJson(subscriptionRequest)}")
 
-    httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, subscriptionRequest) map { response =>
+    http.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, subscriptionRequest) map { response =>
       log(s"Response body: ${Json.toJson(response)}")
       response
     }
@@ -144,7 +144,7 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
 
     log(s"Request body: ${Json.toJson(subscriptionRequest)}")
 
-    httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, subscriptionRequest) map { response =>
+    http.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, subscriptionRequest) map { response =>
       log(s"Response body: ${Json.toJson(response)}")
       response
     }
@@ -156,7 +156,7 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     val (accountType, accountId) = accountTypeId
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/withdrawal"
 
-    httpPost.POST[WithdrawSubscriptionRequest, WithdrawSubscriptionResponse](postUrl, request)
+    http.POST[WithdrawSubscriptionRequest, WithdrawSubscriptionResponse](postUrl, request)
   }
 
   def deregister(amlsRegistrationNumber: String, request: DeRegisterSubscriptionRequest, accountTypeId: (String, String))
@@ -165,7 +165,7 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     val (accountType, accountId) = accountTypeId
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/deregistration"
 
-    httpPost.POST[DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse](postUrl, request)
+    http.POST[DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse](postUrl, request)
   }
 
   def savePayment(paymentId: String, amlsRefNo: String, safeId: String, accountTypeId: (String, String))
@@ -176,7 +176,7 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
 
     Logger.debug(s"[AmlsConnector][savePayment]: Request to $postUrl with paymentId $paymentId")
 
-    httpPost.POSTString[HttpResponse](postUrl, paymentId)
+    http.POSTString[HttpResponse](postUrl, paymentId)
   }
 
   def getPaymentByPaymentReference(paymentReference: String, accountTypeId: (String, String))
@@ -187,7 +187,7 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
 
     Logger.debug(s"[AmlsConnector][getPaymentByPaymentReference]: Request to $getUrl with $paymentReference")
 
-    httpGet.GET[Payment](getUrl) map { result =>
+    http.GET[Payment](getUrl) map { result =>
       Some(result)
     } recover {
       case _: NotFoundException => None
@@ -202,7 +202,7 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
 
     Logger.debug(s"[AmlsConnector][getPaymentByAmlsReference]: Request to $getUrl with $amlsRef")
 
-    httpGet.GET[Payment](getUrl) map { result =>
+    http.GET[Payment](getUrl) map { result =>
       Some(result)
     } recover {
       case _: NotFoundException => None
@@ -215,21 +215,21 @@ class AmlsConnector @Inject()(val httpPost: WSHttp,
     val (accountType, accountId) = accountTypeId
     val putUrl = s"$paymentUrl/$accountType/$accountId/refreshstatus"
     Logger.debug(s"[AmlsConnector][refreshPaymentStatus]: Request to $putUrl with $paymentReference")
-    httpPut.PUT[RefreshPaymentStatusRequest, PaymentStatusResult](putUrl, RefreshPaymentStatusRequest(paymentReference))
+    http.PUT[RefreshPaymentStatusRequest, PaymentStatusResult](putUrl, RefreshPaymentStatusRequest(paymentReference))
   }
 
   def registrationDetails(accountTypeId: (String, String), safeId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[RegistrationDetails] = {
     val getUrl = s"$registrationUrl/${accountTypeId._1}/${accountTypeId._2}/details/$safeId"
-    httpGet.GET[RegistrationDetails](getUrl)
+    http.GET[RegistrationDetails](getUrl)
   }
 
   def updateBacsStatus(accountTypeId: (String, String), ref: String, request: UpdateBacsRequest)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[HttpResponse] = {
     val putUrl = s"$paymentUrl/${accountTypeId._1}/${accountTypeId._2}/$ref/bacs"
-    httpPut.PUT[UpdateBacsRequest, HttpResponse](putUrl, request)
+    http.PUT[UpdateBacsRequest, HttpResponse](putUrl, request)
   }
 
   def createBacsPayment(accountTypeId: (String, String), request: CreateBacsPaymentRequest)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Payment] = {
     val postUrl = s"$paymentUrl/${accountTypeId._1}/${accountTypeId._2}/bacs"
-    httpPost.POST[CreateBacsPaymentRequest, Payment](postUrl, request)
+    http.POST[CreateBacsPaymentRequest, Payment](postUrl, request)
   }
 }

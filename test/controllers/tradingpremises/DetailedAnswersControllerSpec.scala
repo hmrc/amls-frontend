@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito.when
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{OK, contentAsString, status, _}
@@ -47,11 +47,11 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
   val mockCacheMap = mock[CacheMap]
   val statusService = mock[StatusService]
 
-  trait Fixture extends AuthorisedFixture  {
+  trait Fixture  {
     self =>
     val request = addToken(authRequest)
 
-    val controller = new DetailedAnswersController(SuccessfulAuthAction, mockDataCacheConnector)
+    val controller = new DetailedAnswersController(SuccessfulAuthAction, ds = commonDependencies, mockDataCacheConnector, cc = mockMcc)
 
     when(statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
 
@@ -95,7 +95,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
 
           val emptyCache = CacheMap("", Map.empty)
 
-          val newRequest = request.withFormUrlEncodedBody( "hasAccepted" -> "true")
+          val newRequest = requestWithUrlEncodedBody( "hasAccepted" -> "true")
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises =  Some(ytpModel), hasAccepted = true)))))

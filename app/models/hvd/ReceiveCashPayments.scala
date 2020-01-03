@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,15 +64,22 @@ sealed trait ReceiveCashPayments0 {
     implicitly[Rule[UrlFormEncoded, ReceiveCashPayments]]
   }
 
-  val formW: Write[ReceiveCashPayments, UrlFormEncoded] = {
-    import cats.implicits._
-    import utils.MappingUtils.MonoidImplicits.urlMonoid
+  val formWrite: Write[ReceiveCashPayments, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
     import jto.validation.forms.Writes._
-    implicitly
+    import play.api.libs.functional.syntax.unlift
+    (
+      (__ \ "receivePayments").write[Boolean].contramap[Option[_]] {
+        case Some(_) => true
+        case None => false
+      } ~
+        (__ \ "paymentMethods").write[Option[PaymentMethods]]
+      )(a => (a.paymentMethods, a.paymentMethods))
   }
+
   val jsonR: Reads[ReceiveCashPayments] = {
     implicitly[Reads[ReceiveCashPayments]]
   }
+
   val jsonW = Writes[ReceiveCashPayments] {x =>
     x.paymentMethods match {
       case Some(paymentMtds) => Json.obj("receivePayments" -> true,
@@ -91,8 +98,8 @@ object ReceiveCashPayments {
   private object Cache extends ReceiveCashPayments0
 
   implicit val formR: Rule[UrlFormEncoded, ReceiveCashPayments] = Cache.formR
-  implicit val jsonR: Reads[ReceiveCashPayments] = Cache.jsonR
-  implicit val formW: Write[ReceiveCashPayments, UrlFormEncoded] = Cache.formW
+  implicit val jsonR: Reads[ReceiveCashPayments] = Cache.jsonReads
+  implicit val formW: Write[ReceiveCashPayments, UrlFormEncoded] = Cache.formWrite
   implicit val jsonW: Writes[ReceiveCashPayments] = Cache.jsonW
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package controllers
 import models.autocomplete.LocationGraphTransformer
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.Environment
 import play.api.http.HttpErrorHandler
@@ -33,7 +33,7 @@ class AssetsControllerSpec extends PlaySpec with MockitoSugar {
     val environment = mock[Environment]
     val transformer = mock[LocationGraphTransformer]
 
-    val controller = new AssetsController(mock[HttpErrorHandler], environment, transformer)
+    val controller = new AssetsController(mock[HttpErrorHandler], environment, transformer, mock[AssetsMetadata])
   }
 
   "countries" when {

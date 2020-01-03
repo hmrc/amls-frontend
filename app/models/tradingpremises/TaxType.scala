@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ object TaxType {
     (__ \ "taxType").read[String].flatMap[TaxType] {
       case "01" => TaxTypeSelfAssesment
       case "02" => TaxTypeCorporationTax
-      case _ => play.api.data.validation.ValidationError("error.invalid")
+      case _ => play.api.libs.json.JsonValidationError("error.invalid")
     }
   }
 

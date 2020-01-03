@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,11 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement.{AddBusinessTypeFlowModel, FitAndProperPageId}
+import play.api.mvc.MessagesControllerComponents
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, BooleanFormReadWrite, RepeatingSection}
@@ -34,9 +35,10 @@ import scala.concurrent.Future
 @Singleton
 class FitAndProperController @Inject()(
                                         authAction: AuthAction,
+                                        val ds: CommonPlayDependencies,
                                         implicit val dataCacheConnector: DataCacheConnector,
-                                        val router: Router[AddBusinessTypeFlowModel]
-                                      ) extends DefaultBaseController with RepeatingSection {
+                                        val router: Router[AddBusinessTypeFlowModel],
+                                        val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   val NAME = "passedFitAndProper"
 

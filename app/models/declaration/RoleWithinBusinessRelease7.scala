@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,9 @@ import jto.validation.{ValidationError, _}
 import jto.validation.forms.Rules.{minLength => _, _}
 import jto.validation.forms.UrlFormEncoded
 import models.FormTypes._
-import play.api.data.validation.{ValidationError => JsonValidationError}
 import play.api.libs.json.Reads.StringReads
 import play.api.libs.json.{JsError, _}
 import utils.TraversableValidators.minLengthR
-
-//import models.declaration.Other
 
 case class RoleWithinBusinessRelease7(items: Set[RoleType])
 
@@ -146,7 +143,7 @@ object RoleWithinBusinessRelease7 {
     case "08" => (JsPath \ "roleWithinBusinessOther").read[String] map { x =>
       Set(Other(x))
     }
-    case _ => play.api.data.validation.ValidationError("error.invalid")
+    case _ => play.api.libs.json.JsonValidationError("error.invalid")
   }
 
   val fallback = Reads(x => (x \ businessRolePathName).getOrElse(JsNull) match {

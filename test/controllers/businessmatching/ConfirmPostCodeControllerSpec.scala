@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,12 @@ import org.mockito.Mockito._
 import org.mockito.Matchers.{eq => meq, _}
 import models.businesscustomer.{ReviewDetails, Address => BusinessCustomerAddress}
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.auth.core.AuthConnector
 import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
 
 import scala.concurrent.Future
@@ -37,7 +37,7 @@ import scala.concurrent.Future
 
 class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val dataCacheConnector = mock[DataCacheConnector]
@@ -71,9 +71,10 @@ class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with Scal
     }
 
     "update ReviewDetails with valid input post code" in new Fixture {
-      val postRequest = request.withFormUrlEncodedBody {
+      val postRequest = requestWithUrlEncodedBody(
         "postCode" -> "BB1 1BB"
-      }
+      )
+
       when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
         (any(), any())).thenReturn(Future.successful(Some(businessMatching)))
 
@@ -87,9 +88,9 @@ class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with Scal
     }
 
     "update ReviewDetails as none when business matching-> reviewDetails is empty" in new Fixture {
-      val postRequest = request.withFormUrlEncodedBody {
+      val postRequest = requestWithUrlEncodedBody(
         "postCode" -> "BB1 1BB"
-      }
+      )
       when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
         (any(), any())).thenReturn(Future.successful(Some(businessMatching.copy(reviewDetails = None))))
 
@@ -104,9 +105,9 @@ class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
     "throw validation error on invalid field" in new Fixture {
 
-      val postRequest = request.withFormUrlEncodedBody {
+      val postRequest = requestWithUrlEncodedBody(
         "postCode" -> "AA1111AA"
-      }
+      )
       val result = controller.post()(postRequest)
       status(result) must be(BAD_REQUEST)
     }

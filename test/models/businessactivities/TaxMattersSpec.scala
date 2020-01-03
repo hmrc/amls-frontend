@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ class TaxMattersSpec extends PlaySpec {
     "successfully complete a round trip json conversion" in {
       TaxMatters.formats.reads(
         TaxMatters.formats.writes(TaxMatters(false))
-      ) must be(JsSuccess(TaxMatters(false), JsPath \ "manageYourTaxAffairs"))
+      ) must be(JsSuccess(TaxMatters(false), JsPath))
     }
 
     "Serialise TaxMatters as expected" in {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,23 +17,26 @@
 package controllers.asp
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.asp.{Asp, ServicesOfBusiness}
 import models.businessmatching.AccountancyServices
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import utils.{AuthAction, DateOfChangeHelper}
 import views.html.asp._
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class ServicesOfBusinessController @Inject()(val dataCacheConnector: DataCacheConnector,
                                              val statusService: StatusService,
                                              authAction: AuthAction,
-                                             val serviceFlow: ServiceFlow
-                                            ) extends DefaultBaseController with DateOfChangeHelper {
+                                             val ds: CommonPlayDependencies,
+                                             val serviceFlow: ServiceFlow,
+                                             val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

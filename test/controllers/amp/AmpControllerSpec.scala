@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,60 +22,70 @@ import akka.stream.Materializer
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.amp.Amp
-import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
-import org.scalatest.OptionValues
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
-import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.amp.AmpCacheService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.{AmlsSpec, AuthAction, AuthorisedFixture, CacheMocks}
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.scalatest.time.Seconds
+import play.api.mvc.DefaultActionBuilder
+import play.api.test.FakeRequest
 
 import scala.concurrent.Future
 
-class AmpControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with OptionValues {
+class AmpControllerSpec extends AmlsSpec with CacheMocks {
 
   val dateVal = LocalDateTime.now
 
   val completeData = Json.obj(
-    "typeOfParticipant" -> Seq("artGalleryOwner"),
-    "soldOverThreshold" -> true,
-    "dateTransactionOverThreshold" -> LocalDate.now,
-    "identifyLinkedTransactions" -> true,
-    "percentageExpectedTurnover" -> "fortyOneToSixty"
+    "typeOfParticipant"             -> Seq("artGalleryOwner"),
+    "soldOverThreshold"     -> true,
+    "dateTransactionOverThreshold"  -> LocalDate.now,
+    "identifyLinkedTransactions"    -> true,
+    "percentageExpectedTurnover"    -> "fortyOneToSixty"
   )
 
   val completeJson = Json.obj(
-    "_id" -> "someid",
-    "data" -> completeData,
-    "lastUpdated" -> Json.obj("$date" -> dateVal.atZone(ZoneOffset.UTC).toInstant.toEpochMilli),
-    "hasChanged" -> false,
-    "hasAccepted" -> false
+    "_id"            -> "someid",
+    "data"           -> completeData,
+    "lastUpdated"    -> Json.obj("$date" -> dateVal.atZone(ZoneOffset.UTC).toInstant.toEpochMilli),
+    "hasChanged"     -> false,
+    "hasAccepted"    -> false
   )
 
   trait Fixture extends AuthorisedFixture {
     self =>
-    val request = addToken(authRequest)
+    val request         = addToken(authRequest)
     val ampCacheService = mock[AmpCacheService]
-    val mockCacheMap = mock[CacheMap]
-    val credId = "someId"
-    val mockCacheConnector = mock[DataCacheConnector]
+    val credId          = "someId"
 
-    val controller = new AmpController(ampCacheService, SuccessfulAuthAction, mockCacheConnector)
+    lazy val app = new GuiceApplicationBuilder()
+      .disable[com.kenshoo.play.metrics.PlayModule]
+      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
+      .overrides(bind[AmpCacheService].to(ampCacheService))
+      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
+      .build()
+
+    val controller      = app.injector.instanceOf[AmpController]
   }
 
   "get returns 200" when {
     "no amp section in cache" in new Fixture {
       when(ampCacheService.get(any())(any())).thenReturn(Future.successful(Some(Json.obj())))
 
+
+
       val result = controller.get(credId)(request)
       status(result) must be(OK)
 
       val document = Json.parse(contentAsString(result))
-      document mustBe (Json.obj())
+      document mustBe(Json.obj())
     }
 
     "amp section in cache" in new Fixture {
@@ -85,7 +95,7 @@ class AmpControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures wit
       status(result) must be(OK)
 
       val document = Json.parse(contentAsString(result))
-      document mustBe (completeJson)
+      document mustBe(completeJson)
     }
   }
 
@@ -100,26 +110,25 @@ class AmpControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures wit
       val result = controller.set(credId)(postRequest)
       status(result) must be(OK)
       val document = Json.parse(contentAsString(result))
-      document mustBe (Json.obj("_id" -> credId))
+      document mustBe(Json.obj("_id" -> credId))
     }
   }
 
   "accept" must {
     "set accept flag to true and redirect to RegistrationProgressController" in new Fixture {
-      implicit lazy val materializer: Materializer = app.materializer
 
-      when(controller.cacheConnector.fetch[Amp](any(), any())(any(), any()))
+      when(mockCacheConnector.fetch[Amp](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(completeJson.as[Amp])))
 
-      when(controller.cacheConnector.save[Amp](any(), any(), any())(any(), any()))
+      when(mockCacheConnector.save[Amp](any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(mockCacheMap))
 
-      val result = call(controller.accept, FakeRequest())
+      val result = controller.accept.apply(FakeRequest())
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result).value mustBe controllers.routes.RegistrationProgressController.get().toString
 
-      verify(controller.cacheConnector).save[Amp](any(), eqTo(Amp.key),
+      verify(mockCacheConnector).save[Amp](any(), eqTo(Amp.key),
         eqTo(completeJson.as[Amp].copy(hasAccepted = true)))(any(), any())
     }
   }

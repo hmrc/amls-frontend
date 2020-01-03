@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ import jto.validation.{From, Rule, Write}
 import models.FormTypes._
 import org.joda.time.{DateTimeFieldType, LocalDate}
 import play.api.libs.json.{Json, Writes => _}
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 
 case class LegalNameChangeDate(date: LocalDate)
 

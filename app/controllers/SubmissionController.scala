@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import javax.inject.{Inject, Singleton}
 import models.status._
 import models.{SubmissionResponse, SubscriptionResponse}
 import play.api.Logger
+import play.api.mvc.MessagesControllerComponents
 import services.{RenewalService, StatusService, SubmissionService}
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
 import utils.AuthAction
@@ -34,7 +35,9 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
                                      val statusService: StatusService,
                                      val renewalService: RenewalService,
                                      val authenticator: AuthenticatorConnector,
-                                     authAction: AuthAction) extends DefaultBaseController {
+                                     authAction: AuthAction,
+                                     val ds: CommonPlayDependencies,
+                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   private def handleRenewalAmendment(credId: String, amlsRegistrationNumber: Option[String], accountTypeId: (String, String))
                                     (implicit headerCarrier: HeaderCarrier) = {

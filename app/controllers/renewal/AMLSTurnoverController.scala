@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,21 +17,23 @@
 package controllers.renewal
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import javax.inject.{Inject, Singleton}
 import models.businessmatching._
 import models.renewal.{AMLSTurnover, Renewal}
+import play.api.mvc.MessagesControllerComponents
 import services.RenewalService
 import utils.{AuthAction, ControllerHelper}
 import views.html.renewal.amls_turnover
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
-class AMLSTurnoverController @Inject()(
-                                        val dataCacheConnector: DataCacheConnector,
-                                        val authAction: AuthAction,
-                                        val renewalService: RenewalService
-                                      ) extends DefaultBaseController {
+class AMLSTurnoverController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                       val authAction: AuthAction,
+                                       val ds: CommonPlayDependencies,
+                                       val renewalService: RenewalService,
+                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

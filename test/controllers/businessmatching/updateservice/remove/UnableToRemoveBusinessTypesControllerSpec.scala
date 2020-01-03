@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,14 +25,15 @@ import play.api.test.Helpers._
 
 class UnableToRemoveBusinessTypesControllerSpec extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
 
     val controller = new UnableToRemoveBusinessTypesController(
-      authAction = SuccessfulAuthAction,
-      dataCacheConnector = mockCacheConnector
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      dataCacheConnector = mockCacheConnector,
+      cc = mockMcc
     )
   }
 

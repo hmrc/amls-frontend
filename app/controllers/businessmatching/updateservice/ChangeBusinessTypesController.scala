@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,14 @@ package controllers.businessmatching.updateservice
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching._
 import models.businessmatching.updateservice.ChangeBusinessType
 import models.flowmanagement.ChangeBusinessTypesPageId
+import play.api.i18n.Messages
+import play.api.mvc.MessagesControllerComponents
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
@@ -33,14 +35,16 @@ import views.html.businessmatching.updateservice._
 
 import scala.collection.immutable.SortedSet
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class ChangeBusinessTypesController @Inject()(authAction: AuthAction,
+                                              val ds: CommonPlayDependencies,
                                               implicit val dataCacheConnector: DataCacheConnector,
                                               val businessMatchingService: BusinessMatchingService,
                                               val router: Router[ChangeBusinessType],
                                               val helper: RemoveBusinessTypeHelper,
-                                              val addHelper: AddBusinessTypeHelper
-                                            ) extends DefaultBaseController with RepeatingSection {
+                                              val addHelper: AddBusinessTypeHelper,
+                                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get() = authAction.async {
       implicit request =>
@@ -67,7 +71,7 @@ class ChangeBusinessTypesController @Inject()(authAction: AuthAction,
       }
   }
 
-  private def getFormData(credId: String)(implicit dataCacheConnector: DataCacheConnector, hc: HeaderCarrier) = for {
+  private def getFormData(credId: String)(implicit dataCacheConnector: DataCacheConnector, hc: HeaderCarrier, messages: Messages) = for {
     cache <- OptionT(dataCacheConnector.fetchAll(credId))
     businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
     remainingActivities <- businessMatchingService.getRemainingBusinessActivities(credId)

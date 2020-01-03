@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@ package views.payments
 
 import generators.PaymentGenerator
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class bank_detailsSpec extends AmlsSpec with PaymentGenerator{
+class bank_detailsSpec extends AmlsViewSpec with PaymentGenerator {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "bank_details view" must {
@@ -48,7 +48,7 @@ class bank_detailsSpec extends AmlsSpec with PaymentGenerator{
 
     "display non uk details" when {
 
-      "non UK" in new Fixture {
+      "non UK" in new ViewFixture {
 
         def view = views.html.payments.bank_details(false, 100, paymentReferenceNumber)
 
@@ -64,7 +64,7 @@ class bank_detailsSpec extends AmlsSpec with PaymentGenerator{
 
     "display uk details" when {
 
-      "uk" in new Fixture {
+      "uk" in new ViewFixture {
 
         def view = views.html.payments.bank_details(true, 100, paymentReferenceNumber)
 

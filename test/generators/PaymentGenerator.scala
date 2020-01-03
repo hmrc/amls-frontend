@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,6 @@ trait PaymentGenerator extends BaseGenerator with AmlsReferenceNumberGenerator {
     amlsRefNo <- amlsRefNoGen
     safeId <- amlsRefNoGen
     ref <- paymentRefGen
-    desc <- alphaNumOfLengthGen(refLength)
     amountInPence <- numGen
     paymentStatus <- paymentStatusGen
   } yield Payment (
@@ -54,7 +53,6 @@ trait PaymentGenerator extends BaseGenerator with AmlsReferenceNumberGenerator {
     amlsRefNo,
     safeId,
     ref,
-    desc,
     amountInPence,
     paymentStatus,
     now

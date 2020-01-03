@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package services
 
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.{EnrolmentStubConnector, TaxEnrolmentsConnector}
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
 import models.enrolment.{AmlsEnrolmentKey, EnrolmentIdentifier, GovernmentGatewayEnrolment, TaxEnrolment}
@@ -40,7 +40,7 @@ class AuthEnrolmentsServiceSpec extends AmlsSpec
   trait Fixture {
     val enrolmentStore = mock[TaxEnrolmentsConnector]
     val enrolmentStubConnector = mock[EnrolmentStubConnector]
-    val config = mock[AppConfig]
+    val config = mock[ApplicationConfig]
 
     val groupId = stringOfLengthGen(10).sample.get
 

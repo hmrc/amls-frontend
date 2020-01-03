@@ -1,5 +1,5 @@
 @*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 @import forms._
 
-@(form: Form2[_], placeholder:String = "")(implicit lang:Lang,  m: Messages)
+@(form: Form2[_], placeholder:String = "")(implicit m: Messages, lang: Lang)
 
 @if(form.errors.nonEmpty) {
     <div class="flash amls-error-summary" role="alert" tabindex="-1">

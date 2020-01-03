@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import models.responsiblepeople._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.joda.time.LocalDate
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -33,7 +33,7 @@ import utils._
 
 class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
@@ -129,7 +129,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
         "selected option is a valid responsible person in amendment mode" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
+          val newRequest = requestWithUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
 
           val updatedList = Seq(rp.copy(
             positions = Some(positions.copy(positions = Set(BeneficialOwner, InternalAccountant, NominatedOfficer)))
@@ -146,7 +146,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
         "selected option is a valid responsible person" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
+          val newRequest = requestWithUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
 
           val updatedList = Seq(rp.copy(
             positions = Some(positions.copy(positions = Set(BeneficialOwner, InternalAccountant, NominatedOfficer)))
@@ -166,7 +166,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
     "successfully redirect to adding new responsible people .i.e what you need page of RP" when {
       "selected option is 'Register someone else'" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody("value" -> "-1")
+        val newRequest = requestWithUrlEncodedBody("value" -> "-1")
 
         mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
         mockApplicationStatus(SubmissionReady)
@@ -179,7 +179,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
     "fail validation" when {
       "no option is selected on the UI" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody()
+        val newRequest = requestWithUrlEncodedBody("" -> "")
 
         mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeoples), Some(ResponsiblePerson.key))
         mockApplicationStatus(SubmissionReady)

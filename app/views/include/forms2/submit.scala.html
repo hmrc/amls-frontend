@@ -1,5 +1,5 @@
 @*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
  returnLocation : Option[String] = None,
  buttonId : Option[String] = None,
  gaTag : Option[String] = None
- )(implicit lang:Lang,  m: Messages)
+ )(implicit m: Messages)
 <div class="form-group-footer">
     <button type="submit" name="submit" class="button" @if(gaTag.isDefined) {data-journey-click = "@gaTag"} id="@buttonId.getOrElse("")">
         @Messages(buttonMessageKey.getOrElse("button.saveandcontinue"))

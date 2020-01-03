@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ import jto.validation.{From, Rule, Write}
 import models.FormTypes._
 import org.joda.time.{DateTimeFieldType, LocalDate}
 import play.api.libs.json.Json
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 
 case class ActivityStartDate (startDate: LocalDate)
 
@@ -30,7 +32,7 @@ object ActivityStartDate {
 
   implicit val formRule: Rule[UrlFormEncoded, ActivityStartDate] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-      (__ \ "startDate").read(newAllowedPastAndFutureDateRule1700("error.required.tp.address.date", "error.invalid.date.after.1700", "error.required.tp.agent.date.past")) map ActivityStartDate.apply
+      (__ \ "startDate").read(newAllowedPastAndFutureDateRule1700("error.required.tp.address.date", "error.invalid.date.tp.after.1700", "error.invalid.date.tp.before.2100")) map ActivityStartDate.apply
   }
 
   implicit val formWrites: Write[ActivityStartDate, UrlFormEncoded] =

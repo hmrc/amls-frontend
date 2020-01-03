@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,10 @@ class ReceiveCashPaymentsSpec extends PlaySpec {
     "roundtrip through form" in {
       val data = ReceiveCashPayments(Some(paymentMethods))
       val given = ReceiveCashPayments.formW.writes(data)
-      val gthen = ReceiveCashPayments.formR.validate(given)
+      val when = ReceiveCashPayments.formR.validate(given)
       val expected = Valid(data)
-      gthen mustEqual expected
+
+      when mustEqual expected
     }
 
     "roundtrip through json" in {

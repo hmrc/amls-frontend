@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,15 @@ package views
 import forms.EmptyForm
 import models.confirmation.{BreakdownRow, Currency}
 import models.registrationprogress.{Completed, Section}
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.mvc.Call
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 
-class fee_guidanceSpec extends AmlsSpec with MockitoSugar {
+class fee_guidanceSpec extends AmlsViewSpec with MockitoSugar {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     val totalAmount = Currency(600)
 

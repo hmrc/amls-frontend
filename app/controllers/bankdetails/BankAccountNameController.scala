@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package controllers.bankdetails
 
 import connectors.DataCacheConnector
-import controllers.BaseController
+import controllers.CommonPlayDependencies
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import jto.validation.forms.Rules._
@@ -25,20 +25,21 @@ import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Write}
 import models.FormTypes
 import models.bankdetails.BankDetails
-import play.api.mvc.{Action, AnyContent, Request, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthAction, RepeatingSection, StatusConstants}
+import utils.{AuthAction, StatusConstants}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class BankAccountNameController @Inject()(
                                            val authAction: AuthAction,
+                                           val ds: CommonPlayDependencies,
                                            val dataCacheConnector: DataCacheConnector,
-                                           val statusService: StatusService
-                                         ) extends BankDetailsController {
+                                           val statusService: StatusService,
+                                           val mcc: MessagesControllerComponents) extends BankDetailsController(ds, mcc) {
 
   implicit def write: Write[String, UrlFormEncoded] = Write { data =>
     Map("accountName" -> Seq(data))

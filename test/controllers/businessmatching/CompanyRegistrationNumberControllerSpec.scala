@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
@@ -38,16 +38,17 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with StatusMocks with CacheMocks {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
     implicit val ec = app.injector.instanceOf[ExecutionContext]
 
 
     val controller = new CompanyRegistrationNumberController(
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
       statusService = mockStatusService,
-      mock[BusinessMatchingService]
+      mock[BusinessMatchingService],
+      cc = mockMcc
     )
 
     val businessMatching = BusinessMatching(companyRegistrationNumber = Some(CompanyRegistrationNumber("12345678")))
@@ -93,7 +94,7 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
 
     "on post() give a bad request if invalid data sent" in new Fixture {
 
-        val invalidRequest = request.withFormUrlEncodedBody(
+        val invalidRequest = requestWithUrlEncodedBody(
           "companyRegistrationNumber" -> "INVALID_DATA"
         )
 
@@ -108,7 +109,7 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
 
     "on post() redirect correctly if valid data sent and edit is true" in new Fixture {
 
-      val validRequest = request.withFormUrlEncodedBody(
+      val validRequest = requestWithUrlEncodedBody(
         "companyRegistrationNumber" -> "12345678"
       )
 
@@ -125,7 +126,7 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
 
     "on post() redirect correctly if valid data sent and edit is false" in new Fixture {
 
-      val validRequest = request.withFormUrlEncodedBody(
+      val validRequest = requestWithUrlEncodedBody(
         "companyRegistrationNumber" -> "12345678"
       )
 

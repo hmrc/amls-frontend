@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,7 +117,7 @@ class PercentageOfCashPaymentOver15000Spec extends PlaySpec {
 
       "throw error for invalid data" in {
         Json.fromJson[PercentageOfCashPaymentOver15000](Json.obj("percentage" -> "20")) must
-          be(JsError(JsPath , play.api.data.validation.ValidationError("error.invalid")))
+          be(JsError(JsPath , play.api.libs.json.JsonValidationError("error.invalid")))
       }
     }
    

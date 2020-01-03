@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,13 @@ import cats.data._
 import cats.implicits._
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.status.SubmissionStatus
 import models.tradingpremises._
 import org.joda.time.LocalDate
-import play.api.mvc.Request
+import play.api.mvc.{MessagesControllerComponents, Request}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
@@ -36,13 +36,15 @@ import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 import views.html.tradingpremises._
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class WhereAreTradingPremisesController @Inject () (
                                                      val dataCacheConnector: DataCacheConnector,
                                                      val statusService: StatusService,
                                                      val auditConnector: AuditConnector,
-                                                     val authAction: AuthAction
-                                                   )extends RepeatingSection with DefaultBaseController with DateOfChangeHelper with FormHelpers {
+                                                     val authAction: AuthAction,
+                                                     val ds: CommonPlayDependencies,
+                                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
 
 
 

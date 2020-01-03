@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -330,7 +330,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
       localDateFutureRule.validate(Map(
         "day" -> Seq("1"),
         "month" -> Seq("1"),
-        "year" -> Seq("2020")
+        "year" -> Seq("2090")
       )) must be(Invalid(Seq(
         Path -> Seq(ValidationError("error.future.date"))
       )))
@@ -722,14 +722,14 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
       newLocalDateRuleWithPattern("error.required.date").validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.invalid.date.not.real"))))
     }
 
-    "fail validation when date before 1700" in {
+    "fail validation when date before 1900" in {
       val data = Map(
         "day" -> Seq("31"),
         "month" -> Seq("12"),
         "year" -> Seq("1899")
       )
 
-      newAllowedPastAndFutureDateRule("error.required.date", "error.invalid.date.after.1700", "error.required.tp.agent.date.past").validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.invalid.date.after.1700"))))
+      newAllowedPastAndFutureDateRule("error.required.date", "error.invalid.date.after.1900", "error.invalid.date.before.2100").validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.invalid.date.after.1900"))))
     }
 
     "fail validation when date after 2099" in {
@@ -739,7 +739,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
         "year" -> Seq("2100")
       )
 
-      newAllowedPastAndFutureDateRule("error.required.date", "error.invalid.date.after.1700", "error.required.tp.agent.date.past").validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.required.tp.agent.date.past"))))
+      newAllowedPastAndFutureDateRule("error.required.date", "error.invalid.date.after.1700", "error.invalid.date.before.2100").validate(data) mustBe Invalid(Seq(Path -> Seq(ValidationError("error.invalid.date.before.2100"))))
     }
   }
 

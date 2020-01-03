@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import org.jsoup.select.Elements
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
@@ -41,15 +41,14 @@ import scala.concurrent.Future
 
 class RegisteredOfficeUKControllerSpec extends AmlsSpec with  MockitoSugar{
 
-  trait Fixture extends AuthorisedFixture with AutoCompleteServiceMocks {
+  trait Fixture extends AutoCompleteServiceMocks {
     self => val request = addToken(authRequest)
 
     val controller = new RegisteredOfficeUKController(
       dataCacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService],
       auditConnector = mock[AuditConnector],
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
 
     when {
       controller.auditConnector.sendEvent(any())(any(), any())
@@ -109,7 +108,7 @@ class RegisteredOfficeUKControllerSpec extends AmlsSpec with  MockitoSugar{
       when (controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "isUK"-> "true",
         "addressLine1"->"line1",
         "addressLine2"->"line2",
@@ -142,7 +141,7 @@ class RegisteredOfficeUKControllerSpec extends AmlsSpec with  MockitoSugar{
       when (controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "isUK"-> "true",
         "addressLine1"->"line1",
         "addressLine2"->"line2",
@@ -179,7 +178,7 @@ class RegisteredOfficeUKControllerSpec extends AmlsSpec with  MockitoSugar{
       when (controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "isUK"-> "true",
         "addressLine1"->"line1 &",
         "addressLine2"->"line2 *",
@@ -205,7 +204,7 @@ class RegisteredOfficeUKControllerSpec extends AmlsSpec with  MockitoSugar{
         when(controller.dataCacheConnector.fetch(any(), any())(any(), any())).thenReturn(Future.successful(None))
         when(controller.dataCacheConnector.save(any(), any(), any())(any(), any())).thenReturn(Future.successful(emptyCache))
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "isUK" -> "true",
           "addressLine2" -> "line2",
           "addressLine3" -> "",
@@ -229,7 +228,7 @@ class RegisteredOfficeUKControllerSpec extends AmlsSpec with  MockitoSugar{
         when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "isUK" -> "true",
           "addressLine1" -> "line1",
           "addressLine2" -> "line2",
@@ -252,7 +251,7 @@ class RegisteredOfficeUKControllerSpec extends AmlsSpec with  MockitoSugar{
         when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
           .thenReturn(Future.successful(ReadyForRenewal(None)))
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "isUK" -> "true",
           "addressLine1" -> "line1",
           "addressLine2" -> "line2",

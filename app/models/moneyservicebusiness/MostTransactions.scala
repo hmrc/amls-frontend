@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package models.moneyservicebusiness
 import models.Country
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
-import play.api.libs.json.{Reads, Writes}
+import play.api.libs.json.{Reads, Writes, __}
 import utils.TraversableValidators
 
 case class MostTransactions(countries: Seq[Country])
@@ -64,10 +64,11 @@ private sealed trait MostTransactions0 {
     implicitly
   }
 
-  val jsonR: Reads[MostTransactions] = {
-    import utils.JsonMapping._
-    import jto.validation.playjson.Rules.{JsValue => _, pickInJson => _, _}
-    implicitly
+  val jsonReads: Reads[MostTransactions] =
+    (__ \ "mostTransactionsCountries").readNullable[Seq[Country]].map {
+    case Some(countries) if countries.isEmpty => MostTransactions(Seq())
+    case Some(countries) => MostTransactions apply countries
+    case None => MostTransactions(Seq())
   }
 
   val formW: Write[MostTransactions, UrlFormEncoded] = {
@@ -89,6 +90,6 @@ object MostTransactions {
 
   implicit val formR: Rule[UrlFormEncoded, MostTransactions] = Cache.formR
   implicit val formW: Write[MostTransactions, UrlFormEncoded] = Cache.formW
-  implicit val jsonR: Reads[MostTransactions] = Cache.jsonR
+  implicit val jsonR: Reads[MostTransactions] = Cache.jsonReads
   implicit val jsonW: Writes[MostTransactions] = Cache.jsonW
 }

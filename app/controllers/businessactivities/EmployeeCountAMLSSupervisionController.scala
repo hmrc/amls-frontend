@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,20 @@ package controllers.businessactivities
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, EmployeeCountAMLSSupervision, HowManyEmployees}
+import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.businessactivities._
 
 import scala.concurrent.Future
 
 class EmployeeCountAMLSSupervisionController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                                        val authAction: AuthAction
-                                                       ) extends DefaultBaseController {
+                                                        val authAction: AuthAction,
+                                                        val ds: CommonPlayDependencies,
+                                                        val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def updateData(howManyEmployees: Option[HowManyEmployees], data: EmployeeCountAMLSSupervision): HowManyEmployees = {
     howManyEmployees.fold[HowManyEmployees](HowManyEmployees(employeeCountAMLSSupervision = Some(data.employeeCountAMLSSupervision)))(x =>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,13 +62,13 @@ class AccountantForAMLSRegulationsSpec extends PlaySpec {
     "successfully validate given an `true` value" in {
       val json = Json.obj("accountantForAMLSRegulations" -> true)
       Json.fromJson[AccountantForAMLSRegulations](json) must
-        be(JsSuccess(AccountantForAMLSRegulations(true), JsPath \ "accountantForAMLSRegulations"))
+        be(JsSuccess(AccountantForAMLSRegulations(true), JsPath))
     }
 
     "successfully validate given an `false` value" in {
       val json = Json.obj("accountantForAMLSRegulations" -> false)
       Json.fromJson[AccountantForAMLSRegulations](json) must
-        be(JsSuccess(AccountantForAMLSRegulations(false), JsPath \ "accountantForAMLSRegulations"))
+        be(JsSuccess(AccountantForAMLSRegulations(false), JsPath))
     }
 
     "write the correct value given an NCARegisteredYes" in {

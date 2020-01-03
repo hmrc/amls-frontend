@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import play.api.i18n.Messages
 
 import scala.concurrent.Future
 
-class HowToPayControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with SubscriptionResponseGenerator {
+class HowToPayControllerSpec extends AmlsSpec with SubscriptionResponseGenerator {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
@@ -40,7 +40,9 @@ class HowToPayControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
     val request = addToken(authRequest)
     val controller = new HowToPayController(
       authAction = SuccessfulAuthAction,
-      feeHelper = mock[FeeHelper]
+      feeHelper = mock[FeeHelper],
+      cc = mockMcc,
+      ds = commonDependencies
     )
   }
 

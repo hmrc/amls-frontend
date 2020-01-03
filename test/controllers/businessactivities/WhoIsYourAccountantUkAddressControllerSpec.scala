@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks}
@@ -36,14 +36,15 @@ class WhoIsYourAccountantUkAddressControllerSpec extends AmlsSpec
   with ScalaFutures
   with PrivateMethodTester {
 
-  trait Fixture extends AuthorisedFixture with AutoCompleteServiceMocks{
+  trait Fixture extends AutoCompleteServiceMocks{
     self =>
     val request = addToken(authRequest)
 
     val controller = new WhoIsYourAccountantUkAddressController(
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction,
-      autoCompleteService = mockAutoComplete
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      autoCompleteService = mockAutoComplete,
+      cc = mockMcc
     )
   }
 
@@ -98,18 +99,14 @@ class WhoIsYourAccountantUkAddressControllerSpec extends AmlsSpec
       "given invalid data" must {
         "respond with BAD_REQUEST" in new Fixture {
 
+          val newRequest = requestWithUrlEncodedBody(
+            "name" -> ""
+          )
+
           when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(BusinessActivities(
               whoIsYourAccountant = Some(WhoIsYourAccountant(
-                Some(WhoIsYourAccountantName("testname", Some("testtradingName"))),
-                None,
-                None
-              ))
-            ))))
-
-          val newRequest = request.withFormUrlEncodedBody(
-            "name" -> ""
-          )
+                Some(WhoIsYourAccountantName("testname", Some("testtradingName"))), None, None))))))
 
           val result = controller.post()(request)
           status(result) must be(BAD_REQUEST)
@@ -119,7 +116,7 @@ class WhoIsYourAccountantUkAddressControllerSpec extends AmlsSpec
       "edit is true" must {
         "respond with SEE_OTHER and redirect to the SummaryController" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "addressLine1" -> "line1",
             "addressLine2" -> "line2",
             "addressLine3" -> "line3",
@@ -143,7 +140,7 @@ class WhoIsYourAccountantUkAddressControllerSpec extends AmlsSpec
       "edit is false" must {
         "respond with SEE_OTHER and redirect to the TaxMattersController" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "addressLine1" -> "line1",
             "addressLine2" -> "line2",
             "addressLine3" -> "line3",

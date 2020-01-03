@@ -1,5 +1,5 @@
 @*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,13 @@
 
 @import include._
 @import forms2._
+@import config.{ ApplicationConfig}
 @import models.tradingpremises._
 @import utils.StatusConstants
 @import controllers.tradingpremises.ModelHelpers._
 @import models.status._
 
-@(f: forms.Form2[_], add: Boolean, status: SubmissionStatus, completeTp: Seq[(TradingPremises, Int)], incompleteTp: Seq[(TradingPremises, Int)])(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: forms.Form2[_], add: Boolean, status: SubmissionStatus, completeTp: Seq[(TradingPremises, Int)], incompleteTp: Seq[(TradingPremises, Int)])(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @tpDetail(tp: TradingPremises) = {
     @{tp.yourTradingPremises match {

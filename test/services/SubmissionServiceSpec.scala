@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package services
 
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.AmlsConnector
 import exceptions.{DuplicateSubscriptionException, NoEnrolmentException}
 import generators.ResponsiblePersonGenerator
@@ -60,7 +60,7 @@ class SubmissionServiceSpec extends AmlsSpec
 
   trait Fixture extends DependencyMocks {
 
-    val config = mock[AppConfig]
+    val config = mock[ApplicationConfig]
 
     val submissionService = new SubmissionService (
       mockCacheConnector,

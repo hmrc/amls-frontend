@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import controllers.actions.SuccessfulAuthAction
 import models.estateagentbusiness.EstateAgentBusiness
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import services.StatusService
 import services.businessmatching.ServiceFlow
@@ -32,14 +32,15 @@ import scala.concurrent.Future
 
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new SummaryController(
       mock[DataCacheConnector],
-      SuccessfulAuthAction,
+      SuccessfulAuthAction, ds = commonDependencies,
       mock[StatusService],
-      mock[ServiceFlow])
+      mock[ServiceFlow],
+      cc = mockMcc)
 
     val model = EstateAgentBusiness(None, None)
 
@@ -73,7 +74,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
         val emptyCache = CacheMap("", Map.empty)
 
-        val newRequest = request.withFormUrlEncodedBody( "hasAccepted" -> "true")
+        val newRequest = requestWithUrlEncodedBody( "hasAccepted" -> "true")
 
         when(controller.dataCache.fetch[EstateAgentBusiness](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(model.copy(hasAccepted = false))))

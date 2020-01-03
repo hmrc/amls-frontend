@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
@@ -40,16 +40,15 @@ import scala.concurrent.Future
 
 class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePersonGenerator {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val request = addToken(authRequest)
 
-    val mockAuthConnector = self.authConnector
+    val mockAuthConnector = authConnector
 
     val controller = new PositionWithinBusinessController (
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction
-      )
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
 
     object DefaultValues {
       val noNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant), startDate)
@@ -159,7 +158,7 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
 
         "positionWithinBusiness field is given an empty string" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody("positionWithinBusiness" -> "")
+          val newRequest = requestWithUrlEncodedBody("positionWithinBusiness" -> "")
 
           val mockBusinessMatching: BusinessMatching = mock[BusinessMatching]
 
@@ -179,7 +178,7 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
 
         "positionWithinBusiness is given an invalid string code" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody("positionWithinBusiness" -> "10")
+          val newRequest = requestWithUrlEncodedBody("positionWithinBusiness" -> "10")
           val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
             Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
           val businessMatching = BusinessMatching(Some(reviewDtls))
@@ -205,7 +204,7 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
 
           "Nominated Officer is selected" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "positions" -> "04",
               "startDate.day" -> "24",
               "startDate.month" -> "2",
@@ -228,7 +227,7 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
             val positions = Positions(Set(Director, NominatedOfficer), startDate)
             val responsiblePeople = ResponsiblePerson(positions = Some(positions))
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "positions" -> "06",
               "positions" -> "01",
               "startDate.day" -> "24",
@@ -253,7 +252,7 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
 
         "redirect to 'When did this person start their role in the business?'"  in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "positions" -> "04",
             "startDate.day" -> "24",
             "startDate.month" -> "2",

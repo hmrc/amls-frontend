@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,24 +33,22 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.OneAppPerSuite
 import play.api.http.Status.OK
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
-class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuite with PaymentGenerator {
+class StatusControllerSpec extends AmlsSpec with PaymentGenerator {
 
   val cacheMap = mock[CacheMap]
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
 
     val controller = new StatusController (
@@ -64,7 +62,9 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
        mockCacheConnector,
        mock[AuthenticatorConnector],
        SuccessfulAuthAction,
-       mock[FeeResponseService])
+      commonDependencies,
+       mock[FeeResponseService],
+      mockMcc)
 
     val controllerNoAmlsNumber = new StatusController (
       mock[LandingService],
@@ -77,7 +77,9 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
       mockCacheConnector,
       mock[AuthenticatorConnector],
       SuccessfulAuthActionNoAmlsRefNo,
-      mock[FeeResponseService])
+      commonDependencies,
+      mock[FeeResponseService],
+      mockMcc)
 
     val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(PositionStartDate(new LocalDate())))
     val rp1 = ResponsiblePerson(
@@ -276,9 +278,6 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
 
-        when(authConnector.currentAuthority(any(), any()))
-          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
-
         val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
           Some(LocalDate.now.plusDays(30)), false)
 
@@ -303,9 +302,6 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
 
-        when(authConnector.currentAuthority(any(), any()))
-          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
-
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
           .thenReturn(Future.successful((SubmissionDecisionRejected, None)))
 
@@ -328,9 +324,6 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
-
-        when(authConnector.currentAuthority(any(), any()))
-          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
           .thenReturn(Future.successful((SubmissionDecisionRevoked, None)))
@@ -356,9 +349,6 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
 
-        when(authConnector.currentAuthority(any(), any()))
-          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
-
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
           .thenReturn(Future.successful((SubmissionDecisionExpired, None)))
 
@@ -378,9 +368,6 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
-
-        when(authConnector.currentAuthority(any(), any()))
-          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
           .thenReturn(Future.successful((SubmissionWithdrawn, None)))
@@ -402,9 +389,6 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
 
-        when(authConnector.currentAuthority(any(), any()))
-          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
-
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
           .thenReturn(Future.successful((DeRegistered, None)))
 
@@ -424,9 +408,6 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
-
-        when(authConnector.currentAuthority(any(), any()))
-          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
           .thenReturn(Future.successful((RenewalSubmitted(Some(LocalDate.now)), None)))
@@ -453,9 +434,6 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
-
-        when(authConnector.currentAuthority(any(), any()))
-          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
         val renewalDate = LocalDate.now().plusDays(15)
 
@@ -485,9 +463,6 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
-
-        when(authConnector.currentAuthority(any(), any()))
-          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
         when(controller.renewalService.isRenewalComplete(any(), any[String]())(any(), any()))
           .thenReturn(Future.successful(false))
@@ -535,9 +510,6 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
         when(controller.renewalService.isRenewalComplete(any(), any[String]())(any(), any()))
           .thenReturn(Future.successful(true))
-
-        when(authConnector.currentAuthority(any(), any()))
-          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
         val renewalDate = LocalDate.now().plusDays(15)
 
@@ -643,9 +615,6 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
 
-        when(authConnector.currentAuthority(any(), any()))
-          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
-
         val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
           Some(LocalDate.now.plusDays(30)), false)
 
@@ -663,7 +632,6 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
         doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").asScala foreach {
           _.text mustBe Messages("changeofficer.changelink.text")
         }
-
       }
 
       "application status is ReadyForRenewal" in new Fixture {
@@ -676,9 +644,6 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
-
-        when(authConnector.currentAuthority(any(), any()))
-          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
         val renewalDate = LocalDate.now().plusDays(15)
 

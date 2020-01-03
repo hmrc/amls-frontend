@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,21 +20,22 @@ import controllers.actions.SuccessfulAuthAction
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved, SubmissionReadyForReview}
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.auth.core.AuthConnector
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
-    self =>
+  trait Fixture extends DependencyMocks {
+    self => val request = addToken(authRequest)
 
-    val request = addToken(authRequest)
     val controller = new WhatYouNeedController(
       authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       statusService = mockStatusService,
-      authConnector = mock[AuthConnector])
+      authConnector = mock[AuthConnector],
+      cc = mockMcc)
   }
 
   "WhatYouNeedController" must {

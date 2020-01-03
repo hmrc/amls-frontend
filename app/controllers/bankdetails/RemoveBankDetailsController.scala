@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,17 +17,20 @@
 package controllers.bankdetails
 
 import connectors.DataCacheConnector
+import controllers.CommonPlayDependencies
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import models.bankdetails.BankDetails
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, StatusConstants}
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 @Singleton
-class RemoveBankDetailsController @Inject()(
-                                             val authAction: AuthAction,
-                                             val dataCacheConnector: DataCacheConnector
-                                           ) extends BankDetailsController {
+class RemoveBankDetailsController @Inject()(val authAction: AuthAction,
+                                            val ds: CommonPlayDependencies,
+                                            val dataCacheConnector: DataCacheConnector,
+                                            val mcc: MessagesControllerComponents) extends BankDetailsController(ds, mcc) {
 
   def get(index: Int) = authAction.async {
       implicit request =>

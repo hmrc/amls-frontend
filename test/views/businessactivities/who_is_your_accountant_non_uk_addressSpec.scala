@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,14 +22,14 @@ import models.Country
 import models.businessactivities.{AccountantsAddress, NonUkAccountantsAddress, WhoIsYourAccountantIsUk, WhoIsYourAccountantName}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.{AmlsSpec, AutoCompleteServiceMocks}
+import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
 
 
-class who_is_your_accountant_non_uk_addressSpec extends AmlsSpec with MustMatchers {
+class who_is_your_accountant_non_uk_addressSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   val defaultName = WhoIsYourAccountantName("accountantName",Some("tradingName"))

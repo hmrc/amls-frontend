@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ object RiskAssessmentType {
     Reads {
       case JsString("01") => JsSuccess(PaperBased)
       case JsString("02") => JsSuccess(Digital)
-      case _ => JsError((JsPath \ "riskassessments") -> play.api.data.validation.ValidationError("error.invalid"))
+      case _ => JsError((JsPath \ "riskassessments") -> play.api.libs.json.JsonValidationError("error.invalid"))
     }
 
   implicit val jsonRiskAssessmentWrites =

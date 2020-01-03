@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,8 +35,9 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.{AutoCompleteService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -44,7 +45,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.AmlsSpec
 
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
@@ -54,6 +55,9 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
   implicit val hc = HeaderCarrier()
   val mockDataCacheConnector = mock[DataCacheConnector]
   val RecordId = 1
+
+  trait Fixture {
+    self => val request = addToken(authRequest)
 
   val viewResponse = ViewResponse(
     "",
@@ -77,9 +81,6 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
     aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
   )
 
-  trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
-
     val auditConnector = mock[AuditConnector]
     val autoCompleteService = mock[AutoCompleteService]
     val statusService = mock[StatusService]
@@ -88,8 +89,10 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
       dataCacheConnector = mockDataCacheConnector,
       auditConnector = auditConnector,
       authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       statusService = statusService,
-      autoCompleteService = autoCompleteService
+      autoCompleteService = autoCompleteService,
+      cc = mockMcc
     )
 
     when {
@@ -178,7 +181,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
       "redirect to TimeAtAddressController" when {
         "all the mandatory UK parameters are supplied" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "true",
             "addressLine1" -> "Line 1",
             "addressLine2" -> "Line 2",
@@ -216,11 +219,51 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
               d.detail("postCode") mustBe "AA1 1AA"
           }
         }
+
+        "all the mandatory non-UK parameters are supplied" in new Fixture {
+
+          val requestWithParams = requestWithUrlEncodedBody(
+            "isUK" -> "false",
+            "addressLineNonUK1" -> "Line 1",
+            "addressLineNonUK2" -> "Line 2",
+            "country" -> "ES"
+          )
+          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
+          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
+
+          when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
+            .thenReturn(Future.successful(SubmissionReadyForReview))
+
+          when {
+            currentAddressController.dataCacheConnector.fetch[ViewResponse](any(), eqTo(ViewResponse.key))(any(), any())
+          } thenReturn Future.successful(Some(viewResponse))
+
+          val result = currentAddressController.post(RecordId)(requestWithParams)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.TimeAtCurrentAddressController.get(RecordId).url))
+
+          val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+          verify(auditConnector).sendEvent(captor.capture())(any(), any())
+
+          captor.getValue match {
+            case d: DataEvent =>
+              d.detail("addressLine1") mustBe "Line 1"
+              d.detail("addressLine2") mustBe "Line 2"
+              d.detail("country") mustBe "Spain"
+          }
+        }
       }
 
       "redirect to CurrentAddressDateOfChangeController" when {
         "address changed and in approved state" in new Fixture {
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "true",
             "addressLine1" -> "New line 1",
             "addressLine2" -> "New line 2",
@@ -264,7 +307,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
 
       "redirect to CurrentAddressDateOfChangeController" when {
         "address changed and in ready for renewal state" in new Fixture {
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "true",
             "addressLine1" -> "Line 1",
             "addressLine2" -> "Line 2",
@@ -296,7 +339,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
 
       "redirect to CurrentAddressDateOfChangeController" when {
         "address changed and in eligible state for date of change and not in edit mode" in new Fixture {
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "true",
             "addressLine1" -> "Line 1",
             "addressLine2" -> "Line 2",
@@ -327,7 +370,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
 
       "redirect to CurrentAddressDateOfChangeController" when {
         "changed address from non-uk to uk and in eligible state for date of change and not in edit mode" in new Fixture {
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "true",
             "addressLine1" -> "Line 1",
             "addressLine2" -> "Line 2",
@@ -358,7 +401,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
 
       "redirect to TimeAtCurrentAddressController" when {
         "not in edit mode and no line id defined" in new Fixture {
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "true",
             "addressLine1" -> "Line 1",
             "addressLine2" -> "Line 2",
@@ -390,7 +433,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
       "redirect to DetailedAnswersController" when {
         "edit is true" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "true",
             "addressLine1" -> "Line 1",
             "addressLine2" -> "Line 2",
@@ -424,7 +467,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
 
         "given an invalid address" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "true",
             "addressLine1" -> "Line &1",
             "addressLine2" -> "Line *2",
@@ -456,7 +499,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
 
         "isUK field is not supplied" in new Fixture {
 
-          val line1MissingRequest = request.withFormUrlEncodedBody()
+          val line1MissingRequest = addToken(FakeRequest())
 
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
@@ -472,7 +515,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
 
         "the default fields for UK are not supplied" in new Fixture {
 
-          val requestWithMissingParams = request.withFormUrlEncodedBody(
+          val requestWithMissingParams = requestWithUrlEncodedBody(
             "isUK" -> "true",
             "addressLine1" -> "",
             "addressLine2" -> "",
@@ -493,12 +536,63 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
           document.select("a[href=#addressLine2]").html() must include(Messages("error.required.address.line2"))
           document.select("a[href=#postcode]").html() must include(Messages("error.required.postcode"))
         }
+
+        "there is no country supplied" in new Fixture {
+
+          val requestWithMissingParams = requestWithUrlEncodedBody(
+            "isUK" -> "false",
+            "addressLineNonUK1" -> "",
+            "addressLineNonUK2" -> "",
+            "country" -> ""
+          )
+
+          when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
+            .thenReturn(Future.successful(SubmissionReadyForReview))
+
+          val result = currentAddressController.post(RecordId)(requestWithMissingParams)
+          status(result) must be(BAD_REQUEST)
+
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.select("a[href=#addressLineNonUK1]").html() must include(Messages("error.required.address.line1"))
+          document.select("a[href=#addressLineNonUK2]").html() must include(Messages("error.required.address.line2"))
+          document.select("a[href=#country]").html() must include(Messages("error.required.country"))
+        }
+
+        "the country selected is United Kingdom" in new Fixture {
+
+          val requestWithMissingParams = requestWithUrlEncodedBody(
+            "isUK" -> "false",
+            "addressLineNonUK1" -> "",
+            "addressLineNonUK2" -> "",
+            "country" -> "GB"
+          )
+
+          when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
+            .thenReturn(Future.successful(SubmissionReadyForReview))
+
+          val result = currentAddressController.post(RecordId)(requestWithMissingParams)
+          status(result) must be(BAD_REQUEST)
+
+          val rpName: String = personName.map(pName =>
+            pName.titleName
+          ).getOrElse("")
+
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.select("a[href=#addressLineNonUK1]").html() must include(Messages("error.required.address.line1"))
+          document.select("a[href=#addressLineNonUK2]").html() must include(Messages("error.required.address.line2"))
+          document.select("a[href=#country]").html() must include(Messages("error.required.select.non.uk", s"$rpName ${Messages("error.required.select.non.uk.address")}"))
+        }
+
     }
 
       "respond with NOT_FOUND" when {
         "given an out of bounds index" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "true",
             "addressLine1" -> "Line 1",
             "addressLine2" -> "Line 2",

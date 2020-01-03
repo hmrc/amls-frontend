@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,10 @@ import play.api.http.HttpErrorHandler
 import play.api.mvc.{Action, Result}
 
 @Singleton
-class AssetsController @Inject()(errorHandler: HttpErrorHandler, env: Environment, transformer: LocationGraphTransformer) extends AssetsBuilder(errorHandler) {
+class AssetsController @Inject()(errorHandler: HttpErrorHandler,
+                                 env: Environment,
+                                 transformer: LocationGraphTransformer,
+                                 meta: AssetsMetadata) extends AssetsBuilder(errorHandler, meta) {
 
   lazy val countriesJson = transformer
     .transform(models.countries.map(_.code).toSet ++ Set(

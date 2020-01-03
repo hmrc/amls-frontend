@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package controllers.responsiblepeople
 
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople.ResponsiblePerson._
@@ -25,7 +25,7 @@ import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
@@ -37,7 +37,7 @@ import scala.concurrent.Future
 
 class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
@@ -48,8 +48,8 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
       .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .build()
 
-    val mockApplicationConfig = mock[AppConfig]
-    val controller = new PersonNonUKPassportController(messagesApi = messagesApi, dataCacheConnector, SuccessfulAuthAction, mockApplicationConfig)
+    val mockApplicationConfig = mock[ApplicationConfig]
+    val controller = new PersonNonUKPassportController(messagesApi = messagesApi, dataCacheConnector, SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
 
     val emptyCache = CacheMap("", Map.empty)
     val mockCacheMap = mock[CacheMap]
@@ -122,7 +122,7 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
       "edit is false and DOB is defined" must {
         "go to CountryofBirthController" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "nonUKPassport" -> "true",
             "nonUKPassportNumber" -> passportNumber
           )
@@ -148,7 +148,7 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
       "edit is false and DOB is not defined" must {
         "go to CountryofBirthController" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "nonUKPassport" -> "true",
             "nonUKPassportNumber" -> passportNumber
           )
@@ -174,7 +174,7 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
       "edit is true" must {
         "go to DetailedAnswersController" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "nonUKPassport" -> "true",
             "nonUKPassportNumber" -> passportNumber
           )
@@ -201,7 +201,7 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
       "given invalid data" must {
         "respond with BAD_REQUEST" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "nonUKPassport" -> "true"
           )
 
@@ -219,7 +219,7 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
       "Responsible Person cannot be found with given index" must {
         "respond with NOT_FOUND" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "nonUKPassport" -> "false"
           )
 

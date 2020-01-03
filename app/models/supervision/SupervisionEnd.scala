@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ import jto.validation.{From, Rule, Write}
 import models.FormTypes.{supervisionEndDateRule, localDateWrite}
 import org.joda.time.LocalDate
 import play.api.libs.json.{Json, Reads, Writes}
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 
 case class SupervisionEnd(endDate: LocalDate)
 
@@ -46,7 +48,7 @@ object SupervisionEnd {
 
   implicit val jsonReads: Reads[SupervisionEnd] = {
 
-    import play.api.libs.json.Reads._
+    import play.api.libs.json.JodaReads._
     import play.api.libs.json._
 
     (__ \ "supervisionEndDate").read[LocalDate].map(SupervisionEnd.apply) map identity[SupervisionEnd]

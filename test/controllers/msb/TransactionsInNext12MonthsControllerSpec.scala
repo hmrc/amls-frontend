@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import models.moneyservicebusiness.{MoneyServiceBusiness, SendMoneyToOtherCountr
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -33,15 +33,16 @@ import scala.concurrent.Future
 
 class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
     val controller = new TransactionsInNext12MonthsController(
-      SuccessfulAuthAction,
+      SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
       mockStatusService,
-      mockServiceFlow
+      mockServiceFlow,
+      cc = mockMcc
     )
 
     mockIsNewActivityNewAuth(false)
@@ -95,7 +96,7 @@ class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSuga
 
     "Show error message when user has not filled the mandatory fields" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "txnAmount" -> ""
       )
 
@@ -113,7 +114,7 @@ class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSuga
 
     "on valid post" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "txnAmount" -> "12345678963"
       )
 
@@ -130,7 +131,7 @@ class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSuga
 
     "on valid post in edit mode with the next page's data in the store" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "txnAmount" -> "12345678963"
       )
 
@@ -157,7 +158,7 @@ class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSuga
 
     "on valid post in edit mode without the next page's data in the store" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "txnAmount" -> "12345678963"
       )
 

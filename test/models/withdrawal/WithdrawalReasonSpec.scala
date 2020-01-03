@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package models.withdrawal
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatest.MustMatchers
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsString, _}
 
@@ -142,15 +142,15 @@ class WithdrawalReasonSpec extends PlaySpec with MustMatchers with MockitoSugar 
     "throw error" when {
       "enum value is invalid" in {
         Json.fromJson[WithdrawalReason](Json.obj("withdrawalReason" -> "10")) must
-          be(JsError(JsPath -> play.api.data.validation.ValidationError("error.invalid")))
+          be(JsError(JsPath -> play.api.libs.json.JsonValidationError("error.invalid")))
       }
       "enum is missing" in {
         Json.fromJson[WithdrawalReason](Json.obj()) must
-          be(JsError(JsPath \ "withdrawalReason" -> play.api.data.validation.ValidationError("error.path.missing")))
+          be(JsError(JsPath \ "withdrawalReason" -> play.api.libs.json.JsonValidationError("error.path.missing")))
       }
       "other reason is missing" in {
         Json.fromJson[WithdrawalReason](Json.obj("withdrawalReason" -> "Other, please specify")) must
-          be(JsError(JsPath \ "specifyOtherReason" -> play.api.data.validation.ValidationError("error.path.missing")))
+          be(JsError(JsPath \ "specifyOtherReason" -> play.api.libs.json.JsonValidationError("error.path.missing")))
       }
     }
 

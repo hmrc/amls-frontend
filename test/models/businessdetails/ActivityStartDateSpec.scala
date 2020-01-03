@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ class ActivityStartDateSpec extends PlaySpec {
         "startDate.year" -> Seq("2100")
       )
       ActivityStartDate.formRule.validate(model) must be(Invalid(Seq(
-        Path \ "startDate" -> Seq(ValidationError("error.invalid.date.past"))
+        Path \ "startDate" -> Seq(ValidationError("error.invalid.date.before.2100"))
       )))
     }
   }
@@ -74,10 +74,10 @@ class ActivityStartDateSpec extends PlaySpec {
       val model = Map(
         "startDate.day" -> Seq("1"),
         "startDate.month" -> Seq("1"),
-        "startDate.year" -> Seq("2050")
+        "startDate.year" -> Seq("2150")
       )
       ActivityStartDate.formRule.validate(model) must be(Invalid(Seq(
-        Path \ "startDate" -> Seq(ValidationError("error.invalid.date.past"))
+        Path \ "startDate" -> Seq(ValidationError("error.invalid.date.before.2100"))
       )))
     }
   }
@@ -132,7 +132,7 @@ class ActivityStartDateSpec extends PlaySpec {
     "Read and write successfully" in {
 
       ActivityStartDate.format.reads(ActivityStartDate.format.writes(ActivityStartDate(new LocalDate(1990, 2, 24)))) must be(
-        JsSuccess(ActivityStartDate(new LocalDate(1990, 2, 24)), JsPath \ "startDate"))
+        JsSuccess(ActivityStartDate(new LocalDate(1990, 2, 24)), JsPath))
     }
 
     "write successfully" in {

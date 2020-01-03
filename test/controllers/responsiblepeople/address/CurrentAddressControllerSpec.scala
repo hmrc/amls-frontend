@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,9 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
     val currentAddressController = new CurrentAddressController(
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction,
-      autoCompleteService = autoCompleteService
+      autoCompleteService = autoCompleteService,
+      ds = commonDependencies,
+      cc = mockMcc
     )
 
     when {
@@ -149,7 +151,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
       "redirect to CurrentAddressUkController" when {
         "true selected" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "true")
 
           val responsiblePeople = ResponsiblePerson()
@@ -169,7 +171,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
       "redirect to CurrentAddressNonUkController and wipe old address" when {
         "changed the answer from yes to no" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "false")
 
           val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
@@ -198,7 +200,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
       "redirect to CurrentAddressUkController and wipe old address" when {
         "changed the answer from no to yes" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "true")
 
           val ukAddress = PersonAddressNonUK("Line 1", "Line 2", Some("Line 3"), None, Country("", ""))
@@ -227,7 +229,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
       "redirect to CurrentAddressNonUkController" when {
         "false selected" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "false")
 
           val responsiblePeople = ResponsiblePerson()
@@ -248,7 +250,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
 
         "isUK field is not supplied" in new Fixture {
 
-          val line1MissingRequest = request.withFormUrlEncodedBody()
+          val line1MissingRequest = requestWithUrlEncodedBody()
 
           val responsiblePeople = ResponsiblePerson(personName)
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import org.jsoup.select.Elements
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -39,7 +39,7 @@ import scala.concurrent.Future
 
 class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val mockDataConnector = mock[DataCacheConnector]
@@ -47,8 +47,7 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
     val controller = new CorrespondenceAddressIsUkController (
       dataConnector = mock[DataCacheConnector],
       auditConnector = mock[AuditConnector],
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
 
     when {
       controller.auditConnector.sendEvent(any())(any(), any())
@@ -113,7 +112,7 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
 
         val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, None, None, false, false)))
 
-        val newRequest = request.withFormUrlEncodedBody("isUK" -> "true")
+        val newRequest = requestWithUrlEncodedBody("isUK" -> "true")
 
         when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any(), any()))
           .thenReturn(fetchResult)
@@ -130,7 +129,7 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
 
         val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, None, None, false, false)))
 
-        val newRequest = request.withFormUrlEncodedBody("isUK" -> "false")
+        val newRequest = requestWithUrlEncodedBody("isUK" -> "false")
 
         when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any(), any()))
           .thenReturn(fetchResult)
@@ -147,7 +146,7 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
 
         val fetchResult = Future.successful(None)
 
-        val newRequest = request.withFormUrlEncodedBody( )
+        val newRequest = requestWithUrlEncodedBody( )
 
         when(controller.dataConnector.fetch[BusinessDetails](any(), any()) (any(), any())).thenReturn(fetchResult)
 

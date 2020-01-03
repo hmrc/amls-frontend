@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package models.deregister
 
 import org.joda.time.LocalDate
 import play.api.libs.json.{Json, Writes}
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 
 case class DeRegisterSubscriptionRequest(acknowledgementReference: String,
                                          deregistrationDate: LocalDate,
@@ -31,8 +33,8 @@ object DeRegisterSubscriptionRequest {
 
   implicit val writes: Writes[DeRegisterSubscriptionRequest] = {
     import play.api.libs.functional.syntax._
-    import play.api.libs.json.Writes._
     import play.api.libs.json._
+    import play.api.libs.json.JodaWrites._
     Writes[DeRegisterSubscriptionRequest] { ep =>
       (
         (__ \ "acknowledgementReference").write[String] and

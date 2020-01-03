@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,20 @@
 package views.bankdetails
 
 import forms.{Form2, InvalidForm, ValidForm}
-import jto.validation.{Path, ValidationError}
-import models.bankdetails.NonUKAccountNumber
-import org.scalatest.MustMatchers
+import models.bankdetails.{Account, BankAccountType, NonUKAccountNumber}
+import org.scalatest.{MustMatchers}
+import  utils.AmlsViewSpec
+import jto.validation.Path
+import jto.validation.ValidationError
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import utils.AmlsSpec
 import views.Fixture
 
 
-class bank_account_typeSpec extends AmlsSpec with MustMatchers  {
+class bank_account_typeSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "bank_account_type view " must{

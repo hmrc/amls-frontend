@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,10 @@
 
 package models.renewal
 
-import jto.validation._
-import jto.validation.forms._
-import jto.validation.ValidationError
-import play.api.libs.json.{Json, Reads, Writes}
-import utils.JsonMapping
 import cats.data.Validated.{Invalid, Valid}
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.{From, Rule, ValidationError, Write, _}
+import play.api.libs.json.{Json, Reads, Writes}
 
 
 case class PaymentMethods(courier: Boolean,
@@ -30,8 +28,6 @@ case class PaymentMethods(courier: Boolean,
 
 sealed trait PaymentMethods0 {
 
-  import JsonMapping._
-  import utils.MappingUtils.MonoidImplicits._
   import models.FormTypes._
 
   private implicit def rule[A]
@@ -95,8 +91,7 @@ sealed trait PaymentMethods0 {
         (__ \ "other").write[Boolean].contramap[Option[_]] {
           case Some(_) => true
           case None => false
-        } ~
-        (__ \ "details").write[Option[String]]
+        } ~ (__ \ "details").write[Option[String]]
       )(a => (a.courier, a.direct, a.other, a.other))
     }
 
@@ -106,15 +101,22 @@ sealed trait PaymentMethods0 {
   }
 
   val jsonR: Reads[PaymentMethods] = {
-    import utils.JsonMapping._
     import jto.validation.playjson.Rules.{pickInJson => _, _}
+    import utils.JsonMapping._
     implicitly
   }
 
-  val formW: Write[PaymentMethods, UrlFormEncoded] = {
-    import cats.implicits._
+  val formWrites: Write[PaymentMethods, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
     import jto.validation.forms.Writes._
-    implicitly[Write[PaymentMethods, UrlFormEncoded]]
+    (
+      (__ \ "courier").write[Boolean] ~
+        (__ \ "direct").write[Boolean] ~
+        (__ \ "other").write[Boolean].contramap[Option[_]] {
+          case Some(_) => true
+          case None => false
+        } ~
+        (__ \ "details").write[Option[String]]
+      )(a => (a.courier, a.direct, a.other, a.other))
   }
 
   val jsonW = Writes[PaymentMethods] {x =>
@@ -126,7 +128,6 @@ sealed trait PaymentMethods0 {
       case true => jsMethods ++ jsDetails
       case false => jsMethods
     }
-
   }
 }
 
@@ -136,6 +137,6 @@ object PaymentMethods {
 
   implicit val formR: Rule[UrlFormEncoded, PaymentMethods] = Cache.formR
   implicit val jsonR: Reads[PaymentMethods] = Cache.jsonR
-  implicit val formW: Write[PaymentMethods, UrlFormEncoded] = Cache.formW
+  implicit val formW: Write[PaymentMethods, UrlFormEncoded] = Cache.formWrites
   implicit val jsonW: Writes[PaymentMethods] = Cache.jsonW
 }

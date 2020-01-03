@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,10 @@ package controllers.payments
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import models.SubmissionRequestStatus
+import play.api.mvc.MessagesControllerComponents
 import services.{AuthEnrolmentsService, FeeResponseService, StatusService}
 import utils.AuthAction
 
@@ -30,10 +31,11 @@ import scala.concurrent.Future
 
 class BankDetailsController @Inject()(val dataCacheConnector: DataCacheConnector,
                                       val authAction: AuthAction,
+                                      val ds: CommonPlayDependencies,
                                       val authEnrolmentsService: AuthEnrolmentsService,
                                       val feeResponseService: FeeResponseService,
-                                      val statusService: StatusService
-                                    ) extends DefaultBaseController{
+                                      val statusService: StatusService,
+                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
 
   def get(isUK: Boolean = true) = authAction.async {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,13 @@
 package models.businessactivities
 
 import models.Country
-import jto.validation.forms._
+import jto.validation.forms.{UrlFormEncoded, _}
 import jto.validation.{From, Rule, Success, Write}
 import jto.validation._
-import play.api.libs.json.{JsObject, Json, Reads, Writes}
-import utils.{TraversableValidators, JsonMapping}
+import play.api.libs.json.{JsObject, Json, Reads, Writes, __}
+import utils.{JsonMapping, TraversableValidators}
 import cats.data.Validated.{Invalid, Valid}
+import models.renewal.MostTransactions
 
 case class CustomersOutsideUK(countries: Option[Seq[Country]])
 
@@ -90,16 +91,23 @@ sealed trait CustomersOutsideUK0 {
     implicitly
   }
 
-  val jsonR: Reads[CustomersOutsideUK] = {
-    import jto.validation.playjson.Rules.{JsValue => _, pickInJson => _, _}
-    implicitly
-  }
+  val jsonReads: Reads[CustomersOutsideUK] =
+    (__ \ "countries").readNullable[Seq[Country]].map {
+      case Some(countries) if countries.isEmpty => CustomersOutsideUK(None)
+      case c@Some(countries) => CustomersOutsideUK apply c
+      case None => CustomersOutsideUK(None)
+    }
 
-  val formW: Write[CustomersOutsideUK, UrlFormEncoded] = {
-    import cats.implicits._
-    import utils.MappingUtils.MonoidImplicits.urlMonoid
+  val formWrites: Write[CustomersOutsideUK, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
     import jto.validation.forms.Writes._
-    implicitly
+    import play.api.libs.functional.syntax.unlift
+    (
+      (__ \ "isOutside").write[Boolean].contramap[Option[_]] {
+        case Some(_) => true
+        case None => false
+      } ~
+        (__ \ "countries").write[Option[Seq[Country]]]
+      ) (a => (a.countries, a.countries))
   }
 
   val jsonW = Writes[CustomersOutsideUK] { x =>
@@ -125,7 +133,7 @@ object CustomersOutsideUK {
   val maxLength = Cache.maxLength
 
   implicit val formR: Rule[UrlFormEncoded, CustomersOutsideUK] = Cache.formR
-  implicit val jsonR: Reads[CustomersOutsideUK] = Cache.jsonR
-  implicit val formW: Write[CustomersOutsideUK, UrlFormEncoded] = Cache.formW
+  implicit val jsonR: Reads[CustomersOutsideUK] = Cache.jsonReads
+  implicit val formW: Write[CustomersOutsideUK, UrlFormEncoded] = Cache.formWrites
   implicit val jsonW: Writes[CustomersOutsideUK] = Cache.jsonW
 }

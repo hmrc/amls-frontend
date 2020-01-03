@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package models.responsiblepeople
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 
@@ -137,7 +137,7 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
       "fail to validate" when {
         "given an empty value" in {
           Json.fromJson[PositionWithinBusiness](JsString("")) must
-            be(JsError((JsPath \ "positions") -> play.api.data.validation.ValidationError("error.invalid")))
+            be(JsError((JsPath \ "positions") -> play.api.libs.json.JsonValidationError("error.invalid")))
         }
       }
 

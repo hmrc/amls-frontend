@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ class AgentPartnershipSpec extends PlaySpec {
   "Json Validation" must {
     "Successfully read/write Json data" in {
       AgentPartnership.format.reads(AgentPartnership.format.writes(
-        AgentPartnership("test"))) must be(JsSuccess(AgentPartnership("test"), JsPath \ "agentPartnership"))
+        AgentPartnership("test"))) must be(JsSuccess(AgentPartnership("test"), JsPath))
     }
   }
 }

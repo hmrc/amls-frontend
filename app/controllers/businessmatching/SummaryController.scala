@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,16 @@ package controllers.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._
-import controllers.DefaultBaseController
+import connectors.DataCacheConnector
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessActivities, BusinessActivity}
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.businessmatching.summary
 
 import scala.concurrent.Future
@@ -32,9 +35,10 @@ import scala.concurrent.Future
 @Singleton
 class SummaryController @Inject()(
                                    authAction: AuthAction,
+                                   val ds: CommonPlayDependencies,
                                    val statusService: StatusService,
-                                   val businessMatchingService: BusinessMatchingService
-                                 ) extends DefaultBaseController {
+                                   val businessMatchingService: BusinessMatchingService,
+                                   val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
       implicit request =>

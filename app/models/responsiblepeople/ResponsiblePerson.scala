@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -299,6 +299,8 @@ object ResponsiblePerson {
   import play.api.libs.functional.syntax._
   import play.api.libs.json._
   import utils.MappingUtils._
+  import play.api.libs.json.JodaWrites._
+  import play.api.libs.json.JodaReads._
 
   val flowChangeOfficer = "changeofficer"
   val flowFromDeclaration = "fromDeclaration"

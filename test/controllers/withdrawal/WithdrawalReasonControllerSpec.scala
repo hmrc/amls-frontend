@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
@@ -32,7 +31,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
-class WithdrawalReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
+class WithdrawalReasonControllerSpec extends AmlsSpec {
 
   trait TestFixture extends AuthorisedFixture with DependencyMocks {
     self =>
@@ -42,7 +41,7 @@ class WithdrawalReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
     val authService = mock[AuthEnrolmentsService]
     val statusService = mock[StatusService]
 
-    lazy val controller = new WithdrawalReasonController(SuccessfulAuthAction, amlsConnector, authService, statusService, mockCacheConnector)
+    lazy val controller = new WithdrawalReasonController(SuccessfulAuthAction, ds = commonDependencies, amlsConnector, authService, statusService, mockCacheConnector, cc = mockMcc)
 
     val amlsRegistrationNumber = "XA1234567890L"
 
@@ -82,7 +81,7 @@ class WithdrawalReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
         "go to landing controller" which {
           "follows sending a withdrawal to amls" when {
             "withdrawalReason is selection without other reason" in new TestFixture {
-              val newRequest = request.withFormUrlEncodedBody(
+              val newRequest = requestWithUrlEncodedBody(
                 "withdrawalReason" -> "01"
               )
 
@@ -99,7 +98,7 @@ class WithdrawalReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
 
             "withdrawalReason is selection with other reason" in new TestFixture {
 
-              val newRequest = request.withFormUrlEncodedBody(
+              val newRequest = requestWithUrlEncodedBody(
                 "withdrawalReason" -> "04",
                 "specifyOtherReason" -> "reason"
               )
@@ -123,7 +122,7 @@ class WithdrawalReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
       "given invalid data" must {
         "return with BAD_REQUEST" in new TestFixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "withdrawalReason" -> "20"
           )
 
@@ -140,7 +139,7 @@ class WithdrawalReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
             authService.amlsRegistrationNumber(Some(any()), Some(any()))(any(), any())
           } thenReturn Future.successful(None)
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "withdrawalReason" -> "01"
           )
 

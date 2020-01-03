@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,16 @@
 package views.bankdetails
 
 import models.bankdetails._
-import org.scalatest.MustMatchers
 import org.scalatest.prop.PropertyChecks
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import play.api.test.FakeRequest
+import utils.AmlsSummaryViewSpec
 import views.{Fixture, HtmlAssertions}
 
-class summarySpec extends AmlsSpec with MustMatchers with PropertyChecks with HtmlAssertions {
+class summarySpec extends AmlsSummaryViewSpec with PropertyChecks with HtmlAssertions {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView(FakeRequest())
 
     val toHide = 6
 
@@ -35,7 +35,6 @@ class summarySpec extends AmlsSpec with MustMatchers with PropertyChecks with Ht
     val ukBankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("12345678", "111111")))
     val nonUkBankAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some(NonUKAccountNumber("123456789")))
     val nonUkIban = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(true)), Some(NonUKIBANNumber("NL26RABO0163975856")))
-
 
   }
 

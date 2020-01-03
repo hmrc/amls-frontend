@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,7 +79,7 @@ class NewHomeDateOfChangeSpec extends PlaySpec {
 
     "Read and write successfully" in {
       NewHomeDateOfChange.format.reads(NewHomeDateOfChange.format.writes(NewHomeDateOfChange(Some(new LocalDate(1990, 2, 24))))) must be(
-        JsSuccess(NewHomeDateOfChange(Some(new LocalDate(1990, 2, 24))), JsPath \ "dateOfChange"))
+        JsSuccess(NewHomeDateOfChange(Some(new LocalDate(1990, 2, 24))), JsPath))
 
     }
 

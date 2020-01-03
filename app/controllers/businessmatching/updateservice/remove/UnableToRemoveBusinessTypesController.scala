@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,19 +19,23 @@ package controllers.businessmatching.updateservice.remove
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessActivity, BusinessMatching}
+import play.api.i18n.Messages
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.businessmatching.updateservice.remove.unable_to_remove_activity
 
 import scala.concurrent.Future
 
 @Singleton
 class UnableToRemoveBusinessTypesController @Inject()(authAction: AuthAction,
-                                                      val dataCacheConnector: DataCacheConnector
-                                                     ) extends DefaultBaseController {
+                                                      val ds: CommonPlayDependencies,
+                                                      val dataCacheConnector: DataCacheConnector,
+                                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
       implicit request =>
@@ -40,7 +44,7 @@ class UnableToRemoveBusinessTypesController @Inject()(authAction: AuthAction,
       } getOrElse (InternalServerError("Get: Unable to show Unable to Remove Activities page"))
   }
 
-  private def getBusinessActivity(credId: String)(implicit hc: HeaderCarrier) = for {
+  private def getBusinessActivity(credId: String)(implicit hc: HeaderCarrier, messages: Messages) = for {
     model <- OptionT(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
     activities <- OptionT.fromOption[Future](model.alphabeticalBusinessActivitiesLowerCase(false))
   } yield activities.head

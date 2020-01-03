@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,9 +107,9 @@ class WhichCurrenciesSpec extends AmlsSpec with CharacterSets {
 
       "fail when missing all data" in {
         Json.fromJson[WhichCurrencies](Json.obj()) must be
-        JsError((JsPath \ "currencies") -> play.api.data.validation.ValidationError("error.path.missing"))
-        JsError((JsPath \ "customerMoneySource") -> play.api.data.validation.ValidationError("error.path.missing"))
-        JsError((JsPath \ "currencies") -> play.api.data.validation.ValidationError("error.path.missing"))
+        JsError((JsPath \ "currencies") -> play.api.libs.json.JsonValidationError("error.path.missing"))
+        JsError((JsPath \ "customerMoneySource") -> play.api.libs.json.JsonValidationError("error.path.missing"))
+        JsError((JsPath \ "currencies") -> play.api.libs.json.JsonValidationError("error.path.missing"))
       }
     }
 

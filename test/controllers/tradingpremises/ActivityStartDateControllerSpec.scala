@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import org.jsoup.nodes.Document
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
@@ -36,14 +36,14 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
 
   val address = Address("1", "2", None, None, "AA1 1BB", None)
 
-  trait Fixture extends AuthorisedFixture  {
+  trait Fixture  {
     self =>
     val request = addToken(authRequest)
 
     val cache: DataCacheConnector = mock[DataCacheConnector]
     val authAction: AuthAction = SuccessfulAuthAction
 
-    val controller = new ActivityStartDateController(messagesApi, authAction, self.cache)
+    val controller = new ActivityStartDateController(messagesApi, authAction, commonDependencies, self.cache, cc = mockMcc)
   }
 
   "ActivityStartDateController" must {
@@ -87,7 +87,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
 
     "POST:" must {
       "successfully redirect to next page on valid input" in new Fixture {
-        val postRequest = request.withFormUrlEncodedBody(
+        val postRequest = requestWithUrlEncodedBody(
           "startDate.day" -> "20",
           "startDate.month" -> "5",
           "startDate.year" -> "2014"
@@ -104,7 +104,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
       }
 
       "successfully redirect to next page on valid input in edit mode" in new Fixture {
-        val postRequest = request.withFormUrlEncodedBody(
+        val postRequest = requestWithUrlEncodedBody(
           "startDate.day" -> "20",
           "startDate.month" -> "5",
           "startDate.year" -> "2014"
@@ -128,7 +128,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
       }
 
       "throw error on missing required field" in new Fixture {
-        val postRequest = request.withFormUrlEncodedBody(
+        val postRequest = requestWithUrlEncodedBody(
           "startDate.day" -> "",
           "startDate.month" -> "5",
           "startDate.year" -> "2014"

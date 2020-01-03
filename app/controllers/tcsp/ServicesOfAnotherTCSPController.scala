@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,22 @@
 package controllers.tcsp
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.tcsp.Tcsp
+import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.tcsp._
 
 import scala.concurrent.Future
 
 class ServicesOfAnotherTCSPController @Inject()(
                                                  val authAction: AuthAction,
-                                                 val dataCacheConnector: DataCacheConnector) extends DefaultBaseController {
+                                                 val ds: CommonPlayDependencies,
+                                                 val dataCacheConnector: DataCacheConnector,
+                                                 val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   val NAME = "servicesOfAnotherTCSP"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(NAME)

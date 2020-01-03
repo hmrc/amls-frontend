@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,15 +21,15 @@ import jto.validation.{Path, ValidationError}
 import models.businessmatching.{AccountancyServices, BillPaymentServices, BusinessActivities, EstateAgentBusinessService}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
 import views.Fixture
 
 
-class what_does_your_business_doSpec extends AmlsSpec with MustMatchers {
+class what_does_your_business_doSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "what_does_your_business_do view" must {

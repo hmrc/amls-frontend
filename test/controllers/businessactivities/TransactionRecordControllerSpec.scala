@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,18 +21,18 @@ import models.businessactivities._
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
-    val controller = new TransactionRecordController(SuccessfulAuthAction, mockCacheConnector)
+    val controller = new TransactionRecordController(SuccessfulAuthAction, ds = commonDependencies, mockCacheConnector, mockMcc)
 
     mockCacheSave[BusinessActivities]
   }
@@ -69,7 +69,7 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
     "post is called" must {
       "respond with SEE_OTHER" when {
         "given valid data not in edit mode" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "isRecorded" -> "true"
           )
 
@@ -81,7 +81,7 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
         }
 
         "given valid data not in edit mode, and 'no' is selected" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "isRecorded" -> "false"
           )
 
@@ -94,7 +94,7 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
 
         "given valid data in edit mode and 'no' is selected" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "isRecorded" -> "false"
           )
 
@@ -107,7 +107,7 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
 
         "given valid data in edit mode and 'yes' is selected" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "isRecorded" -> "true"
           )
 
@@ -119,7 +119,7 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
         }
 
         "given valid data in edit mode, 'yes' is selected and the next question has already been asked" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "isRecorded" -> "true"
           )
 
@@ -135,7 +135,7 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
       }
 
       "reset the transaction types if 'no' is selected" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "isRecorded" -> "false"
         )
 
@@ -160,7 +160,7 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
       }
 
       "respond with BAD_REQUEST when given invalid data" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody()
+        val newRequest = requestWithUrlEncodedBody("" -> "")
 
         mockCacheFetch[BusinessActivities](None)
 

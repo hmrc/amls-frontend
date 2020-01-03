@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,9 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
     val timeAtCurrentAddressController = new TimeAtCurrentAddressController (
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction,
-      statusService = mockStatusService
+      statusService = mockStatusService,
+      ds = commonDependencies,
+      cc = mockMcc
     )
 
     when(timeAtCurrentAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any()))
@@ -125,7 +127,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
       "go to DetailedAnswersController" when {
         "edit is true" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "timeAtAddress" -> "03"
           )
 
@@ -148,7 +150,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
       "go to PositionWithinBusinessController" when {
         "edit is false and more than 3 years" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "timeAtAddress" -> "04"
           )
 
@@ -171,7 +173,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
       "go to AdditionalAddressController" when {
         "edit is false and less than 3 years" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "timeAtAddress" -> "03"
           )
 
@@ -195,7 +197,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         "given an invalid form" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "timeAtAddress" -> ""
           )
 
@@ -216,7 +218,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
       "respond with NOT_FOUND" when {
         "a current address is not stored for that index" in new Fixture {
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "timeAtAddress" -> "03"
           )
 

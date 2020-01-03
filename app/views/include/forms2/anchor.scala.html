@@ -1,5 +1,5 @@
 @*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
         returnLink: Boolean = false,
         returnLocation: Option[String] = None,
         id: Option[String] = None
-)(implicit lang: Lang, m: Messages)
+)(implicit m: Messages)
     @* Current use suggests we only use the one class on anchors: button;
     may need refactoring at a later date if more are required *@
 <a href="@attrHref" id="@id.getOrElse("")"

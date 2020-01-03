@@ -1,5 +1,5 @@
 @*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@
  * limitations under the License.
  *@
 
+@import config.{ApplicationConfig}
 @import include._
 @import include.forms2._
 @import models.businessmatching._
-@import config.{ApplicationConfig => appConfig}
 
-@(f: forms.Form2[_], model: BusinessMatching, changeActivitiesUrl: String, isPreSubmission: Boolean = true, isPending: Boolean = false)(implicit request: Request[_], messages: Messages)
+@(f: forms.Form2[_], model: BusinessMatching, changeActivitiesUrl: String, isPreSubmission: Boolean = true, isPending: Boolean = false)(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
 @if(isPreSubmission) {

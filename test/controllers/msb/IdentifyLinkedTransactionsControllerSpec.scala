@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -33,9 +33,9 @@ import scala.concurrent.Future
 
 class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSugar  {
 
-    trait Fixture extends AuthorisedFixture with DependencyMocks {
+    trait Fixture extends DependencyMocks {
       self => val request = addToken(authRequest)
-      val controller = new IdentifyLinkedTransactionsController(mockCacheConnector, authAction = SuccessfulAuthAction)
+      val controller = new IdentifyLinkedTransactionsController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
     }
 
   val cacheMap = mock[CacheMap]
@@ -76,8 +76,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
     "Show error message when user has not filled the mandatory fields" in new Fixture  {
 
-      val newRequest = request.withFormUrlEncodedBody(
-      )
+      val newRequest = requestWithUrlEncodedBody()
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
         (any(), any())).thenReturn(Future.successful(None))
@@ -93,7 +92,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
     "Navigate to next page if they have selected MT as a service" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody (
+      val newRequest = requestWithUrlEncodedBody(
         "linkedTxn" -> "true"
       )
       val msbServices = Some(
@@ -133,7 +132,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
     "user selects Yes and nvigate to next page if they have selected CE as a service" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody (
+      val newRequest = requestWithUrlEncodedBody(
         "linkedTxn" -> "true"
       )
       val msbServices = Some(
@@ -173,7 +172,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
     "user selects No and navigates to CE section if they have selected CE as a service" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody (
+      val newRequest = requestWithUrlEncodedBody(
         "linkedTxn" -> "false"
       )
       val msbServices = Some(
@@ -212,7 +211,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
     }
 
     "navigates to FX section if they have selected FX as a service" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody (
+      val newRequest = requestWithUrlEncodedBody(
         "linkedTxn" -> "false"
       )
       val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
@@ -233,7 +232,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
     "Navigate to next page if they have selected cheque cashing as a service" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody (
+      val newRequest = requestWithUrlEncodedBody(
         "linkedTxn" -> "true"
       )
 
@@ -273,7 +272,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
     "Navigate to next page if they have selected cheque cashing as a servicein edit mode" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody (
+      val newRequest = requestWithUrlEncodedBody(
         "linkedTxn" -> "true"
       )
 
@@ -313,7 +312,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
     "Navigate to Summary page in edit mode when all services are included and have data filled" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody (
+      val newRequest = requestWithUrlEncodedBody(
         "linkedTxn" -> "true"
       )
       val msbServices = Some(
@@ -350,7 +349,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
     "Navigate to Summary page in edit mode when CE pages are included and have data filled" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody (
+      val newRequest = requestWithUrlEncodedBody(
         "linkedTxn" -> "true"
       )
       val msbServices = Some(
@@ -385,7 +384,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
     "Navigate to Summary page in edit mode when FX pages are included and have data filled" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody (
+      val newRequest = requestWithUrlEncodedBody(
         "linkedTxn" -> "true"
       )
       val msbServices = Some(
@@ -420,7 +419,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
     "Navigate to MT section in edit mode when MT data is not in the store" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody (
+      val newRequest = requestWithUrlEncodedBody(
         "linkedTxn" -> "true"
       )
       val msbServices = Some(
@@ -454,7 +453,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
     "Navigate to CE section in edit mode when CE data is not in the store" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody (
+      val newRequest = requestWithUrlEncodedBody(
         "linkedTxn" -> "true"
       )
       val msbServices = Some(
@@ -488,7 +487,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
     "Navigate to FX section in edit mode when FX data is not in the store" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody (
+      val newRequest = requestWithUrlEncodedBody(
         "linkedTxn" -> "true"
       )
       val msbServices = Some(
@@ -522,7 +521,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
     "throw exception when msb services in Business Matching returns none" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody (
+      val newRequest = requestWithUrlEncodedBody(
         "linkedTxn" -> "true"
       )
 

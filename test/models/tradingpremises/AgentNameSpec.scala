@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,8 +38,6 @@ class AgentNameSpec extends AmlsSpec {
       AgentName.formReads.validate(formInput) must be(Valid(AgentName("sometext", None, Some(new LocalDate("1956-02-15")))))
 
     }
-
-
 
     "throw error when required date of birth field is missing" in {
       val noContentModel = Map("agentName" -> Seq("sometext")) ++ Map(

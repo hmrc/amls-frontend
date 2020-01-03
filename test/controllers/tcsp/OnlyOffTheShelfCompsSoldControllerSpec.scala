@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,10 @@ import models.tcsp._
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
-import play.api.inject.bind
-import play.api.inject.guice.GuiceInjectorBuilder
+import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -39,12 +37,11 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
 
     val cache = mock[DataCacheConnector]
 
-    val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .overrides(bind[DataCacheConnector].to(self.cache))
-      .build()
-
-    lazy val controller = injector.instanceOf[OnlyOffTheShelfCompsSoldController]
+    lazy val controller = new OnlyOffTheShelfCompsSoldController(
+      SuccessfulAuthAction,
+      commonDependencies,
+      cache,
+      cc = mockMcc)
 
     val tcsp = Tcsp(
       Some(TcspTypes(Set(
@@ -71,7 +68,7 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
       "respond with BAD_REQUEST" when {
         "given invalid data" in new TestFixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "onlyOffTheShelfCompsSold" -> "invalid"
           )
 
@@ -128,7 +125,7 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
             when(cache.fetch[Tcsp](any(), any())(any(), any()))
               .thenReturn(Future.successful(Some(companyFormationAgentTcsp)))
 
-            val result = controller.post()(request.withFormUrlEncodedBody("onlyOffTheShelfCompsSold" -> "true"))
+            val result = controller.post()(requestWithUrlEncodedBody("onlyOffTheShelfCompsSold" -> "true"))
 
             status(result) mustBe SEE_OTHER
             verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any(), any())
@@ -153,7 +150,7 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
                 hasChanged = true
               )
 
-              val result = controller.post(true)(request.withFormUrlEncodedBody("onlyOffTheShelfCompsSold" -> "true"))
+              val result = controller.post(true)(requestWithUrlEncodedBody("onlyOffTheShelfCompsSold" -> "true"))
 
               status(result) mustBe SEE_OTHER
               verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any(), any())
@@ -177,7 +174,7 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
                 hasChanged = true
               )
 
-              val result = controller.post(false)(request.withFormUrlEncodedBody("onlyOffTheShelfCompsSold" -> "false"))
+              val result = controller.post(false)(requestWithUrlEncodedBody("onlyOffTheShelfCompsSold" -> "false"))
               status(result) mustBe SEE_OTHER
               verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any(), any())
               redirectLocation(result) mustBe Some(controllers.tcsp.routes.SummaryController.get().url)

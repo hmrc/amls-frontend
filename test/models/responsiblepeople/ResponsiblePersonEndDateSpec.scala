@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -123,7 +123,7 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
 
       ResponsiblePersonEndDate.format.reads(
         ResponsiblePersonEndDate.format.writes(ResponsiblePersonEndDate(new LocalDate(1990, 2, 24)))) must be(
-        JsSuccess(ResponsiblePersonEndDate(new LocalDate(1990, 2, 24)), JsPath \ "endDate"))
+        JsSuccess(ResponsiblePersonEndDate(new LocalDate(1990, 2, 24)), JsPath))
 
     }
 
