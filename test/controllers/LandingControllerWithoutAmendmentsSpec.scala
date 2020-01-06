@@ -135,33 +135,6 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       }
     }
 
-    "redirect to login event page" when {
-      "responsible persons is not complete" in new Fixture {
-        val inCompleteResponsiblePeople: ResponsiblePerson = completeResponsiblePerson.copy(
-          dateOfBirth = None
-        )
-        val cacheMap: CacheMap = mock[CacheMap]
-
-        val complete: BusinessMatching = mock[BusinessMatching]
-
-        when(complete.isComplete) thenReturn true
-        when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
-        when(cacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(completeATB))
-        when(cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(Seq(inCompleteResponsiblePeople)))
-        when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
-          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0)))))
-
-        when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(Some(cacheMap))
-        when(controllerNoAmlsNumber.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
-          .thenReturn(Future.successful(activeStatusGen.sample.get, None))
-
-        val result: Future[Result] = controllerNoAmlsNumber.get()(request)
-
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) mustBe Some(controllers.routes.LoginEventController.get().url)
-      }
-    }
-
     "load the correct view after calling get" when {
 
       "the landing service has a saved form and " when {

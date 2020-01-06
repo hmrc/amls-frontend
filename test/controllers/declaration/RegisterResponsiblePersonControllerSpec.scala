@@ -26,8 +26,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.StatusService
-import uk.gov.hmrc.auth.core.AuthConnector
-import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthAction, DependencyMocks}
 
 class RegisterResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
