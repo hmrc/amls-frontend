@@ -54,7 +54,13 @@ object RedressScheme {
 
   implicit val formRedressWrites: Write[RedressScheme, UrlFormEncoded] = Write {
     case ThePropertyOmbudsman => Map("propertyRedressScheme" -> "01")
+    case OmbudsmanServices => Map("propertyRedressScheme" -> "02")
     case PropertyRedressScheme => Map("propertyRedressScheme" -> "03")
+    case Other(value) =>
+      Map(
+        "propertyRedressScheme" -> "04",
+        "other" -> value
+      )
     case RedressSchemedNo => Map("propertyRedressScheme" -> "05")
   }
 
@@ -80,9 +86,16 @@ object RedressScheme {
   }
 
   implicit val jsonRedressWrites = Writes[RedressScheme] {
-      case ThePropertyOmbudsman => Json.obj("isRedress" -> true,"propertyRedressScheme" -> "01")
-      case PropertyRedressScheme => Json.obj("isRedress" -> true,"propertyRedressScheme" -> "03")
-      case RedressSchemedNo => Json.obj("isRedress" -> false)
+    case ThePropertyOmbudsman => Json.obj("isRedress" -> true,"propertyRedressScheme" -> "01")
+    case OmbudsmanServices => Json.obj("isRedress" -> true,"propertyRedressScheme" -> "02")
+    case PropertyRedressScheme => Json.obj("isRedress" -> true,"propertyRedressScheme" -> "03")
+    case Other(value) =>
+      Json.obj(
+        "isRedress" -> true,
+        "propertyRedressScheme" -> "04",
+        "propertyRedressSchemeOther" -> value
+      )
+    case RedressSchemedNo => Json.obj("isRedress" -> false)
   }
 }
 

@@ -60,6 +60,8 @@ class EstateAgentBusinessSpec extends AmlsSpec {
     penalisedUnderEstateAgentsAct = None
   )
 
+  val invalidRedressScheme = completeModel.copy(redressScheme = Some(OmbudsmanServices))
+  val invalidRedressSchemeOther = completeModel.copy(redressScheme = Some(Other("foo")))
 
   "EstateAgentBusiness" must {
     "validate complete json" must {
@@ -146,6 +148,14 @@ class EstateAgentBusinessSpec extends AmlsSpec {
 
     "equal false when all properties equal `None`" in {
       incompleteModel.isComplete mustEqual false
+    }
+
+    "equal false for an invalid redress scheme" in {
+      invalidRedressScheme.isComplete mustEqual false
+    }
+
+    "equal false for an invalid other redress scheme" in {
+      invalidRedressSchemeOther.isComplete mustEqual false
     }
   }
 
