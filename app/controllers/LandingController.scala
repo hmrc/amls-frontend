@@ -90,6 +90,82 @@ class LandingController @Inject()(val landingService: LandingService,
         }
   }
 
+  def getWithAmendments(amlsRegistrationNumber: Option[String], credId: String, accountTypeId: (String, String))
+                       (implicit request: Request[_]) = {
+
+    amlsRegistrationNumber match {
+      case Some(mlrNumber) => landingService.cacheMap(credId) flatMap {
+        //enrolment exists
+        case Some(c) =>
+          Logger.debug("getWithAmendments:AMLSReference:" + amlsRegistrationNumber)
+          lazy val fixEmpties = for {
+            c1 <- fixEmptyRecords[TradingPremises](credId, c, TradingPremises.key)
+            c2 <- fixEmptyRecords[ResponsiblePerson](credId, c1, ResponsiblePerson.key)
+          } yield c2
+
+          //there is data in S4l
+          fixEmpties flatMap { cacheMap =>
+            if (dataHasChanged(cacheMap)) {
+              Logger.debug("Data has changed in getWithAmendments()")
+              cacheMap.getEntry[SubmissionRequestStatus](SubmissionRequestStatus.key) collect {
+                case SubmissionRequestStatus(true, _) => refreshAndRedirect(mlrNumber, Some(cacheMap), credId, accountTypeId)
+              } getOrElse landingService.setAltCorrespondenceAddress(mlrNumber, Some(cacheMap), accountTypeId, credId) flatMap { _=>
+                preFlightChecksAndRedirect(amlsRegistrationNumber, accountTypeId, credId)
+              }
+            } else {
+              Logger.debug("Data has not changed route in getWithAmendments()")
+              refreshAndRedirect(mlrNumber, Some(cacheMap), credId, accountTypeId)
+            }
+          }
+        case _ => {
+          Logger.debug("Data with amlsRegistration number route in getWithAmendments()" + amlsRegistrationNumber)
+          refreshAndRedirect(mlrNumber, None, credId, accountTypeId)
+        }
+      }
+
+      case _ => {
+        Logger.debug("No Enrolement exists getWithAmendments()")
+        getWithoutAmendments(amlsRegistrationNumber, credId, accountTypeId)
+      } //no enrolment exists
+    }
+  }
+
+  private def refreshAndRedirect(amlsRegistrationNumber: String, maybeCacheMap: Option[CacheMap], credId: String, accountTypeId: (String, String))
+                                (implicit headerCarrier: HeaderCarrier): Future[Result] = {
+    maybeCacheMap match {
+      case Some(c) if c.getEntry[DataImport](DataImport.key).isDefined =>
+        Logger.debug("[AMLSLandingController][refreshAndRedirect]: dataImport is defined")
+        Future.successful(Redirect(controllers.routes.StatusController.get()))
+
+      case _ =>
+        Logger.debug(s"[AMLSLandingController][refreshAndRedirect]: calling refreshCache with ${amlsRegistrationNumber}")
+        landingService.refreshCache(amlsRegistrationNumber, credId, accountTypeId) flatMap {
+          _ => {
+            preFlightChecksAndRedirect(Option(amlsRegistrationNumber), accountTypeId, credId)
+          }
+        }
+    }
+  }
+
+  private def preFlightChecksAndRedirect(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)
+                                        (implicit headerCarrier: HeaderCarrier):  Future[Result] = {
+
+    val loginEvent = for {
+      dupe <- cacheConnector.fetch[SubscriptionResponse](cacheId, SubscriptionResponse.key).recover { case _ => None } map {
+        case Some(x) => x.previouslySubmitted.contains(true)
+        case _ => false
+      }
+      //below to be called logic to decide if the Login Events Page should be displayed or not
+      redirectToEventPage <- hasIncompleteRedressScheme(amlsRegistrationNumber, accountTypeId, cacheId)
+    } yield (redirectToEventPage, dupe)
+
+    loginEvent.map {
+      case (true, false) => Redirect(controllers.routes.LoginEventController.get())
+      case (_, true) => Redirect(controllers.routes.StatusController.get(true))
+      case (_, false) => Redirect(controllers.routes.StatusController.get(false))
+    }
+  }
+
   def getWithoutAmendments(amlsRegistrationNumber: Option[String], credId: String, accountTypeId: (String, String))
                           (implicit request: Request[_]) = {
 
@@ -124,32 +200,6 @@ class LandingController @Inject()(val landingService: LandingService,
     }
   }
 
-  private def hasIncompleteResponsiblePeople(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)
-                                            (implicit headerCarrier: HeaderCarrier): Future[Boolean] = {
-
-    Logger.debug("[AMLSLandingController][hasIncompleteResponsiblePeople]: calling statusService.getDetailedStatus")
-    statusService.getDetailedStatus(amlsRegistrationNumber, accountTypeId, cacheId).flatMap {
-      case (SubmissionDecisionRejected |
-            SubmissionDecisionRevoked |
-            DeRegistered |
-            SubmissionDecisionExpired |
-            SubmissionWithdrawn, _) =>
-        Logger.debug("[AMLSLandingController][hasIncompleteResponsiblePeople]: status is negative, returning false")
-        Future.successful(false)
-      case _ =>
-        Logger.debug("[AMLSLandingController][hasIncompleteResponsiblePeople]: status is positive, will call the landingService.cachMap")
-        landingService.cacheMap(cacheId).map {
-          cache =>
-            Logger.debug("[AMLSLandingController][hasIncompleteResponsiblePeople]: checking cacheMap for InComplete ResponsiblePeople")
-            val hasIncompleteRps: Option[Boolean] = for {
-              rps <- cache.map(_.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key))
-            } yield ControllerHelper.hasIncompleteResponsiblePerson(rps)
-            Logger.debug(s"[AMLSLandingController][hasIncompleteResponsiblePeople]: Rps.isComplete = ${hasIncompleteRps.contains(true)}")
-            hasIncompleteRps.contains(true)
-        }
-    }
-  }
-
   private def preApplicationComplete(cache: CacheMap, amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)
                                     (implicit headerCarrier: HeaderCarrier): Future[Result] = {
 
@@ -165,8 +215,8 @@ class LandingController @Inject()(val landingService: LandingService,
           landingService.setAltCorrespondenceAddress(abt, cacheId) flatMap { _ =>
             Logger.debug(s"[AMLSLandingController][preApplicationComplete]: landingService.setAltCorrespondenceAddress returned")
             //below to be called logic to decide if the Login Events Page should be displayed or not (second place below)
-            val result: Future[Boolean] = Future.successful(false)
-            result.map {
+            val redirectToEventPage: Future[Boolean] = hasIncompleteRedressScheme(amlsRegistrationNumber, accountTypeId, cacheId)
+            redirectToEventPage.map {
               case true =>
                 Logger.debug(s"[AMLSLandingController][preApplicationComplete]: redirecting to LoginEvent")
                 Redirect(controllers.routes.LoginEventController.get())
@@ -187,38 +237,28 @@ class LandingController @Inject()(val landingService: LandingService,
     } getOrElse deleteAndRedirect()
   }
 
-  private def preFlightChecksAndRedirect(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)
-                                        (implicit headerCarrier: HeaderCarrier):  Future[Result] = {
+  private def hasIncompleteRedressScheme(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)
+                                            (implicit headerCarrier: HeaderCarrier): Future[Boolean] = {
 
-    val loginEvent = for {
-      dupe <- cacheConnector.fetch[SubscriptionResponse](cacheId, SubscriptionResponse.key).recover { case _ => None } map {
-        case Some(x) => x.previouslySubmitted.contains(true)
-        case _ => false
-      }
-      //below to be called logic to decide if the Login Events Page should be displayed or not
-      redirectToEventPage <- Future.successful(false)
-    } yield (redirectToEventPage, dupe)
-
-    loginEvent.map {
-      case (true, false) => Redirect(controllers.routes.LoginEventController.get())
-      case (_, true) => Redirect(controllers.routes.StatusController.get(true))
-      case (_, false) => Redirect(controllers.routes.StatusController.get(false))
-    }
-  }
-
-  private def refreshAndRedirect(amlsRegistrationNumber: String, maybeCacheMap: Option[CacheMap], credId: String, accountTypeId: (String, String))
-                                (implicit headerCarrier: HeaderCarrier): Future[Result] = {
-    maybeCacheMap match {
-      case Some(c) if c.getEntry[DataImport](DataImport.key).isDefined =>
-        Logger.debug("[AMLSLandingController][refreshAndRedirect]: dataImport is defined")
-        Future.successful(Redirect(controllers.routes.StatusController.get()))
-
+    Logger.debug("[AMLSLandingController][hasIncompleteRedressScheme]: calling statusService.getDetailedStatus")
+    statusService.getDetailedStatus(amlsRegistrationNumber, accountTypeId, cacheId).flatMap {
+      case (SubmissionDecisionRejected |
+            SubmissionDecisionRevoked |
+            DeRegistered |
+            SubmissionDecisionExpired |
+            SubmissionWithdrawn, _) =>
+        Logger.debug("[AMLSLandingController][hasIncompleteRedressScheme]: status is negative, returning false")
+        Future.successful(false)
       case _ =>
-        Logger.debug(s"[AMLSLandingController][refreshAndRedirect]: calling refreshCache with ${amlsRegistrationNumber}")
-        landingService.refreshCache(amlsRegistrationNumber, credId, accountTypeId) flatMap {
-          _ => {
-            preFlightChecksAndRedirect(Option(amlsRegistrationNumber), accountTypeId, credId)
-          }
+        Logger.debug("[AMLSLandingController][hasIncompleteRedressScheme]: status is positive, will call the landingService.cachMap")
+        landingService.cacheMap(cacheId).map {
+          cache =>
+            Logger.debug("[AMLSLandingController][hasIncompleteRedressScheme]: checking cacheMap for incomplete redress scheme")
+            val hasInvalidRedressScheme: Option[Boolean] = for {
+              eab <- cache.map(_.getEntry[EstateAgentBusiness](EstateAgentBusiness.key))
+            } yield ControllerHelper.hasInvalidRedressScheme(eab)
+            Logger.debug(s"[AMLSLandingController][hasIncompleteRedressScheme]: eab.isRedressInvalid = ${hasInvalidRedressScheme.contains(true)}")
+            hasInvalidRedressScheme.contains(true)
         }
     }
   }
@@ -268,46 +308,6 @@ class LandingController @Inject()(val landingService: LandingService,
         _.hasChanged
       }
     ).exists(identity)
-  }
-
-  def getWithAmendments(amlsRegistrationNumber: Option[String], credId: String, accountTypeId: (String, String))
-                       (implicit request: Request[_]) = {
-
-    amlsRegistrationNumber match {
-      case Some(mlrNumber) => landingService.cacheMap(credId) flatMap {
-        //enrolment exists
-        case Some(c) =>
-          Logger.debug("getWithAmendments:AMLSReference:" + amlsRegistrationNumber)
-          lazy val fixEmpties = for {
-            c1 <- fixEmptyRecords[TradingPremises](credId, c, TradingPremises.key)
-            c2 <- fixEmptyRecords[ResponsiblePerson](credId, c1, ResponsiblePerson.key)
-          } yield c2
-
-          //there is data in S4l
-          fixEmpties flatMap { cacheMap =>
-            if (dataHasChanged(cacheMap)) {
-              Logger.debug("Data has changed in getWithAmendments()")
-              cacheMap.getEntry[SubmissionRequestStatus](SubmissionRequestStatus.key) collect {
-                case SubmissionRequestStatus(true, _) => refreshAndRedirect(mlrNumber, Some(cacheMap), credId, accountTypeId)
-              } getOrElse landingService.setAltCorrespondenceAddress(mlrNumber, Some(cacheMap), accountTypeId, credId) flatMap { _=>
-                preFlightChecksAndRedirect(amlsRegistrationNumber, accountTypeId, credId)
-              }
-            } else {
-              Logger.debug("Data has not changed route in getWithAmendments()")
-              refreshAndRedirect(mlrNumber, Some(cacheMap), credId, accountTypeId)
-            }
-          }
-        case _ => {
-          Logger.debug("Data with amlsRegistration number route in getWithAmendments()" + amlsRegistrationNumber)
-          refreshAndRedirect(mlrNumber, None, credId, accountTypeId)
-        }
-      }
-
-      case _ => {
-        Logger.debug("No Enrolement exists getWithAmendments()")
-        getWithoutAmendments(amlsRegistrationNumber, credId, accountTypeId)
-      } //no enrolment exists
-    }
   }
 
   private def fixEmptyRecords[T](credId: String, cache: CacheMap, key: String)
