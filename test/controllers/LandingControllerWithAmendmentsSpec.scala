@@ -26,7 +26,7 @@ import models.businessactivities.BusinessActivities
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessdetails.BusinessDetails
 import models.businessmatching._
-import models.estateagentbusiness.EstateAgentBusiness
+import models.estateagentbusiness.{EstateAgentBusiness, OmbudsmanServices}
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal.Renewal
@@ -425,6 +425,31 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       }
     }
 
+    "redirect to login event page" when {
+      "redress scheme is invalid" in new FixtureNoAmlsNumber {
+
+        val eabOmbudsmanServices = EstateAgentBusiness(redressScheme = Some(OmbudsmanServices))
+        val cacheMap: CacheMap = mock[CacheMap]
+        val complete: BusinessMatching = mock[BusinessMatching]
+
+        when(complete.isComplete) thenReturn true
+        when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+        when(cacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(completeATB))
+        when(cacheMap.getEntry[EstateAgentBusiness](meq(EstateAgentBusiness.key))(any())).thenReturn(Some(eabOmbudsmanServices))
+        when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
+          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0)))))
+
+        when(controller.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(Some(cacheMap))
+        when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
+          .thenReturn(Future.successful(activeStatusGen.sample.get, None))
+
+        val result = controller.get()(request)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(controllers.routes.LoginEventController.get().url)
+      }
+    }
+
     "an enrolment exists and" when {
       "there is data in S4L and" when {
         "the Save 4 Later data does not contain any sections" when {
@@ -510,6 +535,35 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 verify(controller.landingService).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext])
               }
             }
+
+            "there is an invalid redress scheme" should {
+              "refresh from API5 and redirect to login events controller" in new Fixture {
+
+                val eabOther = EstateAgentBusiness(redressScheme = Some(models.estateagentbusiness.Other("Other")))
+
+                val testCacheMap = buildTestCacheMap(
+                  hasChanged = true,
+                  includesResponse = false,
+                  includeSubmissionStatus = true)
+
+                setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
+
+                when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any(), any()))
+                  .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
+
+                when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
+                  .thenReturn(Future.successful(NotCompleted, None))
+
+                when(testCacheMap.getEntry[EstateAgentBusiness](meq(EstateAgentBusiness.key))(any())).thenReturn(Some(eabOther))
+
+                val result = controller.get()(requestWithHeaders(("test-context" -> "ESCS")))
+
+                status(result) must be(SEE_OTHER)
+                redirectLocation(result) must be(Some(controllers.routes.LoginEventController.get().url))
+
+                verify(controller.landingService).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext])
+              }
+            }
           }
 
           "the user has not just submitted" when {
@@ -538,6 +592,37 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
                 status(result) must be(SEE_OTHER)
                 redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
+
+                verify(controller.landingService, never()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext])
+              }
+            }
+
+            "there is an invalid redress scheme" should {
+              "redirect to login events" in new Fixture {
+                val eabOmbudsmanServices = EstateAgentBusiness(redressScheme = Some(OmbudsmanServices))
+
+                val testCacheMap = buildTestCacheMap(
+                  hasChanged = true,
+                  includesResponse = false)
+
+                when {
+                  controller.landingService.setAltCorrespondenceAddress(any(), any(), any(), any())(any(), any())
+                } thenReturn Future.successful(testCacheMap)
+
+                setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
+
+                when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any(), any()))
+                  .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
+
+                when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
+                  .thenReturn(Future.successful(NotCompleted, None))
+
+                when(testCacheMap.getEntry[EstateAgentBusiness](meq(EstateAgentBusiness.key))(any())).thenReturn(Some(eabOmbudsmanServices))
+
+                val result = controller.get()(request)
+
+                status(result) must be(SEE_OTHER)
+                redirectLocation(result) must be(Some(controllers.routes.LoginEventController.get().url))
 
                 verify(controller.landingService, never()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext])
               }
@@ -643,7 +728,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
           when(businessMatching.isComplete) thenReturn true
           when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(businessMatching))
           when(cacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(completeATB))
-          when(cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(None)
+          when(cacheMap.getEntry[EstateAgentBusiness](meq(EstateAgentBusiness.key))(any())).thenReturn(None)
           when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
             .thenReturn(Future.successful(NotCompleted, None))
 
