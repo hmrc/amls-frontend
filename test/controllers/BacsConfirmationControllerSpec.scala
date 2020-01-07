@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -183,7 +183,6 @@ class BacsConfirmationControllerSpec extends AmlsSpec
 
         val doc = Jsoup.parse(contentAsString(result))
         doc.html() must include(Messages("confirmation.payment.renewal.info.hmrc_review"))
-        doc.html() must include(Messages("confirmation.payment.renewal.info.hmrc_review2"))
         doc.html() must include(Messages("confirmation.payment.renewal.info.hmrc_review3"))
         doc.html() must include(Messages("confirmation.payment.renewal.info.hmrc_review4"))
 

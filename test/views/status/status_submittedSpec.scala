@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,7 +88,6 @@ class status_submittedSpec extends AmlsSpec with MustMatchers with AmlsReference
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.2.listline2"))
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.2.listline3"))
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.3"))
-      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.4"))
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.5"))
 
       Option(doc.getElementById("submission-ready-pay-the-fee")) mustNot be(defined)
@@ -127,7 +126,6 @@ class status_submittedSpec extends AmlsSpec with MustMatchers with AmlsReference
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.2.listline2"))
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.2.listline3"))
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.3"))
-      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.4"))
       Option(doc.getElementsByClass("partial-deskpro-form").first()) mustNot be(defined)
       doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.5"))
 
