@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -330,7 +330,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
       localDateFutureRule.validate(Map(
         "day" -> Seq("1"),
         "month" -> Seq("1"),
-        "year" -> Seq("2020")
+        "year" -> Seq("2090")
       )) must be(Invalid(Seq(
         Path -> Seq(ValidationError("error.future.date"))
       )))
