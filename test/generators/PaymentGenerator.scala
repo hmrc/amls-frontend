@@ -46,7 +46,6 @@ trait PaymentGenerator extends BaseGenerator with AmlsReferenceNumberGenerator {
     amlsRefNo <- amlsRefNoGen
     safeId <- amlsRefNoGen
     ref <- paymentRefGen
-    desc <- alphaNumOfLengthGen(refLength)
     amountInPence <- numGen
     paymentStatus <- paymentStatusGen
   } yield Payment (
@@ -54,7 +53,6 @@ trait PaymentGenerator extends BaseGenerator with AmlsReferenceNumberGenerator {
     amlsRefNo,
     safeId,
     ref,
-    desc,
     amountInPence,
     paymentStatus,
     now
