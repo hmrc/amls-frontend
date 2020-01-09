@@ -39,6 +39,7 @@ case class Payment(
                     amlsRefNo: String,
                     safeId: String,
                     reference: String,
+                    description: Option[String],
                     amountInPence: Int,
                     status: PaymentStatus,
                     createdAt: LocalDateTime,
